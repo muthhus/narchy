@@ -169,30 +169,29 @@ public abstract class Param  {
     public static final boolean ACTION_CONCEPT_LINK_TRUTH = false;
 
 
-    /**
-     * global input activation multiplier, applied to both concepts and links
-     */
-    @NotNull public FloatParam activationRate = new FloatParam(1f, 0f, 2f);
 
-    @NotNull public FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 2f);
+    /** derivation confidence (by evidence) multiplier.  normal=1.0, <1.0= under-confident, >1.0=over-confident */
+    @NotNull public FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
+
+
 
 
     @NotNull
-    @Range(min = 0, max = 1f)
+    public final FloatParam truthResolution = new FloatParam(TRUTH_EPSILON, TRUTH_EPSILON, 1f);
+
+    /**
+     * truth confidence threshold necessary to form tasks
+     */
+    @NotNull
     public final FloatParam confMin = new FloatParam(0.01f, TRUTH_EPSILON, 1f);
 
-    @NotNull
-    @Range(min = 0, max = 1f)
-    public final FloatParam truthResolution = new FloatParam(TRUTH_EPSILON);
-
-
     /**
-     * budget quality threshold necessary to form a derived task.
+     * budget quality threshold necessary to form tasks
      */
     public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON, 0, 1f);
 
 
-    public float confidenceDefault(byte punctuation) {
+    @Deprecated public float confidenceDefault(byte punctuation) {
 
         switch (punctuation) {
             case BELIEF:

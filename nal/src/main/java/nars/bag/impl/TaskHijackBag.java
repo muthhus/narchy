@@ -16,7 +16,6 @@ import java.util.function.Consumer;
  */
 public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTable {
 
-    protected long lastCommitTime = Long.MIN_VALUE;
 
     public TaskHijackBag(int reprobes, BudgetMerge merge, Random random) {
         super(random, merge, reprobes);
@@ -73,8 +72,6 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        long now = n.time();
-        lastCommitTime = now;
         commit();
 
         Task inserted = put(t);

@@ -22,7 +22,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     public HijackTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity, Random r) {
         super(initialCapacity, r);
         this.historicCapacity = historicCapacity;
-        this.history = new TreeMap<Long, Task>();
+        this.history = new TreeMap<>();
     }
 
     @Override

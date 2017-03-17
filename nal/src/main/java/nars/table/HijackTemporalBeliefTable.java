@@ -50,16 +50,16 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(c);
     }
 
-    @Override
-    public float pri(@NotNull Task key) {
-        long dt = key.mid() - lastCommitTime;
-
-        float f = super.pri(key) * key.conf() * 1f / (1f + Math.abs(dt));
-        if (dt > 0)
-            f = or(f, 0.5f);
-
-        return f;
-    }
+//    @Override
+//    public float pri(@NotNull Task key) {
+//        long dt = key.mid() - lastCommitTime;
+//
+//        float f = super.pri(key) * key.conf() * 1f / (1f + Math.abs(dt));
+//        if (dt > 0)
+//            f = or(f, 0.5f);
+//
+//        return f;
+//    }
 
     //    public void capacity(int newCapacity, NAR nar) {
 //
@@ -114,18 +114,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    }
 
 
-    @Override
-    public boolean removeTask(Task x) {
-        return remove(x)!=null;
-    }
-
-
-    @Override
-    public Bag<Task, Task> commit() {
-        pressure= 0;
-        //nothing
-        return this;
-    }
 
     @Nullable
     @Override

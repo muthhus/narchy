@@ -839,13 +839,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 //        }
 //    }
 
-    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() -> {
-        return new ObjectFloatHashMap<>();
-    });
+    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() ->
+        new ObjectFloatHashMap<>()
+    );
 
     public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-        return new SpreadingActivation(input, c, this, activationRate.floatValue() * scale, acti.get());
+        return new SpreadingActivation(input, c, this,  scale, acti.get());
     }
 
 //    /**

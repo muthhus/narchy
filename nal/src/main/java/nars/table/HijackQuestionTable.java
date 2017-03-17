@@ -7,9 +7,7 @@ import nars.budget.BudgetMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Consumer;
 
 /**
  * Created by me on 2/16/17.

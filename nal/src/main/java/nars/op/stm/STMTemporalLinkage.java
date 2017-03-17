@@ -104,7 +104,6 @@ public final class STMTemporalLinkage extends STM {
 
         if (queued!=null) {
             nar.runLater(()-> {
-                float strength = nar.activationRate.floatValue();
                 float tPri = t.priSafe(0);
                 if (tPri > 0) {
                     for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
@@ -112,7 +111,7 @@ public final class STMTemporalLinkage extends STM {
                         /** current task's... */
                         Concept concept = t.concept(nar);
                         if (concept!=null)
-                            crossLink(concept, t, u, strength * or(tPri, u.priSafe(0)), nar);
+                            crossLink(concept, t, u, or(tPri, u.priSafe(0)), nar);
                     }
                 }
             });

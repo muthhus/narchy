@@ -50,11 +50,9 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         this.termlinkDepth = termlinkDepth;
 
-        Term srcTerm = src.term();
-
         this.spread = spread;
 
-        link(srcTerm, scale, 0);
+        link(src.term(), scale, 0);
 
         spread.forEachKeyValue(this);
 
@@ -75,7 +73,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case IMGe:
             case IMGi:
             case PROD:
-                return 2;
+                return 1;
 
             case INH:
             case SIM:
