@@ -146,12 +146,17 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
         @Override
         public void accept(NAR nar) {
             active.sample(batchSize, c -> {
-                premiser.newPremiseMatrix(c.get(),
-                        _tasklinks, _termlinks,
-                        ConceptBagControl.this, //input them within the current thread here
-                        nar
-                );
-                return true;
+                Concept c1 = c.get();
+                if (c1!=null) {
+                    premiser.newPremiseMatrix(c1,
+                            _tasklinks, _termlinks,
+                            ConceptBagControl.this, //input them within the current thread here
+                            nar
+                    );
+                    return true;
+                } else {
+                    return false;
+                }
             });
         }
 

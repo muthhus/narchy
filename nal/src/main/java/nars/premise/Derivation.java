@@ -161,12 +161,12 @@ public class Derivation extends Unify {
         if (belief == null) {
             beliefTruth = null;
         } else {
-            long start = task.start();
-            if ((start==ETERNAL) || (belief.isEternal())) {
+//            long start = task.start();
+//            if ((start==ETERNAL) || (belief.isEternal())) {
                 beliefTruth = belief.truth();
-            } else {
-                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
-            }
+//            } else {
+//                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
+//            }
         }
 
         this.beliefTruth = beliefTruth;

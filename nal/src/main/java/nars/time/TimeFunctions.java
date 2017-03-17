@@ -248,10 +248,10 @@ public interface TimeFunctions {
             //dont derive a past-tense goal (before the task)
             if (taskStart!=ETERNAL) {
 
-                long now = p.nar.time();
-                if (taskStart < now) {
-                    taskStart = now; //imminanentize the eschaton
-                }
+//                long now = p.nar.time();
+//                if (taskStart < now) {
+//                    taskStart = now; //imminanentize the eschaton
+//                }
 
                 if (taskStart > occReturn[0]) {
                     if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
