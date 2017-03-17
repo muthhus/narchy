@@ -62,7 +62,7 @@ public interface NARBuilder {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
                 Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.avgBlend, rng);
                 return f.apply(termlink, tasklink);
             }
 
@@ -179,8 +179,8 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.5f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;

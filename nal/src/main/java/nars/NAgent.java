@@ -11,6 +11,7 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
+import nars.table.EternalTable;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
 import nars.term.Compound;
@@ -105,7 +106,12 @@ abstract public class NAgent implements NSense, NAction {
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
                 (x) -> t(x, alpha())
-        );
+        ) {
+            @Override
+            public EternalTable newEternalTable(int eCap) {
+                return new EternalTable(1);
+            }
+        };
 
         curiosity = new FloatParam(nar.confMin.floatValue() * 2);
     }
@@ -322,8 +328,8 @@ abstract public class NAgent implements NSense, NAction {
 
                     quest((Compound) (action.term()), now),
 
-                    //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.5f), now, now)
-                    prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.5f), now, now)
+                    //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.01f), now, now)
+                    //prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.01f), now, now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -340,8 +346,8 @@ abstract public class NAgent implements NSense, NAction {
 //                    question(impl(happiness, -dur, conj(varQuery(1),action)), now),
 //                    question(impl(neg(happiness), -dur, conj(varQuery(1),action)), now)
 
-//                    question(impl(happiness, -dur, action), now),
-//                    question(impl(neg(happiness), -dur, action), now),
+                    question(impl(happiness, -dur, action), now),
+                    question(impl(neg(happiness), -dur, action), now)
 
 //                    question(impl(action, dur, happiness), now),
 //                    question(impl(neg(action), dur, happiness), now),

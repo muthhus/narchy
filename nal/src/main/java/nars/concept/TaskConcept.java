@@ -66,7 +66,7 @@ public class TaskConcept extends CompoundConcept {
     final QuestionTable questionsOrNew(@NotNull NAR nar) {
         return questions == null ? (questions =
                 //new ArrayQuestionTable(state.questionCap(true)))
-                new HijackQuestionTable(state.questionCap(true), 2, BudgetMerge.maxBlend, nar.random))
+                new HijackQuestionTable(state.questionCap(true), 2, BudgetMerge.avgBlend, nar.random))
                 : questions;
 
     }
@@ -75,7 +75,7 @@ public class TaskConcept extends CompoundConcept {
     final QuestionTable questsOrNew(@NotNull NAR nar) {
         return quests == null ? (quests =
                 //new ArrayQuestionTable(state.questionCap(false)))
-                new HijackQuestionTable(state.questionCap(true), 2, BudgetMerge.maxBlend, nar.random))
+                new HijackQuestionTable(state.questionCap(true), 2, BudgetMerge.avgBlend, nar.random))
                 : quests;
     }
 

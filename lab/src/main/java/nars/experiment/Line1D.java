@@ -36,7 +36,7 @@ public class Line1D {
 
             //n.setControl(new InteractiveFirer(n));
 
-            //n.log();
+            n.log();
 
             n.onTask(x -> {
                 if (x.isGoal() && !x.isInput()) {
@@ -44,7 +44,7 @@ public class Line1D {
                 }
             });
 
-            n.termVolumeMax.setValue(24);
+            n.termVolumeMax.setValue(14);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
@@ -52,7 +52,7 @@ public class Line1D {
             });
             return a;
 
-        }, 50, 15, -1);
+        }, 2, 1, -1);
 
     }
 

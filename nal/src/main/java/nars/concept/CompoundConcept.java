@@ -23,6 +23,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
+import static nars.budget.BudgetMerge.avgBlend;
 import static nars.budget.BudgetMerge.maxBlend;
 import static nars.budget.BudgetMerge.plusBlend;
 
@@ -129,7 +130,7 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, maxBlend), nar);
+        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, avgBlend), nar);
     }
 
     @Override

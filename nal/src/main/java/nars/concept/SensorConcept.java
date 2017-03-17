@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
+import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.table.SensorBeliefTable;
@@ -138,6 +139,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //        return this.desire;
 //    }
 
+    @Override
+    public EternalTable newEternalTable(int eCap) {
+        return EternalTable.EMPTY;
+    }
 
     public void setSignal(FloatSupplier signal) {
         this.signal = signal;

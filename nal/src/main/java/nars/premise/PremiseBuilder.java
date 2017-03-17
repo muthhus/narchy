@@ -103,7 +103,7 @@ abstract public class PremiseBuilder {
 
                             //Crosslink.crossLink(task, answered, answered.conf(), nar);
 
-                            nar.input(answered);
+                            //nar.input(answered);
 
 
 
@@ -176,19 +176,20 @@ abstract public class PremiseBuilder {
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
-                task.priSafe(0);
-                //taskLinkCopy.pri();
+                //task.priSafe(0);
+                taskLinkCopy.pri();
                 //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
-        float pri =
-                belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
+        float pri = taskPri;
+                //belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
+        pri*=priFactor;
         if (pri < priMin)
             return null;
 
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        return newPremise(c, task, beliefTerm, belief, pri * priFactor, qua, target, nar);
+        return newPremise(c, task, beliefTerm, belief, pri, qua, target, nar);
     }
 
     @Nullable abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);

@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.*;
+import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.task.Revision;
@@ -78,6 +79,11 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
         return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
+    }
+
+    @Override
+    public EternalTable newEternalTable(int eCap) {
+        return EternalTable.EMPTY;
     }
 
     @Override
