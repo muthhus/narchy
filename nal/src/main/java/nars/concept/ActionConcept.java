@@ -207,9 +207,6 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         feedback = new ScalarSignal(n, term, this, (x) ->
             t(x, feedbackConf)
         );
-        feedback.pri(
-            () -> n.priorityDefault(Op.BELIEF)
-        );
     }
 
 

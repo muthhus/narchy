@@ -72,22 +72,24 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        commit();
+        update(new Forget(t.pri()*t.qua()));
 
         Task inserted = put(t);
+
+        //commit();
+
         if (inserted!=null) {
             //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
             if (inserted == t) {
                 return t;
             } else if (inserted.equals(t)) {
-                //merged budget
+                //merged budget with an existing but unique instance
                 return inserted.isInput() ? inserted : null; //ignore duplicate derivations
             }
         }
 
         //failed insert
         return null;
-
     }
 
 

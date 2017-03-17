@@ -17,7 +17,7 @@ import java.util.function.IntSupplier;
 /**
  * Created by me on 9/30/16.
  */
-public interface NAction {
+public interface NAct {
 
     @NotNull Collection<ActionConcept> actions();
 

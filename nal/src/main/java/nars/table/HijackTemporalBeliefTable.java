@@ -41,7 +41,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     public HijackTemporalBeliefTable(int initialCapacity, Random random) {
-        super(4 /* reprobes */, BudgetMerge.maxBlend, random);
+        super(5 /* reprobes */, BudgetMerge.maxBlend, random);
         setCapacity(initialCapacity);
     }
 

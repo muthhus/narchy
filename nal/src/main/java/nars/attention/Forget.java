@@ -38,14 +38,7 @@ public class Forget<X extends Budget> implements Consumer<X> {
 
     @Override
     public void accept(@NotNull X b) {
-        float p = b.priSafe(-1);
-        if (p > 0) {
-            b.setPriority(gain * p * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
-
-            //else
-                //bLink.delete();
-            //bLink.setPriority(p - (r * (1f - q * maxEffectiveQuality)));
-        }
+        b.priMult(gain * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
     }
 
 }

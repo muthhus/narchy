@@ -1423,6 +1423,37 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
     }
 
+    public final void input(@NotNull Stream<Task> taskStream, float priNormalized) {
+        if (priNormalized < Param.BUDGET_EPSILON)
+            return;
+
+        List<Task> t = $.newArrayList(256);
+        float priTotal = 0;
+        Iterator<Task> xx = taskStream.iterator();
+        while (xx.hasNext()) {
+            Task x = xx.next();
+            if (x == null)
+                continue;
+
+            float p = x.pri();
+            if (p != p)
+                continue; //ignore deleted
+
+            t.add(x);
+            priTotal += p;
+        }
+        if (t.isEmpty())
+            return;
+
+        float scale = priNormalized / priTotal;
+
+        for (Task x : t) {
+            x.budget().priMult(scale);
+            input(x);
+        }
+
+    }
+
 
     @Override
     public final boolean equals(Object obj) {

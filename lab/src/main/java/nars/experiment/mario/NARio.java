@@ -2,26 +2,28 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.*;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
-import nars.task.ImmutableTask;
-import nars.term.Compound;
+import nars.video.CameraSensor;
 import nars.video.PixelBag;
 
 import javax.swing.*;
 
 import static nars.$.$;
 import static nars.$.t;
-import static nars.Op.IMPL;
-import static nars.time.Tense.ETERNAL;
 
 public class NARio extends NAgentX {
 
     private final MarioComponent mario;
+
+    public final FloatParam eyesOpen;
+
     private SensorConcept vx;
 
-    public NARio(NAR nar) {
+    public NARio(NAR nar) throws Narsese.NarseseException {
         super("nario", nar);
 
         //Param.ANSWER_REPORTING = false;
@@ -48,87 +50,86 @@ public class NARio extends NAgentX {
         mario.start();
 
 
-        try {
-            PixelBag cc = PixelBag.of(() -> mario.image, 40, 40);
-            cc.setClarity(0.5f, 1f);
-            nar.onCycle(() -> {
+        PixelBag cc = PixelBag.of(() -> mario.image, 40, 40);
+        cc.setClarity(0.5f, 1f);
+        nar.onCycle(() -> {
 
-                Scene scene1 = mario.scene;
+            Scene scene1 = mario.scene;
 
-                if (scene1 instanceof LevelScene) {
-                    LevelScene scene = (LevelScene) scene1;
-                    float xCam = scene.xCam;
-                    float yCam = scene.yCam;
-                    Mario M = ((LevelScene) this.mario.scene).mario;
-                    float x = (-160 + M.x - xCam) / 320f;
-                    float y = (-120 + M.y - yCam) / 240f;
-                    cc.setXRelative(x);
-                    cc.setYRelative(y);
-                    cc.setZoom(0.05f);
-                }
-                //cc.setXRelative( mario.)
-            });
+            if (scene1 instanceof LevelScene) {
+                LevelScene scene = (LevelScene) scene1;
+                float xCam = scene.xCam;
+                float yCam = scene.yCam;
+                Mario M = ((LevelScene) this.mario.scene).mario;
+                float x = (-160 + M.x - xCam) / 320f;
+                float y = (-120 + M.y - yCam) / 240f;
+                cc.setXRelative(x);
+                cc.setYRelative(y);
+                cc.setZoom(0.05f);
+            }
+            //cc.setXRelative( mario.)
+        });
 
-            senseCamera("nario", cc, (v) -> t(v, alpha())).setResolution(0.02f).pri(2f);
+        CameraSensor<PixelBag> sc = senseCamera("nario", cc, (v) -> t(v, alpha()));
+        sc.setResolution(0.02f);
+        sc.priTotal(4f);
+        this.eyesOpen = sc.totalPriority;
 
-            //new CameraGasNet($.the("camF"), cc, this, 64);
+        //new CameraGasNet($.the("camF"), cc, this, 64);
 
-            //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
-
-
-            vx = senseNumberDifference($("vx(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
-            senseNumberDifference($("vy(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
-
-            actionTriState($("x(nario)"), i -> {
-                boolean n, p;
-                switch (i) {
-                    case -1:
-                        p = false;
-                        n = true;
-                        break;
-                    case +1:
-                        p = true;
-                        n = false;
-                        break;
-                    case 0:
-                        p = false;
-                        n = false;
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-                mario.scene.toggleKey(Mario.KEY_LEFT, n);
-                mario.scene.toggleKey(Mario.KEY_RIGHT, p);
-            });
-            actionTriState($("y(nario)"), i -> {
-                boolean n, p;
-                switch (i) {
-                    case -1:
-                        p = false;
-                        n = true;
-                        break;
-                    case +1:
-                        p = true;
-                        n = false;
-                        break;
-                    case 0:
-                        p = false;
-                        n = false;
-                        break;
-                    default:
-                        throw new RuntimeException();
-                }
-                mario.scene.toggleKey(Mario.KEY_DOWN, n);
-                mario.scene.toggleKey(Mario.KEY_UP, p);
-                mario.scene.toggleKey(Mario.KEY_JUMP, p);
-            });
+        //senseCameraRetina("camZ", ()->mario.image, 30, 18, (v) -> t(v, alpha)).setResolution(0.1f);
 
 
-            actionToggle($("speed(nario)"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+        vx = senseNumberDifference($("vx(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
+        senseNumberDifference($("vy(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
 
-        } catch (Narsese.NarseseException e) {
-            e.printStackTrace();
-        }
+        actionTriState($("x(nario)"), i -> {
+            boolean n, p;
+            switch (i) {
+                case -1:
+                    p = false;
+                    n = true;
+                    break;
+                case +1:
+                    p = true;
+                    n = false;
+                    break;
+                case 0:
+                    p = false;
+                    n = false;
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+            mario.scene.toggleKey(Mario.KEY_LEFT, n);
+            mario.scene.toggleKey(Mario.KEY_RIGHT, p);
+        });
+        actionTriState($("y(nario)"), i -> {
+            boolean n, p;
+            switch (i) {
+                case -1:
+                    p = false;
+                    n = true;
+                    break;
+                case +1:
+                    p = true;
+                    n = false;
+                    break;
+                case 0:
+                    p = false;
+                    n = false;
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+            mario.scene.toggleKey(Mario.KEY_DOWN, n);
+            mario.scene.toggleKey(Mario.KEY_UP, p);
+            mario.scene.toggleKey(Mario.KEY_JUMP, p);
+        });
+
+
+        actionToggle($("speed(nario)"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+
 
 //        frame.addKeyListener(mario);
 //        frame.addFocusListener(mario);
@@ -163,7 +164,12 @@ public class NARio extends NAgentX {
 
         NAR nar = runRT((NAR n) -> {
 
-            NAgentX x = new NARio(n);
+            NAgentX x = null;
+            try {
+                x = new NARio(n);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+            }
 
             //n.termVolumeMax.setValue(60);
 

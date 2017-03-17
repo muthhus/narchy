@@ -1,5 +1,6 @@
 package nars.video;
 
+import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
@@ -12,6 +13,7 @@ import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -19,21 +21,32 @@ import java.util.function.Consumer;
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
-public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR> {
-
+public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR>, Iterable<SensorConcept> {
 
     private final NAR nar;
     private final NAgent agent;
 
     private static final int radix = 4;
     private final List<SensorConcept> pixels;
+    private final float sqrtNumPixels;
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
+
+    final int numPixels;
+
+    /** total priority to be shared (in proportion to sqrt # pixels, in order to represent an area -> priority relationship ) */
+    public final FloatParam totalPriority = new FloatParam(1f, 0f, 64f);
+
+    private FloatSupplier pixelPriority;
 
     public CameraSensor(Atomic root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
 
         this.nar = agent.nar;
         this.agent = agent;
+
+        numPixels = src.width() * src.height();
+        sqrtNumPixels = (float)Math.sqrt(numPixels);
+        pixelPriority = () -> totalPriority.floatValue() / sqrtNumPixels;
 
         pixels = encode((x, y) ->
                         $.func(root,
@@ -46,17 +59,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 , brightnessToTruth);
 
 
-        agent.sensors.addAll(
-                pixels);
-
         agent.nar.onCycle(this);
     }
 
-    public void pri(float totalPri) {
-        float pixelPriority = totalPri / pixels.size();
-        pixels.forEach(p -> {
-            p.pri(pixelPriority);
-        });
+    @NotNull
+    @Override
+    public Iterator<SensorConcept> iterator() {
+        return pixels.iterator();
+    }
+
+    public void priTotal(float totalPri) {
+        totalPriority.setValue(totalPri);
     }
 
     @NotNull
@@ -81,15 +94,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                float dx = Math.abs(x - width/2f);
 //                float dy = Math.abs(y - height/2f);
 //                float cdist = (float) (Math.sqrt( dx*dx + dy*dy )-1) / (Math.max(width,height)/2f);
-                SensorConcept sss;
+                SensorConcept sss = new SensorConcept(cell, nar,
+                    brightness,
+                    brightnessToTruth
+                );
+                sss.resolution(
+                    //distToResolution(cdist)
+                    resolution
+                );
+                sss.pri(pixelPriority);
 
-                l.add(sss = new SensorConcept(cell, nar,
-                        brightness,
-                        brightnessToTruth
-                ).resolution(
-                        //distToResolution(cdist)
-                        resolution
-                ));
+                l.add(sss);
 
                 matrix[x][y] = sss;
             }

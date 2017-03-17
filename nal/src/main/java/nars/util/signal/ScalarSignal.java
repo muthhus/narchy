@@ -58,18 +58,14 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
     @Nullable public SignalTask current;
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, FloatToObjectFunction<Truth> truthFloatFunction) {
-        this(n, t, value, truthFloatFunction, n.priorityDefault(Op.BELIEF));
-    }
-
-    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, float pri) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction) {
 
         this.term = t.term();
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
 
-        pri(pri);
+        pri(1);
 
         this.lastInputTime = n.time() - 1;
 

@@ -55,8 +55,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         this.signal = signal;
         this.beliefs = new SensorBeliefTable();
-
-        pri(() -> n.priorityDefault(BELIEF));
     }
 
     @Override
@@ -164,7 +162,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         sensor.pri(v);
     }
 
-    @Deprecated @NotNull public SensorConcept pri(float v) {
+    @NotNull public SensorConcept pri(float v) {
         sensor.pri(v);
         return this;
     }

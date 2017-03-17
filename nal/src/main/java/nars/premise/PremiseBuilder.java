@@ -167,7 +167,7 @@ abstract public class PremiseBuilder {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
 
-        float tq = taskLinkCopy.qua();
+        float tq = task.qua();
 
         float bq = (beliefBudget != null) ? beliefBudget.qua() : Float.NaN;
         float qua = belief == null ? tq : aveAri(tq, bq);
@@ -176,8 +176,8 @@ abstract public class PremiseBuilder {
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
-                //task.priSafe(0);
-                taskLinkCopy.pri();
+                task.priSafe(0);
+                //taskLinkCopy.pri();
                 //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         float pri = taskPri;

@@ -246,7 +246,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //                return null;
 
         //project if different occurrence
-        if (answer.start() != when) {
+        long answerStart = answer.start();
+        if (answerStart!=ETERNAL && answerStart != when) {
             Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
             if (aProj == null)
                 return null;

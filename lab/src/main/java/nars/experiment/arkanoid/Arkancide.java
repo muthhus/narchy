@@ -4,17 +4,9 @@ package nars.experiment.arkanoid;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.Default;
 import nars.task.DerivedTask;
-import nars.time.RealTime;
 import nars.video.*;
 
-import java.io.File;
-import java.io.IOException;
-
-import static java.lang.Runtime.getRuntime;
 import static nars.Op.*;
 
 public class Arkancide extends NAgentX {
@@ -137,7 +129,7 @@ public class Arkancide extends NAgentX {
 
         if (cam) {
             CameraSensor cc = senseCamera("noid", noid, visW, visH);
-            cc.pri(2f);
+            cc.priTotal(2f);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
