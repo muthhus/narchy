@@ -56,8 +56,8 @@ public interface NARBuilder {
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
-                new DefaultConceptState("sleep", 24, 24, 6, 16, 8),
-                new DefaultConceptState("awake", 28, 28, 6, 48, 32)
+                new DefaultConceptState("sleep", 16, 16, 6, 16, 8),
+                new DefaultConceptState("awake", 16, 16, 6, 32, 24)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
@@ -77,7 +77,7 @@ public interface NARBuilder {
         int maxConcepts = 192 * 1024;
 
         Default nar = new Default(3 * 1024,
-                1, 1, 4, rng,
+                1, 2, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -179,8 +179,8 @@ public interface NARBuilder {
 
         };
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.5f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
@@ -190,8 +190,8 @@ public interface NARBuilder {
 
         //nar.stmLinkage.capacity.set(0);
         nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(16);
-        nar.core.derivationsInputPerCycle.setValue(96);
+        nar.core.conceptsFiredPerBatch.setValue(4);
+        nar.core.derivationsInputPerCycle.setValue(256);
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
@@ -200,14 +200,14 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 6, true, 12);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 8);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 6, true, 6);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 3);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.1f, 8);
+        new Inperience(nar, 0.02f, 8);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

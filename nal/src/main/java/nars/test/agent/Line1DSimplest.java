@@ -29,9 +29,9 @@ public class Line1DSimplest extends NAgent {
     public Line1DSimplest(NAR n) {
         super("L", n);
 
-        in = senseNumber( $.inh($.p(id), $.the("i")), this.i);
+        in = senseNumber( $.func("i", id), this.i);
 
-        out = action( $.inh($.p(id), $.the("o")), (b, d) -> {
+        out = action( $.func("o", id), (b, d) -> {
 
             if (d != null) {
                 float f = d.freq();

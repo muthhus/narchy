@@ -40,10 +40,10 @@ public class Tetris extends NAgentX {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 2;
+    public static final int TIME_PER_FALL = 1;
     public static final int PIXEL_RADIX = 2;
     static final float DUR = 0.15f;
-    int frameTimeMS = 100;
+    int frameTimeMS = 50;
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -480,10 +480,10 @@ public class Tetris extends NAgentX {
 //        }
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
         //Param.HORIZON = 1/100f;
 
-        Time clock = new RealTime.DSHalf().durSeconds(DUR);
+        Time clock = new RealTime.DSHalf(true).durSeconds(DUR);
         NAR n =
                 NARBuilder.newMultiThreadNAR(3, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -631,16 +631,17 @@ public class Tetris extends NAgentX {
 
 
         Tetris a = new MyTetris(n);
+        a.trace = true;
 
 
             Default m = new Default(512, 16, 2, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
-                    new RealTime.DSHalf().durSeconds(1f));
+                    new RealTime.DSHalf().durSeconds(0.1f));
 
             float metaLearningRate = 0.5f;
             m.confMin.setValue(0.01f);
             m.goalConfidence(metaLearningRate);
-            m.termVolumeMax.setValue(24);
+            m.termVolumeMax.setValue(18);
         MetaAgent metaT = new MetaAgent(a
                 ,m
 

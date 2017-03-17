@@ -1076,20 +1076,22 @@ public enum Util { ;
 
     public static double[] variance(DoubleStream s) {
         DoubleArrayList dd = new DoubleArrayList();
-        double average = s.peek(dd::add).average().orElse(Float.NaN);
-        if (average!=average)
+        s.forEach(dd::add);
+        if (dd.isEmpty())
             return null;
+
+        double avg = dd.average();
 
         double variance = 0.0;
         int n = dd.size();
         for (int i = 0; i < n; i++) {
             double p = dd.get(i);
-            double d = p - average;
+            double d = p - avg;
             variance += d * d;
         }
         variance /= n;
 
-        return new double[] { average, variance };
+        return new double[] { avg, variance };
     }
 
     public static String className(Object p) {

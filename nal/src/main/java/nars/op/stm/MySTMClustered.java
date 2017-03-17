@@ -143,9 +143,10 @@ public class MySTMClustered extends STMClustered {
 
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
-                    double[] tc = n.coherence(0);
+                    double[] ts = n.coherence(0);
+                    double[] te = n.coherence(1);
 
-                    if (tc != null && (maxGroupSize == 2 || tc[1] >= timeCoherenceThresh)) {
+                    if (ts != null && (maxGroupSize == 2 || (ts[1] >= timeCoherenceThresh && te[1] >= timeCoherenceThresh))) {
                         double[] fc = n.coherence(2);
                         if (fc != null && fc[1] >= freqCoherenceThresh) {
                             double[] cc = n.coherence(3);
@@ -159,7 +160,7 @@ public class MySTMClustered extends STMClustered {
                 })
                 .limit(limit)
                 .filter(Objects::nonNull)
-                .map(n -> PrimitiveTuples.pair(n, n.coherence(1)[0]))
+                .map(n -> PrimitiveTuples.pair(n, n.coherence(2)[0]))
                 .forEach(nodeFreq -> {
 
                     TasksNode node = nodeFreq.getOne();
@@ -180,17 +181,23 @@ public class MySTMClustered extends STMClustered {
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
                         //get only the maximum confidence task for each term
+                        final long[] start = {Long.MAX_VALUE};
+                        final long[] end = {Long.MIN_VALUE};
                         Map<Term, Task> vv = new HashMap(tt.size());
                         tt.forEach(_z -> {
                             Task z = _z.get();
                             //if (z != null) {
+                            long zs = z.start();
+                            long ze = z.end();
+                            if (start[0] > zs) start[0] = zs;
+                            if (end[0] > ze) end[0] = ze;
+
                             vv.merge(z.term(), z, (prevZ, newZ) -> {
                                 if (prevZ == null || newZ.conf() > prevZ.conf())
                                     return newZ;
                                 else
                                     return prevZ;
                             });
-                            //}
                         });
 
                         Collection<Task> uu = vv.values();
@@ -211,8 +218,6 @@ public class MySTMClustered extends STMClustered {
                         if (conj.volume() > maxVol)
                             return; //throw new RuntimeException("exceeded max volume");
 
-
-
                         @Nullable double[] nc = node.coherence(0);
                         if (nc == null)
                             return;
@@ -221,7 +226,7 @@ public class MySTMClustered extends STMClustered {
 
 
                         Task m = new GeneratedTask(conj, punc,
-                                $.t(finalFreq, conf), now, now, t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                                $.t(finalFreq, conf), start[0], end[0], t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                         m.setBudget(BudgetFunctions.fund(uu, 1f / uu.size()));
                         m.log("STMCluster CoOccurr");

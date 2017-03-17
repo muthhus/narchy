@@ -1,5 +1,7 @@
 package nars.table;
 
+import jcog.bag.Bag;
+import jcog.bag.impl.HijackBag;
 import jcog.list.FasterList;
 import jcog.list.MultiRWFasterList;
 import jcog.list.Top2;
@@ -29,6 +31,7 @@ import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -49,7 +52,13 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Override
     public float pri(@NotNull Task key) {
-        return super.pri(key) * (1f / (1f + Math.abs(key.mid() - lastCommitTime)));
+        long dt = key.mid() - lastCommitTime;
+
+        float f = super.pri(key) * key.conf() * 1f / (1f + Math.abs(dt));
+        if (dt > 0)
+            f = or(f, 0.5f);
+
+        return f;
     }
 
     //    public void capacity(int newCapacity, NAR nar) {
@@ -111,6 +120,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
+    @Override
+    public Bag<Task, Task> commit() {
+        pressure= 0;
+        //nothing
+        return this;
+    }
 
     @Nullable
     @Override

@@ -36,7 +36,7 @@ public class Line1D {
 
             //n.setControl(new InteractiveFirer(n));
 
-            n.log();
+            //n.log();
 
             n.onTask(x -> {
                 if (x.isGoal() && !x.isInput()) {
@@ -44,15 +44,15 @@ public class Line1D {
                 }
             });
 
-            n.termVolumeMax.setValue(16);
+            n.termVolumeMax.setValue(24);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
-                a.i.setValue( 0.5f * (Math.sin(n.time()/10f) + 1f) );
+                a.i.setValue( 0.5f * (Math.sin(n.time()/150f) + 1f) );
             });
             return a;
 
-        }, 10, 1, -1);
+        }, 50, 15, -1);
 
     }
 

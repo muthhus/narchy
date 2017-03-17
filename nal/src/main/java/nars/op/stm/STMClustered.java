@@ -139,7 +139,7 @@ public abstract class STMClustered extends STM {
 
 
         /**
-         * 1f - variance measured from the items for a given vector dimension
+         * inverse of variance measured from the items for a given vector dimension
          */
         @Nullable
         public double[] coherence(int dim) {
@@ -149,7 +149,7 @@ public abstract class STMClustered extends STM {
             if (v==null)
                 return noCoherence;
 
-            v[1] = 1f - v[1]; //convert variance to coherence
+            v[1] = 1f / (1f + Math.sqrt(v[1])); //convert variance to coherence
             return v;
         }
 

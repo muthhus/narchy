@@ -88,7 +88,6 @@ public class TruthWave {
         }
         this.start = (long) start;
         this.end = (long) end;
-
         this.current = b.truth(now, dur);
     }
 

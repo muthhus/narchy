@@ -34,7 +34,7 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     @Override
     public float pri(@NotNull Task key) {
-        return key.pri();
+        return key.priSafe(0);
     }
 
     @NotNull

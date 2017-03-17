@@ -170,7 +170,13 @@ abstract public class NAgent implements NSense, NAction {
     private void cycle() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-        this.now = nar.time();
+        long lastNow = this.now;
+        long now = nar.time();
+        if (now - lastNow < nar.time.dur()) {
+            return; //only execute at most one agent frame per duration
+        }
+
+        this.now = now;
 
 
         float r = rewardValue = act();
@@ -314,7 +320,10 @@ abstract public class NAgent implements NSense, NAction {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()), now)
+                    quest((Compound) (action.term()), now),
+
+                    //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.5f), now, now)
+                    prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.5f), now, now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),

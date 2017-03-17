@@ -207,16 +207,16 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-    @Override
-    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        //return super.processBelief(belief, nar);
-        if (belief instanceof SignalTask) {
-            return super.processBelief(belief, nar);
-        }
-
-        return null; //reject non-feedback generated beliefs
-
-    }
+//    @Override
+//    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
+//        //return super.processBelief(belief, nar);
+//        if (belief instanceof SignalTask) {
+//            return super.processBelief(belief, nar);
+//        }
+//
+//        return null; //reject non-feedback generated beliefs
+//
+//    }
 
     @Override
     public final float floatValueOf(Term anObject) {
