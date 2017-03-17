@@ -82,7 +82,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         FloatParam off = opFactor(conclusion);
         p *= off.floatValue();
 
-        p *= q; //further discount priority
+        //p *= q; //further discount priority
 
         return $.b(p, q);
     }

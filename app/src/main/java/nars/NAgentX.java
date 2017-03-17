@@ -227,7 +227,7 @@ abstract public class NAgentX extends NAgent {
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
-    protected Sensor2D senseCamera(String id, Container w, int pw, int ph) {
+    protected CameraSensor senseCamera(String id, Container w, int pw, int ph) {
         return senseCamera(id, w, pw, ph, (v) -> t(v, alpha()));
     }
 
@@ -235,7 +235,7 @@ abstract public class NAgentX extends NAgent {
         return senseCamera(id, new Scale(w, pw, ph), pixelTruth);
     }
 
-    protected Sensor2D<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
         return senseCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 

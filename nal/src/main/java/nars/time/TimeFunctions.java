@@ -221,9 +221,11 @@ public interface TimeFunctions {
      * copiesthe 'dt' and the occurence of the task term directly
      */
     TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-            dtExact(derived, occReturn, p, true);
+            dtExact(derived, occReturn, p, true, +1);
     TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
-            dtExact(derived, occReturn, p, false);
+            dtExact(derived, occReturn, p, false, +1);
+    TimeFunctions dtBeliefReverse = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, long[] occReturn, float[] confScale) ->
+            dtExact(derived, occReturn, p, false, -1);
 
 
     /**
@@ -306,6 +308,7 @@ public interface TimeFunctions {
             throw new InvalidTermException(derived.op(), derived.terms(), "ellipsis commutive match fault: same as parent");
         }
 
+        Task belief = p.belief;
         if (taskSize <= 2) { //conjunction of 1 can not occur actually, but for completeness use the <=
             //a decomposition of this will result in a complete subterm (half) of the input.
             //if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
@@ -329,18 +332,22 @@ public interface TimeFunctions {
                 if (!task.isEternal()) {
                     occReturn[0] = task.start() + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
-                } else if (p.belief != null && !p.belief.isEternal()) {
+                } else if (belief != null && !belief.isEternal()) {
                     int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p,p.beliefTerm));
                     if (timeOfBeliefInTask==DTERNAL)
                         timeOfBeliefInTask = 0;
-                    long taskOcc = p.belief.start() - timeOfBeliefInTask;
+                    long taskOcc = belief.start() - timeOfBeliefInTask;
                     occReturn[0] = taskOcc + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
                 } else {
                     //both eternal - no temporal basis
                     return null;
                 }
+            } else {
+                //TODO offset dt could not be determined; this may occurr in tasks/derivations which consist entirely of variables
+                return null;
             }
+
         } else {
 
             //3 or more
@@ -349,10 +356,10 @@ public interface TimeFunctions {
 
                 if (!task.isEternal()) {
                     occReturn[0] = task.start();
-                } else if ((p.belief != null && !p.belief.isEternal())) {
+                } else if ((belief != null && !belief.isEternal())) {
                     Term resolvedTaskTerm = resolve(p, taskTerm);
                     int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(p.beliefTerm);
-                    occReturn[0] = p.belief.start() - timeOfBeliefInTask;
+                    occReturn[0] = belief.start() - timeOfBeliefInTask;
                 } else {
                     return null;
                 }
@@ -360,6 +367,9 @@ public interface TimeFunctions {
                 occReturn[1] = occReturn[0] + derived.dtRange();
 
                 derived = deriveDT(derived, +0, dt, occReturn);
+            } else {
+                //TODO this should not happen
+                return null;
             }
         }
 
@@ -534,7 +544,7 @@ public interface TimeFunctions {
 
 
     @NotNull
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull Derivation p, boolean taskOrBelief) {
+    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull Derivation p, boolean taskOrBelief, int polarity) {
 
         Term dtTerm = taskOrBelief ? p.taskTerm.unneg() : p.beliefTerm;
 
@@ -573,7 +583,7 @@ public interface TimeFunctions {
 
 
         int dtdt = ((Compound) dtTerm).dt();
-        return deriveDT(derived, +1, dtdt, occReturn);
+        return deriveDT(derived, polarity, dtdt, occReturn);
 
     }
 

@@ -686,7 +686,9 @@ public class PremiseRule extends GenericCompound {
                         case "dtBeliefExact":
                             timeFunction = TimeFunctions.dtBeliefExact;
                             break;
-
+                        case "dtBeliefReverse":
+                            timeFunction = TimeFunctions.dtBeliefExact;
+                            break;
 //                        case "dtTask":
 //                            timeFunction = TimeFunctions.dtTask;
 //                            break;

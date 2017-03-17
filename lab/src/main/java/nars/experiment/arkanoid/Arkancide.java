@@ -7,11 +7,9 @@ import nars.concept.ActionConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
+import nars.task.DerivedTask;
 import nars.time.RealTime;
-import nars.video.CameraGasNet;
-import nars.video.PixelBag;
-import nars.video.Scale;
-import nars.video.SwingCamera;
+import nars.video.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -126,13 +124,21 @@ public class Arkancide extends NAgentX {
             }
         };
 
+        Param.DEBUG = true;
+        nar.onTask(t -> {
+            if (t instanceof DerivedTask && t.isEternal())
+                System.err.println(t.proof());
+        });
+
         maxPaddleSpeed = 15 * Arkanoid.BALL_VELOCITY;
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
-            senseCamera("noid", noid, visW, visH);
+            CameraSensor cc = senseCamera("noid", noid, visW, visH);
+            cc.pri(2f);
+
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         } else {

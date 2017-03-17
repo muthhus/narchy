@@ -36,7 +36,7 @@ public class Line1D {
 
             //n.setControl(new InteractiveFirer(n));
 
-            n.log();
+            //n.log();
 
             n.onTask(x -> {
                 if (x.isGoal() && !x.isInput()) {
@@ -52,7 +52,7 @@ public class Line1D {
             });
             return a;
 
-        }, 2, 1, -1);
+        }, 32, 1, -1);
 
     }
 

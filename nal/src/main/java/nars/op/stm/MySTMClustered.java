@@ -184,13 +184,14 @@ public class MySTMClustered extends STMClustered {
                         final long[] start = {Long.MAX_VALUE};
                         final long[] end = {Long.MIN_VALUE};
                         Map<Term, Task> vv = new HashMap(tt.size());
+
                         tt.forEach(_z -> {
                             Task z = _z.get();
                             //if (z != null) {
                             long zs = z.start();
                             long ze = z.end();
                             if (start[0] > zs) start[0] = zs;
-                            if (end[0] > ze) end[0] = ze;
+                            if (end[0] < ze) end[0] = ze;
 
                             vv.merge(z.term(), z, (prevZ, newZ) -> {
                                 if (prevZ == null || newZ.conf() > prevZ.conf())
@@ -200,9 +201,10 @@ public class MySTMClustered extends STMClustered {
                             });
                         });
 
-                        Collection<Task> uu = vv.values();
-                        if (uu.size() < 2)
+                        if (vv.size() < 2)
                             return;
+
+                        Collection<Task> uu = vv.values();
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function

@@ -33,6 +33,7 @@ import java.util.function.Consumer;
 import static nars.$.the;
 import static nars.Op.*;
 import static nars.bag.impl.CurveBag.power2BagCurve;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Internal Experience (NAL9)
@@ -192,11 +193,19 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 
                 long now = nar.time();
 
+                long start = task.start();
+                long end;
+                if (start == ETERNAL)
+                    end = start = now;
+                else {
+                    end = task.end();
+                }
+
                 ImmutableTask e = new ImmutableTask(
                         r,
                         BELIEF,
                         $.t(1, nar.confidenceDefault(BELIEF)),
-                        now, task.start(), task.end(),
+                        now, start, end,
                         task.stamp()
                 );
                 e.log("Inperience");

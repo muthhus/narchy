@@ -2,7 +2,6 @@ package nars.table;
 
 import jcog.data.sorted.SortedArray;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.budget.BudgetMerge;
 import nars.concept.TaskConcept;
@@ -152,20 +151,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //        return 0;
 //    }
 
-    @Deprecated static void removeTask(@NotNull Task t, @Nullable String reason) {
+    @Deprecated
+    static void removeTask(@NotNull Task t, @Nullable String reason) {
 //        if (reason!=null && Param.DEBUG && t instanceof MutableTask)
 //            ((MutableTask)t).log(reason);
         t.delete();
     }
 
     /**
-     *
-     * @return
-     *      null: no revision could be applied
-     *      ==newBelief: existing duplicate found
-     *      non-null: revised task
+     * @return null: no revision could be applied
+     * ==newBelief: existing duplicate found
+     * non-null: revised task
      */
-    @Nullable public /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    @Nullable
+    private /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -188,9 +187,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 break;
 
             if (x.equals(newBelief)) {
-                if (x!=newBelief)
+                if (x != newBelief)
                     BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
-                return newBelief; //duplicate, ignore it
+                return newBelief;
             }
 
             if (!Revision.isRevisible(newBelief, x))
@@ -242,7 +241,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 nar.random,
                 true
         ));
-        if (t==null)
+        if (t == null)
             return null;
 
         RevisionTask r = new RevisionTask(t,
@@ -253,10 +252,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 concept
         );
         r.budget(oldBelief, newBelief);
-
-        if (r == null)
-            return null;
-
         return r.log("Insertion Revision");
     }
 
@@ -318,8 +313,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         synchronized (this) {
             int findAgainToBeSure = indexOf(x, this);
-            return (findAgainToBeSure!=-1) ?
-                remove(findAgainToBeSure) != null :
+            return (findAgainToBeSure != -1) ?
+                    remove(findAgainToBeSure) != null :
                     false;
         }
 
@@ -348,33 +343,35 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             /*if (!(input instanceof AnswerTask))*/
-            {
-                revised = tryRevision(input, concept, nar);
-                if (revised != null) {
-                    if (revised == input) {
-                        //duplicate detected
+
+            revised = tryRevision(input, concept, nar);
+            if (revised != null) {
+                if (revised == input) {
+                    //duplicate, ignore it if it's a derivation, otherwise if it's input allow it to re-activate
+                    if (input.isInput())
                         return TruthDelta.zero;
-                    }
-
-                    if (revised.isDeleted()) {
-                        revised = null;
-                    } else if (Param.DEBUG) {
-
-//                        if (revised.isDeleted())
-//                            throw new RuntimeException("revised task is deleted");
-                        if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
-                            throw new RuntimeException("useless revision");
-                    }
+                    else
+                        return null;
                 }
-            }/* else {
-                revised = null;
-            }*/
+
+//                    if (revised.isDeleted()) {
+//                        revised = null;
+//                    } else if (Param.DEBUG) {
+//
+////                        if (revised.isDeleted())
+////                            throw new RuntimeException("revised task is deleted");
+//                        if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
+//                            throw new RuntimeException("useless revision");
+//                    }
+            }
+        }/* else {
+            revised = null;
+        }*/
 
 
-            //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            delta = insert(input);
+        //Finally try inserting this task.  If successful, it will be returned for link activation etc
+        delta = insert(input);
 
-        }
 
         if (revised != null) {
 
@@ -392,7 +389,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             //                }
             //            }
             //result = insert(revised, et) ? revised : result;
+
             nar.input(revised);
+
             //            nar.runLater(() -> {
             //                if (!revised.isDeleted())
             //                    nar.input(revised);
