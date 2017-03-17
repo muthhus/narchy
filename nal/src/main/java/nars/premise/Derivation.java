@@ -86,7 +86,7 @@ public class Derivation extends Unify {
     @Nullable
     public final Truth taskTruth;
     @Nullable
-    public final Truth beliefTruth;
+    public final Truth beliefTruth, beliefTruthRaw;
 
     @NotNull
     public final Compound taskTerm;
@@ -156,20 +156,23 @@ public class Derivation extends Unify {
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
 
-        Truth beliefTruth;// = belief != null ? belief.truth() : null;
+
 
         if (belief == null) {
-            beliefTruth = null;
+            this.beliefTruth = this.beliefTruthRaw = null;
         } else {
-//            long start = task.start();
-//            if ((start==ETERNAL) || (belief.isEternal())) {
-                beliefTruth = belief.truth();
-//            } else {
-//                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
-//            }
+            Truth beliefTruth = this.beliefTruthRaw = belief.truth();
+            long start = task.start();
+            if ((start==ETERNAL) || (belief.isEternal())) {
+                //??
+            } else {
+                //project
+                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
+            }
+            this.beliefTruth = beliefTruth;
         }
 
-        this.beliefTruth = beliefTruth;
+
 
 
 //        //normalize to positive truth

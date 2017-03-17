@@ -425,7 +425,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles * 2,
                 "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
                 1.00f,
-                0.37f /* 0.45f */,
+                0.45f /* 0.45f */,
                 0
         );
 
@@ -851,13 +851,22 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Test
-    public void testIntersectionTemporal() {
+    @Test public void testIntersectionTemporalNear() {
+        test()
+                //
+                .inputAt(0, "(x --> a). :|:")
+                .inputAt(1, "(y --> a). :|:")
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.74f, 0,1)
+        ;
+    }
+
+    /** less confident than testIntersectionTemporalNear due to further distance between task and belief */
+    @Test public void testIntersectionTemporalFar() {
         test()
                 //
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(16, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 0,16)
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.03f, 0,16)
         ;
     }
 

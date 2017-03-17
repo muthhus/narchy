@@ -451,7 +451,7 @@ public class NAL8Test extends AbstractNALTest {
     public void subgoal_2()  {
         test()
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) && open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -1209,7 +1209,6 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void conjDecoposeGoalAfter() {
         test()
-                .log()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
@@ -1217,7 +1216,6 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
         test()
-                .log()
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 0f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
@@ -1225,14 +1223,12 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void conjDecoposeGoalAfterNegPos() {
         test()
-                .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { 13, 3, 0, 10, ETERNAL } );
     }
     @Test public void conjDecoposeGoalAfterNegNeg() {
         test()
-                .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(--,(b))! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose

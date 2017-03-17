@@ -20,13 +20,15 @@ abstract public class Solve extends AtomicBoolCondition {
 
     public final TruthOperator belief;
     public final TruthOperator goal;
+    public final boolean beliefProjected;
 
-    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator goal) {
+    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
         super();
         this.id = id;
         this.conclude = conclude;
         this.belief = belief;
         this.goal = goal;
+        this.beliefProjected = beliefProjected;
     }
 
     @NotNull
@@ -57,10 +59,9 @@ abstract public class Solve extends AtomicBoolCondition {
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
                 float confMin = m.confMin;
 
-
                 if ((t = f.apply(
                         m.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                        (single) ? null : m.beliefTruth,
+                        (single) ? null : (beliefProjected ? m.beliefTruth : m.beliefTruthRaw),
                         m.nar, confMin
                 ))==null)
                     return false;

@@ -127,6 +127,8 @@ public class PremiseRule extends GenericCompound {
 
     private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
 
+    /** unless time(raw), projected belief truth will be used by default */
+    boolean beliefProjected = true;
 
     @Nullable
     private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
@@ -205,7 +207,7 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = newHashSet(2); //for ensuring uniqueness / no duplicates
-        Solve truth = solve(post, this, anticipate, eternalize, timeFunction);
+        Solve truth = solve(post, this, anticipate, eternalize, timeFunction, beliefProjected);
 
         //PREFIX
         {
@@ -372,7 +374,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
-                              @NotNull TimeFunctions temporalizer) {
+                              @NotNull TimeFunctions temporalizer, boolean beliefProjected) {
 
 
         byte puncOverride = p.puncOverride;
@@ -400,8 +402,8 @@ public class PremiseRule extends GenericCompound {
         i += ')';
 
         return puncOverride == 0 ?
-                new SolvePuncFromTask(i, der, belief, desire) :
-                new SolvePuncOverride(i, der, puncOverride, belief, desire);
+                new SolvePuncFromTask(i, der, belief, desire, beliefProjected) :
+                new SolvePuncOverride(i, der, puncOverride, belief, desire, beliefProjected);
 
 
     }
@@ -539,6 +541,8 @@ public class PremiseRule extends GenericCompound {
         ListMultimap<Term, MatchConstraint> constraints = constraintMapBuilder.build();
 
         char taskPunc = 0;
+
+
 
         //additional modifiers: either preConditionsList or beforeConcs, classify them here
         for (int i = 2; i < precon.length; i++) {
@@ -741,6 +745,10 @@ public class PremiseRule extends GenericCompound {
                         case "dtAfterReverse":
                             timeFunction = TimeFunctions.occReverse;
                             pres.add(events.after);
+                            break;
+
+                        case "raw":
+                            beliefProjected = false;
                             break;
 
 //                        case "dtBefore":
