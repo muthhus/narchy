@@ -68,17 +68,18 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(128, 1, 1, 3);
-        n.nal(1);
+        Default n = new Default(128, 1, 1, 1);
+        n.nal(4);
+        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
 
-        new DeductiveMeshTest(n, new int[] {2, 2}, 16384);
+        new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
         //Vis.conceptsWindow2D
         Vis.conceptsWindow3D
-                (n, 128, 12).show(800, 600);
+                (n, 128, 8).show(800, 600);
 
         SpaceGraph.window(new CycleView(n), 400, 400);
-        //n.loop(1f);
+        n.loop(35f);
 
 
 

@@ -119,7 +119,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
                 int countPerTermlink = 0;
 
-                int termlinksPerForThisTask = termlinks.lerp(taskLink.qua());
+                int termlinksPerForThisTask = termlinks.lerp(taskLink.priSafe(0));
 
                 //if (Param.PREMISE_LOG)
                 //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);

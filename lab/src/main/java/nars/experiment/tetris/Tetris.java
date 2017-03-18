@@ -7,6 +7,7 @@ import nars.concept.SensorConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.experiment.tetris.impl.TetrisVisualizer;
+import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -634,6 +635,7 @@ public class Tetris extends NAgentX {
         Tetris a = new MyTetris(n);
         a.trace = true;
 
+        Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500);
 
             Default m = new Default(512, 16, 2, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
@@ -659,6 +661,8 @@ public class Tetris extends NAgentX {
         }
 
         NAgentX.chart(a);
+
+
         //a.trace = true;
 
         //metaT.nar.log();

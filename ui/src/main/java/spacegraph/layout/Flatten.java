@@ -17,9 +17,9 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
     private final Quat4f up = Quat4f.angle(0,0,1,0);
     private final Quat4f tmp = new Quat4f();
 
-    private float zTolerance = 0.01f;
+    private float zTolerance = 0.05f;
 
-    private float zSpeed = 0.9f;
+    private float zSpeed = 0.2f;
     float rotateRate = 0.25f;
 
     public Flatten() {
@@ -60,7 +60,7 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
 
     //TODO abstract this
     protected void locate(SimpleSpatial s, v3 f) {
-        f.set(s.x(), s.y(), 0.9f);
+        f.set(s.x(), s.y(), 0f);
     }
 
 }

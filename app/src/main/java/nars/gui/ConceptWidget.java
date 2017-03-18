@@ -133,11 +133,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         edges.forEach(ff -> ff.get().update(ff));
 
-        Term tt = key;
-
-        //Budget b = instance;
-
-        conceptVis.apply(this, tt);
+        conceptVis.apply(this, key);
 
 
 //            float lastConceptForget = instance.getLastForgetTime();
@@ -223,12 +219,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         if (!tt.equals(key)) {
             ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
             if (at!=null) {
+
                 TermEdge ate = new TermEdge(at);
+                ate.add(tgt, !(ttt instanceof Task));
 
                 edges.put(new RawPLink(ate, tgt.pri()));
-//                if (x!=null) {
-//                    x.get().add(tgt, !(ttt instanceof Task));
-//                }
+
+
+
             }
         }
     }
@@ -287,10 +285,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 4f;
-                float maxLineWidth = 8f;
+                float minLineWidth = 6f;
+                float priToWidth = 2f;
 
-                this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
+                this.width = minLineWidth + priToWidth * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
 //                if (qEst!=qEst)
@@ -299,23 +297,23 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
                 if (priSum > 0) {
-                    this.r = ff.pri();
-                    this.g = 0.1f + 0.85f * (tasklinkPri / priSum);
+                    this.g = 0.1f;
+                    this.r = 0.1f + 0.85f * (tasklinkPri / priSum);
                     this.b = 0.1f + 0.85f * (termlinkPri / priSum);
                 } else {
                     this.r = this.g = this.b = 0.5f;
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                this.a = 0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
-                //0.9f;
+                this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
+                    0.5f + 0.5f * ff.pri(); //0.9f;
 
-                this.attraction = 0.25f + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 1f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = target.radius()*1f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;
                 this.attraction = 0;
-                this.attractionDist = 10000;
+                this.attractionDist = 1;
             }
         }
     }
@@ -346,14 +344,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     public static class ConceptVis2 implements ConceptVis {
 
         final float minSize = 2f;
-        final float maxSize = 8f;
+        final float maxSize = 16f;
 
         @Override
         public void apply(ConceptWidget conceptWidget, Term tt) {
             ConceptsSpace space = conceptWidget.space;
             NAR nar = space.nar;
-            float p = nar.pri(tt, Float.NaN);
-            p = (p == p) ? p : 0;// = 1; //pri = key.priIfFiniteElseZero();
+            float p = nar.pri(tt, 0);
 
             //long now = space.now();
 //            float b = conceptWidget.concept.beliefs().eviSum(now);
