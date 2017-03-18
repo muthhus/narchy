@@ -94,13 +94,14 @@ public class MatrixView extends Widget {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
 
-                try {
+                //try {
                     float dz = view.update(x, y, gl);
-                    Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
-                } catch (Exception e) {
+                    if (dz == dz)
+                        Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
+                /*} catch (Exception e) {
                     logger.error(" {}",e);
                     return;
-                }
+                }*/
 
             }
         }

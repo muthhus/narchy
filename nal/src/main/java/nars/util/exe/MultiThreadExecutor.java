@@ -81,11 +81,11 @@ public class MultiThreadExecutor extends Executioner {
                 ringSize /* ringbuffer size */,
                 exe,
                 ProducerType.MULTI,
-                new BusySpinWaitStrategy()
+                //new BusySpinWaitStrategy()
                 /*new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
                         new LiteBlockingWaitStrategy())*/
                 //new LiteBlockingWaitStrategy()
-                //new SleepingWaitStrategy()
+                new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
 

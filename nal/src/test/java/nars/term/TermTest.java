@@ -793,7 +793,7 @@ public class TermTest {
     public void testSubTermStructure() throws Narsese.NarseseException {
         NAR n = new Terminal(16);
         assertTrue( AB.term().impossibleSubTerm( AB.term() ) );
-        assertTrue( !Op.hasAll(AB.term().structure(), n.term("<a-->#b>").term().structure()) );
+        assertTrue( !AB.hasAll(n.term("<a-->#b>").term().structure()) );
     }
 
     @Test

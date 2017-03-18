@@ -155,11 +155,11 @@ public enum Terms { ;
             return true;
         }
 
-        int as = A.structure();
-        if (/*!hasAny(as, Op.PRODUCT) || */!hasAny(as, Op.ImageBits))
+
+        if (/*!hasAny(as, Op.PRODUCT) || */!A.hasAny(Op.ImageBits))
             return false;
-        int bs = B.structure();
-        if (/*!hasAny(bs, Op.PRODUCT) || */!hasAny(bs, Op.ImageBits))
+
+        if (/*!hasAny(bs, Op.PRODUCT) || */!B.hasAny(Op.ImageBits))
             return false;
 
 //        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {

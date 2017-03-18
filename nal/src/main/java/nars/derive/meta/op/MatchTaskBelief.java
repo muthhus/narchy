@@ -164,6 +164,14 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
         if (task!=null && !taskIsPatVar)
             pre.add(new SubTermStructure(0, task.structure()));
+
+//        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
+//            int beliefInTask = ((Compound)task).indexOf(belief);
+//            if (beliefInTask!=-1) {
+//                System.out.println(belief + " in " + task);
+//            }
+//        }
+
         if (belief!=null && !belIsPatVar)
             pre.add(new SubTermStructure(1, belief.structure()));
 

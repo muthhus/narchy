@@ -48,8 +48,9 @@ public interface Termlike {
     }
 
     default boolean hasAny(int structuralVector) {
-        return Op.hasAny(structure(), structuralVector);
+        return (structure() & structuralVector) != 0;
     }
+
     /** tests if contains a term in the structural hash
      *  WARNING currently this does not detect presence of pattern variables
      * */
@@ -107,7 +108,7 @@ public interface Termlike {
     }
 
     default boolean impossibleSubTermOrEquality(@NotNull Term target) {
-        return ((!Op.hasAll(structure(), target.structure())) ||
+        return ((!hasAll(target.structure())) ||
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }
 

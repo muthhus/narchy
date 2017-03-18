@@ -731,13 +731,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    default boolean hasAll(int equivalentSize, int structure, int volCached) {
-        return (equivalentSize == size())
-                &&
-                hasAll(structure)
-                &&
-                (volCached <= volume());
-    }
 
 
 }

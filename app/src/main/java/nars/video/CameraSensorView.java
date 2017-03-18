@@ -74,7 +74,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
                   bf * 0.75f + dg * 0.25f,
                 bf - dSum * 0.5f, 0.5f + 0.5f * p);
 
-        return ((b != null ? b.conf() : 0) + (d != null ? d.conf() : 0)) / 4f;
+        return 0; //((b != null ? b.conf() : 0) + (d != null ? d.conf() : 0)) / 4f;
 
     }
 }

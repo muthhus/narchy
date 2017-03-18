@@ -239,9 +239,11 @@ public enum Op {
         return ((existing | possiblyIncluded) == existing);
     }
 
+    /*
+    used only by Termlike.hasAny
     public static boolean hasAny(int existing, int possiblyIncluded) {
         return (existing & possiblyIncluded) != 0;
-    }
+    }*/
 
 
 
@@ -319,9 +321,9 @@ public enum Op {
         return (needle & haystack) == needle;
     }
 
-    public static boolean hasAny(int structure, @NotNull Op o) {
-        return hasAny(structure, o.bit);
-    }
+//    public static boolean hasAny(int structure, @NotNull Op o) {
+//        return hasAny(structure, o.bit);
+//    }
 
     public final boolean isIntersect() {
         return this == Op.SECTe || this == Op.SECTi;

@@ -44,7 +44,6 @@ public final class SubTermsStructure extends AtomicBoolCondition {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return Op.hasAll(ff.termSub0Struct, bits) &&
-                Op.hasAll(ff.termSub1Struct, bits);
+        return Op.hasAll(ff.termSub1Struct, bits) && Op.hasAll(ff.termSub0Struct, bits);
     }
 }
