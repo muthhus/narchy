@@ -118,14 +118,10 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Nullable
     @Override
-    public final TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
+    public final Task add(@NotNull Task input, @Deprecated EternalTable eternal, @Deprecated Concept concept, @NotNull NAR nar) {
 
 
-        Task x = add(input, nar);
-        if (x == null)
-            return null;
-        else
-            return TruthDelta.zero; //HACK TODO calculate
+        return add(input, nar);
 
 //        int cap = capacity();
 //        if (cap == 0)

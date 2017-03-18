@@ -35,9 +35,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input instanceof DynamicBeliefTask)
-            return TruthDelta.zero; //dont insert its own dynamic belief task, causing a feedback loop
+            return input; //dont insert its own dynamic belief task, causing a feedback loop
         else
             return super.add(input, questions, concept, nar);
     }

@@ -142,7 +142,7 @@ public class TaskConcept extends CompoundConcept {
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
+    public @Nullable Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
         return processBeliefOrGoal(belief, beliefsOrNew(nar), questions(), nar);
     }
 
@@ -151,15 +151,11 @@ public class TaskConcept extends CompoundConcept {
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable TruthDelta processGoal(@NotNull Task goal, @NotNull NAR nar) {
+    public @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
         return processBeliefOrGoal(goal, goalsOrNew(nar), quests(), nar);
     }
 
-    /**
-     * @return null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
-     * TODO remove synchronized by lock-free technique
-     */
-    private final TruthDelta processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull QuestionTable questions, @NotNull NAR nar) {
+    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull QuestionTable questions, @NotNull NAR nar) {
 
         return target.add(belief, questions, this, nar);
 
@@ -243,15 +239,15 @@ public class TaskConcept extends CompoundConcept {
 
         boolean accepted = false;
 
-        TruthDelta delta = null;
+        Task inserted = null;
 
         switch (input.punc()) {
             case BELIEF:
-                delta = processBelief(input, nar);
+                inserted = processBelief(input, nar);
                 break;
 
             case GOAL:
-                delta = processGoal(input, nar);
+                inserted = processGoal(input, nar);
                 break;
 
             case QUESTION:
@@ -266,31 +262,14 @@ public class TaskConcept extends CompoundConcept {
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
-        if (delta != null)
+        if (inserted != null)
             accepted = true;
 
-        Activation a;
         if (accepted) {
-            a = nar.activateTask(input, this, nar.pri(this, 1));
-
-            if (delta != null) {
-                //beliefs/goals
-                feedback(input, delta, (CompoundConcept) a.origin, nar);
-            } else {
-                //questions/quests
-                input.feedback(delta, 0, 0, nar);
-            }
-
-            //check again if during feedback, the task decided deleted itself
-            if (input.isDeleted()) {
-                a = null;
-            }
+            return nar.activateTask(input, this, nar.pri(this, 1));
         } else {
-            input.feedback(null, Float.NaN, Float.NaN, nar);
-            a = null;
+            return null;
         }
-
-        return a;
     }
 
     @Override

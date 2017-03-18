@@ -83,7 +83,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar) {
+        public Task add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar) {
             return null;
         }
 
@@ -154,10 +154,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     /**
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
-     * <p>
-     * return null if wasn't added
+     * @return
+     *      null if the task was not accepted,
+     *      non-null ifthe goal which was accepted and somehow modified the state of this concept (this may be this task or another equal instance)
      */
-    @Nullable TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar);
+    @Nullable Task add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar);
 
 
     @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap);

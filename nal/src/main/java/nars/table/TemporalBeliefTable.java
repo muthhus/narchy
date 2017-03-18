@@ -24,15 +24,9 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     @Nullable Truth truth(long when, long now, float dur, EternalTable eternal);
 
-    /** return null if wasnt added */
-    @Nullable TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar);
-
-    //boolean removeIf(@NotNull Predicate<? super Task> o, NAR nar);
-
-
+    @Nullable Task add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar);
 
     void capacity(int c, NAR nar);
-
 
     void clear();
 
@@ -79,8 +73,8 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable TruthDelta add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
-            throw new UnsupportedOperationException();
+        public @Nullable Task add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
+            return null;
         }
 
         @Override

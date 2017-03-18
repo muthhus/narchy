@@ -189,7 +189,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x.equals(newBelief)) {
                 if (x != newBelief)
                     BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
-                return newBelief;
+                return x;
             }
 
             if (!Revision.isRevisible(newBelief, x))
@@ -322,7 +322,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Nullable
-    public TruthDelta add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
@@ -332,13 +332,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         Task revised = null;
-        TruthDelta delta = null;
 
         synchronized (this) {
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
                 addEternalAxiom(input, this, nar);
-                return new TruthDelta(input.truth(), input.truth()); //special
+                return input;
             }
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
@@ -346,10 +345,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             revised = tryRevision(input, concept, nar);
             if (revised != null) {
-                if (revised == input) {
+                if (revised.equals(input)) {
                     //duplicate, ignore it if it's a derivation, otherwise if it's input allow it to re-activate
                     if (input.isInput())
-                        return TruthDelta.zero;
+                        return revised;
                     else
                         return null;
                 }
@@ -370,7 +369,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
         //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        delta = insert(input);
+        boolean inserted = insert(input);
 
 
         if (revised != null) {
@@ -398,7 +397,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             //            });
         }
 
-        return delta;
+        if (inserted)
+            return input;
+        else
+            return null;
     }
 
 
@@ -406,22 +408,22 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * try to insert but dont delete the input task if it wasn't inserted (but delete a displaced if it was)
      * returns true if it was inserted, false if not
      */
-    private TruthDelta insert(@NotNull Task input) {
+    private boolean insert(@NotNull Task input) {
 
         Truth before = this.truth;
 
         Task displaced = put(input);
 
         if (displaced == input) {
-            return null; //rejected
+            //rejected
+            return false;
         } else if (displaced != null) {
             removeTask(displaced,
                     "Displaced"
                     //"Displaced by " + incoming,
             );
         }
-
-        return new TruthDelta(before, this.truth = truth());
+        return true;
     }
 
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {

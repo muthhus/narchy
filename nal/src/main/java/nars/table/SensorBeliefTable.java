@@ -27,7 +27,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
 
     @Override
-    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         //boolean refresh = false;
 
