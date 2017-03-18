@@ -270,21 +270,27 @@ public class PremiseRule extends GenericCompound {
      */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
 
-        put("PatternOp1", 25);
+        put("PatternOp0", 27);
+        put(TaskPunctuation.class, 26);
 
-        put(TaskPunctuation.class, 22);
+        put(TermNotEquals.class, 25);
+
+        put("PatternOp1", 24);
+
         put(TaskPositive.class, 21); //includes either positive or negative
+        put(TaskNegative.class, 20); //includes either positive or negative
 
-        put(events.class, 20);
 
-        put("PatternOp0", 20);
+        put(BeliefPositive.class, 18);
+        put(BeliefPositive.BeliefNegative.class, 17);
 
-        put(SubTermsStructure.class, 18);
+
+        put(events.class, 16);
+
+        put(SubTermsStructure.class, 15);
 //        put(PatternOpNot.class, 16);
 
-        put(SubTermStructure.class, 12);
-
-        put(TermNotEquals.class, 11);
+        put(SubTermStructure.class, 14);
 
         put(Solve.class, 10);
 
@@ -309,10 +315,10 @@ public class PremiseRule extends GenericCompound {
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
-        if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
-        if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
         if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
+        if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
+        if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
 
         if (b instanceof TermNotEquals) return TermNotEquals.class;
 
@@ -339,35 +345,17 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     private static List<Term> sort(@NotNull List<Term> l) {
-        HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
 
         Collections.sort(l, (a, b) -> {
 
-            int ascore = 0, bscore = 0;
-
             Object ac = classify(a);
-
-            if (!ps.containsKey(ac)) {
-                //System.err.println("preconditionRank missing " + a + " classified as: " + ac);
-                ascore = -1;
-            } else {
-                ascore = ps.get(ac);
-            }
-
             Object bc = classify(b);
-            if (!ps.containsKey(bc)) {
-                //System.err.println("preconditionRank missing " + b + " classified as: " + bc);
-                bscore = -1;
-            } else {
-                bscore = ps.get(bc);
-            }
 
-            if (ascore != bscore) {
-                return Integer.compare(bscore, ascore);
-            }
-
-            return b.compareTo(a);
+            HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
+            int c = Integer.compare(ps.getOrDefault(bc, -1), ps.getOrDefault(ac, -1));
+            return (c != 0) ? c : b.compareTo(a);
         });
+
         return l;
     }
 
