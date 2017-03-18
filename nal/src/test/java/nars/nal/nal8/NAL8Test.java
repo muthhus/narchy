@@ -1242,7 +1242,16 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
                 .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
     }
-
+    @Test public void deriveNegInhGoal() {
+        test()
+                .log()
+                .input("a:b!") //positive pair
+                .input("b:c.")
+                .input("x:y.") //negative pair
+                .input("--y:z.")
+                .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
+                .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
+    }
     @Ignore @Test public void questImplDt() {
         test()
                 .log()

@@ -103,7 +103,9 @@ abstract public class PremiseBuilder {
 
                             //Crosslink.crossLink(task, answered, answered.conf(), nar);
 
-                            nar.input(answered);
+//                            if (!answered.isInput()) //avoid re-inputting an already 'input' task, because if it exists in the table it will reactivate causing a feedback loop
+//                                nar.input(answered);
+
 
 
 
@@ -201,7 +203,7 @@ abstract public class PremiseBuilder {
             return null; //no chance
 
         if (q.equals(a))
-            return q;
+            return null;
 
         if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
 
