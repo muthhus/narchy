@@ -26,6 +26,10 @@ public class PushButton extends AbstractButton {
         setOnClick(onClick);
     }
 
+    public PushButton(String s, Runnable onClick) {
+        this(s, (p) -> onClick.run());
+    }
+
     public PushButton(String s, @Nullable Consumer<PushButton> onClick) {
         this(s);
         setOnClick(onClick);

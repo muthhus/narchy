@@ -94,51 +94,6 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     abstract protected void get(Collection<Y> displayNext);
 
 
-    public static void main(String[] args) {
-
-        Default n = new Default(512, 1, 1, 3);
-        //Default2 n = new Default2();
-        //n.nal(4);
-
-        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        //n.activationGlobal.setValue(0.5f);
-
-        //new ArithmeticInduction(n);
-
-        Vis.conceptsWindow3D(n, 64, 12).show(800, 600);
-
-        //n.run(20); //headstart
-
-
-
-        //n.log();
-        //n.input("(a-->b).", "(b-->c).","(c-->d).");
-        new DeductiveMeshTest(n, new int[] {4, 4}, 16384);
-
-        //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
-
-        //n.linkFeedbackRate.setValue(0.05f);
-
-
-        //Param.DEBUG = true;
-//        n
-//                //.log()
-//                //.logSummaryGT(System.out, 0.05f)
-//                .input(
-////                        "((parent($X,$Y) && parent($Y,$Z)) <=> grandparent($X,$Z)).",
-////                        "parent(c, p).",
-////                        "parent(p, g).",
-////                        "grandparent(p, #g)?"
-//                        "x:(a,(b,c))."
-////                        "$0.9;0.9;0.9$ (a,(b,(c,(d,e))))."
-////
-//                );
-//                //.run(800);
-//
-
-        n.loop(16f);
-
-    }
 
 
 }

@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
 import spacegraph.layout.Flatten;
 import spacegraph.layout.ForceDirected;
+import spacegraph.layout.Spiral;
 import spacegraph.math.Color3f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -349,11 +350,13 @@ public class Vis {
 //                                });
 //                            }
 //                        }
-                        new Flatten() {
-                            protected void locate(SimpleSpatial s, v3 f) {
-                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-                            }
-                        }
+
+//                        new Flatten() {
+//                            protected void locate(SimpleSpatial s, v3 f) {
+//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
+//                            }
+//                        }
+
 //                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )

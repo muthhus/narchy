@@ -629,10 +629,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         emotion.busy(inputPri, input.volume());
 
 
-        boolean isCommand = input.isCommand();
-        long now = time();
-        float dur = time.dur();
-        if (isCommand || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))) { //eternal, present (within duration radius), or future
+        if (input.isCommand() /* || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))*/) { //eternal, present (within duration radius), or future
 
 
             Task transformed = execute(input);
@@ -703,10 +700,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
     }
 
-    private @Nullable Task execute(Task input) {
-        boolean isCommand = input.isCommand();
+    private @Nullable Task execute(Task cmd) {
 
-        Compound inputTerm = input.term();
+
+        Compound inputTerm = cmd.term();
         if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
             Term func = inputTerm.term(1);
             if (func.op() == ATOM) {
@@ -718,44 +715,46 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
                         if (o != null) {
 
 
-                            if (isCommand) {
-                                Task result = o.run(input, this);
-                                if (result != null && result != input) {
+                            /*if (isCommand)*/
+                            {
+                                Task result = o.run(cmd, this);
+                                if (result != null && result != cmd) {
                                     //return input(result); //recurse
                                     return result;
                                 }
-                            } else {
-
-                                if (!input.isEternal() && input.start() > time() + time.dur()) {
-                                    inputAt(input.start(), input); //schedule for execution later
-                                    return null;
-                                } else {
-                                    if (executable(input)) {
-                                        Task result = o.run(input, this);
-                                        if (result != input) { //instance equality, not actual equality in case it wants to change this
-                                            if (result == null) {
-                                                return null; //finished
-                                            } else {
-                                                //input(result); //recurse until its stable
-                                                return result;
-                                            }
-                                        }
-                                    }
-                                }
                             }
+//                            } else {
+//
+//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
+//                                    inputAt(cmd.start(), cmd); //schedule for execution later
+//                                    return null;
+//                                } else {
+//                                    if (executable(cmd)) {
+//                                        Task result = o.run(cmd, this);
+//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
+//                                            if (result == null) {
+//                                                return null; //finished
+//                                            } else {
+//                                                //input(result); //recurse until its stable
+//                                                return result;
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
 
                         }
+
                     }
                 }
             }
         }
 
-        if (isCommand) {
-            eventTaskProcess.emit(input);
+        /*if (isCommand)*/ {
+            eventTaskProcess.emit(cmd);
             return null;
         }
 
-        return input;
     }
 
     /**

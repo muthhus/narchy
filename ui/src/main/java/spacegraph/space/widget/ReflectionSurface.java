@@ -2,6 +2,7 @@ package spacegraph.space.widget;
 
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.space.layout.Grid;
@@ -29,18 +30,25 @@ public class ReflectionSurface<X> extends Grid {
 
             try {
                 String k = f.getName();
-                Class c = f.getType();
+                //Class c = f.getType();
+                Object y = f.get(x);
 
-                if (c == FloatParam.class) {
-                    FloatParam p = (FloatParam) f.get(x);
-                    l.add(col(new Label(k), new FloatSlider(p)));
-                } else if (c == AtomicBoolean.class) {
-                    AtomicBoolean p = (AtomicBoolean) f.get(x);
-                    l.add(new CheckBox(k, p));
+                if (y instanceof Surface) {
+                    //l.add(col(new Label(k), (Surface)y));
+                    l.add((Surface)y);
+                } else {
+                    if (y instanceof FloatParam) {
+                        FloatParam p = (FloatParam) y;
+                        l.add(col(new Label(k), new FloatSlider(p)));
+                    } else if (y instanceof AtomicBoolean) {
+                        l.add(new CheckBox(k, (AtomicBoolean) y));
+                    } else if (y instanceof MutableBoolean) {
+                        l.add(new CheckBox(k, (MutableBoolean) y));
+                    } else if (y instanceof Runnable) {
+                        l.add(new PushButton(k, (Runnable)y));
+                    }
                 }
-                /*else {
-                    l.add(new PushButton(k));
-                }*/
+
             } catch (Throwable t) {
                 t.printStackTrace();
             }

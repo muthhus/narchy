@@ -15,6 +15,7 @@ import spacegraph.math.v3;
 import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
 import spacegraph.space.ListSpace;
+import spacegraph.space.widget.ReflectionSurface;
 
 import java.util.List;
 import java.util.function.Function;
@@ -236,6 +237,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return win;
     }
 
+    public static SpaceGraph window(Object o, int w, int h) {
+        return window(new ReflectionSurface(o), w, h);
+    }
+
     public static SpaceGraph window(Spatial s, int w, int h) {
         return window(w, h, s);
     }
@@ -250,6 +255,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         dyn.addBroadConstraint(b);
         return this;
     }
+
+
 
 
     //    public static class PickDragMouse extends SpaceMouse {

@@ -1,10 +1,16 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.bag.Bag;
+import jcog.bag.PLink;
+import jcog.bag.RawPLink;
+import jcog.bag.impl.PLinkHijackBag;
 import nars.NAR;
+import nars.Task;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
+import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -18,6 +24,7 @@ import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
+import spacegraph.space.widget.Label;
 import spacegraph.space.widget.PushButton;
 
 import java.util.HashMap;
@@ -28,7 +35,7 @@ import static spacegraph.math.v3.v;
 
 public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
 
-    public final ArrayBag<? extends TermEdge> edges;
+    public final PLinkHijackBag<TermEdge> edges;
 
 
     //caches a reference to the current concept
@@ -36,31 +43,31 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     private final ConceptVis conceptVis = new ConceptVis2();
     private transient ConceptsSpace space;
 
-    private static final float bagMomentum = 0.5f;
 
 
     public ConceptWidget(NAR nar, Termed x, int numEdges) {
         super(x.term(),1, 1);
 
-//        setFront(
+        setFront(
 //            /*col(
-//                    new Label(x.toString()),
+                    //new Label(x.toString())
 //                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
 //                    //new CheckBox("?")
 //            )*/
-//            icon = new ConceptIcon(nar, x)
-//        );
+            new ConceptIcon(nar, x)
+        );
 
-        final PushButton icon = new PushButton(x.toString(), (z) -> {
-            setFront(new BeliefTableChart(nar, x).scale(4,4));
-        });
-        setFront(icon);
+//        final PushButton icon = new PushButton(x.toString(), (z) -> {
+//            setFront(new BeliefTableChart(nar, x).scale(4,4));
+//        });
+//        setFront(icon);
 
         //float edgeActivationRate = 1f;
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-            new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
+                new PLinkHijackBag(numEdges, 4, nar.random);
+            //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
 //        for (int i = 0; i < edges; i++)
@@ -216,9 +223,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         if (!tt.equals(key)) {
             ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
             if (at!=null) {
-//                TermEdge ate = new TermEdge(at);
+                TermEdge ate = new TermEdge(at);
 
-//                BLink x = edges.put(ate, tgt, bagMomentum, null);
+                edges.put(new RawPLink(ate, tgt.pri()));
 //                if (x!=null) {
 //                    x.get().add(tgt, !(ttt instanceof Task));
 //                }
@@ -272,7 +279,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             return hash;
         }
 
-        public void update(BLink<? extends TermEdge> ff) {
+        public void update(PLink<TermEdge> ff) {
 
             float priSum = (termlinkPri + tasklinkPri);
 
@@ -280,19 +287,19 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 0.5f;
+                float minLineWidth = 4f;
                 float maxLineWidth = 8f;
 
                 this.width = minLineWidth + (maxLineWidth - minLineWidth) * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
-                float qEst = ff.qua();
-                if (qEst!=qEst)
-                    qEst = 0f;
+//                float qEst = ff.qua();
+//                if (qEst!=qEst)
+//                    qEst = 0f;
 
 
 
                 if (priSum > 0) {
-                    this.r = qEst;
+                    this.r = ff.pri();
                     this.g = 0.1f + 0.85f * (tasklinkPri / priSum);
                     this.b = 0.1f + 0.85f * (termlinkPri / priSum);
                 } else {

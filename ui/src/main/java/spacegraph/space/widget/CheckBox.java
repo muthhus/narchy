@@ -1,5 +1,7 @@
 package spacegraph.space.widget;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -19,10 +21,12 @@ public class CheckBox extends ToggleButton {
     public CheckBox(String text, AtomicBoolean b) {
         this(text);
         set(b.get());
-        on((button,value)->{
-            //System.out.println(b + " " + value);
-            b.set(value);
-        });
+        on((button,value)->b.set(value));
+    }
+    public CheckBox(String text, MutableBoolean b) {
+        this(text);
+        set(b.booleanValue());
+        on((button,value)->b.setValue(value));
     }
 
     @Override

@@ -6,7 +6,7 @@ import spacegraph.SimpleSpatial;
 /**
  * Drawn edge, lightweight
  */
-public class EDraw<X,Y extends SimpleSpatial<X>> {
+public class EDraw<X,Y extends SimpleSpatial<X>>  {
 
     public final Y target;
     public float width, r, g, b, a;
