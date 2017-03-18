@@ -1244,14 +1244,25 @@ public class NAL8Test extends AbstractNALTest {
     }
     @Test public void deriveNegInhGoal() {
         test()
-                .log()
-                .input("a:b!") //positive pair
-                .input("b:c.")
-                .input("x:y.") //negative pair
-                .input("--y:z.")
-                .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
-                .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
+                .input("b:a!") //positive pair
+                .input("c:b.")
+                .input("--y:x!") //negative pair
+                .input("z:y.")
+                .mustDesire(cycles, "c:a", 1f, 0.81f)
+                .mustDesire(cycles, "z:x", 0f, 0.81f);
     }
+    @Test public void deriveNegInhGoalTemporal() {
+        test()
+                .input("b:a! :|:") //positive pair
+                .input("c:b.")
+                .input("--y:x!  :|:") //negative pair
+                .input("z:y.")
+                .mustDesire(cycles, "c:a", 1f, 0.81f, 0)
+                .mustDesire(cycles, "z:x", 0f, 0.81f, 0);
+    }
+
+
+
     @Ignore @Test public void questImplDt() {
         test()
                 .log()

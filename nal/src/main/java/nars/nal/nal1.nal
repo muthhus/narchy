@@ -22,9 +22,10 @@
 //                (A --> C)
 
 //seems like only one of these needs permute backward. these generate a lot of questions so minimize them especially when redundant questions would be generated
+    // the second neqRCom() is to handle the backwards cases until a proper variable transform is implemented for those auto-generated rules
 
     (A --> B), (B --> C), neqRCom(A,C), neqRCom(B,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
-    (A --> B), (A --> C), neqRCom(B,C) |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> B), (A --> C), neqRCom(B,C), neqRCom(A,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
     (A --> C), (B --> C), neqRCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
     (A --> B), (B --> C), neqRCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
