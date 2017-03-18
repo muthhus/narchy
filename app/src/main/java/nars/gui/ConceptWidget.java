@@ -285,8 +285,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 //float priAvg = priSum/2f;
 
-                float minLineWidth = 6f;
-                float priToWidth = 2f;
+                float minLineWidth = 10f;
+                float priToWidth = 10f;
 
                 this.width = minLineWidth + priToWidth * priSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
@@ -297,18 +297,18 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
                 if (priSum > 0) {
-                    this.g = 0.1f;
+                    this.b = 0.1f;
                     this.r = 0.1f + 0.85f * (tasklinkPri / priSum);
-                    this.b = 0.1f + 0.85f * (termlinkPri / priSum);
+                    this.g = 0.1f + 0.85f * (termlinkPri / priSum);
                 } else {
                     this.r = this.g = this.b = 0.5f;
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
-                    0.5f + 0.5f * ff.pri(); //0.9f;
+                    0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 1f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 3f + 2f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = target.radius()*1f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = 0;

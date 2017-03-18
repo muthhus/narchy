@@ -2,6 +2,7 @@ package spacegraph.layout;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import org.joml.Vector3f;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -22,6 +23,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             1;
             //13;
 
+    boolean center = true;
 
     public final FloatParam repel = new FloatParam(80, 0, 100);
     public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
@@ -60,16 +62,37 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     @Override
     public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
 
+        int n = objects.size();
+        if (n == 0)
+            return;
+
         objects.forEach(c -> ((Spatial)c.data()).moveWithin(boundsMin, boundsMax));
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
         //count[0] += l.size();
 //System.out.print(l.size() + "  ");
-        b.forEach((int) Math.ceil((float)objects.size() / clusters), objects, this::batch);
+        b.forEach((int) Math.ceil((float) n / clusters), objects, this::batch);
         //System.out.println(" total=" + count[0]);
 
 
+        if (center) {
+            float cx = 0, cy = 0, cz = 0;
+            for (int i = 0, objectsSize = n; i < objectsSize; i++) {
+                v3 c = objects.get(i).worldTransform;
+                cx += c.x;
+                cy += c.y;
+                cz += c.z;
+            }
+            cx /= -n;
+            cy /= -n;
+            cz /= -n;
+
+            for (int i = 0, objectsSize = n; i < objectsSize; i++) {
+                objects.get(i).worldTransform.add(cx, cy ,cz);
+            }
+
+        }
 
 
     }

@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.NSchool;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
+import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.term.Termed;
 import nars.time.RealTime;
@@ -17,14 +18,13 @@ import spacegraph.render.Draw;
 import spacegraph.space.CrosshairSurface;
 import spacegraph.space.widget.*;
 import spacegraph.space.widget.console.ConsoleSurface;
-import spacegraph.space.widget.console.ConsoleTerminal;
 
 import java.awt.*;
 import java.util.List;
 
 import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
 import static nars.gui.Vis.label;
-import static nars.gui.Vis.stacking;
+import static nars.gui.Vis.stack;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.space.layout.Grid.*;
 
@@ -171,7 +171,7 @@ public class TetriSchool extends NSchool implements Runnable {
             Surface runLabel = label("Slide");
             return col(
 
-                    stacking(
+                    stack(
                             new BaseSlider(.25f  /* pause */),
                             runLabel
                     ),
@@ -197,9 +197,7 @@ public class TetriSchool extends NSchool implements Runnable {
 
         public static Surface newTrainingPanel(TetriSchool school) {
 
-            ConsoleSurface term = new ConsoleTerminal(120, 40);
-
-            school.nar.logBudgetMin(term, 0.25f);
+            ConsoleSurface term = Vis.logConsole(school.nar, 120, 40, 0.25f);
 
             return col(
 

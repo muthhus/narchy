@@ -26,7 +26,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private final NAR nar;
     private final NAgent agent;
 
-    private static final int radix = 4;
+    private static final int radix = 2;
     private final List<SensorConcept> pixels;
     private final float sqrtNumPixels;
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
@@ -49,13 +49,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         pixelPriority = () -> totalPriority.floatValue() / sqrtNumPixels;
 
         pixels = encode((x, y) ->
-                        $.func(root,
+                        $.inh(
                                 //$.inh(
                                 //root,
-                                $.p(radix > 1 ?
-                                        new Term[]{coord(x, width), coord(y, height)} :
+                                $.p
+                                //$.secte
+                                    (radix > 1 ?
+                                        new Term[]{coord('x', x, width), coord('y', y, height)} :
                                         new Term[]{$.the(x), $.the(y)}
-                                ))
+                                ),
+                                root
+                        )
                 , brightnessToTruth);
 
 
@@ -73,7 +77,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
     @NotNull
-    public static Compound coord(int n, int max) {
+    public static Compound coord(char prefix, int n, int max) {
+        //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         return $.pRecurse($.radixArray(n, radix, max));
         //return $.p($.radixArray(n, radix, max));
     }

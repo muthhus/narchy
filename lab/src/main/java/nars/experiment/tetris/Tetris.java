@@ -196,7 +196,7 @@ public class Tetris extends NAgentX {
 
 
     public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
-        float alpha = nar.confidenceDefault(BELIEF);
+
 
         float actionMargin =
                 0.33f; //divides the range into 3 sections: left/nothing/right
@@ -209,6 +209,8 @@ public class Tetris extends NAgentX {
 
 
         actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
+            float alpha = nar.confidenceDefault(BELIEF);
+
             if (d != null) {
                 float x = d.freq();
                 //System.out.println(d + " " + x);
@@ -232,6 +234,8 @@ public class Tetris extends NAgentX {
 
         //if (rotate) {
         actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
+            float alpha = nar.confidenceDefault(BELIEF);
+
             if (d != null) {
                 float r = d.freq();
                 if (r > actionThresholdHigh) {
@@ -262,7 +266,6 @@ public class Tetris extends NAgentX {
     }
 
     public void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
-        float alpha = nar.confidenceDefault(BELIEF);
 
         concept = new SensorConcept[state.width][state.height];
 
@@ -276,15 +279,17 @@ public class Tetris extends NAgentX {
 
                         $.inh(
                                 //$.func(
-                                (tetris),
+
                                  /*   $.p(
                                             $.pRadix(x, PIXEL_RADIX, state.width),
                                             $.pRadix(y, PIXEL_RADIX, state.height))*/
-                                $.p(
-                                        $.pRecurse($.radixArray(x, PIXEL_RADIX, state.width)),
-                                        $.pRecurse($.radixArray(y, PIXEL_RADIX, state.height))
-                                )
+                                $.p( $.pRecurse( $.radixArray(x, PIXEL_RADIX, state.width) ),
+                                     $.pRecurse( $.radixArray(y, PIXEL_RADIX, state.height) ) ),
 
+//                                $.secte( $.pRecurseIntersect( 'x', $.radixArray(x, PIXEL_RADIX, state.width) ),
+//                                        $.pRecurseIntersect( 'y', $.radixArray(y, PIXEL_RADIX, state.height) ) ),
+
+                                tetris
                                 //        x, y
 
                         )
@@ -293,6 +298,8 @@ public class Tetris extends NAgentX {
                         //, $.the(state.time)))
                         ;
 
+                //System.out.println(x + " " + y + " "  + squareTerm);
+
                 //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
                 int index = yy * state.width + xx;
                 @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
@@ -300,8 +307,7 @@ public class Tetris extends NAgentX {
 
                         //null //disable input
 
-                        (v) -> $.t(v, alpha)
-
+                        (v) -> $.t(v, nar.confidenceDefault(BELIEF))
                 )
                         //timing(0, visionSyncPeriod)
                         ;
@@ -635,7 +641,7 @@ public class Tetris extends NAgentX {
         Tetris a = new MyTetris(n);
         a.trace = true;
 
-        Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500);
+        //Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500);
 
             Default m = new Default(512, 16, 2, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),

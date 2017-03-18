@@ -7,12 +7,17 @@ import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.test.DeductiveMeshTest;
+import nars.test.DeductiveChainTest;
 import spacegraph.SpaceGraph;
 
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static nars.gui.Vis.*;
+import static nars.gui.Vis.reflect;
+import static nars.gui.Vis.stack;
+import static nars.test.DeductiveChainTest.inh;
 
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
@@ -68,18 +73,32 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(128, 1, 1, 1);
-        n.nal(4);
-        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        Default n = new Default(64, 1, 1, 1);
+        n.nal(1);
+        n.DEFAULT_BELIEF_PRIORITY = 0.05f;
+        n.DEFAULT_QUESTION_PRIORITY = 1f;
 
-        new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
+//        n.inputAt(1, "c:a?");
+//        n.inputAt(2, "b:a.");
+//        n.inputAt(3, "c:b.");
+
+        new DeductiveChainTest(n, 16,  2048, inh);
+
+        //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
         //Vis.conceptsWindow2D
-        Vis.conceptsWindow3D
-                (n, 128, 8).show(800, 600);
+        conceptsWindow3D(n, 64, 8)
+                //.ortho( logConsole(n, 40, 10, 0.0f) )
+                .show(1300, 900);
 
-        SpaceGraph.window(new CycleView(n), 400, 400);
-        n.loop(15f);
+        SpaceGraph.window(
+            stack(
+                reflect( new CycleView(n) )
+                //logConsole(n, 120, 40, 0.25f).
+            ),
+        400, 400);
+
+        n.loop(3f);
 
 
 

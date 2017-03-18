@@ -35,7 +35,7 @@ public class SynchronousExecutor extends Executioner {
         try {
             r.run();
         } catch (Throwable t) {
-            NAR.logger.error("{} {}", r, t);
+            NAR.logger.error("{} {}", r, t.getMessage());
         }
     }
 

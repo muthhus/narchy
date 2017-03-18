@@ -77,7 +77,7 @@ public interface NARBuilder {
         int maxConcepts = 192 * 1024;
 
         Default nar = new Default(2 * 1024,
-                1, 2, 4, rng,
+                1, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -179,7 +179,7 @@ public interface NARBuilder {
 
         };
 
-        nar.termVolumeMax.setValue(80);
+        nar.termVolumeMax.setValue(70);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
@@ -191,9 +191,9 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(192);
+        nar.core.conceptsFiredPerCycle.setValue(128);
         nar.core.conceptsFiredPerBatch.setValue(8);
-        nar.core.derivationsInputPerCycle.setValue(768);
+        nar.core.derivationsInputPerCycle.setValue(256);
 
         //nar.activationRate.setValue(0.5f);
         nar.quaMin.setValue(0.01f);

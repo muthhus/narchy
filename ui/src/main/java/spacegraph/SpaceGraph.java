@@ -85,6 +85,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
 
+    public SpaceGraph ortho(Surface ortho) {
+        return add(new Ortho(ortho).maximize());
+    }
+
     public SpaceGraph add(Ortho c) {
         if (window == null) {
             preAdd.add(c);

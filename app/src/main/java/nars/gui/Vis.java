@@ -323,7 +323,7 @@ public class Vis {
     /**
      * ordering: first is underneath, last is above
      */
-    public static Stacking stacking(Surface... s) {
+    public static Stacking stack(Surface... s) {
         return new Stacking(s);
     }
 
@@ -444,6 +444,16 @@ public class Vis {
         SpaceGraph.window(new ReflectionSurface(fd), 500, 500);
 
         return s;
+    }
+
+    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, float priMin) {
+        ConsoleSurface term = new ConsoleTerminal(cols, rows);
+        nar.logBudgetMin(term, priMin);
+        return term;
+    }
+
+    public static ReflectionSurface reflect(Object c) {
+        return new ReflectionSurface(c);
     }
 
     private static class MyForceDirected extends ForceDirected {

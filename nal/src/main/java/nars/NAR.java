@@ -845,8 +845,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
 
-        float s = scale * (0.5f + 0.5f * pri(c, 1));
-        return new SpreadingActivation(input, c, this, s, acti.get());
+        //float s = scale * (0.5f + 0.5f * pri(c, 1));
+        return new SpreadingActivation(input, c, this, scale, acti.get());
     }
 
 //    /**

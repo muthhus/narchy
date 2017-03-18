@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
+import com.google.common.base.Strings;
 import jcog.Texts;
 import jcog.Util;
 import jcog.list.FasterList;
@@ -36,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
+import javax.xml.stream.events.Characters;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
@@ -988,6 +990,13 @@ public enum $ {
         return tt;
     }
 
+
+    public static @NotNull Compound pRecurseIntersect(char prefix, @NotNull Term... t) {
+        final int[] index = {0};
+        return (Compound) $.secte($.terms(t, x -> {
+            return $.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic)x).toString() );
+        }));
+    }
 
     public static @NotNull Compound pRecurse(@NotNull Term... t) {
         int tl = t.length;

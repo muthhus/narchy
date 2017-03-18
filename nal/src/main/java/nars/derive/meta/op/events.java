@@ -16,6 +16,21 @@ import static nars.time.Tense.ETERNAL;
 abstract public class events extends AtomicBoolCondition {
 
     /** task is before or simultaneous with belief which follows (T ... B) */
+    public static final events nonEternal = new events() {
+
+        @Override
+        public String toString() {
+            return "nonEternal";
+        }
+
+        @Override
+        public boolean run(@NotNull Derivation m) {
+            return deltaOcc(m.task, m.belief) !=ETERNAL; /* && d!=DTERNAL which is negative */
+        }
+
+    };
+
+    /** task is before or simultaneous with belief which follows (T ... B) */
     public static final events after = new events() {
 
         @Override
@@ -167,6 +182,22 @@ abstract public class events extends AtomicBoolCondition {
 //        }
 //    };
 
+
+
+    @Nullable
+    public static final events beforeAfterOrEternal = new events() {
+
+        @Override
+        public String toString() {
+            return "beforeAfterOrEternal";
+        }
+
+        @Override
+        public boolean run(@NotNull Derivation m) {
+            Task b = m.belief;
+            return b!=null;
+        }
+    };
 
     /** task is before or simultaneous with belief which follows (T ... B) */
     @Nullable

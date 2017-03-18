@@ -29,7 +29,7 @@ import static nars.NAgentX.runRT;
 public class Line1D {
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
 
         NAR nar = runRT((NAR n) -> {

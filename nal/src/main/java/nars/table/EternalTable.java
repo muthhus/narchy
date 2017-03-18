@@ -333,11 +333,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Task revised = null;
 
-        synchronized (this) {
+
             if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
                 //AXIOMATIC/CONSTANT BELIEF/GOAL
-                addEternalAxiom(input, this, nar);
-                return input;
+                synchronized (this) {
+                    addEternalAxiom(input, this, nar);
+                    return input;
+                }
             }
 
             //Try forming a revision and if successful, inputs to NAR for subsequent cycle
@@ -363,13 +365,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //                            throw new RuntimeException("useless revision");
 //                    }
             }
-        }/* else {
-            revised = null;
-        }*/
 
 
-        //Finally try inserting this task.  If successful, it will be returned for link activation etc
-        boolean inserted = insert(input);
+
+        boolean inserted;
+        synchronized (this) {
+            //Finally try inserting this task.  If successful, it will be returned for link activation etc
+            inserted = insert(input);
+        }
 
 
         if (revised != null) {
@@ -397,10 +400,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             //            });
         }
 
-        if (inserted)
-            return input;
-        else
-            return null;
+        return inserted ? input : null;
     }
 
 
@@ -429,8 +429,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     private void addEternalAxiom(@NotNull Task input, @NotNull EternalTable et, NAR nar) {
         //lock incoming 100% confidence belief/goal into a 1-item capacity table by itself, preventing further insertions or changes
         //1. clear the corresponding table, set capacity to one, and insert this task
-        Consumer<Task> overridden = t -> removeTask(t, "Overridden");
-        et.forEachTask(overridden);
+        et.forEachTask(t -> removeTask(t, "Overridden"));
         et.clear();
         et.capacity(1);
 

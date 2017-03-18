@@ -63,36 +63,45 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     @Override
     public Budget budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
 
+        float p = d.premise.pri();
         float q = d.premise.qua();
+
         final float quaMin = d.quaMin;
-
-
 
         if (truth!=null) { //belief and goal:
             q *= confidencePreservationFactor(truth, d);
             if (q < quaMin) return null;
+        } else {
+            q *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
+            if (q < quaMin) return null;
         }
 
-        q *= complexityFactor(conclusion, punc, d.task, d.belief);
-        if (q < quaMin) return null;
+        p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
+        //if (q < quaMin) return null;
 
-        float p = d.premise.pri();
         p *= puncFactor(punc).floatValue();
 
         FloatParam off = opFactor(conclusion);
         p *= off.floatValue();
 
-        p *= q; //further discount priority in similar way as quality
+        //p *= q; //further discount priority in similar way as quality
 
         return $.b(p, q);
     }
 
     /**
      * occam's razor: penalize relative complexity growth
-     *
      * @return a value between 0 and 1 that priority will be scaled by
      */
-    public static float complexityFactor(Compound conclusion, byte punc, Task task, Task belief) {
+    public static float complexityFactorAbsolute(Compound conclusion, byte punc, Task task, Task belief) {
+        return 1f / (1f + conclusion.volume());
+    }
+
+    /**
+     * occam's razor: penalize relative complexity growth
+     * @return a value between 0 and 1 that priority will be scaled by
+     */
+    public static float complexityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
         int parentComplexity;
         int taskCompl = task.complexity();
         int beliefCompl;
@@ -120,7 +129,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         }
         return
                 //Util.sqr( //sharpen
-                    Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
+                    //Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
+                    Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
                 //)
             ;
     }

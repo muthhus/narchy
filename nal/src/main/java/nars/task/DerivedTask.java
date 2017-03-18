@@ -32,7 +32,7 @@ abstract public class DerivedTask extends ImmutableTask {
     public DerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long[] evidence, long now, long start, long end) {
         super(tc, punct, truth, now, start, end, evidence);
 
-        this.premise = p.premise;
+        this.premise = Param.DEBUG ? p.premise : null;
 
 
 
