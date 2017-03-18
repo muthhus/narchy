@@ -189,7 +189,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x.equals(newBelief)) {
                 if (x != newBelief)
                     BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
-                return x;
+                return newBelief;
             }
 
             if (!Revision.isRevisible(newBelief, x))
@@ -345,10 +345,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             revised = tryRevision(input, concept, nar);
             if (revised != null) {
-                if (revised.equals(input)) {
+                if (revised == input) {
                     //duplicate, ignore it if it's a derivation, otherwise if it's input allow it to re-activate
                     if (input.isInput())
-                        return revised;
+                        return input;
                     else
                         return null;
                 }

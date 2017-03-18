@@ -440,7 +440,7 @@ public interface TimeFunctions {
 
                             Term rTaskTerm = resolve(p, task.term());
                             if (rTaskTerm!=null) {
-                                Term rOtherTerm = resolve(p, p.beliefTerm.term());
+                                Term rOtherTerm = resolve(p, p.beliefTerm);
                                 if (rOtherTerm != null) {
                                     int taskInDecomposed = rDecomposed.subtermTime(rTaskTerm);
                                     if (taskInDecomposed!= DTERNAL) { //???
@@ -464,7 +464,7 @@ public interface TimeFunctions {
                 if (occ == ETERNAL && occOther != ETERNAL) {
 
 
-                    @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm.term() : p.taskTerm);
+                    @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm : p.taskTerm);
                     if (rOtherTerm != null) {
 
                         //                        if (derivationMatch(rOtherTerm, derived, p)) {

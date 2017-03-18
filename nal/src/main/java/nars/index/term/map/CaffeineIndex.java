@@ -33,7 +33,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @NotNull public final Cache<Term, Termed> concepts;
 
     @Nullable
-    private final Cache<DynByteSeq,TermContainer> subterms;
+    private final Cache<TermContainer,TermContainer> subterms;
 
 
 
@@ -116,28 +116,24 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public final TermContainer intern(@NotNull Term[] a) {
 
+        TermContainer v = super.intern(a);
+
         int len = a.length;
         if (len < 2)
-            return super.intern(a); //dont intern 1-element containers
+            return v; //dont intern 1-element containers
 
 //        //HACK
 //        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
 //            return new TermVector2(x, y);
 
-        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
-        try {
-            IO.writeTermContainer(d, a);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
+//        try {
+//            IO.writeTermContainer(d, a);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
-        return subterms.get(d, (dd)->{
-            //TODO try reconstructing the stored instance from the byte[] ?
-
-            d.compact();
-
-            return super.intern(a);
-        });
+        return subterms.get(v, vv -> vv);
 
 
         //return subterms!=null ? subterms.get(s, (ss) -> ss) :s;

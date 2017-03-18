@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
@@ -174,15 +175,12 @@ public abstract class TermBuilder {
         return finish(op, dt, u);
     }
 
-//    private void productNormalizeSubterms(@NotNull Term[] u) {
-//        for (int i = 0, uLength = u.length; i < uLength; i++) {
-//            u[i] = productNormalize(u[i]);
-//        }
-//    }
-
 
     /** should only be applied to subterms, not the outer-most compound */
     @NotNull public Term productNormalize(@NotNull Term u) {
+        if (!(u instanceof Compound))
+            return u;
+
         int b = u.structure();
         if (!((b & Op.InhAndIMGbits) > 0) || !((b & INH.bit) > 0) || u.varPattern()>0)
             return u;
@@ -312,6 +310,15 @@ public abstract class TermBuilder {
         return TermVector.the(s);
     }
 
+    public Compound newCompound(@NotNull Op op, int dt, Term[] args) {
+        /*switch (args.length) {
+            case 1:
+                return new UnitCompound1(op, args[0]);
+            default:*/
+                return newCompound(op, dt, intern(args));
+        //}
+    }
+
     static public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
@@ -407,17 +414,9 @@ public abstract class TermBuilder {
             throw new RuntimeException("should not have zero args here");
         }
 
+
         for (int i = 0; i < s; i++) {
             Term x = args[i];
-
-            if (x == null || isTrueOrFalse(x)) {
-                /*if ((op == NEG) || (op == CONJ) || (op == IMPL) || (op == EQUI) || (op == INH) || (op == SIM))*/
-                //if (op!=PROD)
-                //throw new RuntimeException("appearance of True/False in " + op + " should have been filtered prior to this");
-
-                //any other term causes it to be invalid/meaningless
-                return False;
-            }
 
             x = /*eval*/(productNormalize(x));
 
@@ -441,7 +440,7 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, intern(args));
+        return newCompound(op, dt, args);
     }
 
 

@@ -15,6 +15,7 @@ import static nars.time.Tense.DTERNAL;
 
 /**
  * Compound inheriting directly from TermVector1
+ * NOT READY YET
  */
 public class UnitCompound1 extends TermVector1 implements Compound {
 
@@ -29,6 +30,18 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         this.op = op;
         this.hash = Util.hashCombine(super.hashCode(), op.ordinal(), DTERNAL);
+    }
+
+    @Override
+    public int init(@NotNull int[] meta) {
+        the.init(meta);
+        meta[5] |= op.bit;
+        return hash;
+    }
+
+    @Override
+    public int vars() {
+        return the.vars();
     }
 
     @Override
@@ -56,6 +69,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         else
             return false;
 
+        //TODO if this is a NEG then size and dt can be assumed
         return (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.term(0)));
     }
 
@@ -77,7 +91,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public boolean isNormalized() {
-        return true;
+        return the.isNormalized();
+    }
+
+    @Override
+    public void setNormalized() {
+        ((Compound)the).setNormalized();
     }
 
     @Override

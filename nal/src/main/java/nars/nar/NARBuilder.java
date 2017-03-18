@@ -47,7 +47,7 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 512, sync);
+                new MultiThreadExecutor(threads, 2048, sync);
 
         //exe = new InstrumentedExecutor(exe, 8);
 
@@ -76,12 +76,12 @@ public interface NARBuilder {
 
         int maxConcepts = 192 * 1024;
 
-        Default nar = new Default(3 * 1024,
+        Default nar = new Default(2 * 1024,
                 1, 2, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, maxConcepts * 3,
                     exe
                     //null /* null = fork join common pool */
                 )
@@ -179,6 +179,8 @@ public interface NARBuilder {
 
         };
 
+        nar.termVolumeMax.setValue(80);
+
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
@@ -189,11 +191,12 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(64);
-        nar.core.conceptsFiredPerBatch.setValue(4);
-        nar.core.derivationsInputPerCycle.setValue(256);
+        nar.core.conceptsFiredPerCycle.setValue(192);
+        nar.core.conceptsFiredPerBatch.setValue(8);
+        nar.core.derivationsInputPerCycle.setValue(768);
 
         //nar.activationRate.setValue(0.5f);
+        nar.quaMin.setValue(0.01f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 
