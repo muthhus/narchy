@@ -21,9 +21,9 @@ public class QuestTest {
 
     @Test
     public void testQuestAfterGoal() throws Narsese.NarseseException {
-        testQuest(true, 0, 16);
-        testQuest(true, 1, 16);
-        testQuest(true, 4, 16);
+        testQuest(true, 0, 24);
+        testQuest(true, 1, 24);
+        testQuest(true, 4, 24);
     }
 
     @Test

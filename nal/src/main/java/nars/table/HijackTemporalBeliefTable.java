@@ -19,6 +19,7 @@ import nars.time.Time;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;

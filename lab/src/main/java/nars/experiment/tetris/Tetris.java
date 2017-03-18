@@ -1,5 +1,6 @@
 package nars.experiment.tetris;
 
+import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
@@ -46,7 +47,7 @@ public class Tetris extends NAgentX {
     public static final float FPS = 50f;
 
     /** priority shared by all tetris field pixels */
-    private static float pixelTotalPri = 16f;
+    public final FloatParam pixelPri = new FloatParam(0.1f, 0, 1f);
 
     private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -259,12 +260,10 @@ public class Tetris extends NAgentX {
 //        }
     }
 
-    public static void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
+    public void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
         float alpha = nar.confidenceDefault(BELIEF);
 
         concept = new SensorConcept[state.width][state.height];
-
-        float pixelPri = pixelTotalPri / (state.height * state.width);
 
         Atomic tetris = $.the("tetris");
         for (int y = 0; y < state.height; y++) {

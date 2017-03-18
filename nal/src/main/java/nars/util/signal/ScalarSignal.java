@@ -9,6 +9,7 @@ import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -191,12 +192,22 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
 
         SignalTask s = new SignalTask(term(), punc, t, start, end, nar.time.nextStamp());
-        s.budget(pri.asFloat(), nar);
+        s.budget(pri.asFloat() * deltaFactor(previous, t), nar);
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
         //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
         //.log(this);
         return s;
+    }
+
+    /** factor to reduce priority for similar truth value
+     *  TODO revise
+     * */
+    protected float deltaFactor(@Nullable Truthed a, Truth b) {
+        if (a == null)
+            return 1f;
+
+        return Math.abs(a.freq() - b.freq());
     }
 
     /** provides an immediate truth assessment with the last known signal value */

@@ -3,6 +3,7 @@ package nars.table;
 import nars.$;
 import nars.Task;
 import nars.truth.Truth;
+import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -24,6 +25,15 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
         this.historicCapacity = historicCapacity;
         this.history = new TreeMap<>();
     }
+
+    @Override
+    protected boolean replace(Task incoming, Task existing) {
+        if (incoming instanceof SignalTask && incoming.start() >= existing.start())
+            return true;
+        else
+            return super.replace(incoming, existing);
+    }
+
 
     @Override
     public @Nullable Task match(long when, long now, float dur, @Nullable Task against) {

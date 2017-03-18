@@ -116,11 +116,11 @@ public class Arkancide extends NAgentX {
             }
         };
 
-        Param.DEBUG = true;
-        nar.onTask(t -> {
-            if (t instanceof DerivedTask && t.isEternal())
-                System.err.println(t.proof());
-        });
+//        Param.DEBUG = true;
+//        nar.onTask(t -> {
+//            if (t instanceof DerivedTask && t.isEternal())
+//                System.err.println(t.proof());
+//        });
 
         maxPaddleSpeed = 15 * Arkanoid.BALL_VELOCITY;
 

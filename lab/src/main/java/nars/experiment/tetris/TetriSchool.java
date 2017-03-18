@@ -66,7 +66,7 @@ public class TetriSchool extends NSchool implements Runnable {
             }
         };
 
-        Tetris.sensors(nar, game, cells);
+        //sensors(nar, game, cells);
 
         sim = new Thread(this);
         sim.start();
