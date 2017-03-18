@@ -271,7 +271,7 @@ public class TaskConcept extends CompoundConcept {
 
         Activation a;
         if (accepted) {
-            a = nar.activateTask(input, this, 1f);
+            a = nar.activateTask(input, this, nar.pri(this, 1));
 
             if (delta != null) {
                 //beliefs/goals

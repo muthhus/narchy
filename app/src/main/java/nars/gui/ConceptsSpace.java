@@ -79,7 +79,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
                 (n, 128, 8).show(800, 600);
 
         SpaceGraph.window(new CycleView(n), 400, 400);
-        n.loop(35f);
+        n.loop(15f);
 
 
 
