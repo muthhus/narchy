@@ -1,5 +1,6 @@
 package nars.video;
 
+import com.google.common.base.Joiner;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
@@ -57,14 +58,18 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                         $.inh(
                                 //$.inh(
                                 root,
-                                $.p
+
                                 //$.secte
-                                    (radix > 1 ?
-                                        new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                        new Term[]{$.the(x), $.the(y)}
-                                )
+                                    radix > 1 ?
+                                        $.p( zipCoords(coord(x, width), coord(y, height)) ) :
+                                        //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
+                                        //new Term[]{coord('x', x, width), coord('y', y, height)} :
+                                        $.p( $.the(x), $.the(y) )
+
                         )
                 , brightnessToTruth);
+
+        //System.out.println(Joiner.on('\n').join(pixels));
 
 
         nar.onCycle(this);
@@ -80,11 +85,42 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         totalPriority.setValue(totalPri);
     }
 
+    private static Term[] zipCoords(@NotNull Term[] x, @NotNull Term[] y) {
+        int m = Math.max(x.length, y.length);
+        Term[] r = new Term[m];
+        int sx = m - x.length;
+        int sy = m - y.length;
+        int ix = 0, iy = 0;
+        for (int i = 0; i < m; i++) {
+            Term xy;
+            char levelPrefix =
+                //(char)('a' + (m-1 - i)); //each level given a different scale prefix
+                'p';
+
+            if (i >= sx && i >=sy) {
+                xy = $.the(levelPrefix + x[ix++].toString() + y[iy++].toString());
+            } else if (i >= sx) {
+                xy = $.the(levelPrefix + x[ix++].toString() + "_");
+            } else { //if (i < y.length) {
+                xy = $.the(levelPrefix + "_" + y[iy++].toString());
+            }
+            r[i] = xy;
+        }
+        return r;
+    }
+
     @NotNull
     public static Compound coord(char prefix, int n, int max) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         //return $.pRecurse($.radixArray(n, radix, max));
         return $.p($.radixArray(n, radix, max));
+    }
+
+    @NotNull
+    public static Term[] coord(int n, int max) {
+        //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
+        //return $.pRecurse($.radixArray(n, radix, max));
+        return $.radixArray(n, radix, max);
     }
 
     @Override
@@ -98,10 +134,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 changed++;
         }
 
+        float totalPri = totalPriority.floatValue();
         if (changed > 0) {
-            priEach = totalPriority.floatValue() / changed;
+            priEach = totalPri / changed;
         } else {
-            priEach = 0;
+            priEach = totalPri / numPixels; //if none changed, use the value as if all changed
         }
 
     }

@@ -354,9 +354,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         float priEpsilon = priEpsilon();
 
         if (oldPri > priEpsilon) {
-            return (random.nextFloat() > (oldPri / (newPri + oldPri)));
+            return random.nextFloat() > (oldPri / ((newPri/reprobes) + oldPri));
         } else {
-            return (newPri > priEpsilon) || random.nextBoolean(); //50/50 chance
+            return (newPri > priEpsilon) || random.nextFloat() > 1f/reprobes;
+                    // random.nextBoolean(); //50/50 chance
         }
     }
 

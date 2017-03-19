@@ -1447,13 +1447,16 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         if (t.isEmpty())
             return;
 
-        float scale = priNormalized / priTotal;
-
-        for (Task x : t) {
-            x.budget().priMult(scale);
-            input(x);
+        if (priTotal < Param.BUDGET_EPSILON) {
+            input(t); //just input all (having 0 priority) as-is
+        } else {
+            float scale = priNormalized / priTotal;
+            for (int i = 0, tSize = t.size(); i < tSize; i++) {
+                Task x = t.get(i);
+                x.budget().priMult(scale);
+                input(x);
+            }
         }
-
     }
 
 
