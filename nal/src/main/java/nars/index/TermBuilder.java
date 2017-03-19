@@ -586,8 +586,7 @@ public abstract class TermBuilder {
     }
 
     public static boolean commutive(int dt) {
-
-        return (dt == DTERNAL) || (dt == 0);// || (dt == XTERNAL);
+        return (dt == DTERNAL) || (dt == 0);
     }
 
 
@@ -606,7 +605,8 @@ public abstract class TermBuilder {
         Set<Term> s =
                 new HashSet<>(u.length);
         //new TreeSet();
-        if (!flatten(op, u, dt, s))
+        flatten(op, u, dt, s);
+        if (s.isEmpty())
             return False;
 
         //boolean negate = false;
@@ -702,27 +702,25 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
+    private void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
 
         for (Term x : u) {
 
             if ((x.op() == op) && (((Compound) x).dt() == dt)) {
-                if (!flatten(op, ((Compound) x).terms(), dt, s)) //recurse
-                    return false;
+                flatten(op, ((Compound) x).terms(), dt, s); //recurse
             } else {
-                //cancel co-negations
+                //cancel co-negations for terms which can be negatable (ie. everything except atoms)
                 if (x instanceof Compound || x instanceof Variable) {
                     if (!s.isEmpty()) {
-                        if (s.contains(neg(x))) {
-                            //co-negation detected
-                            return false;
+                        if (s.remove(neg(x))) {
+                            //co-negation detected, skip this term
+                            continue;
                         }
                     }
                 }
                 s.add(x);
             }
         }
-        return true;
     }
 
 

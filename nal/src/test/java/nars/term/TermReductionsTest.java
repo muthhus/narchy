@@ -472,7 +472,7 @@ public class TermReductionsTest {
 
     @Test public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
         assertEquals(False, $("(#1 && (--,#1))"));
-        assertEquals(False, $("(&&, #1, (--,#1), (x))"));
+        assertEquals($("(x)"), $("(&&, #1, (--,#1), (x))"));
 
         assertTrue( $("(#1 &&+1 (--,#1))") instanceof Compound);
         assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
@@ -480,6 +480,7 @@ public class TermReductionsTest {
 
         assertEquals(False, $("((--,L(out))&&L(out))"));
     }
+
 
     @Test public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
         assertEquals(False, $.parallel($.varDep(1), $.neg($.varDep(1))));
@@ -530,27 +531,28 @@ public class TermReductionsTest {
 
     @Test
     public void testCoNegatedJunction() throws Narsese.NarseseException {
-        //the conegation cancels itself out
-        assertInvalidTerms(
-                "(&&,x,a:b,(--,a:b))");
+        //the conegation cancels out conflicting terms
 
-        assertInvalidTerms(
-                "(&&,x,y,a:b,(--,a:b))");
+        assertEquals($("x"), $("(&&,x,a:b,(--,a:b))"));
+
+        assertEquals($("(b)"), $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
+        assertEquals($("((b) && (c))"), $("(&&, (a), (--,(a)), (b), (c))"));
+
+
+        assertEquals($("(x && y)"), $("(&&,x,y,a:b,(--,a:b))"));
     }
 
 
     @Test
-    public void testCoNegatedJunction2() throws Narsese.NarseseException {
-        assertEquals(False,
-                $("(&&,x, a:b,(--,a:b))"));
+    public void testCoNegatedDisjunction() throws Narsese.NarseseException {
 
-        assertEquals(True,
+        assertEquals($("x"),
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals(True,
+        assertEquals($("(||,x,y)"),
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals(False, $.parallel($.varDep(0), $.neg($.varDep(0)), $.the("x")));
+        assertEquals($("x"), $.parallel($.varDep(0), $.neg($.varDep(0)), $.the("x")));
     }
 
     @Test
