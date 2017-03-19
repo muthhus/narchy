@@ -1012,28 +1012,28 @@ public interface TimeFunctions {
 //            }
         }
 
-        if (belief!=null) {
-            long taskOcc = task.start();
-            if (taskOcc!=ETERNAL) {
-                long belOcc = belief.start();
-                if (belOcc!=ETERNAL) {
-                    Interval ii = Interval.union(taskOcc, task.end(), belOcc, belief.end() );
-                    if (ii != null) {
-                        occReturn[0] = ii.a;
-                        occReturn[1] = ii.b;
-
-                        return derived;
-                    } else {
-                        //no intersection: point-like below
-                    }
-                }
-            }
-        } else {
-            //inherit task's occurrence exactly
-            occReturn[0] = task.start();
-            occReturn[1] = task.end();
-            return derived;
-        }
+//        if (belief!=null) {
+//            long taskOcc = task.start();
+//            if (taskOcc!=ETERNAL) {
+//                long belOcc = belief.start();
+//                if (belOcc!=ETERNAL) {
+//                    Interval ii = Interval.union(taskOcc, task.end(), belOcc, belief.end() );
+//                    if (ii != null) {
+//                        occReturn[0] = ii.a;
+//                        occReturn[1] = ii.b;
+//
+//                        return derived;
+//                    } else {
+//                        //no intersection: point-like below
+//                    }
+//                }
+//            }
+//        } else {
+//            //inherit task's occurrence exactly
+//            occReturn[0] = task.start();
+//            occReturn[1] = task.end();
+//            return derived;
+//        }
 
         occReturn[0] = occ;
         return derived;

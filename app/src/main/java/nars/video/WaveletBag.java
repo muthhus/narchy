@@ -97,12 +97,6 @@ public class WaveletBag implements Bitmap2D {
     }
 
     @Override
-    public void see(EachPixelRGB p) {
-        throw new UnsupportedOperationException("yet");
-
-    }
-
-    @Override
     public int width() {
         return px;
     }

@@ -17,6 +17,8 @@ import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
+import nars.video.Bitmap2D;
+import nars.video.CameraSensor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.math.v2;
 import spacegraph.space.layout.Grid;
@@ -32,7 +34,7 @@ import static spacegraph.SpaceGraph.window;
 /**
  * Created by me on 7/28/16.
  */
-public class Tetris extends NAgentX {
+public class Tetris extends NAgentX implements Bitmap2D {
 
     //    static final Executioner exe =
 //            //new SingleThreadExecutioner();
@@ -48,66 +50,18 @@ public class Tetris extends NAgentX {
     public static final float FPS = 50f;
 
     /** priority shared by all tetris field pixels */
-    public final FloatParam pixelPri = new FloatParam(0.1f, 0, 1f);
+    public final FloatParam pixelPri;
 
-    private static SensorConcept[][] concept;
+    //private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
-    static boolean easy;
+    static boolean easy = false;
 
     private final TetrisState state;
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-    public final Grid view = new Grid(
-//                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-//                        float r = nar.pri(concept[x][y], Float.NaN);
-//                        gl.glColor3f(r, 0, 0);
-//                        return 0f;
-//                    }),
-            new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-                SensorConcept cxy = concept[x][y];
-                long now = this.now;
-                float dur = nar.time.dur();
-                float b = cxy.beliefFreq(now, dur);
-                Truth gg = cxy.goal(now, dur);
-                float gp, gn;
-                float g = gg!=null ? gg.freq() : Float.NaN;
-                if (g == g) {
-                    g -= 0.5f;
-                    g *= 2f;
-                    float c = gg.conf();
-                    if (g < 0) {
-                        gp = 0;
-                        gn = -g * c;
-                    } else {
-                        gp = g * c;
-                        gn = 0;
-                    }
-                } else {
-                    gp = gn = 0;
-                }
-                gl.glColor3f(gp, b, gn);
-                return 0f;
-            })
-//                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
-//                        long then = (long) (now + DUR * 8);
-//                        Truth f = concept[x][y].belief(then, DUR);
-//                        float fr, co;
-//                        if (f == null) {
-//                            fr = 0.5f;
-//                            co = 0;
-//                        } else {
-//                            fr = f.freq();
-//                            co = f.conf();
-//                        }
-//                        gl.glColor4f(0, fr, 0, 0.25f + 0.75f * co);
-////                        Draw.colorPolarized(gl,
-////                                concept[x][y].beliefFreq(then, 0.5f) -
-////                                        concept[x][y].beliefFreq(now, 0.5f));
-//                        return 0f;
-//                    })
 
-    );
+    private final CameraSensor pixels;
 
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
 //            float r = concept[x][y].goalFreq(now, 0.5f);
@@ -160,38 +114,93 @@ public class Tetris extends NAgentX {
             }
         };
 
-        view.children().add(new TetrisVisualizer(state, 2, false) {
-            @Override
-            public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
+//        view.children().add(new TetrisVisualizer(state, 2, false) {
+//            @Override
+//            public boolean onKey(v2 hitPoint, char charCode, boolean pressed) {
+////
+////                switch (charCode) {
+////                    case 'a':
+////                        if (motorRotate!=null)
+////                            nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
+////                        break;
+////                    case 's':
+////                        if (motorRotate!=null)
+////                            nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
+////                        break;
+////                    case 'z':
+////                        nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
+////                        break;
+////                    case 'x':
+////                        nar.goal(motorLeftRight, Tense.Present, pressed ? 1f : 0.5f, gamma);
+////                        break;
+////                }
 //
-//                switch (charCode) {
-//                    case 'a':
-//                        if (motorRotate!=null)
-//                            nar.goal(motorRotate, Tense.Present, pressed ? 0f : 0.5f, gamma);
-//                        break;
-//                    case 's':
-//                        if (motorRotate!=null)
-//                            nar.goal(motorRotate, Tense.Present, pressed ? 1f : 0.5f, gamma);
-//                        break;
-//                    case 'z':
-//                        nar.goal(motorLeftRight, Tense.Present, pressed ? 0f : 0.5f, gamma);
-//                        break;
-//                    case 'x':
-//                        nar.goal(motorLeftRight, Tense.Present, pressed ? 1f : 0.5f, gamma);
-//                        break;
-//                }
-
-                return true;
-            }
-        });
-        view.layout();
+//                return true;
+//            }
+//        });
 
 
-        sensors(nar, state, sensors);
+
+        senseCamera("tetris", pixels = new CameraSensor($.the("tetris"), this, nar));
+
+        pixelPri = pixels.totalPriority;
 
         actions(nar, state, actions);
 
         state.reset();
+
+
+//        view = new Grid(
+////                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+////                        float r = nar.pri(concept[x][y], Float.NaN);
+////                        gl.glColor3f(r, 0, 0);
+////                        return 0f;
+////                    }),
+//                new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+//                    SensorConcept cxy = pixels.concept(x, y);
+//                    long now = this.now;
+//                    float dur = nar.time.dur();
+//                    float b = cxy.beliefFreq(now, dur);
+//                    Truth gg = cxy.goal(now, dur);
+//                    float gp, gn;
+//                    float g = gg!=null ? gg.freq() : Float.NaN;
+//                    if (g == g) {
+//                        g -= 0.5f;
+//                        g *= 2f;
+//                        float c = gg.conf();
+//                        if (g < 0) {
+//                            gp = 0;
+//                            gn = -g * c;
+//                        } else {
+//                            gp = g * c;
+//                            gn = 0;
+//                        }
+//                    } else {
+//                        gp = gn = 0;
+//                    }
+//                    gl.glColor3f(gp, b, gn);
+//                    return 0f;
+//                })
+////                    new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
+////                        long then = (long) (now + DUR * 8);
+////                        Truth f = concept[x][y].belief(then, DUR);
+////                        float fr, co;
+////                        if (f == null) {
+////                            fr = 0.5f;
+////                            co = 0;
+////                        } else {
+////                            fr = f.freq();
+////                            co = f.conf();
+////                        }
+////                        gl.glColor4f(0, fr, 0, 0.25f + 0.75f * co);
+//////                        Draw.colorPolarized(gl,
+//////                                concept[x][y].beliefFreq(then, 0.5f) -
+//////                                        concept[x][y].beliefFreq(now, 0.5f));
+////                        return 0f;
+////                    })
+//
+//        );
+//        view.layout();
     }
 
 
@@ -265,65 +274,83 @@ public class Tetris extends NAgentX {
 //        }
     }
 
-    public void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
-
-        concept = new SensorConcept[state.width][state.height];
-
-        Atomic tetris = $.the("tetris");
-        for (int y = 0; y < state.height; y++) {
-            int yy = y;
-            for (int x = 0; x < state.width; x++) {
-                int xx = x;
-                Compound squareTerm =
-                        //$.p(x, y);
-
-                        $.inh(
-                                //$.func(
-
-                                 /*   $.p(
-                                            $.pRadix(x, PIXEL_RADIX, state.width),
-                                            $.pRadix(y, PIXEL_RADIX, state.height))*/
-                                $.p( $.pRecurse( $.radixArray(x, PIXEL_RADIX, state.width) ),
-                                     $.pRecurse( $.radixArray(y, PIXEL_RADIX, state.height) ) ),
-
-//                                $.secte( $.pRecurseIntersect( 'x', $.radixArray(x, PIXEL_RADIX, state.width) ),
-//                                        $.pRecurseIntersect( 'y', $.radixArray(y, PIXEL_RADIX, state.height) ) ),
-
-                                tetris
-                                //        x, y
-
-                        )
-                        //$.p(
-                        //$.the("tetris"))
-                        //, $.the(state.time)))
-                        ;
-
-                //System.out.println(x + " " + y + " "  + squareTerm);
-
-                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
-                int index = yy * state.width + xx;
-                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
-                        () -> state.seen[index] > 0 ? 1f : 0f,
-
-                        //null //disable input
-
-                        (v) -> $.t(v, nar.confidenceDefault(BELIEF))
-                )
-                        //timing(0, visionSyncPeriod)
-                        ;
-
-//                FloatSupplier defaultPri = s.sensor.pri;
-//                s.pri( () -> defaultPri.asFloat() * 0.25f );
-
-                concept[x][y] = s;
-
-                s.pri(pixelPri);
-
-                sensors.add(s);
-
-            }
-        }
+    @Override
+    public int width() {
+        return state.width;
     }
+
+    @Override
+    public int height() {
+        return state.height;
+    }
+
+    @Override
+    public float brightness(int xx, int yy) {
+        int index = yy * state.width + xx;
+        return state.seen[index] > 0 ? 1f : 0f;
+    }
+
+//    public void sensors(NAR nar, TetrisState state, List<SensorConcept> sensors) {
+//
+//
+//
+//        concept = new SensorConcept[state.width][state.height];
+//
+//        Atomic tetris = $.the("tetris");
+//        for (int y = 0; y < state.height; y++) {
+//            int yy = y;
+//            for (int x = 0; x < state.width; x++) {
+//                int xx = x;
+//                Compound squareTerm =
+//                        //$.p(x, y);
+//
+//                        $.inh(
+//                                //$.func(
+//
+//                                 /*   $.p(
+//                                            $.pRadix(x, PIXEL_RADIX, state.width),
+//                                            $.pRadix(y, PIXEL_RADIX, state.height))*/
+//                                $.p( $.pRecurse( $.radixArray(x, PIXEL_RADIX, state.width) ),
+//                                     $.pRecurse( $.radixArray(y, PIXEL_RADIX, state.height) ) ),
+//
+////                                $.secte( $.pRecurseIntersect( 'x', $.radixArray(x, PIXEL_RADIX, state.width) ),
+////                                        $.pRecurseIntersect( 'y', $.radixArray(y, PIXEL_RADIX, state.height) ) ),
+//
+//                                tetris
+//                                //        x, y
+//
+//                        )
+//                        //$.p(
+//                        //$.the("tetris"))
+//                        //, $.the(state.time)))
+//                        ;
+//
+//                //System.out.println(x + " " + y + " "  + squareTerm);
+//
+//                //$.p($.pRadix(x, 4, state.width), $.pRadix(y, 4, state.height));
+//                int index = yy * state.width + xx;
+//                @NotNull SensorConcept s = new SensorConcept(squareTerm, nar,
+//                        () -> state.seen[index] > 0 ? 1f : 0f,
+//
+//                        //null //disable input
+//
+//                        (v) -> $.t(v, nar.confidenceDefault(BELIEF))
+//                )
+//                        //timing(0, visionSyncPeriod)
+//                        ;
+//
+////                FloatSupplier defaultPri = s.sensor.pri;
+////                s.pri( () -> defaultPri.asFloat() * 0.25f );
+//
+//                concept[x][y] = s;
+//
+//                s.pri(pixelPri);
+//
+//                sensors.add(s);
+//
+//            }
+//        }
+//    }
 
 //    //TODO
 //    public static class NARCam {
@@ -764,6 +791,9 @@ public class Tetris extends NAgentX {
         };
     }
 
+
+
+
     public static class MyTetris extends Tetris {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {
@@ -775,7 +805,7 @@ public class Tetris extends NAgentX {
 //
 //                view.plot2 = Vis.agentBudgetPlot(this, 256);
 
-            window(view, 600, 600);
+            //window(view, 600, 600);
         }
     }
 

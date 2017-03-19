@@ -191,7 +191,7 @@ public abstract class Param  {
     public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON, 0, 1f);
 
 
-    @Deprecated public float confidenceDefault(byte punctuation) {
+    public float confidenceDefault(byte punctuation) {
 
         switch (punctuation) {
             case BELIEF:

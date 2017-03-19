@@ -1,5 +1,6 @@
 package nars.video;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.$;
@@ -17,58 +18,61 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static nars.Op.BELIEF;
+
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
-public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR>, Iterable<SensorConcept> {
+public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAR>, Iterable<CameraSensor<P>.PixelConcept> {
 
     private final NAR nar;
-    private final NAgent agent;
 
     private static final int radix = 2;
-    private final List<SensorConcept> pixels;
+    private final List<PixelConcept> pixels;
     private final float sqrtNumPixels;
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
     final int numPixels;
 
-    /** total priority to be shared (in proportion to sqrt # pixels, in order to represent an area -> priority relationship ) */
-    public final FloatParam totalPriority = new FloatParam(1f, 0f, 64f);
+    /** total priority to be shared by any changed pixels */
+    public final FloatParam totalPriority = new FloatParam(1f, 0f, 8f);
 
-    private FloatSupplier pixelPriority;
+    private float priEach = 0;
 
-    public CameraSensor(Atomic root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+
+    public CameraSensor(Term root, P src, NAR nar) {
+        this(root, src, nar, (v) -> $.t(v, nar.confidenceDefault(BELIEF)));
+    }
+
+    public CameraSensor(Term root, P src, NAR nar, FloatToObjectFunction<Truth> brightnessToTruth) {
         super(src, src.width(), src.height());
 
-        this.nar = agent.nar;
-        this.agent = agent;
+        this.nar = nar;
 
         numPixels = src.width() * src.height();
         sqrtNumPixels = (float)Math.sqrt(numPixels);
-        pixelPriority = () -> totalPriority.floatValue() / sqrtNumPixels;
 
         pixels = encode((x, y) ->
                         $.inh(
                                 //$.inh(
-                                //root,
+                                root,
                                 $.p
                                 //$.secte
                                     (radix > 1 ?
                                         new Term[]{coord('x', x, width), coord('y', y, height)} :
                                         new Term[]{$.the(x), $.the(y)}
-                                ),
-                                root
+                                )
                         )
                 , brightnessToTruth);
 
 
-        agent.nar.onCycle(this);
+        nar.onCycle(this);
     }
 
     @NotNull
     @Override
-    public Iterator<SensorConcept> iterator() {
+    public Iterator<PixelConcept> iterator() {
         return pixels.iterator();
     }
 
@@ -79,35 +83,44 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     @NotNull
     public static Compound coord(char prefix, int n, int max) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
-        return $.pRecurse($.radixArray(n, radix, max));
-        //return $.p($.radixArray(n, radix, max));
+        //return $.pRecurse($.radixArray(n, radix, max));
+        return $.p($.radixArray(n, radix, max));
     }
 
-    public List<SensorConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
-        List<SensorConcept> l = $.newArrayList();
+    @Override
+    public void accept(NAR n) {
+
+        src.update(1);
+
+        int changed = 0;
+        for (int i = 0, pixelsSize = pixels.size(); i < pixelsSize; i++) {
+            if (pixels.get(i).update())
+                changed++;
+        }
+
+        if (changed > 0) {
+            priEach = totalPriority.floatValue() / changed;
+        } else {
+            priEach = 0;
+        }
+
+    }
+
+    public List<PixelConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
+        List<PixelConcept> l = $.newArrayList();
         for (int x = 0; x < width; x++) {
-            int xx = x;
+
             for (int y = 0; y < height; y++) {
                 //TODO support multiple coordinate termizations
                 Compound cell = cellTerm.get(x, y);
 
-                int yy = y;
 
-                //monochrome only for now
-                FloatSupplier brightness = () -> src.brightness(xx, yy);
-
-//                float dx = Math.abs(x - width/2f);
-//                float dy = Math.abs(y - height/2f);
-//                float cdist = (float) (Math.sqrt( dx*dx + dy*dy )-1) / (Math.max(width,height)/2f);
-                SensorConcept sss = new SensorConcept(cell, nar,
-                    brightness,
-                    brightnessToTruth
-                );
+                PixelConcept sss = new PixelConcept(cell, brightnessToTruth, x, y);
+                sss.pri(()-> priEach);
                 sss.resolution(
                     //distToResolution(cdist)
                     resolution
                 );
-                sss.pri(pixelPriority);
 
                 l.add(sss);
 
@@ -124,22 +137,41 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        return r;
 //    }
 
-    @Override
-    public void accept(NAR n) {
 
-        src.update(1);
-
-
-
-    }
 
     public CameraSensor setResolution(float resolution) {
         this.resolution = resolution;
         return this;
     }
 
+    public PixelConcept concept(int x, int y) {
+        return pixels.get(y * width + x);
+    }
+
 
     interface Int2Function<T> {
         T get(int x, int y);
     }
+
+    public class PixelConcept extends SensorConcept {
+
+        private final int x, y;
+        private float bufferedValue;
+
+        public PixelConcept(Compound cell, FloatToObjectFunction<Truth> brightnessToTruth, int x, int y) {
+            super(cell, nar, null, brightnessToTruth);
+            this.x = x;
+            this.y = y;
+            this.bufferedValue = Float.NaN;
+            setSignal(()->bufferedValue);
+        }
+
+        boolean update() {
+            bufferedValue = src.brightness(x, y);
+            return currentValue!=currentValue || !Util.equals(currentValue, bufferedValue, resolution);
+        }
+
+
+    }
+
 }

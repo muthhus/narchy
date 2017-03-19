@@ -148,7 +148,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
 
     @Override
-    public final float floatValueOf(Term anObject /* ? */) {
+    public float floatValueOf(Term anObject /* ? */) {
         return this.currentValue = signal.asFloat();
     }
 

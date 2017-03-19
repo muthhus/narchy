@@ -204,10 +204,12 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
      *  TODO revise
      * */
     protected float deltaFactor(@Nullable Truthed a, Truth b) {
-        if (a == null)
-            return 1f;
+        return 1f;
 
-        return Math.abs(a.freq() - b.freq());
+//        if (a == null)
+//            return 1f;
+//
+//        return Math.abs(a.freq() - b.freq());
     }
 
     /** provides an immediate truth assessment with the last known signal value */

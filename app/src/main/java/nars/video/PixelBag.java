@@ -225,12 +225,6 @@ public abstract class PixelBag implements Bitmap2D {
 
     abstract public int rgb(int sx, int sy);
 
-    @Override
-    public void see(EachPixelRGB p) {
-        throw new UnsupportedOperationException("yet");
-
-    }
-
     public void setMinZoomOut(float minZoomOut) {
         this.minZoomOut = minZoomOut;
     }

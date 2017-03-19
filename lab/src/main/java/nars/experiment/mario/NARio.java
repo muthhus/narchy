@@ -70,7 +70,7 @@ public class NARio extends NAgentX {
             //cc.setXRelative( mario.)
         });
 
-        CameraSensor<PixelBag> sc = senseCamera("(nario)", cc, (v) -> t(v, alpha()));
+        CameraSensor<PixelBag> sc = senseCamera("nario", cc, (v) -> t(v, alpha()));
         sc.setResolution(0.02f);
         sc.priTotal(4f);
         this.eyesOpen = sc.totalPriority;

@@ -161,7 +161,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * should only be invoked before agent has started TODO check for this
      */
-    protected void sense(@NotNull Iterable<SensorConcept> s) {
+    protected void sense(@NotNull Iterable<? extends SensorConcept> s) {
         Iterables.addAll(sensors, s);
     }
 
@@ -175,7 +175,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * should only be invoked before agent has started TODO check for this
      */
-    protected void action(@NotNull Iterable<ActionConcept> s) {
+    protected void action(@NotNull Iterable<? extends ActionConcept> s) {
         Iterables.addAll(actions, s);
     }
 
