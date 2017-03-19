@@ -8,7 +8,6 @@ import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import nars.util.signal.SignalTask;
@@ -284,7 +283,7 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
                 if (implConcept!=null) {
 
                     //TODO match the task and subtract the dt
-                    Task it = implConcept.beliefs().match(now, dur); //implication belief
+                    Task it = implConcept.beliefs().match(when, now, dur); //implication belief
                     if (it!=null) {
                         int dt = it.dt();
                         if (dt == DTERNAL)
@@ -325,7 +324,7 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 
 
                     //TODO match the task and subtract the dt
-                    Task it = equiConcept.beliefs().match(now, dur); //implication belief
+                    Task it = equiConcept.beliefs().match(when, now, dur); //implication belief
                     if (it!=null) {
                         int dt = it.dt();
                         if (dt == DTERNAL)

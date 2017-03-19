@@ -928,7 +928,7 @@ public class IO {
         int i = 0;
 
         int level = 0;
-        final int MAX_LEVELS = 32;
+        final int MAX_LEVELS = 16;
         byte[][] levels = new byte[MAX_LEVELS][2]; //level stack x (op, subterms remaining) tuple
 
         do {
@@ -945,23 +945,14 @@ public class IO {
                 if (o == INT) {
                      i+=4; //32bit
                 } else {
-                    //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
-                    //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
-                    //                DataInputStream ii = input(term, i);
                     int hi = term[i++] & 0xff;
-                    int lo = term[i++] & 0xff; //ii.readUnsignedByte();
-                    int utfLen = //input(term, i).readUnsignedShort();
-                            (hi << 8) | lo;
-                    //i += 2;
+                    int lo = term[i++] & 0xff;
+                    int utfLen = (hi << 8) | lo;
                     i += utfLen;
-
-                    //null-terminated mode
-                    //                while (term[i++]!=0 /* null terminator */) { }
                 }
             } else {
 
-                int subterms = input(term, i).readUnsignedByte();
-                i++;
+                int subterms = term[i++];
                 levels[level][0] = ob;
                 levels[level][1] = (byte) (subterms  /* include this? */);
                 level++;

@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
+import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
@@ -98,7 +99,7 @@ public class DefaultBeliefTable implements BeliefTable {
      */
     @Nullable
     @Override
-    public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
+    public Task match(long when, long now, float dur, @Nullable Task against, Compound template, boolean noOverlap) {
 
         final Task ete = eternal.match();
         if (when == ETERNAL) {

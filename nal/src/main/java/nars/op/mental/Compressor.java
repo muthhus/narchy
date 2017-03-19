@@ -59,39 +59,87 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
 
-
-
-    /* static */ class Abbr extends RawPLink<Compound> {
+    class Abbr extends RawPLink<Compound> {
 
         @NotNull
-        public final AliasConcept compressed;
-        final SequenceMatcher encode;
-        final SequenceMatcher decode;
-        private final byte[] encoded;
-        private final byte[] decoded;
+        public AliasConcept compressed;
 
-        Abbr(Compound decompressed, @NotNull AliasConcept compressed, NAR nar) {
-            super(decompressed, usageBoost(decompressed)
-            );
+        SequenceMatcher encode;
+        SequenceMatcher decode;
+        byte[] encoded;
+        byte[] decoded;
 
-            this.compressed = compressed;
+        private final float score;
+        private AbbreviationTask relation;
+
+        Abbr(Compound decompressed, float initialPri) {
+            super(decompressed, 0 );
+
+            this.score = score( decompressed );
+            boost( initialPri );
+        }
+
+        public void start() throws RuntimeException {
+
+
+            Compound decompressed = get();
+
+            this.compressed = AliasConcept.get(newSerialTerm(), decompressed, nar);
+            if (compressed == null)
+                throw new RuntimeException("could not create alias concept: " + compressed + " for " + decompressed);
 
             this.encoded = IO.termToBytes(this.compressed);
             this.decoded = IO.termToBytes(decompressed);
             this.decode = new ByteSequenceMatcher(encoded);
             this.encode = new ByteSequenceMatcher(decoded);
 
-            //HACK
+            nar.on(this.compressed);
             ec.put(encode, this);
             dc.put(decode, this);
 
-            nar.on(this.compressed);
+            Compound s = compoundOrNull(
+                    //$.sim
+                    $.equi
+                            (compressed, decompressed)
+            );
+            if (s == null) {
+                throw new RuntimeException("unrelateable: " + compressed + " for " + decompressed);
+            } else {
+
+                relation = new AbbreviationTask(
+                        s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                        nar.time(), ETERNAL, ETERNAL,
+                        new long[]{nar.time.nextStamp()}, decompressed, compressed
+                );
+                relation.log("Abbreviate");
+                relation.budget(nar);
+
+                nar.input(relation);
+
+                recompile();
+            }
         }
+
+        public void stop() {
+            synchronized (code) { //HACK avoid synchronization somehow
+                ec.remove(encode);
+                dc.remove(decode);
+            }
+
+            recompile();
+
+            relation.delete();
+        }
+
+        public void boost(float pri) {
+            priAdd( score * pri );
+        }
+
     }
 
 
     /* boost in proportion to the volume of the uncompressed term, with a scaling factor relative to the capacity of the bag (to avoid clipping at 1.0) */
-    protected float usageBoost(Compound decompressed) {
+    protected float score(Compound decompressed) {
         return 1f/code.capacity() * (decompressed.volume() - 1); /* -1 to compensate for the cost of the abbreviation, ie. an atom */
     }
 
@@ -104,7 +152,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                 new PLinkHijackBag(maxCodes, 4, nar.random) {
                     @Override
                     public void onRemoved(@NotNull Object value) {
-                        onRemoval((Abbr)value);
+                        ((Abbr)value).stop();
                     }
                 };
     }
@@ -120,7 +168,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 //        int xxl = y.volume();
 //        if (xxl >= volume.lo() && xxl <= volume.hi()) {
         //return super.onOut(b);
-        x = compoundOrNull((nar.concepts.productNormalize(x)).unneg());
+        x = compoundOrNull(x.unneg());
         if (x != null) {
             abbreviate(x, b);
             return 1f;
@@ -128,72 +176,46 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
             return 0; //rejected
     }
 
-    public void onRemoval(/*Compound key, */Abbr value/*, RemovalCause cause*/) {
-        ec.remove(value.encode);
-        dc.remove(value.decode);
-    }
-
-
     @Override
-    protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
-        final boolean[] changed = {false};
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
+
 
         Op ao = abbreviated.op();
         if (ao == Op.EQUI || ao == Op.IMPL) //HACK for equivalence relation
-            return;
+            return false;
 
         abbreviated = decode(abbreviated);
         if (abbreviated.volume() > volume.hi())
-            return; //expanded too much
+            return false; //expanded too much
 
         /** dont abbreviate PermanentConcept's themselves */
         if (nar.concept(abbreviated) instanceof PermanentConcept)
-            return;
+            return false;
+
+        float p = b.priSafe(0);
 
         Abbr abb = code.get(abbreviated);
         if (abb != null) {
-            //boost it
-            abb.priAdd(b.pri() * usageBoost(abb.get()));
-            return;
+            abb.boost( p ); //boost it
+            return false;
         }
 
-        //System.out.println("compress CODE: " + a + " to " + compr);
-
-        changed[0] = true;
-        AliasConcept aa = AliasConcept.get(newSerialTerm(), abbreviated, nar);
-        if (aa == null)
-            return;
-
-        abb = new Abbr(abbreviated  /** store fully decompress */, aa, nar);
-
-        if (code.put(abb) == null) {
-            return; //failed insert
-        }
+        abb = new Abbr(abbreviated  /** store fully decompress */, p);
 
         code.commit();
 
-        Compound s = compoundOrNull(
-                //$.sim
-                $.equi
-                        (abb.compressed, abb.get())
-        );
-        if (s == null) {
-            logger.error("unrelateable: {}", abb);
-        } else {
-
-
-            Task abbreviationTask = new AbbreviationTask(
-                    s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                    nar.time(), ETERNAL, ETERNAL,
-                    new long[]{nar.time.nextStamp()}, abb.get(), abb.compressed
-            );
-            abbreviationTask.log("Abbreviate");
-            abbreviationTask.setBudget(b);
-            nar.input(abbreviationTask);
-
-            recompile();
+        if (code.put(abb) == null) {
+            return false; //failed insert
         }
 
+        try {
+            abb.start();
+        } catch (RuntimeException e) {
+            logger.error("start: {}", e);
+            code.remove(abb.get());
+        }
+
+        return true;
     }
 
 
@@ -202,14 +224,15 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
     private void recompile() {
 
-        if (busy.compareAndSet(false, true)) {
-            nar.runLater(() -> {
-                if (busy.compareAndSet(true, false)) {
+        nar.runLater(() -> {
+            if (busy.compareAndSet(false, true)) {
+                synchronized (code) {
                     decoder = matcher(x -> x.decode);
                     encoder = matcher(x -> x.encode);
+                    busy.set(false);
                 }
-            });
-        }
+            }
+        });
 
     }
 
@@ -323,11 +346,14 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
         int numCodes = code.size();
 
+        //POSSIBLE OPTIMIZATIONS
+        //  if the substitution occurred within a non-commutive term, it is probably safe to continue from before the substitution, not from the beginning
+        //  obtain the byte[] width of each segment, and if this is less than a known min compression/decompression target range, skip it since no code would apply there
+
         do {
 
             if (wr == null) {
                 ii = 0;
-                wr = new ByteArrayReader(b);
                 termPos.clear();
                 try {
                     IO.mapSubTerms(b, (o, depth, p) -> {
@@ -337,6 +363,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                     //logger.error("{}", e);
                     return b;
                 }
+                wr = new ByteArrayReader(b);
             }
 
             int i = termPos.get(ii++);

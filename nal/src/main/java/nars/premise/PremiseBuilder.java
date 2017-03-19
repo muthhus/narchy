@@ -140,7 +140,7 @@ abstract public class PremiseBuilder {
             //if belief is still not known, match from the belief table
             if ((belief == null) && (beliefTerm.varQuery() == 0)) {
                 if (beliefConcept instanceof TaskConcept) {
-                    belief = beliefConcept.beliefs().match(when, now, dur, task, true); //in case of quest, proceed with matching belief
+                    belief = beliefConcept.beliefs().match(when, now, dur, task, (Compound)beliefTerm,true); //in case of quest, proceed with matching belief
                 }
 
             }

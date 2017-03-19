@@ -136,10 +136,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
             final Compressor compressor = new Compressor(this, "_",
-                    4, 8,
-                    0.05f, 32, 256);
+                    6, 12,
+                    0.5f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {

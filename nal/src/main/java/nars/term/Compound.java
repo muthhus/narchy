@@ -158,13 +158,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        return t;//.toImmutable();
 //    }
 
-    @Override
-    default void recurseTerms(@NotNull SubtermVisitor v) {
-        v.accept(this);
-        for (Term x : terms())
-            x.recurseTerms(v);
-        //subterms().forEach(a -> a.recurseTerms(v));
-    }
 
     @Override
     default void recurseTerms(@NotNull SubtermVisitorX v) {
@@ -175,6 +168,14 @@ public interface Compound extends Term, IPair, TermContainer {
     default void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
         v.accept(this, parent);
         subterms().forEach(a -> a.recurseTerms(v, this));
+    }
+
+    @Override
+    default void recurseTerms(@NotNull SubtermVisitor v) {
+        v.accept(this);
+//        for (Term x : terms())
+//            x.recurseTerms(v);
+        subterms().forEach(a -> a.recurseTerms(v));
     }
 
     @Override

@@ -97,8 +97,8 @@ public abstract class Param  {
     //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
 
 
-    /** used in linear interpolating link adjustments during feedback. set to zero to disable */
-    public final FloatParam linkFeedbackRate = new FloatParam(0.0f);
+//    /** used in linear interpolating link adjustments during feedback. set to zero to disable */
+//    public final FloatParam linkFeedbackRate = new FloatParam(0.0f);
 
 
 

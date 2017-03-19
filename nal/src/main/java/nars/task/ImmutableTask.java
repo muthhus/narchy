@@ -229,9 +229,9 @@ public class ImmutableTask extends RawBudget implements Task {
 
     boolean eternalizable() {
 
-        return term.varIndep() > 0;
+        //return term.varIndep() > 0;
         //return term.vars() > 0;
-        //return false;
+        return false;
         //return true;
 
 

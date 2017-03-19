@@ -123,25 +123,32 @@ public class Vis {
                 if (c != null) if (c instanceof Atomic) {
                     r = g = b = ph * 0.5f;
                 } else {
-                    float belief = 0;
+                    float belief = 0.5f, goal = 0.5f;
+                    float a = 0;
 
                     long n = now[0];
 
                     float dur = nar.time.dur();
                     @Nullable Truth bt = c.beliefs().truth(n, dur);
-                    if (bt != null)
-                        belief = bt.conf();
+                    if (bt != null) {
+                        belief = bt.freq();
+                        a += bt.conf();
+                    }
 
-
-                    float goal = 0;
                     @Nullable Truth gt = c.goals().truth(n, dur);
-                    if (gt != null)
-                        goal = gt.conf();
+                    if (gt != null) {
+                        goal = gt.freq();
+                        a += gt.conf();
+                    }
 
-                    if (belief > 0 || goal > 0) {
-                        r = 0;
-                        g = 0.25f + 0.75f * belief;
-                        b = 0.25f + 0.75f * goal;
+                    a = Math.min(a, 1f);
+
+                    if (a > 0) {
+
+                        r = 0.1f + 0.5f * (a) * (1f - goal);
+                        g = 0.1f + 0.5f * (a) * goal;
+                        b = 0.1f + 0.9f * (a) * belief;
+
                     } /*else if (c.hasQuestions() || c.hasQuests()) {
                         r = 1; //yellow
                         g = 1/2;

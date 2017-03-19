@@ -4,12 +4,11 @@ import jcog.bag.Prioritized;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.Budget;
 import nars.concept.TaskConcept;
+import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,7 +56,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable Task match(long now, float dur) {
+        public Task match(long when, long now, float dur, Task question, Compound template, boolean noOverlap) {
             return null;
         }
 
@@ -104,10 +103,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return Spliterators.emptySpliterator();
         }
 
-        @Override
-        public Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
-            return null;
-        }
 
         @Override
         public float freq(long when, float dur) {
@@ -162,14 +157,20 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     @Nullable Task add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar);
 
 
-    @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap);
+    default @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
+        return match(when, now, dur, against, null, noOverlap);
+    }
 
-    @Nullable default Task match(long now, float dur) {
+    default Task match(long when, long now, float dur, Task question, @Nullable Compound template, boolean noOverlap) {
         return match(now, now, dur);
     }
 
     @Nullable default Task match(long when, long now, float dur) {
         return match(when, now, dur, null, true);
+    }
+
+    @Nullable default Task match(long when, float dur) {
+        return match(when, when, dur);
     }
 
     @Nullable default Task matchEternal() {
@@ -235,9 +236,15 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     default Task answer(long when, long now, float dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
-        Task answer = match(when, now, dur, question, false);
+        Task answer = match(when, now, dur, question, template, false);
         if (answer == null || answer.isDeleted())
             return null;
+        else {
+            if (answer instanceof DynamicBeliefTask) {
+                nar.input(answer);
+                return answer;
+            }
+        }
 
         //project if different occurrence
         long answerStart = answer.start();

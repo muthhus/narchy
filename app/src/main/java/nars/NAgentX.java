@@ -167,7 +167,7 @@ abstract public class NAgentX extends NAgent {
             window(
                     new TabPane(new TreeMap<String, Supplier<Surface>>(Map.of(
                             "agent", () -> new ReflectionSurface(a),
-                            "core", () -> new ReflectionSurface(((Default)a.nar).core),
+                            "focus", () -> new ReflectionSurface(((Default)a.nar).core),
                             "derive", () -> new ReflectionSurface(((Default)a.nar).derivationBudgeting),
                             "nar", () -> new ReflectionSurface(a.nar),
                             "input", () -> grid(a.cam.values().stream().map(cs ->
@@ -175,7 +175,7 @@ abstract public class NAgentX extends NAgent {
                                     .toArray(Surface[]::new)),
                             "inputEdit", () -> Vis.newInputEditor(a.nar),
                             "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.05f) , 64),
+                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64),
                             "conceptBudget", () ->
                                     Vis.budgetHistogram(nar, 64),
                             //"tasks", ()-> taskChart,

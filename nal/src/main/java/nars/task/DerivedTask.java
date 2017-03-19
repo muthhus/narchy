@@ -138,7 +138,7 @@ abstract public class DerivedTask extends ImmutableTask {
             } else {
 
                 feedbackToPremiseConcepts(nar);
-                feedbackToPremiseLinks(deltaConfidence, deltaSatisfaction, nar);
+                //feedbackToPremiseLinks(deltaConfidence, deltaSatisfaction, nar);
 
             }
 
@@ -190,50 +190,50 @@ abstract public class DerivedTask extends ImmutableTask {
             }
         }
 
-        public void feedbackToPremiseLinks(float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
-
-
-                /* HEURISTIC */
-
-            float rate = nar.linkFeedbackRate.floatValue();
-            if (rate > 0) {
-                float boost = 0f;
-                boost += rate * Math.abs(deltaConfidence);
-                boost += rate * Math.abs(deltaSatisfaction);
-
-                //            float boost =
-                //                    //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
-                //                    //1f + deltaConfidence * Math.abs(deltaSatisfaction);
-                //                    //1f + Math.max(deltaConfidence, deltaSatisfaction);
-                //                    1f + confBoost / 2f + satisBoost / 2f;
-
-
-                if (boost > Param.BUDGET_EPSILON) {
-
-                    @Nullable Premise premise1 = this.premise;
-                    if (premise1 != null) {
-
-                        Concept c = nar.concept(premise1.concept);
-
-                        if (c != null) {
-                            nar.activate(c, boost);
-
-                            BLink<Term> b = new RawBLink(premise1.term, boost, 0.5f);
-                            c.termlinks().put(b);
-                            //c.tasklinks().boost(premise.task, score);
-                            //nar.concept(c.term(), b);
-                        }
-
-
-                    }
-
-                    //budget().priMult(score);
-
-                }
-
-
-            }
-        }
+//        public void feedbackToPremiseLinks(float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+//
+//
+//                /* HEURISTIC */
+//
+//            float rate = nar.linkFeedbackRate.floatValue();
+//            if (rate > 0) {
+//                float boost = 0f;
+//                boost += rate * Math.abs(deltaConfidence);
+//                boost += rate * Math.abs(deltaSatisfaction);
+//
+//                //            float boost =
+//                //                    //1f + or(Math.abs(deltaConfidence), Math.abs(deltaSatisfaction));
+//                //                    //1f + deltaConfidence * Math.abs(deltaSatisfaction);
+//                //                    //1f + Math.max(deltaConfidence, deltaSatisfaction);
+//                //                    1f + confBoost / 2f + satisBoost / 2f;
+//
+//
+//                if (boost > Param.BUDGET_EPSILON) {
+//
+//                    @Nullable Premise premise1 = this.premise;
+//                    if (premise1 != null) {
+//
+//                        Concept c = nar.concept(premise1.concept);
+//
+//                        if (c != null) {
+//                            nar.activate(c, boost);
+//
+//                            BLink<Term> b = new RawBLink(premise1.term, boost, 0.5f);
+//                            c.termlinks().put(b);
+//                            //c.tasklinks().boost(premise.task, score);
+//                            //nar.concept(c.term(), b);
+//                        }
+//
+//
+//                    }
+//
+//                    //budget().priMult(score);
+//
+//                }
+//
+//
+//            }
+//        }
 
     }
 

@@ -181,7 +181,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     //private boolean createRelation = false;
 
 
-    protected void abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);
@@ -218,11 +218,12 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
                     nar.input(abbreviationTask);
                     logger.info("{}", abbreviationTask);
+                    return true;
                 }
             }
         }
 
-
+        return false;
     }
 
 //        final NLPGen nlpGen = new NLPGen();

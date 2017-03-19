@@ -148,19 +148,20 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //    }
 
     @Override
-    public @Nullable Task match(long when, long now, float dur, @Nullable Task target, boolean noOverlap) {
-        Compound localTerm = $.terms.retemporalize( dynamicConcept.term() );
+    public @Nullable Task match(long when, long now, float dur, @Nullable Task target, Compound template, boolean noOverlap) {
+        if (template == null)
+            template = $.terms.retemporalize( dynamicConcept.term() );
 
-        Compound template =
-                //use the provided target task as a temporal template if it matches with this
-                ((target != null) && Terms.equal(localTerm, target.term(), false, false, false)) ?
-                        target.term()
-                    :
-                localTerm;
+//        Compound template =
+//                //use the provided target task as a temporal template if it matches with this
+//                ((target != null) && Terms.equal(localTerm, target.term(), false, false, false)) ?
+//                        target.term()
+//                    :
+//                localTerm;
 
         Task y = generate(template, when);
 
-        Task x = super.match(when, now, dur, target, noOverlap);
+        Task x = super.match(when, now, dur, target, template, noOverlap);
 
         if (x == null) return y;
         if (y == null) return x;
