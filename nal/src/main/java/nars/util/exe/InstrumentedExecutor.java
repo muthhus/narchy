@@ -47,9 +47,13 @@ public class InstrumentedExecutor extends Executioner {
     }
 
     @Override
-    public synchronized void stop() {
+    public void stop() {
         exe.stop();
-        super.stop();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return exe.isRunning();
     }
 
     public PeriodMeter meter(Class cc) {

@@ -84,8 +84,8 @@ public class MultiThreadExecutor extends Executioner {
                 //new BusySpinWaitStrategy()
                 /*new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
                         new LiteBlockingWaitStrategy())*/
-                //new LiteBlockingWaitStrategy()
-                new SleepingWaitStrategy()
+                new LiteBlockingWaitStrategy()
+                //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)
 
@@ -102,8 +102,9 @@ public class MultiThreadExecutor extends Executioner {
     }
 
 
+
     @Override
-    public synchronized void stop() {
+    public void stop() {
 
         synchronized (disruptor) {
 
@@ -111,7 +112,7 @@ public class MultiThreadExecutor extends Executioner {
             disruptor.halt();
         }
 
-        super.stop();
+        nar = null;
 
     }
 

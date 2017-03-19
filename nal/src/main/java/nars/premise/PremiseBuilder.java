@@ -202,9 +202,6 @@ abstract public class PremiseBuilder {
         if (q.op() != a.op())
             return null; //no chance
 
-        if (q.equals(a))
-            return null;
-
         if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
 
             List<Term> result = $.newArrayList(1);

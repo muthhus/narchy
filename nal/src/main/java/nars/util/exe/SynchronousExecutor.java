@@ -10,9 +10,16 @@ public class SynchronousExecutor extends Executioner {
 
     //final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
+    boolean stopping = false;
+
     @Override
     public int concurrency() {
         return 1;
+    }
+
+    @Override
+    public void stop() {
+        stopping = true;
     }
 
     @Override
@@ -26,6 +33,10 @@ public class SynchronousExecutor extends Executioner {
 
         nar.eventCycleStart.emit(nar);
 
+        if (stopping) {
+            nar = null;
+            stopping = false;
+        }
     }
 
     @Override

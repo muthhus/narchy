@@ -51,15 +51,15 @@ public class PatrickTests extends AbstractNALTest {
         TestNAR tt = test();
         tt
 //.log()
-.believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
-.believe("(/,REPRESENT,_,ANIMAL):cat")
-.believe("(/,REPRESENT,_,EATING):eats")
+                .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
+                .believe("(/,REPRESENT,_,ANIMAL):cat")
+                .believe("(/,REPRESENT,_,EATING):eats")
 
 //should WORK with either of these two questions:
 //.askAt(1250,"REPRESENT:((eats,cat),?what)")
-.askAt(550, "REPRESENT:((cat,eats),(?x, ?y))")
+                .askAt(550, "REPRESENT:((cat,eats),(?x, ?y))")
 
-.mustBelieve(2500, "REPRESENT:((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
+                .mustBelieve(2500, "REPRESENT:((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
         //.mustBelieve(2500, "REPRESENT:((eats, cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }
@@ -119,19 +119,19 @@ public class PatrickTests extends AbstractNALTest {
 
 
         tt.input(
-            "made_of(toothbrush,plastic).",
-            "( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
-            "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
-            "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
-            "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
-            "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
-            "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!",
-            "<toothbrush --> here>. :|:" //there is a toothbrush here NOW
+                "made_of(toothbrush,plastic).",
+                "( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
+                "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
+                "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
+                "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
+                "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
+                "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!",
+                "<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
         //tt.log();
 
         tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", GOAL, 1f, 1f,
-0.10f, 1f, //at least some confidence
+                0.10f, 1f, //at least some confidence
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
 
@@ -197,7 +197,8 @@ public class PatrickTests extends AbstractNALTest {
 
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testPixelImage() throws Narsese.NarseseException {
 
         Default n = new Default(1024, 16, 1, 3);
@@ -225,32 +226,32 @@ public class PatrickTests extends AbstractNALTest {
 //    |    ▒▒  ░░|
 //    |      ░░  |
         String image1 =
-        "<p_1_1 --> P>. :|: %0.5;0.9%\n" +
-        "<p_1_2 --> P>. :|: %0.5;0.9%\n" +
-        "<p_1_3 --> P>. :|: %0.6;0.9%\n" +
-        "<p_1_4 --> P>. :|: %0.6;0.9%\n" +
-        "<p_1_5 --> P>. :|: %0.5;0.9%\n" +
-        "<p_2_1 --> P>. :|: %0.5;0.9%\n" +
-        "<p_2_2 --> P>. :|: %0.5;0.9%\n" +
-        "<p_2_3 --> P>. :|: %0.8;0.9%\n" +
-        "<p_2_4 --> P>. :|: %0.5;0.9%\n" +
-        "<p_2_5 --> P>. :|: %0.5;0.9%\n" +
-        "<p_3_1 --> P>. :|: %0.6;0.9%\n" +
-        "<p_3_2 --> P>. :|: %0.8;0.9%\n" +
-        "<p_3_3 --> P>. :|: %0.9;0.9%\n" +
-        "<p_3_4 --> P>. :|: %0.5;0.9%\n" +
-        "<p_3_5 --> P>. :|: %0.5;0.9%\n" +
-        "<p_4_1 --> P>. :|: %0.5;0.9%\n" +
-        "<p_4_2 --> P>. :|: %0.5;0.9%\n" +
-        "<p_4_3 --> P>. :|: %0.7;0.9%\n" +
-        "<p_5_4 --> P>. :|: %0.6;0.9%\n" +
-        "<p_4_4 --> P>. :|: %0.5;0.9%\n" +
-        "<p_4_5 --> P>. :|: %0.6;0.9%\n" +
-        "<p_5_1 --> P>. :|: %0.5;0.9%\n" +
-        "<p_5_2 --> P>. :|: %0.5;0.9%\n" +
-        "<p_5_3 --> P>. :|: %0.5;0.9%\n" +
-        "<p_5_5 --> P>. :|: %0.5;0.9%\n" +
-        "<example1 --> name>. :|:";
+                "<p_1_1 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_1_2 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_1_3 --> P>. :|: %0.6;0.9%\n" +
+                        "<p_1_4 --> P>. :|: %0.6;0.9%\n" +
+                        "<p_1_5 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_2_1 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_2_2 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_2_3 --> P>. :|: %0.8;0.9%\n" +
+                        "<p_2_4 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_2_5 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_3_1 --> P>. :|: %0.6;0.9%\n" +
+                        "<p_3_2 --> P>. :|: %0.8;0.9%\n" +
+                        "<p_3_3 --> P>. :|: %0.9;0.9%\n" +
+                        "<p_3_4 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_3_5 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_4_1 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_4_2 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_4_3 --> P>. :|: %0.7;0.9%\n" +
+                        "<p_5_4 --> P>. :|: %0.6;0.9%\n" +
+                        "<p_4_4 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_4_5 --> P>. :|: %0.6;0.9%\n" +
+                        "<p_5_1 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_5_2 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_5_3 --> P>. :|: %0.5;0.9%\n" +
+                        "<p_5_5 --> P>. :|: %0.5;0.9%\n" +
+                        "<example1 --> name>. :|:";
 
 
         n.input(image1.split("\n"));
@@ -259,7 +260,7 @@ public class PatrickTests extends AbstractNALTest {
         //(&|,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>,<example1 --> name>)?\n" +
 
         //for (int i = 0; i < 2; i++) {
-            n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_4"), $("P:p_4_3"), $("name:example1")));
+        n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_4"), $("P:p_4_3"), $("name:example1")));
         //}
 
         //Answer (&|,<example1 --> name>,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>). :-1: %0.80;0.16%
@@ -277,32 +278,32 @@ public class PatrickTests extends AbstractNALTest {
 //    |    ▒▒  ░░|
 //    |      ░░  |
         String image2 =
-            "<p_1_1 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_1_2 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_1_3 --> pixel>. :|: %0.6;0.9%\n" +
-            "<p_1_4 --> pixel>. :|: %0.6;0.9%\n" +
-            "<p_1_5 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_2_1 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_2_2 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_2_3 --> pixel>. :|: %0.8;0.9%\n" +
-            "<p_2_4 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_2_5 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_3_1 --> pixel>. :|: %0.6;0.9%\n" +
-            "<p_3_2 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_3_3 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_3_4 --> pixel>. :|: %0.8;0.9%\n" +
-            "<p_3_5 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_4_1 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_4_2 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_4_3 --> pixel>. :|: %0.7;0.9%\n" +
-            "<p_5_4 --> pixel>. :|: %0.6;0.9%\n" +
-            "<p_4_4 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_4_5 --> pixel>. :|: %0.6;0.9%\n" +
-            "<p_5_1 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_5_2 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_5_3 --> pixel>. :|: %0.5;0.9%\n" +
-            "<p_5_5 --> pixel>. :|: %0.5;0.9%\n" +
-            "<example2 --> name>. :|:";
+                "<p_1_1 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_1_2 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_1_3 --> pixel>. :|: %0.6;0.9%\n" +
+                        "<p_1_4 --> pixel>. :|: %0.6;0.9%\n" +
+                        "<p_1_5 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_2_1 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_2_2 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_2_3 --> pixel>. :|: %0.8;0.9%\n" +
+                        "<p_2_4 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_2_5 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_3_1 --> pixel>. :|: %0.6;0.9%\n" +
+                        "<p_3_2 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_3_3 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_3_4 --> pixel>. :|: %0.8;0.9%\n" +
+                        "<p_3_5 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_4_1 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_4_2 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_4_3 --> pixel>. :|: %0.7;0.9%\n" +
+                        "<p_5_4 --> pixel>. :|: %0.6;0.9%\n" +
+                        "<p_4_4 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_4_5 --> pixel>. :|: %0.6;0.9%\n" +
+                        "<p_5_1 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_5_2 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_5_3 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<p_5_5 --> pixel>. :|: %0.5;0.9%\n" +
+                        "<example2 --> name>. :|:";
 
         n.input(image2.split("\n"));
 
@@ -310,8 +311,8 @@ public class PatrickTests extends AbstractNALTest {
         //(&|,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>,<example2 --> name>)?
 
         //for (int i = 0; i < 8; i++) {
-            n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_3"), $("P:p_3_4"), $("P:p_4_3"), $("name:example2")));
-            n.run(6000);
+        n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_3"), $("P:p_3_4"), $("P:p_4_3"), $("name:example2")));
+        n.run(6000);
         //}
 
         //Answer (&|,<example2 --> name>,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>). %0.50;0.40%

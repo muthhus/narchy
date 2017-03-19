@@ -26,13 +26,8 @@ abstract public class Executioner implements Executor {
 //        }
     }
 
-    public synchronized void stop() {
-        if (this.nar != null) {
-            this.nar = null;
-        } /*else {
-            throw new RuntimeException("not already started");
-        }*/
-    }
+    /** needs to set nar to null */
+    abstract public void stop();
 
     abstract public void cycle(@NotNull NAR nar);
 
@@ -52,7 +47,11 @@ abstract public class Executioner implements Executor {
 
     /** default impl: */
     public void run(@NotNull Consumer<NAR> r) {
-        this.run(()->r.accept(nar));
+        if (nar!=null) {
+            this.run(() -> r.accept(nar));
+        } else {
+            throw new RuntimeException("stopped");
+        }
     }
 
     abstract public void run(Runnable cmd);

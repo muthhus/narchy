@@ -1370,7 +1370,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @NotNull
     public NAR stopIf(@NotNull BooleanSupplier stopCondition) {
         onCycle(n -> {
-            if (stopCondition.getAsBoolean()) stop();
+            if (stopCondition.getAsBoolean())
+                stop();
         });
         return this;
     }

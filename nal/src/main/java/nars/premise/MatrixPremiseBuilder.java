@@ -44,7 +44,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
 
     @Override
-    public @Nullable Derivation newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua, Consumer<DerivedTask> each, NAR nar) {
+    public @Nullable Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar) {
 
         Premise p = new Premise(c, task, beliefTerm, belief, pri, qua);
 
@@ -56,7 +56,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     }
 
 
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
+    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, @NotNull MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
         @NotNull Bag<Task,BLink<Task>> tasklinkBag = c.tasklinks();
         @NotNull Bag<Term,BLink<Term>> termlinkBag = c.termlinks();
