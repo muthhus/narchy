@@ -71,7 +71,8 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
         private final byte[] decoded;
 
         Abbr(Compound decompressed, @NotNull AliasConcept compressed, NAR nar) {
-            super(decompressed, 1f);
+            super(decompressed, usageBoost(decompressed)
+            );
 
             this.compressed = compressed;
 
@@ -86,6 +87,12 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
             nar.on(this.compressed);
         }
+    }
+
+
+    /* boost in proportion to the volume of the uncompressed term, with a scaling factor relative to the capacity of the bag (to avoid clipping at 1.0) */
+    protected float usageBoost(Compound decompressed) {
+        return 1f/code.capacity() * (decompressed.volume() - 1); /* -1 to compensate for the cost of the abbreviation, ie. an atom */
     }
 
 
@@ -146,7 +153,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
         Abbr abb = code.get(abbreviated);
         if (abb != null) {
             //boost it
-            abb.priAdd(b.pri());
+            abb.priAdd(b.pri() * usageBoost(abb.get()));
             return;
         }
 

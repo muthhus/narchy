@@ -308,17 +308,18 @@ abstract public class NAgent implements NSense, NAct {
             Term action = a.term();
 
 
-            long now = nar.time();
+
 
 
             ((FasterList<Tasked>) predictors).addAll(
-                () -> goal((Compound) action.term(), $.t(nar.random.nextFloat(), curiosity.floatValue()), now)
+                () -> goal((Compound) action.term(), $.t(nar.random.nextFloat(), curiosity.floatValue()), nar.time(), nar.time() + (int) Math.ceil(nar.time.dur()))
             );
 
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()), now)
+                    //quest((Compound) (action.term()), now)
+                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
 
                     //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.01f), now, now)
                     //prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.01f), now, now)

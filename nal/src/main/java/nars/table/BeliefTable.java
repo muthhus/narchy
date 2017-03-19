@@ -2,6 +2,7 @@ package nars.table;
 
 import jcog.bag.Prioritized;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.budget.Budget;
 import nars.concept.TaskConcept;
@@ -234,17 +235,9 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     default Task answer(long when, long now, float dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
-        Budget qBudget = question.budget();
-
-        Task answer;
-
-        answer = match(when, now, dur, question, false);
+        Task answer = match(when, now, dur, question, false);
         if (answer == null || answer.isDeleted())
             return null;
-
-//            //require EXACT term (except for variables) but otherwise requiring exact same dt structure
-//            if (!answer.term().equalsIgnoringVariables(question.term()))
-//                return null;
 
         //project if different occurrence
         long answerStart = answer.start();
@@ -253,27 +246,21 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (aProj == null)
                 return null;
 
-            Budget answerBudget = answer.budget().clone();
-            if (answerBudget == null)
-                return null;
-
             AnswerTask a = new AnswerTask(
                     answer.term(),
                     answer,
                     question,
                     aProj, now, when, when, 0.5f);
-            a.setBudget(answerBudget);
-            answer = a;
+            a.budgetSafe(answer.budget());
 
-                    //.log("Answer Projected")
+            if (Param.DEBUG)
+                a.log("Answer Projected");
 
-
+            nar.input(a);
+            return a;
+        } else {
+            return answer;
         }
-
-
-
-
-        return answer;
     }
 
     @Override default void forEachTask(Consumer<? super Task> x) {

@@ -52,7 +52,7 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 3;
+        final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
@@ -74,14 +74,14 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 192 * 1024;
+        int maxConcepts = 128 * 1024;
 
         Default nar = new Default(2 * 1024,
                 1, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, maxConcepts * 3,
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, maxConcepts * 2,
                     exe
                     //null /* null = fork join common pool */
                 )
@@ -136,10 +136,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 20;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
             final Compressor compressor = new Compressor(this, "_",
-                    4, 6,
-                    0f, 32, 256);
+                    4, 8,
+                    0.05f, 32, 256);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -203,7 +203,7 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 6, true, 6);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 6);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 3);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

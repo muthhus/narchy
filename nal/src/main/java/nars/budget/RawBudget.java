@@ -144,7 +144,7 @@ public class RawBudget implements Budget {
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
     @NotNull
     public final RawBudget budgetSafe(@NotNull Budget b) {
-        budgetSafe(b.pri(), b.qua());
+        budgetSafe(b.priSafe(0), b.qua());
         return this;
     }
 

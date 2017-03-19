@@ -7,6 +7,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -109,7 +110,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         {
             beliefCompl = belief.complexity();
             parentComplexity =
-                    Math.min(taskCompl, beliefCompl);
+                    (int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
         } else {
             beliefCompl = 0;
             parentComplexity = taskCompl;
@@ -118,19 +119,19 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         int derivedComplexity = conclusion.complexity();
 
         //controls complexity decay rate
-        int penaltyComplexity;
-        if (punc == QUESTION || punc == QUEST) {
-            //for questions, penalize more by including the parentComplexity in the denominator
-            penaltyComplexity =
-                    //parentComplexity;
-                    taskCompl + beliefCompl;
-        } else {
-            penaltyComplexity = 1;
-        }
+//        int penaltyComplexity;
+//        if (punc == QUESTION || punc == QUEST) {
+//            //for questions, penalize more by including the parentComplexity in the denominator
+//            penaltyComplexity =
+//                    //parentComplexity;
+//                    taskCompl + beliefCompl;
+//        } else {
+//            penaltyComplexity = 1;
+//        }
         return
                 //Util.sqr( //sharpen
-                    //Util.unitize( ((float) parentComplexity) / (penaltyComplexity + derivedComplexity))
-                    Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
+                    Util.unitize( ((float) parentComplexity) / (parentComplexity + derivedComplexity))
+                    //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
                 //)
             ;
     }
