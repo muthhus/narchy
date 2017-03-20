@@ -34,7 +34,7 @@ public class MatrixPad extends Layout {
                 c.add(components[x][y] = builder.newComponent(x, y));
             }
         }
-        setChildren(c);
+        set(c);
     }
 
     @Override

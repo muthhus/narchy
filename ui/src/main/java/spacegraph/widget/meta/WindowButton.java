@@ -17,6 +17,8 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
 
     private final Supplier spacer;
 
+    int width = 400, height = 240;
+
     SpaceGraph space;
 
     public WindowButton(String text, Object o) {
@@ -28,13 +30,16 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
         this.spacer = spacer;
         on(this);
     }
+    public WindowButton(String text, Supplier spacer, int w, int h) {
+        this(text, spacer);
+        this.width = w; this.height = h;
+    }
 
     @Override
     public void onChange(ToggleButton t, boolean enabled) {
         synchronized (this) {
             if (enabled) {
                 if (space == null) {
-                    int width = 800, height = 800;
                     space = SpaceGraph.window(spacer.get(), width, height);
                     space.addWindowListener(this);
                 }

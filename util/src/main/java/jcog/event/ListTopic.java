@@ -19,17 +19,15 @@ public class ListTopic<V> extends ArrayList<Consumer<V>> implements Topic<V> {
 
     }
 
-    @Override
-    public final On on(Consumer<V> o) {
-        On d = new On(this, o);
-        this.add(o);
-        return d;
+    @Override public final void enable(Consumer<V> o) {
+        if(!this.add(o)) {
+            throw new RuntimeException(this + " not added " + o);
+        }
     }
 
-    @Override
-    public final void off(On<V> o) {
-        if(!this.remove(o.reaction)) {
-            throw new RuntimeException(this + " has not " + o.reaction);
+    @Override public final void disable(Consumer<V> o) {
+        if(!this.remove(o)) {
+            throw new RuntimeException(this + " not removed " + o);
         }
     }
 

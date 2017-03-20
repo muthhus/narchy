@@ -65,8 +65,8 @@ public class NARHear extends NAgent {
                             new FloatSlider(audio.gain)
                     ),
                     new MatrixView(ae.W.length, ae.W[0].length, MatrixView.arrayRenderer(ae.W)),
-                    new MatrixView(ae.y, 4, (v, gl) -> { Draw.colorPolarized(gl, v); return 0; }),
-                    Vis.conceptLinePlot(nar, freqInputs, 64)
+                    new MatrixView(ae.y, 4, (v, gl) -> { Draw.colorPolarized(gl, v); return 0; })
+                    //Vis.conceptLinePlot(nar, freqInputs, 64)
                 ),
                 1200, 1200);
 

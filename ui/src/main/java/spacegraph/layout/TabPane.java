@@ -43,7 +43,7 @@ public class TabPane extends VSplit {
             togglesShown.add(c);
         });
 
-        header.setChildren(togglesShown);
+        header.set(togglesShown);
 
         update();
     }

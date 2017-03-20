@@ -14,6 +14,10 @@ import java.util.function.Predicate;
  */
 public interface Topic<V> {
 
+    void enable(Consumer<V> o);
+
+    void disable(Consumer<V> o);
+
     void delete();
 
     //List<Consumer<V>> all();
@@ -75,8 +79,13 @@ public interface Topic<V> {
     /** TODO rename to 'out' to match Streams api */
     void emit(V arg);
 
-    @NotNull On on(@NotNull Consumer<V> o);
-    void off(@NotNull On<V> reaction);
+    default On on(Consumer<V> o) {
+        return new On.Strong<>(this, o);
+    }
+    default On onWeak(Consumer<V> o) {
+        return new On.Weak<>(this, o);
+    }
+
 
 //    @SafeVarargs
 //    static <V> Active onAll(@NotNull Consumer<V> o, Topic... w) {

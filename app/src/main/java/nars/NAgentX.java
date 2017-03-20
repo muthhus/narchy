@@ -139,27 +139,40 @@ abstract public class NAgentX extends NAgent {
         NAR nar = a.nar;
         a.nar.runLater(() -> {
             window( grid(
-                new WindowButton( "nar", () -> a.nar ),
-                new WindowButton( "agent", () -> (a) ),
-                new WindowButton( "deriver", () -> ((Default)a.nar).derivationBudgeting ),
-                new WindowButton( "focus", () -> (((Default)a.nar).core) ),
-                new WindowButton( "log", () -> Vis.logConsole(nar, 90, 40, new FloatParam(0f)) ),
-                new WindowButton( "vision", () -> grid(a.cam.values().stream().map(cs ->
-                                    new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
-                                    .toArray(Surface[]::new))
-                                ),
-                new WindowButton("input", () -> Vis.newInputEditor(a.nar)),
 
                 grid(
+                    new WindowButton( "nar", () -> nar ),
                     new WindowButton( "emotion", () -> Vis.emotionPlots(a.nar, 256) ),
-                            //"agentActions", () -> Vis.agentActions(a, 64f)
-                            //"agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
+                    new WindowButton( "deriver", () -> ((Default)nar).derivationBudgeting ),
+                    new WindowButton( "focus", () -> (((Default)nar).core) )
+                ),
+
+                grid(
+                    new WindowButton( "log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f)) ),
+                    new WindowButton("prompt", () -> Vis.newInputEditor(nar), 300, 60)
+                ),
+
+                grid(
+                    Vis.beliefCharts(400, nar, a.happy),
+                    new WindowButton( "agent", () -> (a) ),
+                    new WindowButton( "action", () -> Vis.beliefCharts(400, a.actions, a.nar ) ),
+                    new WindowButton( "predict", () -> Vis.beliefCharts(400, a.predictors, a.nar ) ),
+                        //"agentActions",
+                        //"agentPredict",
+
+                    new WindowButton( "vision", () -> grid(a.cam.values().stream().map(cs ->
+                                        new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
+                                        .toArray(Surface[]::new))
+                                )
+                ),
+
+                grid(
                     new WindowButton( "conceptBudget", Vis.budgetHistogram(nar, 64) ),
-                    new WindowButton( "conceptTree", ()-> Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64) ),
+                    new WindowButton( "conceptTreeMap", ()-> Vis.treeChart( nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64) ),
                             //"tasks", ()-> taskChart,
-                    new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500) )
+                    new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar, 32, 4).show(500,500) )
                 )
-            ), 1200, 900);
+            ), 600, 400);
         });
     }
 
@@ -180,7 +193,7 @@ abstract public class NAgentX extends NAgent {
 
                             //budgetHistogram(d, 16),
 
-                            Vis.agentActions(a, 50),
+                            //Vis.agentActions(a, 50),
                             //Vis.beliefCharts(400, a.predictors, a.nar),
                             new ReflectionSurface<>(a.nar),
 

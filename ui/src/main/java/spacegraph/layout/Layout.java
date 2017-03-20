@@ -25,7 +25,7 @@ import java.util.Objects;
     }
 
     public Layout(List<Surface> children) {
-        setChildren(children);
+        set(children);
     }
 
 
@@ -34,11 +34,11 @@ import java.util.Objects;
         return children;
     }
 
-    public void setChildren(Surface... s) {
-        setChildren(Lists.newArrayList(s));
+    public void set(Surface... s) {
+        set(Lists.newArrayList(s));
     }
 
-    public void setChildren(List<Surface> children) {
+    public void set(List<Surface> children) {
         if (!Objects.equals(this.children, children)) {
             if ((this.children = children)!=null)
                 layout();

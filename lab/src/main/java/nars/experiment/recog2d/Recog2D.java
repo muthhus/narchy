@@ -11,6 +11,7 @@ import nars.NAgentX;
 import nars.Param;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
+import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.video.CameraSensor;
@@ -25,10 +26,12 @@ import spacegraph.widget.meter.Plot2D;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.util.stream.Collectors.toList;
 import static jcog.Texts.n2;
 import static nars.Op.BELIEF;
 import static spacegraph.layout.Grid.col;
@@ -132,7 +135,7 @@ public class Recog2D extends NAgentX {
 
         Grid g = col(
 
-                row(BeliefTableChart.beliefTableCharts(nar, out.keySet(), 1024)),
+                row(beliefTableCharts(nar, out.keySet(), 1024)),
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
                     rewardValue
@@ -227,6 +230,16 @@ public class Recog2D extends NAgentX {
         });
 
         return g;
+    }
+
+    @Deprecated public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
+        long[] btRange = new long[2];
+        nar.onCycle(nn -> {
+            long now = nn.time();
+            btRange[0] = now - window;
+            btRange[1] = now + window;
+        });
+        return terms.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
     }
 
 

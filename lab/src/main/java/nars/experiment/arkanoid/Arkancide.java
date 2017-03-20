@@ -1,6 +1,7 @@
 package nars.experiment.arkanoid;
 
 
+import jcog.data.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
@@ -13,7 +14,8 @@ public class Arkancide extends NAgentX {
 
     static boolean cam = true;
 
-    private final float paddleSpeed = 1f;
+    public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
+    public final FloatParam paddleSpeed = new FloatParam(1f, 0.1f, 3f);
 
 
     final int visW = 40;
@@ -122,7 +124,7 @@ public class Arkancide extends NAgentX {
 //                System.err.println(t.proof());
 //        });
 
-        maxPaddleSpeed = 15 * Arkanoid.BALL_VELOCITY;
+        maxPaddleSpeed = 15 * noid.BALL_VELOCITY;
 
         //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
         //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
@@ -153,7 +155,7 @@ public class Arkancide extends NAgentX {
 
             float pct;
             if (d != null) {
-                pct = noid.paddle.moveTo(d.freq(), paddleSpeed * maxPaddleSpeed);// * d.conf());
+                pct = noid.paddle.moveTo(d.freq(), paddleSpeed.floatValue() * maxPaddleSpeed);// * d.conf());
             } else {
                 pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
             }
@@ -171,6 +173,7 @@ public class Arkancide extends NAgentX {
 
     @Override
     protected float act() {
+        noid.BALL_VELOCITY = ballSpeed.floatValue();
         float nextScore = noid.next();
         float reward = Math.max(-1f, Math.min(1f,nextScore - prevScore));
         this.prevScore = nextScore;

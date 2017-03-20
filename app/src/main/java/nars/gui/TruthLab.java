@@ -61,7 +61,7 @@ public class TruthLab extends Grid {
 
         List<Surface> cc = $.newArrayList();
         views.forEach(l -> cc.addAll( l.update(n, start, end, samplePeriod) ));
-        setChildren(cc);
+        set(cc);
         layout();
     }
 

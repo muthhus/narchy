@@ -214,7 +214,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                     window.setSize(new TerminalSize(c-2,r-2));
 
 
-                    TextBox t = new TextBox("sdf", TextBox.Style.MULTI_LINE);
+                    TextBox t = new TextBox("", TextBox.Style.MULTI_LINE);
                     t.setPreferredSize(new TerminalSize(c-3,r-3));
 
                     t.takeFocus();

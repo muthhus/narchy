@@ -1,5 +1,6 @@
 package spacegraph.input;
 
+import spacegraph.SpaceGraph;
 import spacegraph.math.v3;
 import spacegraph.render.JoglPhysics;
 
@@ -8,7 +9,7 @@ import static spacegraph.math.v3.v;
 /** simple XYZ control using keys (ex: numeric keypad) */
 public class KeyXYZ extends KeyXY {
 
-    public KeyXYZ(JoglPhysics g) {
+    public KeyXYZ(SpaceGraph g) {
         super(g);
 
 

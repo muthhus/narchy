@@ -16,7 +16,7 @@ public class CheckBox extends ToggleButton {
 
     public CheckBox(String text) {
         this.text = text;
-        setChildren(label = new Label(""));
+        set(label = new Label(""));
         set(false);
     }
 

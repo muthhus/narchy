@@ -37,13 +37,13 @@ public class Grid extends Layout {
     public Grid(float aspect, Surface... children) {
         super();
         this.gridAspect = (aspect);
-        setChildren(children);
+        set(children);
     }
 
     public Grid(float aspect, List<Surface> children) {
         super();
         this.gridAspect = (aspect);
-        setChildren(children);
+        set(children);
     }
 
 

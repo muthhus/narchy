@@ -25,7 +25,7 @@ public class Space2D extends Layout {
 
     public Space2D(List<Surface> content) {
         super();
-        setChildren(content);
+        set(content);
     }
 
 

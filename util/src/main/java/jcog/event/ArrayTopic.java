@@ -85,18 +85,19 @@ public class ArrayTopic<V> extends ArraySharingList<Consumer<V>> implements Topi
 
     }
 
-    @Override
-    public final On on(Consumer<V> o) {
-        On<V> d = new On<>(this, o);
+
+
+
+    /** called by On<V> instances */
+    @Override public void enable(Consumer<V> o) {
+        //assert(!contains(o))...
         add(o);
-        return d;
     }
 
-
-    @Override
-    public final void off(On<V> o) {
-        if (!remove(o.reaction))
-            throw new RuntimeException(this + " has not " + o.reaction);
+    /** called by On<V> instances */
+    @Override public final void disable(Consumer<V> o) {
+        if (!remove(o))
+            throw new RuntimeException(this + " has not " + o);
     }
 
 

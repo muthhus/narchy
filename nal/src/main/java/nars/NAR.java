@@ -1384,12 +1384,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      * a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame.
      */
-    @NotNull
-    public final On onCycle(@NotNull Consumer<NAR> each) {
-        On r;
-        /*on.add(*/
-        r = eventCycleStart.on(each);//);
-        return r;
+    @NotNull public final On onCycle(@NotNull Consumer<NAR> each) {
+        return eventCycleStart.on(each);
+    }
+
+    /** avoid using lambdas with this, instead use an interface implementation of the class that is expected to be garbage collected */
+    @NotNull public final On onCycleWeak(@NotNull Consumer<NAR> each) {
+        return eventCycleStart.onWeak(each);
     }
 
     @NotNull

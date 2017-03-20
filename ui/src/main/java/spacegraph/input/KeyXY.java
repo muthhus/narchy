@@ -1,6 +1,7 @@
 package spacegraph.input;
 
 import com.jogamp.newt.event.KeyEvent;
+import spacegraph.SpaceGraph;
 import spacegraph.render.JoglPhysics;
 
 /**
@@ -9,7 +10,7 @@ import spacegraph.render.JoglPhysics;
 public class KeyXY extends SpaceKeys {
     protected float speed = 16f;
 
-    public KeyXY(JoglPhysics g) {
+    public KeyXY(SpaceGraph g) {
         super(g);
 
 

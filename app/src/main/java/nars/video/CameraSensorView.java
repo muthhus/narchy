@@ -7,11 +7,13 @@ import nars.nar.Default;
 import nars.truth.Truth;
 import spacegraph.widget.meter.MatrixView;
 
+import java.util.function.Consumer;
+
 /**
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  * monochrome
  */
-public class CameraSensorView extends MatrixView implements MatrixView.ViewFunction2D {
+public class CameraSensorView extends MatrixView implements MatrixView.ViewFunction2D, Consumer<NAR> {
 
     private final Sensor2D cam;
     private final NAR nar;
@@ -23,11 +25,14 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = nar;
-        nar.onCycle(nn -> {
-            now = nn.time();
-            dur = nn.time.dur();
-            maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
-        });
+        nar.onCycleWeak(this);
+    }
+
+    @Override
+    public void accept(NAR nn) {
+        now = nn.time();
+        dur = nn.time.dur();
+        maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
     }
 
     @Override

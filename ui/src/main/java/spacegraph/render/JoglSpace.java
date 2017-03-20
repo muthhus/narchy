@@ -1,5 +1,6 @@
 package spacegraph.render;
 
+import com.jogamp.nativewindow.WindowClosingProtocol;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
@@ -208,6 +209,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setTitle(title);
         g.setSurfaceSize(w, h);
         g.setVisible(true);
+        g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
+        g.preserveGLStateAtDestroy(false);
         this.window = g;
         return g;
     }

@@ -57,6 +57,6 @@ public class ReflectionSurface<X> extends Grid {
                 t.printStackTrace();
             }
         }
-        setChildren(l);
+        set(l);
     }
 }

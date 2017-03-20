@@ -30,6 +30,7 @@ import com.jogamp.opengl.math.FloatUtil;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 import spacegraph.math.Matrix4f;
 import spacegraph.math.Vector4f;
@@ -86,19 +87,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     }
 
-    public interface FrameListener {
-        void onFrame(JoglPhysics j);
-    }
 
-    final List<FrameListener> frameListeners = new FasterList();
 
-    public void addFrameListener(FrameListener f) {
-        frameListeners.add(f);
-    }
 
-    public void removeFrameListener(FrameListener f) {
-        frameListeners.remove(f);
-    }
 
     /**
      * activate/deactivate the simulation; by default it is enabled
@@ -310,7 +301,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //updateCamera();
     }
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
+    //final AtomicBoolean busy = new AtomicBoolean(false);
 
     protected void update() {
 
@@ -326,7 +317,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
             );
         }
 
-        frameListeners.forEach(f -> f.onFrame(this));
 
 
     }

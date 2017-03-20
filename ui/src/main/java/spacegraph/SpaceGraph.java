@@ -3,6 +3,7 @@ package spacegraph;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
@@ -19,6 +20,7 @@ import spacegraph.space.ListSpace;
 import spacegraph.widget.meta.ReflectionSurface;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -32,9 +34,20 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     final List<AbstractSpace<X,Spatial<X>>> inputs = new FasterList<>(1);
 
     final Cache<X, Spatial<X>> atoms;
+    final List<Ortho> preAdd = new FasterList();
+    final List<Consumer<SpaceGraph>> frameListeners = new FasterList();
+
+    @Override
+    public void windowDestroyed(WindowEvent windowEvent) {
+        atoms.invalidateAll();
+        orthos.clear();
+        inputs.clear();
+        frameListeners.clear();
+        preAdd.clear();
+    }
 
     public SpaceGraph() {
-        this(8 * 1024);
+        this(2 * 1024);
     }
 
     /**
@@ -82,7 +95,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    final List<Ortho> preAdd = new FasterList();
+    public void addFrameListener(Consumer<SpaceGraph> f) {
+        frameListeners.add(f);
+    }
+
+    public void removeFrameListener(Consumer<SpaceGraph> f) {
+        frameListeners.remove(f);
+    }
 
 
 
@@ -188,6 +207,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         this.inputs.forEach( this::update );
 
         super.update();
+
+        frameListeners.forEach(f -> f.accept(this));
+
     }
 
     protected void renderHUD() {

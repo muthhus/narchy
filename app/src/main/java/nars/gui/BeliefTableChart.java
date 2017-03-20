@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
@@ -20,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import static java.lang.Math.PI;
 import static java.util.stream.Collectors.toList;
@@ -27,11 +29,11 @@ import static nars.time.Tense.ETERNAL;
 import static spacegraph.layout.Grid.VERTICAL;
 
 
-public class BeliefTableChart extends Widget {
+public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
     public static final float baseTaskSize = 0.05f;
     public static final float CROSSHAIR_THICK = 3;
-    final Termed term;
+    final Term term;
     final TruthWave beliefs;
     final TruthWave beliefProj;
     final TruthWave goals;
@@ -40,12 +42,15 @@ public class BeliefTableChart extends Widget {
     final AtomicBoolean redraw;
 
 
-    private final NAR nar;
-    private String termString;
-    private long now;
-    private float dur;
+    Concept cc = null; //cached concept
+    float cp = 0; //cached priority
+    private float dur; //cached dur
+    private long now; //cached time
+    private String termString; //cached string
 
-    float angleSpeed = 0.5f;
+    private final NAR nar;
+
+    static final float angleSpeed = 0.5f;
 
     private BiFunction<Long, long[], long[]> rangeControl = (now, range) -> range; //default: no change
     float beliefTheta, goalTheta;
@@ -69,12 +74,12 @@ public class BeliefTableChart extends Widget {
 
     public BeliefTableChart(NAR n, Termed term, long[] range) {
         super();
-        this.term = term;
+        this.term = term.term();
         this.nar = n;
 
         this.range = range;
 
-        setChildren(label = new Label(term.toString()));
+        set(label = new Label(this.term.toString()));
 
         redraw = new AtomicBoolean(false);
 
@@ -87,43 +92,31 @@ public class BeliefTableChart extends Widget {
 
         //setAutoSwapBufferMode(true);
 
-        n.onCycle(nn -> {
-            update();
-        });
+        n.onCycleWeak(this);
 
         redraw.set(true);
 
     }
 
-    public static void newBeliefChart(NAR nar, Collection<? extends Termed> terms, long window) {
-
-        List<Surface> actionTables = beliefTableCharts(nar, terms, window);
 
 
-        new SpaceGraph().add(new Ortho(new Grid(VERTICAL, actionTables)).maximize()).show(800, 600);
-    }
+    public void update(NAR nar) {
 
-    public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
-        long[] btRange = new long[2];
-        nar.onCycle(nn -> {
-            long now = nn.time();
-            btRange[0] = now - window;
-            btRange[1] = now + window;
-        });
-        return terms.stream().map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-    }
-
-    public void update() {
+        if (!redraw.compareAndSet(true, false)) {
+            return;
+        }
 
         long now = this.now = nar.time();
-        float dur = this.dur = nar.time.dur();
+        float dur = this.dur = nar.dur();
 
-        Concept c = nar.concept(term.term()/* lookup by term, not the termed which could be a dead instance */);
+        cc = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
-        if (c != null) {
-            beliefs.set(c.beliefs(), now, dur);
-            goals.set(c.goals(), now, dur);
+        if (cc != null) {
+            cp = nar.pri(cc, 0);
+            beliefs.set(cc.beliefs(), now, dur);
+            goals.set(cc.goals(), now, dur);
         } else {
+            cp = 0;
             beliefs.set(BeliefTable.EMPTY, now, dur);
             goals.set(BeliefTable.EMPTY, now, dur);
         }
@@ -236,15 +229,11 @@ public class BeliefTableChart extends Widget {
         gl.glColor3f(0.5f, 0.5f, 0.5f); //border
         Draw.rectStroke(gl, 0, 0, 1, 1);
 
-        Concept cc = nar.concept(term);
-        float cp;
         String currentTermString = termString;
         if (cc != null) {
-            cp = nar.pri(cc, Float.NaN);
             draw(term, cc, gl, minT, maxT);
             termString = cc.toString();
         } else {
-            cp = 0;
             termString = term.toString();
         }
         label.set(termString);
@@ -321,7 +310,7 @@ public class BeliefTableChart extends Widget {
             BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
 
             TruthWave pwave = beliefProj;
-            pwave.project(table, minT, maxT, nar.time.dur(), projections);
+            pwave.project(table, minT, maxT, dur, projections);
             renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 
@@ -476,4 +465,8 @@ public class BeliefTableChart extends Widget {
     }
 
 
+    @Override
+    public final void accept(NAR nar) {
+        update(nar);
+    }
 }

@@ -28,7 +28,7 @@ public class Windo extends Widget {
         PushButton rightButton = new PushButton(">", (p) -> Windo.this.move(1f, 0));
         rightButton.scale(0.25f,0.25f).move(0.75f, 0.5f);
 
-        setChildren(
+        set(
                 upButton, leftButton, rightButton,
                 new VSplit(menubar, content, 0.1f)
                 );
@@ -70,7 +70,7 @@ public class Windo extends Widget {
 
             clipTouchBounds = false;
 
-            setChildren(initial);
+            set(initial);
         }
 
     }

@@ -42,7 +42,7 @@ public class PushButton extends AbstractButton {
     }
 
     public void setText(String s) {
-        setChildren(text = new Label(s));
+        set(text = new Label(s));
     }
 
 

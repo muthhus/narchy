@@ -6,12 +6,15 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.SpaceGraph;
 import spacegraph.render.JoglPhysics;
+
+import java.util.function.Consumer;
 
 /**
  * Created by me on 11/20/16.
  */
-public abstract class SpaceKeys extends KeyAdapter implements JoglPhysics.FrameListener {
+public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGraph> {
 
     public final JoglPhysics space;
 
@@ -20,15 +23,14 @@ public abstract class SpaceKeys extends KeyAdapter implements JoglPhysics.FrameL
     final IntObjectHashMap<FloatProcedure> keyPressed = new IntObjectHashMap();
     final IntObjectHashMap<FloatProcedure> keyReleased = new IntObjectHashMap();
 
-    public SpaceKeys(JoglPhysics g) {
+    public SpaceKeys(SpaceGraph g) {
         this.space = g;
 
 
         g.addFrameListener(this);
     }
 
-    @Override
-    public void onFrame(JoglPhysics j) {
+    @Override public void accept(SpaceGraph j) {
         float dt = j.getLastFrameTime();
         keyState.forEachKeyValue((k, s) -> {
             FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
