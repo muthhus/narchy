@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.data.FloatParam;
 import nars.bag.Bagregate;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -12,8 +13,9 @@ import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
-import spacegraph.space.layout.TabPane;
-import spacegraph.space.widget.ReflectionSurface;
+import spacegraph.layout.TabPane;
+import spacegraph.widget.meta.ReflectionSurface;
+import spacegraph.widget.meta.WindowButton;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -25,7 +27,7 @@ import java.util.function.Supplier;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.space.layout.Grid.grid;
+import static spacegraph.layout.Grid.grid;
 
 /**
  * Extensions to NAgent interface:
@@ -135,63 +137,29 @@ abstract public class NAgentX extends NAgent {
 
     public static void chart(NAgentX a) {
         NAR nar = a.nar;
-
-//        BagChart<Task> taskChart = new BagChart<Task>(new Leak<Task,PLink<Task>>(new ArrayBag<Task>(16, BudgetMerge.maxBlend, new ConcurrentHashMap<>()), 0f, a.nar) {
-//
-//            @Override
-//            protected float onOut(@NotNull PLink<Task> b) {
-//                return 1;
-//            }
-//
-//            @Override
-//            protected void in(@NotNull Task task, Consumer<PLink<Task>> each) {
-//                if (!task.isCommand() && !task.isDeleted())
-//                    each.accept(new RawBLink<>(task, task, 0.1f));
-//            }
-//
-//        }.bag, 16);
-//        a.nar.onCycle(f -> taskChart.update());
-
         a.nar.runLater(() -> {
-
-            //Vis.conceptsWindow2D(a.nar, 64, 12).show(1000, 800);
-
-            //Vis.conceptsWindow2D(a.nar, Iterables.concat(a.predictors, a.actions, a.sensors) /* a.nar */,64 ,8).show(1000, 800);
-            //Vis.conceptsWindow2D(a.nar, 16 ,4).show(1000, 800);
-//
-//            window( new Widget(new TileTab(Maps.mutable.of(
-//                "x", () -> new PushButton("x"),
-//                "y", () -> new PushButton("y"),
-//                "dsf", () -> grid(new Label("y"), new Label("xy"), new Label("xyzxcv"))
-//            ))), 800, 600);
-            window(
-                    new TabPane(new TreeMap<String, Supplier<Surface>>(Map.of(
-                            "agent", () -> new ReflectionSurface(a),
-                            "focus", () -> new ReflectionSurface(((Default)a.nar).core),
-                            "derive", () -> new ReflectionSurface(((Default)a.nar).derivationBudgeting),
-                            "nar", () -> new ReflectionSurface(a.nar),
-                            "input", () -> grid(a.cam.values().stream().map(cs ->
+            window( grid(
+                new WindowButton( "nar", () -> a.nar ),
+                new WindowButton( "agent", () -> (a) ),
+                new WindowButton( "deriver", () -> ((Default)a.nar).derivationBudgeting ),
+                new WindowButton( "focus", () -> (((Default)a.nar).core) ),
+                new WindowButton( "log", () -> Vis.logConsole(nar, 90, 40, new FloatParam(0f)) ),
+                new WindowButton( "vision", () -> grid(a.cam.values().stream().map(cs ->
                                     new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
-                                    .toArray(Surface[]::new)),
-                            "inputEdit", () -> Vis.newInputEditor(a.nar),
-                            "concepts", ()->
-                                    Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64),
-                            "conceptBudget", () ->
-                                    Vis.budgetHistogram(nar, 64),
+                                    .toArray(Surface[]::new))
+                                ),
+                new WindowButton("input", () -> Vis.newInputEditor(a.nar)),
+
+                grid(
+                    new WindowButton( "emotion", () -> Vis.emotionPlots(a.nar, 256) ),
+                            //"agentActions", () -> Vis.agentActions(a, 64f)
+                            //"agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
+                    new WindowButton( "conceptBudget", Vis.budgetHistogram(nar, 64) ),
+                    new WindowButton( "conceptTree", ()-> Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64) ),
                             //"tasks", ()-> taskChart,
-                            "agentCharts", () -> Vis.emotionPlots(a.nar, 256),
-                            "agentActions", () -> Vis.agentActions(a, 64f)
-                            ///"agentPredict", () -> Vis.beliefCharts(400, a.predictors, a.nar)
-
-                    ))
-
-                            //nar instanceof Default ? Vis.concepts((Default) nar, 128) : grid(/*blank*/),
-
-
-                            /*Vis.conceptLinePlot(nar,
-                                    Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                    2000)*/
-                    ), 1200, 900);
+                    new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500) )
+                )
+            ), 1200, 900);
         });
     }
 

@@ -43,7 +43,7 @@ import java.util.ResourceBundle;
  */
 public class InfoViewPresenter implements Initializable {
 
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(InfoViewPresenter.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(InfoViewPresenter.class);
 
     @Inject
     SessionContext ctx;
@@ -51,15 +51,15 @@ public class InfoViewPresenter implements Initializable {
     @Inject
     VncRenderService con;
 
-    private StatisticsImageListener imgListener = new StatisticsImageListener();
+    private final StatisticsImageListener imgListener = new StatisticsImageListener();
 
-    private LongProperty totalCount = new SimpleLongProperty(0);
-    private LongProperty rawCount = new SimpleLongProperty(0);
-    private LongProperty copyRectCount = new SimpleLongProperty(0);
-    private LongProperty hextileCount = new SimpleLongProperty(0);
-    private LongProperty zlibCount = new SimpleLongProperty(0);
-    private LongProperty cursorCount = new SimpleLongProperty(0);
-    private LongProperty desktopCount = new SimpleLongProperty(0);
+    private final LongProperty totalCount = new SimpleLongProperty(0);
+    private final LongProperty rawCount = new SimpleLongProperty(0);
+    private final LongProperty copyRectCount = new SimpleLongProperty(0);
+    private final LongProperty hextileCount = new SimpleLongProperty(0);
+    private final LongProperty zlibCount = new SimpleLongProperty(0);
+    private final LongProperty cursorCount = new SimpleLongProperty(0);
+    private final LongProperty desktopCount = new SimpleLongProperty(0);
 
     @FXML
     private Label infoName;

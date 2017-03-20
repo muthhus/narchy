@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.truth.Truth;
-import spacegraph.space.widget.MatrixView;
+import spacegraph.widget.meter.MatrixView;
 
 /**
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)

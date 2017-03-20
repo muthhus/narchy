@@ -50,12 +50,14 @@ public class BoxShape extends SimpleBoxShape {
 		super(w, h, d);
 	}
 
-	public void size(float x, float y, float z) {
+	@Override
+    public void size(float x, float y, float z) {
 		setMargin(0f); //is margin helpful?
 		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
 	}
 
-	public v3 getHalfExtentsWithMargin(v3 out) {
+	@Override
+    public v3 getHalfExtentsWithMargin(v3 out) {
 		v3 halfExtents = getHalfExtentsWithoutMargin(out);
 
 		float m = getMargin();
@@ -208,7 +210,8 @@ public class BoxShape extends SimpleBoxShape {
 				halfExtents.z * (1 - ((i & 4) >> 2)) - halfExtents.z * ((i & 4) >> 2));
 	}
 	
-	public void getPlaneEquation(Vector4f plane, int i, v3 tmp) {
+	@Override
+    public void getPlaneEquation(Vector4f plane, int i, v3 tmp) {
 		v3 halfExtents = getHalfExtentsWithoutMargin(tmp);
 
 		switch (i) {

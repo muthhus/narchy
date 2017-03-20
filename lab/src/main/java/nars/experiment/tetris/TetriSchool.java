@@ -2,6 +2,7 @@ package nars.experiment.tetris;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NSchool;
@@ -16,8 +17,12 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.space.CrosshairSurface;
-import spacegraph.space.widget.*;
-import spacegraph.space.widget.console.ConsoleSurface;
+import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.MatrixPad;
+import spacegraph.widget.button.PushButton;
+import spacegraph.widget.console.ConsoleSurface;
+import spacegraph.widget.slider.BaseSlider;
+import spacegraph.widget.slider.XYSlider;
 
 import java.awt.*;
 import java.util.List;
@@ -26,7 +31,7 @@ import static nars.experiment.tetris.TetriSchool.TrainingPanel.newTrainingPanel;
 import static nars.gui.Vis.label;
 import static nars.gui.Vis.stack;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.space.layout.Grid.*;
+import static spacegraph.layout.Grid.*;
 
 public class TetriSchool extends NSchool implements Runnable {
 
@@ -197,7 +202,7 @@ public class TetriSchool extends NSchool implements Runnable {
 
         public static Surface newTrainingPanel(TetriSchool school) {
 
-            ConsoleSurface term = Vis.logConsole(school.nar, 120, 40, 0.25f);
+            ConsoleSurface term = Vis.logConsole(school.nar, 120, 40, new FloatParam(0.25f));
 
             return col(
 

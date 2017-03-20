@@ -23,11 +23,11 @@
 
 package spacegraph.render;
 
+import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.glu.GLUquadric;
-import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.ImmModeSink;
 
 import java.nio.ByteBuffer;
@@ -68,7 +68,7 @@ public class GLSRT {
 		} */
 	}
 	
-    ImmModeSink vboCube = null;
+    ImmModeSink vboCube;
 
 	public void drawCube(GL gl, float extent) {
 		extent = extent * 0.5f;
@@ -150,12 +150,12 @@ public class GLSRT {
             16, 19, 17, 18, 16, 17, /* right  */
             23, 20, 21, 20, 22, 21 /* left   */
     };
-    private final ByteBuffer cubeIndices= GLBuffers.newDirectByteBuffer(s_cubeIndices);
+    private final ByteBuffer cubeIndices= Buffers.newDirectByteBuffer(s_cubeIndices);
 	
 	////////////////////////////////////////////////////////////////////////////
 	
-	private static GLUquadric cylinder=null;
-	private static GLUquadric sphere=null;
+	private static GLUquadric cylinder;
+	private static GLUquadric sphere;
 	
 	private static class SphereKey {
 		public float radius;
@@ -186,7 +186,7 @@ public class GLSRT {
 	public void drawSphere(GL gl, float radius) {
         if(sphere==null) {
             sphere = glu.gluNewQuadric();
-            sphere.setImmMode((VBO_CACHE)?false:true);
+            sphere.setImmMode(!VBO_CACHE);
         }
 		sphereKey.radius = radius;
 		ImmModeSink vbo = sphereDisplayLists.get(sphereKey);
@@ -228,9 +228,8 @@ public class GLSRT {
 			if (obj == null || !(obj instanceof CylinderKey)) return false;
 			CylinderKey other = (CylinderKey) obj;
 			if (radius != other.radius) return false;
-			if (halfHeight != other.halfHeight) return false;
-			return true;
-		}
+            return !(halfHeight != other.halfHeight);
+        }
 
 		@Override
 		public int hashCode() {
@@ -247,7 +246,7 @@ public class GLSRT {
 	public void drawCylinder(GL2 gl, float radius, float halfHeight, int upAxis) {
         if(cylinder==null) {
             cylinder = glu.gluNewQuadric();
-            cylinder.setImmMode((VBO_CACHE)?false:true);
+            cylinder.setImmMode(!VBO_CACHE);
         }
 		gl.glPushMatrix();
 		switch (upAxis) {
@@ -262,10 +261,9 @@ public class GLSRT {
 			case 2:
 				gl.glTranslatef(0.0f, 0.0f, -halfHeight);
 				break;
-			default: {
-				assert (false);
-			}
-		}
+			default:
+                assert (false);
+        }
 
 		// The gluCylinder subroutine draws a cylinder that is oriented along the z axis. 
 		// The base of the cylinder is placed at z = 0; the top of the cylinder is placed at z=height. 
@@ -274,8 +272,8 @@ public class GLSRT {
 		cylinderKey.set(radius, halfHeight);
 		ImmModeSink vbo = cylinderDisplayLists.get(cylinderKey);
 		if (vbo == null) {
-			glu.gluQuadricDrawStyle(cylinder, glu.GLU_FILL);
-			glu.gluQuadricNormals(cylinder, glu.GLU_SMOOTH);
+			glu.gluQuadricDrawStyle(cylinder, GLU.GLU_FILL);
+			glu.gluQuadricNormals(cylinder, GLU.GLU_SMOOTH);
 			glu.gluCylinder(cylinder, radius, radius, 2f * halfHeight, 15, 10);
             if(VBO_CACHE) {
                 vbo = cylinder.replaceImmModeSink();

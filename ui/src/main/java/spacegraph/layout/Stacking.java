@@ -1,4 +1,4 @@
-package spacegraph.space.layout;
+package spacegraph.layout;
 
 import spacegraph.Surface;
 

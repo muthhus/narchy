@@ -1,6 +1,7 @@
 package spacegraph.render;
 
 import com.jogamp.newt.event.MouseEvent;
+import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import jcog.Util;
 import spacegraph.AbstractSpace;
 import spacegraph.SimpleSpatial;
@@ -69,7 +70,7 @@ public class SpaceGraph2D<X> extends SpaceGraph<X> {
 //        // mover the origin from the bottom left corner
 //        // to the upper left corner
 //        //gl.glTranslatef(0f, -screenHeight, 0f);
-        gl.glMatrixMode(gl.GL_MODELVIEW);
+        gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
         //gl.glLoadIdentity();
 
         //gl.glDisable(GL2.GL_DEPTH_TEST);

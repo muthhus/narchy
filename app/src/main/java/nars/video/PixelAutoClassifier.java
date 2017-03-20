@@ -10,14 +10,14 @@ import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import spacegraph.Surface;
-import spacegraph.space.widget.MatrixView;
+import spacegraph.widget.meter.MatrixView;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
 import static nars.video.CameraSensor.coord;
-import static spacegraph.space.layout.Grid.col;
+import static spacegraph.layout.Grid.col;
 
 /**
  * Created by me on 9/22/16.

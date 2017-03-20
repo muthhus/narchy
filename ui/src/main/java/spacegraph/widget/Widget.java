@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
 import jcog.Texts;
@@ -7,11 +7,15 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
+import spacegraph.layout.Stacking;
 import spacegraph.render.Draw;
-import spacegraph.space.layout.Stacking;
-import spacegraph.space.widget.console.ConsoleTerminal;
+import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.PushButton;
+import spacegraph.widget.console.ConsoleTerminal;
+import spacegraph.widget.slider.BaseSlider;
+import spacegraph.widget.slider.XYSlider;
 
-import static spacegraph.space.layout.Grid.*;
+import static spacegraph.layout.Grid.*;
 
 /**
  * Base class for GUI widgets, similarly designed to JComponent
@@ -56,10 +60,8 @@ public class Widget extends Stacking {
 //            Draw.text(gl, s2, 0.025f, 0.5f, 1f, 0);
 //        }
 
-        {
-            Draw.colorHash(gl, getClass().hashCode(), 0.25f);
-            Draw.rect(gl, 0, 0, 1, 1);
-        }
+        Draw.colorHash(gl, getClass().hashCode(), 0.25f);
+        Draw.rect(gl, 0, 0, 1, 1);
 
         if (touchedBy != null) {
             Draw.colorHash(gl, getClass().hashCode(), 0.5f);

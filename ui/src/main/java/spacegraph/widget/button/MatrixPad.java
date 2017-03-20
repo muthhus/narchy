@@ -1,10 +1,10 @@
-package spacegraph.space.widget;
+package spacegraph.widget.button;
 
 import jcog.list.FasterList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.Surface;
-import spacegraph.space.layout.Layout;
+import spacegraph.layout.Layout;
 
 import java.util.List;
 

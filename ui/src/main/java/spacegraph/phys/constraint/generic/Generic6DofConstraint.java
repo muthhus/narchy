@@ -90,15 +90,15 @@ public class Generic6DofConstraint extends TypedConstraint {
 
     protected final Transform frameInA = new Transform(); //!< the constraint space w.r.t body A
     protected final Transform frameInB = new Transform(); //!< the constraint space w.r.t body B
-    protected final JacobianEntry[] jacLinear/*[3]*/ = new JacobianEntry[]{new JacobianEntry(), new JacobianEntry(), new JacobianEntry()}; //!< 3 orthogonal linear constraints
-    protected final JacobianEntry[] jacAng/*[3]*/ = new JacobianEntry[]{new JacobianEntry(), new JacobianEntry(), new JacobianEntry()}; //!< 3 orthogonal angular constraints
+    protected final JacobianEntry[] jacLinear/*[3]*/ = {new JacobianEntry(), new JacobianEntry(), new JacobianEntry()}; //!< 3 orthogonal linear constraints
+    protected final JacobianEntry[] jacAng/*[3]*/ = {new JacobianEntry(), new JacobianEntry(), new JacobianEntry()}; //!< 3 orthogonal angular constraints
     protected final TranslationalLimitMotor linearLimits = new TranslationalLimitMotor();
-    protected final RotationalLimitMotor[] angularLimits/*[3]*/ = new RotationalLimitMotor[]{new RotationalLimitMotor(), new RotationalLimitMotor(), new RotationalLimitMotor()};
+    protected final RotationalLimitMotor[] angularLimits/*[3]*/ = {new RotationalLimitMotor(), new RotationalLimitMotor(), new RotationalLimitMotor()};
     protected float timeStep;
     protected final Transform calculatedTransformA = new Transform();
     protected final Transform calculatedTransformB = new Transform();
     protected final v3 calculatedAxisAngleDiff = new v3();
-    protected final v3[] calculatedAxis/*[3]*/ = new v3[]{new v3(), new v3(), new v3()};
+    protected final v3[] calculatedAxis/*[3]*/ = {new v3(), new v3(), new v3()};
     protected final v3 anchorPos = new v3(); // point betwen pivots of bodies A and B to solve linear axes
     protected final v3 calculatedLinearDiff = new v3();
     protected boolean useLinearReferenceFrameA;

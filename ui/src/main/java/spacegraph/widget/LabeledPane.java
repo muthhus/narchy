@@ -1,7 +1,7 @@
-package spacegraph.space.widget;
+package spacegraph.widget;
 
 import spacegraph.Surface;
-import spacegraph.space.layout.VSplit;
+import spacegraph.layout.VSplit;
 
 public class LabeledPane extends VSplit {
 

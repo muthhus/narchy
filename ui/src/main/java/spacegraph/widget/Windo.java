@@ -1,10 +1,11 @@
-package spacegraph.space.widget;
+package spacegraph.widget;
 
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
+import spacegraph.layout.Layout;
+import spacegraph.layout.VSplit;
 import spacegraph.math.v2;
-import spacegraph.space.layout.Layout;
-import spacegraph.space.layout.VSplit;
+import spacegraph.widget.button.PushButton;
 
 /**
  * draggable panel
@@ -33,7 +34,7 @@ public class Windo extends Widget {
                 );
     }
 
-    v2 dragStart = null;
+    v2 dragStart;
 
 //    @Override
 //    protected boolean onTouching(v2 hitPoint, short[] buttons) {

@@ -53,7 +53,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
 
         intrinsic.setSkew(0);
-        intrinsic.setRadial(new double[]{-0.25559248570886445, 0.09997127476560613});
+        intrinsic.setRadial(-0.25559248570886445, 0.09997127476560613);
         intrinsic.setT1(0);
         intrinsic.setT2(0);
 
@@ -103,7 +103,7 @@ public class ExampleVisualOdometryMonocularPlane {
 
                     }
 
-                    int n = 0;
+                    int n;
 
                     @Override
                     public int getFrameNumber() {

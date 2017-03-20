@@ -6,7 +6,7 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.render.Draw;
-import spacegraph.space.widget.Label;
+import spacegraph.widget.Label;
 
 /**
  * Created by me on 11/29/16.

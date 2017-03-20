@@ -118,7 +118,7 @@ public class ExampleStereoTwoViewsOneCamera {
 
 
         intrinsic.setSkew(0);
-        intrinsic.setRadial(new double[]{-0.25559248570886445, 0.09997127476560613});
+        intrinsic.setRadial(-0.25559248570886445, 0.09997127476560613);
         intrinsic.setT1(0);
         intrinsic.setT2(0);
 
@@ -936,21 +936,20 @@ public class ExampleStereoTwoViewsOneCamera {
 
 
             if ((w > 0) && (h > 0)) {
-                /*synchronized (cloud)*/ {
-                    float scale = 1f/100f;
-                    float dw = 1f / w;
-                    float dh = 1f / h;
-                    cloud.forEach(p->{
+                /*synchronized (cloud)*/
+                float scale = 1f/100f;
+                float dw = 1f / w;
+                float dh = 1f / h;
+                cloud.forEach(p->{
 
-                        int rgb = p.rgb;
-                        gl.glColor3f( 0.5f + 0.5f *(rgb & 0xff)/256f,
-                                ((rgb & 0xff00) >> 8)/256f,
-                                ((rgb & 0xff0000) >> 16)/256f);
-                        Draw.rect(gl, scale * (float) p.x, scale * (float) p.y, dw,  dh
-                                ,scale * (float) p.z);
+                    int rgb = p.rgb;
+                    gl.glColor3f( 0.5f + 0.5f *(rgb & 0xff)/256f,
+                            ((rgb & 0xff00) >> 8)/256f,
+                            ((rgb & 0xff0000) >> 16)/256f);
+                    Draw.rect(gl, scale * (float) p.x, scale * (float) p.y, dw,  dh
+                            ,scale * (float) p.z);
 
-                    });
-                }
+                });
             }
 
 //            int r = 2;

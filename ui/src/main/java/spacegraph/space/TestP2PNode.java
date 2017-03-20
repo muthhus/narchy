@@ -3,12 +3,12 @@ package spacegraph.space;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
+import spacegraph.layout.Grid;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.constraint.DistanceConstraint;
 import spacegraph.phys.shape.SimpleBoxShape;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.XYSlider;
+import spacegraph.widget.slider.XYSlider;
 
 /**
  * Created by me on 7/23/16.

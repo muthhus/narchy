@@ -14,8 +14,9 @@ import spacegraph.input.OrbMouse;
 import spacegraph.math.v3;
 import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
+import spacegraph.render.JoglSpace;
 import spacegraph.space.ListSpace;
-import spacegraph.space.widget.ReflectionSurface;
+import spacegraph.widget.meta.ReflectionSurface;
 
 import java.util.List;
 import java.util.function.Function;
@@ -141,6 +142,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
+    @Override
     public void init(GL2 gl) {
         super.init(gl);
 
@@ -242,7 +244,15 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public static SpaceGraph window(Object o, int w, int h) {
-        return window(new ReflectionSurface(o), w, h);
+        /*if (o instanceof JoglSpace) {
+            return window(((JoglSpace)o), w, h);
+        } else */ if (o instanceof Spatial) {
+            return window(((Spatial)o), w, h);
+        } else if (o instanceof Surface) {
+            return window(((Surface)o), w, h);
+        } else {
+            return window(new ReflectionSurface(o), w, h);
+        }
     }
 
     public static SpaceGraph window(Spatial s, int w, int h) {
@@ -260,7 +270,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return this;
     }
 
-
+    public JoglSpace camPos(float x, float y, float z) {
+        camPos.set(x, y, z);
+        return this;
+    }
 
 
     //    public static class PickDragMouse extends SpaceMouse {

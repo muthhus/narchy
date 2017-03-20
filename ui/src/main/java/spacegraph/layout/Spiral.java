@@ -10,6 +10,8 @@ public class Spiral<X> implements SpaceTransform<X> {
     float nodeSpeed = 0.3f;
     private int order;
 
+    float baseRad = 40f;
+    float angleRate = 0.5f;
 
     @Override
     public void update(SpaceGraph<X> g, AbstractSpace<X, Spatial<X>> src, float dt) {
@@ -26,8 +28,6 @@ public class Spiral<X> implements SpaceTransform<X> {
         //float ni = n / (float) Math.E;
         //final float bn = 1f;
 
-        float baseRad = 7f;
-        float angleRate = 0.2f;
         //float p = v.pri;
 
         //float nodeSpeed = (this.nodeSpeed / (1f + v.pri));
@@ -37,7 +37,10 @@ public class Spiral<X> implements SpaceTransform<X> {
 
         float angle = o * angleRate;
         float r = baseRad + o * angleRate * 1.6f /* ~phi */ ;
-        ((SimpleSpatial)v).move(
+        SimpleSpatial vv = (SimpleSpatial) v;
+        vv.body.clearForces();
+        vv.body.setLinearVelocity(0,0,0);
+        vv.move(
             (float) (Math.sin(angle) * r),
             (float) (Math.cos(angle) * r),
             0,

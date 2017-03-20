@@ -12,9 +12,9 @@ import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.Label;
-import spacegraph.space.widget.Widget;
+import spacegraph.layout.Grid;
+import spacegraph.widget.Label;
+import spacegraph.widget.Widget;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.function.BiFunction;
 import static java.lang.Math.PI;
 import static java.util.stream.Collectors.toList;
 import static nars.time.Tense.ETERNAL;
-import static spacegraph.space.layout.Grid.VERTICAL;
+import static spacegraph.layout.Grid.VERTICAL;
 
 
 public class BeliefTableChart extends Widget {

@@ -4,8 +4,8 @@ import jcog.Util;
 import jcog.learn.lstm.DistractedSequenceRecall;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.random.XorShift128PlusRandom;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.MatrixView;
+import spacegraph.layout.Grid;
+import spacegraph.widget.meter.MatrixView;
 
 import java.util.Random;
 

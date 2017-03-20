@@ -15,13 +15,13 @@ import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
 import spacegraph.audio.WaveCapture;
 import spacegraph.render.Draw;
-import spacegraph.space.widget.FloatSlider;
-import spacegraph.space.widget.MatrixView;
+import spacegraph.widget.slider.FloatSlider;
+import spacegraph.widget.meter.MatrixView;
 
 import java.util.List;
 
-import static spacegraph.space.layout.Grid.grid;
-import static spacegraph.space.layout.Grid.row;
+import static spacegraph.layout.Grid.grid;
+import static spacegraph.layout.Grid.row;
 
 /**
  * Created by me on 11/29/16.

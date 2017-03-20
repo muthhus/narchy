@@ -1,6 +1,8 @@
-package spacegraph.space.widget;
+package spacegraph.widget.button;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
+import spacegraph.widget.Label;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,6 +18,16 @@ public class CheckBox extends ToggleButton {
         this.text = text;
         setChildren(label = new Label(""));
         set(false);
+    }
+
+    public CheckBox(String text, BooleanProcedure b) {
+        this(text);
+        on((a,e)->b.value(e));
+    }
+
+    public CheckBox(String text, ToggleAction on) {
+        this(text);
+        on(on);
     }
 
     public CheckBox(String text, AtomicBoolean b) {

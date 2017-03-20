@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
 import jcog.Texts;
@@ -15,7 +15,7 @@ public class FloatSlider extends BaseSlider {
     private final float max;
     private final float min;
     String label;
-    public FloatSupplier input = null;
+    public FloatSupplier input;
 
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
@@ -34,7 +34,7 @@ public class FloatSlider extends BaseSlider {
         input = f;
     }
 
-    public spacegraph.space.widget.FloatSlider label(String label) {
+    public FloatSlider label(String label) {
         this.label = label;
         return this;
     }

@@ -69,7 +69,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected final Constrainer constrainer;
     protected final Islands islands;
     protected final List<TypedConstraint> constraints = new FasterList();
-    @Nullable protected v3 gravity = null;
+    @Nullable protected v3 gravity;
 
 
     volatile private List<Collidable> collidable = new FasterList();
@@ -596,7 +596,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
                     num,
                     /*,m_stackAlloc*/ intersecter);
 
-            constrainer.prepareSolve(getNumCollisionObjects(), ((Collisions) this).intersecter.getNumManifolds());
+            constrainer.prepareSolve(getNumCollisionObjects(), this.intersecter.getNumManifolds());
 
             // solve all the constraints for this island
             islands.buildAndProcessIslands(intersecter, collidable, solverCallback);

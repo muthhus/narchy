@@ -1,4 +1,4 @@
-package spacegraph.space.layout;
+package spacegraph.layout;
 
 import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;

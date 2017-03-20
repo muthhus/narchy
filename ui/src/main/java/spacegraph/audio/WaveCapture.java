@@ -8,17 +8,17 @@ import jcog.math.OneDHaar;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.FloatSlider;
-import spacegraph.space.widget.MatrixView;
-import spacegraph.space.widget.Plot2D;
+import spacegraph.layout.Grid;
+import spacegraph.widget.meter.MatrixView;
+import spacegraph.widget.meter.Plot2D;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static spacegraph.space.layout.Grid.VERTICAL;
-import static spacegraph.space.layout.Grid.row;
+import static spacegraph.layout.Grid.VERTICAL;
+import static spacegraph.layout.Grid.row;
 
 /**
  * Created by me on 10/28/15.

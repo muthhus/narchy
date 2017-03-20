@@ -6,23 +6,17 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.experiment.tetris.impl.TetrisVisualizer;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.term.Compound;
-import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
-import org.jetbrains.annotations.NotNull;
-import spacegraph.math.v2;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.MatrixView;
+import spacegraph.widget.meter.MatrixView;
 
 import java.util.List;
 
@@ -667,8 +661,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         Tetris a = new MyTetris(n);
         a.trace = true;
-
-        //Vis.conceptsWindow3D(a.nar, 32, 4).show(500,500);
+        NAgentX.chart(a);
 
             Default m = new Default(512, 16, 2, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
@@ -693,7 +686,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
             e.printStackTrace();
         }
 
-        NAgentX.chart(a);
 
 
         //a.trace = true;

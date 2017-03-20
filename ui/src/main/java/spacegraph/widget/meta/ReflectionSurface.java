@@ -1,11 +1,15 @@
-package spacegraph.space.widget;
+package spacegraph.widget.meta;
 
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
-import spacegraph.space.layout.Grid;
+import spacegraph.layout.Grid;
+import spacegraph.widget.Label;
+import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.PushButton;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.lang.reflect.Field;
 import java.util.List;

@@ -1,6 +1,7 @@
-package spacegraph.space.widget;
+package spacegraph.widget.button;
 
 import org.jetbrains.annotations.Nullable;
+import spacegraph.widget.AbstractButton;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -12,7 +13,7 @@ public abstract class ToggleButton extends AbstractButton {
     final AtomicBoolean on = new AtomicBoolean(false);
 
     @FunctionalInterface  public interface ToggleAction {
-        void onChange(spacegraph.space.widget.ToggleButton t, boolean enabled);
+        void onChange(ToggleButton t, boolean enabled);
     }
 
     @Nullable ToggleAction action;
@@ -25,6 +26,11 @@ public abstract class ToggleButton extends AbstractButton {
     }
 
 
+    public ToggleButton(ToggleAction a) {
+        this();
+        on(a);
+    }
+
     public ToggleButton set(boolean on) {
         if (this.on.compareAndSet(!on, on)) {
             if (action != null)
@@ -33,7 +39,7 @@ public abstract class ToggleButton extends AbstractButton {
         return this;
     }
 
-    public spacegraph.space.widget.ToggleButton on(ToggleAction a) {
+    public ToggleButton on(ToggleAction a) {
         this.action = a;
         return this;
     }

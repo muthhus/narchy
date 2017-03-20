@@ -51,7 +51,7 @@ import spacegraph.phys.util.OArrayList;
  */
 public class KinematicCharacterController extends ActionInterface {
 
-	private static final v3[] upAxisDirection = new v3[] {
+	private static final v3[] upAxisDirection = {
 		new v3(1.0f, 0.0f, 0.0f),
 		new v3(0.0f, 1.0f, 0.0f),
 		new v3(0.0f, 0.0f, 1.0f),
@@ -385,8 +385,8 @@ public class KinematicCharacterController extends ActionInterface {
 			//return array[index];
 			BroadphasePair collisionPair = ghostObject.getOverlappingPairCache().getOverlappingPairArray().get(i);
                         //XXX: added no contact response
-                        if (!((Collidable)collisionPair.pProxy0.data).hasContactResponse()
-                                 || !((Collidable)collisionPair.pProxy1.data).hasContactResponse())
+                        if (!collisionPair.pProxy0.data.hasContactResponse()
+                                 || !collisionPair.pProxy1.data.hasContactResponse())
                                  continue;
 			if (collisionPair.algorithm != null) {
 				collisionPair.algorithm.getAllContactManifolds(manifoldArray);

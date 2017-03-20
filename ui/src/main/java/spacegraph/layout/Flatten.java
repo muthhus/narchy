@@ -17,9 +17,9 @@ public class Flatten<X> implements SpaceTransform<X>, Consumer<Spatial<X>> {
     private final Quat4f up = Quat4f.angle(0,0,1,0);
     private final Quat4f tmp = new Quat4f();
 
-    private float zTolerance = 0.05f;
+    private final float zTolerance = 0.05f;
 
-    private float zSpeed = 0.2f;
+    private final float zSpeed = 0.2f;
     float rotateRate = 0.25f;
 
     public Flatten() {

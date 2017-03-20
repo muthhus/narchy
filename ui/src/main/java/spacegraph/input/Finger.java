@@ -4,7 +4,7 @@ import com.jogamp.newt.event.MouseEvent;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.space.widget.Widget;
+import spacegraph.widget.Widget;
 
 import java.util.Arrays;
 
@@ -29,7 +29,7 @@ public class Finger {
     //TODO wheel state
 
     /** widget above which this finger currently hovers */
-    public @Nullable Widget touching = null;
+    public @Nullable Widget touching;
 
     public Finger(Surface root) {
         this.root = root;

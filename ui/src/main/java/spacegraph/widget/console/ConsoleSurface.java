@@ -1,4 +1,4 @@
-package spacegraph.space.widget.console;
+package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
@@ -82,6 +82,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         gl.glLineWidth(2f);
 
+        gl.glColor4f(0.75f, 0.75f, 0.75f, fgAlpha);
 
         for (int row = 0; row < rows; row++) {
 
@@ -122,7 +123,6 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                     //TODO: if (!fg.equals(previousFG))
                     //gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
-                    gl.glColor3f(0.75f, 0.75f, 0.75f);
 
                     Draw.textNext(gl, cc, col/charScaleX);
                 }
@@ -146,7 +146,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         Draw.rect(gl,
                 (float) (curx) + m/2f,
                 (rows - 1 - cury),
-                (float) (1 - m), (1 - m)
+                1 - m, (1 - m)
                 , -dz
         );
 
@@ -179,7 +179,10 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         return cc;
     }
 
-
+    public ConsoleSurface opacity(float v) {
+        fgAlpha = v;
+        return this;
+    }
 
 
     public static class EditTerminal extends DefaultVirtualTerminal {

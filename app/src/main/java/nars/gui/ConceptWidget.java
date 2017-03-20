@@ -1,16 +1,12 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.PLinkHijackBag;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.ArrayBag;
 import nars.budget.BLink;
-import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,10 +20,7 @@ import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
-import spacegraph.space.widget.Label;
-import spacegraph.space.widget.PushButton;
 
-import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
@@ -308,13 +301,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                     0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 3f + 2f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = target.radius()*1f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 1f + 24f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = 0;
                 this.attraction = 0;
-                this.attractionDist = 1;
             }
+
+            this.attractionDist = target.radius()*1.5f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
     }
 
@@ -367,7 +360,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
 
 
-            float density = 1f;
+            float density = 2f;
             if (conceptWidget.body!=null)
                 conceptWidget.body.setMass(l*w*h*density);
 

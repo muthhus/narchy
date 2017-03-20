@@ -43,7 +43,7 @@ public class WebCam {
     @Range(min = 0, max = 1)
     public final MutableFloat cpuThrottle = new MutableFloat(0.5f);
 
-    public InterleavedU8 iimage = null;
+    public InterleavedU8 iimage;
 
     final static Logger logger = LoggerFactory.getLogger(WebCam.class);
     //public byte[] image;
@@ -229,7 +229,7 @@ public class WebCam {
     public Surface surface() {
         return new Surface() {
 
-            public Texture texture = null;
+            public Texture texture;
             final AtomicBoolean updated = new AtomicBoolean();
 
 

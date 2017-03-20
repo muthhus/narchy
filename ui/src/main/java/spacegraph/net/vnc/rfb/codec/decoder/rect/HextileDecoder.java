@@ -28,7 +28,7 @@ public class HextileDecoder extends RawRectDecoder {
     private static final Logger logger = LoggerFactory.getLogger(HextileDecoder.class);
 
     enum State {
-    INIT, INIT_PART, ADD_TILE, NEXT_TILE, RAW, BG_FILL, FG_FILL, INIT_SUBRECT, ANY_SUBRECT;
+    INIT, INIT_PART, ADD_TILE, NEXT_TILE, RAW, BG_FILL, FG_FILL, INIT_SUBRECT, ANY_SUBRECT
     }
 
     private State state = State.INIT;
@@ -39,10 +39,10 @@ public class HextileDecoder extends RawRectDecoder {
     public static final int ANY_SUBRECT = 8;
     public static final int SUBRECT_COLORED = 16;
 
-  private int bytesPerPixel;
+  private final int bytesPerPixel;
 
-  private int yPos = 0;
-  private int xPos = 0;
+  private int yPos;
+  private int xPos;
 
 
     private HextileRect partRect;

@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;

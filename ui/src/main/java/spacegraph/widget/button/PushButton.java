@@ -1,6 +1,8 @@
-package spacegraph.space.widget;
+package spacegraph.widget.button;
 
 import org.jetbrains.annotations.Nullable;
+import spacegraph.widget.AbstractButton;
+import spacegraph.widget.Label;
 
 import java.util.function.Consumer;
 

@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;

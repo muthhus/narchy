@@ -363,7 +363,7 @@ public final class Dbvt {
 			normal.normalize(direction);
 			v3 invdir = new v3();
 			invdir.set(1f / normal.x, 1f / normal.y, 1f / normal.z);
-			int[] signs = new int[] { direction.x<0 ? 1:0, direction.y<0 ? 1:0, direction.z<0 ? 1:0 };
+			int[] signs = { direction.x<0 ? 1:0, direction.y<0 ? 1:0, direction.z<0 ? 1:0 };
 			OArrayList<Node> stack = new OArrayList<Node>(SIMPLE_STACKSIZE);
 			stack.add(root);
 			do {
@@ -479,8 +479,8 @@ public final class Dbvt {
 				}
 				if (policy.Descent(se.node)) {
 					if (se.node.isinternal()) {
-						Node[] pns = new Node[]{se.node.childs[0], se.node.childs[1]};
-						sStkNPS[] nes = new sStkNPS[]{new sStkNPS(pns[0], se.mask, pns[0].volume.ProjectMinimum(sortaxis, srtsgns)),
+						Node[] pns = {se.node.childs[0], se.node.childs[1]};
+						sStkNPS[] nes = {new sStkNPS(pns[0], se.mask, pns[0].volume.ProjectMinimum(sortaxis, srtsgns)),
 							new sStkNPS(pns[1], se.mask, pns[1].volume.ProjectMinimum(sortaxis, srtsgns))
 						};
 						int q = nes[0].value < nes[1].value ? 1 : 0;
@@ -751,7 +751,7 @@ public final class Dbvt {
 		int num = leaves.size();
 		while (num > 1) {
 			float minsize = BulletGlobals.SIMD_INFINITY;
-			int[] minidx = new int[] { -1, -1 };
+			int[] minidx = { -1, -1 };
 			for (int i = 0; i< num; i++) {
 				Node li = leaves.get(i);
 				for (int j = i+1; j< num; j++) {
@@ -767,7 +767,7 @@ public final class Dbvt {
 			}
             //return array[index];
             //return array[index];
-            Node[] n = new Node[] {leaves.get(minidx[0]), leaves.get(minidx[1])};
+            Node[] n = {leaves.get(minidx[0]), leaves.get(minidx[1])};
 			Node p = set(pdbvt, null, merge(n[0].volume, n[1].volume, new DbvtAabbMm()), null);
 			p.childs[0] = n[0];
 			p.childs[1] = n[1];
@@ -780,7 +780,7 @@ public final class Dbvt {
 		}
 	}
 
-	private static final v3[] axis = new v3[] { new v3(1, 0, 0), new v3(0, 1, 0), new v3(0, 0, 1) };
+	private static final v3[] axis = { new v3(1, 0, 0), new v3(0, 1, 0), new v3(0, 0, 1) };
 
 	private static Node topdown(Dbvt pdbvt, FasterList<Node> leaves, int bu_treshold) {
 		if (leaves.size() > 1) {
@@ -793,7 +793,7 @@ public final class Dbvt {
 				}
 				int bestaxis = -1;
 				int bestmidp = leaves.size();
-				int[][] splitcount = new int[/*3*/][/*2*/]{{0, 0}, {0, 0}, {0, 0}};
+				int[][] splitcount = {{0, 0}, {0, 0}, {0, 0}};
 
 				v3 x = new v3();
 

@@ -2,7 +2,6 @@ package spacegraph.layout;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import org.joml.Vector3f;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
@@ -25,8 +24,13 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(80, 0, 100);
+    public final FloatParam repel = new FloatParam(50, 0, 100);
     public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
+
+
+
+    /** speed at which center correction is applied */
+    float centerSpeed = 0.5f;
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -59,6 +63,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     }
 
+
     @Override
     public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
 
@@ -66,7 +71,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         if (n == 0)
             return;
 
-        objects.forEach(c -> ((Spatial)c.data()).moveWithin(boundsMin, boundsMax));
+        objects.forEach(c -> ((Spatial)c.data()).stabilize(boundsMin, boundsMax));
 
         //System.out.print("Force direct " + objects.size() + ": ");
         //final int[] count = {0};
@@ -88,8 +93,12 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             cy /= -n;
             cz /= -n;
 
+            v3 correction = v3.v(cx, cy, cz);
+            if (correction.length() > centerSpeed)
+                correction.normalize(centerSpeed);
+
             for (int i = 0, objectsSize = n; i < objectsSize; i++) {
-                objects.get(i).worldTransform.add(cx, cy ,cz);
+                objects.get(i).worldTransform.add(correction);
             }
 
         }
@@ -98,12 +107,14 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     }
 
     protected void batch(List<Collidable> l) {
+
         float speed = repel.floatValue();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
                 repel(x, l.get(j), speed, maxRepelDist);
             }
+
         }
     }
 

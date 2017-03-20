@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget.slider;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
@@ -6,9 +6,10 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
+import spacegraph.widget.Widget;
 
-import static spacegraph.space.layout.Grid.col;
-import static spacegraph.space.layout.Grid.grid;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.grid;
 
 /**
  * abstract 1D slider/scrollbar

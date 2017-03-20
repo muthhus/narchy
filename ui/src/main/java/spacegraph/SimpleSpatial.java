@@ -25,7 +25,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     /** physics motion state */
     //public final Motion motion = new Motion();
-    private final String label;
+    //private final String label;
     protected CollisionShape shape;
 
     /** prevents physics movement */
@@ -41,11 +41,11 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         shapeColor = new float[] { 0.5f, 0.5f, 0.5f, 0.9f };
         this.shape = newShape();
 
-        String label = label(x);
+        //String label = label(x);
 
         //HACK
-        int MAX_LABEL_LEN = 16;
-        this.label = label.length() >= MAX_LABEL_LEN ? (label.substring(0, MAX_LABEL_LEN) + "..") : label;
+        //int MAX_LABEL_LEN = 16;
+        //this.label = label.length() >= MAX_LABEL_LEN ? (label.substring(0, MAX_LABEL_LEN) + "..") : label;
 
     }
 
@@ -54,6 +54,7 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     public Dynamic body;
+
     @Nullable
     private List<TypedConstraint> constraints = null;
 
@@ -193,8 +194,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         //b.setLinearFactor(1,1,0); //restricts movement to a 2D plane
 
 
-        b.setDamping(0.9f, 0.5f);
+        //b.setDamping(0.95f, 0.95f);
         b.setFriction(0.9f);
+
 
         return b;
     }

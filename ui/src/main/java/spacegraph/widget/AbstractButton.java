@@ -1,4 +1,4 @@
-package spacegraph.space.widget;
+package spacegraph.widget;
 
 import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;

@@ -500,7 +500,14 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
                 t.y > max ? max : t.y,
                 t.z > max ? max : t.z);
     }
-
+    public final void clamp(Tuple3f min, Tuple3f max) {
+        if (x < min.x) x = min.x;
+        if (x > max.x ) x = max.x;
+        if (y < min.y) y = min.y;
+        if (y > max.y ) y = max.y;
+        if (z < min.z) z = min.z;
+        if (z > max.z ) z = max.z;
+    }
 
     /**
      * Sets each component of the tuple parameter to its absolute

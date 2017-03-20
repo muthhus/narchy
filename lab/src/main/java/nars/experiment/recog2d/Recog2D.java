@@ -16,12 +16,11 @@ import nars.truth.Truth;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
-import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.Plot2D;
+import spacegraph.layout.Grid;
+import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -32,8 +31,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
 import static nars.Op.BELIEF;
-import static spacegraph.space.layout.Grid.col;
-import static spacegraph.space.layout.Grid.row;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.row;
 
 /**
  * Created by me on 10/8/16.

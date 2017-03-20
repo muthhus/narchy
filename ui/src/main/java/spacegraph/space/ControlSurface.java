@@ -6,9 +6,9 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.widget.Label;
-import spacegraph.space.widget.LabeledPane;
+import spacegraph.layout.Grid;
+import spacegraph.widget.Label;
+import spacegraph.widget.LabeledPane;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

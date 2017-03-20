@@ -26,10 +26,12 @@ public abstract class AbstractSpatial<X> extends Spatial<X> {
         return Collections.emptyList();
     }
 
+    @Override
     public void renderAbsolute(GL2 gl) {
         //blank
     }
 
+    @Override
     public void renderRelative(GL2 gl, Collidable body) {
 
         colorshape(gl);

@@ -1,4 +1,4 @@
-package spacegraph.space.layout;
+package spacegraph.layout;
 
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
-import spacegraph.space.widget.Windo;
+import spacegraph.widget.Windo;
 
 import java.util.List;
 import java.util.Objects;

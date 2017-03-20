@@ -73,7 +73,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     public static void main(String[] args) {
 
-        Default n = new Default(64, 1, 1, 1);
+        Default n = new Default(64, 1, 1, 3);
         n.nal(1);
         n.DEFAULT_BELIEF_PRIORITY = 0.05f;
         n.DEFAULT_QUESTION_PRIORITY = 1f;
@@ -82,12 +82,13 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        n.inputAt(2, "b:a.");
 //        n.inputAt(3, "c:b.");
 
-        new DeductiveChainTest(n, 16,  2048, inh);
+        new DeductiveChainTest(n, 8,  2048, inh);
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
         //Vis.conceptsWindow2D
         conceptsWindow3D(n, 64, 8)
+                .camPos(0, 0, 90)
                 //.ortho( logConsole(n, 40, 10, 0.0f) )
                 .show(1300, 900);
 

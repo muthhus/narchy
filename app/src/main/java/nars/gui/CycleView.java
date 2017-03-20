@@ -2,9 +2,9 @@ package nars.gui;
 
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.Surface;
-import spacegraph.space.widget.Label;
-import spacegraph.space.widget.PushButton;
+import spacegraph.widget.Label;
+import spacegraph.widget.button.ToggleButton;
+import spacegraph.widget.meta.WindowButton;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,6 +21,8 @@ public class CycleView implements Runnable {
 
     public final Label time;
 
+    public final ToggleButton details;
+
     public CycleView(@NotNull NAR nar) {
 
         this.nar = nar;
@@ -32,6 +34,8 @@ public class CycleView implements Runnable {
 
         time = new Label("");
 
+        details = new WindowButton("Details", nar);
+
         nar.onCycle(this);
 
     }
@@ -40,4 +44,5 @@ public class CycleView implements Runnable {
     public void run() {
         time.set("@: " + Long.toString(nar.time()));
     }
+
 }

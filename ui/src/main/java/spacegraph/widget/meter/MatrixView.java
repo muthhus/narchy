@@ -1,9 +1,10 @@
-package spacegraph.space.widget;
+package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.render.Draw;
+import spacegraph.widget.Widget;
 
 /**
  * Created by me on 7/29/16.

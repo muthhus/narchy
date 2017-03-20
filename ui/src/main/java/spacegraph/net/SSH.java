@@ -100,29 +100,36 @@ public class SSH {
 
     public static class MyUserInfo
             implements UserInfo, UIKeyboardInteractive {
+        @Override
         public String getPassword() {
             return null;
         }
 
+        @Override
         public boolean promptYesNo(String str) {
             return false;
         }
 
+        @Override
         public String getPassphrase() {
             return null;
         }
 
+        @Override
         public boolean promptPassphrase(String message) {
             return false;
         }
 
+        @Override
         public boolean promptPassword(String message) {
             return false;
         }
 
+        @Override
         public void showMessage(String message) {
         }
 
+        @Override
         public String[] promptKeyboardInteractive(String destination,
                                                   String name,
                                                   String instruction,

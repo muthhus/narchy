@@ -87,7 +87,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
     public interface FrameListener {
-        public void onFrame(JoglPhysics j);
+        void onFrame(JoglPhysics j);
     }
 
     final List<FrameListener> frameListeners = new FasterList();
@@ -116,7 +116,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     public final @NotNull Dynamics<X> dyn;
 
 
-    protected int debug = 0;
+    protected int debug;
 
 
     public final v3 camPos;
@@ -139,7 +139,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     protected boolean stepping = true;
     protected int lastKey;
 
-    protected GLSRT glsrt = null;
+    protected GLSRT glsrt;
 
 
     public JoglPhysics() {
@@ -212,20 +212,20 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glEnable(GL_POLYGON_SMOOTH);
         gl.glEnable(GL2.GL_MULTISAMPLE);
 
-        gl.glShadeModel(gl.GL_SMOOTH);
+        gl.glShadeModel(GL_SMOOTH);
 
         gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-        gl.glEnable(gl.GL_COLOR_MATERIAL);
+        gl.glEnable(GL_COLOR_MATERIAL);
 
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, new float[] { 1, 1, 1, 1 }, 0);
         //gl.glMaterialfv( GL2.GL_FRONT_AND_BACK, GL2.GL_EMISSION, new float[] { 0, 0, 0, 0 }, 0);
 
-        gl.glEnable(gl.GL_DEPTH_TEST);
-        gl.glDepthFunc(gl.GL_LEQUAL);
+        gl.glEnable(GL_DEPTH_TEST);
+        gl.glDepthFunc(GL_LEQUAL);
 
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
@@ -263,14 +263,14 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glLightModelf(GL_LIGHT_MODEL_AMBIENT, 0.6f);
 
         final float a = 0.7f;
-        float[] light_ambient = new float[]{a, a, a, 1.0f};
-        float[] light_diffuse = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
+        float[] light_ambient = {a, a, a, 1.0f};
+        float[] light_diffuse = {0.5f, 0.5f, 0.5f, 0.5f};
         //float[] light_specular = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-        float[] light_specular = new float[]{0.5f, 0.5f, 0.5f, 0.5f};
+        float[] light_specular = {0.5f, 0.5f, 0.5f, 0.5f};
         /* light_position is NOT default value */
 
         float distance = 25f;
-        float[] light_position0 = new float[]{0f, 0f, distance, 0.0f};
+        float[] light_position0 = {0f, 0f, distance, 0.0f};
 
         //float[] light_position1 = new float[]{-1.0f, -10.0f, -1.0f, 0.0f};
 
@@ -279,14 +279,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //
 //        }
 
-        {
-            gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, light_ambient, 0);
-            gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, light_diffuse, 0);
-            gl.glLightfv(gl.GL_LIGHT0, gl.GL_SPECULAR, light_specular, 0);
-            gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, light_position0, 0);
-            gl.glEnable(gl.GL_LIGHTING);
-            gl.glEnable(gl.GL_LIGHT0);
-        }
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient, 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular, 0);
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, light_position0, 0);
+        gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_LIGHT0);
 
 
 //        if (useLight1) {
@@ -300,6 +298,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
+    @Override
     public final void reshape(GLAutoDrawable drawable,
                               int xstart,
                               int ystart,
@@ -332,6 +331,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     }
 
+    @Override
     public final void display(GLAutoDrawable drawable) {
 
         render();
@@ -353,7 +353,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
     protected void clearComplete() {
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
     protected void clearMotionBlur(float rate /* TODO */) {
@@ -387,6 +387,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     }
 
 
+    @Override
     public void keyPressed(KeyEvent e) {
     }
 
@@ -412,7 +413,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         if(gl == null)
             return;
 
-        gl.glMatrixMode(gl.GL_PROJECTION);
+        gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
 
 //        System.out.println(camPos + " " + camUp + " " + camPosTarget);
@@ -766,7 +767,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         public static final float SIMD_HALF_PI = SIMD_2_PI * 0.25f;
 
 
-        public static boolean gDisableDeactivation = false;
+        public static boolean gDisableDeactivation;
 
 
 //        static {

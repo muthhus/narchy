@@ -13,6 +13,8 @@ import spacegraph.render.JoglPhysics;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static spacegraph.math.v3.v;
+
 /**
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter
@@ -80,14 +82,17 @@ public abstract class Spatial<X> implements Active {
 //        }
 //    }
 
+    @Override
     public boolean active() {
         return preactive && order > -1;
     }
 
+    @Override
     public final boolean preactive() {
         return preactive;
     }
 
+    @Override
     public void reactivate(boolean b) {
 
         this.preactive = b;
@@ -132,12 +137,14 @@ public abstract class Spatial<X> implements Active {
 
     }
 
-    public void moveWithin(v3 boundsMin, v3 boundsMax) {
+    public void stabilize(v3 boundsMin, v3 boundsMax) {
+        v3 zero = v(0,0,0);
+
         forEachBody(b -> {
             v3 t = b.worldTransform;
-            if (t.min(boundsMin) || t.max(boundsMax)) {
-                ((Dynamic)b).linearVelocity.zero();
-            }
+            //((Dynamic)b).clearForces();
+            //((Dynamic)b).setLinearVelocity(zero);
+            t.clamp(boundsMin, boundsMax);
         });
     }
 

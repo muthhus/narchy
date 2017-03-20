@@ -1,11 +1,11 @@
-package spacegraph.space.layout;
+package spacegraph.layout;
 
 import com.jogamp.opengl.GL2;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
-import spacegraph.space.widget.Widget;
+import spacegraph.widget.Widget;
 
 import java.util.List;
 

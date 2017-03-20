@@ -1,4 +1,4 @@
-package spacegraph.space.widget.console;
+package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.jcraft.jsch.JSchException;

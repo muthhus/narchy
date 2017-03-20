@@ -1,4 +1,4 @@
-package spacegraph.space.widget.console;
+package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ConsoleTerminal extends ConsoleSurface implements Appendable {
 
-    final DefaultVirtualTerminal term;
+    public final DefaultVirtualTerminal term;
     private final int[] cursorPos = new int[2];
 
     public ConsoleTerminal(int cols, int rows) {

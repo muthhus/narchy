@@ -1,16 +1,14 @@
-package spacegraph.space.layout;
+package spacegraph.layout;
 
 import jcog.list.FasterList;
 import spacegraph.Surface;
-import spacegraph.space.widget.CheckBox;
-import spacegraph.space.widget.ToggleButton;
+import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.ToggleButton;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-
-import static spacegraph.space.layout.Grid.grid;
 
 /**
  * Created by me on 12/2/16.
@@ -24,7 +22,7 @@ public class TabPane extends VSplit {
 
     public TabPane(Map<String, Supplier<Surface>> builder) {
         super();
-        header = grid();
+        header = Grid.grid();
 
         this.toggles = new FasterList();
         this.builder = builder;
@@ -59,7 +57,7 @@ public class TabPane extends VSplit {
                 }));
             }
         }
-        set(header, grid(newContent), 0.1f);
+        set(header, Grid.grid(newContent), 0.1f);
     }
 
     private final class Wrapped extends VSplit {

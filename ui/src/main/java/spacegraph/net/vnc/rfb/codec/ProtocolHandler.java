@@ -62,7 +62,7 @@ public class ProtocolHandler extends MessageToMessageDecoder<Object> {
     }
 
     @Override
-    public void channelRegistered(ChannelHandlerContext ctx) throws Exception, javax.net.ssl.SSLException {
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
         if (config.sslProperty().get()) {
             if (sslContext == null) {
                 //sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();

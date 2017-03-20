@@ -24,14 +24,14 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     final static int FPS_DEFAULT = 30;
     public static final int MIN_FPS = 3;
-    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_DEFAULT, MIN_FPS, 50);
+    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_DEFAULT, MIN_FPS, 25);
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    protected GLWindow window;
+    public GLWindow window;
     protected GL2 gl;
 
     public static GLWindow window(JoglSpace j) {
@@ -83,8 +83,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                         a.pause();
                         logger.info("PAUSE {}", a);
                     }
-
-                    super.windowDestroyed(e);
                 }
             }
         });
@@ -210,7 +208,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setTitle(title);
         g.setSurfaceSize(w, h);
         g.setVisible(true);
-
+        this.window = g;
         return g;
     }
 
@@ -234,7 +232,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     private static class MyFPSAnimator extends FPSAnimator {
 
         int idealFPS, minFPS;
-        float lagTolerancePercentFPS = 0.07f;
+        float lagTolerancePercentFPS = 0.085f;
 
         public MyFPSAnimator(int idealFPS, int minFPS, int updateEveryNFrames) {
             super(idealFPS);

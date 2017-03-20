@@ -80,12 +80,12 @@ public class MainViewPresenter implements Initializable {
     private volatile long lastPing;
 
 
-    private static PseudoClass CONNECT_CLASS = PseudoClass.getPseudoClass("connect");
-    private static PseudoClass ONLINE_CLASS = PseudoClass.getPseudoClass("online");
+    private static final PseudoClass CONNECT_CLASS = PseudoClass.getPseudoClass("connect");
+    private static final PseudoClass ONLINE_CLASS = PseudoClass.getPseudoClass("online");
 
-    private static PseudoClass WINDOW_CLASS = PseudoClass.getPseudoClass("window");
+    private static final PseudoClass WINDOW_CLASS = PseudoClass.getPseudoClass("window");
 
-    private StringProperty statusProperty = new SimpleStringProperty("-", "mainview.status");
+    private final StringProperty statusProperty = new SimpleStringProperty("-", "mainview.status");
 
     @Override
     public void initialize(URL location, ResourceBundle rb) {

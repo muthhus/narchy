@@ -494,6 +494,9 @@ public class Dynamic<X> extends Collidable<X> {
 	}
 
 
+	public void setLinearVelocity(float x, float y, float z) {
+		linearVelocity.set(x, y, z);
+	}
 
 	public void setLinearVelocity(v3 lin_vel) {
 		assert (collisionFlags != CollisionFlags.STATIC_OBJECT);
@@ -519,7 +522,8 @@ public class Dynamic<X> extends Collidable<X> {
 	public void translate(v3 v) {
 		worldTransform.add(v);
 	}
-	
+
+
 	public void getAabb(v3 aabbMin, v3 aabbMax) {
 		shape().getAabb(worldTransform, aabbMin, aabbMax);
 	}

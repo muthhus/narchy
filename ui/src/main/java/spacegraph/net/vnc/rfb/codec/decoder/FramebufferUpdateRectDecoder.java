@@ -29,9 +29,9 @@ import java.util.List;
 
 class FramebufferUpdateRectDecoder implements FrameDecoder {
 
-  private static Logger logger = LoggerFactory.getLogger(FramebufferUpdateRectDecoder.class);
+  private static final Logger logger = LoggerFactory.getLogger(FramebufferUpdateRectDecoder.class);
 
-  private PixelFormat pixelFormat;
+  private final PixelFormat pixelFormat;
 
     private int numberRects, currentRect;
 

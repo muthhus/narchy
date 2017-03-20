@@ -95,7 +95,7 @@ public enum Draw {
                 0, GL.GL_FLOAT, // normal
                 0, GL.GL_FLOAT, // texCoords
                 GL.GL_STATIC_DRAW);
-        vbo.glBegin(gl.GL_LINES);
+        vbo.glBegin(GL.GL_LINES);
         vbo.glColor4f(1f, 1f, 1f, 1f);
         vbo.glVertex3f(0f, 0f, 0f);
         vbo.glColor4f(1f, 1f, 1f, 1f);
@@ -169,7 +169,7 @@ public enum Draw {
         } else {
             boolean useWireframeFallback = true;
             switch (shape.getShapeType()) {
-                case BOX_SHAPE_PROXYTYPE: {
+                case BOX_SHAPE_PROXYTYPE:
                     SimpleBoxShape boxShape = (SimpleBoxShape) shape;
                     boxShape.getHalfExtentsWithoutMargin(a);
                     //Vector3f halfExtent = stack.vectors.get();
@@ -179,10 +179,9 @@ public enum Draw {
 
                     useWireframeFallback = false;
                     break;
-                }
                 case CONVEX_HULL_SHAPE_PROXYTYPE:
                 case TRIANGLE_SHAPE_PROXYTYPE:
-                case TETRAHEDRAL_SHAPE_PROXYTYPE: {
+                case TETRAHEDRAL_SHAPE_PROXYTYPE:
                     //glutSolidCube(1.0);
 
 
@@ -218,7 +217,7 @@ public enum Draw {
                                 v3 tmp1 = v();
                                 v3 tmp2 = v();
 
-                                gl.glBegin(gl.GL_TRIANGLES);
+                                gl.glBegin(GL.GL_TRIANGLES);
 
                                 for (int i = 0; i < tris; i++) {
 
@@ -245,7 +244,6 @@ public enum Draw {
 
                     useWireframeFallback = false;
                     break;
-                }
                 case SPHERE_SHAPE_PROXYTYPE: {
                     SphereShape sphereShape = (SphereShape) shape;
                     float radius = sphereShape.getMargin(); // radius doesn't include the margin, so draw with margin
@@ -281,9 +279,8 @@ public enum Draw {
                     useWireframeFallback = false;
                     break;
                 }
-                case MULTI_SPHERE_SHAPE_PROXYTYPE: {
+                case MULTI_SPHERE_SHAPE_PROXYTYPE:
                     break;
-                }
                 //				case CONE_SHAPE_PROXYTYPE:
                 //					{
                 //						const btConeShape* coneShape = static_cast<const btConeShape*>(shape);
@@ -311,13 +308,12 @@ public enum Draw {
                 //						break;
                 //
                 //					}
-                case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE: {
+                case CONVEX_TRIANGLEMESH_SHAPE_PROXYTYPE:
                     useWireframeFallback = false;
                     break;
-                }
 
                 case CONVEX_SHAPE_PROXYTYPE:
-                case CYLINDER_SHAPE_PROXYTYPE: {
+                case CYLINDER_SHAPE_PROXYTYPE:
                     CylinderShape cylinder = (CylinderShape) shape;
                     int upAxis = cylinder.getUpAxis();
 
@@ -327,9 +323,7 @@ public enum Draw {
                     glsrt.drawCylinder(gl, radius, halfHeight, upAxis);
 
                     break;
-                }
-                default: {
-                }
+                default:
 
             }
 
@@ -345,7 +339,7 @@ public enum Draw {
                             0, GL.GL_FLOAT,  // normal
                             0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
 
-                    vbo.glBegin(gl.GL_LINES);
+                    vbo.glBegin(GL.GL_LINES);
 
                     //Vector3f a = stack.vectors.get(), b = stack.vectors.get();
                     int i;
@@ -633,16 +627,13 @@ public enum Draw {
         push(gl);
         gl.glBegin(GL2.GL_TRIANGLES);
 
-        {
-
-            gl.glNormal3f(ww.x, ww.y, ww.z);
-            gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
-            gl.glVertex3f( //right base
-                    sx + -vv.x, sy + -vv.y, sz + -vv.z //full triangle
-                    //sx, sy, sz  //half triangle
-            );
-            gl.glVertex3f(tx, ty, tz); //right base
-        }
+        gl.glNormal3f(ww.x, ww.y, ww.z);
+        gl.glVertex3f(sx + vv.x, sy + vv.y, sz + vv.z); //right base
+        gl.glVertex3f( //right base
+                sx + -vv.x, sy + -vv.y, sz + -vv.z //full triangle
+                //sx, sy, sz  //half triangle
+        );
+        gl.glVertex3f(tx, ty, tz); //right base
 
 
         gl.glEnd();
@@ -779,6 +770,7 @@ public enum Draw {
             this.gl = gl;
         }
 
+        @Override
         public void processTriangle(v3[] triangle, int partId, int triangleIndex) {
             diff1.sub(triangle[1], triangle[0]);
             diff2.sub(triangle[2], triangle[0]);
@@ -792,7 +784,7 @@ public enum Draw {
                     3, GL.GL_FLOAT,  // normal
                     0, GL.GL_FLOAT); // texture
 
-            vbo.glBegin(gl.GL_TRIANGLES);
+            vbo.glBegin(GL.GL_TRIANGLES);
             vbo.glColor4f(0, 1f, 0, 1f);
             vbo.glNormal3f(normal.x, normal.y, normal.z);
             vbo.glVertex3f(triangle[0].x, triangle[0].y, triangle[0].z);
@@ -828,12 +820,13 @@ public enum Draw {
 
     private static class GlDrawcallback extends TriangleCallback {
         private final GL gl;
-        public boolean wireframe = false;
+        public boolean wireframe;
 
         public GlDrawcallback(GL gl) {
             this.gl = gl;
         }
 
+        @Override
         public void processTriangle(v3[] triangle, int partId, int triangleIndex) {
             ImmModeSink vbo = ImmModeSink.createFixed(10,
                     3, GL.GL_FLOAT,  // vertex
@@ -841,7 +834,7 @@ public enum Draw {
                     0, GL.GL_FLOAT,  // normal
                     0, GL.GL_FLOAT, GL.GL_STATIC_DRAW); // texture
             if (wireframe) {
-                vbo.glBegin(gl.GL_LINES);
+                vbo.glBegin(GL.GL_LINES);
                 vbo.glColor4f(1, 0, 0, 1);
                 vbo.glVertex3f(triangle[0].x, triangle[0].y, triangle[0].z);
                 vbo.glVertex3f(triangle[1].x, triangle[1].y, triangle[1].z);
@@ -853,7 +846,7 @@ public enum Draw {
                 vbo.glVertex3f(triangle[0].x, triangle[0].y, triangle[0].z);
                 vbo.glEnd(gl);
             } else {
-                vbo.glBegin(gl.GL_TRIANGLES);
+                vbo.glBegin(GL.GL_TRIANGLES);
                 vbo.glColor4f(1, 0, 0, 1);
                 vbo.glVertex3f(triangle[0].x, triangle[0].y, triangle[0].z);
                 vbo.glColor4f(0, 1, 0, 1);
@@ -872,13 +865,14 @@ public enum Draw {
             this.gl = gl;
         }
 
+        @Override
         public void internalProcessTriangleIndex(v3[] triangle, int partId, int triangleIndex) {
             ImmModeSink vbo = ImmModeSink.createFixed(GL.GL_STATIC_DRAW, 10,
                     3, GL.GL_FLOAT,  // vertex
                     4, GL.GL_FLOAT,  // color
                     0, GL.GL_FLOAT,  // normal
                     0, GL.GL_FLOAT); // texture
-            vbo.glBegin(gl.GL_TRIANGLES);//LINES);
+            vbo.glBegin(GL.GL_TRIANGLES);//LINES);
             vbo.glColor4f(1, 0, 0, 1);
             vbo.glVertex3f(triangle[0].x, triangle[0].y, triangle[0].z);
             vbo.glVertex3f(triangle[1].x, triangle[1].y, triangle[1].z);
@@ -1281,7 +1275,7 @@ public enum Draw {
         protected int charHeight;
         protected int[][] chars;
         protected int lineHeight = 10;
-        protected int kerning = 0;
+        protected int kerning;
         protected int wh;
         public static final int defaultChar = 32;
         private int textureHeight;

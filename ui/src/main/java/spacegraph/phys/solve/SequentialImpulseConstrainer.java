@@ -63,7 +63,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
     private static final int SEQUENTIAL_IMPULSE_MAX_SOLVER_POINTS = 16384;
     private final OrderIndex[] gOrder = new OrderIndex[SEQUENTIAL_IMPULSE_MAX_SOLVER_POINTS];
 
-    private int totalCpd = 0;
+    private int totalCpd;
 
     {
         for (int i = 0; i < gOrder.length; i++) {
@@ -83,10 +83,11 @@ public class SequentialImpulseConstrainer extends Constrainer {
     protected final ContactSolverFunc[][] frictionDispatch = new ContactSolverFunc[MAX_CONTACT_SOLVER_TYPES][MAX_CONTACT_SOLVER_TYPES];
 
     // btSeed2 is used for re-arranging the constraint rows. improves convergence/quality of friction
-    protected long btSeed2 = 0L;
+    protected long btSeed2;
 
     public SequentialImpulseConstrainer() {
         BulletGlobals.setContactDestroyedCallback(new ContactDestroyedCallback() {
+            @Override
             public boolean contactDestroyed(Object userPersistentData) {
                 assert (userPersistentData != null);
                 ConstraintPersistentData cpd = (ConstraintPersistentData) userPersistentData;

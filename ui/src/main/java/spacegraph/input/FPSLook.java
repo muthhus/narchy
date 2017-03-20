@@ -13,10 +13,10 @@ import static spacegraph.math.v3.v;
  */
 public class FPSLook extends SpaceMouse {
 
-    boolean dragging = false;
+    boolean dragging;
     private int prevX, prevY;
     float h = (float) Math.PI; //angle
-    float v = 0; //angle
+    float v; //angle
 
     public FPSLook(JoglPhysics g) {
         super(g);

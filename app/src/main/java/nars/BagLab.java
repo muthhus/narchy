@@ -12,13 +12,13 @@ import nars.gui.Vis;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
-import spacegraph.space.widget.FloatSlider;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static spacegraph.space.layout.Grid.col;
-import static spacegraph.space.layout.Grid.row;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.row;
 
 /**
  * Created by me on 11/29/16.

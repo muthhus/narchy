@@ -4,9 +4,10 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
+import jcog.data.FloatParam;
+import nars.*;
+import nars.bag.leak.LeakOut;
+import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
@@ -16,31 +17,34 @@ import nars.truth.Truth;
 import nars.util.Cycles;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.Flatten;
-import spacegraph.layout.ForceDirected;
-import spacegraph.layout.Spiral;
+import spacegraph.layout.*;
 import spacegraph.math.Color3f;
-import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.render.Draw;
 import spacegraph.render.SpaceGraph2D;
 import spacegraph.space.CrosshairSurface;
-import spacegraph.space.layout.Grid;
-import spacegraph.space.layout.Stacking;
-import spacegraph.space.widget.*;
-import spacegraph.space.widget.console.ConsoleSurface;
-import spacegraph.space.widget.console.ConsoleTerminal;
+import spacegraph.widget.*;
+import spacegraph.widget.button.CheckBox;
+import spacegraph.widget.button.PushButton;
+import spacegraph.widget.console.ConsoleSurface;
+import spacegraph.widget.console.ConsoleTerminal;
+import spacegraph.widget.meta.ReflectionSurface;
+import spacegraph.widget.meter.Plot2D;
+import spacegraph.widget.slider.FloatSlider;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.space.layout.Grid.*;
+import static spacegraph.layout.Grid.*;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis
@@ -365,7 +369,8 @@ public class Vis {
 //                            }
 //                        }
 
-//                        //new Spiral()
+
+                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
         ) {
@@ -377,6 +382,7 @@ public class Vis {
 
         s.dyn.addBroadConstraint(new MyForceDirected());
 
+        s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 
         return s;
 
@@ -453,9 +459,30 @@ public class Vis {
         return s;
     }
 
-    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, float priMin) {
+    public static ConsoleSurface logConsole(NAR nar, int cols, int rows, FloatParam priMin) {
         ConsoleSurface term = new ConsoleTerminal(cols, rows);
-        nar.logBudgetMin(term, priMin);
+        new LeakOut(nar, 4, 0.25f) {
+
+            @Override
+            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+                if (t.pri() >= priMin.floatValue()) {
+                    super.in(t, each);
+                }
+            }
+
+            @Override protected float send(Task t) {
+                if (t.pri() >= priMin.floatValue()) {
+                    try {
+                        t.appendTo(term);
+                        term.append('\n');
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return 1;
+                }
+                return 0;
+            }
+        };
         return term;
     }
 
@@ -464,6 +491,9 @@ public class Vis {
     }
 
     private static class MyForceDirected extends ForceDirected {
+
+
+
         @Override
         public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
             super.solve(b, objects, timeStep);
