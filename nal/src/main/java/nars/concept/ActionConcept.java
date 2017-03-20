@@ -74,11 +74,12 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
             //ignore feedback here
         }
     }
-    @Override
-    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
-    }
+
+//    @Override
+//    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+//        //TODO only for Beliefs; Goals can remain normal
+//        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
+//    }
 
     @Override
     public EternalTable newEternalTable(int eCap) {

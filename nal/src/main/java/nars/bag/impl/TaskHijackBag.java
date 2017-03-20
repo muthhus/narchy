@@ -72,7 +72,7 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        update(new Forget(t.pri()*t.qua()));
+        update(new Forget( t.pri() /* * t.qua() */ ));
 
         Task inserted = put(t);
 

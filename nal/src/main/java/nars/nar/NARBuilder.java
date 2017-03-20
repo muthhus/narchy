@@ -80,7 +80,7 @@ public interface NARBuilder {
 
         int maxConcepts = 128 * 1024;
 
-        Default nar = new Default(2 * 1024,
+        Default nar = new Default(512,
                 1, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
@@ -140,10 +140,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
             final Compressor compressor = new Compressor(this, "_",
-                    6, 12,
-                    0.5f, 32, 256);
+                    12, 24,
+                    1f, 32, 64);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -214,7 +214,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.5f, 8);
+        new Inperience(nar, 0.25f, 4);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

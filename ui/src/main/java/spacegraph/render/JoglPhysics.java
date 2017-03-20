@@ -25,15 +25,12 @@ package spacegraph.render;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.math.FloatUtil;
-import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.math.Matrix4f;
-import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
@@ -49,8 +46,6 @@ import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.CollisionShape;
 import spacegraph.phys.util.AnimVector3f;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static com.jogamp.opengl.GL.GL_NICEST;
@@ -73,6 +68,9 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     private int maxSubsteps = 0; //set to zero for variable timing
     protected float aspect;
+
+
+
 
 
     public void camera(v3 target, float radius) {
@@ -130,13 +128,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     protected boolean stepping = true;
     protected int lastKey;
 
-    protected GLSRT glsrt;
 
 
     public JoglPhysics() {
         super();
 
         debug |= DebugDrawModes.NO_HELP_TEXT;
+
 
         // Setup the basic world
         DefaultCollisionConfiguration collision_config = new DefaultCollisionConfiguration();
@@ -169,6 +167,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         camUp = new AnimVector3f(0, 1, 0, dyn, cameraRotateSpeed); //new AnimVector3f(0f, 1f, 0f, dyn, 1f);
 
 
+    }
+
+    @Override
+    public void windowDestroyed(WindowEvent windowEvent) {
+        super.windowDestroyed(windowEvent);
+        meters.remove(this);
     }
 
     /**
@@ -303,7 +307,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     //final AtomicBoolean busy = new AtomicBoolean(false);
 
-    protected void update() {
+    @Override protected void update() {
 
 
         long dt = clock.getTimeThenReset();
@@ -312,7 +316,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         if (simulating) {
             // NOTE: SimpleDynamics world doesn't handle fixed-time-stepping
             dyn.stepSimulation(
-                    Math.max(dt, 1000000f / FPS_DEFAULT) / 1000000.f, maxSubsteps
+                    Math.max(dt, 1000000f / FPS_IDEAL) / 1000000.f, maxSubsteps
                     //clock.getTimeThenReset()
             );
         }
@@ -321,24 +325,20 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     }
 
-    @Override
-    public final void display(GLAutoDrawable drawable) {
 
-        render();
-        update();
 
-    }
-
-    protected void render() {
+    @Override protected void render() {
+        window.swapBuffers();
         clear();
         updateCamera();
         forEachSpatial(this::render);
-        gl.glFlush();
+        //gl.glFlush();
     }
 
 
     protected void clear() {
-        clearMotionBlur(0.35f);
+        //clearMotionBlur(0.35f);
+        clearComplete();
 
     }
 
@@ -697,29 +697,29 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
 
-    public v3 rayTo(int px, int py) {
-        float x = (2.0f * px) / getWidth() - 1.0f;
-        float y = 1.0f - (2.0f * py) / getHeight();
-        float z = 0.0f;
-        v3 ray_nds = v(x, y, z);
-        Vector4f ray_eye = new Vector4f( x, y, -1.0f, 1.0f );
-
-        //https://capnramses.github.io/opengl/raycasting.html
-        Matrix4f viewMatrixInv = new Matrix4f(mat4f);
-        viewMatrixInv.invert();
-        viewMatrixInv.transform(ray_eye);
-        ray_eye.setZ(-1f);
-        ray_eye.setW(1f);
-
-        viewMatrixInv.transform(ray_eye);
-        v3 ray_wor = v(ray_eye.x, ray_eye.y, ray_eye.z);
-        ray_wor.normalize();
-
-
-        return ray_wor;
-
-        //return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
-    }
+//    public v3 rayTo(int px, int py) {
+//        float x = (2.0f * px) / getWidth() - 1.0f;
+//        float y = 1.0f - (2.0f * py) / getHeight();
+//        float z = 0.0f;
+//        v3 ray_nds = v(x, y, z);
+//        Vector4f ray_eye = new Vector4f( x, y, -1.0f, 1.0f );
+//
+//        //https://capnramses.github.io/opengl/raycasting.html
+//        Matrix4f viewMatrixInv = new Matrix4f(mat4f);
+//        viewMatrixInv.invert();
+//        viewMatrixInv.transform(ray_eye);
+//        ray_eye.setZ(-1f);
+//        ray_eye.setW(1f);
+//
+//        viewMatrixInv.transform(ray_eye);
+//        v3 ray_wor = v(ray_eye.x, ray_eye.y, ray_eye.z);
+//        ray_wor.normalize();
+//
+//
+//        return ray_wor;
+//
+//        //return rayTo(-1f + 2 * x / ((float) getWidth()), -1f + 2 * y / ((float) getHeight()));
+//    }
 
 //    public v3 rayTo(float x, float y) {
 //        return rayTo(x, y, zFar);
@@ -790,11 +790,11 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
     public final void render(Spatial<?> s) {
 
+        GL2 gl = this.gl;
 
         s.renderAbsolute(gl);
 
         s.forEachBody(body -> {
-            GL2 gl = this.gl;
 
             gl.glPushMatrix();
 

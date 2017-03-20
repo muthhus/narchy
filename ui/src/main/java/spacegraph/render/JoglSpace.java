@@ -9,6 +9,7 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import jcog.Util;
+import jcog.meter.event.PeriodMeter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,9 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
-    final static int FPS_DEFAULT = 30;
-    public static final int MIN_FPS = 3;
-    private static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_DEFAULT, MIN_FPS, 25);
+    final static int FPS_IDEAL = 25;
+    public static final int FPS_MIN = 8;
+    protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL );
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
@@ -35,14 +36,38 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public GLWindow window;
     protected GL2 gl;
 
+    public final PeriodMeter frameTimeMS;
+
+    static final ConcurrentHashMap<JoglSpace,JoglSpace> meters = new ConcurrentHashMap();
+
+
+    public JoglSpace() {
+        super();
+        frameTimeMS = new PeriodMeter(toString(), 60);
+        meters.put(this, this);
+    }
+
     public static GLWindow window(JoglSpace j) {
         return window(newDefaultConfig(), j);
     }
 
+
+    static final GLAutoDrawable sharedDrawable;
+    static {
+        GLCapabilitiesImmutable cfg = newDefaultConfig();
+        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
+        sharedDrawable.display(); // triggers GLContext object creation and native realization.
+        Draw.init(sharedDrawable.getGL().getGL2());
+    }
+
     public static GLWindow window(GLCapabilitiesImmutable config, JoglSpace j) {
+
+
         GLWindow w = GLWindow.create(config);
         w.addGLEventListener(j);
         w.addWindowListener(j);
+        w.setSharedContext(sharedDrawable.getContext());
+
 
         //TODO FPSAnimator
         animate(w);
@@ -67,6 +92,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 a.resume();
                 logger.info("RESUME {}", a);
             }
+
 
             a.add(w);
         //}
@@ -94,7 +120,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         this.window = (GLWindow)drawable;
 
         this.gl = drawable.getGL().getGL2();
-        printHardware();
+        //printHardware();
+
+        Draw.init(gl);
 
         init(gl);
     }
@@ -197,6 +225,22 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     }
 
+    abstract protected void update();
+    abstract protected void render();
+
+    @Override
+    public final void display(GLAutoDrawable drawable) {
+
+        long start = System.currentTimeMillis();
+        update();
+        render();
+        long now = System.currentTimeMillis();
+
+        frameTimeMS.hit(now - start);
+
+    }
+
+
     public GLWindow show(int w, int h) {
         return show("", w, h );
     }
@@ -208,6 +252,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
         g.preserveGLStateAtDestroy(false);
         g.setSurfaceSize(w, h);
+        g.setAutoSwapBufferMode(false);
         if (x != Integer.MIN_VALUE ) {
             g.setPosition(x, y);
         }
@@ -238,12 +283,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     private static class MyFPSAnimator extends FPSAnimator {
 
         int idealFPS, minFPS;
-        float lagTolerancePercentFPS = 0.085f;
+        float lagTolerancePercentFPS = 0.05f;
 
         public MyFPSAnimator(int idealFPS, int minFPS, int updateEveryNFrames) {
             super(idealFPS);
 
-
+            setIgnoreExceptions(true);
+            setPrintExceptions(false);
 
             this.idealFPS = idealFPS;
             this.minFPS = minFPS;
@@ -273,9 +319,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             //logger.info("{}", MyFPSAnimator.this);
 
             int currentFPS = getFPS();
-            float lag = currentFPS - getLastFPS();
-            if (lag < 1f)
-                return; //the fps can only be adjusted in integers
+            float lastFPS = getLastFPS();
+            float lag = currentFPS - lastFPS;
 
             float error = lag/currentFPS;
 
@@ -284,19 +329,21 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             if (error > lagTolerancePercentFPS) {
                 if (currentFPS > minFPS)  {
                     //decrease fps
-                    nextFPS = Util.lerp(0.25f, minFPS, currentFPS);
+                    nextFPS = Util.lerp(0.1f, minFPS, currentFPS);
+                    resetFPSCounter();
                 }
             } else {
                 if (currentFPS < idealFPS) {
                     //increase fps
-                    nextFPS = Util.lerp(0.25f, idealFPS, currentFPS);
+                    nextFPS = Util.lerp(0.1f, idealFPS, currentFPS);
+                    resetFPSCounter();
                 }
             }
 
-            int inextFPS = Math.round(nextFPS);
+            int inextFPS = Math.max(1, Math.round(nextFPS));
             if (nextFPS==nextFPS && inextFPS!=currentFPS) {
                 //stop();
-                logger.warn("animator rate change from {} to {} fps", currentFPS, inextFPS);
+                logger.debug("animator rate change from {} to {} fps because currentFPS={} and lastFPS={} ", currentFPS, inextFPS, currentFPS, lastFPS);
 
                 Thread x = animThread; //HACK to make it think it's stopped when we just want to change the FPS value ffs!
                 animThread = null;
@@ -307,6 +354,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 //start();
             }
 
+//            if (logger.isDebugEnabled()) {
+//                if (!meters.isEmpty()) {
+//                    meters.forEach((m, x) -> {
+//                        logger.info("{} {}ms", m, ((JoglPhysics) m).frameTimeMS.mean());
+//                    });
+//                }
+//            }
         }
 
 

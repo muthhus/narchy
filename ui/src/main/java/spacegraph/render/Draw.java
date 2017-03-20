@@ -50,12 +50,12 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;
 import static spacegraph.render.JoglSpace.glut;
-import static spacegraph.test.Lesson14.renderString;
 
 /**
  * @author jezek2
@@ -554,36 +554,36 @@ public enum Draw {
      */
     final static float zStep = 0.05f;
 
-    @Deprecated
-    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
-        text(gl, scaleX, scaleY, label, dx, dy, dz, null);
-    }
+//    @Deprecated
+//    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz) {
+//        text(gl, scaleX, scaleY, label, dx, dy, dz, null);
+//    }
 
-    @Deprecated
-    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
-        push(gl);
-        //gl.glNormal3f(0, 0, 1f);
-        gl.glTranslatef(dx, dy, dz + zStep);
-
-        if (color != null)
-            gl.glColor3fv(color, 0);
-
-        float fontThick = 1f;
-        gl.glLineWidth(fontThick);
-
-        /*
-         GLUT_STROKE_ROMAN
-            A proportionally spaced Roman Simplex font for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units.
-
-        GLUT_STROKE_MONO_ROMAN
-            A mono-spaced spaced Roman Simplex font (same characters as GLUT_STROKE_ROMAN) for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units. Each character is 104.76 units wide.
-         */
-        //float r = v.radius;
-        renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
-                scaleX, scaleY,
-                0, 0, dz); // Print GL Text To The Screen
-        pop(gl);
-    }
+//    @Deprecated
+//    static public void text(GL2 gl, float scaleX, float scaleY, String label, float dx, float dy, float dz, float[] color) {
+//        push(gl);
+//        //gl.glNormal3f(0, 0, 1f);
+//        gl.glTranslatef(dx, dy, dz + zStep);
+//
+//        if (color != null)
+//            gl.glColor3fv(color, 0);
+//
+//        float fontThick = 1f;
+//        gl.glLineWidth(fontThick);
+//
+//        /*
+//         GLUT_STROKE_ROMAN
+//            A proportionally spaced Roman Simplex font for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units.
+//
+//        GLUT_STROKE_MONO_ROMAN
+//            A mono-spaced spaced Roman Simplex font (same characters as GLUT_STROKE_ROMAN) for ASCII characters 32 through 127. The maximum top character in the font is 119.05 units; the bottom descends 33.33 units. Each character is 104.76 units wide.
+//         */
+//        //float r = v.radius;
+//        renderString(gl, /*GLUT.STROKE_ROMAN*/ STROKE_MONO_ROMAN, label,
+//                scaleX, scaleY,
+//                0, 0, dz); // Print GL Text To The Screen
+//        pop(gl);
+//    }
 
     //    static final float[] tmpV = new float[3];
     static final v3 ww = new v3();
@@ -934,6 +934,7 @@ public enum Draw {
         // Hershey fonts use coordinates represented by characters'
         // integer values relative to ascii 'R'
         static final int offsetR = (int) ('R');
+        private int id;
 
 
         HGlyph(String hspec) {
@@ -964,12 +965,13 @@ public enum Draw {
                 curY = (int) (spec.charAt(i + 1)) - offsetR; //0..20
                 currentSeg.add((byte)(10 - curY)); //half above zero half below zero
             }
-            if (currentSeg.size() > 0)
+            if (!currentSeg.isEmpty())
                 segments.add(currentSeg.toArray());
 
             this.segments = segments.toArray(new byte[segments.size()][]);
-        }
 
+
+        }
 
         public void draw(GL2 gl, float x) {
             //int pLastX = 0, pLastY = 0;
@@ -981,6 +983,16 @@ public enum Draw {
             if (x!=0)
                 gl.glTranslatef(x, 0, 0);
 
+            gl.glCallList(id);
+
+            if (x!=0)
+                gl.glTranslatef(-x, 0, 0); //HACK un-translate, cheaper than pushMatrix
+        }
+
+        public void init(GL2 gl) {
+            id = gl.glGenLists(1);            // Generate 2 Different Lists
+            gl.glNewList(id, GL2.GL_COMPILE);  // Start With The Box List
+
             for (byte[] seg : segments) {
 
                 int ss = seg.length;
@@ -988,13 +1000,12 @@ public enum Draw {
                 gl.glBegin(GL2.GL_LINE_STRIP);
                 for (int j = 0; j < ss; ) {
                     //gl.glVertex2i(seg[j++], seg[j++]);
-                    gl.glVertex3f(seg[j++], seg[j++], 0);
+                    gl.glVertex2i(seg[j++], seg[j++]);
                 }
                 gl.glEnd();
             }
 
-            if (x!=0)
-                gl.glTranslatef(-x, 0, 0); //HACK un-translate, cheaper than pushMatrix
+            gl.glEndList();
         }
     }
 
@@ -1151,14 +1162,18 @@ public enum Draw {
                 }
             }
 
-//
-
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
-        fontMono = glyphs.toArray(new HGlyph[glyphs.size()]);
 
+        fontMono = glyphs.toArray(new HGlyph[glyphs.size()]);
+    }
+
+    static void init(GL2 gl) {
+        for (HGlyph x : fontMono) {
+            x.init(gl);
+        }
     }
 
 

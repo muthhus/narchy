@@ -250,11 +250,6 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 //            new Color(0.2f + 0.4f * c, 1f, 0.2f, 0.39f + 0.6f * c)
 //    );
 
-    static final float dz = 0.0f;
-
-
-
-
     public void drawCrossHair(GL2 gl, float x, float gew, Truth truth, double theta) {
         gl.glLineWidth(CROSSHAIR_THICK);
 
@@ -403,15 +398,15 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 return;
             }
 
-            float a = 0.25f + 0.75f * conf;
+            float a = 0.45f + 0.5f * conf;
             if (beliefOrGoal) {
-                gl.glColor4f(0.75f, 0.25f, 0f, a);
+                gl.glColor4f(0.5f + 0.5f * conf, 0.25f, 0f, a);
             } else {
-                gl.glColor4f(0f, 0.75f, 0.25f, a);
+                gl.glColor4f(0f, 0.5f + 0.5f * conf, 0.25f, a);
             }
 
             //r.renderTask(gl, qua, conf, pw, ph, x, freq);
-            gl.glVertex3f(x, freq, dz);
+            gl.glVertex2f(x, freq);
 
 
             if (start == end)
@@ -424,7 +419,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 x = xTime(minT, maxT, (long)end);
             }
 
-            gl.glVertex3f(x, freq, dz);
+            gl.glVertex2f(x, freq);
         });
 
         gl.glEnd();

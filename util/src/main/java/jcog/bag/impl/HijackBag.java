@@ -64,7 +64,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return (int) (Integer.toUnsignedLong(hash) % c);
     }
 
-    private static boolean hijackGreedy(float newPri, float weakestPri) {
+    public static boolean hijackGreedy(float newPri, float weakestPri) {
         return weakestPri <= newPri;
     }
 

@@ -39,6 +39,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     @Override
     public void windowDestroyed(WindowEvent windowEvent) {
+        super.windowDestroyed(windowEvent);
         atoms.invalidateAll();
         orthos.clear();
         inputs.clear();
@@ -61,6 +62,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         Cache<X, Spatial<X>> atoms =
                 //new NonBlockingHashMap(cacheCapacity);
                 //new ConcurrentHashMap<>(cacheCapacity);
+
+
                 Caffeine.newBuilder()
                 //.softValues().build();
                 .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
@@ -74,6 +77,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         this.atoms = atoms;
 
     }
+
 
 
     public SpaceGraph(AbstractSpace<X, ?>... cc) {

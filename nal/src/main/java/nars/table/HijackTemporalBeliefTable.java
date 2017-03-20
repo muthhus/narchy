@@ -19,6 +19,7 @@ import nars.time.Time;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
+import nars.util.signal.ScalarSignal;
 import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -115,6 +116,14 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    }
 
 
+    @Override
+    protected boolean replace(Task incoming, Task existing) {
+        if (incoming instanceof SignalTask)
+            return true;
+
+        float incomingPri = pri(incoming);
+        return hijackGreedy(incomingPri, pri(existing));
+    }
 
     @Nullable
     @Override
