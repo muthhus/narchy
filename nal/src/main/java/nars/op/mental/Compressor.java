@@ -82,10 +82,17 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
         public void start() throws RuntimeException {
 
-
             Compound decompressed = get();
-
             this.compressed = AliasConcept.get(newSerialTerm(), decompressed, nar);
+
+            Compound s = compoundOrNull(
+                    //$.sim
+                    $.equi
+                            (compressed, decompressed)
+            );
+            if (s == null)
+                throw new RuntimeException("unrelateable: " + compressed + " for " + decompressed);
+
             if (compressed == null)
                 throw new RuntimeException("could not create alias concept: " + compressed + " for " + decompressed);
 
@@ -98,42 +105,38 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
             ec.put(encode, this);
             dc.put(decode, this);
 
-            Compound s = compoundOrNull(
-                    //$.sim
-                    $.equi
-                            (compressed, decompressed)
+            relation = new AbbreviationTask(
+                    s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
+                    nar.time(), ETERNAL, ETERNAL,
+                    new long[]{nar.time.nextStamp()}, decompressed, compressed
             );
-            if (s == null) {
-                throw new RuntimeException("unrelateable: " + compressed + " for " + decompressed);
-            } else {
+            relation.log("Abbreviate");
+            relation.budget(nar);
+            nar.input(relation);
 
-                relation = new AbbreviationTask(
-                        s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                        nar.time(), ETERNAL, ETERNAL,
-                        new long[]{nar.time.nextStamp()}, decompressed, compressed
-                );
-                relation.log("Abbreviate");
-                relation.budget(nar);
+            recompile();
+        }
 
-                nar.input(relation);
+        public void stop() {
+            AbbreviationTask r = this.relation;
+            if (r !=null) {
+                this.relation = null;
+
+                r.delete();
+
+                ec.remove(encode);
+                dc.remove(decode);
 
                 recompile();
             }
         }
 
-        public void stop() {
-            synchronized (code) { //HACK avoid synchronization somehow
-                ec.remove(encode);
-                dc.remove(decode);
-            }
-
-            recompile();
-
-            relation.delete();
-        }
-
         public void boost(float pri) {
             priAdd( score * pri );
+        }
+
+        public boolean ready() {
+            return this.relation!=null;
         }
 
     }
@@ -227,11 +230,11 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
         nar.runLater(() -> {
             if (busy.compareAndSet(false, true)) {
-                synchronized (code) {
-                    decoder = matcher(x -> x.decode);
-                    encoder = matcher(x -> x.encode);
-                    busy.set(false);
-                }
+
+                decoder = matcher(x -> x.decode);
+                encoder = matcher(x -> x.encode);
+                busy.set(false);
+
             }
         });
 
@@ -240,7 +243,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
     private MultiSequenceMatcher matcher(Function<Abbr, SequenceMatcher> which) {
 
-        Collection<SequenceMatcher> mm = HijackBag.stream(code.map.get()).filter(Objects::nonNull).map(which).collect(toList());
+        Collection<SequenceMatcher> mm = HijackBag.stream(code.map.get()).filter(x -> x!=null && x.ready()).map(which).collect(toList());
             //code.asMap().values().stream().map(which).collect(Collectors.toList());
 
         switch (mm.size()) {

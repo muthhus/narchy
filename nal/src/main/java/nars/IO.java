@@ -256,7 +256,7 @@ public class IO {
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
         if (isTrueOrFalse(term))
-            throw new RuntimeException("true/false leak");
+            throw new InvalidTermException("true/false leak", $.p(term));
 
         if (term instanceof SerialCompound) {
             //it's already serialized in a SerialCompound
