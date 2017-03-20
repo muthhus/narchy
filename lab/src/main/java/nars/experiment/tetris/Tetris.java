@@ -514,7 +514,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         Time clock = new RealTime.DSHalf(true).durSeconds(DUR);
         NAR n =
-                NARBuilder.newMultiThreadNAR(3, clock);
+                NARBuilder.newMultiThreadNAR(-1, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 //        n.onTask((t)->{

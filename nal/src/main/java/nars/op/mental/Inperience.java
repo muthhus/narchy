@@ -1,6 +1,7 @@
 package nars.op.mental;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -63,12 +64,18 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 
 
     /**
-     * minimum expectation necessary to create a concept
+     * minimum conf necessary to create a concept
      * original value: 0.66
      */
     @NotNull
-    public final AtomicDouble conceptCreationExpectation = new AtomicDouble(0.66);
+    public final FloatParam confMin = new FloatParam(0.5f);
 
+    /**
+     * max frequency difference from either 0.0 or 1.0 to be polarized enough.
+     * use the < 0.5 value here, ex: 0.1 means that 0..0.1 and 0.9..1.0 will be accepted
+     */
+    @NotNull
+    public final FloatParam freqMax = new FloatParam(0.25f);
 
 //    public boolean isEnableWantBelieve() {
 //        return enableWantBelieve;
@@ -149,6 +156,17 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 
         if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
             return;
+
+        if (task.isBeliefOrGoal()) {
+            //check for sufficient truth polarization
+            if (task.conf() <= confMin.floatValue())
+                return; //too low confidence
+
+            float f = task.freq();
+            float fm = freqMax.floatValue();
+            if (!(f <= fm) || !(f >= (1f - fm))  )
+                return;
+        }
 
         if (!task.isDeleted())
             each.accept(new RawBLink<>(task, task, 1f / tt.volume()));

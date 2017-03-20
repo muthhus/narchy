@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -82,9 +83,9 @@ public class MultiThreadExecutor extends Executioner {
                 exe,
                 ProducerType.MULTI,
                 //new BusySpinWaitStrategy()
-                /*new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
-                        new LiteBlockingWaitStrategy())*/
-                new LiteBlockingWaitStrategy()
+                new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
+                        new SleepingWaitStrategy())
+                //new LiteBlockingWaitStrategy()
                 //new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(0, TimeUnit.MILLISECONDS)

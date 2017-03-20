@@ -431,13 +431,12 @@ public class Vis {
         @Override
         public void accept(PLink<Concept> x, ItemVis<PLink<Concept>> y) {
             float p = x.pri();
-            float ph = 0.25f + 0.75f * p;
 
             float r, g, b;
 
             Concept c = x.get();
             if (c != null) if (c instanceof Atomic) {
-                r = g = b = ph * 0.5f;
+                r = g = b = p * 0.5f;
             } else {
                 float belief = 0.5f, goal = 0.5f;
                 //float a = 0;
@@ -458,9 +457,16 @@ public class Vis {
 
                 //a = Math.min(a, 1f);
 
-                    r = 0.05f + 0.5f * (1f - goal);
-                    g = 0.05f + 0.5f * goal;
-                    b = 0.05f + 0.5f * belief;
+
+                if (goal < 0.5f) {
+                    r = 0.05f + 0.75f * (0.5f - goal);
+                    g = 0;
+                } else {
+                    g = 0.05f + 0.75f * (goal - 0.5f);
+                    r = 0;
+                }
+
+                b = 0.05f + 0.95f * belief;
 
                 /*else if (c.hasQuestions() || c.hasQuests()) {
                     r = 1; //yellow

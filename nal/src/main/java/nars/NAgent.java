@@ -73,10 +73,10 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictTime = new FloatParam(2, 0, 32);
+    public final FloatParam predictTime = new FloatParam(5, 0, 32);
 
 
-    public float predictorProbability = 1f; //scaled to 1/num predictors
+    public float predictorProbability = 0.5f;
 
 
     private boolean initialized;
@@ -319,7 +319,8 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     //quest((Compound) (action.term()), now)
-                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    quest((Compound)$.conj(varQuery(1), (Compound) (action.term())), now),
+                    quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
                     //prediction($.impl(happiness, dur, action), BELIEF, $.t(0.5f, 0.01f), now, now)
                     //prediction($.seq(action, dur, happiness), BELIEF, $.t(0.5f, 0.01f), now, now)
@@ -433,7 +434,7 @@ abstract public class NAgent implements NSense, NAct {
         float dur = nar.time.dur();
         int num = predictors.size();
 
-        float pp =  predictorProbability / num;
+        float pp =  predictorProbability;
 
         return IntStream.range(0, num).mapToObj(i -> {
             if (nar.random.nextFloat() > pp)

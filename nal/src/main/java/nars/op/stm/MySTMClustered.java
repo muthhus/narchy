@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static nars.Op.CONJ;
 import static nars.term.Terms.compoundOrNull;
 
 /**
@@ -254,7 +255,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private static Compound group(boolean negated, @NotNull Collection<Task> uuu) {
+    private Compound group(boolean negated, @NotNull Collection<Task> uuu) {
 
 
         if (uuu.size() == 2) {
@@ -275,11 +276,11 @@ public class MySTMClustered extends STMClustered {
             int dt = (int) (late.start() - early.start());
 
 
-            return $.seq(
+            return compoundOrNull(
+                nar.concepts.the(CONJ, dt, new Term[] {
                     $.negIf(early.term(), negated),
-                    dt,
                     $.negIf(late.term(), negated)
-            );
+            } ));
 
         } else {
 
@@ -289,7 +290,7 @@ public class MySTMClustered extends STMClustered {
                 $.neg(uu);
 
             //just assume they occurr simultaneously
-            return compoundOrNull($.parallel(uu));
+            return compoundOrNull( nar.concepts.the(CONJ, 0, uu ) );
             //return $.secte(s);
         }
     }

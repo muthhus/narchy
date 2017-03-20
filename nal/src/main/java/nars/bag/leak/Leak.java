@@ -24,11 +24,16 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
     @NotNull
     public final Bag<X,V> bag;
     private final On onTask, onReset, onCycle;
+    private long last;
 
     public Leak(@NotNull Bag<X,V> bag, float rate, @NotNull NAR n) {
          this(bag, new MutableFloat(rate), n);
     }
 
+
+    /**
+     * rate = max successful leaks per duration
+     */
     public Leak(@NotNull Bag<X,V> bag, @NotNull MutableFloat rate, @NotNull NAR n) {
         this.bag = bag;
         this.rate = rate;
@@ -62,9 +67,18 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
 
         bag.commit();
 
+        long last = this.last;
+        long now = nar.time();
+
+        if (now == last)
+            return; //no time yet
+
+        float durDelta = Math.min(1f, (now - last) / nar.dur()); //limit to one in case of lag
+
+        boolean leaked = false;
         //for each full integer = 1 instanceof a 100% prob selection
         // each fraction of an integer = some probability of a next one occurring
-        for (float r = rate.floatValue();
+        for (float r = rate.floatValue() * durDelta;
              (r > 0) &&
              bag.size() >= minSizeForLeak() &&
              ((r >= 1) || ((r < 1f) && (nar.random.nextFloat() < r)));
@@ -73,8 +87,12 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
             if (t!=null) {
                 float cost = onOut(t);
                 r -= cost;
+                leaked = true;
             }
         }
+
+        if (leaked)
+            this.last = now;
 
     }
 

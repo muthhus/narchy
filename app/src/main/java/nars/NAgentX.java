@@ -94,7 +94,7 @@ abstract public class NAgentX extends NAgent {
         Time clock = new RealTime.DSHalf(true).durSeconds(durFrames / fps);
         NAR nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NARBuilder.newMultiThreadNAR(4, clock, true);
+                NARBuilder.newMultiThreadNAR(-1, clock, true);
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
@@ -153,10 +153,10 @@ abstract public class NAgentX extends NAgent {
                 ),
 
                 grid(
-                    Vis.beliefCharts(400, nar, a.happy),
+                    Vis.beliefCharts(16, nar, a.happy),
                     new WindowButton( "agent", () -> (a) ),
-                    new WindowButton( "action", () -> Vis.beliefCharts(400, a.actions, a.nar ) ),
-                    new WindowButton( "predict", () -> Vis.beliefCharts(400, a.predictors, a.nar ) ),
+                    new WindowButton( "action", () -> Vis.beliefCharts(100, a.actions, a.nar ) ),
+                    new WindowButton( "predict", () -> Vis.beliefCharts(100, a.predictors, a.nar ) ),
                         //"agentActions",
                         //"agentPredict",
 

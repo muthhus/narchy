@@ -45,9 +45,13 @@ public interface NARBuilder {
 
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
         Random rng = new XorShift128PlusRandom(1);
+
+        if (threads == -1)
+            threads = Runtime.getRuntime().availableProcessors()-1;
+
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 2048, sync);
+                new MultiThreadExecutor(threads, 512, sync);
 
         //exe = new InstrumentedExecutor(exe, 8);
 
@@ -210,7 +214,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.02f, 8);
+        new Inperience(nar, 0.5f, 8);
 
 //        //causal accelerator
 //        nar.onTask(t -> {
