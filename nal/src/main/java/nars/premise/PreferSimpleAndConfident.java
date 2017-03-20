@@ -61,7 +61,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     }
 
 
-    @Override
+    @Nullable @Override
     public Budget budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
 
         float p = d.premise.pri();

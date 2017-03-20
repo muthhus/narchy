@@ -10,6 +10,7 @@ import nars.concept.PermanentConcept;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.var.Variable;
 import net.byteseek.automata.factory.MutableStateFactory;
 import net.byteseek.automata.trie.TrieFactory;
 import net.byteseek.io.reader.ByteArrayReader;
@@ -293,14 +294,23 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
     }
 
     @NotNull
-    public Term transcode(@NotNull Term t, boolean en) {
-        if (!(t instanceof Compound))
-            return t;
-        else {
-            byte[] ii = IO.termToBytes(t);
-            byte[] oo = transcode(ii, en);
-            return ii != oo ? compoundOr(IO.termFromBytes(oo, nar.concepts), (Compound) t) : t;
+    public Term transcode(@NotNull Term x, boolean en) {
+        if (!(x instanceof Compound)) {
+            //if encoding or t is a variable, do nothing
+            if (en || x instanceof Variable)
+                return x;
         }
+
+        byte[] ii = IO.termToBytes(x);
+        byte[] oo = transcode(ii, en);
+
+        if (ii!=oo) {
+            Term y = IO.termFromBytes(oo, nar.concepts);
+            if (y != null)
+                return y;
+        }
+
+        return x;
     }
 
     @NotNull

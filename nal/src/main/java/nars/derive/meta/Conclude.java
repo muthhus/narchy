@@ -14,6 +14,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
+import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -109,6 +111,28 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
                 Term r = m.index.transform(this.conclusionPattern, m);
+                if (r == null || r instanceof Variable || isTrueOrFalse(r))
+                    return true;
+
+                TruthPuncEvidence ct = m.punct.get();
+
+                Truth truth = ct.truth;
+
+                //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
+                if (r.op()==NEG) {
+                    r = r.unneg();
+
+                    if (r instanceof Variable)
+                        return true;
+
+                    if (truth!=null)
+                        truth = truth.negated();
+                }
+
+                if (!(r instanceof Compound)) {
+                    r = nar.post(r);
+                }
+
 
                 if (r instanceof Compound) {
 
@@ -125,19 +149,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             return true;
                     }
 
-                    TruthPuncEvidence ct = m.punct.get();
                     byte punc = ct.punc;
-
-                    Truth truth = ct.truth;
-
-                    if (crr.op()==NEG) {
-                        crr = compoundOrNull(crr.unneg());
-                        if (crr == null)
-                            return true;
-
-                        if (truth!=null)
-                            truth = truth.negated();
-                    }
 
                     Budget budget = m.budgeting.budget(m, crr, truth, punc);
                     if (budget != null) {
@@ -258,7 +270,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             return;
         }
 
-        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence);
+        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence, nar);
 
 
 
@@ -271,7 +283,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Compound c, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence) {
+    public final DerivedTask derive(@NotNull Compound cc, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence, NAR nar) {
 
         long start, end;
         if (occ!=null) {
@@ -283,8 +295,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         else
             start = end = ETERNAL;
 
+
         DerivedTask d =
-                new DerivedTask.DefaultDerivedTask(c, truth, punc, evidence, p, now, start, end);
+                new DerivedTask.DefaultDerivedTask(cc, truth, punc, evidence, p, now, start, end);
 
 
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
