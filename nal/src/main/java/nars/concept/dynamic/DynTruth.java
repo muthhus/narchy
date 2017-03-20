@@ -1,9 +1,6 @@
 package nars.concept.dynamic;
 
-import nars.$;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
@@ -76,7 +73,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long start, @Nullable Budget b) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long start, @Nullable Budget b, NAR nar) {
 
         Budget budget = b != null ? b : budget();
         if (budget == null || budget.isDeleted())
@@ -88,7 +85,7 @@ public final class DynTruth implements Truthed {
 
         long dur = (start!=ETERNAL && template.op() == CONJ) ? template.dtRange() : 0;
 
-        DynamicBeliefTask dyn = new DynamicBeliefTask(template, beliefOrGoal ? Op.BELIEF : Op.GOAL,
+        DynamicBeliefTask dyn = new DynamicBeliefTask(Task.post(template, nar), beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, start + dur, evidence());
         dyn.setBudget( budget );
         if (Param.DEBUG)

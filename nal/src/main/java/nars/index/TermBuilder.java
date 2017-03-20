@@ -491,8 +491,13 @@ public abstract class TermBuilder {
             if (isTrue(t)) return False;
         }
 
-        return finalize(NEG,t);
-        //return newCompound(Op.NEG, DTERNAL, new TermVector1(t)); //<- faster than through finalize()
+        Term y = finalize(NEG,t);
+        if (t.isNormalized() && y instanceof Compound) {
+            ((Compound)y).setNormalized();
+        }
+        return y;
+
+        //return newCompound(Op.NEG, DTERNAL, new TermVector1(t)); //<- faster than through finalize()?
     }
 
 

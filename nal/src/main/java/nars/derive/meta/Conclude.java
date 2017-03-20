@@ -1,10 +1,7 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
@@ -114,31 +111,11 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 if (r == null || r instanceof Variable || isTrueOrFalse(r))
                     return true;
 
-                TruthPuncEvidence ct = m.punct.get();
-
-                Truth truth = ct.truth;
-
-                //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
-                if (r.op()==NEG) {
-                    r = r.unneg();
-
-                    if (r instanceof Variable)
-                        return true;
-
-                    if (truth!=null)
-                        truth = truth.negated();
-                }
-
-                if (!(r instanceof Compound)) {
-                    r = nar.post(r);
-                }
-
+                r = Task.post(r, nar);
 
                 if (r instanceof Compound) {
 
                     Compound cr = (Compound) r;
-
-
 
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                     Compound crr = compoundOrNull(nar.concepts.eval(cr));
@@ -149,6 +126,9 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                             return true;
                     }
 
+                    TruthPuncEvidence ct = m.punct.get();
+
+                    Truth truth = ct.truth;
                     byte punc = ct.punc;
 
                     Budget budget = m.budgeting.budget(m, crr, truth, punc);
@@ -169,23 +149,12 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     /**
      * 2nd-stage
      */
-    final void derive(@NotNull Derivation m, @NotNull Compound content, Truth truth, Budget budget, byte punc, long[] evidence) {
+    final void derive(@NotNull Derivation m, @NotNull final Compound _content, Truth truth, Budget budget, byte punc, long[] evidence) {
+
+        Compound content = _content;
 
         NAR nar = m.nar;
 
-        Op o = content.op();
-        if (o == NEG) {
-            content = compoundOrNull(content.unneg());
-            if (content == null)
-                return; //??
-
-            if (truth != null)
-                truth = truth.negated();
-        }
-
-//this is performed on input also
-//        if (!Task.taskContentValid(content, ct.punc, nar, false/* !Param.DEBUG*/))
-//            return; //INVALID TERM FOR TASK
 
         long[] occ;
 
@@ -193,10 +162,27 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //            if (nar.level() < 7)
 //                throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
+
+            //process time with the unnegated term
+            Op o = content.op();
+            Compound temporalized;
+            boolean negated;
+            if (o == NEG) {
+                temporalized = Task.post(content.unneg(), nar);
+                if (temporalized == null) {
+                    temporalized = content; //use as-is since it cant be decompressed unnegated
+                    negated = false;
+                } else
+                    negated = true;
+            } else {
+                negated = false;
+                temporalized = content;
+            }
+
             long[] occReturn = {ETERNAL, ETERNAL};
             float[] confScale = {1f};
 
-            Compound temporalized = this.time.compute(content,
+            temporalized = this.time.compute(temporalized,
                     m, this, occReturn, confScale
             );
 
@@ -223,23 +209,24 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
 //            }
 
-            if (temporalized != content) {
-                ((content = temporalized)).setNormalized();
-            }
-
-
             //apply any non 1.0 the confidence scale
             if (truth != null) {
+
+                if (negated)
+                    truth = truth.negated();
 
                 float cf = confScale[0];
                 if (cf != 1) {
                     throw new UnsupportedOperationException("yet");
+
 //                    truth = truth.confMultViaWeightMaxEternal(cf);
 //                    if (truth == null) {
 //                        throw new InvalidTaskException(content, "temporal leak");
 //                    }
                 }
             }
+
+            content = temporalized;
 
             occ = occReturn;
 
@@ -249,20 +236,22 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
+        content = Task.post(content, nar);
+        if (content == null)
+            return;
+
         //the derived compound indicated a potential dt, but the premise was actually atemporal;
         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
         if (content.hasTemporal()) {
-            Compound content2 = m.index.retemporalize(content);
-            if (content2 == null)
+            content = m.index.retemporalize(content);
+            if (content == null)
                 return;
-
-
-
-            content = content2;
+        } else if (!content.isNormalized()) {
+            content = compoundOrNull(m.index.normalize(content));
+            if (content == null)
+                return;
         }
 
-
-        //content = nar.pre(content);
 
         if (!Task.taskContentValid(content, punc, nar, !Param.DEBUG)) {
             //throw new InvalidTaskException(crr, "Invalid content");
@@ -271,8 +260,6 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence, nar);
-
-
 
         if (d != null)
             m.target.accept(d);

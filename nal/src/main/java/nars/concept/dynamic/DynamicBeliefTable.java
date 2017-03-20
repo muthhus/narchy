@@ -78,7 +78,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             return null;
 
         // normalize it
-        template = compoundOrNull($.terms.normalize(template));
+        template = compoundOrNull(dynamicConcept.nar.concepts.normalize(template));
 
         // then if the term is valid, see if it is valid for a task
         if (template==null || !Task.taskContentValid(template, beliefOrGoal ? BELIEF : GOAL, null, true)) {
@@ -86,7 +86,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         DynTruth yy = truth(when, template, true);
-        return yy != null ? yy.task(template, beliefOrGoal, now, when, b) : null;
+        return yy != null ? yy.task(template, beliefOrGoal, now, when, b, dynamicConcept.nar) : null;
     }
 
     @Override
@@ -168,10 +168,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         //choose the non-overlapping one
         if (noOverlap && target != null) {
-            if (Stamp.overlapping(x, target))
-                return y;
             if (Stamp.overlapping(y, target))
                 return x;
+            if (Stamp.overlapping(x, target))
+                return y;
         }
 
         //choose higher confidence

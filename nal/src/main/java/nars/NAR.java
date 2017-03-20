@@ -793,7 +793,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return t;
     }
 
-    @NotNull
+    @Nullable
     public Compound post(@NotNull Compound c) {
         Compound d = compoundOrNull(post((Term) c));
         if (d == null)
@@ -801,6 +801,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         else
             return d;
     }
+
 
 //    protected void processDuplicate(@NotNull Task input, Task existing) {
 //        if (existing != input) {

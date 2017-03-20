@@ -7,6 +7,8 @@ import nars.Param;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.util.task.InvalidTaskException;
@@ -42,22 +44,23 @@ public class ImmutableTask extends RawBudget implements Task {
         return new ImmutableTask(term, punc, truth, creation, ETERNAL, ETERNAL, stamp);
     }
 
+
     public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
 
 
-        if (term.op()==NEG) {
+        if (term.op() == NEG) {
             Compound term2 = compoundOrNull(term.unneg());
             if (term2 == null)
                 throw new InvalidTaskException(term, "became non-compound on un-negation");
             term = term2;
-            if (truth!=null)
+            if (truth != null)
                 truth = truth.negated();
         }
 
         if (truth == null && ((punc == BELIEF) || (punc == GOAL)))
             throw new InvalidTaskException(term, "null truth");
 
-        if (term.varQuery() > 0 && (punc==BELIEF|| punc == GOAL))
+        if (term.varQuery() > 0 && (punc == BELIEF || punc == GOAL))
             throw new InvalidTaskException(term, "query variable in belief or goal");
 
         this.priority = 0;
@@ -176,8 +179,6 @@ public class ImmutableTask extends RawBudget implements Task {
     }
 
 
-
-
     @NotNull
     @Override
     @Deprecated
@@ -190,7 +191,8 @@ public class ImmutableTask extends RawBudget implements Task {
     }
 
 
-    @Override public float evi(long when, float dur) {
+    @Override
+    public float evi(long when, float dur) {
 
         Truth t = truth();
         long a = start();
@@ -248,26 +250,27 @@ public class ImmutableTask extends RawBudget implements Task {
     @Override
     public void meta(Object key, Object value) {
         //synchronized (this) {
-            if (meta==null) {
-                //meta = new UnifiedMap(1); /* for compactness */
-                meta = new Flat3Map(); /* for compactness */
-            }
+        if (meta == null) {
+            //meta = new UnifiedMap(1); /* for compactness */
+            meta = new Flat3Map(); /* for compactness */
+        }
 
-            meta.put(key, value);
+        meta.put(key, value);
         //}
     }
 
     @Override
     public <X> X meta(Object key) {
-        if (meta!=null) {
+        if (meta != null) {
             //synchronized (this) {
-                return (X) meta.get(key);
+            return (X) meta.get(key);
             //}
         }
         return null;
     }
 
-    @Nullable public Task project(long newStart, float dur, float confMin) {
+    @Nullable
+    public Task project(long newStart, float dur, float confMin) {
         float newConf = conf(newStart, dur);
         if (newConf < confMin)
             return null;

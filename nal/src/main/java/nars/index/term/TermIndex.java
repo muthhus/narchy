@@ -698,16 +698,10 @@ public abstract class TermIndex extends TermBuilder {
 
         int dt = x.dt();
         Term y = transform(x, dt==XTERNAL ? DTERNAL : dt, retemporalization);
-        if (y==x)
-            return x;
-        else if (!(y instanceof Compound)) {
+        if (!(y instanceof Compound)) {
             return null;
         } else {
-            if (x.isNormalized()) {
-                return compoundOrNull(normalize((Compound)y));
-            } else {
-                return ((Compound)y);
-            }
+            return compoundOrNull(normalize((Compound)y));
         }
 
     }
