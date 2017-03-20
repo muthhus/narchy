@@ -197,22 +197,25 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     }
 
-
-
-
     public GLWindow show(int w, int h) {
         return show("", w, h );
     }
 
-    public GLWindow show(String title, int w, int h) {
+    public GLWindow show(String title, int w, int h, int x, int y) {
         GLWindow g = window(this);
+        this.window = g;
         g.setTitle(title);
-        g.setSurfaceSize(w, h);
-        g.setVisible(true);
         g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
         g.preserveGLStateAtDestroy(false);
-        this.window = g;
+        g.setSurfaceSize(w, h);
+        if (x != Integer.MIN_VALUE ) {
+            g.setPosition(x, y);
+        }
+        g.setVisible(true);
         return g;
+    }
+    public GLWindow show(String title, int w, int h) {
+        return show(title, w, h, Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
     public void addMouseListener(MouseListener m) {

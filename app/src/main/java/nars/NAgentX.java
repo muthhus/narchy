@@ -2,6 +2,8 @@ package nars;
 
 import jcog.data.FloatParam;
 import nars.bag.Bagregate;
+import nars.concept.Concept;
+import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -13,7 +15,6 @@ import nars.util.task.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
-import spacegraph.layout.TabPane;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meta.WindowButton;
 
@@ -21,7 +22,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -168,7 +168,13 @@ abstract public class NAgentX extends NAgent {
 
                 grid(
                     new WindowButton( "conceptBudget", Vis.budgetHistogram(nar, 64) ),
-                    new WindowButton( "conceptTreeMap", ()-> Vis.treeChart( nar, new Bagregate(a.nar.conceptsActive(), 64, 0.5f) , 64) ),
+                    new WindowButton( "conceptTreeMap", () -> {
+
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 64, 0.5f), 64, nar);
+
+
+                        return tc;
+                    }),
                             //"tasks", ()-> taskChart,
                     new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar, 32, 4).show(500,500) )
                 )
@@ -182,13 +188,16 @@ abstract public class NAgentX extends NAgent {
 
             //Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
 
+            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 32, 0.05f), 32, a.nar);
+
+
             window(
                     grid(
                             new ReflectionSurface<>(a),
 
                             Vis.emotionPlots(a.nar, 256),
 
-                            Vis.treeChart( a.nar, new Bagregate(a.nar.conceptsActive(), 32, 0.05f) , 32),
+                            tc,
 
 
                             //budgetHistogram(d, 16),

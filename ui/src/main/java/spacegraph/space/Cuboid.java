@@ -63,7 +63,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         this.front = front;
         if (front!=null) {
             front.setParent(null);
-            mouseFront = new Finger(front);
+            mouseFront = null; //new Finger(this);
         } else {
             mouseFront = null;
         }
@@ -120,7 +120,8 @@ public class Cuboid<X> extends SimpleSpatial<X> {
                         this.mousePick = r.hitPointWorld;
 
                         //System.out.println(localPoint + " " + thick);
-                        return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+                        if (mouseFront!=null)
+                            return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
                         //return mouseFront.update(null, localPoint.x, localPoint.y, buttons);
                     }
                 } else {

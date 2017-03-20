@@ -5,6 +5,8 @@ import com.jogamp.newt.event.WindowListener;
 import com.jogamp.newt.event.WindowUpdateEvent;
 import com.jogamp.newt.opengl.GLWindow;
 import spacegraph.SpaceGraph;
+import spacegraph.input.Finger;
+import spacegraph.math.v2;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.ToggleButton;
 
@@ -36,11 +38,21 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
     }
 
     @Override
+    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+        return super.onTouching(hitPoint, buttons);
+    }
+
+    @Override
     public void onChange(ToggleButton t, boolean enabled) {
-        synchronized (this) {
+        synchronized (spacer) {
             if (enabled) {
                 if (space == null) {
-                    space = SpaceGraph.window(spacer.get(), width, height);
+                    space = SpaceGraph.window(spacer.get(), 0, 0);
+                    int sx = Finger.pointer.getX();
+                    int sy = Finger.pointer.getY();
+                    int nx = sx - width/2;
+                    int ny = sy - height/2;
+                    space.show(this.toString(), width,height, nx, ny);
                     space.addWindowListener(this);
                 }
             } else {

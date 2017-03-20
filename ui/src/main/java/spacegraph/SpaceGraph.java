@@ -261,7 +261,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             //.scale(Math.min(w,h))
                 .maximize()
         );
-        win.show(w, h);
+        if (w>0 && h > 0)
+            win.show(w, h);
         return win;
     }
 

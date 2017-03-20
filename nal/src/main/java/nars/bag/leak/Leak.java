@@ -33,6 +33,8 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
         this.bag = bag;
         this.rate = rate;
         onTask = n.onTask(this);
+
+        //TODO make Weak
         onReset = n.onReset((nn)->bag.clear());
         onCycle = n.onCycle(this::next);
     }

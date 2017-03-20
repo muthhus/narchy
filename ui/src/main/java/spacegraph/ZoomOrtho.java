@@ -28,8 +28,8 @@ public class ZoomOrtho extends Ortho {
     }
 
     @Override
-    protected Finger newFinger(Surface content) {
-        return new DebugFinger(content);
+    protected Finger newFinger() {
+        return new DebugFinger(this);
     }
 
     class DebugFinger extends Finger {
@@ -46,7 +46,7 @@ public class ZoomOrtho extends Ortho {
             }
         };
 
-        public DebugFinger(Surface root) {
+        public DebugFinger(Ortho root) {
             super(root);
         }
 

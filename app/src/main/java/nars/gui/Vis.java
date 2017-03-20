@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -89,20 +88,7 @@ public class Vis {
     }
 
 
-    public static BagChart<Concept> conceptsTreeChart(final Default d, final int count) {
-        return treeChart(d, d.core.active, count);
-    }
-
-    public static BagChart<Concept> treeChart(NAR nar, Bag<Concept,PLink<Concept>> b, final int count) {
-
-        BagChart<Concept> tc = new ConceptBagChart(b, count, nar);
-
-
-
-        return tc;
-    }
-
-//    public static <X extends Termed> BagChart<X> items(Bag<X,PLink<X>> bag, final Cycles d, final int count) {
+    //    public static <X extends Termed> BagChart<X> items(Bag<X,PLink<X>> bag, final Cycles d, final int count) {
 //        BagChart tc = new BagChart(bag, count) {
 //            @Override
 //            public void accept(PLink x, ItemVis y) {
@@ -217,31 +203,7 @@ public class Vis {
 
     public static Grid emotionPlots(NAR nar, int plotHistory) {
 
-        return new Grid(VERTICAL) {
-
-            Plot2D plot1 = new Plot2D(plotHistory, Plot2D.Line);
-            Plot2D plot2 = new Plot2D(plotHistory, Plot2D.Line);
-            Plot2D plot3 = new Plot2D(plotHistory, Plot2D.Line);
-            Plot2D plot4 = new Plot2D(plotHistory, Plot2D.Line);
-
-            {
-                set( plot1, plot2, plot3, plot4 );
-
-                plot1.add("Conf", nar.emotion.confident::getSum);
-                plot2.add("Busy", nar.emotion.busyPri::getSum);
-                plot3.add("Lern", nar.emotion::learningPri);
-                plot4.add("Hapy", nar.emotion.happy::getSum);
-                plot4.add("Sad",nar.emotion.sad::getSum);
-//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
-
-                nar.onCycleWeak(f -> {
-                    plot1.update();
-                    plot2.update();
-                    plot3.update();
-                    plot4.update();
-                });
-            }
-        };
+        return new EmotionPlot(plotHistory, nar);
     }
 
     public static Label label(String text) {
@@ -437,7 +399,7 @@ public class Vis {
         }
     }
 
-    private static class ConceptBagChart extends BagChart<Concept> implements Consumer<NAR> {
+    public static class ConceptBagChart extends BagChart<Concept> implements Consumer<NAR> {
 
         long now;
         float dur;
@@ -496,11 +458,9 @@ public class Vis {
 
                 //a = Math.min(a, 1f);
 
-
-
-                    r = 0.1f + 0.75f * (1f - goal);
-                    g = 0.1f + 0.75f * goal;
-                    b = 0.1f + 0.9f * belief;
+                    r = 0.05f + 0.5f * (1f - goal);
+                    g = 0.05f + 0.5f * goal;
+                    b = 0.05f + 0.5f * belief;
 
                 /*else if (c.hasQuestions() || c.hasQuests()) {
                     r = 1; //yellow
@@ -511,11 +471,47 @@ public class Vis {
                 }*/
             }
             else {
-                r = g = b = 0.5f;
+                r = g = b = 0f;
             }
 
             y.update(p, r, g, b);
 
+        }
+    }
+
+    private static class EmotionPlot extends Grid implements Consumer<NAR> {
+
+        private final int plotHistory;
+        //Plot2D plot1;
+        Plot2D plot2;
+        Plot2D plot3;
+        Plot2D plot4;
+
+        public EmotionPlot(int plotHistory, NAR nar) {
+            super(Grid.VERTICAL);
+            this.plotHistory = plotHistory;
+            //plot1 = new Plot2D(plotHistory, Plot2D.Line);
+            plot2 = new Plot2D(plotHistory, Plot2D.BarWave);
+            plot3 = new Plot2D(plotHistory, Plot2D.Line);
+            plot4 = new Plot2D(plotHistory, Plot2D.Line);
+            set( plot2, plot3, plot4 );
+
+            //plot1.add("Conf", nar.emotion.confident::getSum);
+            plot2.add("Busy", nar.emotion.busyPri::getSum);
+            plot3.add("Lern", nar.emotion::learningPri);
+            plot4.add("Hapy", nar.emotion.happy::getSum);
+            plot4.add("Sad", nar.emotion.sad::getSum);
+//                plot4.add("Errr", ()->nar.emotion.errr.getSum());
+
+            nar.onCycleWeak(this);
+        }
+
+        @Override
+        public void accept(NAR nar) {
+            //plot1.update();
+            plot2.update();
+            plot3.update();
+            plot4.update();
         }
     }
 }

@@ -3,6 +3,7 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import nars.concept.Concept;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,10 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
         Default d = new Default(1024,50,2,2);
         d.input("(a --> b). (b --> c).  (c --> d).  (d-->e)! :|: ");
 
-        SpaceGraph.window(Vis.conceptsTreeChart(d, 1024), 800, 600);
+        BagChart<Concept> tc = new Vis.ConceptBagChart(d.core.active, 1024, d);
+
+
+        SpaceGraph.window(tc, 800, 600);
 
         d.loop(30f);
 
