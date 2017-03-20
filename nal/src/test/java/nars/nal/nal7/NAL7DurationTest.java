@@ -1,12 +1,10 @@
 package nars.nal.nal7;
 
 import com.google.common.collect.Lists;
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import org.junit.Test;
 
 import java.util.List;
@@ -17,6 +15,18 @@ import static org.junit.Assert.*;
  * Created by me on 2/2/17.
  */
 public class NAL7DurationTest {
+
+    @Test
+    public void testDurationDithering() throws Narsese.NarseseException {
+        Terminal n = new Terminal();
+        n.time.dur(5);
+        assertEquals( $.$("((x) &&+0 (y))"), n.term("((x) &&+1 (y))"));
+        assertEquals( "( &&+0 ,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
+        assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
+        assertEquals( $.$("((x) ==>+0 (y))"), n.term("((x) ==>+1 (y))"));
+        assertEquals( $.$("((x) <=>+0 (y))"), n.term("((x) <=>+1 (y))"));
+
+    }
 
     @Test
     public void testTemporalIntersection() throws Narsese.NarseseException {

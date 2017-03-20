@@ -292,9 +292,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
      */
     @NotNull
     public Task task(@NotNull String taskText) throws NarseseException {
-        Task task = Narsese.the().task(taskText, this);
-        //task.normalize(this);
-        return task;
+        return Narsese.the().task(taskText, this);
     }
 
     @NotNull
@@ -935,6 +933,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
             }
         }
+    }
+
+    public final float dur() {
+        return time.dur();
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {

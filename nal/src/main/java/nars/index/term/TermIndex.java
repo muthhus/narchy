@@ -57,6 +57,22 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
 
+    @Override
+    protected int dt(int dt) {
+        NAR n = this.nar;
+        if (n == null)
+            return dt;
+
+        switch (dt) {
+            case DTERNAL:
+            case XTERNAL:
+            case 0:
+                return dt; //no-change
+        }
+
+        return Math.abs(dt) < n.dur() ? 0 : dt;
+    }
+
     /**
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
      * be replaced with a non-Permanent concept

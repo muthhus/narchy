@@ -122,7 +122,7 @@ public abstract class TermBuilder {
                     throw new InvalidTermException(op, dt, "Disjunction must be DTERNAL", u);
                 return disjunction(u);
             case CONJ:
-                return conj(dt, u);
+                return conj(dt(dt), u);
 
             case IMGi:
             case IMGe:
@@ -157,10 +157,12 @@ public abstract class TermBuilder {
                         SETi,
                         SETe);
 
-            case INH:
-            case SIM:
             case EQUI:
             case IMPL:
+                dt = dt(dt);
+                //fall-through:
+            case INH:
+            case SIM:
                 if (arity == 1)
                     return True;
                 if (arity != 2)
@@ -172,9 +174,15 @@ public abstract class TermBuilder {
 
         }
 
+
         return finish(op, dt, u);
     }
 
+
+    /** dt pre-filter */
+    protected int dt(int dt) {
+        return dt;
+    }
 
     /** should only be applied to subterms, not the outer-most compound */
     @NotNull public Term productNormalize(@NotNull Term u) {
@@ -477,7 +485,7 @@ public abstract class TermBuilder {
         if (t instanceof Compound) {
             // (--,(--,P)) = P
             if (t.op() == NEG)
-                return t.unneg();
+                return ((Compound)t).term(0);//unneg();
         } else if (t instanceof AtomicSingleton) {
             if (isFalse(t)) return True;
             if (isTrue(t)) return False;
@@ -601,9 +609,7 @@ public abstract class TermBuilder {
 
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
-
-        Set<Term> s =
-                new HashSet<>(u.length);
+        Set<Term> s = new HashSet<>(u.length);
         //new TreeSet();
         flatten(op, u, dt, s);
         if (s.isEmpty())
@@ -706,16 +712,14 @@ public abstract class TermBuilder {
 
         for (Term x : u) {
 
-            if ((x.op() == op) && (((Compound) x).dt() == dt)) {
+            Op xo = x.op();
+            if ((xo == op) && (((Compound) x).dt() == dt)) {
                 flatten(op, ((Compound) x).terms(), dt, s); //recurse
             } else {
-                //cancel co-negations for terms which can be negatable (ie. everything except atoms)
-                if (x instanceof Compound || x instanceof Variable) {
-                    if (!s.isEmpty()) {
-                        if (s.remove(neg(x))) {
-                            //co-negation detected, skip this term
-                            continue;
-                        }
+                if (!s.isEmpty()) {
+                    if (s.remove(neg(x))) {
+                        //co-negation detected, skip this term
+                        continue;
                     }
                 }
                 s.add(x);
