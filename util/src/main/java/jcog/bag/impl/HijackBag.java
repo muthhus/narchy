@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -503,7 +504,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * the scan progress proportion, a value in 0..1.0 also.
      */
     protected static float tolerance(float scanProgressProportion) {
-        return scanProgressProportion * scanProgressProportion /* power 2 curve */;
+        return Util.sqr(Util.sqr(scanProgressProportion )); /* power 4 curve */
     }
 
     @Override
@@ -521,7 +522,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      */
     public float curve() {
         float c = random.nextFloat();
-        return 1f - (c * c);
+        return 1f - (c * c * c * c);
     }
 
     @Override

@@ -11,16 +11,17 @@ import java.util.function.Consumer;
  */
 public class PushButton extends AbstractButton {
 
-    private Label text;
+    private final Label text;
 
     @Nullable private Consumer<PushButton> onClick;
 
     public PushButton() {
+        this("");
     }
 
     public PushButton(String s) {
-        this();
-        setText(s);
+        super();
+        text = new Label(s);
     }
 
     public PushButton(Consumer<PushButton> onClick) {
@@ -42,7 +43,7 @@ public class PushButton extends AbstractButton {
     }
 
     public void setText(String s) {
-        set(text = new Label(s));
+        this.text.set(s);
     }
 
 

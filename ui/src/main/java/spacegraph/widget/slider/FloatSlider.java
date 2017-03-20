@@ -6,6 +6,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import spacegraph.render.Draw;
+import spacegraph.widget.Label;
 
 /**
  * Created by me on 11/18/16.
@@ -14,18 +15,23 @@ public class FloatSlider extends BaseSlider {
 
     private final float max;
     private final float min;
-    String label;
+    final Label label;
     public FloatSupplier input;
 
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
+
+
+        label = new Label();
+        set(label);
+
         this.min = min;
         this.max = max;
     }
 
     public FloatSlider(String label, float v, float min, float max) {
         this(v, min, max);
-        this.label = label;
+        this.label.set(label);
     }
 
     public FloatSlider(FloatParam f) {
@@ -35,7 +41,7 @@ public class FloatSlider extends BaseSlider {
     }
 
     public FloatSlider label(String label) {
-        this.label = label;
+        this.label.set(label);
         return this;
     }
 
@@ -47,12 +53,10 @@ public class FloatSlider extends BaseSlider {
         if (input!=null)
             value(input.asFloat());
 
-        gl.glLineWidth(1f);
-        gl.glColor3f(1, 1, 1);
-        String label = this.label;
-        if (label == null)
-            label = Texts.n2(value());
-        Draw.text(gl, label, 0.5f / label.length(), 0.5f, 0.5f, 0);
+//        gl.glLineWidth(1f);
+//        gl.glColor3f(1, 1, 1);
+        this.label.set( Texts.n2(value()) );
+//        Draw.text(gl, label, 0.5f / label.length(), 0.5f, 0.5f, 0);
 
     }
 

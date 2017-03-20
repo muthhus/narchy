@@ -62,29 +62,7 @@ public class Vis {
 
     public static Grid beliefCharts(float window, Iterable<?> ii, NAR nar) {
 
-        return new Grid(1 / 3f) {
-
-            long[] btRange = new long[2];
-
-            {
-                List<Surface> s = StreamSupport.stream(ii.spliterator(), false)
-                        .map(x -> x instanceof Termed ? (Termed) x : null).filter(Objects::nonNull)
-                        .map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
-
-                if (!s.isEmpty()) {
-                    set(s);
-                    nar.onCycle(nn -> {
-                        long now = nn.time();
-                        float dur = nn.dur();
-                        btRange[0] = now - (long) Math.ceil(window * dur);
-                        btRange[1] = now + (long) Math.ceil(window * dur);
-                    });
-                } else {
-                    set(label("(empty)"));
-                }
-
-            }
-        };
+        return new BeliefChartsGrid(ii, nar, window);
     }
 
 
@@ -518,6 +496,37 @@ public class Vis {
             plot2.update();
             plot3.update();
             plot4.update();
+        }
+    }
+
+    private static class BeliefChartsGrid extends Grid implements Consumer<NAR> {
+
+        private final float window;
+        long[] btRange;
+
+        public BeliefChartsGrid(Iterable<?> ii, NAR nar, float window) {
+            btRange = new long[2];
+            this.window = window;
+
+            List<Surface> s = StreamSupport.stream(ii.spliterator(), false)
+                    .map(x -> x instanceof Termed ? (Termed) x : null).filter(Objects::nonNull)
+                    .map(c -> new BeliefTableChart(nar, c, btRange)).collect(toList());
+
+            if (!s.isEmpty()) {
+                set(s);
+                nar.onCycleWeak(this);
+            } else {
+                set(label("(empty)"));
+            }
+
+        }
+
+        @Override
+        public void accept(NAR nar) {
+            long now = nar.time();
+            float dur = nar.dur();
+            btRange[0] = now - (long) Math.ceil(window * dur);
+            btRange[1] = now + (long) Math.ceil(window * dur);
         }
     }
 }

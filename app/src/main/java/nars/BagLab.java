@@ -25,22 +25,28 @@ import static spacegraph.layout.Grid.row;
  */
 public class BagLab  {
 
+    public static final int BINS = 64;
+
+    int clearInterval = 16;
+    int iteration = 0;
+
+
     final Bag<Integer,BLink<Integer>> bag;
     private final List<FloatSlider> inputSliders;
     private final int uniques;
 
-    double[] selectionHistogram = new double[16];
+    double[] selectionHistogram = new double[BINS];
 
     public BagLab(Bag<Integer,BLink<Integer>> bag) {
         super();
         this.bag = bag;
 
-        this.uniques = bag.capacity()*2;
+        this.uniques = bag.capacity()*8;
 
         int inputs = 10;
         inputSliders = $.newArrayList(inputs);
         for (int i = 0; i < inputs; i++)
-            inputSliders.add(new FloatSlider(0, 0, 1));
+            inputSliders.add(new FloatSlider(0.1f, 0, 1));
 
 
     }
@@ -62,13 +68,16 @@ public class BagLab  {
     public static void main(String[] arg) {
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
-                new BLinkHijackBag(512, 4, BudgetMerge.maxBlend, new XorShift128PlusRandom(1))
+                new BLinkHijackBag(1024, 4,
+                        //BudgetMerge.maxBlend,
+                        BudgetMerge.plusBlend,
+                        new XorShift128PlusRandom(1))
         );
 
         SpaceGraph.window(
             bagLab.surface(), 800, 800);
 
-        long delayMS = 50;
+        long delayMS = 30;
         new Thread(()->{
             while (true) {
                 bagLab.update();
@@ -76,6 +85,7 @@ public class BagLab  {
             }
         }).start();
     }
+
 
     private void update() {
 
@@ -96,7 +106,10 @@ public class BagLab  {
         int bins = selectionHistogram.length;
         float sampleBatches = 16;
         int batchSize = 16;
-        Arrays.fill(selectionHistogram, 0);
+
+        if (iteration++ % clearInterval == 0)
+            Arrays.fill(selectionHistogram, 0);
+
         List<BLink<Integer>> sampled = $.newArrayList();
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();

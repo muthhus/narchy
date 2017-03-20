@@ -990,8 +990,8 @@ public enum Draw {
         }
 
         public void init(GL2 gl) {
-            id = gl.glGenLists(1);            // Generate 2 Different Lists
-            gl.glNewList(id, GL2.GL_COMPILE);  // Start With The Box List
+            id = gl.glGenLists(1);
+            gl.glNewList(id, GL2.GL_COMPILE);
 
             for (byte[] seg : segments) {
 

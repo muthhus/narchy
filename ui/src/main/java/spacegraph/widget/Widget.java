@@ -52,6 +52,8 @@ public class Widget extends Stacking {
     @Override
     protected void paint(GL2 gl) {
 
+        super.paint(gl);
+
 //        /*if (Param.DEBUG)*/ {
 //            Draw.colorHash(gl, hashCode(), 0.5f);
 //            String s = "g:" + scaleGlobal;

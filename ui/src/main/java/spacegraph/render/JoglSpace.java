@@ -330,13 +330,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 if (currentFPS > minFPS)  {
                     //decrease fps
                     nextFPS = Util.lerp(0.1f, minFPS, currentFPS);
-                    resetFPSCounter();
                 }
             } else {
                 if (currentFPS < idealFPS) {
                     //increase fps
                     nextFPS = Util.lerp(0.1f, idealFPS, currentFPS);
-                    resetFPSCounter();
                 }
             }
 
