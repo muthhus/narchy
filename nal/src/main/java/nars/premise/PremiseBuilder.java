@@ -178,11 +178,11 @@ abstract public class PremiseBuilder {
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
-                task.priSafe(0);
+                Math.max(task.priSafe(0), taskLinkCopy.priSafe(0));
                 //taskLinkCopy.pri();
                 //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
-        float pri = taskPri;
+        float pri = Math.max(taskPri, beliefBudget!=null ? beliefBudget.pri() : 0);
                 //belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
         pri*=priFactor;
         if (pri < priMin)

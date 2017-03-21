@@ -209,9 +209,8 @@ public interface NAct {
         return action(s, (b, d) -> {
             if (d!=null) {
                 float f = d.freq();
-                float alpha = nar().confidenceDefault(Op.BELIEF);
                 if (update.accept(f)) {
-                    return $.t(f, alpha);
+                    return $.t(f, d.conf());
                 } else {
                     //return $.t(0.5f, alpha); //neutral on failure
                     return null;

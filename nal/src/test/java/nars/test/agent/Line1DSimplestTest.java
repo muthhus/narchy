@@ -285,10 +285,6 @@ public class Line1DSimplestTest {
                 n.run(1);
 
                 in.add(a.in.asFloat());
-                float o = (float) a.out.feedback.getAsDouble();
-                if (o != o)
-                    o = 0.5f;
-                out.add(o);
                 hapy.add(a.rewardValue);
                 motv.add(a.dexterity());
             }

@@ -37,14 +37,14 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public final FloatParam timePerFall = new FloatParam(1f, 1f, 8f);
+    public final FloatParam timePerFall = new FloatParam(2f, 1f, 8f);
 
-    public static final int tetris_width = 8;
-    public static final int tetris_height = 16;
+    public static final int tetris_width = 6;
+    public static final int tetris_height = 12;
 
     public static final int PIXEL_RADIX = 2;
     static final float DUR = 0.1f;
-    public static final float FPS = 20f;
+    public static final float FPS = 30f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;
@@ -201,7 +201,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     }
 
 
-    public static void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
+    public void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
 
 
         float actionMargin =
@@ -214,53 +214,69 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        float actionThresholdLower = actionMargin / 1.5f;
 
 
-        actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
-            float alpha = nar.confidenceDefault(BELIEF);
-
-            if (d != null) {
-                float x = d.freq();
-                //System.out.println(d + " " + x);
-                if (x > actionThresholdHigh) {
-                    if (state.take_action(RIGHT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(1, alpha);
-                } else if (x < actionThresholdLow) {
-                    if (state.take_action(LEFT))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(0, alpha);
-                } else {
-                    //return $.t(0.5f, alpha); //no action taken or move ineffective
-                }
+        actionTriState($("tetris:x"), (i) ->{
+           switch (i) {
+               case -1: state.take_action(LEFT); break;
+               case 0: break;
+               case +1: state.take_action(RIGHT); break;
+           }
+        });
+        actionTriState($("tetris:rotate"), (i) ->{
+            switch (i) {
+                case -1: state.take_action(CCW); break;
+                case 0: break;
+                case +1: state.take_action(CW); break;
             }
-            return $.t(0.5f, alpha); //no action taken or move ineffective
-            //return null;
-        }));
+        });
+
+//        actions.add(new ActionConcept($("x(tetris)"), nar, (b, d) -> {
+//            //float alpha = nar.confidenceDefault(BELIEF);
+//
+//            if (d != null) {
+//                float x = d.freq();
+//                float alpha = d.conf();
+//                //System.out.println(d + " " + x);
+//                if (x > actionThresholdHigh) {
+//                    if (state.take_action(RIGHT))
+//                        //return d; //legal move
+//                        //return d.withConf(gamma);
+//                        return $.t(1, alpha);
+//                } else if (x < actionThresholdLow) {
+//                    if (state.take_action(LEFT))
+//                        //return d; //legal move
+//                        //return d.withConf(gamma);
+//                        return $.t(0, alpha);
+//                } else {
+//                    //return $.t(0.5f, alpha); //no action taken or move ineffective
+//                }
+//            }
+//            //return $.t(0.5f, alpha); //no action taken or move ineffective
+//            return null;
+//        }));
 
         //if (rotate) {
-        actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
-            float alpha = nar.confidenceDefault(BELIEF);
-
-            if (d != null) {
-                float r = d.freq();
-                if (r > actionThresholdHigh) {
-                    if (state.take_action(CW))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(1, alpha);
-                } else if (r < actionThresholdLow) {
-                    if (state.take_action(CCW))
-                        //return d; //legal move
-                        //return d.withConf(gamma);
-                        return $.t(0, alpha);
-                } else {
-                    //return $.t(0.5f, alpha); //no action taken or move ineffective
-                }
-            }
-            return $.t(0.5f, alpha); //no action taken or move ineffective
-            //return null;
-        }));
+//        actions.add(new ActionConcept($("rotate(tetris)"), nar, (b, d) -> {
+//
+//            if (d != null) {
+//                float r = d.freq();
+//                float alpha = d.conf();
+//                if (r > actionThresholdHigh) {
+//                    if (state.take_action(CW))
+//                        //return d; //legal move
+//                        //return d.withConf(gamma);
+//                        return $.t(1, alpha);
+//                } else if (r < actionThresholdLow) {
+//                    if (state.take_action(CCW))
+//                        //return d; //legal move
+//                        //return d.withConf(gamma);
+//                        return $.t(0, alpha);
+//                } else {
+//                    //return $.t(0.5f, alpha); //no action taken or move ineffective
+//                }
+//            }
+//            //return $.t(0.5f, alpha); //no action taken or move ineffective
+//            return null;
+//        }));
 //        } else {
 //            motorRotate = null;
 //        }

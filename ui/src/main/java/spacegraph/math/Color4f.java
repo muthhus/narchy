@@ -31,6 +31,8 @@
 
 package spacegraph.math;
 
+import com.jogamp.opengl.GL2;
+
 import java.awt.*;
 
 
@@ -159,5 +161,14 @@ public class Color4f extends Tuple4f implements java.io.Serializable {
 
 	return new Color(r, g, b, a);
     }
+
+    public final void apply(GL2 gl) {
+        gl.glColor4f(x, y, z, w);
+    }
+
+    public Color4f r(float v) { x = v; return this;    }
+    public Color4f g(float v) { y = v; return this;    }
+    public Color4f b(float v) { z = v; return this;    }
+    public Color4f a(float v) { w = v; return this;    }
 
 }

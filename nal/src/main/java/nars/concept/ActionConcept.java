@@ -33,7 +33,6 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
     /** relative temporal delta time for desire/belief prediction */
     static final int decisionDT = 0;
 
-    @Deprecated public final ScalarSignal feedback;
 
     private Truth currentFeedback;
 
@@ -55,7 +54,7 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
         @Override
         protected Task ressurect(Task t) {
-            t.budget().setPriority(feedback.pri.asFloat());
+            t.budget().setPriority(0);
             return t;
         }
 
@@ -146,7 +145,7 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
         if (currentFeedback!=null) {
             SignalTask s = new SignalTask(term(), BELIEF, currentFeedback, Math.round(nar.time()-dur), nar.time(), nar.time.nextStamp());
-            s.budget(feedback.pri.asFloat(), nar);
+            s.budget(nar);
             return s;
         } else {
             return null;
@@ -201,25 +200,9 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
-
         this.nar = n;
-
-        //assert (Op.isOperation(this));
-
         this.motor = motor;
         this.goals = newBeliefTable(nar, false); //pre-create
-
-        feedback = new ScalarSignal(n, term, null, /*N/A*/(x)-> currentFeedback) {
-            @Override
-            public Task apply(@NotNull NAR nar) {
-                if (currentFeedback!=null) {
-                    SignalTask s = new SignalTask(term(), BELIEF, currentFeedback, nar.time(), nar.time(), nar.time.nextStamp());
-                    s.budget(pri.asFloat(), nar);
-                    return s;
-                }
-                return null;
-            }
-        };
     }
 
 

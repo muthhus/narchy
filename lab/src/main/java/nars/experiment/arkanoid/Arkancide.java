@@ -84,7 +84,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 17, 1, -1);
+        }, 10, 1, -1);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -150,18 +150,22 @@ public class Arkancide extends NAgentX {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        action(new ActionConcept( $.func("nx", "paddle"), nar, (b, d) -> {
-
-
-            float pct;
-            if (d != null) {
-                pct = noid.paddle.moveTo(d.freq(), paddleSpeed.floatValue() * maxPaddleSpeed);// * d.conf());
-            } else {
-                pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
-            }
-            return $.t(pct, nar.confidenceDefault(BELIEF));
-            //return null; //$.t(0.5f, alpha);
-        })/*.feedbackResolution(resX)*/);
+        actionUnipolar($.inh($.the("paddle"), $.the("nx") ), (v) -> {
+            noid.paddle.moveTo(v, paddleSpeed.floatValue() * maxPaddleSpeed);
+            return true;
+        });
+//        action(new ActionConcept( $.func("nx", "paddle"), nar, (b, d) -> {
+//
+//
+//            float pct;
+//            if (d != null) {
+//                pct = noid.paddle.moveTo(d.freq(), paddleSpeed.floatValue() * maxPaddleSpeed);// * d.conf());
+//            } else {
+//                pct = noid.paddle.x / Arkanoid.SCREEN_WIDTH; //unchanged
+//            }
+//            return $.t(pct, nar.confidenceDefault(BELIEF));
+//            //return null; //$.t(0.5f, alpha);
+//        })/*.feedbackResolution(resX)*/);
 
         //nar.log();
 //        predictors.add( (MutableTask)nar.input(

@@ -46,9 +46,12 @@ public class Line1DSimplest extends NAgent {
 //                }
 
 
+                return $.t(o.floatValue(), d.conf());
             }
 
-            return $.t(o.floatValue(), nar.confidenceDefault(BELIEF));
+            return null;
+
+
         });
 
         in.resolution(resolution);
