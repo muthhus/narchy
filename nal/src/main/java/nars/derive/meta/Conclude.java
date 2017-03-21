@@ -62,6 +62,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                 Joiner.on(',').join(
                         p.pattern,
                         "time" + Integer.toHexString(time.hashCode()) //HACK todo until names are given to unique classes
+
                         //belief != null ? belief : "_",
                         //goal != null ? goal : "_",
                         //eternalize ? "Et" : "_") +

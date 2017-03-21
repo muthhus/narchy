@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
@@ -158,6 +159,11 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                     public void onRemoved(@NotNull Object value) {
                         ((Abbr)value).stop();
                     }
+                    @Override
+                    protected boolean replace(Object incoming, Object existing) {
+                        return hijackGreedy(((Abbr)incoming).pri(), ((Abbr)existing).pri());
+                    }
+
                 };
     }
 

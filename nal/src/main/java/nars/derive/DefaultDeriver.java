@@ -5,9 +5,9 @@ import nars.premise.Derivation;
 /**
  * Created by me on 12/26/16.
  */
-public class DefaultDeriver implements Deriver {
+public class DefaultDeriver  {
 
-    static final Deriver[] modules = Deriver.get(
+    public static final Deriver the = Deriver.get(
         "nal1.nal",
         "nal2.nal",
         "nal3.nal",
@@ -18,13 +18,13 @@ public class DefaultDeriver implements Deriver {
     );
 
 
-    @Override
-    public void accept(Derivation x) {
-        int start = x.now();
-        for (Deriver d : modules) {
-            d.accept(x);
-            if (x.now()!=start)
-                throw new RuntimeException("revert fault");
-        }
-    }
+//    @Override
+//    public void accept(Derivation x) {
+//        int start = x.now();
+//        for (Deriver d : modules) {
+//            d.accept(x);
+//            if (x.now()!=start)
+//                throw new RuntimeException("revert fault");
+//        }
+//    }
 }

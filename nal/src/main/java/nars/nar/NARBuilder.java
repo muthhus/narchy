@@ -66,7 +66,7 @@ public interface NARBuilder {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
                 Bag<Term, BLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
-                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.avgBlend, rng);
+                Bag<Task, BLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
                 return f.apply(termlink, tasklink);
             }
 
@@ -183,7 +183,8 @@ public interface NARBuilder {
 
         };
 
-        nar.termVolumeMax.setValue(70);
+        nar.core.activationRate.setValue(1f/(nar.core.active.capacity()/64f));
+        nar.termVolumeMax.setValue(96);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);

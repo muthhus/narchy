@@ -504,7 +504,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * the scan progress proportion, a value in 0..1.0 also.
      */
     protected static float tolerance(float scanProgressProportion) {
-        return Util.sqr(Util.sqr(scanProgressProportion )); /* power 4 curve */
+        return /*Util.sqr*/(Util.sqr(scanProgressProportion )); /* polynomial curve */
     }
 
     @Override
@@ -522,7 +522,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      */
     public float curve() {
         float c = random.nextFloat();
-        return 1f - (c * c * c * c);
+        return 1f - (c * c);
     }
 
     @Override

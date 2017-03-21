@@ -88,7 +88,7 @@ public class Default extends NAR {
     }
 
     public Deriver newDeriver() {
-        return new DefaultDeriver();
+        return DefaultDeriver.the;
     }
 
     public MatrixPremiseBuilder newPremiseBuilder() {

@@ -97,10 +97,6 @@ public class PremiseRule extends GenericCompound {
 //        }
 //    };
 
-    public boolean eternalize;
-
-    public boolean anticipate;
-
 
     /**
      * conditions which can be tested before term matching
@@ -207,7 +203,7 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = newHashSet(2); //for ensuring uniqueness / no duplicates
-        Solve truth = solve(post, this, anticipate, eternalize, timeFunction, beliefProjected);
+        Solve truth = solve(post, this, timeFunction, beliefProjected);
 
         //PREFIX
         {
@@ -361,7 +357,7 @@ public class PremiseRule extends GenericCompound {
 
 
     @NotNull
-    public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule, boolean anticipate, boolean eternalize,
+    public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule,
                               @NotNull TimeFunctions temporalizer, boolean beliefProjected) {
 
 
@@ -383,15 +379,19 @@ public class PremiseRule extends GenericCompound {
         String beliefLabel = belief != null ? belief.toString() : "_";
         String desireLabel = desire != null ? desire.toString() : "_";
 
-        String sn = "Truth(";
-        String i =
-                sn + beliefLabel + ',' + desireLabel + ",punc:\"" +
-                        (puncOverride == 0 ? '_' : puncOverride) + '\"';
-        i += ')';
+        StringBuilder i =
+                new StringBuilder().append("Truth(").append(beliefLabel).append(',')
+                        .append(desireLabel).append(",punc:\"").append(puncOverride == 0 ? '_' : puncOverride)
+                        .append('\"');
+        if (!beliefProjected)
+            i.append(",unprojBelief");
+        i.append(')');
+
+        String ii = i.toString();
 
         return puncOverride == 0 ?
-                new SolvePuncFromTask(i, der, belief, desire, beliefProjected) :
-                new SolvePuncOverride(i, der, puncOverride, belief, desire, beliefProjected);
+                new SolvePuncFromTask(ii, der, belief, desire, beliefProjected) :
+                new SolvePuncOverride(ii, der, puncOverride, belief, desire, beliefProjected);
 
 
     }

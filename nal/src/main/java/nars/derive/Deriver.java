@@ -29,23 +29,18 @@ public interface Deriver extends Consumer<Derivation> {
 
     Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
-    final static Function<String,Deriver> loader = (s) -> {
-        try {
-            return new TrieDeriver(PremiseRuleSet.rules(s));
-        } catch (IOException ignored) {
-            return (Deriver) null;
-        }
-    };
+//    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
+//    Function<String,Deriver> loader = (s) -> new TrieDeriver(PremiseRuleSet.rules(s));
 
     @NotNull
-    static Deriver get(String path) {
-        return derivers.get(path, loader);
+    static Deriver get(String... path) {
+        return new TrieDeriver(PremiseRuleSet.rules(path));
     }
-    @NotNull
-    static Deriver[] get(String... paths) {
-        return Lists.newArrayList(paths).stream().map(path -> derivers.get(path,loader)).toArray(Deriver[]::new);
-    }
+
+    //    @NotNull
+//    static Deriver[] get(String... paths) {
+//        return Lists.newArrayList(paths).stream().map(path -> derivers.get(path,loader)).toArray(Deriver[]::new);
+//    }
 
 
 //    @NotNull public static TrieDeriver getDefaultDeriver() {

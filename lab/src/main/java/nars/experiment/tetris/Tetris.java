@@ -41,7 +41,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static final int TIME_PER_FALL = 1;
     public static final int PIXEL_RADIX = 2;
     static final float DUR = 0.1f;
-    public static final float FPS = 50f;
+    public static final float FPS = 20f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;

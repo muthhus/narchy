@@ -66,23 +66,25 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
         switch (host.op()) {
             case SETe:
             case SETi:
+            case IMGe:
+            case IMGi:
+            case PROD:
             case DIFFe:
             case DIFFi:
             case SECTi:
             case SECTe:
-            case IMGe:
-            case IMGi:
-            case PROD:
                 return 1;
 
-            case INH:
-            case SIM:
-                return 3;
 
-            case IMPL:
+            case SIM:
+            case INH:
+                return 2;
+
             case EQUI:
                 //return (host.vars() > 0) ? 3 : 2;
-                return 3;
+                return 2;
+
+            case IMPL:
             case CONJ:
                 return 3;
 //                int s = host.size();

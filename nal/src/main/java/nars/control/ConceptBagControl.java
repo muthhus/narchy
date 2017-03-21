@@ -57,7 +57,7 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
-    protected float currentActivationRate = 1f;
+    protected float currentActivationRate = Float.NaN;
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 

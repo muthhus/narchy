@@ -161,16 +161,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "at(SELF,x)", 1.0f, 0.81f, 5);
     }
 
-    @Test
-    public void condition_goal_deductionWithVariableElimination()  {
 
-        test()
-                .input("goto({t003}). :|:")
-                .input("(goto(#1) &&+5 at(SELF,#1))!")
-                .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.58f, 7)
-                //.mustNotOutput(cycles, "goto({t003})", GOAL, -5) //??
-                ;
-    }
 
     @Test
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
@@ -179,7 +170,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("goto({t003}). :|:")
                 .input("(goto(#1) &&+5 at(SELF,#1))!")
-                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.58f, 7)
+                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
         ;
     }
 

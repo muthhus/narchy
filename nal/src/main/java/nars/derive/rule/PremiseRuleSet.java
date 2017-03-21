@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -92,10 +93,26 @@ public class PremiseRuleSet {
 //    }
 
     @NotNull
-    public static PremiseRuleSet rules(String name) throws IOException {
+    public static PremiseRuleSet rules(String... name) {
 
         PatternTermIndex p = new PatternTermIndex(1024);
-        PremiseRuleSet rs = new PremiseRuleSet(parse(load(NAR.class.getResourceAsStream("nal/" + name).readAllBytes()), p), p);
+        PremiseRuleSet rs = new PremiseRuleSet(
+                Stream.of(name).flatMap(n -> {
+
+                            InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
+                            byte[] bb = new byte[0];
+                            try {
+                                bb = nn.readAllBytes();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                bb = new byte[0];
+                            }
+                            return parse(load(bb), p);
+
+                        }
+                )
+            , p
+        );
 
         logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
@@ -106,14 +123,11 @@ public class PremiseRuleSet {
     }
 
 
-
-
     @NotNull
     public final PatternTermIndex patterns;
 
 
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
-
 
 
     public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
@@ -125,7 +139,6 @@ public class PremiseRuleSet {
     }
 
     final int[] errors = {0};
-
 
 
     public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns) {
@@ -213,15 +226,13 @@ public class PremiseRuleSet {
             }
 
             return unparsed_rules;
-                    //.parallelStream();
-                    //.stream();
+            //.parallelStream();
+            //.stream();
         } else {
             return lines;//.stream();
         }
 
     }
-
-
 
 
     @NotNull
@@ -245,7 +256,7 @@ public class PremiseRuleSet {
 
         //(Compound) index.parseRaw(src)
         String[] ab = src.split("\\|\\-");
-        if (ab.length!=2) {
+        if (ab.length != 2) {
             throw new Narsese.NarseseException("Rule component must have arity=2, separated by \"|-\": " + src);
         }
 
@@ -261,7 +272,7 @@ public class PremiseRuleSet {
             throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }
 
-        return new PremiseRule((Compound)a, (Compound)b);
+        return new PremiseRule((Compound) a, (Compound) b);
     }
 
     @NotNull
