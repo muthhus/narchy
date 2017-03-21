@@ -31,13 +31,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private static final int radix = 2;
     private final List<PixelConcept> pixels;
-    private final float sqrtNumPixels;
+
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
     final int numPixels;
 
     /** total priority to be shared by any changed pixels */
-    public final FloatParam totalPriority = new FloatParam(1f, 0f, 8f);
+    public final FloatParam totalPriority = new FloatParam(1f, 0f, 16f);
 
     private float priEach = 0;
 
@@ -52,7 +52,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         this.nar = nar;
 
         numPixels = src.width() * src.height();
-        sqrtNumPixels = (float)Math.sqrt(numPixels);
+        //sqrtNumPixels = (float)Math.sqrt(numPixels);
 
         pixels = encode((x, y) ->
                         $.inh(
@@ -178,6 +178,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor setResolution(float resolution) {
         this.resolution = resolution;
+        pixels.forEach(p -> p.resolution(resolution));
         return this;
     }
 

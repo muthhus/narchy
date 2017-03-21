@@ -76,7 +76,7 @@ abstract public class NAgent implements NSense, NAct {
     public final FloatParam predictTime = new FloatParam(5, 0, 32);
 
 
-    public float predictorProbability = 0.5f;
+    public final FloatParam predictorProbability = new FloatParam(1f);
 
 
     private boolean initialized;
@@ -115,7 +115,7 @@ abstract public class NAgent implements NSense, NAct {
         this.nar = nar;
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : func("happy", id),
+                id == null ? p("happy") : $.inh(id, $.the("happy")),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
                 (x) -> t(x, alpha())
@@ -268,6 +268,7 @@ abstract public class NAgent implements NSense, NAct {
         int numSensors = sensors.size();
         int numActions = actions.size();
 
+        predictorProbability.setValue(numActions > 0 ? 1f/numActions : 0.5f);
 
         @NotNull Compound happiness = happy.term();
 
@@ -433,7 +434,7 @@ abstract public class NAgent implements NSense, NAct {
         float dur = nar.time.dur();
         int num = predictors.size();
 
-        float pp =  predictorProbability;
+        float pp =  predictorProbability.floatValue();
 
         return IntStream.range(0, num).mapToObj(i -> {
             if (nar.random.nextFloat() > pp)

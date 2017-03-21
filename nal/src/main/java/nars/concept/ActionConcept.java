@@ -27,17 +27,15 @@ import static nars.time.Tense.DTERNAL;
 
 
 /** TODO make extend SensorConcept and utilize that for feedback control */
-public class ActionConcept extends WiredConcept implements FloatFunction<Term>, Function<NAR,Task> {
+public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
 
     /** relative temporal delta time for desire/belief prediction */
     static final int decisionDT = 0;
 
-    public final ScalarSignal feedback;
+    @Deprecated public final ScalarSignal feedback;
 
-    private float feedbackConf;
-
-    private float currentFeedback;
+    private Truth currentFeedback;
 
 
     private final boolean updateOnBeliefChange = false;
@@ -75,11 +73,11 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         }
     }
 
-//    @Override
-//    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-//        //TODO only for Beliefs; Goals can remain normal
-//        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
-//    }
+    @Override
+    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+        //TODO only for Beliefs; Goals can remain normal
+        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
+    }
 
     @Override
     public EternalTable newEternalTable(int eCap) {
@@ -130,10 +128,9 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 
             Truth f = this.motor.motor(b, d);
             if (f!=null) {
-                this.currentFeedback = f.freq(); //HACK ignores the conf component
-                this.feedbackConf = f.conf();
+                this.currentFeedback = f; //HACK ignores the conf component
             } else {
-                this.currentFeedback = Float.NaN;
+                this.currentFeedback = null;
             }
 
 
@@ -146,7 +143,17 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 //            }
         }
 
-        return feedback.apply(nar);
+
+        if (currentFeedback!=null) {
+            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback, Math.round(nar.time()-dur), nar.time(), nar.time.nextStamp());
+            s.budget(feedback.pri.asFloat(), nar);
+            return s;
+        } else {
+            return null;
+        }
+
+
+        //return feedback.apply(nar);
     }
 
 
@@ -202,11 +209,17 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
         this.motor = motor;
         this.goals = newBeliefTable(nar, false); //pre-create
 
-        //this.commonEvidence = Param.SENSOR_TASKS_SHARE_COMMON_EVIDENCE ? new long[] { n.time.nextStamp() } : LongArrays.EMPTY_ARRAY;
-
-        feedback = new ScalarSignal(n, term, this, (x) ->
-            t(x, feedbackConf)
-        );
+        feedback = new ScalarSignal(n, term, null, /*N/A*/(x)-> currentFeedback) {
+            @Override
+            public Task apply(@NotNull NAR nar) {
+                if (currentFeedback!=null) {
+                    SignalTask s = new SignalTask(term(), BELIEF, currentFeedback, nar.time(), nar.time(), nar.time.nextStamp());
+                    s.budget(pri.asFloat(), nar);
+                    return s;
+                }
+                return null;
+            }
+        };
     }
 
 
@@ -221,10 +234,6 @@ public class ActionConcept extends WiredConcept implements FloatFunction<Term>, 
 //
 //    }
 
-    @Override
-    public final float floatValueOf(Term anObject) {
-        return this.currentFeedback;
-    }
 
 
     Truth[] linkTruth(long when, long now, float minConf) {

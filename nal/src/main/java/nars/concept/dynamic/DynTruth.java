@@ -48,7 +48,7 @@ public final class DynTruth implements Truthed {
             //                BudgetMerge.plusBlend.apply(b, x.budget(), f);
             //            }
             //            return b;
-            return BudgetFunctions.fund(e, f);
+            return BudgetFunctions.fund(e, f, true);
         } else {
             return e.get(0).budget().clone();
         }

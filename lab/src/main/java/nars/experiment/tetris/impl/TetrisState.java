@@ -60,7 +60,7 @@ public class TetrisState {
     Vector<TetrisPiece> possibleBlocks = new Vector<>();
     public int time;
 
-    private final int timePerFall;
+    public int timePerFall;
     private int rowsFilled;
 
 

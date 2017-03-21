@@ -241,7 +241,7 @@ public class RevisionTest {
 
     /** test that budget is conserved during a revision between
      * the input tasks and the result */
-    @Test public void testRevisionBudgetConserved() {
+    @Test public void testRevisionBudgeting() {
         Default  n = newNAR(6);
 
         BeliefAnalysis b = new BeliefAnalysis(n, AB);
@@ -274,7 +274,7 @@ public class RevisionTest {
 
 
         float beliefAfter2;
-        assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.1f /* large delta to allow for forgetting */);
+        assertEquals(2.0f, beliefAfter2 = b.priSum(), 0.1f /* large delta to allow for forgetting */);
 
         //assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 

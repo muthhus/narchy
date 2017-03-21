@@ -16,6 +16,7 @@ import nars.truth.Truth;
 import nars.util.task.TaskStatistics;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.widget.meter.MatrixView;
 
 import java.util.List;
@@ -36,9 +37,11 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
-    public static final int TIME_PER_FALL = 1;
+    public final FloatParam timePerFall = new FloatParam(1f, 1f, 8f);
+
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
+
     public static final int PIXEL_RADIX = 2;
     static final float DUR = 0.1f;
     public static final float FPS = 20f;
@@ -464,6 +467,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     @Override
     public float act() {
 
+        state.timePerFall = Math.round(timePerFall.floatValue());
         state.next();
         return state.score;
 
@@ -789,7 +793,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static class MyTetris extends Tetris {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {
-            super(nar, Tetris.tetris_width, Tetris.tetris_height, Tetris.TIME_PER_FALL);
+            super(nar, Tetris.tetris_width, Tetris.tetris_height, 1);
 
 //                view.plot1 =
 //                        Vis.emotionPlots(nar, 256);

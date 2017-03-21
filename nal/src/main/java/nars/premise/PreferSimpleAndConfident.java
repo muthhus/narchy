@@ -85,7 +85,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         FloatParam off = opFactor(conclusion);
         p *= off.floatValue();
 
-        //p *= q; //further discount priority in similar way as quality
+        p *= q; //further discount priority in similar way as quality
 
         return $.b(p, q);
     }
@@ -137,7 +137,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     }
 
     protected float confidencePreservationFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
-        return unitize(truth.conf() / w2c( conclude.premiseEvidence ));
+        return 0.5f + 0.5f * unitize(truth.conf() / w2c( conclude.premiseEvidence ));
     }
 
 }

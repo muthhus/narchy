@@ -231,7 +231,10 @@ public class MySTMClustered extends STMClustered {
                         Task m = new GeneratedTask(conj, punc,
                                 $.t(finalFreq, conf), start[0], end[0], t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                        m.setBudget(BudgetFunctions.fund(uu, 1f / uu.size()));
+//                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
+//                        float priAvg = ((float)(priTotal / uu.size()));
+//
+                        m.setBudget(BudgetFunctions.fund(uu, (1f / uu.size()), false));
                         m.log("STMCluster CoOccurr");
 
                         toInput.add(m);

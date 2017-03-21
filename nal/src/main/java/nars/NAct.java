@@ -35,12 +35,17 @@ public interface NAct {
 
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
             int now = state[0];
-            boolean next = d!=null && d.freq() >= 0.5f;
-            float alpha = nar().confidenceDefault(Op.BELIEF);
-            if (now>=0 && !next) {
-                state[0] = -1; off.run(); return $.t(0, alpha);
-            } else if (now<=0 && next) {
-                state[0] = +1; on.run(); return $.t(1f, alpha);
+            if (d!=null) {
+                boolean next = d.freq() >= 0.5f;
+                if (now >= 0 && !next) {
+                    state[0] = -1;
+                    off.run();
+                    return $.t(0, d.conf());
+                } else if (now <= 0 && next) {
+                    state[0] = +1;
+                    on.run();
+                    return $.t(1f, d.conf());
+                }
             }
             return null;
         });
@@ -59,8 +64,9 @@ public interface NAct {
 
         ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
-                    1f/6;
-                    //1f/4
+                    //1f/6;
+                    1f/4;
+                    //1f/3f;
 
             int ii;
             if (d == null) {
@@ -88,9 +94,11 @@ public interface NAct {
                 default:
                     throw new RuntimeException();
             }
-            //return d!=null ? $.t(f, d.conf()) : null;
-            return $.t(f, nar().confidenceDefault(Op.BELIEF));
 
+            return d!=null ? $.t(f,
+                    d.conf()
+                    //nar().confidenceDefault(Op.BELIEF)
+            ) : null;
         });
 
         actions().add(m);

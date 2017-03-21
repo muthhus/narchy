@@ -23,11 +23,12 @@ public enum TruthPolation  {
 
     /** dt > 0 */
     public static float evidenceDecay(float evi, float dur, float dt) {
-        //return evi * 1f/( sqr( 1 + dt/dur) ); //inverse square
+
         return evi * 1f/( 1f + sqr( dt/dur) ); //inverse square
+        //return evi * 1f/( 1 + (dt/dur) ); //inverse linear
+
         //return evi * Math.max(0, 1f - dt / dur ); //hard linear
 
-        //return evi * 1f/( 1 + (dt/dur) ); //inverse
         //return evi / (1f + dt / dur ); //first order decay
         //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
 

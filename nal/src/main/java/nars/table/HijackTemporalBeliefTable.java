@@ -122,7 +122,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             return true;
 
         float incomingPri = pri(incoming);
-        return hijackGreedy(incomingPri, pri(existing));
+        return hijackSoftmax(incomingPri, pri(existing));
+        //return hijackGreedy(incomingPri, pri(existing));
     }
 
     @Nullable

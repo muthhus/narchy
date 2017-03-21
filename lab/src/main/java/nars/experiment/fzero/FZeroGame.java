@@ -27,13 +27,19 @@ import java.awt.image.BufferedImage;
 
 public class FZeroGame extends JFrame implements Runnable {
 
+  public static final int FULL_POWER = 80;
+  public static final int MAX_VEL = 20;
   public boolean thrust = false, left = false, right = false;
+  public double playerAngle = 0;
   public BufferedImage image = new BufferedImage(
           320, 240, BufferedImage.TYPE_INT_RGB);
+
+  public final double[][] vehicleMetrics = new double[10][9];
 
   boolean[] K = new boolean[65535]; // pressed keys
   public double power = 0;
   public int rank = 0;
+  private int frameDelayMS = 50;
 
   public FZeroGame() {
     new Thread(this).start();
@@ -57,8 +63,6 @@ public class FZeroGame extends JFrame implements Runnable {
     // 3 = white circle
     // 4 = dark road
     // 5 = checkered road
-    double playerAngle = 0;
-    final double[][] vehicleMetrics = new double[10][9];
     // 0 = x, 1 = y
     // 2 = stunned velocity x, 3 = stunned velocity y
     // 4 = projected x, 5 = projected z
@@ -89,7 +93,8 @@ public class FZeroGame extends JFrame implements Runnable {
       for(double t = 0; t < 2.0 * Math.PI; t += 0.001) {
         int X = 128 + (int)((256 + 64 * Math.cos(t * 3.0)) * Math.sin(t));
         int Y = 128 + (int)((256 + 64 * Math.sin(t * 3.0)) * Math.cos(t));
-        int color = C(t + i * Math.PI / 16.0, 1, 1);
+        //int color = C(t + i * Math.PI / 16.0, 1, 1);
+        int color = 0;
         for(int y = 0; y < 16; y++) {
           for(int x = 0; x < 16; x++) {
             wiresBitmap[i][0xFF & (Y + y)][0xFF & (X + x)] = color;
@@ -284,7 +289,7 @@ public class FZeroGame extends JFrame implements Runnable {
               vehicleMetrics[i + 2][0] = 8144;
               vehicleMetrics[i + 2][1] = vehicleMetrics[i][1] + 3840;
             }
-            power = 80;
+            power = FULL_POWER;
             playerAngle = hitWallCount = 0;
             imageGraphics.setFont(getFont().deriveFont(32f));
             onPowerBar = playing = false;
@@ -322,7 +327,7 @@ public class FZeroGame extends JFrame implements Runnable {
           vehicleMetrics[0][5] = 0;
           if (thrust || K[KeyEvent.VK_D]) {
             playing = true;
-            if (vehicleMetrics[0][6] < 20) {
+            if (vehicleMetrics[0][6] < MAX_VEL) {
               vehicleMetrics[0][6] += 0.2;
             }
           } else {
@@ -468,7 +473,7 @@ public class FZeroGame extends JFrame implements Runnable {
         }
 
 // -- UPDATE MODEL END ---------------------------------------------------------
-        nextFrameStart += 28571429;
+        nextFrameStart += 1000000 * frameDelayMS;
       } while(nextFrameStart < System.nanoTime());
 // -- RENDER FRAME BEGIN -------------------------------------------------------
 

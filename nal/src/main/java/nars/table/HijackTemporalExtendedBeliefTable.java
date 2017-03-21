@@ -26,13 +26,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
         this.history = new TreeMap<>();
     }
 
-    @Override
-    protected boolean replace(Task incoming, Task existing) {
-        if (incoming instanceof SignalTask && incoming.start() >= existing.start())
-            return true;
-        else
-            return super.replace(incoming, existing);
-    }
+
 
 
     @Override

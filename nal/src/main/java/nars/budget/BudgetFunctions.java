@@ -26,6 +26,8 @@ import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.budget.BudgetMerge.plusBlend;
+
 /**
  * Budget functions for resources allocation
  */
@@ -235,13 +237,20 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion /* TODO: , boolean copyOrTransfer */) {
+    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion, boolean copyOrTransfer) {
         RawBudget u = new RawBudget(0f, Float.NaN);
         for (Task t : tt) {
             Budget tbudget = t.budget();
-            BudgetMerge.plusBlend.merge(u, tbudget, paymentProportion);
-            //if (!copyOrTransfer)
-                //tbudget.priAdd(-spent)
+            if (copyOrTransfer) {
+                //COPY
+                plusBlend.merge(u, tbudget, paymentProportion);
+            } else {
+                //TRANSFER
+                float before = u.pri();
+                plusBlend.merge(u, tbudget, paymentProportion);
+                float after = u.pri();
+                tbudget.priAdd(-(after - before));
+            }
         }
         return u;
     }
