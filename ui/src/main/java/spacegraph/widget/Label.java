@@ -20,11 +20,13 @@ public class Label extends Surface {
 
     public Label(String s) {
         super();
+        align(Align.Center);
         set(s);
     }
 
     @Override
     public void paint(GL2 gl) {
+
         color.apply(gl);
         gl.glLineWidth(1.5f);
         float dz = 0.1f;
@@ -38,9 +40,10 @@ public class Label extends Surface {
         this.value = newValue;
         int len = newValue.length();
 
-        this.aspect = this.fontScale = 1f / (len);
+        this.aspect = 1f / (len);
+        this.fontScale = 1f / len;
 
-                //0.5f;
+        //0.5f;
                 //0.5f;
 
                 //0.5f; //(1f/ConsoleSurface.fontWidth)/value.length();

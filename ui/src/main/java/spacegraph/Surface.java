@@ -192,6 +192,7 @@ public class Surface {
             //TODO others
 
             case Center:
+                //HACK TODO figure this out
                 tx += (1f - (sx/scale.x))/2f;
                 ty += (1f - (sy/scale.y))/2f;
                 break;

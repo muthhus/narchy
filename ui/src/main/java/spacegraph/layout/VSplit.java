@@ -45,7 +45,7 @@ public class VSplit extends Layout {
         Surface bottom = bottom();
         if (bottom!=null) {
             bottom.scale(1f, 1f - split);
-            bottom.translateLocal.set(x, -split /2f, 0);
+            bottom.translateLocal.set(x, 0, 0);
         }
 
     }

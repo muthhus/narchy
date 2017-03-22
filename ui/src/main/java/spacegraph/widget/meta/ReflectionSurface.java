@@ -6,7 +6,9 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.layout.VSplit;
 import spacegraph.widget.Label;
+import spacegraph.widget.LabeledPane;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.slider.FloatSlider;
@@ -33,7 +35,6 @@ public class ReflectionSurface<X> extends Grid {
             //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
 
             try {
-                String k = f.getName();
                 //Class c = f.getType();
                 Object y = f.get(x);
 
@@ -41,8 +42,11 @@ public class ReflectionSurface<X> extends Grid {
                     //l.add(col(new Label(k), (Surface)y));
                     l.add((Surface)y);
                 } else {
+                    String k = f.getName();
+
                     if (y instanceof FloatParam) {
                         FloatParam p = (FloatParam) y;
+                        //l.add(new LabeledPane(k, new FloatSlider(p)));
                         l.add(col(new Label(k), new FloatSlider(p)));
                     } else if (y instanceof AtomicBoolean) {
                         l.add(new CheckBox(k, (AtomicBoolean) y));

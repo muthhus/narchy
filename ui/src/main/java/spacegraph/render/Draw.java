@@ -732,14 +732,24 @@ public enum Draw {
     public static void colorHash(Object x, float[] color) {
         colorHash(x.hashCode(), color, 1f);
     }
-    public static void colorHash(int hash, float[] color, float alpha) {
-        Draw.hsb((hash%500) / 500f * 360.0f, 0.7f, 0.7f, alpha, color);
+
+    public static void colorHash(int hash, float[] color, float sat, float bri, float alpha) {
+        Draw.hsb(Math.abs(hash%500) / 500f * 360.0f, sat, bri, alpha, color);
     }
-    public static void colorHash(GL2 gl, int hash, float alpha) {
+    public static void colorHash(int hash, float[] color, float alpha) {
+        colorHash(hash, color, 0.7f, 0.7f, alpha);
+    }
+
+    public static void colorHash(GL2 gl, int hash, float sat, float bri, float alpha) {
         float[] f = new float[4];
-        colorHash(hash, f, alpha);
+        colorHash(hash, f, sat, bri, alpha);
         gl.glColor4fv(f, 0);
     }
+
+    public static void colorHash(GL2 gl, int hash, float alpha) {
+        colorHash(gl, hash, 0.7f, 0.7f, alpha);
+    }
+
     public static void colorHash(GL2 gl, Object o, float alpha) {
         colorHash(gl, o.hashCode(), alpha);
     }
