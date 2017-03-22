@@ -24,7 +24,9 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 40, 40, (v) -> t(v, alpha())).setResolution(0.05f).priTotal(32f);
+        senseCamera("fz", ()->fz.image, 15, 15, (v) -> t(v, alpha()))
+                //.setResolution(0.04f)
+                .priTotal(16f);
 
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
@@ -60,13 +62,15 @@ public class FZero extends NAgentX {
         lastDistance = distance;
 
         //lifesupport
-        fz.power = Math.max(FZeroGame.FULL_POWER*0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.1f));
+        fz.power = Math.max(FZeroGame.FULL_POWER*0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.01f));
 
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
-        return Util.clamp(-(FZeroGame.FULL_POWER - ((float)fz.power))/FZeroGame.FULL_POWER +
-                //((float)fz.vehicleMetrics[0][6]/100f)+
-                (float) (deltaDistance), -1f, +1f);
+
+
+        return Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float)fz.power))/FZeroGame.FULL_POWER +
+                        //((float)fz.vehicleMetrics[0][6]/100f)+
+                        deltaDistance), -1f, +1f);
     }
 
     public static void main(String[] args) throws Narsese.NarseseException {

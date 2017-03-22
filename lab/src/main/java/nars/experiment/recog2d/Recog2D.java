@@ -106,11 +106,11 @@ public class Recog2D extends NAgentX {
 
         //still
         CameraSensor sp = senseCamera(id.toString(), new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
-        sp.priTotal(4);
+        sp.priTotal(32);
 
         //nar.log();
 
-        outs = new Outputs(ii -> $.func("s" + ii, id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> $.inh($.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(

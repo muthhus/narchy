@@ -20,7 +20,6 @@ public class Label extends Surface {
 
     public Label(String s) {
         super();
-        align(Align.Center, 1);
         set(s);
     }
 
@@ -38,8 +37,9 @@ public class Label extends Surface {
             newValue = "(null)";
         this.value = newValue;
         int len = newValue.length();
-        this.fontScale =
-                1f / (len);
+
+        this.aspect = this.fontScale = 1f / (len);
+
                 //0.5f;
                 //0.5f;
 

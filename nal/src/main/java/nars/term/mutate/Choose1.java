@@ -75,8 +75,10 @@ public class Choose1 extends Termutator {
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
-                    if (!f.chain(chain, current))
+                    if (!f.chain(chain, current)) {
+                        f.revert(start);
                         return false;
+                    }
                 }
 
             }

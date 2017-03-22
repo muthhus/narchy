@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
 import spacegraph.math.v2;
+import spacegraph.render.Draw;
 
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +52,10 @@ public class Grid extends Layout {
     float lw, lh;
     @Override
     protected void paint(GL2 gl) {
-        super.paint(gl);
+        Draw.colorHash(gl, this, 0.5f);
+        Draw.rect(gl, 0, 0, 1, 1);
+
+        //super.paint(gl);
     }
 
     public boolean isGrid() {
@@ -87,13 +91,9 @@ public class Grid extends Layout {
             a = 0; //use linear layout for small n
 
 
-        if (a == 0) {
-            //horizontal
-            layoutLinear(1f/n, 0f, margin, 0, n);
-        } else if (!Float.isFinite(a)) {
-            //vertical
-            layoutLinear(0f, 1f/n, margin, n-1, -1);
-        } else {
+        float aa = a;
+
+        if (a!=0 && Float.isFinite(a)) {
 
             //determine the ideal rows and columns of the grid to match the visible aspect ratio
             //in a way that keeps each grid cell as close to 1:1 as possible
@@ -114,26 +114,47 @@ public class Grid extends Layout {
             x = Math.max(1, x);
             int y = (int)Math.max(1, Math.ceil((float)n / x));
 
-
-            layoutGrid(x, y, margin);
+            if (y==1) {
+                aa = Float.POSITIVE_INFINITY; //column
+            } else if (x == 1) {
+                aa = 0; //row
+            } else {
+                layoutGrid(x, y, margin);
+                return;
+            }
         }
+
+
+        if (aa == 0) {
+            //horizontal
+            layoutGrid(n, 1, margin);
+        } else /*if (!Float.isFinite(aa))*/ {
+            //vertical
+            layoutGrid(1, n, margin);
+        }
+
     }
 
     private void layoutGrid(int nx, int ny, float margin) {
         int i = 0;
-        float content = 1f - margin;
 
-        float dx = 1f/nx;
-        float dxc = dx * content;
-        float dy = 1f/ny;
-        float dyc = dy * content;
-        float py = ((ny-1) * dy) + margin/2;
+        float hm = margin/2f;
+
+        float mx = (1 + 1 + nx/2f) * hm;
+        float my = (1 + 1 + ny/2f) * hm;
+
+        float dx = nx > 0 ? (1f-hm)/nx : 0;
+        float dxc = (1f - mx)/nx;
+        float dy = ny > 0 ? (1f-hm)/ny : 0;
+        float dyc = (1f - my)/ny;
+
         int n = children.size();
-        //System.out.println(nx + " " + ny + " x " + dx + " " + dy);
+
+        float py = ((ny-1) * dy) + hm;
 
         for (int y = 0; y < ny; y++) {
 
-            float px = margin / 2f;
+            float px = hm;//margin / 2f;
 
             for (int x = 0; x < nx; x++) {
                 //System.out.println("\t" + px + " " + py);
@@ -155,24 +176,6 @@ public class Grid extends Layout {
 
         }
     }
-
-    protected void layoutLinear(float dx, float dy, float margin, int start, int end) {
-        float content = 1f - margin;
-        float x = margin/2f;
-        float y = margin/2f;
-        float dxc = dx != 0 ? dx * content : content;
-        float dyc = dy != 0 ? dy * content : content;
-
-        int inc = start > end ? -1 : +1;
-        for (int i = start; i != end; i+=inc) {
-            Surface c = children.get(i);
-            c.translateLocal.set(x, y, 0);
-            c.scale(dxc, dyc);
-            x += dx;
-            y += dy;
-        }
-    }
-
 
     public static Grid grid(Iterable<? extends Surface> content) {
         return grid( Iterables.toArray(content, Surface.class ) );

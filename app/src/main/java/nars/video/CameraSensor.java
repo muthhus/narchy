@@ -57,14 +57,16 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         pixels = encode((x, y) ->
                         $.inh(
                                 //$.inh(
-                                root,
+
 
                                 //$.secte
                                     radix > 1 ?
                                         $.p( zipCoords(coord(x, width), coord(y, height)) ) :
                                         //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                         //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                        $.p( $.the(x), $.the(y) )
+                                        $.p( $.the(x), $.the(y) ),
+
+                                root
 
                         )
                 , brightnessToTruth);

@@ -82,6 +82,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         label = new Label(this.term.toString());
         label.color.a(0.25f);
         label.scale(0.25f, 0.25f);
+        label.align(Align.Center);
         set(label);
 
         redraw = new AtomicBoolean(false);

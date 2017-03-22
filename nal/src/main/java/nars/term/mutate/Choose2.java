@@ -98,8 +98,10 @@ public class Choose2 extends Termutator {
                 if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
-                    if (!f.chain(chain, current))
+                    if (!f.chain(chain, current)) {
+                        f.revert(start);
                         return false;
+                    }
 
                 }
 

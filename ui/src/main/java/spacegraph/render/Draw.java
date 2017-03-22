@@ -740,6 +740,12 @@ public enum Draw {
         colorHash(hash, f, alpha);
         gl.glColor4fv(f, 0);
     }
+    public static void colorHash(GL2 gl, Object o, float alpha) {
+        colorHash(gl, o.hashCode(), alpha);
+    }
+    public static void colorHash(GL2 gl, Object o) {
+        colorHash(gl, o, 1f);
+    }
 
 
 //

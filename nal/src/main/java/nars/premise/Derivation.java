@@ -229,7 +229,7 @@ public class Derivation extends Unify {
      */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
 
-        int t = now();
+        int start = now();
 
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
@@ -245,7 +245,7 @@ public class Derivation extends Unify {
         this.forEachMatch = null;
 
         if (finish) {
-            versioning.revert(t);
+            versioning.revert(start);
         } //else: allows the set constraints to continue
 
     }

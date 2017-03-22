@@ -22,6 +22,8 @@ public class Surface {
     public enum Align {
 
 
+        None,
+
         /**
          * 1:1, centered
          */
@@ -168,17 +170,11 @@ public class Surface {
             float globalAspect = globalScale.y / globalScale.x;
             float targetAspect = aspect/globalAspect;
             if (targetAspect < 1) {
-//                //wider, shrink y
-                //System.out.println(this + " " + globalScale + " " + apparentAspect + " "+  targetAspect );
-
-                //sy = scale.y / targetAspect;
+                //wider, shrink y
                 sx = scale.x;
                 sy = scale.y * targetAspect;
-                //System.out.println("   " + this + " " + globalScale + " " + (sy/sx) + "<- " + sx + "," + sy );
-
             } else {
-                //sy = scale.y;
-                //sx = scale.y / targetAspect;
+                //taller, shrink x
                 sx = scale.x / targetAspect;
                 sy = scale.y;
             }
@@ -193,15 +189,20 @@ public class Surface {
         float tx = translate.x, ty = translate.y;
         switch (align) {
 
-            default:
+            //TODO others
+
             case Center:
-                tx += (scale.x - sx) / 2f;
-                ty += (scale.y - sy) / 2f;
+                tx += (1f - (sx/scale.x))/2f;
+                ty += (1f - (sy/scale.y))/2f;
                 break;
 
+            case None:
+            default:
+                break;
 
         }
 
+        //System.out.println(this + " scale=" + sx + "," + sy + " (a=" + aspect + ") @ " + tx + ","+ ty + "," + translate.z);
         gl.glTranslatef(tx, ty, translate.z);
         gl.glScalef(sx, sy, 1f);
     }

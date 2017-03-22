@@ -49,8 +49,10 @@ public final class CommutivePermutations extends Termutator {
             p.next();
 
             if (f.matchLinear(p, y)) {
-                if (!f.chain(chain, current))
+                if (!f.chain(chain, current)) {
+                    f.revert(start);
                     return false;
+                }
             }
 
             f.revert(start);

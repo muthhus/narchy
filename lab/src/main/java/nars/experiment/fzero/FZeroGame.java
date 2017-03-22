@@ -39,7 +39,7 @@ public class FZeroGame extends JFrame implements Runnable {
   boolean[] K = new boolean[65535]; // pressed keys
   public double power = 0;
   public int rank = 0;
-  private int frameDelayMS = 50;
+  public int frameDelayMS = 80;
 
   public FZeroGame() {
     new Thread(this).start();
@@ -89,19 +89,18 @@ public class FZeroGame extends JFrame implements Runnable {
 
 // -- GENERATE WIRES BITMAP BEGIN ----------------------------------------------
 
-    for(int i = 0; i < 32; i++) {
-      for(double t = 0; t < 2.0 * Math.PI; t += 0.001) {
-        int X = 128 + (int)((256 + 64 * Math.cos(t * 3.0)) * Math.sin(t));
-        int Y = 128 + (int)((256 + 64 * Math.sin(t * 3.0)) * Math.cos(t));
-        //int color = C(t + i * Math.PI / 16.0, 1, 1);
-        int color = 0;
-        for(int y = 0; y < 16; y++) {
-          for(int x = 0; x < 16; x++) {
-            wiresBitmap[i][0xFF & (Y + y)][0xFF & (X + x)] = color;
-          }
-        }
-      }
-    }
+//    for(int i = 0; i < 32; i++) {
+//      for(double t = 0; t < 2.0 * Math.PI; t += 0.001) {
+//        int X = 128 + (int)((256 + 64 * Math.cos(t * 3.0)) * Math.sin(t));
+//        int Y = 128 + (int)((256 + 64 * Math.sin(t * 3.0)) * Math.cos(t));
+//        int color = C(t + i * Math.PI / 16.0, 1, 1);
+//        for(int y = 0; y < 16; y++) {
+//          for(int x = 0; x < 16; x++) {
+//            wiresBitmap[i][0xFF & (Y + y)][0xFF & (X + x)] = color;
+//          }
+//        }
+//      }
+//    }
 
 // -- GENERATE WIRES BITMAP END ------------------------------------------------
 

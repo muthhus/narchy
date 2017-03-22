@@ -7,6 +7,7 @@ import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 
+import static spacegraph.Surface.Align.None;
 import static spacegraph.math.v3.v;
 
 /**
@@ -34,6 +35,8 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     public Ortho(Surface content) {
 
         this.surface = content;
+        surface.align = None;
+
         this.finger = newFinger();
         this.scale = new AnimVector2f(3f);
         this.translate = new AnimVector2f(3f);
