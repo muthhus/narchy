@@ -32,7 +32,7 @@ public class DefaultBeliefTable implements BeliefTable {
      */
     @Nullable
     @Override
-    public Truth truth(long when, long now, float dur) {
+    public Truth truth(long when, long now, int dur) {
 
         Truth tt = temporal.truth(when, now, dur, eternal);
 
@@ -99,7 +99,7 @@ public class DefaultBeliefTable implements BeliefTable {
      */
     @Nullable
     @Override
-    public Task match(long when, long now, float dur, @Nullable Task against, Compound template, boolean noOverlap) {
+    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap) {
 
         final Task ete = eternal.match();
         if (when == ETERNAL) {

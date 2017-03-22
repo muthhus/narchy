@@ -283,7 +283,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
 //
 //            case Classic:
 //                float priority = or(receiver.getPriority(), amount.getPriority());
-//                float durability = aveAri(receiver.getDurability(), amount.getDurability());
+//                int durability = aveAri(receiver.getDurability(), amount.getDurability());
 //                receiver.setPriority(priority);
 //                receiver.setDurability(durability);
 //                break;

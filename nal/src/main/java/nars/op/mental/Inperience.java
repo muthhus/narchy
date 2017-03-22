@@ -191,7 +191,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 
 
 //        float pri = Global.DEFAULT_JUDGMENT_PRIORITY * INTERNAL_EXPERIENCE_PRIORITY_MUL;
-//        float dur = Global.DEFAULT_JUDGMENT_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL;
+//        int dur = Global.DEFAULT_JUDGMENT_DURABILITY * INTERNAL_EXPERIENCE_DURABILITY_MUL;
 //        if (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY) {
 //            pri *= INTERNAL_EXPERIENCE_PRIORITY_MUL;
 //            dur *= INTERNAL_EXPERIENCE_DURABILITY_MUL;
@@ -297,7 +297,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
         return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), neg));
     }
 
-    static Term reify(@NotNull Compound term) {
+    @Nullable static Term reify(@NotNull Compound term) {
         return $.terms.transform(term, queryToDepVar);
     }
 

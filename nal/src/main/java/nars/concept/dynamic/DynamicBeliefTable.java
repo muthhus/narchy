@@ -91,7 +91,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     @Nullable
-    public Truth truth(long when, long now, float dur) {
+    public Truth truth(long when, long now, int dur) {
         DynTruth d = dyntruth(when, now, false);
         return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now, dur) /* includes only non-dynamic beliefs */);
     }
@@ -148,7 +148,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //    }
 
     @Override
-    public @Nullable Task match(long when, long now, float dur, @Nullable Task target, Compound template, boolean noOverlap) {
+    public @Nullable Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap) {
         if (template == null)
             template = $.terms.retemporalize( dynamicConcept.term() );
 

@@ -72,63 +72,12 @@ public class Line1DContinuous extends NAgent {
 
         ActionConcept a;
 
-        actions.add(a = new ActionConcept($.func("move", $.the("x")), n, (b, d) -> {
-            if (d!=null) {
-                float v =
-                        //d.expectation();
-                        d.freq();
-                float yBefore = yEst;
-                yEst += (v - 0.5f)*speed;
+        actionBipolar($.inh($.the("move"), $.the("x")), (v) -> {
 
-                float f;
-                if (yBefore==0 || yBefore == 1) {
-                    //wall
-                    f = 0.5f;
-                } else {
-                    f = v;
-                }
+            yEst += (v)*speed;
 
-                return $.t(f, alpha());
-                //return d;
-            }
-            return null;
-        }));
-
-//        actions.add(a1 = new ActionConcept("e(left)", n, (b, d) -> {
-//            if (d!=null) {
-//                float v =
-//                        //d.expectation();
-//                        d.freq();
-//                yEst += v*speed;
-//                return $.t(d.freq(), gamma);
-//            }
-//            return null;
-//        }));
-//        actions.add(a2 = new ActionConcept("e(right)", n, (b, d) -> {
-//            if (d!=null) {
-//                float v =
-//                        //d.expectation();
-//                        d.freq();
-//                yEst += v*(-speed);
-//                return $.t(d.freq(), gamma);
-//            }
-//            return null;
-//        }));
-
-
-
-//        n.onTask(t -> {
-//           if (t instanceof DerivedTask
-//                   && t.punc() == GOAL
-//                   && (t.term().equals(a1.term()) || t.term().equals(a2.term()))
-//                   //&& t.term().containsTermRecursively(a.term())
-//            ) {
-//                System.out.println(t.proof());
-//                System.out.println();
-////                n.runLater(()->a1.print());
-////               n.runLater(()->a2.print());
-//           }
-//        });
+            return true;
+        });
 
         trace = false;
 
@@ -256,7 +205,7 @@ public class Line1DContinuous extends NAgent {
         Default nar = new Default(1024,
                 8, 1, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
-                new FrameTime(1f), exe
+                new FrameTime(), exe
         );
         nar.termVolumeMax.set(32);
 

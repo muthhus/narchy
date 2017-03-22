@@ -40,10 +40,10 @@ import static nars.Op.GOAL;
 public interface NARBuilder {
 
     static Default newMultiThreadNAR(int cores, Time time) {
-        return newMultiThreadNAR(cores, time, true);
+        return newMultiThreadNAR(cores, time, true, -1);
     }
 
-    static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
+    static Default newMultiThreadNAR(int threads, Time time, boolean sync, float fps) {
         Random rng = new XorShift128PlusRandom(1);
 
         if (threads == -1)
@@ -80,7 +80,9 @@ public interface NARBuilder {
 
         int maxConcepts = 128 * 1024;
 
-        Default nar = new Default(512,
+        int activeConcepts = 512;
+
+        Default nar = new Default(activeConcepts,
                 1, 1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
@@ -93,6 +95,7 @@ public interface NARBuilder {
                 ,
                 time,
                 exe) {
+
 
 //            @Override
 //            public MatrixPremiseBuilder newPremiseBuilder() {
@@ -183,6 +186,20 @@ public interface NARBuilder {
 
         };
 
+        if (fps>0) {
+            DefaultConceptBagControl.ThrottledConceptBagControl core =
+                new DefaultConceptBagControl.ThrottledConceptBagControl(
+                    nar, nar.newConceptBag(activeConcepts), nar.newPremiseBuilder(), fps
+                );
+            nar.setControl(core);
+            core.conceptsFiredPerCycle.setValue(128);
+            core.conceptsFiredPerBatch.setValue(8);
+            core.derivationsInputPerCycle.setValue(256);
+        } else {
+            nar.core.conceptsFiredPerCycle.setValue(128);
+            nar.core.conceptsFiredPerBatch.setValue(8);
+            nar.core.derivationsInputPerCycle.setValue(256);
+        }
 
         nar.termVolumeMax.setValue(96);
 
@@ -196,12 +213,8 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
 
         //nar.stmLinkage.capacity.set(0);
-        nar.core.conceptsFiredPerCycle.setValue(128);
-        nar.core.conceptsFiredPerBatch.setValue(8);
-        nar.core.derivationsInputPerCycle.setValue(256);
 
         //nar.activationRate.setValue(0.5f);
-        //nar.core.activationRate.setValue(0.1f);
         nar.quaMin.setValue(0.01f);
         nar.confMin.setValue(0.005f);
         nar.truthResolution.setValue(0.01f);

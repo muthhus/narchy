@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Util;
 import nars.concept.ActionConcept;
+import nars.concept.GoalActionConcept;
 import nars.term.Compound;
 import nars.time.Tense;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
@@ -33,7 +34,7 @@ public interface NAct {
 
         final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
 
-        ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             int now = state[0];
             if (d!=null) {
                 boolean next = d.freq() >= 0.5f;
@@ -62,7 +63,7 @@ public interface NAct {
     default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
 
 
-        ActionConcept m = new ActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
                     //1f/6;
                     1f/4;
@@ -129,7 +130,7 @@ public interface NAct {
         final long[] reset = { Tense.ETERNAL }; //last enable time
         final int[] state = { 0 }; // 0: unknown, -1: false, +1: true
 
-        ActionConcept m = new ActionConcept(term, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(term, nar(), (b, d) -> {
 
             boolean next = d!=null && d.freq() >= 0.5f;
 
@@ -179,13 +180,13 @@ public interface NAct {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default ActionConcept action(@NotNull String s, @NotNull ActionConcept.MotorFunction update) throws Narsese.NarseseException {
+    default ActionConcept action(@NotNull String s, @NotNull GoalActionConcept.MotorFunction update) throws Narsese.NarseseException {
         return action($.$(s), update);
     }
 
     @NotNull
-    default ActionConcept action(@NotNull Compound s, @NotNull ActionConcept.MotorFunction update) {
-        ActionConcept m = new ActionConcept(s, nar(), update);
+    default ActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
+        ActionConcept m = new GoalActionConcept(s, nar(), update);
         actions().add(m);
         return m;
     }

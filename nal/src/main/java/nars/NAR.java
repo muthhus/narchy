@@ -936,7 +936,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         }
     }
 
-    public final float dur() {
+    public final int dur() {
         return time.dur();
     }
 

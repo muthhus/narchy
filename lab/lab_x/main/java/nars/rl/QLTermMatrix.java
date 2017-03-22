@@ -338,7 +338,7 @@ abstract public class QLTermMatrix<S extends Term, A extends Term> extends Conce
             acted(action, punctuation, 1.0f, conf, actionPriority, actionDurability);
     }
 
-    public void acted(Term action, byte punctuation, float freq, float conf, float priority, float durability) {
+    public void acted(Term action, byte punctuation, float freq, float conf, float priority, int durability) {
         Task t = TaskSeed.make(nar.memory, (Compound) action).punctuation(punctuation).truth(freq, conf).budget(priority, durability).present();
         input(t);
     }

@@ -142,7 +142,7 @@
 //        ItemAccumulator<Task> ii = new ItemAccumulator<>(capacity, BudgetMerge.plusDQBlend);
 //
 //        for (int i = 0; i < capacity-1; i++) {
-//            float dur = i * 0.05f;
+//            int dur = i * 0.05f;
 //            ii.bag().put($.task($.$("a:" + i), '?', null).budget(0.5f, dur, 0.5f));
 //        }
 //

@@ -381,7 +381,7 @@ public abstract class TermIndex extends TermBuilder {
 //    }
 
 
-    @NotNull
+    @Nullable
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
         if (!t.testSuperTerm(src)) {
             return src;
@@ -421,6 +421,8 @@ public abstract class TermIndex extends TermBuilder {
 
             if (y == x && x instanceof Compound) {
                 y = transform((Compound) x, t); //recurse
+                if (y == null)
+                    return null;
             }
 
             if (y != x) {
@@ -572,7 +574,7 @@ public abstract class TermIndex extends TermBuilder {
             }
         }
 
-        if ((term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
+        if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
             return null;
 
         return term;

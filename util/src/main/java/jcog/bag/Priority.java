@@ -34,7 +34,7 @@ public interface Priority extends Prioritized {
      */
     void setPriority(float p);
 
-    //    default Budget mult(float priFactor, float durFactor, float quaFactor) {
+    //    default Budget mult(float priFactor, int durFactor, float quaFactor) {
     //        if (priFactor!=1) priMult(priFactor);
     //        if (durFactor!=1) durMult(durFactor);
     //        if (quaFactor!=1) quaMult(quaFactor);

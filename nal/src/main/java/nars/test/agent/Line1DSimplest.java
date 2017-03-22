@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.ActionConcept;
+import nars.concept.BeliefActionConcept;
 import nars.concept.SensorConcept;
 
 import static nars.Op.BELIEF;
@@ -29,30 +30,37 @@ public class Line1DSimplest extends NAgent {
     public Line1DSimplest(NAR n) {
         super("L", n);
 
-        in = senseNumber( $.func("i", id), this.i);
+        in = senseNumber( $.inh($.the("i"), id), this.i);
 
-        out = action( $.func("o", id), (b, d) -> {
-
-            if (d != null) {
-                float f = d.freq();
-//                float inc = ((f - 0.5f) * 2f) * 0.04f;
-//                o.setValue(unitize(o.getValue() + inc));
-
-                o.setValue(f);
-
-//                else {
-//                    //no change
-//                    return null;
-//                }
-
-
-                return $.t(o.floatValue(), d.conf());
+        action( new BeliefActionConcept($.inh($.the("o"), id), nar, (b) -> {
+            if (b!=null) {
+                o.setValue( b.freq() );
             }
+        }));
+        out = null;
 
-            return null;
-
-
-        });
+//        out = action( $.inh($.the("o"), id), (b, d) -> {
+//
+//            if (d != null) {
+//                float f = d.freq();
+////                float inc = ((f - 0.5f) * 2f) * 0.04f;
+////                o.setValue(unitize(o.getValue() + inc));
+//
+//                o.setValue(f);
+//
+////                else {
+////                    //no change
+////                    return null;
+////                }
+//
+//
+//                return $.t(o.floatValue(), d.conf());
+//            }
+//
+//            return null;
+//
+//
+//        });
 
         in.resolution(resolution);
 

@@ -40,7 +40,7 @@ public class MetaAgent extends NAgent {
 
         actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 
-//        float dur = nar.time.dur();
+//        int dur = nar.dur();
 //        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),
 //                 Math.max(1,dur *0.5f) /* 0 might cause problems with temporal truthpolation, examine */,
 //                dur * 2f /* multiple of the originl duration of the input NAR */);

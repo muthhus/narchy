@@ -3,9 +3,13 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.impl.HijackBag;
+import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
+import jcog.math.RecycledSummaryStatistics;
+import jcog.meter.event.FloatGuage;
+import jcog.meter.event.PeriodMeter;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -15,6 +19,9 @@ import nars.concept.Concept;
 import nars.derive.Deriver;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.apache.commons.math3.stat.StatUtils;
+import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -134,7 +141,46 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
 
     }
 
-    public DefaultConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+    public static class ThrottledConceptBagControl extends BufferedConceptBagControl {
+
+        final static int WINDOW_SIZE = 16;
+        final PeriodMeter timing = new PeriodMeter("", WINDOW_SIZE);
+
+        public final FloatParam fps = new FloatParam();
+        long lastCycle;
+
+        public ThrottledConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder, float fps) {
+            super(nar, conceptBag, premiseBuilder);
+            this.fps.setValue(fps);
+            lastCycle = System.nanoTime();
+        }
+
+        public float actualFPS() {
+            double meanNS = timing.mean();
+            double fps = 1E9/meanNS;
+            return (float)fps;
+        }
+
+
+        @Override
+        protected void cycle() {
+            super.cycle();
+            long end = System.nanoTime();
+
+            timing.hit(end-lastCycle);
+
+
+            //System.out.println(this + " actualFPS = " + actualFPS()  + ", target=" + fps.floatValue());
+
+
+            lastCycle = end;
+
+        }
+
+    }
+
+
+        public DefaultConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
         super(nar, conceptBag, premiseBuilder);
 
         this.conceptsFiredPerCycle = new MutableInteger(1);

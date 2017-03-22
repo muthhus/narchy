@@ -19,7 +19,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     private final NAR nar;
     private float maxConceptPriority;
     private long now;
-    float dur;
+    int dur;
 
     public CameraSensorView(Sensor2D cam, NAR nar) {
         super(cam.width, cam.height);

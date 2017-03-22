@@ -194,7 +194,7 @@ public class CompoundConcept implements Concept, Termlike {
         int polarity = 0;
 
         Time time = nar.time;
-        float dur = time.dur();
+        int dur = time.dur();
         long now = time.time();
         if (input.isBelief()) {
             //compare against the current goal state

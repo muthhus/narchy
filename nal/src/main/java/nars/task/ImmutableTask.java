@@ -192,7 +192,7 @@ public class ImmutableTask extends RawBudget implements Task {
 
 
     @Override
-    public float evi(long when, float dur) {
+    public float evi(long when, int dur) {
 
         Truth t = truth();
         long a = start();
@@ -270,7 +270,7 @@ public class ImmutableTask extends RawBudget implements Task {
     }
 
     @Nullable
-    public Task project(long newStart, float dur, float confMin) {
+    public Task project(long newStart, int dur, float confMin) {
         float newConf = conf(newStart, dur);
         if (newConf < confMin)
             return null;

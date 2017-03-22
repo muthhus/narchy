@@ -66,7 +66,7 @@ public class RevectionTest {
     @Test
     public void testPolation1() throws Narsese.NarseseException {
 
-        float dur = 1;
+        int dur = 1;
 
         Task a = t(1f, 0.5f, 3).evidence(1).apply(n);
         Task b = t(0f, 0.5f, 6).evidence(2).apply(n);

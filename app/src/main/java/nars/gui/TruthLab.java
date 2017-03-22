@@ -153,7 +153,7 @@ public class TruthLab extends Grid {
         }
     }
 
-    private final float dur = 1;
+    private final int dur = 1;
 
     class BeliefTableTimeline extends TruthTimeline {
 

@@ -12,32 +12,25 @@ public class FrameTime implements Time {
     long t;
     int dt;
 
-    float dur;
+    int dur;
 
-    public FrameTime() {
-        this(1);
-    }
 
-    public FrameTime(float dur) {
-        this(1, dur);
-    }
-
-    public FrameTime(int dt) {
-        this(dt, 1f);
-    }
-
-    public FrameTime(int dt, float dur) {
+    FrameTime(int dt, int dur) {
         this.dt = dt;
         this.dur = dur;
     }
 
+    public FrameTime() {
+        this(1, 1);
+    }
+
     @Override
-    public float dur() {
+    public int dur() {
         return dur;
     }
 
     @Override
-    public FrameTime dur(float d) {
+    public FrameTime dur(int d) {
         this.dur = d;
         return this;
     }

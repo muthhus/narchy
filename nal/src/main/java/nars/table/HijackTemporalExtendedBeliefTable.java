@@ -30,7 +30,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
 
 
     @Override
-    public @Nullable Task match(long when, long now, float dur, @Nullable Task against) {
+    public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
         Task t = super.match(when, now, dur, against);
         Task h = matchHistory(when);
         if (h != null) {
@@ -50,7 +50,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     }
 
     @Override
-    public @Nullable Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
+    public @Nullable Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
         Truth t = super.truth(when, now, dur, eternal);
         Task h = matchHistory(when);
         if (h != null) {

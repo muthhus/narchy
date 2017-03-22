@@ -619,7 +619,7 @@
 //    //    private boolean presentJudgments = false;
 //    //
 //    //    /** how much to scale the memory's duration parameter for this reasoner's "now" duration; default=1.0 */
-//    //    float durationMultiplier = 1.0f;
+//    //    int durationMultiplier = 1.0f;
 //    //
 //    //    /** how often to remove temporally irrelevant beliefs */
 //    //    @Deprecated float forgetCyclePeriod; ///TODO use a Map<Long,belief> indexed by expiration time, so they can be removed efficiently
@@ -1032,7 +1032,7 @@
 //    //        float freq = 1.0f;
 //    //        float conf = Global.DEFAULT_JUDGMENT_CONFIDENCE;
 //    //        float priority = Global.DEFAULT_JUDGMENT_PRIORITY;
-//    //        float durability = Global.DEFAULT_JUDGMENT_DURABILITY;
+//    //        int durability = Global.DEFAULT_JUDGMENT_DURABILITY;
 //    //        Tense tense = question.isEternal() ? Tense.Eternal : Tense.Present;
 //    //
 //    //        //TODO use derivation of prolog result to create a correct stamp

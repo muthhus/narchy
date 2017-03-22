@@ -122,7 +122,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this;
     }
 
-//    public Task desire(@Nullable Truth t, float pri, float dur) {
+//    public Task desire(@Nullable Truth t, float pri, int dur) {
 //        if (this.desire==null || !this.desire.truth().equals(t)) {
 //            if (this.desire != null) {
 //                this.desire.delete(nar);

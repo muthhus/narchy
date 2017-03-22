@@ -56,12 +56,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, long now, float dur, Task question, Compound template, boolean noOverlap) {
+        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap) {
             return null;
         }
 
         @Override
-        public @Nullable Task match(long when, long now, float dur) {
+        public @Nullable Task match(long when, long now, int dur) {
             return null;
         }
 
@@ -72,7 +72,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, float dur, @NotNull Task question, Compound template, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, NAR nar) {
             return null;
         }
 
@@ -105,14 +105,14 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public float freq(long when, float dur) {
+        public float freq(long when, int dur) {
             return Float.NaN;
         }
 
 
         @Nullable
         @Override
-        public Truth truth(long when, long now, float dur) {
+        public Truth truth(long when, long now, int dur) {
             return null;
         }
 
@@ -157,19 +157,19 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     @Nullable Task add(@NotNull Task input, @NotNull QuestionTable questions, TaskConcept concept, @NotNull NAR nar);
 
 
-    default @Nullable Task match(long when, long now, float dur, @Nullable Task against, boolean noOverlap) {
+    default @Nullable Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap) {
         return match(when, now, dur, against, null, noOverlap);
     }
 
-    default Task match(long when, long now, float dur, Task question, @Nullable Compound template, boolean noOverlap) {
+    default Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap) {
         return match(now, now, dur);
     }
 
-    @Nullable default Task match(long when, long now, float dur) {
+    @Nullable default Task match(long when, long now, int dur) {
         return match(when, now, dur, null, true);
     }
 
-    @Nullable default Task match(long when, float dur) {
+    @Nullable default Task match(long when, int dur) {
         return match(when, when, dur);
     }
 
@@ -203,26 +203,26 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      * estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available
      */
-    @Nullable Truth truth(long when, long now, float dur);
+    @Nullable Truth truth(long when, long now, int dur);
 
 
     @Nullable
-    default Truth truth(long when, float dur) {
+    default Truth truth(long when, int dur) {
         return truth(when, when, dur);
     }
 
 
-    default float expectation(long when, float dur) {
+    default float expectation(long when, int dur) {
         Truth t = truth(when, dur);
         return t != null ? t.expectation() : 0.5f;
     }
 
-    default float motivation(long when, float dur) {
+    default float motivation(long when, int dur) {
         Truth t = truth(when, dur);
         return t != null ? t.motivation() : 0;
     }
 
-    default float freq(long when, float dur) {
+    default float freq(long when, int dur) {
         Truth t = truth(when, dur);
         return t != null ? t.freq() : Float.NaN;
     }
@@ -234,7 +234,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
 
-    default Task answer(long when, long now, float dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
         Task answer = match(when, now, dur, question, template, false);
         if (answer == null || answer.isDeleted())
@@ -416,8 +416,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 //            if (!Temporal.isEternal(t.getOccurrenceTime())) {
 //
 //                final long now = concept.getMemory().time();
-//                float dur = t.getDuration();
-//                float durationsToNow = Math.abs(t.getOccurrenceTime() - now) / dur;
+//                int dur = t.getDuration();
+//                int durationsToNow = Math.abs(t.getOccurrenceTime() - now) / dur;
 //
 //
 //                //float agePenalty = (1f - 1f / (1f + (durationsToNow / relevanceWindow))) * temporalityFactor;

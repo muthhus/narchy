@@ -64,7 +64,7 @@ public final class BudgetFunctions extends UtilityFunctions {
     // final Truth tTruth = task.getTruth();
     // final float dif = tTruth.getExpDifAbs(bTruth);
     // final float priority = or(dif, task.getPriority());
-    // final float durability = aveAri(dif, task.getDurability());
+    // final int durability = aveAri(dif, task.getDurability());
     // final float quality = truthToQuality(bTruth);
     // return new Budget(priority, durability, quality);
     // }

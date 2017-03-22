@@ -142,7 +142,7 @@ public class Outputs {
 
         a.nar.onCycle(nn -> {
             long now = nar.time();
-            float dur = nar.time.dur();
+            int dur = nar.dur();
             out.forEach((cc, nnn) -> {
 
                 Truth t =

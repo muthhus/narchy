@@ -54,7 +54,7 @@ abstract public class PremiseBuilder {
 
         Task belief = null;
 
-        float dur = nar.time.dur();
+        int dur = nar.dur();
 
 
 

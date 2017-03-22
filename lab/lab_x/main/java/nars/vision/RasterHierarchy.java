@@ -411,7 +411,7 @@ public class RasterHierarchy extends JPanel {
 
     protected void input(int x, int y, float pixelWidth, float pixelHeight, float grayness) {
         float pri = 0.5f;
-        float dur = 0.25f;
+        int dur = 0.25f;
         float conf = 1.0f / (Math.max(pixelWidth, pixelHeight));
 
         //coordinate calculation #1: relative to focus point center

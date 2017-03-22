@@ -571,7 +571,7 @@
 ////
 ////        float linkMinLow = 4, linkMaxLow = 8, linkMinHigh = 16, linkMaxHigh = 32;
 ////        float confMinMin = 0.15f, confMinMax = 0.05f;
-////        float durMinMin = 0.1f, durMinMax = Param.BUDGET_EPSILON * 4f;
+////        int durMinMin = 0.1f, durMinMax = Param.BUDGET_EPSILON * 4f;
 ////
 ////        public MemoryManager(Default nar) {
 ////

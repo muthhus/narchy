@@ -44,7 +44,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
     Concept cc = null; //cached concept
     float cp = 0; //cached priority
-    private float dur; //cached dur
+    private int dur; //cached dur
     private long now; //cached time
     private String termString; //cached string
 
@@ -111,7 +111,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         }
 
         long now = this.now = nar.time();
-        float dur = this.dur = nar.dur();
+        int dur = this.dur = nar.dur();
 
         cc = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 

@@ -30,7 +30,7 @@ public class DynamicBeliefTableTest {
         n.believe("b:x", 0f, 0.9f);
         n.run(1);
         long now = n.time();
-        float dur = n.time.dur();
+        int dur = n.time.dur();
         assertEquals($.t(1f,0.81f), n.concept($("(a:x && a:y)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("(b:x && a:y)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("(a:x && (--,a:y))"), true).belief(now, dur));
@@ -48,7 +48,7 @@ public class DynamicBeliefTableTest {
         n.believe("z:b", 0f, 0.9f);
         n.run(1);
         long now = n.time();
-        float dur = n.time.dur();
+        int dur = n.time.dur();
         assertTrue(n.concept($("((x|y)-->a)"), true) instanceof DynamicConcept);
         assertEquals($.t(1f,0.81f), n.concept($("((x|y)-->a)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("((x|z)-->a)"), true).belief(now, dur));
@@ -147,7 +147,7 @@ public class DynamicBeliefTableTest {
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"), false);
-        float dur = n.time.dur();
+        int dur = n.time.dur();
 
         Truth t = prod.belief(n.time(), dur);
         System.out.println(t);
@@ -172,7 +172,7 @@ public class DynamicBeliefTableTest {
 
     @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
-        float dur = n.time.dur();
+        int dur = n.time.dur();
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 

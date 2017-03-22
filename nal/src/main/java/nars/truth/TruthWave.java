@@ -51,7 +51,7 @@ public class TruthWave {
     }
 
     /** clears and fills this wave with the data from a table */
-    public void set(@NotNull BeliefTable b, long now, float dur) {
+    public void set(@NotNull BeliefTable b, long now, int dur) {
         int s = b.size();
         if (s == 0) {
             this.current = null;
@@ -115,7 +115,7 @@ public class TruthWave {
 
 
     /** fills the wave with evenly sampled points in a time range */
-    public void project(@NotNull BeliefTable table, float minT, float maxT, float dur, int points) {
+    public void project(@NotNull BeliefTable table, float minT, float maxT, int dur, int points) {
         clear();
 
         if (minT == maxT) {

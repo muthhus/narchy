@@ -103,7 +103,7 @@ public class BeliefTableTest  {
         BeliefTable beliefs = b.concept().beliefs();
 
         assertEquals(0.5, beliefs.matchEternal().conf(), 0.001);
-        float dur = n.time.dur();
+        int dur = n.time.dur();
         assertEquals(0.5, beliefs.match(n.time(), dur).conf(), 0.001);
         assertEquals(1, beliefs.size());
 
@@ -197,7 +197,7 @@ public class BeliefTableTest  {
         assertEquals(0.03f, firstBeliefTruth.freq(), 0.1f);
 
         /* last */
-        float dur = n.time.dur();
+        int dur = n.time.dur();
         @Nullable Truth lastBeliefTruth = table.truth(spacing * (maxBeliefs - 1), dur);
         assertEquals(1f, lastBeliefTruth.freq(), 0.1f);
 

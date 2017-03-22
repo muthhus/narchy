@@ -534,13 +534,13 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return term().dt();
     }
 
-    default float conf(long when, float dur) {
+    default float conf(long when, int dur) {
         float cw = evi(when, dur);
         return cw == cw ? w2c(cw) : Float.NaN;
     }
 
     @Nullable
-    default Truth truth(long when, float dur, float minConf) {
+    default Truth truth(long when, int dur, float minConf) {
         float cw = evi(when, dur);
         if (cw == cw && cw > 0) {
 
@@ -559,7 +559,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
      * @param dur duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
-    float evi(long when, float dur);
+    float evi(long when, int dur);
 
 
     default long mid() {

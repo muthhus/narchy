@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.concept.BeliefActionConcept;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
 
@@ -30,14 +31,39 @@ public class FZero extends NAgentX {
 
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
-        actionTriState($.inh($.the("rot"), $.the("fz")), (dh) -> {
-            switch (dh) {
-                case +1: fz.left = false; fz.right = true; break;
-                case 0: fz.left = fz.right = false; break;
-                case -1: fz.left = true; fz.right = false; break;
+//        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
+//        actionTriState($.inh($.the("rot"), $.the("fz")), (dh) -> {
+//            switch (dh) {
+//                case +1: fz.left = false; fz.right = true; break;
+//                case 0: fz.left = fz.right = false; break;
+//                case -1: fz.left = true; fz.right = false; break;
+//            }
+//        });
+
+        action( new BeliefActionConcept($.inh($.the("fwd"), $.the("fz")), nar, (b) -> {
+            if (b!=null) {
+                float f = b.freq();
+                if (f > 0.75f) {
+                    fz.thrust = true;
+                    return;
+                }
             }
-        });
+            fz.thrust = false;
+        }));
+        action( new BeliefActionConcept($.inh($.the("rot"), $.the("fz")), nar, (b) -> {
+            if (b!=null) {
+                float f = b.freq();
+                if (f > 0.75f) {
+                    fz.left = false; fz.right = true;
+                    return;
+                } else if (f < 0.25f) {
+                    fz.left = true; fz.right = false;
+                    return;
+                }
+            }
+            fz.left = fz.right = false;
+        }));
+
 //        actionBipolar($.inh($.the("rot"), $.the("fz")), (dh) -> {
 //           fz.playerAngle += dh * 2f;
 //           return true;
@@ -74,6 +100,8 @@ public class FZero extends NAgentX {
     }
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        new FZero(NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.1f))).runRT(20f);
+        new FZero(NARBuilder.newMultiThreadNAR(
+                3, new RealTime.DSHalf(true).durSeconds(0.1f), false, 20f))
+                .runRT(0);
     }
 }

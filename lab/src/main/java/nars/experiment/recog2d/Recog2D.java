@@ -154,7 +154,7 @@ public class Recog2D extends NAgentX {
                         float freq, conf;
 
                         long now = nar.time();
-                        float dur = nar.time.dur();
+                        int dur = nar.dur();
 
                         Truth t = c.belief(now, dur);
                         if (t != null) {
@@ -334,7 +334,7 @@ public class Recog2D extends NAgentX {
             if (i == null || i.length!= s)
                 i = new float[s];
             for (int j = 0, insSize = ins.size(); j < insSize; j++) {
-                float b = ins.get(j).beliefFreq(when, 0.5f);
+                float b = ins.get(j).beliefFreq(when, nar.dur(), 0.5f);
                 if (b!=b) //dont input NaN
                     b = 0.5f;
                 i[j] = b;

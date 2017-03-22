@@ -3,6 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
+import nars.control.DefaultConceptBagControl;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -92,9 +93,10 @@ abstract public class NAgentX extends NAgent {
     public static NAR runRT(Function<NAR, NAgent> init, float fps, int durFrames, int endTime) {
 
         Time clock = new RealTime.DSHalf(true).durSeconds(durFrames / fps);
-        NAR nar =
+        Default nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NARBuilder.newMultiThreadNAR(-1, clock, true);
+                NARBuilder.newMultiThreadNAR(-1, clock, true, fps);
+
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
 
@@ -113,7 +115,7 @@ abstract public class NAgentX extends NAgent {
 
     }
 
-    //    public static NAR newAlann(float dur) {
+    //    public static NAR newAlann(int dur) {
 //
 //        NAR nar = NARBuilder.newALANN(new RealTime.CS(true).dur( dur ), 3, 512, 3, 3, 2 );
 //

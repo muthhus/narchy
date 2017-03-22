@@ -31,6 +31,8 @@ import static spacegraph.SpaceGraph.window;
  */
 public class Tetris extends NAgentX implements Bitmap2D {
 
+
+
     //    static final Executioner exe =
 //            //new SingleThreadExecutioner();
 ////            new MultiThreadExecutioner(2, 1024*8);
@@ -43,8 +45,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static final int tetris_height = 12;
 
     public static final int PIXEL_RADIX = 2;
-    static final float DUR = 0.1f;
     public static final float FPS = 30f;
+
+    private static final float DUR = 0.1f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;
@@ -156,7 +159,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //                new MatrixView(tetris_width, tetris_height, (x, y, gl) -> {
 //                    SensorConcept cxy = pixels.concept(x, y);
 //                    long now = this.now;
-//                    float dur = nar.time.dur();
+//                    int dur = nar.dur();
 //                    float b = cxy.beliefFreq(now, dur);
 //                    Truth gg = cxy.goal(now, dur);
 //                    float gp, gn;
@@ -768,7 +771,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     }
 
     public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
-        float dur = nar.time.dur();
+        int dur = nar.dur();
         return (x, y, g) -> {
 //            int rgb = cam.out.getRGB(x,y);
 //            float r = decodeRed(rgb);

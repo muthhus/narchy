@@ -49,7 +49,7 @@ abstract public class DynamicTruthModel {
 
         float confMin = 0; //n.confMin.floatValue();
 
-        float dur = n.time.dur();
+        int dur = n.time.dur();
 
         for (int i = 0; i < inputs.length; i++) {
             @NotNull Term subterm = inputs[i];

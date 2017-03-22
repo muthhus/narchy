@@ -22,7 +22,7 @@ public enum TruthPolation  {
     ;
 
     /** dt > 0 */
-    public static float evidenceDecay(float evi, float dur, float dt) {
+    public static float evidenceDecay(float evi, int dur, float dt) {
 
         return evi * 1f/( 1f + sqr( dt/dur) ); //inverse square
         //return evi * 1f/( 1 + (dt/dur) ); //inverse linear
@@ -37,12 +37,12 @@ public enum TruthPolation  {
     final static float MIN_ILLUMINATION = c2w(TRUTH_EPSILON);
 
     @Nullable
-    public static Truth truth(long when, float dur, @NotNull Task... tasks) {
+    public static Truth truth(long when, int dur, @NotNull Task... tasks) {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
     @Nullable
-    public static Truth truth(@Nullable Task topEternal, long when, float dur, @NotNull Iterable<Task> tasks) {
+    public static Truth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
         float[] illWei = new float[2];
         // Contribution of each sample point to the illumination of the

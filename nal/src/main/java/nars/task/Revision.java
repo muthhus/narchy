@@ -366,7 +366,7 @@ public class Revision {
 //        float priority =
 //                proportion * nBudget.pri();
 //                //or(dif, nBudget.pri());
-//        float durability =
+//        int durability =
 //                //aveAri(dif, nBudget.dur());
 //                proportion * nBudget.dur();
 //        float quality = BudgetFunctions.truthToQuality(revised);

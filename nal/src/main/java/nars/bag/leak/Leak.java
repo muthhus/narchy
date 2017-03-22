@@ -73,7 +73,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
         if (now == last)
             return; //no time yet
 
-        float durDelta = Math.min(1f, (now - last) / nar.dur()); //limit to one in case of lag
+        float durDelta = Math.min(1f, ((float)(now - last)) / nar.dur()); //limit to one in case of lag
 
         boolean leaked = false;
         //for each full integer = 1 instanceof a 100% prob selection

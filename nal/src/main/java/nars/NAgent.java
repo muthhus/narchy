@@ -254,18 +254,11 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     private Stream<Task> curious() {
-        long now = nar.time();
-        long nowEnd = now + (int) Math.ceil(nar.time.dur());
         return actions.stream().map(action -> {
-            if (nar.random.nextFloat() > curiosityProb.floatValue())
-                return null;
 
-            return goal((Compound) action.term(),
-                $.t(nar.random.nextFloat(),
-                curiosityConf.floatValue()),
-                now,
-                nowEnd
-            );
+            return (nar.random.nextFloat() >= curiosityProb.floatValue()) ?
+                    action.curiosity(curiosityConf.floatValue(), nar) : null;
+
         }).filter(Objects::nonNull);
     }
 
@@ -453,7 +446,7 @@ abstract public class NAgent implements NSense, NAct {
         float horizon = this.predictTime.floatValue();
 
         //long frameDelta = now-prev;
-        float dur = nar.time.dur();
+        int dur = nar.dur();
         int num = predictors.size();
 
         float pp =  predictorProbability.floatValue();
@@ -492,7 +485,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    private Task boost(@NotNull Task t, float dur, float horizon /* in multiples of dur */) {
+    private Task boost(@NotNull Task t, int dur, float horizon /* in multiples of dur */) {
 
 
         Task result;

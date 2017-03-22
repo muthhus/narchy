@@ -74,7 +74,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //
 //                    Time time = nar.time;
 //
-//                    float dur = time.dur();
+//                    int dur = time.dur();
 //                    long now = time.time();
 //
 //                    float confMin = nar.confMin.floatValue();
@@ -159,7 +159,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //
 //            Time time = nar.time;
 //            long now = time.time();
-//            float dur = time.dur();
+//            int dur = time.dur();
 //
 //            before = truth(now, dur, eternal, l);
 //
@@ -262,7 +262,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //
 //    }
 
-//    public float duration() {
+//    public int duration() {
 //        //return (((float)range()) / size()) * 2f;
 //        return 1f;
 //    }
@@ -317,15 +317,15 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
-    static private Function<Task, Float> temporalConfidence(long when, long now, float dur) {
+    static private Function<Task, Float> temporalConfidence(long when, long now, int dur) {
         return x -> rankTemporalByConfidence(x, when, now, dur);
     }
 
-//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, float dur) {
+//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
 //        return x -> rankTemporalByConfidence(x, when, now, dur);
 //    }
 
-    static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, float dur) {
+    static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, int dur) {
 
         if (t == null)
             return Float.NEGATIVE_INFINITY;
@@ -341,7 +341,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         return r;
     }
 
-    @Nullable static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, float dur) {
+    @Nullable static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
         return l.maxBy(Float.NEGATIVE_INFINITY, rankMatchMerge(toMergeWith, now, dur));
     }
 
@@ -349,7 +349,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
      * max value given to the ideal match for the provided task to be merged with
      */
     @NotNull
-    static public FloatFunction<Task> rankMatchMerge(@NotNull Task y, long now, float dur) {
+    static public FloatFunction<Task> rankMatchMerge(@NotNull Task y, long now, int dur) {
 
         //prefer
         //  same frequency
@@ -394,7 +394,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     /**
      * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
      */
-    protected Task compress(@Nullable Task input, long now, FasterList<Task> l, float dur, float confMin) {
+    protected Task compress(@Nullable Task input, long now, FasterList<Task> l, int dur, float confMin) {
 
         int cap = capacity();
 
@@ -458,7 +458,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     /**
      * t is the target time of the new merged task
      */
-    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, float dur) {
+    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, int dur) {
 
 
         Interval ai = new Interval( a.start() , a.end() );
@@ -504,7 +504,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Nullable
     @Override
-    public Task match(long when, long now, float dur, @Nullable Task against) {
+    public Task match(long when, long now, int dur, @Nullable Task against) {
         Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), this);
 
         Task a = s.a;
@@ -516,7 +516,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Nullable
     @Override
-    public Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
+    public Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
 
         return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, this);
         //return Truth.maxConf(r, topEternal);
@@ -625,7 +625,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 ////            if (t < mintime)
 ////                mintime = t;
 ////        }
-////        float dur = 1f/(1f + (maxtime - mintime));
+////        int dur = 1f/(1f + (maxtime - mintime));
 //
 //
 //        long mdt = Long.MAX_VALUE;

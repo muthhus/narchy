@@ -380,7 +380,7 @@ public class Vis {
     public static class ConceptBagChart extends BagChart<Concept> implements Consumer<NAR> {
 
         long now;
-        float dur;
+        int dur;
         final NAR nar;
 
         public ConceptBagChart(Bag<Concept, PLink<Concept>> b, int count, NAR nar) {
@@ -526,7 +526,7 @@ public class Vis {
         @Override
         public void accept(NAR nar) {
             long now = nar.time();
-            float dur = nar.dur();
+            int dur = nar.dur();
             btRange[0] = now - (long) Math.ceil(window * dur);
             btRange[1] = now + (long) Math.ceil(window * dur);
         }

@@ -19,7 +19,7 @@ public abstract class RealTime implements Time {
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000; //???
 
     final AtomicLong nextStamp = new AtomicLong(1);
-    private float dur = 1;
+    private int dur = 1;
 
 
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {
@@ -90,7 +90,7 @@ public abstract class RealTime implements Time {
     }
 
     @Override
-    public Time dur(float cycles) {
+    public Time dur(int cycles) {
         this.dur = cycles;
         return this;
     }
@@ -101,7 +101,7 @@ public abstract class RealTime implements Time {
 
 
     @Override
-    public float dur() {
+    public int dur() {
         return dur;
     }
 
