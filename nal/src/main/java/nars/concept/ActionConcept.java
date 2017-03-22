@@ -88,7 +88,6 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
         long now = nar.time();
 
-
         long then = now + decisionDT;
 
         Truth tdb, tdg;
@@ -144,7 +143,10 @@ public class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
 
         if (currentFeedback!=null) {
-            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback, Math.round(nar.time()-dur), nar.time(), nar.time.nextStamp());
+            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
+                    now,
+                    Math.round(now + dur),
+                    nar.time.nextStamp());
             s.budget(nar);
             return s;
         } else {

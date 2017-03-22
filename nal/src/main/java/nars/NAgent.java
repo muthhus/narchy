@@ -118,8 +118,18 @@ abstract public class NAgent implements NSense, NAct {
                 id == null ? p("happy") : $.inh(id, $.the("happy")),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
+
                 (x) -> t(x, alpha())
-        ) {
+
+                /*(x) -> {
+                    if (x > 0.5f + Param.TRUTH_EPSILON) {
+                        return t(1f, alpha() * (x - 0.5f) * 2f);
+                    } else if (x < 0.5f - Param.TRUTH_EPSILON) {
+                        return t(0f, alpha() * (0.5f - x) * 2f);
+                    } else {
+                        return t(0.5f, alpha());
+                    }
+                }*/) {
             @Override
             public EternalTable newEternalTable(int eCap) {
                 return new EternalTable(1); //for storing the eternal happiness goal

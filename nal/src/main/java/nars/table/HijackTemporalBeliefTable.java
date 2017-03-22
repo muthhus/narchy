@@ -126,6 +126,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         //return hijackGreedy(incomingPri, pri(existing));
     }
 
+    @Override
+    public float pri(@NotNull Task t) {
+        return (1f + t.priSafe(0)) * (1f + t.conf());
+    }
+
     @Nullable
     @Override
     public final Task add(@NotNull Task input, @Deprecated EternalTable eternal, @Deprecated Concept concept, @NotNull NAR nar) {
