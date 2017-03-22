@@ -44,24 +44,22 @@ public enum TruthPolation  {
     @Nullable
     public static Truth truth(@Nullable Task topEternal, long when, float dur, @NotNull Iterable<Task> tasks) {
 
-        float weightedValue = 0, illumination = 0;
+        float[] illWei = new float[2];
+        // Contribution of each sample point to the illumination of the
+        // microsphere's facets.
+        // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
+        tasks.forEach(t -> {
+            if (t instanceof DynamicBeliefTask)
+                return; //ignore dynamic belief tasks
 
-
-        {
-
-            // Contribution of each sample point to the illumination of the
-            // microsphere's facets.
-            for (Task t : tasks) {
-                if (t instanceof DynamicBeliefTask)
-                    continue; //ignore dynamic belief tasks
-
-                float tw = t.evi(when, dur);
-                if (tw > 0) {
-                    illumination += tw;
-                    weightedValue += tw * t.freq();
-                }
+            float tw = t.evi(when, dur);
+            if (tw > 0) {
+                illWei[0] += tw;
+                illWei[1] += tw * t.freq();
             }
-        }
+        });
+        float illumination = illWei[0];
+        float weightedValue = illWei[1];
 
         if (topEternal!=null) {
             float ew = topEternal.evi();

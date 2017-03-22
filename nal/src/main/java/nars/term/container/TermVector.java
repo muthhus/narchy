@@ -88,8 +88,8 @@ public abstract class TermVector implements TermContainer {
 
 
     @NotNull
-    public static TermVector the(@NotNull Term x, @NotNull Term y) {
-        return new TermVector2(x, y);
+    public static TermVector the2(@NotNull Term[] xy) {
+        return new TermVector2(xy);
     }
 
 
@@ -101,7 +101,7 @@ public abstract class TermVector implements TermContainer {
             case 1:
                 return the(t[0]);
             case 2:
-                return the(t[0], t[1]);
+                return the2(t);
             default:
                 return new ArrayTermVector(t);
         }

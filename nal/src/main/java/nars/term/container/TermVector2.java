@@ -14,10 +14,12 @@ public final class TermVector2 extends TermVector {
 
     public final Term x, y;
 
-    public TermVector2(Term x, Term y) {
-        super(x, y);
-        this.x = x;
-        this.y = y;
+    /** uses an array argument so that the input array can be used directly without needing to create a new one when it calls the superclass constructor */
+    public TermVector2(Term... xy) {
+        super(xy);
+        assert(xy.length == 2);
+        this.x = xy[0];
+        this.y = xy[1];
     }
 
     @NotNull

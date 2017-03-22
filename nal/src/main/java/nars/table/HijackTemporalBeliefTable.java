@@ -1,9 +1,6 @@
 package nars.table;
 
-import jcog.bag.Bag;
-import jcog.bag.impl.HijackBag;
 import jcog.list.FasterList;
-import jcog.list.MultiRWFasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
@@ -15,11 +12,8 @@ import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.TruthPolation;
-import nars.time.Time;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
-import nars.util.signal.ScalarSignal;
 import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -27,9 +21,7 @@ import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
@@ -525,13 +517,10 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Nullable
     @Override
     public Truth truth(long when, long now, float dur, @Nullable EternalTable eternal) {
-        return truth(when, dur, eternal, this);
+
+        return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, this);
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;
-    }
-
-    @Nullable Truth truth(long when, float dur, @Nullable EternalTable eternal, Iterable<Task> l) {
-        return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, l);
     }
 
     final boolean clean(MutableList<Task> l) {
