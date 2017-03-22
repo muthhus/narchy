@@ -505,6 +505,8 @@ public class Vis {
         long[] btRange;
 
         public BeliefChartsGrid(Iterable<?> ii, NAR nar, float window) {
+            super(VERTICAL);
+
             btRange = new long[2];
             this.window = window;
 

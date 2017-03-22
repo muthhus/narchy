@@ -87,8 +87,8 @@ public class Grid extends Layout {
             return;
 
         float a = gridAspect;
-        if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
-            a = 0; //use linear layout for small n
+//        if ((n < 3) && !((a==0) || (a == Float.POSITIVE_INFINITY)))
+//            a = 0; //use linear layout for small n
 
 
         float aa = a;
@@ -97,6 +97,8 @@ public class Grid extends Layout {
 
             //determine the ideal rows and columns of the grid to match the visible aspect ratio
             //in a way that keeps each grid cell as close to 1:1 as possible
+
+            //TODO use the 'a' value to adjust the x/y balance, currently it is not
 
             float actualAspect = lh/lw;
 

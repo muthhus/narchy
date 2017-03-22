@@ -1,7 +1,6 @@
 package nars;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import jcog.data.FloatParam;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -85,9 +85,11 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * action exploration rate; analogous to epsilon in QLearning
      */
-    public final FloatParam curiosity;
+    public final FloatParam curiosityConf;
+    public final FloatParam curiosityProb;
 
-    public final List<Tasked> predictors = newArrayList();
+    public final List<Task> predictors = newArrayList();
+
 
 
     public boolean trace = false;
@@ -137,7 +139,8 @@ abstract public class NAgent implements NSense, NAct {
         };
         happy.pri(ambition);
 
-        curiosity = new FloatParam(nar.confMin.floatValue() * 1);
+        curiosityConf = new FloatParam(nar.confMin.floatValue() * 1);
+        curiosityProb = new FloatParam(0.5f);
     }
 
     @NotNull
@@ -231,7 +234,9 @@ abstract public class NAgent implements NSense, NAct {
                     actions.stream()
                 ).map(f -> f.apply(nar)),
 
-                predict()
+                predict(),
+
+                curious()
 
             ),
 
@@ -246,6 +251,22 @@ abstract public class NAgent implements NSense, NAct {
 
         if (trace)
             logger.info(summary());
+    }
+
+    private Stream<Task> curious() {
+        long now = nar.time();
+        long nowEnd = now + (int) Math.ceil(nar.time.dur());
+        return actions.stream().map(action -> {
+            if (nar.random.nextFloat() > curiosityProb.floatValue())
+                return null;
+
+            return goal((Compound) action.term(),
+                $.t(nar.random.nextFloat(),
+                curiosityConf.floatValue()),
+                now,
+                nowEnd
+            );
+        }).filter(Objects::nonNull);
     }
 
 
@@ -317,15 +338,6 @@ abstract public class NAgent implements NSense, NAct {
 
         for (Concept a : actions) {
             Term action = a.term();
-
-
-
-
-
-            ((FasterList<Tasked>) predictors).addAll(
-                () -> goal((Compound) action.term(), $.t(nar.random.nextFloat(), curiosity.floatValue()), nar.time(), nar.time() + (int) Math.ceil(nar.time.dur()))
-            );
-
 
             ((FasterList) predictors).addAll(
 

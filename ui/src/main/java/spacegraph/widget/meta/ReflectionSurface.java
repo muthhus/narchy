@@ -25,6 +25,7 @@ public class ReflectionSurface<X> extends Grid {
     private final X x;
 
     public ReflectionSurface(@NotNull X x) {
+        super();
         this.x = x;
 
         List<Surface> l = new FasterList();
@@ -47,7 +48,7 @@ public class ReflectionSurface<X> extends Grid {
                     if (y instanceof FloatParam) {
                         FloatParam p = (FloatParam) y;
                         //l.add(new LabeledPane(k, new FloatSlider(p)));
-                        l.add(col(new Label(k), new FloatSlider(p)));
+                        l.add(new MyFloatSlider(p, k));
                     } else if (y instanceof AtomicBoolean) {
                         l.add(new CheckBox(k, (AtomicBoolean) y));
                     } else if (y instanceof MutableBoolean) {
@@ -62,5 +63,19 @@ public class ReflectionSurface<X> extends Grid {
             }
         }
         set(l);
+    }
+
+    private static class MyFloatSlider extends FloatSlider {
+        private final String k;
+
+        public MyFloatSlider(FloatParam p, String k) {
+            super(p);
+            this.k = k;
+        }
+
+        @Override
+        public String labelText() {
+            return k + "=" + super.labelText();
+        }
     }
 }

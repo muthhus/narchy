@@ -734,7 +734,7 @@ public enum Draw {
     }
 
     public static void colorHash(int hash, float[] color, float sat, float bri, float alpha) {
-        Draw.hsb(Math.abs(hash%500) / 500f * 360.0f, sat, bri, alpha, color);
+        Draw.hsb((Math.abs(hash)%500) / 500f * 360.0f, sat, bri, alpha, color);
     }
     public static void colorHash(int hash, float[] color, float alpha) {
         colorHash(hash, color, 0.7f, 0.7f, alpha);

@@ -1,17 +1,13 @@
 package nars.test.agent;
 
 import jcog.list.FasterList;
-import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.op.Command;
-import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import nars.time.Tense;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -228,7 +224,7 @@ public class Line1DSimplestTest {
 
         //a.trace = true;
         a.init();
-        a.curiosity.setValue(0.25);
+        a.curiosityConf.setValue(0.25);
         //a.predictorProbability = 1.0f;
 
 

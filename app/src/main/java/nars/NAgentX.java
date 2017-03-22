@@ -176,7 +176,8 @@ abstract public class NAgentX extends NAgent {
                         return tc;
                     }),
                             //"tasks", ()-> taskChart,
-                    new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar, 32, 4).show(500,500) )
+                    new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar,
+                            64, 6) )
                 )
             ), 600, 400);
         });

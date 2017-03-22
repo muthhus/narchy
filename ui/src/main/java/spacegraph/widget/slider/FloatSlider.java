@@ -55,9 +55,13 @@ public class FloatSlider extends BaseSlider {
 
 //        gl.glLineWidth(1f);
 //        gl.glColor3f(1, 1, 1);
-        this.label.set( Texts.n2(value()) );
+        this.label.set(labelText());
 //        Draw.text(gl, label, 0.5f / label.length(), 0.5f, 0.5f, 0);
 
+    }
+
+    public String labelText() {
+        return Texts.n2(value());
     }
 
     @Override

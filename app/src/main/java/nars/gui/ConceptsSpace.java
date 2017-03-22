@@ -22,17 +22,16 @@ import static nars.test.DeductiveChainTest.inh;
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
+    public static final float UPDATE_RATE = 0.5f;
     public final NAR nar;
-    private final int maxNodes;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
 
     public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNode) {
         super(nar);
         this.nar = nar;
-        this.maxNodes = maxNodes;
         this.maxEdgesPerNode = maxEdgesPerNode;
-        bag = new Bagregate<Concept>(Iterables.transform(nar.conceptsActive(), Supplier::get), maxNodes, 0.5f) {
+        bag = new Bagregate<Concept>(Iterables.transform(nar.conceptsActive(), Supplier::get), maxNodes, UPDATE_RATE) {
             @Override
             protected boolean include(Concept x) {
                 return display(x.term());

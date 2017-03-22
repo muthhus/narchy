@@ -37,17 +37,16 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     private transient ConceptsSpace space;
 
 
-
     public ConceptWidget(NAR nar, Termed x, int numEdges) {
-        super(x.term(),1, 1);
+        super(x.term(), 1, 1);
 
         setFront(
 //            /*col(
-                    //new Label(x.toString())
+                //new Label(x.toString())
 //                row(new FloatSlider( 0, 0, 4 ), new BeliefTableChart(nar, x))
 //                    //new CheckBox("?")
 //            )*/
-            new ConceptIcon(nar, x)
+                new ConceptIcon(nar, x)
         );
 
 //        final PushButton icon = new PushButton(x.toString(), (z) -> {
@@ -60,14 +59,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
                 new PLinkHijackBag(numEdges, 4, nar.random);
-            //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
+        //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
 //        for (int i = 0; i < edges; i++)
 //            this.edges.add(new EDraw());
 
     }
-
 
 
     @Override
@@ -96,16 +94,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     @Override
     public void delete() {
         super.delete();
-        if (concept!=null) {
-            edges.clear();
-            concept = null;
-        }
+        edges.clear();
+        concept = null;
     }
 
 
-    @Override public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
+    @Override
+    public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
         Surface s = super.onTouch(body, hitPoint, buttons, space);
-        if (s!=null) {
+        if (s != null) {
 
         }
         return s;
@@ -115,19 +112,35 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         this.space = space;
 
+
+        edges.forEach(x -> {
+            if (null==space.space.getIfActive(x.get().term())) {
+                //the target of this edge has disappeared
+                x.delete();
+            } else {
+                x.get().clear();
+            }
+        });
+
         edges.commit();
-        edges.forEachKey(TermEdge::clear);
 
         Concept c = concept;
 
-        //phase 1: collect
-        c.tasklinks().forEach(this);
-        c.termlinks().forEach(this);
+        if (c != null) {
 
-        edges.forEach(ff -> ff.get().update(ff));
 
-        conceptVis.apply(this, key);
 
+            //phase 1: collect
+            c.tasklinks().forEach(this);
+            c.termlinks().forEach(this);
+
+            edges.forEach(ff -> ff.get().update(ff));
+
+            conceptVis.apply(this, key);
+
+        } else {
+            hide();
+        }
 
 //            float lastConceptForget = instance.getLastForgetTime();
 //            if (lastConceptForget != lastConceptForget)
@@ -200,25 +213,27 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         float width = e.width;// * radius();
         if (width <= 0.1f) {
-            Draw.renderLineEdge(gl, this, e, width );
+            Draw.renderLineEdge(gl, this, e, width);
         } else {
             Draw.renderHalfTriEdge(gl, this, e, width / 9f, e.r * 2f /* hack */);
         }
     }
 
-    @Override public void accept(BLink<? extends Termed> tgt) {
+    @Override
+    public void accept(BLink<? extends Termed> tgt) {
+        float pri = tgt.priSafe(-1);
+        if (pri < 0)
+            return;
+
         Termed ttt = tgt.get();
         Term tt = ttt.term();
         if (!tt.equals(key)) {
             ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
-            if (at!=null) {
+            if (at != null) {
 
                 TermEdge ate = new TermEdge(at);
                 ate.add(tgt, !(ttt instanceof Task));
-
-                edges.put(new RawPLink(ate, tgt.pri()));
-
-
+                edges.put(new RawPLink(ate, pri));
 
             }
         }
@@ -230,7 +245,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         return this;
     }
 
-    public static class TermEdge extends EDraw<Term,ConceptWidget> implements Termed {
+    public static class TermEdge extends EDraw<Term, ConceptWidget> implements Termed {
 
         float termlinkPri, tasklinkPri;
 
@@ -246,7 +261,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         }
 
         public void add(BLink b, boolean termOrTask) {
-            float p = b.pri();
+            float p = b.priSafe(0);
             if (termOrTask) {
                 termlinkPri += p;
             } else {
@@ -288,7 +303,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 //                    qEst = 0f;
 
 
-
                 if (priSum > 0) {
                     this.b = 0.1f;
                     this.r = 0.1f + 0.85f * (tasklinkPri / priSum);
@@ -299,15 +313,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
                 //this.a = 0.1f + 0.5f * pri;
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
-                    0.1f + 0.9f * ff.pri(); //0.9f;
+                        0.1f + 0.9f * ff.pri(); //0.9f;
 
                 this.attraction = 1f + 24f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
-                this.a = 0;
+                this.a = -1;
                 this.attraction = 0;
             }
 
-            this.attractionDist = target.radius()*1.5f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+            this.attractionDist = target.radius() * 1.5f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
     }
 
@@ -334,6 +348,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             Draw.hsb((tt.op().ordinal() / 16f), 0.75f + 0.25f * p, 0.75f, 0.9f, conceptWidget.shapeColor);
         }
     }
+
     public static class ConceptVis2 implements ConceptVis {
 
         final float minSize = 2f;
@@ -359,14 +374,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             conceptWidget.scale(l, w, h);
 
 
-
             float density = 2f;
-            if (conceptWidget.body!=null)
-                conceptWidget.body.setMass(l*w*h*density);
+            if (conceptWidget.body != null)
+                conceptWidget.body.setMass(l * w * h * density);
 
             Draw.hsb(
                     (tt.op().ordinal() / 16f),
-                    0.5f + 0.5f/tt.volume(),
+                    0.5f + 0.5f / tt.volume(),
                     0.3f + 0.2f * p,
                     0.9f, conceptWidget.shapeColor);
         }

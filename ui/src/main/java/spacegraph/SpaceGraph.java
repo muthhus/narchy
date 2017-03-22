@@ -271,9 +271,11 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public static SpaceGraph window(Object o, int w, int h) {
-        /*if (o instanceof JoglSpace) {
-            return window(((JoglSpace)o), w, h);
-        } else */ if (o instanceof Spatial) {
+        if (o instanceof SpaceGraph) {
+            SpaceGraph s = (SpaceGraph) o;
+            s.show(w, h);
+            return s;
+        } else if (o instanceof Spatial) {
             return window(((Spatial)o), w, h);
         } else if (o instanceof Surface) {
             return window(((Surface)o), w, h);

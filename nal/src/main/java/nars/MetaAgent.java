@@ -4,7 +4,6 @@ import jcog.Util;
 
 import static nars.$.func;
 import static nars.$.p;
-import static nars.Op.GOAL;
 
 /**
  * meta-controller of an NAgent
@@ -36,8 +35,8 @@ public class MetaAgent extends NAgent {
 
         actionLerp(p("curi"), (c) -> {
             c = Util.unitize(c);
-            agent.curiosity.setValue(c * nar.confidenceDefault(GOAL));
-        }, -0.02f /* non-zero deadzone */, 0.1f);
+            agent.curiosityConf.setValue(c);
+        }, -0.02f /* non-zero deadzone */, 0.25f);
 
         actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 
