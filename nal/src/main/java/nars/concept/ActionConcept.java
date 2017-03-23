@@ -7,23 +7,38 @@ import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.truth.TruthAccumulator;
 import nars.util.signal.SignalTask;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task> {
+public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
 
     @NotNull
     @Deprecated protected final NAR nar;
 
+    final TruthAccumulator
+            beliefIntegrated = new TruthAccumulator(),
+            goalIntegrated = new TruthAccumulator();
+
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         this.nar = n;
+        n.onCycle(this);
+    }
+
+    @Override
+    public void accept(NAR nar) {
+        long now = nar.time();
+        int dur = nar.dur();
+        beliefIntegrated.add( belief( now, dur ));
+        goalIntegrated.add( goal( now, dur ));
     }
 
     @Override

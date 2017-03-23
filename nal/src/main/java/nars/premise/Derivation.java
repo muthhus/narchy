@@ -229,24 +229,19 @@ public class Derivation extends Unify {
      */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
 
-        int start = now();
-
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
                 throw new RuntimeException("constraints not set");
         }
 
-        boolean finish = eachMatch!=null;
-        this.forEachMatch = eachMatch; //to notify of matches
         matchesRemain = matchesMax;
 
+        this.forEachMatch = eachMatch;
+
+        boolean finish = eachMatch!=null;
         unify(x, y, !finish, finish);
 
         this.forEachMatch = null;
-
-        if (finish) {
-            versioning.revert(start);
-        } //else: allows the set constraints to continue
 
     }
 
@@ -281,8 +276,8 @@ public class Derivation extends Unify {
     }
 
 
-    public void replaceAllXY(@NotNull Unify m) {
-        m.xy.forEachVersioned(this::replaceXY);
+    public boolean replaceAllXY(@NotNull Unify m) {
+        return m.xy.forEachVersioned(this::replaceXY);
     }
 
 

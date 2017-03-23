@@ -11,36 +11,36 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqCom(S,P), time(dtUnionReverse)                     |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neq(S,P), time(dtUnionReverse)                     |- (S ==>+- P), (Belief:Deduction)
         //, Permute:Backward
 
-    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
+    (P ==> M), (S ==> M), neq(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
         //, Permute:Backward
 
-    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neq(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
         //, Permute:Backward
 
-    (P ==> M), (M ==> S), neqCom(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neq(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
         //, Permute:Backward
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent
 
-    (S ==> P), (P ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection)
+    (S ==> P), (P ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Intersection)
 
 //// equivalence-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
     //TODO some of these notEqui and notImplEqui can be removed because the premise is already valid in the same way as the conclusion would be
 
-    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
+    (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtTminB) |- (S <=>+- P), (Belief:Comparison)
 
-    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neqCom(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
+    (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
 
-    (M ==> P), (S <=> M), notImplEqui(S), notEqui(P), neqCom(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
+    (M ==> P), (S <=> M), notImplEqui(S), notEqui(P), neq(S,P), time(dtTminB) |- (S ==>+- P), (Belief:Analogy)
 
-    (P ==> M), (S <=> M), notImplEqui(P), notEqui(S), neqCom(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
+    (P ==> M), (S <=> M), notImplEqui(P), notEqui(S), neq(S,P), time(dtTminB) |- (P ==>+- S), (Belief:Analogy)
 
 
 // Contraposition (structural)
@@ -56,11 +56,11 @@
     //Note: the P && S subterm of the conclusion may get rewritten with appropraite 'dt' as per dtCombinePre/dtCombinePost.
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
-    (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
-        (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
+        (P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
-    (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
-        (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
+    (M ==> P), (M ==> S), neq(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
+        (M ==> P), (M ==> S), neq(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -148,9 +148,9 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     //((&&,A..+) ==> C), M, time(dtTask), neqRec(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), neqCom(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqCom(C,M), notImplEqui(M), notEqui(C)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neq(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 
 
@@ -179,10 +179,10 @@
 //  TODO can these also apply to goals somehow?
 //  TODO negative versions
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neqCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqCom(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neqCom(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
     //(X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (?1 ==>+- Y), (Punctuation:Question)

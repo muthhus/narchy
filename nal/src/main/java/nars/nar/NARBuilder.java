@@ -216,8 +216,8 @@ public interface NARBuilder {
 
         //nar.activationRate.setValue(0.5f);
         nar.quaMin.setValue(0.01f);
-        nar.confMin.setValue(0.005f);
-        nar.truthResolution.setValue(0.01f);
+        nar.confMin.setValue(0.001f);
+        nar.truthResolution.setValue(0.001f);
 
 
         //NARTune tune = new NARTune(nar);

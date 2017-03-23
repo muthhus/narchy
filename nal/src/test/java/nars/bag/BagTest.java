@@ -261,7 +261,7 @@ public class BagTest {
 
         System.out.println(ratioUniform + " " + ratioFlat);
 
-        assertTrue(ratioUniform > 10f); //should be ideally ~10
+        assertTrue(ratioUniform > 8f); //should be ideally ~10
         assertTrue(ratioFlat < 4.5f); //should be ideally ~1
 
     }

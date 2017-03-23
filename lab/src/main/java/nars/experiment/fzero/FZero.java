@@ -81,7 +81,7 @@ public class FZero extends NAgentX {
 
         double distance = fz.vehicleMetrics[0][1];
         double deltaDistance;
-        deltaDistance = (distance - lastDistance) / 40f;
+        deltaDistance = (distance - lastDistance) / 20f;
         if (deltaDistance > 1f) deltaDistance = 1f;
         if (deltaDistance < -1f) deltaDistance = -1f;
 
@@ -101,7 +101,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.DSHalf(true).durSeconds(0.1f), false, 20f))
+                3, new RealTime.DSHalf(true).durSeconds(0.5f), false, 20f))
                 .runRT(0);
     }
 }

@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * Less powerful one-match only unification
  */
-public final class SubUnify extends Unify {
+public class SubUnify extends Unify {
 
     private @Nullable Term xterm;
     private @Nullable Derivation target;
@@ -41,12 +41,21 @@ public final class SubUnify extends Unify {
         if (xterm != null) {
             Subst s;
             if (target != null) {
-                target.replaceAllXY(this);
-                s = target;
+                int start = target.now();
+                if (target.replaceAllXY(this)) {
+                    s = target;
+                } else {
+                    target.revert(start);
+                    s = null; //returns null after decrementing retries
+                }
             } else {
                 s = this;
             }
-            result = transform(xterm, s);
+            if (s == null) {
+                result = null;
+            } else {
+                result = transform(xterm, s);
+            }
         }
 
         return (result == null) && --retries > 0;

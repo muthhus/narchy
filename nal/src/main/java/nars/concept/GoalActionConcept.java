@@ -44,8 +44,7 @@ public class GoalActionConcept extends ActionConcept {
         );
     }
 
-    /** relative temporal delta time for desire/belief prediction */
-    static final int decisionDT = 0;
+
 
 
     private Truth currentFeedback;
@@ -60,36 +59,34 @@ public class GoalActionConcept extends ActionConcept {
     @Override
     public Task apply(NAR nar) {
 
-        long now = nar.time();
 
-        long then = now + decisionDT;
 
-        Truth tdb, tdg;
-        if (Param.ACTION_CONCEPT_LINK_TRUTH) {
-            Truth[] td = linkTruth(then, now, nar.confMin.floatValue());
-            tdb = td[0]; //NOT NECESSARY, SHOULD ONLY RELY ON THE FEEDBACK THIS ACTIONCONCEPT GENERATES ITSELF
-            tdg = td[1];
-        } else {
-            tdb = tdg = null;
-        }
+//        Truth tdb, tdg;
+//        if (Param.ACTION_CONCEPT_LINK_TRUTH) {
+//            Truth[] td = linkTruth(now, now, nar.confMin.floatValue());
+//            tdb = td[0]; //NOT NECESSARY, SHOULD ONLY RELY ON THE FEEDBACK THIS ACTIONCONCEPT GENERATES ITSELF
+//            tdg = td[1];
+//        } else {
+//            tdb = tdg = null;
+//        }
 
-        int dur = nar.dur();
 
-        @Nullable Truth b = this.belief(then, now, dur);
+
+        Truth b = beliefIntegrated.commitSum();
 //        if (tdb != null) {
 //            b = (b != null) ? Revision.revise(b, tdb) : tdb;
 //        }
 
-        @Nullable Truth d = this.goal(then, now, dur);
-        if (tdg!=null) {
-            d = (d != null) ? Revision.revise(d, tdg) : tdg;
-        }
+        Truth g = goalIntegrated.commitSum();
+//        if (tdg!=null) {
+//            g = (g != null) ? Revision.revise(g, tdg) : tdg;
+//        }
 
 
 
-        boolean noDesire = d == null;
-        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !d.equals(lastGoal));
-        lastGoal = d;
+        boolean noDesire = g == null;
+        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !g.equals(lastGoal));
+        lastGoal = g;
 
         boolean noBelief = b == null;
         boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief));
@@ -98,7 +95,7 @@ public class GoalActionConcept extends ActionConcept {
 
         if (goalChange || (updateOnBeliefChange && beliefChange)) {
 
-            Truth f = this.motor.motor(b, d);
+            Truth f = this.motor.motor(b, g);
             if (f!=null) {
                 this.currentFeedback = f; //HACK ignores the conf component
             } else {
@@ -117,9 +114,10 @@ public class GoalActionConcept extends ActionConcept {
 
 
         if (currentFeedback!=null) {
+            long now = nar.time();
             SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
                     now,
-                    Math.round(now + dur),
+                    Math.round(now + nar.dur()),
                     nar.time.nextStamp());
             s.budget(nar);
             return s;

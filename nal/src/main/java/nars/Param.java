@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
-import jcog.data.Range;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
@@ -106,21 +105,21 @@ public abstract class Param  {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 96;
+    public final static int UnificationStackMax = 32;
 
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority
      */
-    public static final int UnificationMatchesMax = 6;
+    public static final int UnificationMatchesMax = 3;
 
 
-    public final static int SubUnificationStackMax = UnificationStackMax/2;
+    public final static int SubUnificationStackMax = UnificationStackMax/8;
     public static final int SubUnificationMatchRetries = UnificationMatchesMax;
 
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components
      */
-    public static final float BUDGET_EPSILON = PLink.DEFAULT_EPSILON;
+    public static final float BUDGET_EPSILON = PLink.EPSILON_DEFAULT;
 
 
 
@@ -162,11 +161,11 @@ public abstract class Param  {
 
 
 
-    /** EXPERIMENTAL  decreasing priority of sibling tasks on temporal task insertion */
-    public static final boolean SIBLING_TEMPORAL_TASK_FEEDBACK = false;
+//    /** EXPERIMENTAL  decreasing priority of sibling tasks on temporal task insertion */
+//    public static final boolean SIBLING_TEMPORAL_TASK_FEEDBACK = false;
 
-    /** EXPERIMENTAL enable/disable dynamic tasklink truth revision */
-    public static final boolean ACTION_CONCEPT_LINK_TRUTH = false;
+//    /** EXPERIMENTAL enable/disable dynamic tasklink truth revision */
+//    public static final boolean ACTION_CONCEPT_LINK_TRUTH = false;
 
 
 

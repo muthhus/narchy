@@ -6,6 +6,7 @@ import nars.Task;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.truth.TruthAccumulator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +19,10 @@ import static nars.Op.BELIEF;
  */
 public class BeliefActionConcept extends ActionConcept {
 
+
+
     private final Consumer<Truth> action;
+
 
     public BeliefActionConcept(@NotNull Compound term, @NotNull NAR n, Consumer<Truth> action) {
         super(term, n);
@@ -32,21 +36,25 @@ public class BeliefActionConcept extends ActionConcept {
 
     @Override
     public Task apply(NAR nar) {
-        long now = nar.time();
-        int dur = nar.dur();
 
-        Truth belief = belief(now, dur);
+        Truth belief = beliefIntegrated.commitAverage();
         action.accept(belief);
 
-        Truth goal = goal(now , dur);
+        Truth goal = goalIntegrated.commitAverage();
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
             Truth t = $.t(goal.freq(), goal.conf() * rate);
-            if (t!=null)
-                return new ImmutableTask(term(), BELIEF, t, now, now, (now+dur), new long[] { nar.time.nextStamp() } );
+            if (t!=null) {
+                long now = nar.time();
+                int dur = nar.dur();
+                return new ImmutableTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
+            }
         }
+
 
         return null;
     }
+
+
 }

@@ -153,12 +153,18 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.compute(x, r)!=null;
     }
 
-    public void forEachVersioned(@NotNull BiConsumer<? super X, ? super Y> each) {
-        map.forEach((x,v)-> {
-           Y y = v.get();
-           if (y!=null)
-               each.accept(x,y);
-        });
+    public boolean forEachVersioned(@NotNull BiPredicate<? super X, ? super Y> each) {
+        Set<Entry<X, Versioned<Y>>> ee = map.entrySet();
+        for (Entry<X, Versioned<Y>> e : ee) {
+            Y y = e.getValue().get();
+            if (y!=null) {
+                X x = e.getKey();
+                if (!each.test(x, y)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 

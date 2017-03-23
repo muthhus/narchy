@@ -39,7 +39,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected float priEpsilon() {
-        return PLink.DEFAULT_EPSILON;
+        return PLink.EPSILON_DEFAULT;
     }
 
     @Override

@@ -158,16 +158,23 @@ public abstract class Unify extends Termunator implements Subst {
             termutes.clear();
         }
 
+        int s = now();
+        boolean result;
         if (unify(x, y)) {
 
             if (finish) {
-                return run(this, null, -1);
+                result = run(this, null, -1);
+            } else {
+                result = true;
             }
-
-            return true;
+        } else {
+            result = false;
         }
 
-        return false;
+        if (finish)
+            revert(s); //else: allows the set constraints to continue
+
+        return result;
     }
 
     @Override
@@ -250,8 +257,10 @@ public abstract class Unify extends Termunator implements Subst {
 
             //return putYX(x, y);
             if (putYX((Variable) y, x)) {
+                int start = now();
                 if (y instanceof CommonVariable) {
                     if (!putXY((Variable) y, x)) {
+                        revert(start);
                         return false;
                     }
                 }
@@ -301,9 +310,11 @@ public abstract class Unify extends Termunator implements Subst {
 
 
     public boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
+        int start = now();
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
                 if (!putYX(x, y)) {
+                    revert(start);
                     return false;
                 }
             }
@@ -315,8 +326,17 @@ public abstract class Unify extends Termunator implements Subst {
 
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
+        int start = now();
         @NotNull Term common = CommonVariable.make((Variable) x, (Variable) y);
-        return putXY(x, common) && putYX(y, common);
+        if (putXY(x, common)) {
+            if (!putYX(y, common)) {
+                revert(start); //undo the first put
+                return false;
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

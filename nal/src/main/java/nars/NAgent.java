@@ -253,13 +253,21 @@ abstract public class NAgent implements NSense, NAct {
             logger.info(summary());
     }
 
-    private Stream<Task> curious() {
+    protected Stream<Task> curious() {
+        float conf = curiosityConf.floatValue();
+        float confMin = nar.confMin.floatValue();
+
         return actions.stream().map(action -> {
 
-            return (nar.random.nextFloat() >= curiosityProb.floatValue()) ?
-                    action.curiosity(curiosityConf.floatValue(), nar) : null;
+            if ((conf >= confMin) && (nar.random.nextFloat() < curiosityProb.floatValue())) {
+                return action.curiosity(conf, nar);
+            }/* else {
+                nar.activate(action, 1f);
+            }*/
+            return null;
 
         }).filter(Objects::nonNull);
+
     }
 
 
