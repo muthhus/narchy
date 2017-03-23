@@ -185,6 +185,33 @@ abstract public class events extends AtomicBoolCondition {
 
 
     @Nullable
+    public static final events lexicalIfEternal = new events() {
+
+        @Override
+        public String toString() {
+            return "lexicalIfEternal";
+        }
+
+        @Override
+        public boolean run(@NotNull Derivation m) {
+
+            /* true if belief is present and both task and belief are eternal */
+            Task b = m.belief;
+            if (b == null) return false;
+
+            long bOcc = b.start();
+            boolean bEternal = (bOcc == ETERNAL);
+
+            long tOcc = m.task.start();
+            boolean tEternal = (tOcc == ETERNAL);
+            return tEternal ? true :
+                    (bEternal || m.task.term().compareTo(b.term()) < 0); //enforce lexical ordering so that the reverse isnt also computed
+
+        }
+    };
+
+
+    @Nullable
     public static final events beforeAfterOrEternal = new events() {
 
         @Override
@@ -220,7 +247,9 @@ abstract public class events extends AtomicBoolCondition {
 
             long tOcc = m.task.start();
             boolean tEternal = (tOcc == ETERNAL);
-            return tEternal ? bEternal : (!bEternal && (bOcc <= tOcc));
+            return tEternal ?
+                    (bEternal && m.task.term().compareTo(b.term()) < 0) : //enforce lexical ordering so that the reverse isnt also computed
+                    (!bEternal && (bOcc <= tOcc));
         }
     };
 //    public static final @Nullable BoolCondition ifTermLinkBefore = new events() {

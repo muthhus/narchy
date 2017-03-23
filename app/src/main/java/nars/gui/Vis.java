@@ -347,7 +347,7 @@ public class Vis {
         return new ReflectionSurface(c);
     }
 
-    private static class MyForceDirected extends ForceDirected {
+    protected static class MyForceDirected extends ForceDirected {
 
 
 

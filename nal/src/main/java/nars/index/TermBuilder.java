@@ -786,6 +786,11 @@ public abstract class TermBuilder {
 
                     case EQUI: {
 
+                        if (dt == XTERNAL) {
+                            //create as-is
+                            return finalize(op, dt, subject, predicate);
+                        }
+
                         if ((dt!=0 && dt!=DTERNAL)) {
                             mustNotEqual = false; //allow repeat
                             if (dt < 0 && subject.equals(predicate)) {

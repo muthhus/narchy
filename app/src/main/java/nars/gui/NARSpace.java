@@ -87,7 +87,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     }
 
     /** override to filter items */
-    protected boolean display(X x) {
+    protected boolean include(X x) {
         return true;
     }
 

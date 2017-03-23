@@ -4,12 +4,14 @@ import com.jogamp.opengl.GL2;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.PLinkHijackBag;
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -23,6 +25,7 @@ import spacegraph.space.EDraw;
 
 import java.util.function.Consumer;
 
+import static nars.util.UtilityFunctions.or;
 import static spacegraph.math.v3.v;
 
 
@@ -108,27 +111,30 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         return s;
     }
 
+    final static Truth zero = $.t(0.5f, 0.01f);
+
     public void commit(ConceptsSpace space) {
 
         this.space = space;
 
 
-        edges.forEach(x -> {
-            if (null==space.space.getIfActive(x.get().term())) {
-                //the target of this edge has disappeared
-                x.delete();
-            } else {
-                x.get().clear();
-            }
-        });
 
-        edges.commit();
 
         Concept c = concept;
 
         if (c != null) {
 
 
+            edges.forEach(x -> {
+                if (null==space.space.getIfActive(x.get().term())) {
+                    //the target of this edge has disappeared
+                    x.delete();
+                } else {
+                    x.get().clear();
+                }
+            });
+
+            edges.commit();
 
             //phase 1: collect
             c.tasklinks().forEach(this);
@@ -139,6 +145,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             conceptVis.apply(this, key);
 
         } else {
+            edges.clear();
             hide();
         }
 
@@ -315,7 +322,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 3f + 8f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 1f + 4f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
@@ -378,11 +385,21 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             if (conceptWidget.body != null)
                 conceptWidget.body.setMass(l * w * h * density);
 
-            Draw.hsb(
-                    (tt.op().ordinal() / 16f),
-                    0.5f + 0.5f / tt.volume(),
-                    0.3f + 0.2f * p,
-                    0.9f, conceptWidget.shapeColor);
+//            Draw.hsb(
+//                    (tt.op().ordinal() / 16f),
+//                    0.5f + 0.5f / tt.volume(),
+//                    0.3f + 0.2f * p,
+//                    0.9f, conceptWidget.shapeColor);
+
+            Concept c = conceptWidget.concept;
+            Truth belief = c.belief(space.now, space.dur);
+            if (belief == null) belief = zero;
+            Truth goal = c.goal(space.now, space.dur);
+            if (goal == null) goal = zero;
+
+            float angle = belief.freq() * 90f + (goal.freq() - 0.5f)  * 45f;
+            Draw.hsb(angle, 0.5f, 0.8f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
+
         }
     }
 //        private class ConceptFilter implements Predicate<BLink<Concept>> {

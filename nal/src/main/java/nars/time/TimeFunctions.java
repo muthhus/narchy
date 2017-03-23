@@ -118,6 +118,14 @@ public interface TimeFunctions {
                 case -1:
                 case +1: //difference: -1 or +1
                     dt = (ttd - btd);
+                    if (dt!=0 && derived.isCommutative()) {
+                        int lexical = derived.term(0).compareTo(derived.term(1));
+                        if (lexical < 0)
+                        //if ((dt > 0 && lexical > 0) || (dt < 0 && lexical < 0))
+                            dt = -dt;
+
+                    }
+
                     break;
 
                 case 0:

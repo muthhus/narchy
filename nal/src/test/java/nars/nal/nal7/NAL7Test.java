@@ -232,16 +232,17 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_induction_comparison() {
-        TestNAR tester = test();
+        test()
 
         // hold ==>+4 open ==>+5 enter
-        tester.believe("((( $x, door) --> open) ==>+5 (( $x, room) --> enter))", 0.9f, 0.9f);
-        tester.believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f);
+        .believe("((( $x, door) --> open) ==>+5 (( $x, room) --> enter))", 0.9f, 0.9f)
+        .believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f)
 
 
-        tester.mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f);
-        tester.mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f);
-        tester.mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f);
+        .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
+        .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f)
+        .mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f)
+        .mustNotOutput(cycles, "((($1,key) --> hold) <=>-9 (($1,room) --> enter))", BELIEF, ETERNAL); //test correct dt polarity
 
     }
 
@@ -694,7 +695,8 @@ public class NAL7Test extends AbstractNALTest {
 
                 .input("(p ==>+1 m).")
                 .inputAt(5, "(s ==>+4 m). :|:")
-                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f, 5);
+                .mustBelieve(cycles, "(s <=>+3 p)", 1f, 0.45f, 5)
+                .mustNotOutput(cycles, "(s <=>-3 p).", BELIEF, ETERNAL); //test correct dt polarity
     }
 
     @Test
@@ -1031,4 +1033,15 @@ public class NAL7Test extends AbstractNALTest {
 //            .mustOutput(0, cycles, "(a-->c)", BELIEF, 1f, 1f, conf-toler, conf+toler, 1+dist)
 //        ;
 //    }
+
+    @Test public void testDTTMinB() {
+        test()
+            .believe("((b-->x) ==>+10 (c-->x))")
+            .believe("((e-->x) ==>-20 (c-->x))")
+            .mustBelieve(cycles, "(x:e ==>-30 x:b)", 1f, 0.45f)
+            .mustBelieve(cycles, "(x:b ==>+30 x:e)", 1f, 0.45f)
+            .mustBelieve(cycles, "(x:b <=>+30 x:e)", 1f, 0.45f)
+            .mustNotOutput(cycles, "(x:b <=>-30 x:e)", BELIEF, ETERNAL);
+    }
+
 }

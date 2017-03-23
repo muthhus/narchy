@@ -21,7 +21,7 @@ public class PushButton extends AbstractButton {
 
     public PushButton(String s) {
         super();
-        text = new Label(s);
+        set(text = new Label(s));
     }
 
     public PushButton(Consumer<PushButton> onClick) {
