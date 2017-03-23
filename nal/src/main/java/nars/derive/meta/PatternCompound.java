@@ -22,6 +22,7 @@ abstract public class PatternCompound extends GenericCompound {
 
     public final int sizeCached;
     public final int structureCached;
+    public final boolean commutativeCached;
 
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(seed.op(), seed.dt(), subterms);
@@ -33,8 +34,13 @@ abstract public class PatternCompound extends GenericCompound {
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
+        commutativeCached = super.isCommutative();
     }
 
+    @Override
+    public boolean isCommutative() {
+        return commutativeCached;
+    }
 
     @Override
     public final int structure() {
@@ -53,6 +59,12 @@ abstract public class PatternCompound extends GenericCompound {
             this.ellipsis = ellipsis;
 
         }
+
+        @Override
+        public boolean isCommutative() {
+            return op().commutative;
+        }
+
 
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 

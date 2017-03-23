@@ -633,7 +633,7 @@ public class IO {
 
             int dt = c.dt();
             boolean reversedDT;
-            if (dt < 0 && c.isCommutative() && dt != DTERNAL && dt != XTERNAL) {
+            if (c.op().commutative && dt!=XTERNAL && dt!=DTERNAL && dt < 0) {
                 reversedDT = true;
                 Term x = a;
                 a = b;

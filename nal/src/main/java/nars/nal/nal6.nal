@@ -17,7 +17,7 @@
     (P ==> M), (S ==> M), neq(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
         //, Permute:Backward
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neq(S,P), time(dtBminT), notImplEqui(S)             |- (P ==>+- S), (Belief:Abduction)
         //, Permute:Backward
 
     (P ==> M), (M ==> S), neq(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
@@ -32,9 +32,9 @@
 //Same as for inheritance again
     //TODO some of these notEqui and notImplEqui can be removed because the premise is already valid in the same way as the conclusion would be
 
-    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtBminT) |- (P <=>+- S), (Belief:Comparison)
-
     (M ==> P), (M ==> S), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtBminT) |- (P <=>+- S), (Belief:Comparison)
+
+    (P ==> M), (S ==> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtTminB) |- (P <=>+- S), (Belief:Comparison)
 
     (M <=> P), (S <=> M), notImplEqui(S), notImplEqui(P), neq(S,P), time(dtCombine) |- (S <=>+- P), (Belief:Resemblance)
 

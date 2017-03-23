@@ -90,11 +90,12 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void temporal_analogy() {
         test()
-
-
-                .believe("( open:($x, door) ==>+5 enter:($x, room) )", 0.95f, 0.9f)
-                .believe("( enter:($x, room) <=>+0 leave:($x, corridor_100) )", 1.0f, 0.9f)
-                .mustBelieve(cycles, "( open:($1, door) ==>+5 leave:($1, corridor_100) )", 0.95f, 0.81f);
+            .log()
+            .believe("( open($x, door) ==>+5 enter($x, room) )", 0.95f, 0.9f)
+            .believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
+            .mustBelieve(cycles*2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.81f)
+            .mustNotOutput(cycles*2, "( open($1, door) ==>-5 leave($1, corridor_100) )", BELIEF, ETERNAL); //test correct dt polarity
+        ;
 
     }
 
@@ -153,10 +154,21 @@ public class NAL7Test extends AbstractNALTest {
     public void testTminB() {
         //(M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
 
+        //y..x
+        //y.z
+        //  zx
         test()
+                .log()
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
-                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f);
+                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
+                .mustNotOutput(cycles, "(z ==>-1 x)", BELIEF, ETERNAL)
+                .mustBelieve(cycles, "(x ==>-1 z)", 1.00f, 0.45f)
+                .mustNotOutput(cycles, "(x ==>+1 z)", BELIEF, ETERNAL)
+                .mustBelieve(cycles, "(z <=>+1 x)", 1.00f, 0.45f)
+                .mustNotOutput(cycles, "(z <=>-1 x)", BELIEF, ETERNAL)
+        ;
+
     }
 
 //    @Test
@@ -211,7 +223,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
-                .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
+                .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
                 .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
                 .mustNotOutput(time, "(Y:y &&+2 Z:z)", BELIEF, 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
                 .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
@@ -223,11 +235,11 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_deduction() {
-        TestNAR tester = test();
-        tester.believe("((($x, room) --> enter) ==>-3 (($x, door) --> open))", 0.9f, 0.9f);
-        tester.believe("((($y, door) --> open) ==>-4 (($y, key) --> hold))", 0.8f, 0.9f);
-
-        tester.mustBelieve(cycles, "((($1,room) --> enter) ==>-7 (($1,key) --> hold))", 0.72f, 0.58f);
+        test()
+            .believe("(enter($x, room) ==>-3 open($x, door))", 0.9f, 0.9f)
+            .believe("(open($y, door) ==>-4 hold($y, key))", 0.8f, 0.9f)
+            .mustBelieve(cycles, "(enter($1,room) ==>-7 hold($1,key))", 0.72f, 0.58f)
+            .mustBelieve(cycles, "(hold($1,key) ==>+7 enter($1,room))", 1f, 0.37f);
     }
 
     @Test
@@ -239,8 +251,8 @@ public class NAL7Test extends AbstractNALTest {
         .believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f)
 
 
-        .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
-        .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f)
+        .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.8f, 0.42f)
+        .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.9f, 0.39f)
         .mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f)
         .mustNotOutput(cycles, "((($1,key) --> hold) <=>-9 (($1,room) --> enter))", BELIEF, ETERNAL); //test correct dt polarity
 
@@ -702,10 +714,9 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testComparison2() {
         test()
-
                 .input("(m ==>+1 p).")
                 .input("(m ==>+4 s).")
-                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
+                .mustBelieve(cycles, "(p <=>+3 s).", 1f, 0.45f);
     }
 
 //    @Test public void testConditionalAbductionByDepVar() {
@@ -751,10 +762,10 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testDecomposeConjunctionEmbeddedInnerCommute() {
         test()
-                .input("((&&,a,b,c) &&+1 (z)). :|:")
-                .mustBelieve(cycles, "(a &&+1 (z))", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles, "(b &&+1 (z))", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles, "(c &&+1 (z))", 1f, 0.81f, 0, 1);
+                .input("((&&,a,b,c) &&+1 z). :|:")
+                .mustBelieve(cycles, "(a &&+1 z)", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "(b &&+1 z)", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "(c &&+1 z)", 1f, 0.81f, 0, 1);
     }
 
 
@@ -1035,6 +1046,9 @@ public class NAL7Test extends AbstractNALTest {
 //    }
 
     @Test public void testDTTMinB() {
+        // x +20 e
+        // b +10 x
+        //   -> b +30 e
         test()
             .believe("((b-->x) ==>+10 (c-->x))")
             .believe("((e-->x) ==>-20 (c-->x))")

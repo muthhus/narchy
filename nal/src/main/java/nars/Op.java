@@ -1,6 +1,7 @@
 package nars;
 
 
+import jcog.Texts;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

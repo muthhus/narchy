@@ -7,8 +7,10 @@ import nars.bag.Bagregate;
 import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.RealTime;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
@@ -81,12 +83,14 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Param.DEBUG = true;
 
-        Default n = new Default(64, 1, 1, 1);
-        n.time.dur(8);
+        //Default n = new Default(64, 3, 1, 3);
+        Default n = NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.2f));
         //n.nal(1);
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 0.5f;
-        //n.DEFAULT_QUESTION_PRIORITY = 1f;
+//        n.termVolumeMax.setValue(7f);
+//        n.DEFAULT_BELIEF_PRIORITY = 0.9f;
+//        n.DEFAULT_GOAL_PRIORITY = 0.9f;
+//        n.DEFAULT_QUESTION_PRIORITY = 0.01f;
+//        n.DEFAULT_QUEST_PRIORITY = 0.01f;
 
 //        n.inputAt(1, "c:a?");
 //        n.inputAt(2, "b:a.");
@@ -94,11 +98,14 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveChainTest(n, 8,  2048, inh);
 
-        n.input("(x:a ==>+10 x:b).",
-                "(x:b ==>+10 x:c).",
-                "(x:c ==>+10 x:d).",
-                "(x:d ==>+10 x:e)."
-                //"((bN) ==>+1 --x:c)."
+        n.input("(x:a ==> x:b).",
+                "(x:b ==> x:c).",
+                "(x:c ==> x:d).",
+                "(x:d ==> x:e).",
+                "(x:e ==> x:f).",
+                "(x:f ==> x:g).",
+                "(x:g ==> x:h)."
+
                 );
 //        for (int i = 0; i < 10; i++) {
 //            n.inputAt(i * 5 , i % 2 == 0 ? "x:c! :|:" : "--x:c! :|:");
@@ -108,10 +115,12 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
         NARSpace cs = new ConceptsSpace(n, 64, 8) {
-            @Override
-            protected boolean include(Term term) {
-                return term instanceof Compound;
-            }
+//            @Override
+//            protected boolean include(Term term) {
+//
+//                return term instanceof Compound &&
+//                        term.complexity()==3 && term.toString().endsWith("-->x)");
+//            }
         };
 
 
@@ -163,21 +172,20 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         SpaceGraph.window(
             col(
                 reflect( new CycleView(n) ),
-                new PushButton("C+", () -> {
-                    n.input("x:a. :|:");
+                new PushButton("+", () -> {
+                    n.input("x:h! :|:");
                 }),
-                new PushButton("C-", () -> {
-                    n.input("--x:a. :|:");
+                new PushButton("-", () -> {
+                    n.input("--x:h! :|:");
                 })
             ),
         400, 400);
 
-        n.log();
-        n.loop(5f);
-
-
-
         //n.log();
+        n.loop(2f);
+
+
+
         //n.input("(a-->b).", "(b-->c).","(c-->d).");
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));

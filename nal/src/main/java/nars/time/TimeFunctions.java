@@ -118,14 +118,15 @@ public interface TimeFunctions {
                 case -1:
                 case +1: //difference: -1 or +1
                     dt = (ttd - btd);
-                    if (dt!=0 && derived.isCommutative()) {
-                        int lexical = derived.term(0).compareTo(derived.term(1));
-                        if (lexical < 0)
-                        //if ((dt > 0 && lexical > 0) || (dt < 0 && lexical < 0))
-                            dt = -dt;
 
-                    }
-
+//                    if (derived.op().commutative) {
+//                        boolean lex = derived.term(0).compareTo(derived.term(1)) > 0;
+//                        if ((lex && dt < 0) || (!lex && dt > 0)) {
+//                            //swap term order
+//                            //derived = (Compound) p.index.the(derived, derived.term(1), derived.term(0));
+//                            dt = -dt;
+//                        }
+//                    }
                     break;
 
                 case 0:
@@ -255,21 +256,23 @@ public interface TimeFunctions {
         if ((x!=null) && p.task.isGoal() && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
 
+
             //dont derive a past-tense goal (before the task)
             if (taskStart!=ETERNAL) {
+
 
 //                long now = p.nar.time();
 //                if (taskStart < now) {
 //                    taskStart = now; //imminanentize the eschaton
 //                }
 
-//                if (taskStart > occReturn[0]) {
-//                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
-//                    long range = occReturn[1] - occReturn[0];
-//
-//                    occReturn[0] = taskStart;
-//                    occReturn[1] = taskStart + range;
-//                }
+                if (taskStart > occReturn[0]) {
+                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+                    long range = occReturn[1] - occReturn[0];
+
+                    occReturn[0] = taskStart;
+                    occReturn[1] = taskStart + range;
+                }
             }
 
         }

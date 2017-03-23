@@ -51,6 +51,7 @@ import java.util.function.Function;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * a compound term
@@ -296,8 +297,7 @@ public interface Compound extends Term, IPair, TermContainer {
                         TermContainer ysubs = y.subterms();
 
                         return
-
-                                Compound.commutative(op, xs) ?
+                                isCommutative() ?
                                         subst.matchPermute(xsubs, ysubs) :
                                         subst.matchLinear(xsubs, ysubs);
 
@@ -360,12 +360,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     TermContainer subterms();
-
-
-    /*@Override
-    default String toString() {
-        return toStringBuilder().toString();
-    }*/
 
     @Nullable
     @Override
@@ -488,12 +482,20 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean isCommutative() {
-        return commutative(op(), size());
+        if (op().commutative) {
+            int dt = dt();
+            switch (dt) {
+                case 0:
+                case DTERNAL:
+                    return (size() > 1);
+                case XTERNAL:
+                default:
+                    return false;
+            }
+        }
+        return false;
     }
 
-    public static boolean commutative(@NotNull Op op, int size) {
-        return size > 1 && op.commutative;
-    }
 
     @Override
     default void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {

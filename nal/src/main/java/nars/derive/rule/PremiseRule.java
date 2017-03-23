@@ -767,11 +767,9 @@ public class PremiseRule extends GenericCompound {
 
                         case "dtTminB":
                             timeFunction = TimeFunctions.dtTminB;
-                            pres.add(events.lexicalIfEternal);
                             break;
                         case "dtBminT":
                             timeFunction = TimeFunctions.dtBminT;
-                            pres.add(events.lexicalIfEternal);
                             break;
 //                        case "dtIntersect":
 //                            timeFunction = TimeFunctions.dtIntersect;

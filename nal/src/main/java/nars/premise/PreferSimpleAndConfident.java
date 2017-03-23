@@ -73,7 +73,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             q *= confidencePreservationFactor(truth, d);
             if (q < quaMin) return null;
         } else {
-            q *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
+            q *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
             if (q < quaMin) return null;
         }
 
@@ -95,7 +95,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
      * @return a value between 0 and 1 that priority will be scaled by
      */
     public static float complexityFactorAbsolute(Compound conclusion, byte punc, Task task, Task belief) {
-        return 1f / (1f + conclusion.volume());
+        //return 1f / (1f + conclusion.complexity());
+        return 1f / (1f + (float)Math.sqrt(conclusion.complexity()));
     }
 
     /**

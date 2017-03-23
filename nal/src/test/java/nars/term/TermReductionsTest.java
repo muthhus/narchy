@@ -359,6 +359,10 @@ public class TermReductionsTest {
     @Test
     public void testTemporalConjunctionReduction1() throws Narsese.NarseseException {
         assertEquals("(a &&+0 b)", $("(a &&+0 b)").toString());
+        assertEquals(
+                $("((--,(ball_left)) &&-270 (ball_right))"),
+                $("((ball_right) &&+270 (--,(ball_left)))"));
+
     }
 
     @Test

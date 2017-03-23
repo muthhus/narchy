@@ -273,7 +273,7 @@ public abstract class TermIndex extends TermBuilder {
 //    }
 
     @NotNull
-    public final Term the(@NotNull Compound csrc, @NotNull Term[] args) {
+    public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
         return csrc.equalTerms(args) ? csrc : the(csrc.op(), csrc.dt(), args);
     }
 

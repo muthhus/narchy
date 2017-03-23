@@ -322,7 +322,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 1f + 4f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0.5f + 2f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
@@ -398,8 +398,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 Truth goal = c.goal(space.now, space.dur);
                 if (goal == null) goal = zero;
 
-                float angle = belief.freq() * 90f + (goal.freq() - 0.5f) * 45f;
-                Draw.hsb(angle, 0.5f, 0.8f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
+                float angle = 45 + belief.freq() * 90f + (goal.freq() - 0.5f) * 45f;
+                Draw.hsb(angle, 0.5f, 0.25f + 0.5f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
             }
 
         }
