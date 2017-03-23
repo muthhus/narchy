@@ -29,40 +29,42 @@ public class FZero extends NAgentX {
                 //.setResolution(0.04f)
                 .priTotal(16f);
 
+        senseNumberDifference($.inh($.the("joy"), $.the("fz")), ()->happy.asFloat());
+        senseNumberDifference($.inh($.the("angVel"), $.the("fz")), ()->(float)fz.playerAngle);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-//        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
-//        actionTriState($.inh($.the("rot"), $.the("fz")), (dh) -> {
-//            switch (dh) {
-//                case +1: fz.left = false; fz.right = true; break;
-//                case 0: fz.left = fz.right = false; break;
-//                case -1: fz.left = true; fz.right = false; break;
-//            }
-//        });
+        actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
+        actionTriState($.inh($.the("rot"), $.the("fz")), (dh) -> {
+            switch (dh) {
+                case +1: fz.left = false; fz.right = true; break;
+                case 0: fz.left = fz.right = false; break;
+                case -1: fz.left = true; fz.right = false; break;
+            }
+        });
 
-        action( new BeliefActionConcept($.inh($.the("fwd"), $.the("fz")), nar, (b) -> {
-            if (b!=null) {
-                float f = b.freq();
-                if (f > 0.75f) {
-                    fz.thrust = true;
-                    return;
-                }
-            }
-            fz.thrust = false;
-        }));
-        action( new BeliefActionConcept($.inh($.the("rot"), $.the("fz")), nar, (b) -> {
-            if (b!=null) {
-                float f = b.freq();
-                if (f > 0.75f) {
-                    fz.left = false; fz.right = true;
-                    return;
-                } else if (f < 0.25f) {
-                    fz.left = true; fz.right = false;
-                    return;
-                }
-            }
-            fz.left = fz.right = false;
-        }));
+//        action( new BeliefActionConcept($.inh($.the("fwd"), $.the("fz")), nar, (b) -> {
+//            if (b!=null) {
+//                float f = b.freq();
+//                if (f > 0.75f) {
+//                    fz.thrust = true;
+//                    return;
+//                }
+//            }
+//            fz.thrust = false;
+//        }));
+//        action( new BeliefActionConcept($.inh($.the("rot"), $.the("fz")), nar, (b) -> {
+//            if (b!=null) {
+//                float f = b.freq();
+//                if (f > 0.75f) {
+//                    fz.left = false; fz.right = true;
+//                    return;
+//                } else if (f < 0.25f) {
+//                    fz.left = true; fz.right = false;
+//                    return;
+//                }
+//            }
+//            fz.left = fz.right = false;
+//        }));
 
 //        actionBipolar($.inh($.the("rot"), $.the("fz")), (dh) -> {
 //           fz.playerAngle += dh * 2f;
@@ -81,14 +83,14 @@ public class FZero extends NAgentX {
 
         double distance = fz.vehicleMetrics[0][1];
         double deltaDistance;
-        deltaDistance = (distance - lastDistance) / 20f;
+        deltaDistance = (distance - lastDistance) / 50f;
         if (deltaDistance > 1f) deltaDistance = 1f;
         if (deltaDistance < -1f) deltaDistance = -1f;
 
         lastDistance = distance;
 
         //lifesupport
-        fz.power = Math.max(FZeroGame.FULL_POWER*0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.01f));
+        fz.power = Math.max(FZeroGame.FULL_POWER*0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.15f));
 
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
@@ -101,7 +103,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.DSHalf(true).durSeconds(0.5f), false, 20f))
+                3, new RealTime.DSHalf(true).durSeconds(0.1f), false))
                 .runRT(0);
     }
 }

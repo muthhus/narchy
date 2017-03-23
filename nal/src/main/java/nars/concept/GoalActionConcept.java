@@ -35,13 +35,16 @@ public class GoalActionConcept extends ActionConcept {
     public static Task curiosity(Compound term, byte punc, float conf, NAR nar) {
         long now = nar.time();
         long nowEnd = now + (int) Math.ceil(nar.time.dur());
-        return new ImmutableTask(term, punc,
+        ImmutableTask t = new ImmutableTask(term, punc,
                 $.t(nar.random.nextFloat(), conf),
                 now,
                 now,
                 nowEnd,
                 new long[] { nar.time.nextStamp() }
         );
+        t.budget(0f, nar);
+        return t;
+
     }
 
 
@@ -72,12 +75,12 @@ public class GoalActionConcept extends ActionConcept {
 
 
 
-        Truth b = beliefIntegrated.commitSum();
+        Truth b = beliefIntegrated.commitAverage();
 //        if (tdb != null) {
 //            b = (b != null) ? Revision.revise(b, tdb) : tdb;
 //        }
 
-        Truth g = goalIntegrated.commitSum();
+        Truth g = goalIntegrated.commitAverage();
 //        if (tdg!=null) {
 //            g = (g != null) ? Revision.revise(g, tdg) : tdg;
 //        }

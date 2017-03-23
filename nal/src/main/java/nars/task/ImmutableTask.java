@@ -1,10 +1,7 @@
 package nars.task;
 
 import jcog.Util;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.term.Term;
@@ -235,6 +232,7 @@ public class ImmutableTask extends RawBudget implements Task {
         //return term.vars() > 0;
         return false;
         //return true;
+        //return op().temporal;
 
 
         //Op op = term.op();

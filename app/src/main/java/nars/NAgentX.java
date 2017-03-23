@@ -3,7 +3,6 @@ package nars;
 import jcog.data.FloatParam;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
-import nars.control.DefaultConceptBagControl;
 import nars.gui.BagChart;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -95,7 +94,7 @@ abstract public class NAgentX extends NAgent {
         Time clock = new RealTime.DSHalf(true).durSeconds(durFrames / fps);
         Default nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
-                NARBuilder.newMultiThreadNAR(-1, clock, true, fps);
+                NARBuilder.newMultiThreadNAR(-1, clock, true);
 
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);

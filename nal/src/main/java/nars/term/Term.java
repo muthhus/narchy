@@ -259,7 +259,8 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
                 if (dt < 0) {
                     //offset by width of the other subterm
-                    dt = -dt + c.term(1).dtRange();
+
+                    dt = -dt + ((c.size() > 1) ? c.term(1).dtRange() : 0);
 
                     firstIndex = 1;
                     lastIndex = 0;

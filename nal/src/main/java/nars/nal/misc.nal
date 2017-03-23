@@ -21,8 +21,8 @@
      B, (A==>B), time(decomposeBelief), task("?@") |- A, ()
 
      //quest to 'how' question
-     B, X, neq(B,X), task("@"), time(dtAfterOrEternal) |- (B ==>+- X), (Punctuation:Question)
-
+     //B, X, neq(B,X), task("@"), time(dtAfterOrEternal), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
+     //B, X, neq(B,X), task("@"), time(dtAfterOrEternal), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()

@@ -39,7 +39,7 @@ public class FZeroGame extends JFrame implements Runnable {
   boolean[] K = new boolean[65535]; // pressed keys
   public double power = 0;
   public int rank = 0;
-  public int frameDelayMS = 80;
+  public int frameDelayMS = 20;
 
   public FZeroGame() {
     new Thread(this).start();

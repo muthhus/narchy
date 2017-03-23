@@ -5,6 +5,7 @@ import jcog.version.Versioned;
 import jcog.version.Versioning;
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.TermIndex;
 import nars.term.Term;
@@ -17,6 +18,8 @@ import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
@@ -145,6 +148,7 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
+    final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
@@ -160,15 +164,23 @@ public abstract class Unify extends Termunator implements Subst {
 
         int s = now();
         boolean result;
-        if (unify(x, y)) {
+        try {
+            if (unify(x, y)) {
 
-            if (finish) {
-                result = run(this, null, -1);
+                if (finish) {
+
+                    result = run(this, null, -1);
+                } else {
+                    result = true;
+                }
             } else {
-                result = true;
+                result = false;
             }
-        } else {
+        } catch (Exception e) {
+            if (Param.DEBUG_EXTRA)
+                logger.error("{}", e);
             result = false;
+            finish = true;
         }
 
         if (finish)

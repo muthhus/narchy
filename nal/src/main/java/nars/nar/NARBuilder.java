@@ -11,8 +11,6 @@ import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.control.ConceptBagControl;
-import nars.control.DefaultConceptBagControl;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -40,10 +38,10 @@ import static nars.Op.GOAL;
 public interface NARBuilder {
 
     static Default newMultiThreadNAR(int cores, Time time) {
-        return newMultiThreadNAR(cores, time, true, -1);
+        return newMultiThreadNAR(cores, time, true);
     }
 
-    static Default newMultiThreadNAR(int threads, Time time, boolean sync, float fps) {
+    static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
         Random rng = new XorShift128PlusRandom(1);
 
         if (threads == -1)
@@ -186,22 +184,11 @@ public interface NARBuilder {
 
         };
 
-        if (fps>0) {
-            DefaultConceptBagControl.ThrottledConceptBagControl core =
-                new DefaultConceptBagControl.ThrottledConceptBagControl(
-                    nar, nar.newConceptBag(activeConcepts), nar.newPremiseBuilder(), fps
-                );
-            nar.setControl(core);
-            core.conceptsFiredPerCycle.setValue(128);
-            core.conceptsFiredPerBatch.setValue(8);
-            core.derivationsInputPerCycle.setValue(256);
-        } else {
-            nar.core.conceptsFiredPerCycle.setValue(128);
-            nar.core.conceptsFiredPerBatch.setValue(8);
-            nar.core.derivationsInputPerCycle.setValue(256);
-        }
+        nar.core.conceptsFiredPerCycle.setValue(128);
+        nar.core.conceptsFiredPerBatch.setValue(8);
+        nar.core.derivationsInputPerCycle.setValue(128);
 
-        nar.termVolumeMax.setValue(96);
+        nar.termVolumeMax.setValue(72);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
@@ -216,8 +203,8 @@ public interface NARBuilder {
 
         //nar.activationRate.setValue(0.5f);
         nar.quaMin.setValue(0.01f);
-        nar.confMin.setValue(0.001f);
-        nar.truthResolution.setValue(0.001f);
+        nar.confMin.setValue(0.01f);
+        nar.truthResolution.setValue(0.01f);
 
 
         //NARTune tune = new NARTune(nar);
