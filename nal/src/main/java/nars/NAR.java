@@ -1230,7 +1230,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         for (String s : tt) {
             tasks(s).forEach(x -> {
                 long xs = x.start();
-                Task y = Task.clone(x, time, xs != ETERNAL ? time : ETERNAL, xs != ETERNAL ? time : ETERNAL);
+                long xe = x.end();
+                Task y = Task.clone(x, time, xs != ETERNAL ? time : ETERNAL, xs != ETERNAL ? time + (xe - xs) : ETERNAL);
                 yy.add(y);
             });
         }
@@ -1261,18 +1262,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         } else {
 
             //future
-            if (Param.DEBUG) {
-                for (Task t : x)
-                    ((ImmutableTask) t).log("Scheduled");
-            }
+//            if (Param.DEBUG) {
+//                for (Task t : x)
+//                    ((ImmutableTask) t).log("Scheduled");
+//            }
 
-            onCycle(m -> {
-                //if (timeCondition.test(m.time())) {
-                if (m.time() == when) {
-                    m.input(x);
-                    //this.off.off();
+
+            Consumer<NAR> z = new Consumer<NAR>() {
+                @Override
+                public void accept(NAR m) {
+                    //if (timeCondition.test(m.time())) {
+                    if (m.time() == when) {
+                        eventCycleStart.disable((Consumer)this);
+                        m.input(x);
+                    }
                 }
-            });
+            };
+            eventCycleStart.enable(z);
 
         }
     }

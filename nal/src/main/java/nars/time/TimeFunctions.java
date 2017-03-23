@@ -174,13 +174,14 @@ public interface TimeFunctions {
 
         if (beliefStart != ETERNAL && taskStart != ETERNAL) {
 
-            int dt = (int) (beliefStart - taskStart); //TODO check valid int/long conversion
+            long beliefEnd = p.belief.end();
+            int dt = (int) (beliefEnd - taskStart); //TODO check valid int/long conversion
             long start = occurrenceTarget(p.premise, earliestOccurrence);
 
             occReturn[0] = start;
 
             //HACK to handle commutive switching so that the dt is relative to the effective subject
-            if (dt != 0 && dt != DTERNAL && derived.op().commutative) {
+            if (dt != 0 && dt != DTERNAL && derived.isCommutative()) {
 
                 Term bt = p.beliefTerm;
                 Term d0 = derived.term(0);
@@ -194,17 +195,15 @@ public interface TimeFunctions {
 
 
         }
-        if (beliefStart != ETERNAL) {
-            occReturn[0] = beliefStart;
-            occReturn[1] = p.belief.end();
-            //eventDelta = DTERNAL;
-        } else if (taskStart != ETERNAL) {
-            occReturn[0] = taskStart;
-            occReturn[1] = p.task.end();
-            //eventDelta = DTERNAL;
-        } else {
-            //eventDelta = DTERNAL;
-        }
+
+        //conjunction duration??
+//        if (beliefStart != ETERNAL) {
+//            occReturn[0] = beliefStart;
+//            occReturn[1] = p.belief.end();
+//        } else if (taskStart != ETERNAL) {
+//            occReturn[0] = taskStart;
+//            occReturn[1] = p.task.end();
+//        }
 
         return derived;
     }

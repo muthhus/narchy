@@ -17,7 +17,7 @@
     (P ==> M), (S ==> M), neq(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
         //, Permute:Backward
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtBminT), notImplEqui(S)             |- (P ==>+- S), (Belief:Abduction)
+    (M ==> P), (M ==> S), neq(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
         //, Permute:Backward
 
     (P ==> M), (M ==> S), neq(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)

@@ -60,10 +60,6 @@ abstract public class PatternCompound extends GenericCompound {
 
         }
 
-        @Override
-        public boolean isCommutative() {
-            return op().commutative;
-        }
 
 
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);

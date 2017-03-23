@@ -443,7 +443,7 @@ public class NAL8Test extends AbstractNALTest {
     public void subgoal_2()  {
         test()
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) && open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
+                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -1206,14 +1206,14 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
         test()
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 0f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 0f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
     }
 
@@ -1221,14 +1221,14 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.07f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { 3, 0, 10, ETERNAL } );
     }
     @Test public void conjDecoposeGoalBefore() {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(a)! :|:")
-                .mustDesire(cycles, "(b)", 1f, 0.07f, 16)
+                .mustDesire(cycles, "(b)", 1f, 0.14f, 16)
                 .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
     }
     @Test public void deriveNegInhGoal() {

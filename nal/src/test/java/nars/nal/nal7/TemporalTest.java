@@ -250,6 +250,28 @@ public class TemporalTest {
 
         assertTrue( a.beliefs().size() >= 4);
     }
+    @Test
+    public void testCommutiveTemporalityConcepts2() throws Narsese.NarseseException {
+        Default n = new Default();
+
+        for (String op : new String[] { "&&", "<=>"} ) {
+            Concept a = n.concept($("(x " + op + "   y)"), true);
+            Concept b = n.concept($("(x " + op + "+1 y)"), true);
+            Concept c = n.concept($("(x " + op + "+2 y)"), true);
+            Concept d = n.concept($("(x " + op + "-1 y)"), true);
+            Concept e = n.concept($("(x " + op + "+- y)"), true);
+            Concept f = n.concept($("(y " + op + "+- x)"), true);
+
+            //n.concepts.forEach(System.out::println);
+
+            assertTrue(a == b);
+            assertTrue(b == c);
+            assertTrue(c == d);
+            assertTrue(d == e);
+            assertTrue(e == f);
+        }
+
+    }
 
     @Nullable
     static final Term A = $.the("a");
@@ -333,9 +355,6 @@ public class TemporalTest {
 
         int indexSize = d.concepts.size();
 
-        d.concepts.print(System.out);
-
-
         assertEquals(3, d.concept("(x==>y)").beliefs().size());
 
         d.input("(x ==>+1 y). :|:"); //present
@@ -345,10 +364,8 @@ public class TemporalTest {
 
         assertEquals(4, d.concept("(x==>y)").beliefs().size());
 
-        d.concepts.print(System.out);
         assertEquals(indexSize, d.concepts.size()); //remains same amount
 
-        d.concepts.print(out);
         d.concept("(x==>y)").print();
     }
 
@@ -358,7 +375,7 @@ public class TemporalTest {
         Default d = new Default();
         d.believe("(((#1-->[happy])&&(#1-->[sad])),(((0-->v),(0-->h))-->[pill]))");
         d.run(1);
-        //d.conceptsActive().print();
+
         assertTrue(3 <= size(d.conceptsActive()));
     }
 
@@ -530,7 +547,9 @@ public class TemporalTest {
     public void testCommutivity() throws Narsese.NarseseException {
 
         assertTrue($("(b && a)").isCommutative());
-        assertTrue($("(b &&+1 a)").isCommutative());
+        assertTrue($("(b &&+0 a)").isCommutative());
+        assertFalse($("(b &&+1 a)").isCommutative());
+        assertFalse($("(b &&+- a)").isCommutative());
 
 
         Term abc = $("((a &&+0 b) &&+0 c)");

@@ -614,15 +614,16 @@ public abstract class TermIndex extends TermBuilder {
         Term[] newSubs;
 
         Op o = c.op();
+        int pdt = c.dt();
         if (psubs.hasAny(Op.TemporalBits)) {
             boolean subsChanged = false;
-            int cs = c.size();
+            int cs = psubs.size();
             Term[] ss = new Term[cs];
             for (int i = 0; i < cs; i++) {
 
                 Term x = psubs.term(i), y;
                 if (x instanceof Compound) {
-                    subsChanged |= (!x.equals(y = atemporalize((Compound) x)));
+                    subsChanged |= (x != (y = atemporalize((Compound) x)));
                 } else {
                     y = x;
                 }
@@ -630,11 +631,9 @@ public abstract class TermIndex extends TermBuilder {
                 ss[i] = y;
 
             }
-//            int dt = c.dt();
-//            newSubs = subsChanged ? /*theSubterms(*/TermContainer.theTermArray(o,
-//                    DTERNAL,
-//                    //(dt == DTERNAL||dt==0) ? DTERNAL : XTERNAL /* preserve order */,
-//                    ss)/*)*/ : null;
+
+
+
             newSubs = subsChanged ? ss : null;
 
 
@@ -642,8 +641,25 @@ public abstract class TermIndex extends TermBuilder {
             newSubs = null;
         }
 
+        //resolve XTERNAL temporals to lexical order
+        if (pdt == XTERNAL /*&& cs == 2*/) {
+            boolean swap = false;
+            if (newSubs == null) {
+                if (psubs.term(0).compareTo(psubs.term(1)) > 0) {
+                    newSubs = psubs.terms();
+                    swap = true;
+                }
+            } else {
+                if (newSubs[0].compareTo(newSubs[1]) > 0) {
+                    swap = true;
+                }
+            }
 
-        int pdt = c.dt();
+            if (swap) {
+                Term x = newSubs[0];  newSubs[0] = newSubs[1]; newSubs[1] = x;
+            }
+        }
+
 
 
         boolean dtChanged = (pdt != DTERNAL && o.temporal);

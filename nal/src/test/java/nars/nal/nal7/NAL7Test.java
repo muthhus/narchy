@@ -251,8 +251,8 @@ public class NAL7Test extends AbstractNALTest {
         .believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f)
 
 
-        .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.8f, 0.42f)
-        .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.9f, 0.39f)
+        .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
+        .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f)
         .mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f)
         .mustNotOutput(cycles, "((($1,key) --> hold) <=>-9 (($1,room) --> enter))", BELIEF, ETERNAL); //test correct dt polarity
 
@@ -760,6 +760,15 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
     }
     @Test
+    public void testDecomposeConjunctionEmbedded2() {
+        test()
+                .input("((z) &&+1 ((x) &&+1 (y))). :|:")
+                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 1, 2)
+                .mustBelieve(cycles, "((z) &&+2 (y))", 1f, 0.81f, 0, 2)
+                .mustBelieve(cycles, "((z) &&+1 (x))", 1f, 0.81f, 0, 1);
+    }
+
+    @Test
     public void testDecomposeConjunctionEmbeddedInnerCommute() {
         test()
                 .input("((&&,a,b,c) &&+1 z). :|:")
@@ -1058,4 +1067,17 @@ public class NAL7Test extends AbstractNALTest {
             .mustNotOutput(cycles, "(x:b <=>-30 x:e)", BELIEF, ETERNAL);
     }
 
+    @Test public void testInductionInterval() {
+        /*
+        $.02;.69$ (((a-->b) &&+4 (c==>#1)) &&+9 (#1-->e)). 1⋈14 %1.0;.73% {1⋈14: 3;5;8} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfterOrEternal),neqAndCom(%1,%2)),(varIntro((%1 &&+- %2)),((Intersection-->Belief))))
+            $.50;.90$ (d-->e). 10 %1.0;.90% {10: 8} Scheduled
+            $.11;.81$ ((a-->b) &&+4 (c==>d)). 1⋈5 %1.0;.81% {1⋈5: 3;5} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfter)),((%1 &&+- %2),((Intersection-->Belief))))
+        */
+        test()
+                .inputAt(1, "((a-->b) &&+4 (c==>d)). :|:")
+                .inputAt(10, "(d-->e). :|:")
+                .mustBelieve(cycles, "(((a-->b) &&+4 (c==>#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
+                .mustNotOutput(cycles, "(((a-->b) &&+4 (c==>#1)) &&+9 (#1-->e))", BELIEF, ETERNAL);
+
+    }
 }
