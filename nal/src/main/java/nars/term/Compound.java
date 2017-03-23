@@ -36,14 +36,18 @@ import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import nars.time.Tense;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -71,7 +75,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        Set<Term> t = $.newHashSet(volume() /* estimate */);
+        Set<Term> t = $.newHashSet( volume() /* estimate */);
         recurseTerms((t1) -> {
             if (t1.op() == onlyType)
                 t.add(t1);
@@ -86,14 +90,13 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         boolean r = false;
-        for (int i = 0; i < size(); i++) {
-            @NotNull Term s = term(i);
-            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
-                if (addOrRemoved)
-                    r |= t.add(s);
-                else
-                    r |= t.remove(s);
 
+        TermContainer tt = subterms();
+        int l = tt.size();
+        for (int i = 0; i < l; i++) {
+            @NotNull Term s = tt.term(i);
+            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
+                r |= (addOrRemoved) ? t.add(s) : t.remove(s);
                 if (!addOrRemoved && r) //on removal we can exit early
                     return true;
             }
@@ -111,14 +114,7 @@ public interface Compound extends Term, IPair, TermContainer {
             }
 
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
-                if (addOrRemoved)
-                    r[0] |= t.add(s);
-                else
-                    r[0] |= t.remove(s);
-
-//                if (!addOrRemoved && r[0]) { //on removal we can exit early
-//                    return true;
-//                }
+                r[0] |= (addOrRemoved) ? t.add(s) : t.remove(s);
             }
         });
 
@@ -168,15 +164,23 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
         v.accept(this, parent);
-        subterms().forEach(a -> a.recurseTerms(v, this));
+
+        TermContainer tt = subterms();
+        int s = tt.size();
+        for (int i = 0; i < s; i++) {
+            tt.term(i).recurseTerms(v, this);
+        }
     }
 
     @Override
     default void recurseTerms(@NotNull SubtermVisitor v) {
         v.accept(this);
-//        for (Term x : terms())
-//            x.recurseTerms(v);
-        subterms().forEach(a -> a.recurseTerms(v));
+
+        TermContainer tt = subterms();
+        int s = tt.size();
+        for (int i = 0; i < s; i++) {
+            tt.term(i).recurseTerms(v);
+        }
     }
 
     @Override
@@ -579,10 +583,9 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
-        Term[] x = container.terms();
-        int s = x.length;
+        int s = container.size();
         for (int i = 0; i < s; i++) {
-            Term xx = x[i];
+            Term xx = container.term(i);
             if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
                 l.add((byte) i);
                 return true;
@@ -637,15 +640,33 @@ public interface Compound extends Term, IPair, TermContainer {
         return false;
     }
 
-//    default boolean containsTermAtemporally(Term y) {
-//        y = y.unneg();
-//        if (!impossibleSubTerm(y)) {
-//            Term ay = $.terms.atemporalize(y);
-//            if (or(x -> Terms.equalAtemporally(x, ay)))
-//                return true;
-//        }
-//        return false;
-//    }
+    @Override
+    default void events(List<ObjectLongPair<Term>> events, long offset) {
+        Op o = op();
+        if (o ==CONJ) {
+            int dt = dt();
+
+            if (dt!=DTERNAL && dt!=XTERNAL) {
+
+                boolean reverse;
+                if (dt < 0) { dt = -dt; reverse = true; }
+                else reverse = false;
+
+                TermContainer tt = subterms();
+                int s = tt.size();
+                long t = offset;
+                for (int i = 0; i < s; i++) {
+                    tt.term(reverse ? (s-1 - i) : i).events(events, t);
+                    t += dt;
+                }
+
+                return;
+            }
+
+        }
+
+        events.add(PrimitiveTuples.pair(this, offset));
+    }
 
     @Override
     default Term eval(TermIndex index) {
@@ -654,13 +675,15 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!hasAll(Op.OpBits))
             return this;
 
+        TermContainer tt = subterms();
+
         //any contained evaluables
-        if (subterms().hasAll(OpBits)) {
-            int s = size();
+        if (tt.hasAll(OpBits)) {
+            int s = tt.size();
             Term[] evalSubs = new Term[s];
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term x = term(i);
+                Term x = tt.term(i);
                 Term y = x.eval(index);
                 if (!x.equals(y)) {
                     modified = true;
@@ -679,9 +702,9 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op() == INH) {
             //recursively compute contained subterm functors
 
-            final Term subject = ((Compound) this).term(0);
+            final Term subject = term(0);
             if (subject.op() == PROD) {
-                Term predicate = ((Compound) this).term(1);
+                Term predicate = term(1);
                 if (predicate.op() == ATOM) {
 
                     Functor f = null;

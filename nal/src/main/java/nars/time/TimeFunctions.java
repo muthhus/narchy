@@ -16,8 +16,13 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static nars.$.terms;
 import static nars.Op.CONJ;
@@ -162,12 +167,13 @@ public interface TimeFunctions {
      * no occurence shift
      * should be used in combination with a "premise Event" precondition
      */
-    TimeFunctions occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1);
-    TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1);
+    TimeFunctions occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1, false);
+    TimeFunctions occForwardMerge = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1, true);
+    TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1, false);
 
 
     @NotNull
-    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
+    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity, boolean merge) {
 
         long beliefStart = p.belief.start();
         long taskStart = p.task.start();
@@ -175,23 +181,40 @@ public interface TimeFunctions {
         if (beliefStart != ETERNAL && taskStart != ETERNAL) {
 
             long beliefEnd = p.belief.end();
+            long taskEnd = p.task.end();
+
+            Interval union = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
             int dt = (int) (beliefEnd - taskStart); //TODO check valid int/long conversion
             long start = occurrenceTarget(p.premise, earliestOccurrence);
 
-            occReturn[0] = start;
+            occReturn[0] = union.a;
 
-            //HACK to handle commutive switching so that the dt is relative to the effective subject
-            if (dt != 0 && dt != DTERNAL && derived.isCommutative()) {
+            if (merge && derived.op() == CONJ) {
+                assert(polarity==1);
 
-                Term bt = p.beliefTerm;
-                Term d0 = derived.term(0);
+                occReturn[1] = union.b;
 
-                if (derivationMatch(bt, d0))
-                    dt *= -1;
+                //merge all events
+                derived = merge(derived.term(0), taskStart, derived.term(1), beliefStart);
+
+            } else {
+
+                //HACK to handle commutive switching so that the dt is relative to the effective subject
+                if (derived.isCommutative()) {
+
+                    Term bt = p.beliefTerm;
+                    Term d0 = derived.term(0);
+
+                    if (derivationMatch(bt, d0))
+                        dt *= -1;
+                }
+
+
+                return deriveDT(derived, polarity, dt, occReturn);
+
+
             }
 
-
-            return deriveDT(derived, polarity, dt, occReturn);
 
 
         }
@@ -206,6 +229,77 @@ public interface TimeFunctions {
 //        }
 
         return derived;
+    }
+
+    @Nullable static Compound merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+
+        List<ObjectLongPair<Term>> events = $.newArrayList();
+
+        a.events(events, aStart);
+        b.events(events, bStart);
+
+        events.sort((x,y) -> Long.compare(x.getTwo(), y.getTwo()));
+
+
+        int ee = events.size(); assert(ee > 1);
+
+        //group all parallel clusters
+        {
+            Term head = events.get(0).getOne();
+            long headAt = events.get(0).getTwo();
+            int groupStart = -1;
+            for (int i = 1; i <= ee; i++) {
+                long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
+                if (nextAt == headAt) {
+                    if (groupStart == -1) groupStart = i-1;
+                } else {
+                    if (groupStart!=-1) {
+                        int groupEnd = i;
+                        Term[] p = new Term[groupEnd - groupStart];  assert(p.length > 1);
+                        long when = events.get(groupStart).getTwo();
+                        for (int k = 0, j = groupStart; j < groupEnd; j++) {
+                            p[k++] = events.get(groupStart).getOne();
+                            events.remove(groupStart);  i--; ee--;
+                        }
+                        Term replacement = $.parallel(p);
+                        if (replacement==null)
+                            return null; //failure
+                        if (events.isEmpty()) {
+                            //got them all here
+                            return compoundOrNull(replacement);
+                        }
+                        events.add(i-1, PrimitiveTuples.pair(replacement, when)); i++; ee++;
+                        groupStart = -1; //reset
+                    }
+                }
+                headAt = nextAt;
+            }
+        }
+
+        {
+            if (ee == 1) {
+                return compoundOrNull(events.get(0).getOne());
+            } else if (ee == 0) {
+                return null;
+            }
+
+            Term head = events.get(0).getOne();
+            long headAt = events.get(0).getTwo();
+            for (int i = 1; i < ee; i++) {
+
+                Term next = events.get(i).getOne();
+                long nextAt = events.get(i).getTwo();
+
+                int dt = (int) (nextAt - headAt);
+                head = $.seq(head, dt, next);
+                if (head == null)
+                    return null;
+
+                headAt = nextAt;
+            }
+            return compoundOrNull(head);
+        }
+
     }
 
     @Deprecated
@@ -916,7 +1010,7 @@ public interface TimeFunctions {
 
 
         //apply occurrence shift
-        if (occ > Tense.TIMELESS) {
+        if (occ != ETERNAL) {
 
             Term T = resolve(p, tt);
             if (T!=null) {

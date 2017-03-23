@@ -6,7 +6,6 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -55,7 +54,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     @Nullable
     private long[] evidence = LongArrays.EMPTY_ARRAY;
 
-    private long creation = Tense.TIMELESS;
+    private long creation = ETERNAL;
     private long start = ETERNAL, end = ETERNAL;
 
 //    /** Array of tasks from which the Task is derived, or null if input
@@ -79,7 +78,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     private List log;
 
 
-    public TaskBuilder(@NotNull Compound t, byte punct, float freq, @NotNull NAR nar) {
+    public TaskBuilder(@NotNull Compound t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
         this(t, punct, $.t(freq, nar.confidenceDefault(punct)));
     }
 
@@ -90,17 +89,17 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         this(t, punct, t(freq, conf));
     }
 
-    public TaskBuilder(@NotNull String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException {
+    public TaskBuilder(@NotNull String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException, InvalidTaskException {
         this($.$(compoundTermString), punct, truth);
     }
 
 
-    public TaskBuilder(@NotNull Compound term, byte punct, @Nullable Truth truth) {
+    public TaskBuilder(@NotNull Compound term, byte punct, @Nullable Truth truth) throws InvalidTaskException {
         this(term, punct, truth,
             /* budget: */ 0, Float.NaN);
     }
 
-    public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) {
+    public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
         super();
         priority = p; //direct set
         quality = q; //direct set
@@ -120,6 +119,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
                 throw new InvalidTaskException(this, "Top-level negation not wrapping a Compound");
             }
         }
+
 
         this.truth = truth;
         this.term = tt;
@@ -141,7 +141,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
-        Compound cntt = eval(n.concepts, t);
+        Compound cntt = n.concepts.eval(t);
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
@@ -192,7 +192,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         // set it to the memory's current time here,
         // and adjust occurenceTime if it's not eternal
 
-        if (creation() <= Tense.TIMELESS) {
+        if (creation() == ETERNAL) {
             long now = n.time();
             long oc = start();
             if (oc != ETERNAL)
@@ -238,11 +238,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         ImmutableTask i = new ImmutableTask(term, punc, truth, creation, start, end, evidence);
         i.setBudget(this);
         return i;
-    }
-
-    @Nullable
-    protected Compound eval(@NotNull TermIndex index, @NotNull Compound t) {
-        return compoundOrNull(index.eval(t));
     }
 
 
@@ -359,13 +354,14 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 //    }
 
     @NotNull
-    public final TaskBuilder setCreationTime(long creationTime) {
-        if ((this.creation <= Tense.TIMELESS) && (start > Tense.TIMELESS)) {
-            //use the occurrence time as the delta, now that this has a "finite" creationTime
-            long when = start + creationTime;
-            setStart(when);
-            setEnd(when);
-        }
+    private final TaskBuilder setCreationTime(long creationTime) {
+//        if ((this.creation == ETERNAL) && (start > Tense.TIMELESS)) {
+//            //use the occurrence time as the delta, now that this has a "finite" creationTime
+//            long when = start + creationTime;
+//            setStart(when);
+//            setEnd(when);
+//        }
+
         //if (this.creationTime != creationTime) {
         this.creation = creationTime;
         //does not need invalidated since creation time is not part of hash
@@ -376,7 +372,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     /**
      * TODO for external use in TaskBuilder instances only
      */
-    public final void setStart(long o) {
+    private final void setStart(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
@@ -389,7 +385,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     /**
      * TODO for external use in TaskBuilder instances only
      */
-    public final void setEnd(long o) {
+    private final void setEnd(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
@@ -497,7 +493,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
         long endTime = occurrenceTime;
 
         if (occurrenceTime!=ETERNAL && op()==CONJ) {
-             int dt = term().dt();
+             int dt = term().dtRange();
              switch (dt) {
                  case DTERNAL:
                  case 0:

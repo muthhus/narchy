@@ -15,7 +15,7 @@ abstract public class TemporalStabilityTest {
 
     Set<Task> irregular = $.newHashSet(1);
 
-
+    private boolean stopOnFirstError = true;
 
     public void test(int cycles, @NotNull NAR n) {
 
@@ -23,6 +23,7 @@ abstract public class TemporalStabilityTest {
         n.onCycle(f -> {
 
             TimeMap m = new TimeMap(n);
+
             //Set<Between<Long>> times = m.keySetSorted();
             /*if (times.size() < 3)
                 continue; //wait until the initial temporal model is fully constructed*/
@@ -34,6 +35,8 @@ abstract public class TemporalStabilityTest {
                 long end = tt.end();
                 if (!validOccurrence(start) || (end != start && !validOccurrence(tt.end())))  {
                     if (irregular.add(tt)) { //already detected?
+                        if (stopOnFirstError)
+                            n.stop();
                         //System.err.println("  instability: " + tt + "\n" + tt.proof() + "\n");
                     }
                 }

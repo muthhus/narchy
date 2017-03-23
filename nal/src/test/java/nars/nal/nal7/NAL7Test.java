@@ -1077,7 +1077,54 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "((a-->b) &&+4 (c==>d)). :|:")
                 .inputAt(10, "(d-->e). :|:")
                 .mustBelieve(cycles, "(((a-->b) &&+4 (c==>#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
-                .mustNotOutput(cycles, "(((a-->b) &&+4 (c==>#1)) &&+9 (#1-->e))", BELIEF, ETERNAL);
+                .mustNotOutput(cycles, "(((a-->b) &&+4 (c==>#1)) &&+9 (#1-->e))", BELIEF, ETERNAL, 1);
 
     }
+    @Test public void testInductionInterval2() {
+        /*
+        $.02;.69$ ((a==>b) &&+4 ((b-->#1) &&+3 (#1-->d))). 1⋈8 %1.0;.73% {1⋈8: 1;6;7} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfter)),((%1 &&+- %2),((Intersection-->Belief))))
+            $.48;.90$ (a==>b). 1 %1.0;.90% {1: 1}
+            $.12;.81$ ((b-->#1) &&+3 (#1-->d)). 2⋈5 %1.0;.81% {2⋈5: 6;7} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfterOrEternal),neqAndCom(%1,%2)),(varIntro((%1 &&+- %2)),((Intersection-->Belief))))
+        */
+        test()
+                .inputAt(1, "(a). :|:")
+                .inputAt(2, "((b) &&+3 (d)). :|:")
+                .mustBelieve(cycles, "(((a) &&+1 (b)) &&+3 (d))", 1f, 0.81f, 1, 5)
+                ;
+
+    }
+
+    @Test public void testInductionIntervalMerge1() {
+        /*
+        1: a
+        3: b
+        5: c
+        */
+        test()
+                .inputAt(1, "((a) &&+5 (c)). :|:")
+                .inputAt(3, "(b). :|:")
+                .mustBelieve(cycles,
+                        "(((a) &&+2 (b)) &&+3 (c))",
+                        1f, 0.81f, 1, 6)
+                .mustNotOutput(cycles,
+                        "((b) &&+3 ((a) &&+5 (c)))", BELIEF, ETERNAL, 1);
+    }
+    @Test public void testInductionIntervalMerge2() {
+        test()
+                .inputAt(1, "((a) &&+2 (c)). :|:")
+                .inputAt(3, "((b) &&+0 (d)). :|:")
+                .mustBelieve(cycles,
+                        //"((a) &&+2 (&|, (b), (c), (d)))",
+                        "((a) &&+2 (((b) &| (c)) &| (d)) )",
+                        1f, 0.81f, 1, 3);
+    }
+    @Test public void testInductionIntervalMerge3() {
+        test()
+                .inputAt(1, "(((a) &&+3 (c)) &&+4 (e)). :|:")
+                .inputAt(4, "(b). :|:")
+                .mustBelieve(cycles,
+                        "(((a) &&+3 ((b) &| (c))) &&+4 (e))",
+                        1f, 0.81f, 1, 8);
+    }
+
 }

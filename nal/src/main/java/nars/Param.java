@@ -280,11 +280,10 @@ public abstract class Param  {
                 return defaultBeliefTruth;
 
             case COMMAND:
-                return null;
             case QUEST:
-                return null;
             case QUESTION:
                 return null;
+
             default:
                 throw new RuntimeException("invalid punctuation");
         }

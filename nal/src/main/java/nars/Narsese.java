@@ -560,7 +560,9 @@ public class Narsese extends BaseParser<Object> {
                                         //default to product if no operator specified in ( )
                                         MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, false),
 
-                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true)
+                                        MultiArgTerm(null, COMPOUND_TERM_CLOSER, false, true),
+
+                                        ConjunctionParallel()
 
                                 )
 
@@ -594,8 +596,25 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    //    public Rule ConjunctionParallel() {
-//    }
+    public Rule ConjunctionParallel() {
+        return seq(
+
+                "&|", sepArgSep(),
+
+                Term(true, false),
+                s(),
+                oneOrMore(sequence(
+
+                        sepArgSep(),
+
+                        Term(true, false)
+                )),
+                s(),
+                COMPOUND_TERM_CLOSER,
+
+                push(T.the(CONJ, 0, ((Compound)popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */ )
+        );
+    }
 
     @Deprecated
     public Rule TemporalRelation() {
@@ -906,7 +925,7 @@ public class Narsese extends BaseParser<Object> {
         return firstOf(
                 seq("<|>", push(EQUI)),
                 seq("=|>", push(IMPL)),
-                seq("&|",  push(EQUI))
+                seq("&|",  push(CONJ))
         );
     }
 

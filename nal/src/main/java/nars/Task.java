@@ -129,10 +129,10 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
                 return test(t, "Term exceeds maximum NAL level", safe);
         }
 
-        if (Param.DEBUG) {
+        //if (Param.DEBUG) {
             if (t.containsTerm(Term.True) || t.containsTerm(Term.False))
                 throw new InvalidTaskException(t, "term contains True or False");
-        }
+        //}
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
             return test(t, "Belief or goal with query variable", safe);
@@ -496,7 +496,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
         long ot = start();
 
-        if (Tense.isEternal(ot)) {
+        if (ot == ETERNAL) {
             return "";
         }
 

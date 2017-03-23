@@ -37,8 +37,11 @@ import nars.term.var.Variable;
 import nars.term.visit.SubtermVisitor;
 import nars.term.visit.SubtermVisitorX;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -490,5 +493,10 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     }
 
     Term eval(TermIndex index);
+
+    default void events(List<ObjectLongPair<Term>> events, long dt) {
+        events.add(PrimitiveTuples.pair(this, dt));
+    }
+
 }
 

@@ -102,8 +102,11 @@ abstract public class events extends AtomicBoolCondition {
 
         @Override
         public boolean run(@NotNull Derivation m) {
-            int dt = m.belief.dt();
-            return (dt == DTERNAL) || (dt == 0);
+            if (m.belief!=null) {
+                int dt = m.belief.dt();
+                return (dt == DTERNAL) || (dt == 0);
+            }
+            return false;
         }
 
     };
@@ -197,7 +200,13 @@ abstract public class events extends AtomicBoolCondition {
         @Override
         public boolean run(@NotNull Derivation m) {
             Task b = m.belief;
-            return b!=null;
+            if (b==null)
+                return false;
+            if (m.task.isEternal() && m.belief.isEternal()) {
+                return m.task.term().compareTo(b.term()) < 0; //lexical filter
+            } else {
+                return true;
+            }
         }
     };
 

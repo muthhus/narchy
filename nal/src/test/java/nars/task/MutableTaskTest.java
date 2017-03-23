@@ -18,11 +18,11 @@ public class MutableTaskTest {
 
         String s = "<a --> b>.";
 
-        assertTrue(Tense.isEternal(n.task(s).start()));
+        assertTrue(n.task(s).start() == Tense.ETERNAL);
 
         assertTrue("default is eternal", n.task(s).isEternal());
 
-        assertTrue("tense=eternal is eternal", Tense.isEternal(n.task(s).start()));
+        assertTrue("tense=eternal is eternal", n.task(s).start() == Tense.ETERNAL);
 
         //assertTrue("present is non-eternal", !Tense.isEternal(((Task)n.task(s)).present(n).start()));
 

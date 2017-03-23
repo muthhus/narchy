@@ -40,7 +40,7 @@ public class NarseseExtendedTest {
         tensed(t, false, w);
     }
     void tensed(@NotNull Task t, boolean eternal, @NotNull Tense w) {
-        assertEquals(eternal, isEternal(t.start()));
+        assertEquals(eternal, t.start() == ETERNAL);
         if (!eternal) {
             switch (w) {
                 case Past: assertTrue(t.start() < 0); break;
@@ -227,6 +227,15 @@ public class NarseseExtendedTest {
     @Test public void testTripleQuote() throws Narsese.NarseseException {
         assertEquals( "(\"\"\"triplequoted\"\"\")", term("(\"\"\"triplequoted\"\"\")").toString() );
         assertEquals( "(\"\"\"triple\"quoted\"\"\")", term("(\"\"\"triple\"quoted\"\"\")").toString() );
+    }
+
+    @Test public void testParallelTemporals() throws Narsese.NarseseException {
+        //TODO use &| in print out, it is 2 chars shorter
+
+        assertEquals("(a &&+0 b)", term("(a &| b)").toString());
+        assertEquals("(a <=>+0 b)", term("(a <|> b)").toString());
+        assertEquals("(a ==>+0 b)", term("(a =|> b)").toString());
+        assertEquals("( &&+0 ,a,b,c)", term("(&|, a, b, c)").toString());
     }
 
 }

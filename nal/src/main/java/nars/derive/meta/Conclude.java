@@ -119,7 +119,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
                     Compound cr = (Compound) r;
 
                     //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                    Compound crr = compoundOrNull(nar.concepts.eval(cr));
+                    Compound crr = nar.concepts.eval(cr);
                     if (crr == null) {
 //                        if (Param.DEBUG)
 //                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());

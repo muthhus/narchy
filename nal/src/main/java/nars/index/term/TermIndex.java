@@ -718,14 +718,14 @@ public abstract class TermIndex extends TermBuilder {
         }
     }
 
-    public Term eval(Compound x) {
+    @Nullable public Compound eval(Compound x) {
 
         //eval before normalizing
         Compound z = compoundOrNull(x.eval(this));
         if (z == null)
             return null;
 
-        return normalize(z);
+        return compoundOrNull(normalize(z));
     }
 
     /**

@@ -25,7 +25,6 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.table.TemporalBeliefTable;
-import nars.time.Tense;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;
@@ -191,7 +190,7 @@ public interface Stamp {
         /*if (creation() == TIMELESS) {
             buffer.append('?');
         } else */
-        if (!Tense.isEternal(start())) {
+        if (!(start() == ETERNAL)) {
             appendOccurrenceTime(buffer);
         } else {
             buffer.append(creation());

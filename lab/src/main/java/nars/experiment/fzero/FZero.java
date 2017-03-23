@@ -20,14 +20,14 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    public FZero(NAR nar) throws Narsese.NarseseException {
+    public FZero(NAR nar) {
         super("fz", nar);
 
         this.fz =  new FZeroGame();
 
         senseCamera("fz", ()->fz.image, 15, 15, (v) -> t(v, alpha()))
                 //.setResolution(0.04f)
-                .priTotal(16f);
+                .priTotal(2f);
 
         senseNumberDifference($.inh($.the("joy"), $.the("fz")), ()->happy.asFloat());
         senseNumberDifference($.inh($.the("angVel"), $.the("fz")), ()->(float)fz.playerAngle);
@@ -76,7 +76,7 @@ public class FZero extends NAgentX {
         NAgentX.chart(this);
     }
 
-    double lastDistance = 0;
+    double lastDistance;
 
     @Override
     protected float act() {

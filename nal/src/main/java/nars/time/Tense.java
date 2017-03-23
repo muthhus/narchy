@@ -30,13 +30,6 @@ public enum Tense  {
     /** a dt placeholder value for preventing premature flattening during derivation term construction */
     public static final int XTERNAL = Integer.MAX_VALUE;
 
-    /**
-     * flag for an unknown time, or as-yet-un-perceived time,
-     * signalling a missing value to set to some default
-     * if eventually perceived or derived
-     */
-    @Deprecated public static final long TIMELESS = Long.MIN_VALUE + 1;
-
 
 
     public final String symbol;
@@ -107,10 +100,6 @@ public enum Tense  {
             throw new RuntimeException("order() does not compare ETERNAL times");
 
         return order(b - a, durationCycles);
-    }
-
-    public static boolean isEternal(long t)  {
-        return t <= TIMELESS; /* includes ETERNAL */
     }
 
     public static long getRelativeOccurrence(@NotNull Tense tense, @NotNull NAR m) {

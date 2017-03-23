@@ -266,34 +266,32 @@ public class PremiseRule extends GenericCompound {
      */
     static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
 
-        put("PatternOp0", 27);
-        put(TaskPunctuation.class, 26);
+        int rank = 50;
 
-        put(TermNotEquals.class, 25);
+        put("PatternOp0", rank--);
+        put(TaskPunctuation.class, rank--);
 
-        put("PatternOp1", 24);
+        put("PatternOp1", rank--);
 
-        put(TaskPositive.class, 21); //includes either positive or negative
-        put(TaskNegative.class, 20); //includes either positive or negative
+        put(TermNotEquals.class, rank--);
 
+        put(events.class, rank--);
 
-        put(BeliefPositive.class, 18);
-        put(BeliefPositive.BeliefNegative.class, 17);
+        put(TaskPositive.class, rank--); //includes either positive or negative
+        put(TaskNegative.class, rank--); //includes either positive or negative
 
-
-        put(events.class, 16);
-
-        put(SubTermsStructure.class, 15);
-//        put(PatternOpNot.class, 16);
-
-        put(SubTermStructure.class, 14);
-
-        put(Solve.class, 10);
+        put(BeliefPositive.class, rank--);
+        put(BeliefPositive.BeliefNegative.class, rank--);
 
 
-//        put(BeliefNegative.class, 7);
-//        put(BeliefPositive.class, 7);
 
+
+        put(SubTermsStructure.class, rank--);
+//        put(PatternOpNot.class, rank--);
+
+        put(SubTermStructure.class, rank--);
+
+        put(Solve.class, rank--);
 
 //        put(SubTermOp.class, 10);
 //        put(TaskPunctuation.class, 9);
@@ -725,6 +723,15 @@ public class PremiseRule extends GenericCompound {
 //                            pres.add(events.bothTemporal);
 //                            break;
 
+                        case "conjoin":
+                            timeFunction = TimeFunctions.occForwardMerge;
+                            pres.add(events.nonEternal);
+                            break;
+                        case "conjoinEternal":
+                            timeFunction = TimeFunctions.occForwardMerge;
+                            pres.add(events.afterOrEternal);
+                            break;
+
                         case "dtAfter":
                             timeFunction = TimeFunctions.occForward;
                             pres.add(events.nonEternal);
@@ -756,6 +763,7 @@ public class PremiseRule extends GenericCompound {
                         case "dtCombinePre":  timeFunction = TimeFunctions.dtCombinePre; break;
                         case "dtCombinePost": timeFunction = TimeFunctions.dtCombinePost; break;
 
+                        //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
                         case "dtAfterOrEternal":
                             timeFunction = TimeFunctions.occForward;
                             pres.add(events.beforeAfterOrEternal);
