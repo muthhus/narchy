@@ -263,13 +263,13 @@ public interface TimeFunctions {
 //                    taskStart = now; //imminanentize the eschaton
 //                }
 
-                if (taskStart > occReturn[0]) {
-                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
-                    long range = occReturn[1] - occReturn[0];
-
-                    occReturn[0] = taskStart;
-                    occReturn[1] = taskStart + range;
-                }
+//                if (taskStart > occReturn[0]) {
+//                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+//                    long range = occReturn[1] - occReturn[0];
+//
+//                    occReturn[0] = taskStart;
+//                    occReturn[1] = taskStart + range;
+//                }
             }
 
         }

@@ -84,7 +84,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         Default n = new Default(64, 1, 1, 1);
         n.time.dur(8);
         //n.nal(1);
-        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
         n.DEFAULT_GOAL_PRIORITY = 0.5f;
         //n.DEFAULT_QUESTION_PRIORITY = 1f;
 

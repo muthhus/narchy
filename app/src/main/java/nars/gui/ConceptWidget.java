@@ -392,13 +392,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 //                    0.9f, conceptWidget.shapeColor);
 
             Concept c = conceptWidget.concept;
-            Truth belief = c.belief(space.now, space.dur);
-            if (belief == null) belief = zero;
-            Truth goal = c.goal(space.now, space.dur);
-            if (goal == null) goal = zero;
+            if (c!=null) {
+                Truth belief = c.belief(space.now, space.dur);
+                if (belief == null) belief = zero;
+                Truth goal = c.goal(space.now, space.dur);
+                if (goal == null) goal = zero;
 
-            float angle = belief.freq() * 90f + (goal.freq() - 0.5f)  * 45f;
-            Draw.hsb(angle, 0.5f, 0.8f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
+                float angle = belief.freq() * 90f + (goal.freq() - 0.5f) * 45f;
+                Draw.hsb(angle, 0.5f, 0.8f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
+            }
 
         }
     }

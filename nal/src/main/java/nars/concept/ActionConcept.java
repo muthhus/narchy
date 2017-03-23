@@ -17,6 +17,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.concept.SensorConcept.historicCapMultiplier;
+
 
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
 
@@ -44,7 +46,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * 2, nar.random);
+        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier, nar.random);
     }
 
     @Override
