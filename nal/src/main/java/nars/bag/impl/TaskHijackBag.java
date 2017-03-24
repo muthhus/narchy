@@ -1,6 +1,7 @@
 package nars.bag.impl;
 
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;
@@ -72,7 +73,12 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        update(new Forget( t.pri() /* * t.qua() */ ));
+        float forgetRate = t.priSafe(-1) * t.qua();
+        if (forgetRate < 0)
+            return null; //deleted
+
+        if (forgetRate > Param.BUDGET_EPSILON)
+            update(new Forget( forgetRate ));
 
         Task inserted = put(t);
 
@@ -84,7 +90,7 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
                 return t;
             } else if (inserted.equals(t)) {
                 //merged budget with an existing but unique instance
-                return inserted.isInput() ? inserted : null; //ignore duplicate derivations
+                return inserted.isInput() ? t : null; //ignore duplicate derivations
             }
         }
 

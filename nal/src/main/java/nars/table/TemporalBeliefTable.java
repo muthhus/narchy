@@ -23,7 +23,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     @Nullable Truth truth(long when, long now, int dur, EternalTable eternal);
 
-    @Nullable Task add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar);
+    @Nullable Task add(@NotNull Task input, Concept concept, @NotNull NAR nar);
 
     void capacity(int c, NAR nar);
 
@@ -72,7 +72,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable Task add(@NotNull Task input, EternalTable eternal, Concept concept, @NotNull NAR nar) {
+        public @Nullable Task add(@NotNull Task input, Concept concept, @NotNull NAR nar) {
             return null;
         }
 

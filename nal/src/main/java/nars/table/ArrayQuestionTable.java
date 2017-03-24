@@ -6,7 +6,6 @@ import jcog.list.MultiRWFasterList;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,9 +69,8 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
 
 
 
-    @Nullable
     @Override
-    public final Task add(@NotNull Task question, @NotNull BeliefTable answers, @NotNull NAR n) {
+    public final Task add(@NotNull Task question, @NotNull NAR n) {
 
         if (contains(question))
             return null; //already here

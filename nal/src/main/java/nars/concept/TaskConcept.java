@@ -142,7 +142,7 @@ public class TaskConcept extends CompoundConcept {
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     public @Nullable Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return processBeliefOrGoal(belief, beliefsOrNew(nar), questions(), nar);
+        return processBeliefOrGoal(belief, beliefsOrNew(nar), nar);
     }
 
     /**
@@ -151,12 +151,12 @@ public class TaskConcept extends CompoundConcept {
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
     public @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return processBeliefOrGoal(goal, goalsOrNew(nar), quests(), nar);
+        return processBeliefOrGoal(goal, goalsOrNew(nar), nar);
     }
 
-    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull QuestionTable questions, @NotNull NAR nar) {
+    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull NAR nar) {
 
-        return target.add(belief, questions, this, nar);
+        return target.add(belief, this, nar);
 
     }
 
@@ -194,19 +194,19 @@ public class TaskConcept extends CompoundConcept {
     public boolean processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTable questionTable;
-        final BeliefTable answerTable;
+        //final BeliefTable answerTable;
         if (q.isQuestion()) {
             //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = questionsOrNew(nar);
-            answerTable = beliefs();
+            //answerTable = beliefs();
         } else { // else if (q.isQuest())
             //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
             questionTable = questsOrNew(nar);
-            answerTable = goals();
+            //answerTable = goals();
         }
 
 
-        return questionTable.add(q, answerTable,  nar) != null;
+        return questionTable.add(q, nar) != null;
     }
 
 

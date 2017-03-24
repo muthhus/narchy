@@ -62,9 +62,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
             Long ticket = (((long)target) << 32) | hash;
 
-            while (map.putIfAbsent(ticket, Void.TYPE) != null) {
-                //System.out.println("wait");
-            }
+//            while (map.putIfAbsent(ticket, Void.TYPE) != null) {
+//                //System.out.println("wait");
+//            }
+
+            map.putIfAbsentRetry(ticket);
 
             return ticket;
         }

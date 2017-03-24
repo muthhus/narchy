@@ -347,11 +347,11 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     quest((Compound) (action.term()), now),
-                    //quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
-                    question(impl(action, 0, happiness), now),
-                    question(impl(neg(action), 0, happiness), now)
+//                    question(impl(action, 0, happiness), now),
+//                    question(impl(neg(action), 0, happiness), now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),

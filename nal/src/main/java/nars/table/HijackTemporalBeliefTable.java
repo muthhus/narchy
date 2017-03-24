@@ -124,7 +124,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Nullable
     @Override
-    public final Task add(@NotNull Task input, @Deprecated EternalTable eternal, @Deprecated Concept concept, @NotNull NAR nar) {
+    public final Task add(@NotNull Task input, @Deprecated Concept concept, @NotNull NAR nar) {
 
 
         return add(input, nar);

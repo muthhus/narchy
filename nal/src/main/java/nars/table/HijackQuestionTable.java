@@ -5,7 +5,6 @@ import nars.Task;
 import nars.bag.impl.TaskHijackBag;
 import nars.budget.BudgetMerge;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
@@ -27,11 +26,6 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
         return (1f + key.priSafe(0)) * (1f * key.qua());
     }
 
-    @Override
-    public @Nullable Task add(@NotNull Task t, @NotNull BeliefTable answers, @NotNull NAR n) {
-
-        return add(t, n);
-    }
 
 
     @Override

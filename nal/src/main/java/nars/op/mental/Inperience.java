@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import jcog.bag.impl.PLinkHijackBag;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
@@ -129,8 +130,11 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 //
 
     public Inperience(@NotNull NAR n, float rate, int capacity) {
-        super(new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap()), rate, n);
-
+        super(
+            //new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap())
+            new PLinkHijackBag(capacity, 4, n.random)
+            , rate, n
+        );
         this.nar = n;
 
 //        n.eventConceptProcess.on(p -> {

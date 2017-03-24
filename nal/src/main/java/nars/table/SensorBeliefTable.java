@@ -26,7 +26,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
 
     @Override
-    public Task add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         //boolean refresh = false;
 
@@ -45,7 +45,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
         }
 
 
-        return super.add(input, questions, concept, nar);
+        return super.add(input, concept, nar);
     }
 
 

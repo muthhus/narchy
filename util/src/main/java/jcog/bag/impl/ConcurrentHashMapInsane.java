@@ -55,8 +55,49 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 @SuppressWarnings("UseOfSunClasses")
 public class ConcurrentHashMapInsane<K, V>
         extends AbstractMutableMap<K, V>
-        implements ConcurrentMutableMap<K, V>, Externalizable {
-    private static final long serialVersionUID = 1L;
+        implements ConcurrentMutableMap<K, V> {
+
+
+    /** optimized method for retrying put in a busy spin until successful
+     *  also, it totally ignores checking entry value. does not involve
+     *  repeated allocations of entry instances, instead uses the one constructed
+     *  at the start.  key needs to be a primitive type or something with identity equality
+     * */
+    public V putIfAbsentRetry(K key) {
+
+        int hash = this.hash(key);
+        final Entry<K, V> newEntry = new Entry<>(key, null, null);
+
+        retry: while (true) {
+
+            Object[] currentArray = this.table;
+
+            while (true) {
+                int length = currentArray.length;
+                int index = ConcurrentHashMapInsane.indexFor(hash, length);
+                Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+                if (o == RESIZED || o == RESIZING) {
+                    currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
+                } else {
+                    Entry<K, V> e = (Entry<K, V>) o;
+                    while (e != null) {
+                        if (e.key == key)
+                            break retry; //occupied, retry
+                        e = e.next;
+                    }
+                    newEntry.setNext(e);
+                    if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, e, newEntry)) {
+                        this.incrementSizeAndPossiblyResize(currentArray, length, e);
+                        return null; // per the contract of putIfAbsent, we return null when the map didn't have this key before
+                    }
+                }
+            }
+        }
+
+        throw new UnsupportedOperationException();
+
+    }
+
 
     private static final Object RESIZE_SENTINEL = new Object();
     private static final int DEFAULT_INITIAL_CAPACITY = 16;
@@ -190,6 +231,7 @@ public class ConcurrentHashMapInsane<K, V>
             }
         }
     }
+
 
     private void incrementSizeAndPossiblyResize(Object[] currentArray, int length, Object prev) {
         this.addToSize(1);
@@ -1207,41 +1249,7 @@ public class ConcurrentHashMapInsane<K, V>
         }
     }
 
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        int size = in.readInt();
-        int capacity = 1;
-        while (capacity < size) {
-            capacity <<= 1;
-        }
-        this.table = new Object[capacity + 1];
-        for (int i = 0; i < size; i++) {
-            this.put((K) in.readObject(), (V) in.readObject());
-        }
-    }
 
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        int size = this.size();
-        out.writeInt(size);
-        int count = 0;
-        for (int i = 0; i < this.table.length - 1; i++) {
-            Object o = ConcurrentHashMapInsane.arrayAt(this.table, i);
-            if (o == RESIZED || o == RESIZING) {
-                throw new ConcurrentModificationException("Can't serialize while resizing!");
-            }
-            Entry<K, V> e = (Entry<K, V>) o;
-            while (e != null) {
-                count++;
-                out.writeObject(e.getKey());
-                out.writeObject(e.getValue());
-                e = e.getNext();
-            }
-        }
-        if (count != size) {
-            throw new ConcurrentModificationException("Map changed while serializing");
-        }
-    }
 
     private static final class IteratorState {
         private Object[] currentTable;
@@ -1448,9 +1456,9 @@ public class ConcurrentHashMapInsane<K, V>
     }
 
     private static final class Entry<K, V> implements Map.Entry<K, V> {
-        private final K key;
-        private final V value;
-        private final Entry<K, V> next;
+        public final K key;
+        public final V value;
+        public  Entry<K, V> next;
 
         private Entry(K key, V value) {
             this.key = key;
@@ -1503,12 +1511,16 @@ public class ConcurrentHashMapInsane<K, V>
 
         @Override
         public int hashCode() {
-            return (this.key == null ? 0 : this.key.hashCode()) ^ (this.value == null ? 0 : this.value.hashCode());
+            return key.hashCode(); //(this.key == null ? 0 : this.key.hashCode()) ^ (this.value == null ? 0 : this.value.hashCode());
         }
 
         @Override
         public String toString() {
             return this.key + "=" + this.value;
+        }
+
+        public void setNext(Entry<K, V>  next) {
+            this.next = next;
         }
     }
 
