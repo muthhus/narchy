@@ -13,11 +13,9 @@ import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -268,7 +266,7 @@ public interface TimeFunctions {
                             //got them all here
                             return compoundOrNull(replacement);
                         }
-                        events.add(i-1, PrimitiveTuples.pair(replacement, when)); i++; ee++;
+                        events.add(i, PrimitiveTuples.pair(replacement, when)); i++; ee++;
                         groupStart = -1; //reset
                     }
                 }
@@ -1022,22 +1020,22 @@ public interface TimeFunctions {
                     if (task.isEternal() && !belief.isEternal()) {
                         //find relative time of belief in the task, relative time of the conclusion, and subtract
                         //the occ (=belief time's)
-                        long timeOfBeliefInTask = T.subtermTime(B, td);
-                        long timeOfDerivedInTask = T.subtermTime(derived, td);
+                        long timeOfBeliefInTask = T.subtermTime(B) + td;
+                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
                         if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
                             occ += (timeOfDerivedInTask - timeOfBeliefInTask);
                         else if (timeOfDerivedInTask != DTERNAL)
                             occ += timeOfDerivedInTask;
                     } else if (!task.isEternal() && belief.isEternal() && B != null) {
-                        long timeOfTaskInBelief = B.subtermTime(T, bd);
-                        long timeOfDerivedInBelief = B.subtermTime(derived, bd);
+                        long timeOfTaskInBelief = B.subtermTime(T) + bd;
+                        long timeOfDerivedInBelief = B.subtermTime(derived) + bd;
 
                         if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
                             occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
                         else if (timeOfDerivedInBelief != DTERNAL)
                             occ += timeOfDerivedInBelief;
                         else {
-                            long timeOfDerivedInTask = T.subtermTime(derived, td);
+                            long timeOfDerivedInTask = T.subtermTime(derived) + td;
                             if (timeOfDerivedInTask != DTERNAL) {
                                 occ += timeOfDerivedInTask;
                             } else {
@@ -1055,7 +1053,7 @@ public interface TimeFunctions {
                 } else {
 
                     if (!task.isEternal()) {
-                        long timeOfDerivedInTask = T.subtermTime(derived, td);
+                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
                         if (timeOfDerivedInTask != DTERNAL)
                             occ += timeOfDerivedInTask;
                     } else {

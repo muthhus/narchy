@@ -641,6 +641,52 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
+    default int subtermTime(@NotNull Term x) {
+
+        if (equals(x))
+            return 0;
+
+        if (impossibleSubTerm(x))
+            return DTERNAL;
+
+        int dt = dt();
+        int idt;
+        boolean reverse;
+
+        //TODO do shuffled search to return different equivalent results wherever they may appear
+
+        Op op = op();
+        boolean shift;
+        if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
+            idt = 0; //parallel or eternal, no dt increment
+            reverse = false;
+            shift = false;
+        } else {
+            shift = op == CONJ;
+            idt = dt;
+            if (idt < 0) {
+                idt = -idt;
+                reverse = true;
+            } else {
+                reverse = false;
+            }
+        }
+
+        @NotNull TermContainer yy = subterms();
+        int ys = yy.size();
+        int offset = 0;
+        for (int yi = 0; yi < ys; yi++) {
+            Term yyy = yy.term( reverse ? ((ys-1) - yi) : yi);
+            int sdt = yyy.subtermTime(x);
+            if (sdt!=DTERNAL)
+                return sdt + offset;
+            offset += idt + ((shift && yyy.op()==CONJ) ? yyy.dtRange() : 0);
+        }
+
+        return DTERNAL; //not found
+    }
+
+    @Override
     default void events(List<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
         if (o ==CONJ) {
@@ -656,8 +702,9 @@ public interface Compound extends Term, IPair, TermContainer {
                 int s = tt.size();
                 long t = offset;
                 for (int i = 0; i < s; i++) {
-                    tt.term(reverse ? (s-1 - i) : i).events(events, t);
-                    t += dt;
+                    Term st = tt.term(reverse ? (s - 1 - i) : i);
+                    st.events(events, t);
+                    t += dt + st.dtRange();
                 }
 
                 return;

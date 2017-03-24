@@ -1127,4 +1127,16 @@ public class NAL7Test extends AbstractNALTest {
                         1f, 0.81f, 1, 8);
     }
 
+    @Test public void testDecomposeTaskSubset() {
+        /*
+        $0.0;.23$ (((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). 1⋈10 %1.0;.31% {1⋈10: 4;5;6;7;8} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(conjoin)),((%1 &&+- %2),((Intersection-->Belief))))
+        $.03;.40$ ((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). 1 %1.0;.42% {1: 4;5;6} ((%1,%2,belief(positive),task("."),time(raw),time(dtAfterReverse),notEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
+            |- (d -->e) @ 10, not 19
+        */
+        test()
+                .inputAt(1, "(((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
+                .inputAt(1, "((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
+                .mustBelieve(cycles, "(d-->e)", 1f, 0.81f, 10)
+                .mustNotOutput(cycles, "(d-->e)", BELIEF, ETERNAL, 1, 19);
+    }
 }

@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -214,98 +215,22 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return true;
     }
 
-    /** note: only gets the first found subterm time of x occurring in this term. */
-    default int subtermTime(@NotNull Term x) {
-        return subtermTime(x, this instanceof Compound ? ((Compound) this).dt() : DTERNAL);
-    }
-
-//    default long subtermTimeOrZero(Term x, long offset) {
-//        int e = subtermTime(x, this instanceof Compound ? ((Compound)this).dt() : DTERNAL);
-//        return e == DTERNAL ? DTERNAL : e + offset;
-//    }
-
     /**
      * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
+     * @param dt the current offset in the search
+     * @return DTERNAL if the subterm was not found
      */
-    default int subtermTime(@NotNull Term x, int dt) {
-
-        Term ty = unneg();
-        x = x.unneg(); //ignore polarity
-
-        if (ty.equals(x)) //unneg().equalsIgnoringVariables(x))
+    default int subtermTime(@NotNull Term x) {
+        if (this.equals(x)) //unneg().equalsIgnoringVariables(x))
             return 0;
-
-        if (!(ty instanceof Compound))
+        else
             return DTERNAL;
-
-        Compound y = (Compound)ty;
-        if (!y.op().temporal)
-            return DTERNAL;
-
-        Compound c = ((Compound) this);
-
-        //TODO use structure to early exit
-
-        if (dt == 0 || dt == DTERNAL) {
-            //TODO search better, containsTerm wont work in all cases
-            for (Term yy : y.terms()) {
-                int sdt = yy.subtermTime(x);
-                if (sdt!=DTERNAL)
-                    return sdt;
-            }
-        } else if (y.size() == 2) {
-
-            int firstIndex, lastIndex;
-
-            //if (isCommutative()) {
-                //use the normalized order of the terms so that the first is always @ 0
-
-                if (dt < 0) {
-                    //offset by width of the other subterm
-
-                    dt = -dt + ((c.size() > 1) ? c.term(1).dtRange() : 0);
-
-                    firstIndex = 1;
-                    lastIndex = 0;
-                } else {
-                    //already left-aligned
-
-                    firstIndex = 0;
-                    lastIndex = 1;
-                }
-//            } else {
-//                firstIndex = 0;
-//                lastIndex = 1;
-//            }
-
-            Term first = c.term(firstIndex);//.unneg();
-            if (first.equals(x))///if (first.equalsIgnoringVariables(x))
-                return 0;
-
-            Term last = c.term(lastIndex);//.unneg();
-            if (last.equals(x)) //if (last.equalsIgnoringVariables(x))
-                return dt;
-
-            int withinSubj = first.subtermTime(x);
-            if (withinSubj != DTERNAL)
-                return withinSubj;
-
-            int withinPred = last.subtermTime(x);
-            if (withinPred != DTERNAL)
-                return dt + withinPred;
-
-        } else {
-            //throw new RuntimeException("invalid temporal type: " + this);
-            return 0;
-        }
-
-        return DTERNAL;
     }
 
-    /** total span of time consumed within a temporal compound */
+    /** total span across time represented by a sequence conjunction compound */
     default int dtRange() {
         Op o = op();
-        if (o.temporal) {
+        if (o == CONJ) {
             Compound c = (Compound) this;
             int dt = c.dt();
             if (c.size() == 2) {
