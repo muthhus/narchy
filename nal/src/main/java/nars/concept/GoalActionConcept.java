@@ -9,7 +9,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import nars.util.signal.SignalTask;
+import nars.task.SignalTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

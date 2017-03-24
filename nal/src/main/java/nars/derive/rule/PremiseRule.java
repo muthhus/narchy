@@ -1166,7 +1166,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound) terms.replace(this, m);
+        Compound remapped = (Compound) index.replace(this, m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.term(0);
@@ -1194,7 +1194,7 @@ public class PremiseRule extends GenericCompound {
 
         } else {
             if (swapTruth) {
-                newConclusion = (Compound) terms.transform(newConclusion, truthSwap);
+                newConclusion = (Compound) index.transform(newConclusion, truthSwap);
             }
 
             newPremise = pc; //same

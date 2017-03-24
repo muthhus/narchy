@@ -13,7 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
-import nars.util.signal.SignalTask;
+import nars.task.SignalTask;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.list.MutableList;

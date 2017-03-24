@@ -14,7 +14,7 @@ import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.util.signal.SignalTask;
+import nars.task.SignalTask;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;

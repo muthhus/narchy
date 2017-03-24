@@ -63,8 +63,10 @@ public class SubUnify extends Unify {
     }
 
     public boolean tryMatch(@NotNull Term x, @NotNull Term y) {
-        tryMatch(null, null, x, y);
-        return !xy.isEmpty();
+        this.xterm = null;
+        this.target = null;
+        this.result = null;
+        return unify(x, y, true, true);
     }
 
     @Nullable

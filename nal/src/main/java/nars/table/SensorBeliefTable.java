@@ -3,7 +3,7 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.util.signal.SignalTask;
+import nars.task.SignalTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

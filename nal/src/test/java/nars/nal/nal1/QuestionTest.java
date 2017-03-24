@@ -95,6 +95,8 @@ public class QuestionTest {
         final int[] s = {0};
         new TaskMatch("add(%1, %2, #x)", nar) {
 
+            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
+
             @Override
             protected void onMatch(Task task, Map<Term, Term> xy) {
                 System.out.println(task + " " + xy);
@@ -114,6 +116,8 @@ public class QuestionTest {
         final int[] s = {0};
         StringBuilder match = new StringBuilder();
         new OperationTaskMatch( $.$("add(%1, %2, #x)"), nar) {
+
+            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
 
             @Override
             protected void onMatch(Term[] args) {

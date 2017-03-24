@@ -1,4 +1,4 @@
-package nars.util.signal;
+package nars.task;
 
 
 import nars.task.ImmutableTask;

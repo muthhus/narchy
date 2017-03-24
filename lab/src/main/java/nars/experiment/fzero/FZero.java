@@ -1,14 +1,11 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
-import jcog.math.FloatNormalized;
-import nars.$;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Narsese;
-import nars.concept.BeliefActionConcept;
+import nars.*;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
+import nars.util.task.TaskRule;
+import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;
 
@@ -32,6 +29,23 @@ public class FZero extends NAgentX {
         senseNumberDifference($.inh($.the("joy"), $.the("fz")), ()->happy.asFloat());
         senseNumberDifference($.inh($.the("angVel"), $.the("fz")), ()->(float)fz.playerAngle);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
+
+        try {
+//            new TaskRule("(%1 &&+0 fz:joy)", "(%1 ==>+0 fz:happy)", nar) {
+//                @Override
+//                public boolean test(@NotNull Task task) {
+//                    return task.isBelief();
+//                }
+//            };
+            new TaskRule("((%1 &&+5 %2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return task.isBelief();
+                }
+            };
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
+        }
 
         actionToggle($.inh($.the("fwd"), $.the("fz")), (b)->{ fz.thrust = b; });
         actionTriState($.inh($.the("rot"), $.the("fz")), (dh) -> {
@@ -83,7 +97,7 @@ public class FZero extends NAgentX {
 
         double distance = fz.vehicleMetrics[0][1];
         double deltaDistance;
-        deltaDistance = (distance - lastDistance) / 50f;
+        deltaDistance = (distance - lastDistance) / 20f;
         if (deltaDistance > 1f) deltaDistance = 1f;
         if (deltaDistance < -1f) deltaDistance = -1f;
 

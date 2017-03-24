@@ -294,7 +294,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 if ((xs = size()) == y.size()) {
 
-                    if (!op.image || (dt() == y.dt())) {
+                    if ((op.image && (dt() == y.dt())) || !op.temporal || matchTemporalDT(dt(), y.dt())) {
 
                         TermContainer xsubs = subterms();
                         TermContainer ysubs = y.subterms();
@@ -313,6 +313,13 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return false;
 
+    }
+
+    //TODO generalize
+    static boolean matchTemporalDT(int a, int b) {
+        if (a == XTERNAL || b == XTERNAL) return true;
+        if (a == DTERNAL || b == DTERNAL) return true;
+        return a==b;
     }
 
     @Override

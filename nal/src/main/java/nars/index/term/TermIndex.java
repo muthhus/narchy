@@ -183,7 +183,7 @@ public abstract class TermIndex extends TermBuilder {
         int len = src.size();
         List<Term> sub = $.newArrayList(len /* estimate */);
 
-        boolean strict = f instanceof Derivation;
+        boolean strict = !(this instanceof PatternTermIndex); //f instanceof Derivation;
 
         boolean changed = false;
         Compound crc = (Compound) src;

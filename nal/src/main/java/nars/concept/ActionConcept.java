@@ -8,7 +8,7 @@ import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
-import nars.util.signal.SignalTask;
+import nars.task.SignalTask;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
