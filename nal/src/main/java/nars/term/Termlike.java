@@ -139,4 +139,10 @@ public interface Termlike {
     int varPattern();
 
 
+    default boolean unificationPossible(@Nullable Op t) {
+        return (t == Op.VAR_PATTERN) ?
+                (varPattern() > 0) :
+                hasAny(t == null ? Op.VariableBits : t.bit);
+    }
+
 }

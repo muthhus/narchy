@@ -166,13 +166,7 @@ public abstract class Unify extends Termunator implements Subst {
         boolean result;
         try {
             if (unify(x, y)) {
-
-                if (finish) {
-
-                    result = run(this, null, -1);
-                } else {
-                    result = true;
-                }
+                result = finish ? run(this, null, -1) : true;
             } else {
                 result = false;
             }
@@ -235,12 +229,6 @@ public abstract class Unify extends Termunator implements Subst {
         return t == null ? oy.var : oy == t;
     }
 
-    public final boolean matchPossible(@NotNull Termlike x) {
-        Op t = this.type;
-        return (t == Op.VAR_PATTERN) ?
-                    (x.varPattern() > 0) :
-                    x.hasAny(t == null ? Op.VariableBits : t.bit);
-    }
 
 
 
@@ -264,15 +252,13 @@ public abstract class Unify extends Termunator implements Subst {
         Term y2 = yx.get(y);
         if (y2 != null) {
             return unify(x, y2);
-
         } else {
 
             //return putYX(x, y);
             if (putYX((Variable) y, x)) {
-                int start = now();
                 if (y instanceof CommonVariable) {
                     if (!putXY((Variable) y, x)) {
-                        revert(start);
+                        pop(2);
                         return false;
                     }
                 }
@@ -315,18 +301,13 @@ public abstract class Unify extends Termunator implements Subst {
         return t.add(x);
     }
 
-    public final boolean matchPermute(@NotNull TermContainer x, @NotNull TermContainer y) {
-        //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
-        return matchPossible(x) && addTermutator(new CommutivePermutations(this, x, y));
-    }
-
 
     public boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        int start = now();
+
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
                 if (!putYX(x, y)) {
-                    revert(start);
+                    pop(2);
                     return false;
                 }
             }
@@ -338,11 +319,10 @@ public abstract class Unify extends Termunator implements Subst {
 
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
-        int start = now();
         @NotNull Term common = CommonVariable.make((Variable) x, (Variable) y);
         if (putXY(x, common)) {
             if (!putYX(y, common)) {
-                revert(start); //undo the first put
+                pop(2);
                 return false;
             }
             return true;
@@ -351,40 +331,24 @@ public abstract class Unify extends Termunator implements Subst {
         }
     }
 
-    /**
-     * a branch for comparing a particular permutation, called from the main next()
-     */
-    public final boolean matchLinear(@NotNull TermContainer X, @NotNull TermContainer Y) {
-        int s = X.size();
-        switch (s) {
-            case 0:
-                return true; //shouldnt ever happen
-            case 1:
-                return matchSub(X, Y, 0);
-            case 2:
-                //match the target variable first, if exists:
-                return matchLinear2(X, Y, matchType(X.term(0)) ? 0 : 1);
-                //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
-            default:
-                return matchLinearN(X, Y, s);
-        }
-    }
 
-    final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y, int s) {
+
+    public final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y, int s) {
         for (int i = 0; i < s; i++) {
-            if (!matchSub(X, Y, i)) return false;
+            if (!matchSub(X, Y, i))
+                return false;
         }
         return true;
     }
 
-    final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
+    public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
         return unify(X.term(i), Y.term(i));
     }
 
     /**
      * special match for size=2 compounds, with order reversal ability
      */
-    final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
+    public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
         return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
     }
 
@@ -416,6 +380,9 @@ public abstract class Unify extends Termunator implements Subst {
 
     public final void revert(int then) {
         versioning.revert(then);
+    }
+    public final void pop(int count) {
+        versioning.pop(count);
     }
 
     @NotNull public final Term yxResolve(@NotNull Term y) {

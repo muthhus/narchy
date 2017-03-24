@@ -292,22 +292,28 @@ public interface Compound extends Term, IPair, TermContainer {
             int xs;
             if (op == y.op()) {
 
-                if ((xs = size()) == y.size()) {
+                TermContainer xsubs = subterms();
+                TermContainer ysubs = y.subterms();
 
-                    if (op.image && (dt() != y.dt()))
-                        return false;
-                    else if (op.temporal && !matchTemporalDT(dt(), y.dt()))
-                        return false;
+                if ((xs = xsubs.size()) == ysubs.size()) {
 
-                    TermContainer xsubs = subterms();
-                    TermContainer ysubs = y.subterms();
+                    if (op.image) {
+                        if (dt() != y.dt())
+                            return false;
+                    } else if (op.temporal) {
+                        if (!matchTemporalDT(dt(), y.dt()))
+                            return false;
+
+                        //fast test for subterm equality because the compound may not be equal (different but matching dt)
+                        if (xsubs.equals(ysubs)) {
+                            return true;
+                        }
+                    }
 
                     return
                             isCommutative() ?
-                                    subst.matchPermute(xsubs, ysubs) :
-                                    subst.matchLinear(xsubs, ysubs);
-
-
+                                    xsubs.unifyCommute(ysubs, subst) :
+                                    xsubs.unifyLinear(ysubs, subst);
                 }
             }
 

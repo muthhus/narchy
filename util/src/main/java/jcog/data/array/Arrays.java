@@ -341,4 +341,20 @@ public enum Arrays {
             }
         }
     }
+	public static void shuffle(byte[] array, int len, Random random) {
+
+		//probabality for no shuffle at all:
+		if (random.nextInt(factorial(len)) == 0) return;
+
+		for (int i = len; i > 1; i--) {
+			int a = i - 1;
+			int b = random.nextInt(i);
+			if (b != a) {
+				byte t = array[b];
+				array[b] = array[a];
+				array[a] = t;
+			}
+		}
+	}
+
 }

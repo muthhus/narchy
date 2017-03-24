@@ -18,16 +18,14 @@ import java.util.function.Consumer;
 public final class ShuffledSubterms extends ShuffledPermutations implements TermContainer {
 
     public final TermContainer srcsubs;
-    private final Random rng;
 
     public ShuffledSubterms(Random rng, Term[] subterms) {
         this(rng, TermVector.the(subterms));
     }
 
     public ShuffledSubterms(Random rng, TermContainer subterms) {
-        this.rng = rng;
         this.srcsubs = subterms;
-        reset();
+        reset(rng);
     }
 
     @Override
@@ -151,7 +149,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         forEach(set::add);
     }
 
-    public void reset() {
+    public void reset(Random rng) {
         restart(srcsubs.size(), rng);
     }
 

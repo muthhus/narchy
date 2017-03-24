@@ -10,45 +10,47 @@ import org.jetbrains.annotations.NotNull;
  * Created by me on 12/22/15.
  */
 public final class CommutivePermutations extends Termutator {
-    @NotNull
-    private final ShuffledSubterms perm;
+
     @NotNull
     private final TermContainer y;
+    private final TermContainer x;
 
     @NotNull
     @Override
     public String toString() {
 
             return "CommutivePermutations{" +
-                    "perm=" + perm.srcsubs +
+                    //"perm=" + perm.srcsubs +
+                    ", x=" + x +
                     ", y=" + y +
                     '}';
     }
 
-    public CommutivePermutations(@NotNull Unify f, @NotNull TermContainer x, @NotNull TermContainer y) {
+    public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
         super(Util.tuple(CommutivePermutations.class, x, y));
         this.y = y;
-        this.perm = new ShuffledSubterms(f.random,  x);
+        this.x = x;
     }
 
     @Override
     public int getEstimatedPermutations() {
-        return perm.total();
+        throw new UnsupportedOperationException();
+        //return perm.total();
     }
 
     @Override
     public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
         int start = f.now();
 
-        ShuffledSubterms p = this.perm;
-        p.reset();
+        ShuffledSubterms p = new ShuffledSubterms(f.random,  x);
+        //p.reset(f.random); //why is this needed when its called in SHuffledSubterms constructor
 
 
         while (p.hasNext()) {
 
             p.next();
 
-            if (f.matchLinear(p, y)) {
+            if (p.unifyLinear(y, f)) {
                 if (!f.chain(chain, current)) {
                     f.revert(start);
                     return false;

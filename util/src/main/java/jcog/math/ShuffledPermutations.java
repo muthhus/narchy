@@ -10,7 +10,7 @@ import java.util.Random;
 public class ShuffledPermutations extends Permutations {
 
     /** starting index of the current shuffle */
-    int[] shuffle;
+    byte[] shuffle;
 
     /** you probably want to supply your own RNG and use the other restart method */
     @Override public ShuffledPermutations restart(int size) {
@@ -18,16 +18,19 @@ public class ShuffledPermutations extends Permutations {
     }
 
     public ShuffledPermutations restart(int size, Random random) {
+        assert(size < 127);
+
         super.restart(size);
 
         //shuffle = random.nextInt(num);
-        int[] shuffle = this.shuffle;
+        byte[] shuffle = this.shuffle;
         if (shuffle == null || shuffle.length < size)
-            this.shuffle = shuffle = new int[size];
+            this.shuffle = shuffle = new byte[size];
 
         for (int i = 0; i < size; i++)
-            shuffle[i] = i;
+            shuffle[i] = (byte)i;
         Arrays.shuffle(shuffle, size, random);
+
 
         return this;
     }

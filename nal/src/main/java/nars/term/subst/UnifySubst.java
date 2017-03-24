@@ -42,7 +42,7 @@ public class UnifySubst extends Unify {
         this.a = x;
         this.matches = 0;
 
-        if (matchPossible(x) || matchPossible(y)) { //no need to unify if there is actually no variable
+        if (x.unificationPossible(type) || y.unificationPossible(type)) { //no need to unify if there is actually no variable
             super.unify(x, y, start, finish);
         }
 

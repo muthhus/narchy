@@ -7,6 +7,8 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.mutate.CommutivePermutations;
+import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
@@ -731,6 +733,29 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
+    default boolean unifyLinear(TermContainer Y, @NotNull Unify subst) {
+        /**
+         * a branch for comparing a particular permutation, called from the main next()
+         */
+            int s = size();
+            switch (s) {
+                case 0:
+                    return true; //shouldnt ever happen
+                case 1:
+                    return subst.matchSub(this, Y, 0);
+                case 2:
+                    //match the target variable first, if exists:
+                    return subst.matchLinear2(this, Y, subst.matchType(term(0)) ? 0 : 1);
+                //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
+                default:
+                    return subst.matchLinearN(this, Y, s);
+            }
 
+    }
+
+    default boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
+        //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
+        return unificationPossible(subst.type) && subst.addTermutator(new CommutivePermutations(this, y));
+    }
 
 }
