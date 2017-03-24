@@ -1,7 +1,7 @@
 package spacegraph.audio;
 
 
-import jcog.list.ConcurrentArrayList;
+import jcog.list.SynchronizedArrayList;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,7 +9,7 @@ import java.util.List;
 
 
 public class ListenerMixer implements StereoSoundProducer {
-    public final List<Sound> sounds = new ConcurrentArrayList<>(Sound.class);
+    public final List<Sound> sounds = new SynchronizedArrayList<>(Sound.class);
 
 
     private float[] buf = new float[0];

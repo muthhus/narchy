@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
+import edu.cmu.sphinx.linguist.util.LRUCache;
 import jcog.list.FasterList;
 import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -59,8 +60,7 @@ public class TreeChart<X> extends Surface {
 	private LayoutOrient layoutOrient = LayoutOrient.HORIZONTAL;
 	private Collection<ItemVis<X>> children;
 
-	//final Cache<X,ItemVis<X>> cache;// = new WeakHashMap();
-	final LRUMap<X, ItemVis<X>> cache = new LRUMap(1024);
+	final Cache<X,ItemVis<X>> cache;
 
 	public TreeChart() {
 		this(0,0, null);
@@ -68,7 +68,7 @@ public class TreeChart<X> extends Surface {
 
 
 	public TreeChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
-		//cache = Caffeine.newBuilder().maximumSize(1024).build();
+		cache = Caffeine.newBuilder().maximumSize(1024).build();
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class TreeChart<X> extends Surface {
 			if (item == null || i[0]-- <= 0)
 				return; //TODO return false to stop the iteration
 
-			ItemVis<X> e = cache.computeIfAbsent(item, itemBuilder);
+			ItemVis<X> e = cache.get(item, itemBuilder);
 			if (e!=null) {
 				update.accept(item, e);
 				newChildren.add(e);

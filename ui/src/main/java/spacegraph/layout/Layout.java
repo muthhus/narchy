@@ -16,7 +16,7 @@ import java.util.Objects;
  */
  public class Layout extends Surface {
 
-    volatile public List<Surface> children;
+    public List<Surface> children;
 
     protected boolean clipTouchBounds = true;
 

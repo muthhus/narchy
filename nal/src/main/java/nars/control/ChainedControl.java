@@ -2,7 +2,7 @@ package nars.control;
 
 import com.google.common.collect.Iterators;
 import jcog.bag.PLink;
-import jcog.list.ConcurrentArrayList;
+import jcog.list.SynchronizedArrayList;
 import nars.Control;
 import nars.concept.Concept;
 import nars.term.Termed;
@@ -14,7 +14,7 @@ import java.util.Collections;
 /**
  * adapter for a chain of controls
  */
-public class ChainedControl extends ConcurrentArrayList<Control> implements Control {
+public class ChainedControl extends SynchronizedArrayList<Control> implements Control {
 
     public ChainedControl(Control... c) {
         super(Control.class);

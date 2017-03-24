@@ -72,7 +72,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     @Nullable protected v3 gravity;
 
 
-    volatile private List<Collidable> collidable = new FasterList();
+    private List<Collidable> collidable = new FasterList();
 
     final FasterList<BroadConstraint> broadConstraints = new FasterList<>(0);
     final FasterList<TypedConstraint> sortedConstraints = new FasterList<>(0);

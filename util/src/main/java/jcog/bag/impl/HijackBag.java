@@ -1,7 +1,11 @@
 package jcog.bag.impl;
 
+import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.data.array.IntArrays;
+import jcog.data.array.LongArrays;
+import jcog.list.SynchronizedArrayList;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -10,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
@@ -37,11 +42,39 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
     final AtomicInteger size = new AtomicInteger(0);
     final AtomicInteger capacity = new AtomicInteger(0);
-    /**
-     * hash -> ticket
-     */
-    final Map<Integer, Integer> busy = new ConcurrentHashMapUnsafe<>();
-    final AtomicInteger ticket = new AtomicInteger(0);
+
+    /** ID of this bag, for use in constructing keys for the global treadmill */
+    private final int id;
+
+
+    /** lock-free int -> int mapping used as a ticket barrier */
+    static final class Treadmill  {
+
+        static ConcurrentHashMapInsane map = new ConcurrentHashMapInsane(Util.MAX_CONCURRENCY * 2);
+
+        static final AtomicInteger ticket = new AtomicInteger(0);
+
+        public static int newTarget() {
+            return ticket.incrementAndGet();
+        }
+
+        public static long start(int target, int hash) {
+
+            Long ticket = (((long)target) << 32) | hash;
+
+            while (map.putIfAbsent(ticket, Void.TYPE) != null) {
+                //System.out.println("wait");
+            }
+
+            return ticket;
+        }
+
+        public static void end(long ticket) {
+            map.remove(ticket);
+        }
+    }
+
+
     /**
      * pressure from outside trying to enter
      */
@@ -58,6 +91,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public HijackBag(int reprobes, Random random) {
         this.random = random;
         this.reprobes = reprobes;
+        this.id = Treadmill.newTarget();
         this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
 
@@ -160,7 +194,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         if (c == 0)
             return null;
 
-        int hash = x.hashCode();
 
         boolean add = adding != null;
         boolean remove = (!add && (scale == -1));
@@ -170,15 +203,16 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         V found = null; //get or remove
 
         boolean merged = false;
-        final int ticket = add ? busy(hash) : Integer.MIN_VALUE /* N/A for get or remove */;
 
 
         int targetIndex = -1;
         V target = null;
 
-        int iStart = i(c, hash);
         boolean dir = random.nextBoolean(); //choose random initial direction
 
+        int hash = x.hashCode();
+        int iStart = i(c, hash);
+        final long ticket = add ? Treadmill.start(id, hash) : Long.MIN_VALUE /* N/A for get or remove */;
         try {
 
             for (int retry = 0; retry < reprobes; retry++, dir = !dir) {
@@ -274,7 +308,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         }
 
         if (add) {
-            unbusy(hash/*, ticket*/);
+            Treadmill.end(ticket);
         }
 
         if (!merged) {
@@ -376,22 +410,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return y;
     }
 
-    public int busy(int hash) {
-        int ticket = this.ticket.incrementAndGet();
-
-        while (busy.putIfAbsent(hash, ticket) != null) {
-            //System.out.println("wait");
-        }
-
-        return ticket;
-    }
-
-    public void unbusy(int x/*, int ticket*/) {
-        /*boolean freed = */
-        Integer freed = busy.remove(x/*, ticket*/);
-        /*if (freed==null || freed!=ticket)
-            throw new RuntimeException("insertion fault");*/
-    }
 
     /**
      * considers if this priority value stretches the current min/max range

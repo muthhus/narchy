@@ -43,14 +43,14 @@ import java.util.function.Consumer;
  *
  * https://github.com/baratine/baratine/blob/master/core/src/main/java/com/caucho/v5/util/ConcurrentArrayList.java
  */
-public class ConcurrentArrayList<E> extends AbstractList<E>
+public class SynchronizedArrayList<E> extends AbstractList<E>
 {
   private final Class<? extends E> _type;
   private final FasterList<E> _list = new FasterList<E>();
   
   private E []_array;
   
-  public ConcurrentArrayList(Class<E> type)
+  public SynchronizedArrayList(Class<E> type)
   {
     _type = type;
 

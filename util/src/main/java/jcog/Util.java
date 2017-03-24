@@ -62,7 +62,10 @@ public enum Util { ;
     public static final int PRIME2 = 92821;
     public static final int PRIME1 = 31;
     public static final float[] EmptyFloatArray = new float[0]; //TODO find what class this is elsewhere something like ArrayUtils
-    // --- Bits to allow Unsafe access to arrays
+
+    public static final int MAX_CONCURRENCY = Runtime.getRuntime().availableProcessors();
+
+
 
     /**
      * It is basically the same as a lookup table with 2048 entries and linear interpolation between the entries, but all this with IEEE floating point tricks.
