@@ -28,6 +28,7 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermIndex;
+import nars.op.mental.Abbreviation;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Functor;
@@ -317,6 +318,11 @@ public interface Compound extends Term, IPair, TermContainer {
                 }
             }
 
+        } else if (ty instanceof Abbreviation.AliasConcept) {
+            Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
+            if (abbreviated.equals(this) || unify(abbreviated, subst)) {
+                return true;
+            }
         }
 
         return false;

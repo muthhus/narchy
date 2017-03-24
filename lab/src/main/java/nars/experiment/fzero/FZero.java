@@ -3,6 +3,7 @@ package nars.experiment.fzero;
 import jcog.Util;
 import nars.*;
 import nars.nar.NARBuilder;
+import nars.term.Term;
 import nars.time.RealTime;
 import nars.util.task.TaskRule;
 import org.jetbrains.annotations.NotNull;
@@ -40,37 +41,37 @@ public class FZero extends NAgentX {
             new TaskRule("(%1 &&+5 %2)", "seq(%1,%2)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
+                    return polarized(task);
                 }
             };
             new TaskRule("(seq(%1,%2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
+                    return polarized(task);
                 }
             };
             new TaskRule("((%1 &&+5 %2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
+                    return polarized(task);
                 }
             };
             new TaskRule("(%1 &&+0 %2)", "par:{%1,%2}", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
-                }
-            };
+                    return polarized(task);
+                }            };
             new TaskRule("((%1 &| %2) &| %3)", "par:{%1,%2,%3}", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
-                }
-            };
+                    return polarized(task);
+                }            };
+
+            final Term same = $.the("same");
             new TaskRule("(%1 <-> %2)", "same:{%1,%2}", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return true;
+                    return polarized(task) && task.term().containsTermRecursively(same);
                 }
             };
         } catch (Narsese.NarseseException e) {
@@ -118,6 +119,13 @@ public class FZero extends NAgentX {
 //        actionToggle($.inh($.the("right"), $.the("fz")), (b)->{ fz.right = b; });
 
         NAgentX.chart(this);
+    }
+
+    protected boolean polarized(@NotNull Task task) {
+        if (task.isQuestOrQuestion())
+            return true;
+        float f = task.freq();
+        return f <= 0.15f || f >= 0.85f;
     }
 
     double lastDistance;

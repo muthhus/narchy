@@ -12,7 +12,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static nars.Op.BELIEF;
 import static nars.Op.CONJ;
+import static nars.Op.GOAL;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -73,7 +76,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound template, boolean beliefOrGoal, long cre, long start, @Nullable Budget b, NAR nar) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, @Nullable Budget b, NAR nar) {
 
         Budget budget = b != null ? b : budget();
         if (budget == null || budget.isDeleted())
@@ -83,11 +86,25 @@ public final class DynTruth implements Truthed {
         if (tr == null)
             return null;
 
-        long dur = (start!=ETERNAL && template.op() == CONJ) ? template.dtRange() : 0;
-
-        Compound c = Task.post(template, nar);
-        if (c==null)
+        //HACK try to reconstruct the term because it may be invalid
+        c = compoundOrNull($.terms.the(c.op(), c.dt(), c.terms()));
+        if (c == null)
             return null;
+
+
+        c = Task.post(c, nar);
+        if (c == null) return null;
+
+        // normalize it
+        c = compoundOrNull(nar.concepts.normalize(c));
+        if (c == null) return null;
+
+        // then if the term is valid, see if it is valid for a task
+        if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, null, true)) {
+            return null;
+        }
+
+        long dur = (start!=ETERNAL && c.op() == CONJ) ? c.dtRange() : 0;
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, start + dur, evidence());

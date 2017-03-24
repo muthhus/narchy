@@ -279,10 +279,10 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
      * <p>
      * seen from a superterm containing one, it appears as a simple volume=2 concept meanwhile it could be aliasing a concept much larger than it. common "phrase" concepts with a volume >> 2 are good candidates for abbreviation. but when printed, the default toString() method is proxied so it will automatically decompress on output (or other serialization).
      */
-    static final class AliasConcept extends AtomConcept {
+    public static final class AliasConcept extends AtomConcept {
 
         @NotNull
-        private final CompoundConcept abbr;
+        public final CompoundConcept abbr;
         private TermContainer templates;
 
         static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
@@ -363,7 +363,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
             }
 
             //try to unify with 'y'
-            return tt.equals(y); //tt.unify(y, subst);
+            return tt.equals(y) || tt.unify(y, subst);
         }
 
 //        @Override

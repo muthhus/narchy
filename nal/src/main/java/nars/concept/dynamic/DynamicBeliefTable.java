@@ -66,18 +66,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Budget b) {
 
-        //HACK try to reconstruct the term because it may be invalid
-        template = compoundOrNull($.terms.the(template.op(), template.dt(), template.terms()));
-        if (template == null)
-            return null;
 
-        // normalize it
-        template = compoundOrNull(dynamicConcept.nar.concepts.normalize(template));
-
-        // then if the term is valid, see if it is valid for a task
-        if (template==null || !Task.taskContentValid(template, beliefOrGoal ? BELIEF : GOAL, null, true)) {
-            return null;
-        }
 
         DynTruth yy = truth(when, template, true);
         return yy != null ? yy.task(template, beliefOrGoal, now, when, b, dynamicConcept.nar) : null;

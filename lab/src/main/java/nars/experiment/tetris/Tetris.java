@@ -687,13 +687,13 @@ public class Tetris extends NAgentX implements Bitmap2D {
         NAgentX.chart(a);
 
             Default m = new Default(512, 16, 2, 2, n.random,
-                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, null),
+                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
                     new RealTime.DSHalf().durSeconds(0.1f));
 
-            float metaLearningRate = 0.5f;
+            float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);
             m.goalConfidence(metaLearningRate);
-            m.termVolumeMax.setValue(18);
+            m.termVolumeMax.setValue(24);
         MetaAgent metaT = new MetaAgent(a
                 ,m
 

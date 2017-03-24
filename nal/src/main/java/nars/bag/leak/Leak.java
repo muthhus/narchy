@@ -69,16 +69,13 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
 
         long last = this.last;
         long now = nar.time();
+        int dur = nar.dur();
+        if (now - last < dur)
+            return; //too soon
 
-        if (now == last)
-            return; //no time yet
-
-        float durDelta = Math.min(1f, ((float)(now - last)) / nar.dur()); //limit to one in case of lag
-
-        boolean leaked = false;
         //for each full integer = 1 instanceof a 100% prob selection
         // each fraction of an integer = some probability of a next one occurring
-        for (float r = rate.floatValue() * durDelta;
+        for (float r = rate.floatValue();
              (r > 0) &&
              bag.size() >= minSizeForLeak() &&
              ((r >= 1) || ((r < 1f) && (nar.random.nextFloat() < r)));
@@ -87,12 +84,10 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
             if (t!=null) {
                 float cost = onOut(t);
                 r -= cost;
-                leaked = true;
             }
         }
 
-        if (leaked)
-            this.last = now;
+        this.last = now;
 
     }
 

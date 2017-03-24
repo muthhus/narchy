@@ -33,6 +33,9 @@ public class TaskRule extends TaskMatch{
         Compound y = compoundOrNull(nar.concepts.transform(output, new MapSubst(xy)));
         if (y==null) return;
 
+        y = Task.post(y, nar);
+        if (y==null) return;
+
         y = compoundOrNull(nar.concepts.normalize(y));
         if (y==null) return;
 
@@ -40,7 +43,8 @@ public class TaskRule extends TaskMatch{
             return;
 
         Task Y = ((ImmutableTask)X).clone(y);
-        nar.input(Y);
+        if (Y != null)
+            nar.input(Y);
     }
 
 }

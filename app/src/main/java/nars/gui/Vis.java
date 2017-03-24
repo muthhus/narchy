@@ -475,7 +475,7 @@ public class Vis {
             super(Grid.VERTICAL);
             this.plotHistory = plotHistory;
             //plot1 = new Plot2D(plotHistory, Plot2D.Line);
-            plot2 = new Plot2D(plotHistory, Plot2D.BarWave);
+            plot2 = new Plot2D(plotHistory, Plot2D.Line);
             plot3 = new Plot2D(plotHistory, Plot2D.Line);
             plot4 = new Plot2D(plotHistory, Plot2D.Line);
             set( plot2, plot3, plot4 );
@@ -483,8 +483,8 @@ public class Vis {
             //plot1.add("Conf", nar.emotion.confident::getSum);
             plot2.add("Busy", nar.emotion.busyPri::getSum);
             plot3.add("Lern", nar.emotion::learningPri);
-            plot4.add("Hapy", nar.emotion.happy::getSum);
-            plot4.add("Sad", nar.emotion.sad::getSum);
+//            plot4.add("Hapy", nar.emotion.happy::getSum);
+//            plot4.add("Sad", nar.emotion.sad::getSum);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
             nar.onCycleWeak(this);

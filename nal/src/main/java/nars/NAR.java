@@ -655,7 +655,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
 
                 if (a != null) {
 
-                    eventTaskProcess.emit(post(input));
+                    eventTaskProcess.emit(/*post*/(input));
 
                     emotion.learn(inputPri, input.volume());
 

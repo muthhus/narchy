@@ -84,8 +84,8 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
             this.compressed = AliasConcept.get(newSerialTerm(), decompressed, nar);
 
             Compound s = compoundOrNull(
-                    //$.sim
-                    $.equi
+                    $.sim
+                    //$.equi
                             (compressed, decompressed)
             );
             if (s == null)

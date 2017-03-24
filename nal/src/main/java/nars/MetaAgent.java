@@ -25,18 +25,24 @@ public class MetaAgent extends NAgent {
         this.agent = agent;
         NAR agentNAR = agent.nar;
 
-        senseNumberNormalized(p("happy"), agentNAR.emotion::happy);
-        senseNumberNormalized(p("sad"), agentNAR.emotion::sad);
+        senseNumberNormalized(p("happy"),
+                //agentNAR.emotion::happy
+                agent.happy
+        );
+        //senseNumberNormalized(p("sad"), agentNAR.emotion::sad);
         senseNumberNormalized(p("busyPri") /*$.func($.the("busy"),$.the("pri"))*/, ()->(float)agentNAR.emotion.busyPri.getSum());
         senseNumberNormalized(p("busyVol") /*$.func($.the("busy"),$.the("vol"))*/, ()->(float)agentNAR.emotion.busyVol.getSum());
         senseNumber(p("lernPri") /*$.func($.the("lern"),$.the("pri"))*/, agentNAR.emotion::learningPri);
         senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, agentNAR.emotion::learningVol);
         senseNumber(p("dext"), agent::dexterity);
 
-        actionLerp(p("curi"), (c) -> {
-            c = Util.unitize(c);
-            agent.curiosityConf.setValue(c);
+        actionLerp(p("curiConf"), (c) -> {
+            agent.curiosityConf.setValue(Util.unitize(c));
         }, -0.02f /* non-zero deadzone */, 0.25f);
+        actionLerp(p("curiProb"), (c) -> {
+            agent.curiosityProb.setValue(Util.unitize(c));
+        }, -0.02f /* non-zero deadzone */, 0.5f);
+
 
         actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 
@@ -49,11 +55,12 @@ public class MetaAgent extends NAgent {
     @Override
     protected float act() {
         //TODO other qualities to maximize: runtime speed, memory usage, etc..
-        //float agentHappiness = agent.happy.asFloat();
-        float narHappiness = agent.nar.emotion.happy();
-        float narSadness = agent.nar.emotion.sad();
+        float agentHappiness = agent.happy.asFloat();
+        //float narHappiness = agent.nar.emotion.happy();
+        //float narSadness = agent.nar.emotion.sad();
 
-        return /*agentHappiness + */narHappiness - narSadness;
+        //return /*agentHappiness + */narHappiness - narSadness;
+        return agentHappiness;
     }
 
 }
