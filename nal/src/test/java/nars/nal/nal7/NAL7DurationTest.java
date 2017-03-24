@@ -1,7 +1,10 @@
 package nars.nal.nal7;
 
 import com.google.common.collect.Lists;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Task;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;

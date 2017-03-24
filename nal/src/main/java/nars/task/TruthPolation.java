@@ -8,8 +8,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 import static jcog.Util.sqr;
 import static nars.Param.TRUTH_EPSILON;
 import static nars.truth.TruthFunctions.c2w;

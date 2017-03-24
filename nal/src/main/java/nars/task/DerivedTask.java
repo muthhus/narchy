@@ -1,10 +1,8 @@
 package nars.task;
 
-import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.DependentBLink;
 import nars.budget.RawBLink;
@@ -12,7 +10,6 @@ import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.Premise;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;

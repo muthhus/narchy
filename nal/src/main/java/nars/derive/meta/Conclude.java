@@ -1,7 +1,10 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;

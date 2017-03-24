@@ -25,7 +25,6 @@ import java.util.Random;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
-import static nars.util.UtilityFunctions.or;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal

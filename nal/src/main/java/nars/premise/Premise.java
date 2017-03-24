@@ -5,12 +5,9 @@
 package nars.premise;
 
 import nars.Task;
-import nars.budget.Budget;
 import nars.budget.RawBudget;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -23,7 +23,6 @@ import org.junit.Test;
 import java.util.TreeSet;
 
 import static com.google.common.collect.Iterables.size;
-import static java.lang.System.out;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.time.Tense.DTERNAL;

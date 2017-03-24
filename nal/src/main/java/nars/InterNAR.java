@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
 import nars.budget.BLink;
+import nars.task.LambdaQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -11,12 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
  * InterNAR P2P Network Interface for a NAR
  */
-public class InterNAR extends UDPeer {
+public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, Task> {
 
     public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
@@ -40,10 +42,12 @@ public class InterNAR extends UDPeer {
                 if (!them.isEmpty()) {
                     try {
                         x = nar.post(x);
-                        @Nullable byte[] msg = IO.taskToBytes(x);
-                        if (msg!=null) {
-                            if (say(msg, Util.lerp(x.pri() * x.qua(), 3, 1), true) > 0) {
-                                return 1;
+                        if (x!=null) {
+                            @Nullable byte[] msg = IO.taskToBytes(x);
+                            if (msg != null) {
+                                if (say(msg, ttl(x), true) > 0) {
+                                    return 1;
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -63,6 +67,10 @@ public class InterNAR extends UDPeer {
             }
         };
         logger.info("start");
+    }
+
+    private static byte ttl(Task x) {
+        return (byte)Util.lerp((1f + x.pri()) * (1f + x.qua()), 5, 2);
     }
 
     @Override
@@ -88,6 +96,8 @@ public class InterNAR extends UDPeer {
         if (x!=null) {
             if (x.isQuestOrQuestion()) {
                 //reconstruct a question task with an onAnswered handler to reply with answers to the sender
+                x = new LambdaQuestionTask(x, 8, nar, this);
+                x.meta(Msg.class, m);
             }
 
             //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
@@ -95,4 +105,25 @@ public class InterNAR extends UDPeer {
         }
     }
 
+    @Override
+    public void accept(LambdaQuestionTask question, Task answer) {
+        Msg q = question.meta(Msg.class);
+        if (q==null)
+            return;
+
+        try {
+            answer = nar.post(answer);
+            if (answer!=null) {
+                @Nullable byte[] a = IO.taskToBytes(answer);
+                if (a != null) {
+                    Msg aa = new Msg(SAY, ttl(answer), me, a);
+                    if (!seen(aa, 1f))
+                        send(aa, q.origin());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

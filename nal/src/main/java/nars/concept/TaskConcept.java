@@ -8,7 +8,6 @@ import nars.budget.BudgetMerge;
 import nars.conceptualize.state.ConceptState;
 import nars.table.*;
 import nars.term.Compound;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -4,8 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
-import jcog.data.byt.DynByteSeq;
-import nars.IO;
 import nars.NAR;
 import nars.Param;
 import nars.conceptualize.ConceptBuilder;
@@ -15,7 +13,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 

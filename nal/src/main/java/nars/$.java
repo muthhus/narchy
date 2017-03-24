@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
-import javax.xml.stream.events.Characters;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;

@@ -23,7 +23,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
-import static nars.budget.BudgetMerge.avgBlend;
 import static nars.budget.BudgetMerge.maxBlend;
 import static nars.budget.BudgetMerge.plusBlend;
 

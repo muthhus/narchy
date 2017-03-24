@@ -1,6 +1,8 @@
 package nars.concept;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Task;
 import nars.task.ImmutableTask;
 import nars.task.Revision;
 import nars.term.Compound;
@@ -13,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.$.t;
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 

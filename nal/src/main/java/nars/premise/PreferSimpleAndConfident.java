@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import static jcog.Util.unitize;
 import static nars.Op.*;
 import static nars.truth.TruthFunctions.w2c;
-import static nars.util.UtilityFunctions.and;
 
 /**
  * prioritizes derivations exhibiting confidence increase, relative to the premise's evidence

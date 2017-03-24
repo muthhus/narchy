@@ -1,17 +1,12 @@
 package nars.derive;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.collect.Lists;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Implements a strategy for managing submitted derivation processes

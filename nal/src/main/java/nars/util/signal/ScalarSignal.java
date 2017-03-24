@@ -3,7 +3,6 @@ package nars.util.signal;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.term.Compound;

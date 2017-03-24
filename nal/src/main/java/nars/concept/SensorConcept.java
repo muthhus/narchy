@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.function.Function;
 
-import static nars.Op.BELIEF;
-
 
 /**
  * primarily a collector for believing time-changing input signals

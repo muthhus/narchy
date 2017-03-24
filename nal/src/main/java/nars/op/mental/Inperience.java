@@ -1,17 +1,14 @@
 package nars.op.mental;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.bag.leak.Leak;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
-import nars.premise.Premise;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;

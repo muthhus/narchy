@@ -9,7 +9,6 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.time.Tense;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import nars.util.task.InvalidTaskException;
@@ -22,10 +21,7 @@ import java.util.function.Function;
 
 import static nars.$.t;
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 /**
  * Default Task implementation

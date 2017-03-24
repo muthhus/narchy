@@ -15,9 +15,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.Op.QUESTION;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 

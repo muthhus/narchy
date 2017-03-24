@@ -30,9 +30,7 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
-import static nars.Op.ATOM;
-import static nars.Op.INH;
-import static nars.Op.INT;
+import static nars.Op.*;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;

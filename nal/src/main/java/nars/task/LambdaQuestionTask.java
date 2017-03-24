@@ -17,9 +17,16 @@ import java.util.function.Consumer;
  */
 public class LambdaQuestionTask extends ImmutableTask {
 
-    private @NotNull final BiConsumer<LambdaQuestionTask /* Q */, Task /* A */ > eachAnswer;
+    private @NotNull final BiConsumer<? super LambdaQuestionTask /* Q */, Task /* A */ > eachAnswer;
 
     final ArrayBag<Task> answers;
+
+    /** wrap an existing question task */
+    public LambdaQuestionTask(Task q, int history, NAR nar, BiConsumer<? super LambdaQuestionTask,Task> eachAnswer ) {
+        super(q.term(), q.punc(), null, q.creation(), q.start(), q.end(), new long[] { nar.time.nextStamp() } );
+        this.answers = newBag(history);
+        this.eachAnswer = eachAnswer;
+    }
 
     public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull Consumer<Task> eachAnswer) {
         this(term, punc, occ, history, nar, (q, a) -> {
@@ -27,11 +34,15 @@ public class LambdaQuestionTask extends ImmutableTask {
         });
     }
 
-    public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<? super LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null, nar.time(), occ, occ, new long[] { nar.time.nextStamp() } );
 
-        this.answers = new ArrayBag<>(history, BudgetMerge.maxHard, new ConcurrentHashMap<>(history));
+        this.answers = newBag(history);
         this.eachAnswer = eachAnswer;
+    }
+
+    protected ArrayBag<Task> newBag(int history) {
+        return new ArrayBag<>(history, BudgetMerge.maxHard, new ConcurrentHashMap<>(history));
     }
 
     @Override

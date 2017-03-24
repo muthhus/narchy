@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

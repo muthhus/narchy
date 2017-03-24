@@ -9,10 +9,8 @@ import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
-import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,6 @@ import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.Param.TRUTH_EPSILON;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/4/16.

@@ -8,8 +8,6 @@ import nars.concept.ActionConcept;
 import nars.concept.BeliefActionConcept;
 import nars.concept.SensorConcept;
 
-import static nars.Op.BELIEF;
-
 
 /**
  * 1 input x 1 output environment

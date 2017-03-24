@@ -3,19 +3,11 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
-import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
-import jcog.data.MutableInteger;
-import jcog.data.Range;
 import nars.Control;
 import nars.NAR;
-import nars.Param;
-import nars.Task;
-import nars.bag.impl.TaskHijackBag;
-import nars.budget.BudgetMerge;
 import nars.concept.Concept;
-import nars.derive.Deriver;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Termed;
@@ -24,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
 /**

@@ -13,7 +13,6 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.premise.DerivationBudgeting;
 import nars.premise.MatrixPremiseBuilder;
 import nars.premise.PreferSimpleAndConfident;
 import nars.time.FrameTime;

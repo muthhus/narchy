@@ -3,7 +3,6 @@ package nars.table;
 import nars.$;
 import nars.Task;
 import nars.truth.Truth;
-import nars.util.signal.SignalTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;

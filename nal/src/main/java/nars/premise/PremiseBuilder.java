@@ -5,15 +5,12 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
-import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
-import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -26,7 +23,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
 

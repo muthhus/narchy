@@ -359,8 +359,10 @@ public class Formula implements Comparable {
                 // if (DEBUG) { System.out.println(); }
                 while (insideQuote || theFormula.charAt(i) != ')' || level > 0) {
 
+                    char fi = theFormula.charAt(i);
+
                     // if (DEBUG) { System.out.print(theFormula.charAt(i)); }
-                    if (quoteChars.contains(theFormula.charAt(i))) {
+                    if (quoteChars.contains(fi)) {
                         if (theFormula.charAt(i - 1) != '\\') {
                             if (quoteCharInForce == '0') {
                                 quoteCharInForce = theFormula.charAt(i);
@@ -370,7 +372,7 @@ public class Formula implements Comparable {
                                  System.out.println("|insideQuote == " + insideQuote + "|");
                                  }
                                  */
-                            } else if (quoteCharInForce == theFormula.charAt(i)) {
+                            } else if (quoteCharInForce == fi) {
                                 quoteCharInForce = '0';
                                 insideQuote = false;
                                 /*
@@ -382,10 +384,9 @@ public class Formula implements Comparable {
                         }
                     }
                     if (!insideQuote) {
-                        if (theFormula.charAt(i) == ')') {
+                        if (fi == ')') {
                             level--;
-                        }
-                        if (theFormula.charAt(i) == '(') {
+                        } else if (fi == '(') {
                             level++;
                         }
                     }
@@ -398,11 +399,12 @@ public class Formula implements Comparable {
                 if (theFormula.charAt(i) == '"' || theFormula.charAt(i) == '\'') {
                     char quoteChar = theFormula.charAt(i);
                     i++;
-                    while (((theFormula.charAt(i) != quoteChar
-                            || (theFormula.charAt(i) == quoteChar && theFormula.charAt(i - 1) == '\\'))
-                            && i < theFormula.length() - 1)) {
-                        i++;
-                    }
+                    char fi;
+                    do {
+                        fi = theFormula.charAt(i);
+                    } while ((fi != quoteChar
+                            || (fi == quoteChar && theFormula.charAt(i - 1) == '\\'))
+                            && (i++ < theFormula.length() - 1));
                     i++;
                 } else {
                     while (!Character.isWhitespace(theFormula.charAt(i)) && i < theFormula.length() - 1) {
@@ -889,10 +891,7 @@ public class Formula implements Comparable {
             }
             form.read(form.cdr());
         }
-        if (ans == null) {
-            ans = "";
-        }
-        return ans;
+        return ans!=null ? ans : "";
     }
 
     /**
@@ -931,7 +930,7 @@ public class Formula implements Comparable {
         int index = start;
         ArrayList<String> result = new ArrayList();
         String arg = getArgument(index);
-        while (arg != null && !arg.isEmpty() && !arg.isEmpty()) {
+        while (arg != null && !arg.isEmpty()) {
             result.add(arg.intern());
             index++;
             arg = getArgument(index);

@@ -1,7 +1,5 @@
 package nars.derive;
 
-import nars.premise.Derivation;
-
 /**
  * Created by me on 12/26/16.
  */

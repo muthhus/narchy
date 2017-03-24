@@ -50,7 +50,6 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 
 public interface Term extends Termed, Termlike, Comparable<Termlike> {

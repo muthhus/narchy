@@ -342,7 +342,7 @@ public class UDPeer extends UDP {
         }
     }
 
-    private boolean seen(Msg o, float pri) {
+    public boolean seen(Msg o, float pri) {
         RawPLink p = new RawPLink(o, pri);
         return seen.put(p) != p; //what about if it returns null
     }

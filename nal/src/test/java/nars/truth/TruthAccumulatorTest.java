@@ -3,7 +3,8 @@ package nars.truth;
 import nars.$;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Created by me on 3/22/17.

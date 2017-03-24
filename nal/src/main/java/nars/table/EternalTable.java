@@ -9,7 +9,6 @@ import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
