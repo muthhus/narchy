@@ -157,7 +157,7 @@ public abstract class Param  {
     /**
      * how precise unit test results must match expected values to pass
      */
-    public static final float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
+    public static float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
 
 
 

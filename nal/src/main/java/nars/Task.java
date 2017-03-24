@@ -274,7 +274,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
                 new ArrayBag<>(BudgetMerge.maxBlend,
                         new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            float confEffective = answer.conf(mid(), nar.time.dur());
+            float confEffective = answer.conf(mid(), nar.dur());
 
             if (!answers.contains(answer)) {
 

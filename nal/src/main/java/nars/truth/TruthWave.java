@@ -47,7 +47,7 @@ public class TruthWave {
 
     public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
         this(b.size());
-        set(b, n.time(), n.time.dur());
+        set(b, n.time(), n.dur());
     }
 
     /** clears and fills this wave with the data from a table */

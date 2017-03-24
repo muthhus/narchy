@@ -220,16 +220,17 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (task == null)
             return false;
 
-        if (!task.term().equals(term))
-            return false;
-
-        if (task.punc() != punc)
-            return false;
 
         if (!truthMatches(task))
             return false;
 
         if (!timeMatches(task))
+            return false;
+
+        if (!task.term().equals(term))
+            return false;
+
+        if (task.punc() != punc)
             return false;
 
         return true;
@@ -241,12 +242,12 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (tt == null)
                 return false;
 
-            float fr = tt.freq();
-            if ((fr > freqMax) || (fr < freqMin))
-                return false;
-
             float co = tt.conf();
             if ((co > confMax) || (co < confMin))
+                return false;
+
+            float fr = tt.freq();
+            if ((fr > freqMax) || (fr < freqMin))
                 return false;
 
         }

@@ -317,7 +317,7 @@ public class Line1DSimplestTest {
         Default n = new Default(1024, 16, 1, 3);
         n.on("say", (Command) (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
-                n.inputAt(Math.round(nar.time()+nar.time.dur()), "say(" +  args[0] + "). :|:");
+                n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");
         });
 
         n.log();

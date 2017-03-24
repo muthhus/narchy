@@ -167,7 +167,7 @@ public class Derivation extends Unify {
                 //??
             } else {
                 //project
-                beliefTruth = belief.truth(start, nar.time.dur(), confMin); //project belief truth to task's time
+                beliefTruth = belief.truth(start, nar.dur(), confMin); //project belief truth to task's time
             }
             this.beliefTruth = beliefTruth;
         }

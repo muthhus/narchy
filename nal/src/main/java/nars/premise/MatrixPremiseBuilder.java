@@ -143,7 +143,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
                     if ((now >= start) && (now <= end)) {
                         when = now; //inner
                     } else {
-                        if (Math.abs(now - start) < Math.abs(now - end)) {
+                        if (Math.abs(now - start) <= Math.abs(now - end)) {
                             when = start;
                         } else {
                             when = end;

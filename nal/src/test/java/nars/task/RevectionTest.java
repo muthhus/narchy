@@ -170,7 +170,7 @@ public class RevectionTest {
 
             long now = b.nar.time();
 
-            Task tt = b.concept().beliefs().match(now, b.nar.time.dur());
+            Task tt = b.concept().beliefs().match(now, b.nar.dur());
             tops.add(tt);
 
             System.out.println(now + " " +  tt);
@@ -249,7 +249,7 @@ public class RevectionTest {
         b.print();
         assertEquals(repeats, b.size(true));
 
-        @Nullable Truth result = b.beliefs().truth(at, n.time.dur());
+        @Nullable Truth result = b.beliefs().truth(at, n.dur());
         assertEquals(freq, result.freq(), Param.TRUTH_EPSILON);
         assertEquals(outConf, result.conf(), Param.TRUTH_EPSILON);
     }

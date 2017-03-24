@@ -906,8 +906,19 @@ public class NAL8Test extends AbstractNALTest {
             .goal("(reward)")
             .believe("((good) ==> (reward))", 1, 0.9f)
             .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
-            .mustDesire(cycles*5, "(bad)", 0.0f, 0.81f);
+            .mustDesire(cycles, "(good)", 1.0f, 0.81f)
+            .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
 
+    }
+    @Test
+    public void testInhibitionReverse()  {
+        test()
+                .goal("(--,(reward))")
+                .believe("((good) ==> (reward))", 1, 0.9f)
+                .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
+                .mustDesire(cycles, "(good)", 0.0f, 0.81f)
+                .mustDesire(cycles, "(bad)", 1.0f, 0.81f)
+        ;
     }
 
     @Test

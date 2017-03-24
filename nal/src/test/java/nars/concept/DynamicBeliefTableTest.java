@@ -30,7 +30,7 @@ public class DynamicBeliefTableTest {
         n.believe("b:x", 0f, 0.9f);
         n.run(1);
         long now = n.time();
-        int dur = n.time.dur();
+        int dur = n.dur();
         assertEquals($.t(1f,0.81f), n.concept($("(a:x && a:y)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("(b:x && a:y)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("(a:x && (--,a:y))"), true).belief(now, dur));
@@ -48,7 +48,7 @@ public class DynamicBeliefTableTest {
         n.believe("z:b", 0f, 0.9f);
         n.run(1);
         long now = n.time();
-        int dur = n.time.dur();
+        int dur = n.dur();
         assertTrue(n.concept($("((x|y)-->a)"), true) instanceof DynamicConcept);
         assertEquals($.t(1f,0.81f), n.concept($("((x|y)-->a)"), true).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.concept($("((x|z)-->a)"), true).belief(now, dur));
@@ -71,7 +71,7 @@ public class DynamicBeliefTableTest {
         n.run(1);
 
         Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
-        Truth now = cc.belief(n.time(), n.time.dur());
+        Truth now = cc.belief(n.time(), n.dur());
         assertTrue($.t(1f, 0.73f).equals(now, 0.01f));
         //the truth values were provided despite the belief tables being empty:
         assertTrue(cc.beliefs().isEmpty());
@@ -79,14 +79,14 @@ public class DynamicBeliefTableTest {
         //test unknown:
         {
             Concept ccn = n.concept($("(&&, a:x, a:w)"), true);
-            Truth nown = ccn.belief(n.time(), n.time.dur());
+            Truth nown = ccn.belief(n.time(), n.dur());
             assertNull(nown);
         }
 
         //test negation:
         {
             Concept ccn = n.concept($("(&&, a:x, (--, a:y), a:z)"), true);
-            Truth nown = ccn.belief(n.time(), n.time.dur());
+            Truth nown = ccn.belief(n.time(), n.dur());
             assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
         }
 
@@ -94,7 +94,7 @@ public class DynamicBeliefTableTest {
         n.believe("a:y", 0, 0.95f);
         n.run(1);
         Concept ccn = n.concept("(&&, a:x, a:y, a:z)");
-        Truth now2 = ccn.belief(n.time(), n.time.dur());
+        Truth now2 = ccn.belief(n.time(), n.dur());
         assertTrue(now2.freq() < 0.4f);
 
     }
@@ -147,7 +147,7 @@ public class DynamicBeliefTableTest {
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"), false);
-        int dur = n.time.dur();
+        int dur = n.dur();
 
         Truth t = prod.belief(n.time(), dur);
         System.out.println(t);
@@ -172,7 +172,7 @@ public class DynamicBeliefTableTest {
 
     @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
-        int dur = n.time.dur();
+        int dur = n.dur();
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 

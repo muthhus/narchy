@@ -32,10 +32,17 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    Goduction() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return (T == null || B == null) ? null : TruthFunctions.desireStrongOriginal(T, B, minConf);
+        }
+    },
+
     @SinglePremise StructuralGoduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
+            return (T == null) ? null : TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
         }
     },
 

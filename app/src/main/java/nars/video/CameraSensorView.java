@@ -31,7 +31,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     @Override
     public void accept(NAR nn) {
         now = nn.time();
-        dur = nn.time.dur();
+        dur = nn.dur();
         maxConceptPriority = nar instanceof Default ? ((Default) nar).core.active.priMax() : 1; //HACK TODO cache this
     }
 

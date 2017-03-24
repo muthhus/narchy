@@ -5,6 +5,8 @@ import nars.Narsese;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.time.Tense.ETERNAL;
+
 /**
  * Created by me on 10/14/15.
  */
@@ -38,15 +40,15 @@ public class TemporalTaskCondition extends EternalTaskCondition {
 
     @Override
     protected boolean occurrenceTimeMatches(@NotNull Task task) {
-        if (task.isEternal()) return false;
-
-        //final long cc = task.getCreationTime();
         long s = task.start();
-        if (!((s >= occStartStart) && (s <= occStartEnd)))
+
+        if (s == ETERNAL) return false;
+
+        if ((s < occStartStart) || (s > occStartEnd))
             return false;
 
         long e = task.end();
-        if (!((e >= occEndStart) && (e <= occEndEnd)))
+        if ((e < occEndStart) || (e > occEndEnd))
             return false;
 
         return true;

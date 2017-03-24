@@ -105,45 +105,45 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         NAR nar = m.nar;
 
-        if (rule.minNAL <= nar.level()) { //HACK
+//        if (rule.minNAL <= nar.level())  //HACK
+//            return true;
 
-            try {
-                //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
-                //  which is already determined bythe constructed term's growing complexity) in m.budget()
+        try {
+            //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
+            //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-                Term r = m.index.transform(this.conclusionPattern, m);
-                if (r == null || r instanceof Variable || isTrueOrFalse(r))
-                    return true;
+            Term r = m.index.transform(this.conclusionPattern, m);
+            if (r == null || r instanceof Variable || isTrueOrFalse(r))
+                return true;
 
-                r = Task.post(r, nar);
+            r = Task.post(r, nar);
 
-                if (r instanceof Compound) {
+            if (r instanceof Compound) {
 
-                    Compound cr = (Compound) r;
+                Compound cr = (Compound) r;
 
-                    //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                    Compound crr = nar.concepts.eval(cr);
-                    if (crr == null) {
+                //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+                Compound crr = nar.concepts.eval(cr);
+                if (crr == null) {
 //                        if (Param.DEBUG)
 //                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
 //                        else
-                            return true;
-                    }
-
-                    TruthPuncEvidence ct = m.punct.get();
-
-                    Truth truth = ct.truth;
-                    byte punc = ct.punc;
-
-                    Budget budget = m.budgeting.budget(m, crr, truth, punc);
-                    if (budget != null) {
-                        derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2
-                    }
+                        return true;
                 }
-            } catch (@NotNull InvalidTermException | InvalidTaskException e) {
-                if (Param.DEBUG_EXTRA)
-                    logger.warn("{} {}", m, e.getMessage());
+
+                TruthPuncEvidence ct = m.punct.get();
+
+                Truth truth = ct.truth;
+                byte punc = ct.punc;
+
+                Budget budget = m.budgeting.budget(m, crr, truth, punc);
+                if (budget != null) {
+                    derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2
+                }
             }
+        } catch (@NotNull InvalidTermException | InvalidTaskException e) {
+            if (Param.DEBUG_EXTRA)
+                logger.warn("{} {}", m, e.getMessage());
         }
 
         return true;

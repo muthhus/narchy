@@ -423,7 +423,7 @@ public class TemporalTest {
 
         //test belief match interpolated a result
         {
-            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.time.dur(), null, true).term().toString());
+            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
         }
 
 
@@ -437,7 +437,7 @@ public class TemporalTest {
             //n.forEachTask(System.out::println);
 
             //INTERMPOLATION APPLIED AFTER REVECTION:
-            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.time.dur(), null, true).term().toString());
+            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
         }
     }
 

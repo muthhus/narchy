@@ -29,8 +29,8 @@ public class BeliefActionConcept extends ActionConcept {
     }
 
     @Override
-    public @Nullable Task curiosity(float conf, NAR nar) {
-        return GoalActionConcept.curiosity(term(), BELIEF, conf, nar);
+    public @Nullable Task curiosity(float conf, long next, NAR nar) {
+        return GoalActionConcept.curiosity(term(), BELIEF, conf, next, nar);
     }
 
     @Override

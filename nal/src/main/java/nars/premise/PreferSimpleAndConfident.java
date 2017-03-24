@@ -129,10 +129,12 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 //            penaltyComplexity = 1;
 //        }
         return
-                //Util.sqr( //sharpen
-                    Util.unitize( ((float) parentComplexity) / (parentComplexity + derivedComplexity))
+                //Util.sqr(Util.unitize( //sharpen
+                1f - Util.unitize(
+                    Math.max(0, (float)(derivedComplexity - parentComplexity) / (parentComplexity + derivedComplexity))
+                    //((float) parentComplexity) / (parentComplexity + derivedComplexity)
                     //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
-                //)
+                )
             ;
     }
 

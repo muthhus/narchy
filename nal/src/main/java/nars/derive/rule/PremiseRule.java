@@ -782,13 +782,14 @@ public class PremiseRule extends GenericCompound {
 //                        case "dtIntersect":
 //                            timeFunction = TimeFunctions.dtIntersect;
 //                            break;
-                        case "dtUnion":
-                            timeFunction = TimeFunctions.dtUnion;
+
+                        case "dtSum":
+                            timeFunction = TimeFunctions.dtSum;
                             break;
-                        case "dtUnionReverse":
-                            timeFunction = TimeFunctions.dtUnionReverse;
+                        case "dtSumReverse":
+                            timeFunction = TimeFunctions.dtSumReverse;
                             break;
-//                        case "occMerge":
+                            //                        case "occMerge":
 //                            timeFunction = TimeFunctions.occMerge;
 //                            break;
 

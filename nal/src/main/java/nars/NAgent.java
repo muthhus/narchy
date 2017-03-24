@@ -205,7 +205,8 @@ abstract public class NAgent implements NSense, NAct {
 
         long lastNow = this.now;
         long now = nar.time();
-        if (now - lastNow < nar.time.dur()) {
+        int dur = nar.dur();
+        if (now - lastNow < dur) {
             return; //only execute at most one agent frame per duration
         }
 
@@ -223,6 +224,7 @@ abstract public class NAgent implements NSense, NAct {
 //        if (load < 1) {
 
 
+        long next = now + dur;
 
         nar.input(
 
@@ -234,9 +236,9 @@ abstract public class NAgent implements NSense, NAct {
                     actions.stream()
                 ).map(f -> f.apply(nar)),
 
-                predict(),
+                predict(next),
 
-                curious()
+                curious(next)
 
             ),
 
@@ -253,14 +255,16 @@ abstract public class NAgent implements NSense, NAct {
             logger.info(summary());
     }
 
-    protected Stream<Task> curious() {
+    protected Stream<Task> curious(long next) {
         float conf = curiosityConf.floatValue();
         float confMin = nar.confMin.floatValue();
+        if (conf < confMin)
+            return Stream.empty();
 
         return actions.stream().map(action -> {
 
-            if ((conf >= confMin) && (nar.random.nextFloat() < curiosityProb.floatValue())) {
-                return action.curiosity(conf, nar);
+            if (nar.random.nextFloat() < curiosityProb.floatValue()) {
+                return action.curiosity(conf, next, nar);
             }/* else {
                 nar.activate(action, 1f);
             }*/
@@ -332,7 +336,7 @@ abstract public class NAgent implements NSense, NAct {
 //                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
 //        );
 
-        int dur = (int) Math.ceil(nar.time.dur());
+        int dur = nar.dur();
 
         //predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
         //predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
@@ -342,12 +346,12 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-                    //quest((Compound) (action.term()), now)
-                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                    quest((Compound) (action.term()), now),
+                    //quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
-                    question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now)
+                    question(impl(action, 0, happiness), now),
+                    question(impl(neg(action), 0, happiness), now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -448,10 +452,10 @@ abstract public class NAgent implements NSense, NAct {
 
 
 
-    protected Stream<Task> predict() {
+    protected Stream<Task> predict(long next) {
 
 
-        float horizon = this.predictTime.floatValue();
+        int horizon = Math.round(this.predictTime.floatValue());
 
         //long frameDelta = now-prev;
         int dur = nar.dur();
@@ -463,13 +467,11 @@ abstract public class NAgent implements NSense, NAct {
             if (nar.random.nextFloat() > pp)
                 return null;
 
-            Tasked xx = predictors.get(i);
-            Task x = xx.task();
+            Task x = predictors.get(i);
             if (x != null) {
-                Task y = boost(x, dur, horizon);
-                if (x != y) {
-                    if (xx instanceof Task)
-                        predictors.set(i, y); //predictor changed or needs re-input
+                Task y = predict(x, next, horizon * dur);
+                if (x != y && x!=null) {
+                    x.budget().priMult(0.5f);
                 }
                 return y;
             } else {
@@ -485,7 +487,7 @@ abstract public class NAgent implements NSense, NAct {
         float m = 0;
         int n = actions.size();
         for (ActionConcept a : actions) {
-            Truth d = a.goals().truth(now, nar.time.dur());
+            Truth d = a.goals().truth(now, nar.dur());
             if (d != null)
                 m += d.evi();
         }
@@ -493,18 +495,16 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    private Task boost(@NotNull Task t, int dur, float horizon /* in multiples of dur */) {
-
+    private Task predict(@NotNull Task t, long next, int horizon /* future time range */) {
 
         Task result;
-        byte pp = t.punc();
         if (t.start() != ETERNAL) {
 
             //only shift for questions
-            long shift = t.isQuestOrQuestion() ? Math.round(dur * (1 + horizon * nar.random.nextFloat())) : (int)Math.ceil(dur);
+            long shift = horizon > 0 && t.isQuestOrQuestion() ? nar.random.nextInt(horizon) : 0;
 
             long range = t.end() - t.start();
-            result = prediction(t.term(), t.punc(), t.truth(), now + shift, now + shift + range);
+            result = prediction(t.term(), t.punc(), t.truth(), next + shift, next + shift + range);
 
         } else if (t.isDeleted()) {
 
@@ -517,7 +517,6 @@ abstract public class NAgent implements NSense, NAct {
 
         return result
             .budget(ambition.floatValue(), nar)
-            .log("Agent Predictor")
         ;
     }
 

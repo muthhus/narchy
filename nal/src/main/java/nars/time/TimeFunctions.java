@@ -24,6 +24,7 @@ import java.util.List;
 
 import static nars.$.terms;
 import static nars.Op.CONJ;
+import static nars.Op.GOAL;
 import static nars.Op.NEG;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
@@ -86,14 +87,13 @@ public interface TimeFunctions {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtUnion = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
-        //TODO
+    TimeFunctions dtSum = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, 2);
     };
-    TimeFunctions dtUnionReverse = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
-        //TODO
+    TimeFunctions dtSumReverse = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, -2);
     };
+
 
     /**
      * does nothing but set DTternal; the input tasks will be considered to be eternal
@@ -111,13 +111,13 @@ public interface TimeFunctions {
         int btd = beliefTerm instanceof Compound ? ((Compound)beliefTerm).dt() : DTERNAL;
         if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
+                case -2:
+                    dt = -(ttd + btd); //sumReverse
+                    break;
+                case 2:
+                    dt = (ttd + btd); //sum
+                    break;
 
-                case 2:  //union
-                    dt = -(ttd + btd);
-                    break;
-                case -2:  //unionReverse
-                    dt = (ttd + btd);
-                    break;
                 case -1:
                 case +1: //difference: -1 or +1
                     dt = (ttd - btd);
@@ -149,7 +149,6 @@ public interface TimeFunctions {
         if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
             occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence); //TODO CALCULATE
 
-            //restore forward polarity for function call at the end
             polarity = 1;
         } else {
             //diff
@@ -343,8 +342,8 @@ public interface TimeFunctions {
         return lateIfGoal(p, occReturn, decompose(derived, p, occReturn, b));
     }
 
-    static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, Compound x) {
-        if ((x!=null) && p.task.isGoal() && (occReturn[0]!=ETERNAL)) {
+    static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Compound x) {
+        if ((x!=null) && p.task.isGoal() && p.punct.get().punc==GOAL && (occReturn[0]!=ETERNAL)) {
             long taskStart = p.task.start();
 
 
@@ -589,7 +588,8 @@ public interface TimeFunctions {
                                 }
 
                             } else {
-                                return null; //could not back substitute resolve
+                                //could not back substitute resolve
+                                return null;
                             }
                         }
 
@@ -598,8 +598,8 @@ public interface TimeFunctions {
                 }
 
                 //default:
-                if (occ == ETERNAL)
-                    occ = occOther;
+                /*if (occ == ETERNAL)
+                    occ = occOther;*/
 
             }
 
@@ -615,9 +615,9 @@ public interface TimeFunctions {
         occReturn[0] = occ;
 
         //TODO decide if this is right
-        int dt = derived.dt();
-        if (derived.op()==CONJ && dt !=DTERNAL)
+        if (occ!=ETERNAL)
             occReturn[1] = occ + derived.dtRange();
+
 
         return derived;
 

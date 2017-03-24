@@ -251,7 +251,7 @@ public class Recog2D extends NAgentX {
         for (int i = 0; i < maxImages; i++) {
 
 
-            Truth g = nar.concept(outs.outVector[i]).belief( nar.time(), nar.time.dur() );
+            Truth g = nar.concept(outs.outVector[i]).belief( nar.time(), nar.dur() );
 
             if (g == null) {
                 error += 0.5;

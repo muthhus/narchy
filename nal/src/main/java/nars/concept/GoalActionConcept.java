@@ -29,11 +29,11 @@ public class GoalActionConcept extends ActionConcept {
     }
 
     @Override
-    public @Nullable Task curiosity(float conf, NAR nar) {
-        return curiosity(term(), GOAL, conf, nar);
+    public @Nullable Task curiosity(float conf, long next, NAR nar) {
+        return curiosity(term(), GOAL, conf, next, nar);
     }
 
-    public static Task curiosity(Compound term, byte punc, float conf, NAR nar) {
+    public static Task curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
         int dur = nar.dur();
         int lookAhead = 0;
         long now = nar.time() - lookAhead * dur;
@@ -279,7 +279,7 @@ public class GoalActionConcept extends ActionConcept {
                         if (otherConcept!=null) {
                             //    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
 
-                            Truth pbt = otherConcept.belief(whenActual, now, nar.time.dur());
+                            Truth pbt = otherConcept.belief(whenActual, now, nar.dur());
                             if (pbt!=null) {
                                 Truth y = TruthFunctions.analogy(pbt, itt, 0);
                                 if (y!=null) {
@@ -288,7 +288,7 @@ public class GoalActionConcept extends ActionConcept {
                                 }
                             }
 
-                            Truth pgt = otherConcept.belief(whenActual, now, nar.time.dur());
+                            Truth pgt = otherConcept.belief(whenActual, now, nar.dur());
                             if (pgt!=null) {
                                 Truth y = TruthFunctions.deduction(pbt, itt, 0);
                                 if (y!=null) {
@@ -317,7 +317,7 @@ public class GoalActionConcept extends ActionConcept {
         if (preconditionConcept != null) {
 
             //belief = deduction(pbt, it)
-            Truth pbt = preconditionConcept.belief(when, now, nar.time.dur());
+            Truth pbt = preconditionConcept.belief(when, now, nar.dur());
             if (pbt!=null) {
                 Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), itt, 0 /* gather anything */);
                 if (y!=null) {
@@ -327,7 +327,7 @@ public class GoalActionConcept extends ActionConcept {
             }
 
             //goal = induction(pgt, it)
-            Truth pgt = preconditionConcept.goal(when, now, nar.time.dur());
+            Truth pgt = preconditionConcept.goal(when, now, nar.dur());
             if (pgt!=null) {
                 Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), itt, 0 /* gather anything */);
                 if (y!=null) {

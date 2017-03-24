@@ -134,7 +134,6 @@ public interface Stamp {
     @NotNull
     default StringBuilder appendOccurrenceTime(@NotNull StringBuilder sb) {
         long oc = start();
-        long ct = creation();
 
         /*if (oc == Stamp.TIMELESS)
             throw new RuntimeException("invalid occurrence time");*/
@@ -190,11 +189,11 @@ public interface Stamp {
         /*if (creation() == TIMELESS) {
             buffer.append('?');
         } else */
-        if (!(start() == ETERNAL)) {
-            appendOccurrenceTime(buffer);
-        } else {
+        /*if (!(start() == ETERNAL)) {
+            appendTime(buffer);
+        } else {*/
             buffer.append(creation());
-        }
+        //}
         buffer.append(Op.STAMP_STARTER).append(' ');
 
         for (int i = 0; i < len; i++) {

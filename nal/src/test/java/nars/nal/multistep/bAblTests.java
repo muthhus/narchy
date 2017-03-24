@@ -1,6 +1,7 @@
 package nars.nal.multistep;
 
 import nars.NAR;
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Ignore;
@@ -63,7 +64,7 @@ public class bAblTests extends AbstractNALTest {
             .inputAt(0,"isIn({bob},{kitchen}). :|:") ////Bob went to the kitchen.
             .askAt  (0,"isIn({football},?where)") ////Where is the football?
             .mustBelieve(2000, "isIn({football},{playground})",
-                    1f, 0.56f, 0); ////A: playground
+                    1f, 0.51f, 0); ////A: playground
 
     }
 

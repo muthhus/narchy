@@ -38,8 +38,8 @@ public class TestNAR  {
 
     static final Logger logger = LoggerFactory.getLogger(TestNAR.class);
 
-    @NotNull
-    public final Map<Object, HitMeter> eventMeters;
+//    @NotNull
+//    public final Map<Object, HitMeter> eventMeters;
     @NotNull
     public final NAR nar;
 
@@ -61,7 +61,7 @@ public class TestNAR  {
 
     public final List<Task> inputs = $.newArrayList();
     private static final int temporalTolerance = 0;
-    protected static final float truthTolerance = Param.TESTS_TRUTH_ERROR_TOLERANCE;
+
 
 
     /** enable this to print reports even if the test was successful.
@@ -90,7 +90,7 @@ public class TestNAR  {
         this.nar = nar;
 
 
-        eventMeters = new EventCount(nar).eventMeters;
+        //eventMeters = new EventCount(nar).eventMeters;
 
 
     }
@@ -127,7 +127,8 @@ public class TestNAR  {
     @NotNull
     public TestNAR input(@NotNull String... s) {
         finished = false;
-        nar.input(s);
+        for (String x : s)
+            nar.input(x);
         return this;
     }
 
@@ -290,9 +291,10 @@ public class TestNAR  {
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end, boolean must) throws Narsese.NarseseException {
 
 
-        float h = (freqMin!=-1) ? truthTolerance / 2.0f : 0;
+        float h = Param.TESTS_TRUTH_ERROR_TOLERANCE / 2.0f;
 
-        if (freqMin == -1) freqMin = freqMax;
+        if (freqMin == -1)
+            freqMin = freqMax;
 
         int tt = temporalTolerance;
         cycleStart -= tt;
@@ -639,12 +641,12 @@ public class TestNAR  {
             long time = time();
 
             //Task[] inputs = n.inputs.toArray(new Task[n.inputs.size()]);
-            Collection<HitMeter> var = eventMeters.values();
-            HitMeter[] eventMeters1 = var.toArray(new HitMeter[var.size()]);
+//            Collection<HitMeter> var = eventMeters.values();
+//            HitMeter[] eventMeters1 = var.toArray(new HitMeter[var.size()]);
 
 
             String pattern = "{}\n\t{} {} {}IN \ninputs";
-            Object[] args = { id, time, result, eventMeters1 };
+            Object[] args = { id, time, result/*, eventMeters1*/ };
 
            if (result!=null) {
                 logger.error(pattern, args);

@@ -749,19 +749,21 @@ public interface Compound extends Term, IPair, TermContainer {
                         case XTERNAL:
                         case 0:
                             dt = 0;
+                            break;
+                        default:
+                            dt = Math.abs(dt);
+                            break;
                     }
 
-
-                    //if (dt > 0) {
-                    return c.term(0).dtRange() + Math.abs(dt) + c.term(1).dtRange();
-                    //} else {
-                    //return c.term(0).dtRange() + dt + c.term(0).dtRange();
-                    //}
-                    //return Math.abs(dt);
+                    return c.term(0).dtRange() + (dt) + c.term(1).dtRange();
 
                 } else {
                     int s = 0;
-                    for (Term x : c.terms()) {
+
+                    TermContainer tt = subterms();
+                    int l = tt.size();
+                    for (int i = 0; i < l; i++) {
+                        @NotNull Term x = tt.term(i);
                         s = Math.max(s, x.dtRange());
                     }
 

@@ -126,8 +126,8 @@ public class Builtin {
 
         nar.on(Functor.f0("self", nar::self));
 
-        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time.time(), n.time.dur()))));
-        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time.time(), n.time.dur()))));
+        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time.time(), n.dur()))));
+        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time.time(), n.dur()))));
 
         nar.on("concept", (Command) (op, a, nn) -> {
             Concept c = nn.concept(a[0]);

@@ -3,6 +3,7 @@ package nars.nal.multistep;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.nar.Default;
 import nars.test.TestNAR;
@@ -117,21 +118,20 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
 
-
         tt.input(
                 "made_of(toothbrush,plastic).",
-                "( ( made_of($1, plastic) &&+10 lighter({SELF}, $1) ) ==>+10 <$1 --> [heated]>).",
+                "( ( made_of($1, plastic) &&+0 lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
                 "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
                 "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
-                "(( <$1 --> [pliable]> &&+0 reshape({SELF},$1)) ==>+10 <$1 --> [hardened]>).",
-                "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrewing]>).",
-                "( <#1 --> here> &&+0 <#1 --> [unscrewing]>)!",
-                "<toothbrush --> here>. :|:" //there is a toothbrush here NOW
+                "(( <$1 --> [pliable]> &&+0 reshape(I,$1)) ==>+10 <$1 --> [hardened]>).",
+                "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrews]>).",
+                "<toothbrush --> here>. :|:", //there is a toothbrush here NOW
+                "( <#1 --> here> &&+0 <#1 --> [unscrews]>)! :|:" //make something that is here a screwdriver
         );
         //tt.log();
 
-        tt.mustOutput(0, 2500, "lighter({SELF}, toothbrush)", GOAL, 1f, 1f,
-                0.10f, 1f, //at least some confidence
+        tt.mustDesire(2500, "lighter(I, toothbrush)", 1f,
+                0.18f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
 

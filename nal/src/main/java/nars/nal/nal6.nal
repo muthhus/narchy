@@ -11,7 +11,7 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neq(S,P), time(dtUnionReverse)                     |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neq(S,P), time(dtSum)                               |- (S ==>+- P), (Belief:Deduction)
         //, Permute:Backward
 
     (P ==> M), (S ==> M), neq(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
@@ -20,7 +20,7 @@
     (M ==> P), (M ==> S), neq(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
         //, Permute:Backward
 
-    (P ==> M), (M ==> S), neq(S,P), time(dtUnion), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neq(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
         //, Permute:Backward
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
@@ -93,9 +93,11 @@
 
     B, (C ==> A), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
         B, (C ==> A), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+//    B, (C ==> A), task(negative), belief(positive), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
+//        B, (C ==> A), task(negative), belief(negative), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
     B, (A <=> C), belief(positive), time(decomposeBeliefLate), neq(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
-        B, (A <=> C), belief(negative), time(decomposeBeliefLate), neq(B,C) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:DeductionPN)
+        B, (A <=> C), belief(negative), time(decomposeBeliefLate), neq(B,C) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyPN, Goal:DeductionPN)
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
             //     S, (S<=>P), task(positive), belief(negative) |- (--,%P), (Goal:StrongN)
@@ -148,7 +150,7 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     //((&&,A..+) ==> C), M, time(dtTask), neqRec(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtUnion), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neq(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 

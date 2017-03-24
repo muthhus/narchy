@@ -131,7 +131,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
             SignalTask t = task(next, currentValue,
-                    now - Math.round(nar.time.dur()), now,
+                    now - Math.round(nar.dur()), now,
                     this.current, nar);
             if (t!=null) {
                 //Task prevStart = this.current;

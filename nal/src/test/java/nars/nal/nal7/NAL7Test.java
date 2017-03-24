@@ -1150,4 +1150,24 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(d-->e)", 1f, 0.81f, 10)
                 .mustNotOutput(cycles, "(d-->e)", BELIEF, ETERNAL, 1, 19);
     }
+
+    @Test public void testForwardImplChainDTUnion() {
+        /** wrong direction: this should have been dt = +20
+        $.29;.69$ ((reshape(I,$1)&&($1-->[heated])) ==>-20 ($1-->[hardened])). %1.0;.73% {3: 3;4;5} ((((%2&&%1073742337..+)==>%3),(%4==>%2),time(dtUnion),neq(%3,%2),notImplEqui(%2),notEqui(%3)),(((%4&&%1073742337..+) ==>+- %3),((Deduction-->Belief))))
+            $.50;.90$ ((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])). %1.0;.90% {0: 5}
+            $.41;.81$ (($1-->[heated]) ==>+10 ($1-->[pliable])). %1.0;.81% {1: 3;4} ((%1,(%2<=>%3),neqCom(%1,%3),neq(%1,%2),time(beliefDTSimultaneous)),(substitute(%1,%2,%3,strict),((Intersection-->Belief),(Strong-->Goal))))
+        */
+        test()
+            .input( "((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])).")
+            .input( "(($1-->[heated]) ==>+10 ($1-->[pliable])).")
+
+//            .mustBelieve(cycles, "((reshape(I,$1)&&($1-->[heated])) ==>+20 ($1-->[hardened]))", 1f, 0.81f, ETERNAL)
+//            .mustNotOutput(cycles, "((reshape(I,$1)&&($1-->[heated])) ==>-20 ($1-->[hardened]))", BELIEF, ETERNAL, 10, 20, 0)
+
+            .mustBelieve(cycles, "(($1-->[heated]) ==>+20 ($1-->[hardened]))", 1f, 0.73f, ETERNAL)
+            .mustNotOutput(cycles, "(($1-->[heated]) ==>-20 ($1-->[hardened]))", BELIEF, ETERNAL, 10, 20, 0)
+
+        ;
+    }
+
 }

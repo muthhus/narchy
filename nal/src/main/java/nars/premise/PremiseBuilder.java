@@ -102,9 +102,6 @@ abstract public class PremiseBuilder {
                             if (!answered.isInput()) //avoid re-inputting an already 'input' task, because if it exists in the table it will reactivate causing a feedback loop
                                 nar.input(answered);
 
-
-
-
                             /*
                             if (qBefore > 0) {
                                 float qFactor = taskBudget.priSafe(0) / qBefore;

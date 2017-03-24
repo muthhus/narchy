@@ -58,7 +58,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     public abstract Task apply(NAR nar);
 
     /** produces a curiosity exploratoin task */
-    @Nullable public abstract Task curiosity(float conf, NAR nar);
+    @Nullable public abstract Task curiosity(float conf, long next, NAR nar);
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept

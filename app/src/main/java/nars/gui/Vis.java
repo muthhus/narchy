@@ -159,8 +159,8 @@ public class Vis {
 //            };
 //            p.setTitle(t.toString());
 //            p.add("P", () -> nar.pri(t, Float.NaN), 0f, 1f);
-//            p.add("B", () -> nar.concept(t).beliefFreq(nar.time(), nar.time.dur()), 0f, 1f);
-//            p.add("G", () -> nar.concept(t).goalFreq(nar.time(), nar.time.dur()), 0f, 1f);
+//            p.add("B", () -> nar.concept(t).beliefFreq(nar.time(), nar.dur()), 0f, 1f);
+//            p.add("G", () -> nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
 //            grid.children.add(p);
 //            plots.add(p);
 //        }

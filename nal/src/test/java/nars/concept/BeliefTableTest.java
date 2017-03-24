@@ -74,7 +74,7 @@ public class BeliefTableTest  {
         n.cycle();
         b.print();
 
-        assertEquals(0.86f, b.beliefs().match(n.time(), n.time.dur()).expectation(), 0.1f);
+        assertEquals(0.86f, b.beliefs().match(n.time(), n.dur()).expectation(), 0.1f);
 
         n.input("b:a. %0.2|0.7%");
         n.input("b:a. %0.1|0.8%"); //highest negative
@@ -103,7 +103,7 @@ public class BeliefTableTest  {
         BeliefTable beliefs = b.concept().beliefs();
 
         assertEquals(0.5, beliefs.matchEternal().conf(), 0.001);
-        int dur = n.time.dur();
+        int dur = n.dur();
         assertEquals(0.5, beliefs.match(n.time(), dur).conf(), 0.001);
         assertEquals(1, beliefs.size());
 
@@ -185,19 +185,19 @@ public class BeliefTableTest  {
 
 
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth(i, n.time.dur()));
+            System.out.println(i + "\t" + table.truth(i, n.dur()));
         }
         System.out.println();
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth(i, 0   /* relative to zero */, n.time.dur()));
+            System.out.println(i + "\t" + table.truth(i, 0   /* relative to zero */, n.dur()));
         }
 
         /* first */
-        @Nullable Truth firstBeliefTruth = table.truth(0, n.time.dur());
+        @Nullable Truth firstBeliefTruth = table.truth(0, n.dur());
         assertEquals(0.03f, firstBeliefTruth.freq(), 0.1f);
 
         /* last */
-        int dur = n.time.dur();
+        int dur = n.dur();
         @Nullable Truth lastBeliefTruth = table.truth(spacing * (maxBeliefs - 1), dur);
         assertEquals(1f, lastBeliefTruth.freq(), 0.1f);
 

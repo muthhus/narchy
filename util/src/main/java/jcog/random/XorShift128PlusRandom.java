@@ -93,7 +93,8 @@ public class XorShift128PlusRandom extends Random {
      * @return the next pseudorandom {@code long} value between {@code 0} (inclusive) and {@code n} (exclusive).
      */
 	public long nextLong( long n ) {
-        if ( n <= 0 ) throw new IllegalArgumentException();
+        if ( n <= 0 )
+        	throw new IllegalArgumentException();
 		// No special provision for n power of two: all our bits are good.
 		while (true) {
 			long bits = nextLong() >>> 1;

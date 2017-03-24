@@ -216,7 +216,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 //        if (dur!=dur) {
 //            //assign default duration from NAR
-//            dur = n.time.dur();
+//            dur = n.dur();
 //        }
 
         //shift the occurrence time if input and dt < 0 and non-eternal HACK dont use log it may be removed without warning
