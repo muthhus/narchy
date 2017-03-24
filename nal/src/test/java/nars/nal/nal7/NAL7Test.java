@@ -1127,6 +1127,15 @@ public class NAL7Test extends AbstractNALTest {
                         1f, 0.81f, 1, 8);
     }
 
+    @Test public void testInductionIntervalMerge3Neg() {
+        test()
+                .inputAt(1, "(--((a) &&+3 --(c)) &&+4 (e)). :|:")
+                .inputAt(4, "(b). :|:")
+                .mustBelieve(cycles,
+                        "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+4 (e))",
+                        1f, 0.81f, 1, 8);
+    }
+
     @Test public void testDecomposeTaskSubset() {
         /*
         $0.0;.23$ (((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). 1⋈10 %1.0;.31% {1⋈10: 4;5;6;7;8} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(conjoin)),((%1 &&+- %2),((Intersection-->Belief))))

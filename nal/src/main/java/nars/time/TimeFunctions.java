@@ -170,7 +170,7 @@ public interface TimeFunctions {
     TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1, false);
 
 
-    @NotNull
+    @Nullable
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity, boolean merge) {
 
         long beliefStart = p.belief.start();

@@ -40,7 +40,6 @@ import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectLongHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -50,7 +49,6 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -64,7 +62,9 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     AtomicSingleton True = new AtomicSingleton("†");
 
     AtomicSingleton False = new AtomicSingleton("Ø") {
-        @NotNull @Override public Term unneg() {
+        @NotNull
+        @Override
+        public Term unneg() {
             return True;
         }
     };
@@ -123,13 +123,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
     /**
-     *
-     * @param y another term
+     * @param y     another term
      * @param subst the unification context
      * @return whether unification succeeded
      */
     boolean unify(@NotNull Term y, @NotNull Unify subst);
-
 
 
     /**
@@ -217,6 +215,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     /**
      * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
+     *
      * @param dt the current offset in the search
      * @return DTERNAL if the subterm was not found
      */
@@ -227,41 +226,12 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             return DTERNAL;
     }
 
-    /** total span across time represented by a sequence conjunction compound */
+    /**
+     * total span across time represented by a sequence conjunction compound
+     */
     default int dtRange() {
-        Op o = op();
-        if (o == CONJ) {
-            Compound c = (Compound) this;
-            int dt = c.dt();
-            if (c.size() == 2) {
-
-                switch (dt) {
-                    case DTERNAL:
-                    case XTERNAL:
-                    case 0:
-                        dt = 0;
-                }
-
-
-                //if (dt > 0) {
-                    return c.term(0).dtRange() + Math.abs(dt) + c.term(1).dtRange();
-                //} else {
-                    //return c.term(0).dtRange() + dt + c.term(0).dtRange();
-                //}
-                //return Math.abs(dt);
-
-            } else  {
-                int s = 0;
-                for (Term x : c.terms()) {
-                    s = Math.max(s, x.dtRange());
-                }
-
-                return s;
-            }
-        }
         return 0;
     }
-
 
 
     /**
@@ -303,21 +273,24 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 //        //TODO
 //    }
 
-    /** returns an int[] path to the first occurrence of the specified subterm
+    /**
+     * returns an int[] path to the first occurrence of the specified subterm
+     *
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
      */
-    @Nullable default byte[] pathTo(@NotNull Term subterm) {
+    @Nullable
+    default byte[] pathTo(@NotNull Term subterm) {
         return subterm.equals(this) ? IntArrays.EMPTY_BYTES : null;
     }
 
     @NotNull
     default ByteList structureKey() {
-        return structureKey(new ByteArrayList(volume()*2 /* estimate */));
+        return structureKey(new ByteArrayList(volume() * 2 /* estimate */));
     }
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
-        appendTo.add((byte)op().ordinal());
+        appendTo.add((byte) op().ordinal());
         return appendTo;
     }
 
@@ -325,39 +298,41 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default List<byte[]> pathsTo(Term subterm) {
         List<byte[]> list = $.newArrayList();
         pathsTo(
-            (x) -> x.equals(subterm) ? x : null,
-            (l,t) -> list.add(l.toArray())
+                (x) -> x.equals(subterm) ? x : null,
+                (l, t) -> list.add(l.toArray())
         );
         return list;
     }
 
-    default boolean pathsTo(@NotNull Term subterm, @NotNull BiPredicate<ByteList,Term> receiver) {
-        return pathsTo((x)->subterm.equals(x) ? x : null, receiver);
+    default boolean pathsTo(@NotNull Term subterm, @NotNull BiPredicate<ByteList, Term> receiver) {
+        return pathsTo((x) -> subterm.equals(x) ? x : null, receiver);
     }
 
-    default <X> boolean pathsTo(@NotNull Function<Term,X> subterm, @NotNull BiPredicate<ByteList,X> receiver) {
+    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
-        if (ss!=null)
+        if (ss != null)
             return receiver.test(ByteLists.immutable.empty(), ss);
         return true;
     }
 
 
-    /** GLOBAL TERM COMPARATOR FUNCTION */
+    /**
+     * GLOBAL TERM COMPARATOR FUNCTION
+     */
     @Override
     default int compareTo(@NotNull Termlike y) {
         if (this == y /*|| this.equals(y)*/) return 0;
 
-        int d = this.op().ordinal() - ((Term)y).op().ordinal();
-        if (d!=0)
+        int d = this.op().ordinal() - ((Term) y).op().ordinal();
+        if (d != 0)
             return d;
 
         if (this instanceof Compound) {
 
-            Compound cx = (Compound)this;
-            Compound cy = (Compound)y;
+            Compound cx = (Compound) this;
+            Compound cy = (Compound) y;
 
-            int diff3 = TermContainer.compare(cx.subterms(),cy.subterms());
+            int diff3 = TermContainer.compare(cx.subterms(), cy.subterms());
             if (diff3 != 0)
                 return diff3;
 
@@ -389,14 +364,19 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     }
 
 
-    /** unwraps any negation superterm */
-    @NotNull @Override default Term unneg() {
+    /**
+     * unwraps any negation superterm
+     */
+    @NotNull
+    @Override
+    default Term unneg() {
         return this;
     }
 
-    @Deprecated static int intValue(Term intTerm) {
+    @Deprecated
+    static int intValue(Term intTerm) {
         if (intTerm instanceof IntTerm) {
-            return ((IntTerm)intTerm).val;
+            return ((IntTerm) intTerm).val;
         } else /*else /*if (x.op() == INT )*/ {
             String xs = intTerm.toString();
             return Integer.valueOf(xs);
@@ -407,7 +387,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     static int intValue(Term intTerm, int ifNotInt) {
         if (intTerm instanceof IntTerm) {
-            return ((IntTerm)intTerm).val;
+            return ((IntTerm) intTerm).val;
         } else /*else /*if (x.op() == INT )*/ {
             return Texts.i(intTerm.toString(), ifNotInt);
         }

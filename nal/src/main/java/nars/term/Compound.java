@@ -716,6 +716,50 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
+    default int dtRange() {
+        Op o = op();
+        switch (o) {
+
+            case NEG:
+                return term(0).dtRange();
+
+            case CONJ: {
+                Compound c = (Compound) this;
+                int dt = c.dt();
+                if (c.size() == 2) {
+
+                    switch (dt) {
+                        case DTERNAL:
+                        case XTERNAL:
+                        case 0:
+                            dt = 0;
+                    }
+
+
+                    //if (dt > 0) {
+                    return c.term(0).dtRange() + Math.abs(dt) + c.term(1).dtRange();
+                    //} else {
+                    //return c.term(0).dtRange() + dt + c.term(0).dtRange();
+                    //}
+                    //return Math.abs(dt);
+
+                } else {
+                    int s = 0;
+                    for (Term x : c.terms()) {
+                        s = Math.max(s, x.dtRange());
+                    }
+
+                    return s;
+                }
+            }
+
+            default:
+                return 0;
+        }
+
+    }
+
+    @Override
     default Term eval(TermIndex index) {
 
         //somewhere in the subterms is a functor to eval
