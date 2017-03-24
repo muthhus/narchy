@@ -40,9 +40,6 @@ import static org.eclipse.collections.impl.factory.Sets.mutable;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
-
-
-
     @NotNull
     default public TermContainer append(@NotNull Term x) {
         return TermVector.the(ArrayUtils.add(terms(),x));
@@ -742,13 +739,46 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 case 0:
                     return true; //shouldnt ever happen
                 case 1:
-                    return subst.matchSub(this, Y, 0);
-                case 2:
+                    return subst.unify(term(0), Y.term(0));
+                case 2: {
+
+                    Term x0 = term(0);
+                    Term x1 = term(1);
+                    Term y0 = Y.term(0);
+                    Term y1 = Y.term(1);
+
+                    boolean match0 = subst.matchType(x0) || subst.matchType(y0);
+                    boolean match1 = subst.matchType(x1) || subst.matchType(y1);
+
                     //match the target variable first, if exists:
-                    return subst.matchLinear2(this, Y, subst.matchType(term(0)) ? 0 : 1);
-                //return matchLinear2(X, Y, 0); //<- fails for certain image transformation rules
-                default:
-                    return subst.matchLinearN(this, Y, s);
+                    boolean  reverse;
+                    if (!match0 && !match1) {
+                        reverse = subst.random.nextBoolean(); //neither has any priority for matching a unification target, so choose randomly
+                    } else if (match0) {
+                        reverse = true;
+                    } else {
+                        reverse = false;
+                    }
+
+                    if (reverse) {
+                        return subst.unify(x0, y0) && subst.unify(x1, y1);
+                    } else {
+                        return subst.unify(x1, y1) && subst.unify(x0, y0);
+                    }
+                }
+
+                default: {
+                    //begin at random offset to shuffle the matching order
+                    int j = subst.random.nextInt() % s;
+                    if (j < 0) j = -j;
+                    for (int i = 0; i < s; i++) {
+                        if (!subst.unify(term(j), Y.term(j)))
+                            return false;
+                        if (++j == s)
+                            j = 0;
+                    }
+                    return true;
+                }
             }
 
     }
@@ -757,5 +787,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
         return unificationPossible(subst.type) && subst.addTermutator(new CommutivePermutations(this, y));
     }
+
+
+
 
 }

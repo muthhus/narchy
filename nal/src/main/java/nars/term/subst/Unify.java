@@ -229,9 +229,6 @@ public abstract class Unify extends Termunator implements Subst {
         return t == null ? oy.var : oy == t;
     }
 
-
-
-
     /**
      * x's and y's ops already determined inequal
      */
@@ -333,24 +330,7 @@ public abstract class Unify extends Termunator implements Subst {
 
 
 
-    public final boolean matchLinearN(@NotNull TermContainer X, @NotNull TermContainer Y, int s) {
-        for (int i = 0; i < s; i++) {
-            if (!matchSub(X, Y, i))
-                return false;
-        }
-        return true;
-    }
 
-    public final boolean matchSub(@NotNull TermContainer X, @NotNull TermContainer Y, int i) {
-        return unify(X.term(i), Y.term(i));
-    }
-
-    /**
-     * special match for size=2 compounds, with order reversal ability
-     */
-    public final boolean matchLinear2(@NotNull TermContainer X, @NotNull TermContainer Y, int first) {
-        return matchSub(X, Y, first) && matchSub(X, Y, 1 - first);
-    }
 
 
     /**
