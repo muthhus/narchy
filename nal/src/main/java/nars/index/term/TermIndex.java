@@ -175,18 +175,22 @@ public abstract class TermIndex extends TermBuilder {
                 return null; //unassigned pattern variable
         }
 
-
+        //shortcut for premise evaluation matching:
         //no variables that could be substituted, so return this constant
-        if (f instanceof Derivation && src.vars() + src.varPattern() == 0) //shortcut for premise evaluation matching
+        if (f instanceof Derivation && (src.vars() + src.varPattern() == 0))
             return src;
 
-        int len = src.size();
-        List<Term> sub = $.newArrayList(len /* estimate */);
 
         boolean strict = !(this instanceof PatternTermIndex); //f instanceof Derivation;
 
-        boolean changed = false;
         Compound crc = (Compound) src;
+        TermContainer subs = crc.subterms();
+
+        int len = subs.size();
+        List<Term> sub = $.newArrayList(len /* estimate */);
+
+
+        boolean changed = false;
         Op cop = crc.op();
 
         //early prefilter for True/False subterms
@@ -197,7 +201,7 @@ public abstract class TermIndex extends TermBuilder {
         int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
-            Term t = crc.term(i);
+            Term t = subs.term(i);
             Term u = transform(t, f);
 
 

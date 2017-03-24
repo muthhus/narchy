@@ -22,9 +22,9 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 15, 15, (v) -> t(v, alpha()))
+        senseCamera("fz", ()->fz.image, 20, 20, (v) -> t(v, alpha()))
                 //.setResolution(0.04f)
-                .priTotal(2f);
+                .priTotal(16f);
 
         senseNumberDifference($.inh($.the("joy"), $.the("fz")), ()->happy.asFloat());
         senseNumberDifference($.inh($.the("angVel"), $.the("fz")), ()->(float)fz.playerAngle);
@@ -37,10 +37,40 @@ public class FZero extends NAgentX {
 //                    return task.isBelief();
 //                }
 //            };
+            new TaskRule("(%1 &&+5 %2)", "seq(%1,%2)", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return true;
+                }
+            };
+            new TaskRule("(seq(%1,%2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return true;
+                }
+            };
             new TaskRule("((%1 &&+5 %2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
-                    return task.isBelief();
+                    return true;
+                }
+            };
+            new TaskRule("(%1 &&+0 %2)", "par:{%1,%2}", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return true;
+                }
+            };
+            new TaskRule("((%1 &| %2) &| %3)", "par:{%1,%2,%3}", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return true;
+                }
+            };
+            new TaskRule("(%1 <-> %2)", "same:{%1,%2}", nar) {
+                @Override
+                public boolean test(@NotNull Task task) {
+                    return true;
                 }
             };
         } catch (Narsese.NarseseException e) {

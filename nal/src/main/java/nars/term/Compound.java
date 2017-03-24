@@ -74,7 +74,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @NotNull
     default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        Set<Term> t = $.newHashSet( volume() /* estimate */);
+        Set<Term> t = $.newHashSet(volume() /* estimate */);
         recurseTerms((t1) -> {
             if (t1.op() == onlyType)
                 t.add(t1);
@@ -294,17 +294,19 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 if ((xs = size()) == y.size()) {
 
-                    if ((op.image && (dt() == y.dt())) || !op.temporal || matchTemporalDT(dt(), y.dt())) {
+                    if (op.image && (dt() != y.dt()))
+                        return false;
+                    else if (op.temporal && !matchTemporalDT(dt(), y.dt()))
+                        return false;
 
-                        TermContainer xsubs = subterms();
-                        TermContainer ysubs = y.subterms();
+                    TermContainer xsubs = subterms();
+                    TermContainer ysubs = y.subterms();
 
-                        return
-                                isCommutative() ?
-                                        subst.matchPermute(xsubs, ysubs) :
-                                        subst.matchLinear(xsubs, ysubs);
+                    return
+                            isCommutative() ?
+                                    subst.matchPermute(xsubs, ysubs) :
+                                    subst.matchLinear(xsubs, ysubs);
 
-                    }
 
                 }
             }
@@ -319,7 +321,7 @@ public interface Compound extends Term, IPair, TermContainer {
     static boolean matchTemporalDT(int a, int b) {
         if (a == XTERNAL || b == XTERNAL) return true;
         if (a == DTERNAL || b == DTERNAL) return true;
-        return a==b;
+        return a == b;
     }
 
     @Override
@@ -682,11 +684,11 @@ public interface Compound extends Term, IPair, TermContainer {
         int ys = yy.size();
         int offset = 0;
         for (int yi = 0; yi < ys; yi++) {
-            Term yyy = yy.term( reverse ? ((ys-1) - yi) : yi);
+            Term yyy = yy.term(reverse ? ((ys - 1) - yi) : yi);
             int sdt = yyy.subtermTime(x);
-            if (sdt!=DTERNAL)
+            if (sdt != DTERNAL)
                 return sdt + offset;
-            offset += idt + ((shift && yyy.op()==CONJ) ? yyy.dtRange() : 0);
+            offset += idt + ((shift && yyy.op() == CONJ) ? yyy.dtRange() : 0);
         }
 
         return DTERNAL; //not found
@@ -695,14 +697,16 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default void events(List<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
-        if (o ==CONJ) {
+        if (o == CONJ) {
             int dt = dt();
 
-            if (dt!=DTERNAL && dt!=XTERNAL) {
+            if (dt != DTERNAL && dt != XTERNAL) {
 
                 boolean reverse;
-                if (dt < 0) { dt = -dt; reverse = true; }
-                else reverse = false;
+                if (dt < 0) {
+                    dt = -dt;
+                    reverse = true;
+                } else reverse = false;
 
                 TermContainer tt = subterms();
                 int s = tt.size();
@@ -814,7 +818,7 @@ public interface Compound extends Term, IPair, TermContainer {
                         if (resolvedPred != null) {
                             Term resolvedPredTerm = resolvedPred.term();
                             if (resolvedPredTerm instanceof Functor) {
-                                f = (Functor)resolvedPredTerm;
+                                f = (Functor) resolvedPredTerm;
                             }
                         }
                     }

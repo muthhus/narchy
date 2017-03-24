@@ -74,6 +74,12 @@ public class Inperience extends Leak<Task, BLink<Task>> {
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.25f);
 
+    float beliefFactor = 1f;
+    float questionFactor = 0.25f;
+
+    /** multiplier for he sensory task priority to determine inperienced task priority */
+    private float priFactor = 0.75f;
+
 //    public boolean isEnableWantBelieve() {
 //        return enableWantBelieve;
 //    }
@@ -154,19 +160,26 @@ public class Inperience extends Leak<Task, BLink<Task>> {
         if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
             return;
 
+        boolean full = bag.isFull();
+
+        boolean belief;
         if (task.isBeliefOrGoal()) {
             //check for sufficient truth polarization
-            if (task.conf() <= confMin.floatValue())
+            if (full && task.conf() <= confMin.floatValue())
                 return; //too low confidence
 
             float f = task.freq();
             float fm = freqMax.floatValue();
-            if (!(f <= fm) || !(f >= (1f - fm))  )
+            if (!(f <= fm) && !(f >= (1f - fm))  )
                 return;
+
+            belief = true;
+        } else {
+            belief = false;
         }
 
         if (!task.isDeleted())
-            each.accept(new RawBLink<>(task, task, 1f / tt.volume()));
+            each.accept(new RawBLink<>(task, task, (belief ? beliefFactor : questionFactor) / tt.volume()));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -224,7 +237,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
                         task.stamp()
                 );
                 e.log("Inperience");
-                e.budget( task.priSafe(0), nar);
+                e.setBudget( task.priSafe(0) * priFactor, task.qua() );
 
                 logger.info(" {}", e);
                 nar.input(e);
@@ -276,22 +289,11 @@ public class Inperience extends Leak<Task, BLink<Task>> {
 
         arg[k++] = self;
 
-        arg[k++] = reify(s.term()); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        arg[k++] = reify((Compound)$.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
-        boolean neg;
 
-        if (tr != null) {
-            neg = tr.isNegative();
-            //arg[k] = tr.expTerm(tr.negIf(neg).expectation(), conceptCreationExpectation);
-            //arg[k++] = tr.freqTerm(tr.freq(), 0.66f);
-            //arg[k++] = tr.confTerm(tr.conf(), 0.5f);
-        } else {
-            neg = false;
-        }
-
-
-        return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), neg));
+        return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), false));
     }
 
     @Nullable static Term reify(@NotNull Compound term) {

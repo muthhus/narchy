@@ -34,8 +34,10 @@ public class GoalActionConcept extends ActionConcept {
     }
 
     public static Task curiosity(Compound term, byte punc, float conf, NAR nar) {
-        long now = nar.time();
-        long nowEnd = now + (int) Math.ceil(nar.time.dur());
+        int dur = nar.dur();
+        int lookAhead = 0;
+        long now = nar.time() - lookAhead * dur;
+        long nowEnd = now + dur;
         ImmutableTask t = new ImmutableTask(term, punc,
                 $.t(nar.random.nextFloat(), conf),
                 now,
@@ -43,7 +45,7 @@ public class GoalActionConcept extends ActionConcept {
                 nowEnd,
                 new long[] { nar.time.nextStamp() }
         );
-        t.budget(0f, nar);
+        t.budget( nar);
         return t;
 
     }
