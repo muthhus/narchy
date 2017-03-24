@@ -790,6 +790,16 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!hasAll(Op.OpBits))
             return this;
 
+        if (op()==NEG) {
+            //unwrap negation before recursion, it should be more efficient
+            Compound inner = (Compound) unneg();
+            Term innerEval = inner.eval(index);
+            if (inner.equals(innerEval))
+                return this;
+            else
+                return $.neg(innerEval);
+        }
+
         TermContainer tt = subterms();
 
         //any contained evaluables

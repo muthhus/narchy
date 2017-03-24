@@ -32,7 +32,12 @@ public final class substitute extends Functor {
 
         final Term y = parent.yxResolve(xx[2]); //replacement term (y)
 
-        return parent.transform(term, new MapSubstWithOverride(parent.yx,  x, y));
+        Term z = parent.transform(term, new MapSubstWithOverride(parent.yx,  x, y));
+        if (z != null) {
+            return z;
+        }
+
+        return False;
     }
 
 }

@@ -148,10 +148,13 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
         @Override
-        public @NotNull Term apply(@NotNull Term[] args) {
+        public @NotNull Term apply(@NotNull Term... args) {
+            return introduce(args[0]);
+        }
 
+        @NotNull
+        protected Term introduce(Term x) {
             Term[] only = { False };
-            Term x = args[0];
 
             //temporarily unwrap negation
             boolean negated = x.op() == NEG;
@@ -160,8 +163,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             if (!(xx instanceof Compound))
                 return x;
 
-            x = xx;
-            introducer.accept((Compound)x, y -> only[0] = y);
+            introducer.accept((Compound)xx, y -> only[0] = y);
 
             Term o = only[0];
             return (o == False) ? False : $.negIf(o, negated);

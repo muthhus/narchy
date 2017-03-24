@@ -263,6 +263,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             return;
         }
 
+
         DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence, nar);
 
         if (d != null)
