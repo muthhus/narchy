@@ -1132,8 +1132,10 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "(--((a) &&+3 --(c)) &&+4 (e)). :|:")
                 .inputAt(4, "(b). :|:")
                 .mustBelieve(cycles,
-                        "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+4 (e))",
-                        1f, 0.81f, 1, 8);
+                        "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+1 (e))",
+                        1f, 0.81f, 1, 5)
+                .mustNotOutput(cycles, "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+4 (e))", BELIEF, ETERNAL, 1);
+
     }
 
     @Test public void testDecomposeTaskSubset() {

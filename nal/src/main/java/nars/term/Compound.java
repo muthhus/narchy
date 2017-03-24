@@ -720,8 +720,8 @@ public interface Compound extends Term, IPair, TermContainer {
         Op o = op();
         switch (o) {
 
-            case NEG:
-                return term(0).dtRange();
+//            case NEG:
+//                return term(0).dtRange();
 
             case CONJ: {
                 Compound c = (Compound) this;
