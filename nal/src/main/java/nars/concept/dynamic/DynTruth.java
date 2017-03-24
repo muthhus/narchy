@@ -85,7 +85,11 @@ public final class DynTruth implements Truthed {
 
         long dur = (start!=ETERNAL && template.op() == CONJ) ? template.dtRange() : 0;
 
-        DynamicBeliefTask dyn = new DynamicBeliefTask(Task.post(template, nar), beliefOrGoal ? Op.BELIEF : Op.GOAL,
+        Compound c = Task.post(template, nar);
+        if (c==null)
+            return null;
+
+        DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, start + dur, evidence());
         dyn.setBudget( budget );
         if (Param.DEBUG)

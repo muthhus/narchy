@@ -69,9 +69,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Budget b) {
 
-        if (when == ETERNAL)
-            when = now;
-
         //HACK try to reconstruct the term because it may be invalid
         template = compoundOrNull($.terms.the(template.op(), template.dt(), template.terms()));
         if (template == null)
