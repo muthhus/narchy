@@ -134,7 +134,7 @@ public abstract class Spatial<X> implements Active {
     public abstract void renderRelative(GL2 gl, Collidable body);
 
     public void delete() {
-
+        hide();
     }
 
     public void stabilize(v3 boundsMin, v3 boundsMax) {

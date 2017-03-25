@@ -38,29 +38,29 @@ public class Bagregate<X> extends ArrayBag<X> {
         if (!busy.compareAndSet(false, true))
             return;
 
-        commit();
+        try {
 
-        float scale = this.scale.floatValue();
+            commit();
 
-        Iterator<? extends X> ss = src.iterator();
-        int count = 0;
-        int limit = capacity;
-        while (ss.hasNext() && count < limit) {
-            X x = ss.next();
+            float scale = this.scale.floatValue();
 
-            float pri;
-            if (x instanceof PLink) { //HACK
-                PLink p = (PLink) x;
-                x = (X) p.get();
-                pri = p.pri();
-            } else {
-                pri = 1f;
-            }
+            src.forEach(x -> {
 
-            if (x!=null && include(x)) {
-                if (put(new RawBLink(x, pri, 0.5f), scale, null)!=null)
-                    count++;
-            }
+                float pri;
+                if (x instanceof PLink) { //HACK
+                    PLink p = (PLink) x;
+                    x = (X) p.get();
+                    pri = p.pri();
+                } else {
+                    pri = 1f;
+                }
+
+                if (x != null && include(x)) {
+                    put(new RawBLink(x, pri, 0.5f), scale, null);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         busy.set(false);

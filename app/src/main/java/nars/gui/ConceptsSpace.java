@@ -11,7 +11,9 @@ import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
@@ -42,6 +44,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             protected boolean include(Concept x) {
                 return ConceptsSpace.this.include(x.term());
             }
+
         };
     }
 

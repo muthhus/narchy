@@ -125,6 +125,10 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     @Override int size();
 
 
+    /** when adjusting the priority of links directly, to correctly absorb the pressure difference, call this */
+    default void pressurize(float f) {
+
+    }
 
     default float priAvg() {
         int s = size();

@@ -13,10 +13,12 @@ import spacegraph.space.ListSpace;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 
 /**
  * thread-safe visualization of capacity-bound NAR data buffers
+ * TODO extract to superclass: BufferedListSpace
  */
 public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends ListSpace<X, Y> {
 
@@ -28,7 +30,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     protected SpaceGraph<X> space;
 
 
-    final Collection<Y> next;
+
+
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);
     //public final MutableFloat minPri = new MutableFloat(0.0f);
@@ -41,17 +44,16 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
     public NARSpace(NAR nar) {
         super();
-        this.next =
-                new LinkedHashSet<>();
         this.nar = nar;
     }
 
 
     @Override
     public final void stop() {
+        super.stop();
         if (on!=null) {
-            next.forEach(Active::hide);
-            next.clear();
+            active.forEach(Active::hide);
+            active.clear();
             on.off();
             on = null;
         }
@@ -73,17 +75,17 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
         on = nar.onCycle(nn -> updateIfNotBusy(this::update));
     }
 
+
+    /** swap buffers */
     protected void update() {
 
-        Collection<Y> prev = active;
-
+        List<Y> prev = this.active;
         prev.forEach(Active::deactivate);
 
+        List<Y> next = new FasterList(prev.size() /* estimate */);
         get(next);
 
-        //commit the changes
-        this.active = new FasterList<>(next);
-        next.clear();
+        this.active = next;
     }
 
     /** override to filter items */

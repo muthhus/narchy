@@ -121,7 +121,7 @@ abstract public class NAgent implements NSense, NAct {
         this.nar = nar;
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : (id instanceof Atomic ? $.p(id) : (Compound)id),
+                id == null ? p("happy") : $.func("happy", id),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 

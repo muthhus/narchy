@@ -61,7 +61,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
                                 //$.secte
                                     radix > 1 ?
-                                        $.p( zipCoords(coord(x, width), coord(y, height)) ) :
+                                        $.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
+                                        //$.p( zipCoords(coord(x, width), coord(y, height)) ) :
                                         //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                         //new Term[]{coord('x', x, width), coord('y', y, height)} :
                                         $.p( $.the(x), $.the(y) ),

@@ -152,6 +152,11 @@ public class Interval {
 		return new Interval(x1, x2).union(new Interval(y1, y2));
 	}
 
+	public static long unionLength(long x1, long x2, long y1, long y2) {
+		//return new Interval(x1, x2).union(new Interval(y1, y2)).length();
+		return max(x2, y2) - min(x1, y1);
+	}
+
 //static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 //	public static final long INTERVAL_POOL_MAX_VALUE = 1000;
 //	public static long creates = 0;

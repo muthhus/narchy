@@ -107,6 +107,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         forEach(map, bag::active, e);
     }
 
+    @Override
+    public void pressurize(float f) {
+        pressure += f;
+    }
+
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = -1; ++j < c; ) {
             Y v = map.get(j);
@@ -613,7 +618,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @NotNull
     @Override
-    public HijackBag<K, V> commit(Consumer<V> update) {
+    public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
+
+        if (update!=null) {
+            update(update);
+        }
 
         float mass = 0;
         float min = Float.POSITIVE_INFINITY;
@@ -649,10 +658,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         }
 
         this.mass = mass;
-
-        if (update!=null) {
-            update(update);
-        }
 
         return this;
     }

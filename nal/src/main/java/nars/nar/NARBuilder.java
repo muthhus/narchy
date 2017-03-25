@@ -76,9 +76,9 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 256 * 1024;
+        int maxConcepts = 192 * 1024;
 
-        int activeConcepts = 1024;
+        int activeConcepts = 256;
 
         Default nar = new Default(activeConcepts,
                 1, 1, 3, rng,
@@ -141,10 +141,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
             final Compressor compressor = new Compressor(this, "_",
-                    8, 12,
-                    1f, 64, 32);
+                    8, 16,
+                    2f, 64, 32);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -184,11 +184,11 @@ public interface NARBuilder {
 
         };
 
-        nar.core.conceptsFiredPerCycle.setValue(64);
+        nar.core.conceptsFiredPerCycle.setValue(32);
         nar.core.conceptsFiredPerBatch.setValue(8);
-        nar.core.derivationsInputPerCycle.setValue(64);
+        nar.core.derivationsInputPerCycle.setValue(48);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(96);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);

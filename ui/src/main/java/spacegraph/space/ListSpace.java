@@ -6,23 +6,16 @@ import spacegraph.AbstractSpace;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 
 public class ListSpace<X,Y> extends AbstractSpace<X,Y> {
 
-    public Collection<Y> active = Collections.emptyList();
+    public List<Y> active;
 
-    public ListSpace() {
-        super();
-    }
-
-    public ListSpace(Collection<Y> xx) {
-        this();
-        active = xx;
-    }
     public ListSpace(Y... xx) {
-        this();
+        super();
         this.active = new FasterList<>(xx);
     }
 

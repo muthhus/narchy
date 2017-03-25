@@ -9,6 +9,7 @@ import nars.Param;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
@@ -83,6 +84,21 @@ public class SerialCompound extends DynByteSeq implements Compound {
     }
 
     @Override
+    public int hashCode() {
+        throw new UnsupportedOperationException(); //TODO impl in a subclass
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        throw new UnsupportedOperationException(); //TODO impl in a subclass
+    }
+
+    @Override
+    public int compareTo(@NotNull Termlike y) {
+        throw new UnsupportedOperationException(); //TODO impl in a subclass
+    }
+
+    @Override
     public @NotNull TermContainer subterms() {
         return build().subterms(); //HACK just a temporary way of accessing them
     }
@@ -102,8 +118,8 @@ public class SerialCompound extends DynByteSeq implements Compound {
         Op o = op();
         if (o.temporal) {
             int p = this.len;
-            byte[] bb = Arrays.copyOfRange(bytes, p - 4, p);
-            return Ints.fromByteArray(bb);
+            final byte[] b = bytes;
+            return Ints.fromBytes(b[p-3], b[p-2], b[p-1], b[p]);
         } else if (o.image) {
             return bytes[len -1];
         } else {

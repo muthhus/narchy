@@ -78,6 +78,10 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
         return false;
     }
 
+    @Override
+    public void pressurize(float f) {
+        pressure += f;
+    }
 
     /**
      * returns true unless failed to add during 'add' operation or is empty

@@ -322,13 +322,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 0.5f + 2f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 4f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
-            this.attractionDist = 10.0f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+            this.attractionDist = 5.0f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
     }
 
