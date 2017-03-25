@@ -17,6 +17,7 @@ import java.util.function.Consumer;
 /**
  *  a bag which wraps another bag, accepts its value as input but at a throttled rate
  *  resulting in containing effectively the integrated / moving average values of the input bag
+ *  TODO make a PLink version of ArrayBag since quality is not used here
  */
 public class Bagregate<X> extends ArrayBag<X> {
 
@@ -25,7 +26,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
-        super(capacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity));
+        super(capacity, BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
@@ -36,6 +37,8 @@ public class Bagregate<X> extends ArrayBag<X> {
     protected void update() {
         if (!busy.compareAndSet(false, true))
             return;
+
+        commit();
 
         float scale = this.scale.floatValue();
 
@@ -59,8 +62,6 @@ public class Bagregate<X> extends ArrayBag<X> {
                     count++;
             }
         }
-
-        commit();
 
         busy.set(false);
     }

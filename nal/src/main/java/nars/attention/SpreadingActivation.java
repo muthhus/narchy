@@ -7,6 +7,7 @@ import nars.Task;
 import nars.budget.BLink;
 import nars.budget.Budgeted;
 import nars.budget.RawBLink;
+import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
 import nars.term.Compound;
@@ -30,14 +31,14 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
     private final int termlinkDepth;
 
-    final float inPri; //cached priority value of input at input
 
     final ObjectFloatHashMap<Termed> spread;
 
     final static float parentRetention = 0.5f;
 
-    private final int dur; //cache
-
+    transient final int dur; //cache
+    transient final float inPri; //cached priority value of input at input
+    transient final float inQua; //cached quality value of input at input
 
     /**
      * runs the task activation procedure
@@ -55,13 +56,15 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     public SpreadingActivation(@NotNull Budgeted in, float scale, @NotNull Concept src, int termlinkDepth, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
         super(in, scale, src, nar);
 
-        this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
-
         this.termlinkDepth = termlinkDepth;
 
         this.spread = spread;
 
+        this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
+        this.inQua = in.qua();
         this.dur = nar.dur();
+
+
 
         link(src.term(), scale, 0);
 
@@ -88,7 +91,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case DIFFi:
             case SECTi:
             case SECTe:
-                return 2;
+                return 1;
 
 
             case SIM:
@@ -143,7 +146,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     void link(@NotNull Term targetTerm, float scale, int depth) {
 
 
-        float parentScale = scale;
+        float parentActivation = scale;
 
         boolean isntVariable = !(targetTerm instanceof Variable);
 
@@ -170,55 +173,77 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                 if (n > 0) {
                     float childScale = ((1f - parentRetention) * scale) / (n);
                     if (childScale >= minScale) {
-                        parentScale = scale * parentRetention;
+                        parentActivation = scale * parentRetention;
                         for (int i = 0; i < n; i++) {
                             link(targetSubs.term(i).unneg(), childScale, nextDepth); //link and recurse to the concept
                         }
                     }
                 }
-            } else if (linkedTerm instanceof Concept) {
-                //activate through Atom's termlinks
-                Bag<Task,BLink<Task>> tlinks = ((Concept) linkedTerm).tasklinks();
-                int n = tlinks.size();
-                if (n > 0) {
-                    float maxSubScale = ((1f - parentRetention) * scale) / (n);
-                    if (maxSubScale >= minScale) {
-                        parentScale = scale * parentRetention;
-                        if (in instanceof Task) {
-
-                            long target = ((Task)in).mid();
-
-                            tlinks.commit((b) -> {
-                                float p =
-                                        //b.priSafe(0)
-                                        b.qua()
-                                                * maxSubScale ;
-                                Task bt = b.get();
-                                if (target!=ETERNAL && !bt.isEternal()) {
-                                    //decrease by temporal irrelevancy
-                                    p *= TruthPolation.evidenceDecay(1, dur, Math.abs(bt.mid() - target));
-                                }
-
-                                if (p >= minScale) {
-//                                {
-//                                    //activate the concept
-//                                    spread.addToValue(b.get(), p);
-//                                }
-
-                                    {
-                                        //activate the link
-                                        b.priAdd(p);
-                                    }
-                                }
-                            });
-                        }
-
-                    }
-                }
             }
         }
 
-        spread.addToValue(linkedTerm, parentScale);
+        if (linkedTerm instanceof AtomConcept) {
+            //activation terminating at an atom: activate through Atom links
+            if (in instanceof Task) {
+                Bag<Task, BLink<Task>> tlinks = ((Concept) linkedTerm).tasklinks();
+                int n = tlinks.size();
+                if (n > 0) {
+
+                    //initially start with a fair budget assuming each link receives a full share
+                    float subActivation = ((1f - parentRetention) * scale) / (n);
+                    final float[] change = {0};
+                    parentActivation = subActivation * n;
+
+                    long inStart = ((Task) in).start();
+                    long inEnd = ((Task) in).end();
+
+
+                    tlinks.commit((b) -> {
+                        float subSubActivation =
+                                //b.priSafe(0)
+                                b.qua() * subActivation;
+
+                        if (subSubActivation >= minScale) {
+                            Task bt = b.get();
+                            if (inStart != ETERNAL) {
+                                long timeDistance = bt.timeDistance(inStart);
+                                if (timeDistance != ETERNAL) {
+                                    timeDistance = Math.min(timeDistance, bt.timeDistance(inEnd)); //HACK do this faster
+
+                                    //increase duration up to 2x in proportion to the conf of a belief or goal
+                                    int eDur =
+                                            (int) Math.ceil(dur * (1f + (bt.isBeliefOrGoal() ? bt.conf() : 0f)));
+
+                                    //multiply by temporal relevancy
+                                    subSubActivation *= TruthPolation.evidenceDecay(
+                                            1 + (change[0] / 2f / subActivation), //boost with up to half of collected change
+                                            eDur,
+                                            timeDistance);
+                                }
+                            }
+
+                            if (subSubActivation >= minScale) {
+                                change[0] += b.priAddOverflow(subSubActivation); //activate the link
+                            } else {
+                                subSubActivation = 0;
+                            }
+
+                        } else {
+                            subSubActivation = 0;
+                        }
+
+                        change[0] += (subActivation - subSubActivation);
+                    });
+
+                    //recoup losses to the parent
+                    parentActivation += change[0];
+                }
+            } else {
+                //termlinks?
+            }
+        }
+
+        spread.addToValue(linkedTerm, parentActivation);
     }
 
     final void termBidi(@NotNull Termed tgt, float tlForward, float tlReverse) {
@@ -230,7 +255,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
         if (tlForward > 0)
             termlink(origin, tgtTerm, tlForward);
 
-        if (tgt!=origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
+        if (tgt != origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
             Term originTerm = origin.term();
             if (!originTerm.equals(tgtTerm)) {
                 termlink((Concept) tgt, originTerm, tlReverse);
@@ -240,15 +265,14 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     }
 
     void tasklink(Concept target, float scale) {
-        Task src = (Task) in;
         target.tasklinks().put(
-                //new DependentBLink(src),
-                new RawBLink(src, src.pri(), src.qua()),
+                new RawBLink(in, inPri, inQua),
+                    //new DependentBLink(src),
                 scale, null);
     }
 
     void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(new RawBLink(to, in), scale, linkOverflow);
+        from.termlinks().put(new RawBLink(to, inPri, inQua), scale, linkOverflow);
     }
 
 

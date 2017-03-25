@@ -171,7 +171,7 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton( "conceptBudget", Vis.budgetHistogram(nar, 64) ),
                     new WindowButton( "conceptTreeMap", () -> {
 
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 64, 0.5f), 64, nar);
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 128, 0.75f), 128, nar);
 
 
                         return tc;

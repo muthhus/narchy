@@ -778,4 +778,16 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return (Compound) s;
     }
 
+    /** returns the time separating this task from a target time. if the target occurrs
+     *  during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
+     */
+    default long timeDistance(long t) {
+        long s = start();
+        if (s == ETERNAL) return ETERNAL;
+        long e = end();
+        if ((t >= s) || (t <= e)) return 0;
+        else if (t > e) return t - e;
+        else return s - t;
+    }
+
 }

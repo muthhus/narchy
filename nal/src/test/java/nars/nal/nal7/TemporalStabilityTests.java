@@ -128,8 +128,8 @@ public class TemporalStabilityTests {
     }
     @Test public void testTemporalStabilityLinkedImplExt2() {
         Param.DEBUG = true;
-        @NotNull NAR n = new Default(1024, 4, 2, 3);
-        int time = 100;
+        @NotNull NAR n = new Default(1024, 3, 2, 3);
+        int time = 80;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);
         T1 b = new T1(linkedinh, 1, 2, 5, 10);
 

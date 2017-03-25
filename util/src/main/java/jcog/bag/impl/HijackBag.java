@@ -516,7 +516,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             n--;
                             selected++;
                         } else {
-                            throw new UnsupportedOperationException("reinsertion TODO");
+                            //try to reinsert in that slot
+                            if (!map.compareAndSet(i, null, v)) {
+                                //try to insert as if normally
+                                put(v);
+                            }
                         }
                     }
                 }
@@ -647,7 +651,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         this.mass = mass;
 
         if (update!=null) {
-            this.pressure = 0;
             update(update);
         }
 

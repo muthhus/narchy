@@ -14,6 +14,19 @@ public interface Priority extends Prioritized {
         setPriority(priSafe(0) + toAdd);
     }
 
+    default float priAddOverflow(float toAdd) {
+        float next = priSafe(0) + toAdd;
+        float change;
+        if (next > 1) {
+            change = next - 1;
+            next = 1;
+        } else {
+            change = 0;
+        }
+        setPriority(next);
+        return change;
+    }
+
     default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
 
     static float validPriority(float p) {
