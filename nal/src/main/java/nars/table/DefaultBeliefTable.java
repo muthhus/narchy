@@ -108,6 +108,8 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
         if (now != ETERNAL) {
+            if (when == ETERNAL)
+                when = now;
 
             Task tmp = temporal.match(when, now, dur, against);
 

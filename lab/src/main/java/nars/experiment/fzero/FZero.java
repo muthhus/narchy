@@ -38,18 +38,18 @@ public class FZero extends NAgentX {
 //                    return task.isBelief();
 //                }
 //            };
-            new TaskRule("(%1 &&+5 %2)", "seq(%1,%2)", nar) {
-                @Override
-                public boolean test(@NotNull Task task) {
-                    return polarized(task);
-                }
-            };
-            new TaskRule("(seq(%1,%2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
-                @Override
-                public boolean test(@NotNull Task task) {
-                    return polarized(task);
-                }
-            };
+//            new TaskRule("(%1 &&+5 %2)", "seq(%1,%2)", nar) {
+//                @Override
+//                public boolean test(@NotNull Task task) {
+//                    return polarized(task);
+//                }
+//            };
+//            new TaskRule("(seq(%1,%2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
+//                @Override
+//                public boolean test(@NotNull Task task) {
+//                    return polarized(task);
+//                }
+//            };
             new TaskRule("((%1 &&+5 %2) &&+5 %3)", "seq(%1,%2,%3)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {

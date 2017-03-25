@@ -211,7 +211,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         @Override
         protected Task ressurect(Task t) {
-            t.budget().setPriority(sensor.pri.asFloat());
+            if (t.isDeleted())
+                t.budget().setPriority(0);
             return t;
         }
 

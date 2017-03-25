@@ -5,6 +5,8 @@ import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
+import nars.task.AnswerTask;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
@@ -89,9 +91,11 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
             super(tCap, historicCap, r);
         }
 
+
         @Override
         protected Task ressurect(Task t) {
-            t.budget().setPriority(0);
+            if (t.isDeleted())
+                t.budget().setPriority(0);
             return t;
         }
 

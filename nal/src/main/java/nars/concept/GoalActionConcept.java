@@ -1,7 +1,10 @@
 package nars.concept;
 
+import jcog.data.FloatParam;
+import jcog.data.MutableDouble;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.task.ImmutableTask;
 import nars.task.Revision;
@@ -22,10 +25,14 @@ import static nars.time.Tense.DTERNAL;
 /** ActionConcept which is driven by Goals that are interpreted into feedback Beliefs */
 public class GoalActionConcept extends ActionConcept {
 
+    public final FloatParam resolution;
+
     public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
+        resolution = n.truthResolution;
         this.motor = motor;
         this.goals = newBeliefTable(nar, false); //pre-create
+
     }
 
     @Override
@@ -78,28 +85,31 @@ public class GoalActionConcept extends ActionConcept {
 
 
 
-        Truth b = beliefIntegrated.commitAverage();
+        Truth b = beliefIntegrated.commitSum();
 //        if (tdb != null) {
 //            b = (b != null) ? Revision.revise(b, tdb) : tdb;
 //        }
 
-        Truth g = goalIntegrated.commitAverage();
+        Truth g = goalIntegrated.commitSum();
 //        if (tdg!=null) {
 //            g = (g != null) ? Revision.revise(g, tdg) : tdg;
 //        }
 
 
+        float resolution = this.resolution.floatValue();
 
         boolean noDesire = g == null;
-        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !g.equals(lastGoal));
+        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !g.equals(lastGoal, resolution));
         lastGoal = g;
 
         boolean noBelief = b == null;
-        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief));
+        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief, resolution));
         lastBelief = b;
 
 
-        /*if (goalChange || (updateOnBeliefChange && beliefChange))*/ {
+        if (goalChange || (updateOnBeliefChange && beliefChange)) {
+
+            Truth lastFeedback = currentFeedback;
 
             Truth f = this.motor.motor(b, g);
             if (f!=null) {
@@ -116,20 +126,21 @@ public class GoalActionConcept extends ActionConcept {
 //                    nar.input(nextFeedback);
 //                }
 //            }
+
+            if (currentFeedback!=null && (lastFeedback==null || !currentFeedback.equals(lastFeedback, resolution))) {
+                long now = nar.time();
+                SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
+                        now,
+                        now,
+                        nar.time.nextStamp());
+                s.budget(nar);
+                return s;
+            }
         }
 
 
-        if (currentFeedback!=null) {
-            long now = nar.time();
-            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
-                    now,
-                    Math.round(now + nar.dur()),
-                    nar.time.nextStamp());
-            s.budget(nar);
-            return s;
-        } else {
-            return null;
-        }
+        return null;
+
 
 
         //return feedback.apply(nar);

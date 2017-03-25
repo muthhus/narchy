@@ -31,11 +31,13 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     @Override
     public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
         Task t = super.match(when, now, dur, against);
-        Task h = matchHistory(when);
-        if (h != null) {
-            float conf = h.conf(when, dur);
-            if (t == null || conf > t.conf()) {
-                return ressurect(h);
+        if (when < now) {
+            Task h = matchHistory(when);
+            if (h != null) {
+                float conf = h.conf(when, dur);
+                if (t == null || conf > t.conf()) {
+                    t = ressurect(h);
+                }
             }
         }
         return t;

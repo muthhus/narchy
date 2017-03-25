@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import jcog.Util;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -11,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;
+
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 2/17/17.
@@ -71,14 +74,26 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
     }
 
 
+    long lastForget = ETERNAL;
+
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        float forgetRate = t.priSafe(-1) * t.qua();
-        if (forgetRate < 0)
-            return null; //deleted
+        //new Forget( Util.unitize(1f/capacity() + forgetRate) )
 
-        if (forgetRate > Param.BUDGET_EPSILON)
-            update(new Forget( forgetRate ));
+        long now = n.time();
+        int dur = n.dur();
+        if (lastForget + dur < now) {
+            update(x -> {
+                long s = x.start();
+                long e = x.end();
+                if (e < now) {
+                    //forget old tasks
+                    x.budget().priMult( x.qua() );
+                }
+            });
+            lastForget = now;
+        }
+
 
         Task inserted = put(t);
 

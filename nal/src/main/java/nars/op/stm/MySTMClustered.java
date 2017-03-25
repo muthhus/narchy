@@ -159,13 +159,18 @@ public class MySTMClustered extends STMClustered {
                     }
                     return false;
                 })
-                .limit(limit)
                 .filter(Objects::nonNull)
-                .map(n -> PrimitiveTuples.pair(n, n.coherence(2)[0]))
-                .forEach(nodeFreq -> {
+                .flatMap(node -> {
 
-                    TasksNode node = nodeFreq.getOne();
-                    float freq = (float) nodeFreq.getTwo();
+                    @Nullable double[] freqDim = node.coherence(2);
+                    if (freqDim == null)
+                        return null;
+
+                    @Nullable double[] startDim = node.coherence(0);
+                    if (startDim == null)
+                        return null;
+
+                    float freq = (float) freqDim[0];
 
                     boolean negated;
                     if (freq < 0.5f) {
@@ -177,7 +182,7 @@ public class MySTMClustered extends STMClustered {
 
                     float finalFreq = freq;
                     int maxVol = nar.termVolumeMax.intValue();
-                    node.chunk(maxGroupSize, maxVol - 1).forEach(tt -> {
+                    return node.chunk(maxGroupSize, maxVol - 1).map(tt -> {
 
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
@@ -203,29 +208,22 @@ public class MySTMClustered extends STMClustered {
                         });
 
                         if (vv.size() < 2)
-                            return;
+                            return null;
 
                         Collection<Task> uu = vv.values();
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
                         if (conf < confMin)
-                            return;
+                            return null;
 
                         long[] evidence = Stamp.zip(uu);
 
                         @Nullable Compound conj = group(negated, uu);
-                        if (conj == null)
-                            return;
+                        if ((conj == null) || (conj.op()!=CONJ) || conj.volume() > maxVol)
+                            return null;
 
-                        if (conj.volume() > maxVol)
-                            return; //throw new RuntimeException("exceeded max volume");
-
-                        @Nullable double[] nc = node.coherence(0);
-                        if (nc == null)
-                            return;
-
-                        long t = Math.round(nc[0]);
+                        long t = Math.round(startDim[0]);
 
 
                         Task m = new GeneratedTask(conj, punc,
@@ -235,9 +233,9 @@ public class MySTMClustered extends STMClustered {
 //                        float priAvg = ((float)(priTotal / uu.size()));
 //
                         m.setBudget(BudgetFunctions.fund(uu, (1f / uu.size()), false));
-                        m.log("STMCluster CoOccurr");
+                        //m.log("STMCluster CoOccurr");
 
-                        toInput.add(m);
+                        return m;
 
                         //logger.debug("{}", m);
                         //generate.emit(m);
@@ -247,10 +245,9 @@ public class MySTMClustered extends STMClustered {
                         //node.tasks.removeAll(tt);
 
 
-                    });
+                    }).filter(Objects::nonNull);
 
-
-                });
+                }).limit(limit).forEach(toInput::add);
 
         if (!toInput.isEmpty())
             nar.input(toInput);

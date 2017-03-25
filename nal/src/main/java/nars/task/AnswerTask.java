@@ -18,8 +18,8 @@ import static jcog.Util.lerp;
 public class AnswerTask extends ImmutableTask {
 
 
-    @Nullable
-    protected Task aBelief, bBelief;
+//    @Nullable
+//    protected Task aBelief, bBelief;
 
     public AnswerTask(@NotNull Compound term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion, creationTime, start, end, evidence);
@@ -28,16 +28,17 @@ public class AnswerTask extends ImmutableTask {
     public AnswerTask(@NotNull Compound term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
         this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.stamp(), bBelief.stamp(), evidenceBalance));
 
-        this.aBelief = aBelief;
-        this.bBelief = bBelief;
+        //this.aBelief = null; aBelief;
+        //this.bBelief = null; //bBelief;
     }
 
     /**
      * rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept
      */
-    public void unlink() {
-        this.aBelief = this.bBelief = null;
-    }
+    @Deprecated public void unlink() {
+
+        //this.aBelief = this.bBelief = null;
+        }
 
     @Override
     public final boolean isInput() {
@@ -47,13 +48,13 @@ public class AnswerTask extends ImmutableTask {
     @Nullable
     @Override
     public Task getParentTask() {
-        return aBelief;
+        return null; //return aBelief;
     }
 
     @Nullable
     @Override
     public Task getParentBelief() {
-        return bBelief;
+        return null; //return bBelief;
     }
 
     @Nullable

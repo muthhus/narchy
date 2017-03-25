@@ -21,10 +21,10 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     }
 
 
-    @Override
-    public float pri(@NotNull Task key) {
-        return (1f + key.priSafe(0)) * (1f * key.qua());
-    }
+//    @Override
+//    public float pri(@NotNull Task key) {
+//        return (1f + key.priSafe(0)) * (1f * key.qua());
+//    }
 
 
 

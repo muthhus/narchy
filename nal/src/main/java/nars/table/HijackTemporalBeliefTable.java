@@ -25,6 +25,7 @@ import java.util.Random;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal
@@ -119,7 +120,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Override
     public float pri(@NotNull Task t) {
-        return (1f + t.priSafe(0)) * (1f + t.conf());
+        //return (1f + t.priSafe(0)) * (1f + t.conf());
+        return t.priSafe(0);
     }
 
     @Nullable
@@ -504,6 +506,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Nullable
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against) {
+
         Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), this);
 
         Task a = s.a;

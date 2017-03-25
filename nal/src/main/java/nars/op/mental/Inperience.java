@@ -73,13 +73,13 @@ public class Inperience extends Leak<Task, BLink<Task>> {
      * use the < 0.5 value here, ex: 0.1 means that 0..0.1 and 0.9..1.0 will be accepted
      */
     @NotNull
-    public final FloatParam freqMax = new FloatParam(0.25f);
+    public final FloatParam freqMax = new FloatParam(0.1f);
 
     float beliefFactor = 1f;
-    float questionFactor = 0.25f;
+    float questionFactor = 0.5f;
 
     /** multiplier for he sensory task priority to determine inperienced task priority */
-    private float priFactor = 0.75f;
+    private float priFactor = 0.5f;
 
 //    public boolean isEnableWantBelieve() {
 //        return enableWantBelieve;

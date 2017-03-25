@@ -129,6 +129,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
                 if (taskLinkCopy == null) //deleted
                     continue;
 
+
                 Task task = (taskLink.get());
 
                 long when;

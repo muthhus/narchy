@@ -224,7 +224,7 @@ abstract public class NAgent implements NSense, NAct {
 //        if (load < 1) {
 
 
-        long next = now + dur;
+        long next = now + (dur * 3 / 2);
 
         nar.input(
 
@@ -346,8 +346,10 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()), now),
-                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    quest((Compound) (action.term()),
+                            now)
+                            //ETERNAL)
+                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 //                    question(impl(action, 0, happiness), now),
@@ -504,6 +506,7 @@ abstract public class NAgent implements NSense, NAct {
             long shift = horizon > 0 && t.isQuestOrQuestion() ? nar.random.nextInt(horizon) : 0;
 
             long range = t.end() - t.start();
+            //System.out.println(now + " " + nar.time() + " -> " + next + "+" + shift + " = " + (next+shift));
             result = prediction(t.term(), t.punc(), t.truth(), next + shift, next + shift + range);
 
         } else if (t.isDeleted()) {
