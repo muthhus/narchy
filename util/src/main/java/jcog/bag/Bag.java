@@ -401,7 +401,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
      * commits the next set of changes and updates budgeting
      * @return this bag
      */
-    @NotNull Bag<K,V> commit(Function<Bag<K,V>, Consumer<V>> update);
+    @NotNull Bag<K,V> commit(Consumer<V> update);
 
 
     @Nullable Bag EMPTY = new Bag() {
@@ -459,21 +459,20 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
             return true;
         }
 
-        @NotNull
-        @Override
-        public Bag commit() {
-            return this;
-        }
 
         @Override
         public boolean setCapacity(int c) {
             return false;
         }
 
+        @Override
+        public Bag commit() {
+            return this;
+        }
 
         @NotNull
         @Override
-        public Bag commit(Function update) {
+        public Bag commit(Consumer update) {
             return this;
         }
 

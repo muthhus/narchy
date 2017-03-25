@@ -134,7 +134,7 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     @NotNull
     @Override
-    public Bag<X,BLink<X>> commit(Function<Bag<X,BLink<X>>, Consumer<BLink<X>>> update) {
+    public Bag<X,BLink<X>> commit(Consumer<BLink<X>> update) {
         bag.commit(update);
         return this;
     }

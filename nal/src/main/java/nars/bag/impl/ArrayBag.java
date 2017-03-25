@@ -401,17 +401,23 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     @Override
     @Deprecated
     public Bag<X, BLink<X>> commit() {
-        return commit((b) -> Forget.forget(size(), pressure, mass, Forget::new));
+        float p = this.pressure;
+        this.pressure = 0;
+        commit(Forget.forget(size(), p, mass, Forget::new));
+        return this;
     }
 
     @Override
     @NotNull
-    public final ArrayBag<X> commit(@Nullable Function<Bag<X, BLink<X>>, Consumer<BLink<X>>> update) {
+    public final ArrayBag<X> commit(Consumer<BLink<X>> update) {
         commit(update, false);
         return this;
     }
 
-    private void commit(@Nullable Function<Bag<X, BLink<X>>, Consumer<BLink<X>>> update, boolean checkCapacity) {
+    private void commit(@Nullable Consumer<BLink<X>> update, boolean checkCapacity) {
+
+        if (update != null || checkCapacity)
+            update(update, checkCapacity);
 
         if (update != null) {
             float mass = 0;
@@ -426,9 +432,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
             this.mass = mass;
         }
 
-        Consumer<BLink<X>> u = update != null ? update.apply(this) : null;
-        if (u != null || checkCapacity)
-            update(u, checkCapacity);
     }
 
 

@@ -588,8 +588,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     @Deprecated
     public Bag<K, V> commit() {
-        return commit((b) -> Bag.forget(
-                b.size(), pressure, mass, temperature(), priEpsilon(), this::forget));
+        float p = this.pressure;
+        pressure = 0;
+        commit(Bag.forget( size(), p, mass, temperature(), priEpsilon(), this::forget));
+        return this;
     }
 
     /**
@@ -607,7 +609,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @NotNull
     @Override
-    public HijackBag<K, V> commit(Function<Bag<K, V>, Consumer<V>> update) {
+    public HijackBag<K, V> commit(Consumer<V> update) {
 
         float mass = 0;
         float min = Float.POSITIVE_INFINITY;
@@ -644,16 +646,18 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         this.mass = mass;
 
-        update(update != null ? update.apply(this) : null);
+        if (update!=null) {
+            this.pressure = 0;
+            update(update);
+        }
 
         return this;
     }
 
     @NotNull
-    public HijackBag<K, V> update(@Nullable Consumer<V> each) {
+    protected HijackBag<K, V> update(@Nullable Consumer<V> each) {
 
         if (each != null) {
-            this.pressure = 0;
             forEach(each);
         }
 

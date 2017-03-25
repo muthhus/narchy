@@ -8,6 +8,7 @@ import nars.budget.BLink;
 import nars.budget.Budgeted;
 import nars.budget.RawBLink;
 import nars.concept.Concept;
+import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -17,6 +18,10 @@ import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedur
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
+
+import static nars.time.Tense.ETERNAL;
 
 /**
  * activation from a point source to its subterm components (termlink templates)
@@ -30,6 +35,9 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     final ObjectFloatHashMap<Termed> spread;
 
     final static float parentRetention = 0.5f;
+
+    private final int dur; //cache
+
 
     /**
      * runs the task activation procedure
@@ -53,6 +61,8 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         this.spread = spread;
 
+        this.dur = nar.dur();
+
         link(src.term(), scale, 0);
 
         spread.forEachKeyValue(this);
@@ -61,6 +71,10 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
 
         nar.emotion.stress(linkOverflow);
 
+    }
+
+    private Consumer<BLink<Task>> newTaskLinkUpdate(Task in) {
+        return null;
     }
 
     public static int levels(@NotNull Compound host) {
@@ -170,23 +184,35 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
                     float maxSubScale = ((1f - parentRetention) * scale) / (n);
                     if (maxSubScale >= minScale) {
                         parentScale = scale * parentRetention;
-                        tlinks.forEach(b -> {
-                            float p =
-                                    //b.priSafe(0)
-                                    b.qua()
-                                        * maxSubScale;
-                            if (p >= minScale) {
+                        if (in instanceof Task) {
+
+                            long target = ((Task)in).mid();
+
+                            tlinks.commit((b) -> {
+                                float p =
+                                        //b.priSafe(0)
+                                        b.qua()
+                                                * maxSubScale ;
+                                Task bt = b.get();
+                                if (target!=ETERNAL && !bt.isEternal()) {
+                                    //decrease by temporal irrelevancy
+                                    p *= TruthPolation.evidenceDecay(1, dur, Math.abs(bt.mid() - target));
+                                }
+
+                                if (p >= minScale) {
 //                                {
 //                                    //activate the concept
 //                                    spread.addToValue(b.get(), p);
 //                                }
 
-                                {
-                                    //activate the link
-                                    b.priAdd(p);
+                                    {
+                                        //activate the link
+                                        b.priAdd(p);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+
                     }
                 }
             }
