@@ -24,7 +24,7 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
     @NotNull
     @Override
     public String toString() {
-        return "neqAndCom(" + b + ")";
+        return "neqAndCom(" + b + ')';
     }
 
 }

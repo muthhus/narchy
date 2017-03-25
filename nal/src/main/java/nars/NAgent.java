@@ -11,10 +11,8 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
-import nars.table.DefaultBeliefTable;
 import nars.table.EternalTable;
 import nars.task.ImmutableTask;
-import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
@@ -351,9 +349,9 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     quest((Compound) (action.term()),
-                            now)
+                            ETERNAL),
                             //ETERNAL)
-                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 //                    question(impl(action, 0, happiness), now),
@@ -496,7 +494,7 @@ abstract public class NAgent implements NSense, NAct {
         List<Task> nonCuriosityTasks = $.newArrayList();
         for (ActionConcept a : actions) {
 
-            ((DefaultBeliefTable)a.goals()).temporal.forEach(x -> {
+            a.goals().forEach(x -> {
                 if (!(x instanceof ActionConcept.CuriosityTask)) {
                     nonCuriosityTasks.add(x);
                 }

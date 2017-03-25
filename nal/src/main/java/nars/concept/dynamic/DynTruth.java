@@ -12,9 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.Op.BELIEF;
-import static nars.Op.CONJ;
-import static nars.Op.GOAL;
+import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
@@ -92,7 +90,7 @@ public final class DynTruth implements Truthed {
             return null;
 
 
-        c = Task.post(c, nar);
+        c = Task.content(c, nar);
         if (c == null) return null;
 
         // normalize it

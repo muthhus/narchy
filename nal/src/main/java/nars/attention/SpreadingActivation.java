@@ -11,6 +11,7 @@ import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -73,7 +74,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
             case DIFFi:
             case SECTi:
             case SECTe:
-                return 1;
+                return 2;
 
 
             case SIM:
@@ -128,7 +129,7 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
     void link(@NotNull Term targetTerm, float scale, int depth) {
 
 
-        float thisScale = scale;
+        float parentScale = scale;
 
         boolean isntVariable = !(targetTerm instanceof Variable);
 
@@ -149,40 +150,49 @@ public class SpreadingActivation extends Activation implements ObjectFloatProced
         if (nextDepth <= termlinkDepth) {
 
             if (targetTerm instanceof Compound) {
-                int n = targetTerm.size();
+                Compound targetCompound = (Compound) targetTerm;
+                @NotNull TermContainer targetSubs = targetCompound.subterms();
+                int n = targetSubs.size();
                 if (n > 0) {
                     float childScale = ((1f - parentRetention) * scale) / (n);
                     if (childScale >= minScale) {
-                        Compound targetCompound = (Compound) targetTerm;
-                        Term[] children = targetCompound.terms();
-                        for (Term t : children)
-                            link(t.unneg(), childScale, nextDepth); //link and recurse to the concept
-
-                        thisScale = scale * parentRetention;
+                        parentScale = scale * parentRetention;
+                        for (int i = 0; i < n; i++) {
+                            link(targetSubs.term(i).unneg(), childScale, nextDepth); //link and recurse to the concept
+                        }
                     }
                 }
             } else if (linkedTerm instanceof Concept) {
-                //activate (but not link to) Atom's termlinks
-                Bag<Term,BLink<Term>> tlinks = ((Concept) linkedTerm).termlinks();
+                //activate through Atom's termlinks
+                Bag<Task,BLink<Task>> tlinks = ((Concept) linkedTerm).tasklinks();
                 int n = tlinks.size();
                 if (n > 0) {
                     float maxSubScale = ((1f - parentRetention) * scale) / (n);
                     if (maxSubScale >= minScale) {
+                        parentScale = scale * parentRetention;
                         tlinks.forEach(b -> {
-                            Term key = b.get();
                             float p =
                                     //b.priSafe(0)
                                     b.qua()
                                         * maxSubScale;
-                            if (p >= minScale)
-                                spread.addToValue(key, p);
+                            if (p >= minScale) {
+//                                {
+//                                    //activate the concept
+//                                    spread.addToValue(b.get(), p);
+//                                }
+
+                                {
+                                    //activate the link
+                                    b.priAdd(p);
+                                }
+                            }
                         });
                     }
                 }
             }
         }
 
-        spread.addToValue(linkedTerm, thisScale);
+        spread.addToValue(linkedTerm, parentScale);
     }
 
     final void termBidi(@NotNull Termed tgt, float tlForward, float tlReverse) {

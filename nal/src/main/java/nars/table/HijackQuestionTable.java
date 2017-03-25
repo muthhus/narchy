@@ -1,10 +1,8 @@
 package nars.table;
 
 import nars.NAR;
-import nars.Task;
 import nars.bag.impl.TaskHijackBag;
 import nars.budget.BudgetMerge;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 

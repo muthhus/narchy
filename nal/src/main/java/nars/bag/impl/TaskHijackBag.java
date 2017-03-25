@@ -1,8 +1,6 @@
 package nars.bag.impl;
 
-import jcog.Util;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;

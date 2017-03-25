@@ -2,7 +2,6 @@ package nars;
 
 import jcog.Util;
 import jcog.math.FirstOrderDifferenceFloat;
-import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
 import nars.concept.FuzzyScalarConcepts;

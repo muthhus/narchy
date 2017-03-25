@@ -8,7 +8,6 @@ import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,7 @@ public class TaskRule extends TaskMatch{
         Compound y = compoundOrNull(nar.concepts.transform(output, new MapSubst(xy)));
         if (y==null) return;
 
-        y = Task.post(y, nar);
+        y = Task.content(y, nar);
         if (y==null) return;
 
         y = compoundOrNull(nar.concepts.normalize(y));

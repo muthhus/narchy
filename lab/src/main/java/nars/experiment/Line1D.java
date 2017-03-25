@@ -51,9 +51,13 @@ public class Line1D {
             n.onCycle(() -> {
                 a.i.setValue(
                     //0.5f * (Math.sin(n.time()/20f) + 1f)
-                    Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                    (0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
             });
+
+            a.curiosityProb.setValue(0f);
+
             return a;
 
         }, 20, 5, -1);

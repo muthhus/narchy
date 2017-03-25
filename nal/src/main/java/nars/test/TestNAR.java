@@ -1,10 +1,8 @@
 package nars.test;
 
 import jcog.event.Topic;
-import jcog.meter.event.HitMeter;
 import nars.*;
 import nars.task.Tasked;
-import nars.test.analyze.EventCount;
 import nars.test.condition.EternalTaskCondition;
 import nars.test.condition.NARCondition;
 import nars.test.condition.TemporalTaskCondition;
@@ -15,9 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.BELIEF;

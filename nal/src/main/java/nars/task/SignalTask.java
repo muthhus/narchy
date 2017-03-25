@@ -1,7 +1,6 @@
 package nars.task;
 
 
-import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

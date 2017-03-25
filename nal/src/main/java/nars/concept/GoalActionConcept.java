@@ -5,11 +5,11 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.task.Revision;
+import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import nars.task.SignalTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,10 +19,13 @@ import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 
 
-/** ActionConcept which is driven by Goals that are interpreted into feedback Beliefs */
+/**
+ * ActionConcept which is driven by Goals that are interpreted into feedback Beliefs
+ */
 public class GoalActionConcept extends ActionConcept {
 
     public final FloatParam resolution;
+    private SignalTask currentFeedbackTask;
 
     public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
@@ -41,15 +44,8 @@ public class GoalActionConcept extends ActionConcept {
     private Truth currentFeedback;
 
 
-    private final boolean updateOnBeliefChange = false;
-
-
-    private Truth lastGoal, lastBelief;
-
-
     @Override
     public Task apply(NAR nar) {
-
 
 
 //        Truth tdb, tdg;
@@ -60,7 +56,6 @@ public class GoalActionConcept extends ActionConcept {
 //        } else {
 //            tdb = tdg = null;
 //        }
-
 
 
         Truth b = beliefIntegrated.commitSum();
@@ -76,79 +71,37 @@ public class GoalActionConcept extends ActionConcept {
 
         float resolution = this.resolution.floatValue();
 
-        boolean noDesire = g == null;
-        boolean goalChange =   (noDesire ^ lastGoal == null) || (!noDesire && !g.equals(lastGoal, resolution));
-        lastGoal = g;
 
-        boolean noBelief = b == null;
-        boolean beliefChange = (noBelief ^ lastBelief == null) || (!noBelief && !b.equals(lastBelief, resolution));
-        lastBelief = b;
+        Truth lastFeedback = currentFeedback;
 
+        this.currentFeedback = this.motor.motor(b, g);
 
-        if (goalChange || (updateOnBeliefChange && beliefChange)) {
-
-            Truth lastFeedback = currentFeedback;
-
-            Truth f = this.motor.motor(b, g);
-            if (f!=null) {
-                this.currentFeedback = f; //HACK ignores the conf component
-            } else {
-                this.currentFeedback = null;
-            }
-
-
-//            if (feedback != null) {
-//                //if feedback is different from last
-//                if (nextFeedback == null || !nextFeedback.equalsTruth(feedback, feedbackResolution)) {
-//                    this.nextFeedback = feedback(feedback, now + feedbackDT);
-//                    nar.input(nextFeedback);
-//                }
+//        if (lastFeedback!=null) {
+//            if (currentFeedback == null) {
+//                //cancel it: lastFeedback.setEnd()
+//            } else if (currentFeedback.equals(lastFeedback, resolution)) {
+//                //continue it
 //            }
-
-            if (currentFeedback!=null && (lastFeedback==null || !currentFeedback.equals(lastFeedback, resolution))) {
-                long now = nar.time();
-                SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
-                        now,
-                        now,
-                        nar.time.nextStamp());
-                s.budget(nar);
-                return s;
-            }
+//        }
+        if (currentFeedback != null) {
+            long now = nar.time();
+            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
+                    now,
+                    now,
+                    nar.time.nextStamp());
+            s.budget(nar);
+            this.currentFeedbackTask = s;
+            return s;
         }
 
-
         return null;
-
-
-
-        //return feedback.apply(nar);
     }
 
 
-//    @Override
-//    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull NAR nar, float deltaSatisfaction, float deltaConf) {
-//        if (!input.isInput() && !(input instanceof AnswerTask))
-//            System.out.println(input + ": " + this + ": " + delta + " " + deltaSatisfaction + " " + deltaConf);
-//        super.feedback(input, delta, nar, deltaSatisfaction, deltaConf);
-//    }
 
 
     @NotNull
     private MotorFunction motor;
-
-
-
-
-//    @Override
-//    public @Nullable TruthDelta processBelief(@NotNull Task belief, @NotNull NAR nar) {
-//        //return super.processBelief(belief, nar);
-//        if (belief instanceof SignalTask) {
-//            return super.processBelief(belief, nar);
-//        }
-//
-//        return null; //reject non-feedback generated beliefs
-//
-//    }
 
 
 
@@ -185,7 +138,7 @@ public class GoalActionConcept extends ActionConcept {
         Truth g = Revision.revise(goal, minConf);
         //System.out.println(belief.size() + "=" + b + "\t" + goal.size() + "=" + g);
 
-        return new Truth[] {b, g};
+        return new Truth[]{b, g};
 
     }
 
@@ -206,11 +159,11 @@ public class GoalActionConcept extends ActionConcept {
 
                 //a termlink to an implication in which the postcondition is this concept
                 Concept implConcept = nar.concept(t);
-                if (implConcept!=null) {
+                if (implConcept != null) {
 
                     //TODO match the task and subtract the dt
                     Task it = implConcept.beliefs().match(when, now, dur); //implication belief
-                    if (it!=null) {
+                    if (it != null) {
                         int dt = it.dt();
                         if (dt == DTERNAL)
                             dt = 0;
@@ -226,7 +179,7 @@ public class GoalActionConcept extends ActionConcept {
             //TODO
         } else if (t.op() == EQUI) {
             //TODO
-            Compound c = (Compound)t;
+            Compound c = (Compound) t;
             Term other = null;
             boolean first = false;
 
@@ -244,14 +197,14 @@ public class GoalActionConcept extends ActionConcept {
 
                 //a termlink to an implication in which the postcondition is this concept
                 Concept equiConcept = nar.concept(t);
-                if (equiConcept!=null) {
+                if (equiConcept != null) {
 
                     //TODO refactor to: linkTruthEqui
 
 
                     //TODO match the task and subtract the dt
                     Task it = equiConcept.beliefs().match(when, now, dur); //implication belief
-                    if (it!=null) {
+                    if (it != null) {
                         int dt = it.dt();
                         if (dt == DTERNAL)
                             dt = 0;
@@ -263,24 +216,23 @@ public class GoalActionConcept extends ActionConcept {
                         Truth itt = it.truth();
 
 
-
                         Concept otherConcept = nar.concept(other);
-                        if (otherConcept!=null) {
+                        if (otherConcept != null) {
                             //    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
 
                             Truth pbt = otherConcept.belief(whenActual, now, nar.dur());
-                            if (pbt!=null) {
+                            if (pbt != null) {
                                 Truth y = TruthFunctions.analogy(pbt, itt, 0);
-                                if (y!=null) {
+                                if (y != null) {
                                     belief.add(y);
                                     gain += y.conf();
                                 }
                             }
 
                             Truth pgt = otherConcept.belief(whenActual, now, nar.dur());
-                            if (pgt!=null) {
+                            if (pgt != null) {
                                 Truth y = TruthFunctions.deduction(pbt, itt, 0);
-                                if (y!=null) {
+                                if (y != null) {
                                     goal.add(y);
                                     gain += y.conf();
                                 }
@@ -300,16 +252,16 @@ public class GoalActionConcept extends ActionConcept {
     public static float linkTruthImpl(Truth itt, Term preCondition, long when, long now, List<Truth> belief, List<Truth> goal, NAR nar) {
         float gain = 0;
 
-        boolean preCondNegated = preCondition.op()==NEG;
+        boolean preCondNegated = preCondition.op() == NEG;
 
         Concept preconditionConcept = nar.concept(preCondition);
         if (preconditionConcept != null) {
 
             //belief = deduction(pbt, it)
             Truth pbt = preconditionConcept.belief(when, now, nar.dur());
-            if (pbt!=null) {
+            if (pbt != null) {
                 Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), itt, 0 /* gather anything */);
-                if (y!=null) {
+                if (y != null) {
                     belief.add(y);
                     gain += y.conf();
                 }
@@ -317,9 +269,9 @@ public class GoalActionConcept extends ActionConcept {
 
             //goal = induction(pgt, it)
             Truth pgt = preconditionConcept.goal(when, now, nar.dur());
-            if (pgt!=null) {
+            if (pgt != null) {
                 Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), itt, 0 /* gather anything */);
-                if (y!=null) {
+                if (y != null) {
                     goal.add(y);
                     gain += y.conf();
                 }
@@ -397,9 +349,6 @@ public class GoalActionConcept extends ActionConcept {
     }
 
 
-
-
-
 //    @NotNull
 //    @Override
 //    protected BeliefTable newBeliefTable(int eCap, int tCap) {
@@ -453,7 +402,6 @@ public class GoalActionConcept extends ActionConcept {
 ////        }
 //    }
 //
-
 
 
 }

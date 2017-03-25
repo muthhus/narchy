@@ -11,10 +11,10 @@ import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Revision;
+import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.task.SignalTask;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -25,7 +25,6 @@ import java.util.Random;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * stores the items unsorted; revection manages their ranking and removal

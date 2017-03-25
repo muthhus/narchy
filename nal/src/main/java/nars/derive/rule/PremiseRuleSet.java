@@ -100,7 +100,7 @@ public class PremiseRuleSet {
                 Stream.of(name).flatMap(n -> {
 
                             InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
-                            byte[] bb = new byte[0];
+                            byte[] bb;
                             try {
                                 bb = nn.readAllBytes();
                             } catch (IOException e) {

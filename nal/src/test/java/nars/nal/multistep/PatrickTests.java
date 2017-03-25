@@ -3,7 +3,6 @@ package nars.nal.multistep;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.nar.Default;
 import nars.test.TestNAR;
@@ -15,7 +14,6 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.$.$;
-import static nars.Op.GOAL;
 
 /**
  * see Natural_Language_Processing2.md

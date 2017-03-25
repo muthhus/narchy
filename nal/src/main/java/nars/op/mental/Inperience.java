@@ -5,10 +5,8 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.CurveBag;
 import nars.bag.leak.Leak;
 import nars.budget.BLink;
-import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
@@ -26,12 +24,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.$.the;
 import static nars.Op.*;
-import static nars.bag.impl.CurveBag.power2BagCurve;
 import static nars.time.Tense.ETERNAL;
 
 /**

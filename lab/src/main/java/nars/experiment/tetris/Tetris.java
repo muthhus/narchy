@@ -44,10 +44,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
 
-    public static final int PIXEL_RADIX = 2;
-    public static final float FPS = 30f;
+    public static final float FPS = 20f;
 
-    private static final float DUR = 0.1f;
+    private static final float DUR = 0.2f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;
@@ -207,14 +206,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
 
 
-        float actionMargin =
-                0.33f; //divides the range into 3 sections: left/nothing/right
-        //0.25f;
-
-        float actionThresholdHigh = 1f - actionMargin;
-        float actionThresholdLow = actionMargin;
-//        float actionThresholdHigher = 1f - actionMargin / 1.5f;
-//        float actionThresholdLower = actionMargin / 1.5f;
 
 
         actionTriState($("tetris:x"), (i) ->{

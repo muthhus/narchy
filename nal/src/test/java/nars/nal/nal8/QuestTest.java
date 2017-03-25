@@ -19,11 +19,14 @@ import static org.junit.Assert.assertTrue;
 public class QuestTest {
 
 
-    @Test
-    public void testQuestAfterGoal() throws Narsese.NarseseException {
-        testQuest(true, 0, 24);
-        testQuest(true, 1, 24);
-        testQuest(true, 4, 24);
+    @Test public void testQuestAfterGoal1() throws Narsese.NarseseException {
+        testQuest(true, 0, 256);
+    }
+    @Test public void testQuestAfterGoal2() throws Narsese.NarseseException {
+        testQuest(true, 1, 256);
+    }
+    @Test public void testQuestAfterGoal3() throws Narsese.NarseseException {
+        testQuest(true, 4, 256);
     }
 
     @Test

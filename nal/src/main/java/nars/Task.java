@@ -737,8 +737,11 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return false;
     }
 
-    @Nullable
-    static Compound post(final Term r, NAR nar)  {
+    /** prepares a term for use as a Task's content */
+    @Nullable static Compound content(@Nullable final Term r, NAR nar)  {
+        if (r == null)
+            return null;
+
         //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
         boolean negated;
         Term s = r;
@@ -753,6 +756,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
             }
         } else if (r instanceof Compound) {
             return (Compound) r; //do not uncompress any further
+        } else if (r instanceof Variable) {
+            return null;
         } else {
             negated = false;
         }

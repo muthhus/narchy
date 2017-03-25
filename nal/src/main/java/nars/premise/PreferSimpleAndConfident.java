@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.unitize;
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * prioritizes derivations exhibiting confidence increase, relative to the premise's evidence
@@ -128,10 +127,11 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 //        } else {
 //            penaltyComplexity = 1;
 //        }
+        int derivationPenalty = 1;
         return
                 //Util.sqr(Util.unitize( //sharpen
                 1f - Util.unitize(
-                    Math.max(0, (float)(derivedComplexity - parentComplexity) / (parentComplexity + derivedComplexity))
+                    Math.max(0, (float)(derivedComplexity - parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity))
                     //((float) parentComplexity) / (parentComplexity + derivedComplexity)
                     //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
                 )

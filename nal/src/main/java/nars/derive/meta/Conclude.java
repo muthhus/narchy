@@ -14,7 +14,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
-import nars.term.var.Variable;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
@@ -26,7 +25,6 @@ import org.slf4j.LoggerFactory;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
-import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -105,42 +103,33 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         NAR nar = m.nar;
 
-//        if (rule.minNAL <= nar.level())  //HACK
-//            return true;
+        if (rule.minNAL > nar.level())  //HACK
+            return true;
 
         try {
             //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
             //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-            Term r = m.index.transform(this.conclusionPattern, m);
-            if (r == null || r instanceof Variable || isTrueOrFalse(r))
+            Compound cr = Task.content(m.index.transform(this.conclusionPattern, m), nar);
+            if (cr == null)
                 return true;
 
-            r = Task.post(r, nar);
+            //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
+            cr = nar.concepts.eval(cr);
+            if (cr == null)
+                return true;
 
-            if (r instanceof Compound) {
+            TruthPuncEvidence ct = m.punct.get();
+            Truth truth = ct.truth;
+            byte punc = ct.punc;
 
-                Compound cr = (Compound) r;
+            Budget budget = m.budgeting.budget(m, cr, truth, punc);
+            if (budget == null)
+                return true;
 
-                //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                Compound crr = nar.concepts.eval(cr);
-                if (crr == null) {
-//                        if (Param.DEBUG)
-//                            throw new InvalidTermException(r.op(), DTERNAL, "normalization failed", (cr).terms());
-//                        else
-                        return true;
-                }
+            derive(m, cr, truth, budget, punc, ct.evidence); //continue to stage 2
 
-                TruthPuncEvidence ct = m.punct.get();
 
-                Truth truth = ct.truth;
-                byte punc = ct.punc;
-
-                Budget budget = m.budgeting.budget(m, crr, truth, punc);
-                if (budget != null) {
-                    derive(m, crr, truth, budget, punc, ct.evidence); //continue to stage 2
-                }
-            }
         } catch (@NotNull InvalidTermException | InvalidTaskException e) {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} {}", m, e.getMessage());
@@ -172,7 +161,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
             Compound temporalized;
             boolean negated;
             if (o == NEG) {
-                temporalized = Task.post(content.unneg(), nar);
+                temporalized = Task.content(content.unneg(), nar);
                 if (temporalized == null) {
                     temporalized = content; //use as-is since it cant be decompressed unnegated
                     negated = false;
@@ -240,7 +229,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
         }
 
 
-        content = Task.post(content, nar);
+        content = Task.content(content, nar);
         if (content == null)
             return;
 
@@ -278,13 +267,12 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
     public final DerivedTask derive(@NotNull Compound cc, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence, NAR nar) {
 
         long start, end;
-        if (occ!=null) {
+        if (occ != null) {
             start = occ[0];
             end = occ[1];
             if (end == ETERNAL)
                 end = start;
-        }
-        else
+        } else
             start = end = ETERNAL;
 
 
@@ -294,7 +282,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
 
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
         d.setBudget(budget); // copied in, not shared
-                //.anticipate(derivedTemporal && d.anticipate)
+        //.anticipate(derivedTemporal && d.anticipate)
 
         if (Param.DEBUG)
             d.log(rule);

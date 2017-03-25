@@ -23,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.$.terms;
-import static nars.Op.CONJ;
-import static nars.Op.GOAL;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
 import static nars.term.Terms.compoundOrNull;

@@ -24,12 +24,13 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 20, 20, (v) -> t(v, alpha()))
-                //.setResolution(0.04f)
+        senseCamera("fz", ()->fz.image, 20, 16, (v) -> t(v, alpha()))
+                .setResolution(0.05f)
                 .priTotal(4f);
 
         //senseNumberDifference($.inh($.the("joy"), $.the("fz")), ()->happy.asFloat());
-        senseNumberDifference((Compound) $.prop($.the("fz"), $.the("angVel")), ()->(float)fz.playerAngle).resolution(0.05f);
+        senseNumberDifference((Compound) $.func("angVel", $.the("fz")), ()->(float)fz.playerAngle).resolution(0.02f);
+        senseNumberDifference((Compound) $.func("accel", $.the("fz")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
         try {
@@ -69,18 +70,25 @@ public class FZero extends NAgentX {
                     return polarized(task);
                 }
             };
-            new TaskRule("(%1 && (--,(fz)))", "good((--,%1))", nar) {
+//            new TaskRule("(%1 &&+0 (--,(fz)))", "--good(%1)", nar) {
+//                @Override
+//                public boolean test(@NotNull Task task) {
+//                    return polarized(task);
+//                }
+//            };
+//            new TaskRule("(%1 &&+0 (fz))", "good(%1)", nar) {
+//                @Override
+//                public boolean test(@NotNull Task task) {
+//                    return polarized(task);
+//                }
+//            };
+            new TaskRule("(%1 ==>+0 (fz))", "good(%1)", nar) {
                 @Override
                 public boolean test(@NotNull Task task) {
                     return polarized(task);
                 }
             };
-            new TaskRule("(%1 && (fz))", "good(%1)", nar) {
-                @Override
-                public boolean test(@NotNull Task task) {
-                    return polarized(task);
-                }
-            };
+
 //            new TaskRule("(%1 &&+0 %2)", "par:{%1,%2}", nar) {
 //                @Override
 //                public boolean test(@NotNull Task task) {
@@ -103,8 +111,11 @@ public class FZero extends NAgentX {
             e.printStackTrace();
         }
 
-        actionToggle((Compound)$.prop($.the("fz"), $.the("fwd")), (b)->{ fz.thrust = b; });
-        actionTriState((Compound)$.prop($.the("fz"), $.the("rot")), (dh) -> {
+        actionTogglePWM((Compound)$.func($.the("fwd"), $.the("fz")),
+            //(b)->{ fz.thrust = b; }
+            () -> fz.thrust = true, () -> fz.thrust = false
+        );
+        actionTriState((Compound)$.func($.the("rot"), $.the("fz")), (dh) -> {
             switch (dh) {
                 case +1: fz.left = false; fz.right = true; break;
                 case 0: fz.left = fz.right = false; break;
@@ -150,7 +161,7 @@ public class FZero extends NAgentX {
         if (task.isQuestOrQuestion())
             return true;
         float f = task.freq();
-        return f <= 0.15f || f >= 0.85f;
+        return f <= 0.2f || f >= 0.8f;
     }
 
     double lastDistance;
@@ -180,7 +191,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.DSHalf(true).durSeconds(0.2f), true))
+                3, new RealTime.DSHalf(true).durSeconds(0.05f), true))
                 .runRT(0);
     }
 }

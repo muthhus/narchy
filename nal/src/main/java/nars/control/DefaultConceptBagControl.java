@@ -1,9 +1,7 @@
 package nars.control;
 
-import jcog.Texts;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -21,7 +19,6 @@ import nars.task.DerivedTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 
 
 abstract public class DefaultConceptBagControl extends ConceptBagControl {

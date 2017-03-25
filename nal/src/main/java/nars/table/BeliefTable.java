@@ -2,12 +2,9 @@ package nars.table;
 
 import jcog.bag.Prioritized;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;

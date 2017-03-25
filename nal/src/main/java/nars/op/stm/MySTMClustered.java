@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
