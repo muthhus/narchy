@@ -11,11 +11,14 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
+import nars.table.DefaultBeliefTable;
 import nars.table.EternalTable;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
+import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import nars.util.Loop;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +54,10 @@ abstract public class NAgent implements NSense, NAct {
     public final NAR nar;
 
     /** master gain for this agent that all the tasks will be normalized as a fraction of per cycle.
-     *  to control the relative priority of multiple active agents within a NAR * */
+     *  to control the relative priority of multiple active agents within a NAR.
+     *  measured in priority integrated over the duration, in other words,
+     *  the total normalized priority is equal to this value times the duration time.
+     *  */
     public final FloatParam priority = new FloatParam(1f, 0f, 2f);
 
     public final List<SensorConcept> sensors = newArrayList();
@@ -117,7 +123,7 @@ abstract public class NAgent implements NSense, NAct {
         this.nar = nar;
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : $.inh($.the("happy"), id),
+                id == null ? p("happy") : (id instanceof Atomic ? $.p(id) : (Compound)id),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 
@@ -139,7 +145,7 @@ abstract public class NAgent implements NSense, NAct {
         };
         happy.pri(ambition);
 
-        curiosityConf = new FloatParam(nar.confMin.floatValue() * 1);
+        curiosityConf = new FloatParam(nar.confMin.floatValue() * 5);
         curiosityProb = new FloatParam(0.5f);
     }
 
@@ -242,7 +248,7 @@ abstract public class NAgent implements NSense, NAct {
 
             ),
 
-            priority.floatValue()
+            priority.floatValue() * dur
         );
 
 
@@ -303,8 +309,6 @@ abstract public class NAgent implements NSense, NAct {
         /** set the sensor budget policy */
         int numSensors = sensors.size();
         int numActions = actions.size();
-
-        predictorProbability.setValue(numActions > 0 ? 1f/numActions : 0.5f);
 
         @NotNull Compound happiness = happy.term();
 
@@ -472,9 +476,9 @@ abstract public class NAgent implements NSense, NAct {
             Task x = predictors.get(i);
             if (x != null) {
                 Task y = predict(x, next, horizon * dur);
-                if (x != y && x!=null) {
-                    x.budget().priMult(0.5f);
-                }
+//                if (x != y && x!=null) {
+//                    x.budget().priMult(0.5f);
+//                }
                 return y;
             } else {
                 return null;
@@ -488,10 +492,23 @@ abstract public class NAgent implements NSense, NAct {
     public float dexterity() {
         float m = 0;
         int n = actions.size();
+        int dur = nar.dur();
+        List<Task> nonCuriosityTasks = $.newArrayList();
         for (ActionConcept a : actions) {
-            Truth d = a.goals().truth(now, nar.dur());
-            if (d != null)
-                m += d.evi();
+
+            ((DefaultBeliefTable)a.goals()).temporal.forEach(x -> {
+                if (!(x instanceof ActionConcept.CuriosityTask)) {
+                    nonCuriosityTasks.add(x);
+                }
+            });
+
+            if (!nonCuriosityTasks.isEmpty()) {
+                Truth d = TruthPolation.truth(null, now, dur, nonCuriosityTasks);
+                if (d != null)
+                    m += d.evi();
+
+                nonCuriosityTasks.clear();
+            }
         }
         return w2c(m / n);
     }

@@ -9,6 +9,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -18,6 +20,8 @@ import static nars.term.Terms.compoundOrNull;
  * matches a belief pattern and creates an identity result
  */
 public class TaskRule extends TaskMatch{
+
+    static final Logger logger = LoggerFactory.getLogger(TaskRule.class);
 
     /** the output pattern */
     public final Compound output;
@@ -43,8 +47,10 @@ public class TaskRule extends TaskMatch{
             return;
 
         Task Y = ((ImmutableTask)X).clone(y);
-        if (Y != null)
+        if (Y != null) {
+            logger.info("{}\t{}", X, Y);
             nar.input(Y);
+        }
     }
 
 }

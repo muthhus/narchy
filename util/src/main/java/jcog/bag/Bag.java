@@ -527,6 +527,15 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         V x = sample();
         return (x != null) ? remove(key(x)) : null;
     }
+    @Nullable default V pop(Predicate<? super V> each) {
+        V x = sample();
+        if (x != null) {
+            if (each.test(x))
+                return remove(key(x));
+            return x;
+        }
+        return null;
+    }
 
     default Bag<K,V> copy(@NotNull Bag target, int limit) {
         return this.sample(limit, t -> {
@@ -538,6 +547,16 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     default Bag<K,V> capacity(int i) {
         setCapacity(i);
         return this;
+    }
+
+    default int pop(int num, Predicate<? super V> each) {
+        int i;
+        for (i = 0; i < num; i++) {
+            V x = pop(each);
+            if (x==null)
+                break;
+        }
+        return i;
     }
 
 //    default boolean putIfAbsent(V b) {

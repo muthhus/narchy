@@ -255,9 +255,9 @@ public class Plot2D extends Surface {
 
             //float m = 0; //margin
 
-            gl.glColor4f(0.5f,0.5f,0.5f, 0.75f); //gray
+            gl.glColor4f(1f,1f,1f, 1f); //gray
 
-            gl.glLineWidth(1);
+            gl.glLineWidth(2);
 
             float W = 1.0f;
             Draw.line(gl, 0, 0, W, 0);
@@ -266,6 +266,7 @@ public class Plot2D extends Surface {
 
             Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
             Draw.text(gl, n2(maxValue), 0.1f, 0, H, 0, Draw.TextAlignment.Left);
+
 
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
 
@@ -303,7 +304,7 @@ public class Plot2D extends Surface {
                 }
                 gl.glEnd();
 
-                gl.glLineWidth(1);
+                gl.glLineWidth(2);
                 Draw.text(gl, s.name, 0.1f, W, ny, 0, Draw.TextAlignment.Right);
 
             }

@@ -78,6 +78,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         s.addKeyListener(this);
         s.dyn.addAnimation(scale);
         s.dyn.addAnimation(translate);
+        surface.start(null);
         surface.layout();
         resized();
     }
@@ -134,6 +135,11 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
     @Override
     public void windowDestroyed(WindowEvent e) {
         visible = false;
+        stop();
+    }
+
+    private void stop() {
+        surface.stop();
     }
 
     @Override

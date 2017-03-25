@@ -19,6 +19,7 @@ public class Surface {
     protected v2 scaleGlobal;
 
 
+
     public enum Align {
 
 
@@ -76,14 +77,18 @@ public class Surface {
         return align(align, height / width);
     }
 
-    public void setParent(Surface s) {
-        parent = s;
+    /** null parent means it is the root surface */
+    public void start(@Nullable Surface parent) {
+        this.parent = parent;
     }
 
     public void layout() {
         //nothing by default
     }
 
+    public void stop() {
+        parent = null;
+    }
 
     /**
      * returns non-null if the event has been absorbed by a speciifc sub-surface

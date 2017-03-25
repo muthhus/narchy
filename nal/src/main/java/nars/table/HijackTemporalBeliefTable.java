@@ -121,7 +121,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Override
     public float pri(@NotNull Task t) {
         //return (1f + t.priSafe(0)) * (1f + t.conf());
-        return t.priSafe(0);
+        return (t.priSafe(0)) * (1f + t.conf());
+        //return t.priSafe(0);
     }
 
     @Nullable

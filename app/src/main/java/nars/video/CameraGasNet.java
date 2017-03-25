@@ -3,6 +3,8 @@ package nars.video;
 import com.jogamp.opengl.GL2;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.Node;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -49,27 +51,30 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
         IntStream.range(0, blobs).forEach(i->{
             Term base = $.func("blob" , $.the(i), root);
 
-            agent.senseNumberNormalized($.inh(base, $.the("x")), 0f, 1f, () -> {
+            FloatSupplier v2 = () -> {
                 Node node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(0);
                 else
                     return Float.NaN;
-            });
-            agent.senseNumberNormalized($.inh(base, $.the("y")), 0f, 1f, () -> {
+            };
+            agent.senseNumber($.inh(base, $.the("x")), new FloatNormalized(v2, 0f, 1f));
+            FloatSupplier v1 = () -> {
                 Node node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(1);
                 else
                     return Float.NaN;
-            });
-            agent.senseNumberNormalized($.inh(base, $.the("c")), 0f, 1f, () -> {
+            };
+            agent.senseNumber($.inh(base, $.the("y")), new FloatNormalized(v1, 0f, 1f));
+            FloatSupplier v = () -> {
                 Node node = net.node(i);
                 if (node!=null)
                     return (float) node.getEntry(2);
                 else
                     return Float.NaN;
-            });
+            };
+            agent.senseNumber($.inh(base, $.the("c")), new FloatNormalized(v, 0f, 1f));
 
             //TODO
             //  Size

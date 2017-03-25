@@ -43,6 +43,9 @@ abstract public class TaskMatch implements Consumer<Task> {
 
     @Override
     public void accept(@NotNull Task task) {
+
+        task = nar.post(task);
+
         if (test(task)) {
             Map<Term,Term> result = new HashMap();
             final int[] matches = {0};

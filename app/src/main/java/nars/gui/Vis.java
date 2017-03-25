@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;
+import jcog.event.On;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.budget.BLink;
@@ -179,9 +180,9 @@ public class Vis {
 //                Iterables.concat(t.actions, Lists.newArrayList(t.happy, t.joy)), history);
 //    }
 
-    public static Grid emotionPlots(NAR nar, int plotHistory) {
+    public static Grid emotionPlots(NAgent a, int plotHistory) {
 
-        return new EmotionPlot(plotHistory, nar);
+        return new EmotionPlot(plotHistory, a);
     }
 
     public static Label label(String text) {
@@ -379,6 +380,7 @@ public class Vis {
 
     public static class ConceptBagChart extends BagChart<Concept> implements Consumer<NAR> {
 
+        private final On on;
         long now;
         int dur;
         final NAR nar;
@@ -387,7 +389,13 @@ public class Vis {
             super(b, count);
             this.now = nar.time();
             this.nar = nar;
-            nar.onCycleWeak(this);
+            on = nar.onCycle(this);
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            on.off();
         }
 
         @Override
@@ -408,7 +416,7 @@ public class Vis {
 
         @Override
         public void accept(PLink<Concept> x, ItemVis<PLink<Concept>> y) {
-            float p = x.pri();
+            float p = x.priSafe(0);
 
             float r, g, b;
 
@@ -463,36 +471,52 @@ public class Vis {
         }
     }
 
-    private static class EmotionPlot extends Grid implements Consumer<NAR> {
+    public static class EmotionPlot extends Grid implements Consumer<NAR> {
 
         private final int plotHistory;
-        //Plot2D plot1;
+        private final On on;
+        Plot2D plot1;
         Plot2D plot2;
         Plot2D plot3;
         Plot2D plot4;
 
-        public EmotionPlot(int plotHistory, NAR nar) {
+        public EmotionPlot(int plotHistory, NAgent a) {
             super(Grid.VERTICAL);
+
+            NAR nar = a.nar;
+
             this.plotHistory = plotHistory;
-            //plot1 = new Plot2D(plotHistory, Plot2D.Line);
+            plot1 = new Plot2D(plotHistory, Plot2D.Line);
             plot2 = new Plot2D(plotHistory, Plot2D.Line);
             plot3 = new Plot2D(plotHistory, Plot2D.Line);
             plot4 = new Plot2D(plotHistory, Plot2D.Line);
-            set( plot2, plot3, plot4 );
+            set( plot1, plot2, plot3, plot4 );
 
             //plot1.add("Conf", nar.emotion.confident::getSum);
             plot2.add("Busy", nar.emotion.busyPri::getSum);
-            plot3.add("Lern", nar.emotion::learningPri);
+            plot3.add("Lern", nar.emotion::learningPri, 0f, 1f);
+
+            plot1.add("Dex", a::dexterity, 0f, 1f);
+
+            //plot4.add("Hapy", a.happy, 0f, 1f);
+            plot4.add("Hapy", ()->a.rewardValue, -1f, 1f);
+
 //            plot4.add("Hapy", nar.emotion.happy::getSum);
 //            plot4.add("Sad", nar.emotion.sad::getSum);
 //                plot4.add("Errr", ()->nar.emotion.errr.getSum());
 
-            nar.onCycleWeak(this);
+            on = nar.onCycle(this);
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+            on.off();
         }
 
         @Override
         public void accept(NAR nar) {
-            //plot1.update();
+            plot1.update();
             plot2.update();
             plot3.update();
             plot4.update();

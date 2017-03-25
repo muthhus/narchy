@@ -143,7 +143,7 @@ abstract public class NAgentX extends NAgent {
 
                 grid(
                     new WindowButton( "nar", () -> nar ),
-                    new WindowButton( "emotion", () -> Vis.emotionPlots(a.nar, 256) ),
+                    new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
                     new WindowButton( "deriver", () -> ((Default)nar).derivationBudgeting ),
                     new WindowButton( "focus", () -> (((Default)nar).core) )
                 ),
@@ -197,7 +197,7 @@ abstract public class NAgentX extends NAgent {
                     grid(
                             new ReflectionSurface<>(a),
 
-                            Vis.emotionPlots(a.nar, 256),
+                            Vis.emotionPlots(a, 256),
 
                             tc,
 

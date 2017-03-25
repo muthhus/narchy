@@ -28,23 +28,6 @@ public class TreeChart<X> extends Surface {
 
 	protected int limit = -1;
 
-	public static void main(String[] args) {
-		SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
-		s.show(800, 800);
-		TreeChart<WeightedString> tc = new TreeChart<>(500, 400,
-				(w, v) -> {
-					v.update(w.weight);
-				},
-				w("z", 0.25f),
-				w("x", 1f),
-				w("y", 0.5f),
-				w("a", 0.1f),
-				w("b", 0.08f),
-				w("c", 0.07f)
-		);
-		System.out.println(tc.children);
-		s.add(new Ortho(tc));
-	}
 
 	enum LayoutOrient {
 
@@ -416,4 +399,23 @@ public class TreeChart<X> extends Surface {
 
         }
     }
+
+//	public static void main(String[] args) {
+//		SpaceGraph<VirtualTerminal> s = new SpaceGraph<>();
+//		s.show(800, 800);
+//		TreeChart<WeightedString> tc = new TreeChart<>(500, 400,
+//				(w, v) -> {
+//					v.update(w.weight);
+//				},
+//				w("z", 0.25f),
+//				w("x", 1f),
+//				w("y", 0.5f),
+//				w("a", 0.1f),
+//				w("b", 0.08f),
+//				w("c", 0.07f)
+//		);
+//		System.out.println(tc.children);
+//		s.add(new Ortho(tc));
+//	}
+
 }

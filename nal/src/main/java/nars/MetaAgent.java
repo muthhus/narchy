@@ -1,6 +1,8 @@
 package nars;
 
 import jcog.Util;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatSupplier;
 
 import static nars.$.func;
 import static nars.$.p;
@@ -25,13 +27,12 @@ public class MetaAgent extends NAgent {
         this.agent = agent;
         NAR agentNAR = agent.nar;
 
-        senseNumberNormalized(p("happy"),
-                //agentNAR.emotion::happy
-                agent.happy
-        );
+        senseNumber(p("happy"), new FloatNormalized(agent.happy));
         //senseNumberNormalized(p("sad"), agentNAR.emotion::sad);
-        senseNumberNormalized(p("busyPri") /*$.func($.the("busy"),$.the("pri"))*/, ()->(float)agentNAR.emotion.busyPri.getSum());
-        senseNumberNormalized(p("busyVol") /*$.func($.the("busy"),$.the("vol"))*/, ()->(float)agentNAR.emotion.busyVol.getSum());
+        FloatSupplier v1 = ()->(float)agentNAR.emotion.busyPri.getSum();
+        senseNumber(p("busyPri"), new FloatNormalized(v1));
+        FloatSupplier v = ()->(float)agentNAR.emotion.busyVol.getSum();
+        senseNumber(p("busyVol"), new FloatNormalized(v));
         senseNumber(p("lernPri") /*$.func($.the("lern"),$.the("pri"))*/, agentNAR.emotion::learningPri);
         senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, agentNAR.emotion::learningVol);
         senseNumber(p("dext"), agent::dexterity);

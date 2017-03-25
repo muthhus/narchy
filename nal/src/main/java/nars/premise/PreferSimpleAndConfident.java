@@ -72,7 +72,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             q *= confidencePreservationFactor(truth, d);
             if (q < quaMin) return null;
         } else {
-            q *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
+            q *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
             if (q < quaMin) return null;
         }
 

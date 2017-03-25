@@ -76,12 +76,12 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 128 * 1024;
+        int maxConcepts = 256 * 1024;
 
-        int activeConcepts = 512;
+        int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                1, 1, 4, rng,
+                1, 1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -141,10 +141,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
             final Compressor compressor = new Compressor(this, "_",
-                    12, 24,
-                    1f, 32, 64);
+                    8, 12,
+                    1f, 64, 32);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -184,20 +184,20 @@ public interface NARBuilder {
 
         };
 
-        nar.core.conceptsFiredPerCycle.setValue(128);
+        nar.core.conceptsFiredPerCycle.setValue(64);
         nar.core.conceptsFiredPerBatch.setValue(8);
-        nar.core.derivationsInputPerCycle.setValue(128);
+        nar.core.derivationsInputPerCycle.setValue(64);
 
-        nar.termVolumeMax.setValue(72);
+        nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
         float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.5f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.5f * p;
+        nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.stmLinkage.capacity.set(0);
 

@@ -1,6 +1,7 @@
 package nars.experiment;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import jcog.bag.PLink;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
@@ -38,21 +39,24 @@ public class Line1D {
 
             //n.log();
 
-            n.onTask(x -> {
-                if (x.isGoal() && !x.isInput()) {
-                    System.err.println(x.proof());
-                }
-            });
+//            n.onTask(x -> {
+//                if (x.isGoal() && !x.isInput()) {
+//                    System.err.println(x.proof());
+//                }
+//            });
 
-            n.termVolumeMax.setValue(24);
+            n.termVolumeMax.setValue(32);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
-                a.i.setValue( 0.5f * (Math.sin(n.time()/350f) + 1f) );
+                a.i.setValue(
+                    //0.5f * (Math.sin(n.time()/20f) + 1f)
+                    Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                );
             });
             return a;
 
-        }, 32, 8, -1);
+        }, 20, 5, -1);
 
     }
 

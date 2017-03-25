@@ -280,7 +280,7 @@ public class Line1DSimplestTest {
 
                 n.run(1);
 
-                in.add(a.in.asFloat());
+                //in.add(a.in.asFloat());
                 hapy.add(a.rewardValue);
                 motv.add(a.dexterity());
             }

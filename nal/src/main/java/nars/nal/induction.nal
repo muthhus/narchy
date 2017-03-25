@@ -11,10 +11,10 @@
         A, B, belief(negative), task("."), time(raw), time(dtAfterReverse),                            notEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
         A, B, belief(negative), task("."), time(raw), time(dtAfterOrEternalReverse), neqAndCom(A,B),   notEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
-    A, B, task(positive), task("."), time(raw), time(dtAfter),                                  notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-    A, B, task(positive), task("."), time(raw), time(dtAfterOrEternal), neqAndCom(A,B),         notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
-        A, B, task(negative), task("."), time(raw), time(dtAfter),                              notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
-        A, B, task(negative), task("."), time(raw), time(dtAfterOrEternal), neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
+    A, B, task(positive), task("."), time(raw), time(dtAfter), neqRCom(A,B),                                 notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
+    A, B, task(positive), task("."), time(raw), time(dtAfterOrEternal), neqAndCom(A,B), neqRCom(A,B),        notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
+        A, B, task(negative), task("."), time(raw), time(dtAfter), neqRCom(A,B),                             notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+        A, B, task(negative), task("."), time(raw), time(dtAfterOrEternal), neqAndCom(A,B), neqRCom(A,B),    notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
 
     A, B, task(positive), belief(positive), task("."), time(raw), time(conjoin)                     |- (A &&+- B), (Belief:Intersection)
     A, B, task(positive), belief(positive), task("."), time(raw), time(conjoinEternal), neqAndCom(A,B)     |- varIntro((A &&+- B)), (Belief:Intersection)

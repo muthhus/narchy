@@ -62,7 +62,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     public void setFront(Surface front) {
         this.front = front;
         if (front!=null) {
-            front.setParent(null);
+            front.start(null);
             mouseFront = null; //new Finger(this);
         } else {
             mouseFront = null;

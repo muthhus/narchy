@@ -1,16 +1,15 @@
 package nars.concept;
 
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
-import nars.task.AnswerTask;
-import nars.task.DerivedTask;
+import nars.task.*;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
-import nars.task.SignalTask;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +34,33 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         super(term, n);
         this.nar = n;
         n.onCycle(this);
+    }
+
+    public static class CuriosityTask extends GeneratedTask {
+
+        public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
+            super(term, punc, truth, creation, start, end, stamp);
+        }
+
+
+
+    }
+
+    public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
+        int dur = nar.dur();
+        int lookAhead = 0;
+        long now = nar.time() - lookAhead * dur;
+        long nowEnd = now + dur;
+        CuriosityTask t = new CuriosityTask(term, punc,
+                $.t(nar.random.nextFloat(), conf),
+                now,
+                now,
+                nowEnd,
+                new long[] { nar.time.nextStamp() }
+        );
+        t.budget( nar);
+        return t;
+
     }
 
     @Override

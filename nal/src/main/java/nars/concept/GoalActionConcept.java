@@ -1,12 +1,9 @@
 package nars.concept;
 
 import jcog.data.FloatParam;
-import jcog.data.MutableDouble;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
-import nars.task.ImmutableTask;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.term.Term;
@@ -39,25 +36,6 @@ public class GoalActionConcept extends ActionConcept {
     public @Nullable Task curiosity(float conf, long next, NAR nar) {
         return curiosity(term(), GOAL, conf, next, nar);
     }
-
-    public static Task curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
-        int dur = nar.dur();
-        int lookAhead = 0;
-        long now = nar.time() - lookAhead * dur;
-        long nowEnd = now + dur;
-        ImmutableTask t = new ImmutableTask(term, punc,
-                $.t(nar.random.nextFloat(), conf),
-                now,
-                now,
-                nowEnd,
-                new long[] { nar.time.nextStamp() }
-        );
-        t.budget( nar);
-        return t;
-
-    }
-
-
 
 
     private Truth currentFeedback;

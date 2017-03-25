@@ -2,12 +2,14 @@ package spacegraph.layout;
 
 import com.google.common.collect.Lists;
 import com.jogamp.newt.event.KeyEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.widget.Windo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,15 +36,56 @@ import java.util.Objects;
         return children;
     }
 
-    public void set(Surface... s) {
+    public final void set(Surface... s) {
         set(Lists.newArrayList(s));
     }
 
-    public void set(List<Surface> children) {
-        if (!Objects.equals(this.children, children)) {
-            if ((this.children = children)!=null)
+    public void set(@NotNull List<Surface> next) {
+        synchronized (scaleLocal) {
+
+            if (!Objects.equals(this.children, next)) {
+
+                List<Surface> existing = this.children;
+                if (existing != null) {
+                    for (Surface x : existing)
+                        if (!next.contains(x)) {
+                            remove(x);
+                        }
+                }
+
+                this.children = next;
+
+
+                for (Surface x : next) {
+                    if (x != null) {
+                        if (x.parent != this)
+                            add(x);
+                    }
+                }
+
                 layout();
+            }
         }
+    }
+
+    private void add(Surface x) {
+        x.start(this);
+    }
+
+    private void remove(Surface x) {
+        x.stop();
+    }
+
+    @Override
+    public void stop() {
+        synchronized (scaleLocal) {
+            if (children!=null) {
+                children.forEach(Surface::stop);
+                children = null;
+            }
+            super.stop();
+        }
+
     }
 
     @Override @Nullable

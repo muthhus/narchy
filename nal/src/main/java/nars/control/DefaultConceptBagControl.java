@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Texts;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.impl.HijackBag;
@@ -8,6 +9,7 @@ import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.meter.event.PeriodMeter;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -18,6 +20,7 @@ import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 
@@ -63,13 +66,26 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
         /** pending derivations to be input after this cycle */
         final TaskHijackBag pending;
 
+
+
         public BufferedConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
             super(nar, conceptBag, premiseBuilder);
 
-            this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random);
+            this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
+                @Override
+                public float pri(@NotNull Task key) {
+                    return (1f + key.priSafe(0)) * (1f + key.qua());
+                }
+
+//                @Override
+//                public void onRemoved(@NotNull Task value) {
+//                    System.out.println(value);
+//                }
+            };
 
             nar.onReset((n)->{
                 pending.clear();
+                active.clear();
             });
         }
 
@@ -77,25 +93,26 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
         protected void cycle() {
 
 
-            AtomicReferenceArray<Task> all = pending.reset();
-            if (all!=null) {
-                nar.input(HijackBag.stream(all));
-            }
+//            AtomicReferenceArray<Task> all = pending.reset();
+//            if (all!=null) {
+//                nar.input(HijackBag.stream(all));
+//            }
 
-//        int toInput = pending.capacity() / 2;
-//        for (int i = 0; i < toInput; i++) {
-//            Task t = pending.pop();
-//            if (t == null)
-//                break;
-//            nar.input(t);
-//        }
 
             //update concept bag
-            pending.capacity( derivationsInputPerCycle.intValue() );
+            int inputsPerCycle = derivationsInputPerCycle.intValue();
+
+            final List<Task> ready = $.newArrayList(inputsPerCycle);
+            int input = pending.pop(inputsPerCycle, ready::add);
+            //System.out.println(input + " (" + Texts.n2(100f * input/((float)inputsPerCycle)) + "%) load, " + pending.size() + " remain");
+
+            nar.runLater(ready, nar::input, 16);
+            //ready.clear();
+
+            //pending.commit();
+
+            pending.capacity( inputsPerCycle * 8 );
             // * 1f/((float)Math.sqrt(active.capacity()))
-            ;
-
-
 
             //float load = nar.exe.load();
             int cpf = Math.round(conceptsFiredPerCycle.floatValue());

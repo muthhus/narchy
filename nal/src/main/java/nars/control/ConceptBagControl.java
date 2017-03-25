@@ -50,7 +50,7 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
     protected float currentActivationRate = 1f;
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
+
 
     //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
 
@@ -65,24 +65,24 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
         nar.onCycle(()->{
 
-            if (!busy.compareAndSet(false, true))
-                return;
+            currentActivationRate = activationRate.floatValue();
 
             //while clear is enabled, keep active clear
             if (clear.get()) {
+
                 active.clear();
+
+            } else {
+                active.commit();
+
+                try {
+                    cycle();
+                } catch (Exception e) {
+                    logger.error("cycle {}", e);
+                }
             }
 
-            active.commit();
-            currentActivationRate = activationRate.floatValue();
 
-            try {
-                cycle();
-            } catch (Exception e) {
-                logger.error("cycle {}", e);
-            }
-
-            busy.set(false);
         });
 
         nar.onReset((n)->{
@@ -113,7 +113,7 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
     @Override
     public float pri(@NotNull Termed concept) {
         PLink c = active.get(concept);
-        return (c != null) ? c.pri() : Float.NaN;
+        return (c != null) ? c.priSafe(0) : Float.NaN;
     }
 
 
