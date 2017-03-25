@@ -1,20 +1,14 @@
 package jcog.bag.impl;
 
-import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.data.array.IntArrays;
-import jcog.data.array.LongArrays;
-import jcog.list.SynchronizedArrayList;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
@@ -50,7 +44,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /** lock-free int -> int mapping used as a ticket barrier */
     static final class Treadmill  {
 
-        static ConcurrentHashMapInsane map = new ConcurrentHashMapInsane(Util.MAX_CONCURRENCY * 2);
+        static final ConcurrentLongSet map = new ConcurrentLongSet(Util.MAX_CONCURRENCY * 2);
 
         static final AtomicInteger ticket = new AtomicInteger(0);
 
@@ -60,11 +54,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         public static long start(int target, int hash) {
 
-            Long ticket = (((long)target) << 32) | hash;
-
-//            while (map.putIfAbsent(ticket, Void.TYPE) != null) {
-//                //System.out.println("wait");
-//            }
+            long ticket = (((long)target) << 32) | hash;
 
             map.putIfAbsentRetry(ticket);
 

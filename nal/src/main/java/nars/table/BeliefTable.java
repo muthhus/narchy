@@ -7,6 +7,7 @@ import nars.Task;
 import nars.concept.TaskConcept;
 import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
@@ -236,14 +237,13 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
+        boolean novel;
+
         Task answer = match(when, now, dur, question, template, false);
-        if (answer == null || answer.isDeleted())
+        if (answer == null || answer.isDeleted()) {
             return null;
-        else {
-            if (answer instanceof DynamicBeliefTask) {
-                nar.input(answer);
-                return answer;
-            }
+        } else {
+            novel = answer instanceof AnswerTask; //includes: answers, revision, or dynamic
         }
 
         //project if different occurrence
@@ -260,14 +260,17 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                     aProj, now, when, when, 0.5f);
             a.budgetSafe(answer.budget());
 
-            if (Param.DEBUG)
-                a.log("Answer Projected");
-
-            nar.input(a);
-            return a;
-        } else {
-            return answer;
+//            if (Param.DEBUG)
+//                a.log("Answer Projected");
+            novel = true; //because it was projected
+            answer = a;
         }
+
+        if (novel) {
+            nar.input(answer);
+        }
+
+        return answer;
     }
 
     @Override default void forEachTask(Consumer<? super Task> x) {

@@ -419,6 +419,9 @@ public class Dynamic<X> extends Collidable<X> {
 	public void impulse(v3 impulse) {
 		linearVelocity.scaleAdd(inverseMass, impulse, linearVelocity);
 	}
+	public void impulse(float ix, float iy, float iz) {
+		linearVelocity.scaleAdd(inverseMass, ix, iy, iz, linearVelocity);
+	}
 	
 
 	public void torqueImpulse(v3 torque) {

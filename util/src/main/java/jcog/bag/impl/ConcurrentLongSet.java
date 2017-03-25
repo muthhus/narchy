@@ -31,10 +31,6 @@ import org.eclipse.collections.impl.utility.MapIterate;
 import org.eclipse.collections.impl.utility.internal.IterableIterate;
 import sun.misc.Unsafe;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -53,9 +49,66 @@ import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  * @param <V>
  */
 @SuppressWarnings("UseOfSunClasses")
-public class ConcurrentHashMapInsane<K, V>
+public class ConcurrentLongSet<K, V>
         extends AbstractMutableMap<K, V>
         implements ConcurrentMutableMap<K, V> {
+
+
+    static final class LongEntry {
+        public long key;
+
+        public LongEntry next;
+
+        public int set(long key) {
+            this.key = key;
+            this.next = null;
+            return Long.hashCode(key);
+        }
+
+    }
+
+    static final ThreadLocal<LongEntry> entries = ThreadLocal.withInitial(()->new LongEntry());
+
+    /** optimized method for retrying put in a busy spin until successful
+     *  also, it totally ignores checking entry value. does not involve
+     *  repeated allocations of entry instances, instead uses the one constructed
+     *  at the start.  key needs to be a primitive type or something with identity equality
+     * */
+    public V putIfAbsentRetry(long key) {
+
+        LongEntry le = entries.get();
+        int hash = le.set(key);
+
+        retry: while (true) {
+
+            Object[] currentArray = this.table;
+
+            while (true) {
+                int length = currentArray.length;
+                int index = ConcurrentLongSet.indexFor(hash, length);
+                Object o = ConcurrentLongSet.arrayAt(currentArray, index);
+                if (o == RESIZED || o == RESIZING) {
+                    currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
+                } else {
+                    LongEntry e = (LongEntry) o;
+                    while (e != null) {
+                        if (e.key == key)
+                            continue retry; //occupied, retry
+                        e = e.next;
+                    }
+                    le.next = e;
+                    if (ConcurrentLongSet.casArrayAt(currentArray, index, e, le)) {
+                        this.incrementSizeAndPossiblyResize(currentArray, length, e);
+                        return null; // per the contract of putIfAbsent, we return null when the map didn't have this key before
+                    }
+                }
+            }
+        }
+
+        //throw new UnsupportedOperationException();
+
+    }
+
 
 
     /** optimized method for retrying put in a busy spin until successful
@@ -74,8 +127,8 @@ public class ConcurrentHashMapInsane<K, V>
 
             while (true) {
                 int length = currentArray.length;
-                int index = ConcurrentHashMapInsane.indexFor(hash, length);
-                Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+                int index = ConcurrentLongSet.indexFor(hash, length);
+                Object o = ConcurrentLongSet.arrayAt(currentArray, index);
                 if (o == RESIZED || o == RESIZING) {
                     currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
                 } else {
@@ -86,7 +139,7 @@ public class ConcurrentHashMapInsane<K, V>
                         e = e.next;
                     }
                     newEntry.setNext(e);
-                    if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, e, newEntry)) {
+                    if (ConcurrentLongSet.casArrayAt(currentArray, index, e, newEntry)) {
                         this.incrementSizeAndPossiblyResize(currentArray, length, e);
                         return null; // per the contract of putIfAbsent, we return null when the map didn't have this key before
                     }
@@ -110,7 +163,7 @@ public class ConcurrentHashMapInsane<K, V>
     private static final int MAXIMUM_CAPACITY = 1 << 30;
 
     @SuppressWarnings("rawtypes")
-    private static final AtomicReferenceFieldUpdater<ConcurrentHashMapInsane, Object[]> TABLE_UPDATER = AtomicReferenceFieldUpdater.newUpdater(ConcurrentHashMapInsane.class, Object[].class, "table");
+    private static final AtomicReferenceFieldUpdater<ConcurrentLongSet, Object[]> TABLE_UPDATER = AtomicReferenceFieldUpdater.newUpdater(ConcurrentLongSet.class, Object[].class, "table");
     private static final Object RESIZED = new Object();
     private static final Object RESIZING = new Object();
     private static final int PARTITIONED_SIZE_THRESHOLD = 4096; // chosen to keep size below 1% of the total size of the map
@@ -142,7 +195,7 @@ public class ConcurrentHashMapInsane<K, V>
             }
             INT_ARRAY_SHIFT = 31 - Integer.numberOfLeadingZeros(intArrayScale);
 
-            Class<?> mapClass = ConcurrentHashMapInsane.class;
+            Class<?> mapClass = ConcurrentLongSet.class;
             SIZE_OFFSET = UNSAFE.objectFieldOffset(mapClass.getDeclaredField("size"));
         } catch (NoSuchFieldException e) {
             throw new AssertionError(e);
@@ -161,7 +214,7 @@ public class ConcurrentHashMapInsane<K, V>
     @SuppressWarnings("UnusedDeclaration")
     private volatile int size; // updated via atomic field updater
 
-    public ConcurrentHashMapInsane(int initialCapacity) {
+    public ConcurrentLongSet(int initialCapacity) {
         if (initialCapacity < 0) {
             throw new IllegalArgumentException("Illegal Initial Capacity: " + initialCapacity);
         }
@@ -184,8 +237,8 @@ public class ConcurrentHashMapInsane<K, V>
 
 
 
-    public static <K, V> ConcurrentHashMapInsane<K, V> newMap(int newSize) {
-        return new ConcurrentHashMapInsane<>(newSize);
+    public static <K, V> ConcurrentLongSet<K, V> newMap(int newSize) {
+        return new ConcurrentLongSet<>(newSize);
     }
 
     private static Object arrayAt(Object[] array, int index) {
@@ -210,8 +263,8 @@ public class ConcurrentHashMapInsane<K, V>
         Object[] currentArray = this.table;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -224,7 +277,7 @@ public class ConcurrentHashMapInsane<K, V>
                     e = e.getNext();
                 }
                 Entry<K, V> newEntry = new Entry<>(key, value, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return null; // per the contract of putIfAbsent, we return null when the map didn't have this key before
                 }
@@ -256,7 +309,7 @@ public class ConcurrentHashMapInsane<K, V>
     private Object[] helpWithResizeWhileCurrentIndex(Object[] currentArray, int index) {
         Object[] newArray = this.helpWithResize(currentArray);
         int helpCount = 0;
-        while (ConcurrentHashMapInsane.arrayAt(currentArray, index) != RESIZED) {
+        while (ConcurrentLongSet.arrayAt(currentArray, index) != RESIZED) {
             helpCount++;
             newArray = this.helpWithResize(currentArray);
             if ((helpCount & 7) == 0) {
@@ -267,7 +320,7 @@ public class ConcurrentHashMapInsane<K, V>
     }
 
     private Object[] helpWithResize(Object[] currentArray) {
-        ResizeContainer resizeContainer = (ResizeContainer) ConcurrentHashMapInsane.arrayAt(currentArray, currentArray.length - 1);
+        ResizeContainer resizeContainer = (ResizeContainer) ConcurrentLongSet.arrayAt(currentArray, currentArray.length - 1);
         Object[] newTable = resizeContainer.nextArray;
         if (resizeContainer.getQueuePosition() > ResizeContainer.QUEUE_INCREMENT) {
             resizeContainer.incrementResizer();
@@ -286,7 +339,7 @@ public class ConcurrentHashMapInsane<K, V>
     private void resize(Object[] oldTable, int newSize) {
         int oldCapacity = oldTable.length;
         int end = oldCapacity - 1;
-        Object last = ConcurrentHashMapInsane.arrayAt(oldTable, end);
+        Object last = ConcurrentLongSet.arrayAt(oldTable, end);
         if (this.size() < end && last == RESIZE_SENTINEL) {
             return;
         }
@@ -298,13 +351,13 @@ public class ConcurrentHashMapInsane<K, V>
         if (last == null || last == RESIZE_SENTINEL) {
             synchronized (oldTable) // allocating a new array is too expensive to make this an atomic operation
             {
-                if (ConcurrentHashMapInsane.arrayAt(oldTable, end) == null) {
-                    ConcurrentHashMapInsane.setArrayAt(oldTable, end, RESIZE_SENTINEL);
+                if (ConcurrentLongSet.arrayAt(oldTable, end) == null) {
+                    ConcurrentLongSet.setArrayAt(oldTable, end, RESIZE_SENTINEL);
                     if (this.partitionedSize == null && newSize >= PARTITIONED_SIZE_THRESHOLD) {
                         this.partitionedSize = new int[SIZE_BUCKETS * 16];
                     }
                     resizeContainer = new ResizeContainer(new Object[newSize], oldTable.length - 1);
-                    ConcurrentHashMapInsane.setArrayAt(oldTable, end, resizeContainer);
+                    ConcurrentLongSet.setArrayAt(oldTable, end, resizeContainer);
                     ownResize = true;
                 }
             }
@@ -331,9 +384,9 @@ public class ConcurrentHashMapInsane<K, V>
         Object[] dest = resizeContainer.nextArray;
 
         for (int j = 0; j < src.length - 1; ) {
-            Object o = ConcurrentHashMapInsane.arrayAt(src, j);
+            Object o = ConcurrentLongSet.arrayAt(src, j);
             if (o == null) {
-                if (ConcurrentHashMapInsane.casArrayAt(src, j, null, RESIZED)) {
+                if (ConcurrentLongSet.casArrayAt(src, j, null, RESIZED)) {
                     j++;
                 }
             } else if (o == RESIZED || o == RESIZING) {
@@ -343,12 +396,12 @@ public class ConcurrentHashMapInsane<K, V>
                 }
             } else {
                 Entry<K, V> e = (Entry<K, V>) o;
-                if (ConcurrentHashMapInsane.casArrayAt(src, j, o, RESIZING)) {
+                if (ConcurrentLongSet.casArrayAt(src, j, o, RESIZING)) {
                     while (e != null) {
                         this.unconditionalCopy(dest, e);
                         e = e.getNext();
                     }
-                    ConcurrentHashMapInsane.setArrayAt(src, j, RESIZED);
+                    ConcurrentLongSet.setArrayAt(src, j, RESIZED);
                     j++;
                 }
             }
@@ -367,9 +420,9 @@ public class ConcurrentHashMapInsane<K, V>
                     start = 0;
                 }
                 for (int j = end - 1; j >= start; ) {
-                    Object o = ConcurrentHashMapInsane.arrayAt(src, j);
+                    Object o = ConcurrentLongSet.arrayAt(src, j);
                     if (o == null) {
-                        if (ConcurrentHashMapInsane.casArrayAt(src, j, null, RESIZED)) {
+                        if (ConcurrentLongSet.casArrayAt(src, j, null, RESIZED)) {
                             j--;
                         }
                     } else if (o == RESIZED || o == RESIZING) {
@@ -377,12 +430,12 @@ public class ConcurrentHashMapInsane<K, V>
                         return;
                     } else {
                         Entry<K, V> e = (Entry<K, V>) o;
-                        if (ConcurrentHashMapInsane.casArrayAt(src, j, o, RESIZING)) {
+                        if (ConcurrentLongSet.casArrayAt(src, j, o, RESIZING)) {
                             while (e != null) {
                                 this.unconditionalCopy(dest, e);
                                 e = e.getNext();
                             }
-                            ConcurrentHashMapInsane.setArrayAt(src, j, RESIZED);
+                            ConcurrentLongSet.setArrayAt(src, j, RESIZED);
                             j--;
                         }
                     }
@@ -396,10 +449,10 @@ public class ConcurrentHashMapInsane<K, V>
         Object[] currentArray = dest;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
-                currentArray = ((ResizeContainer) ConcurrentHashMapInsane.arrayAt(currentArray, length - 1)).nextArray;
+                currentArray = ((ResizeContainer) ConcurrentLongSet.arrayAt(currentArray, length - 1)).nextArray;
             } else {
                 Entry<K, V> newEntry;
                 if (o == null) {
@@ -411,7 +464,7 @@ public class ConcurrentHashMapInsane<K, V>
                 } else {
                     newEntry = new Entry<>(toCopyEntry.getKey(), toCopyEntry.getValue(), (Entry<K, V>) o);
                 }
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     return;
                 }
             }
@@ -441,8 +494,8 @@ public class ConcurrentHashMapInsane<K, V>
         boolean createdValue = false;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -459,7 +512,7 @@ public class ConcurrentHashMapInsane<K, V>
                     newValue = factory.valueOf(key);
                 }
                 Entry<K, V> newEntry = new Entry<>(key, newValue, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return newValue;
                 }
@@ -475,8 +528,8 @@ public class ConcurrentHashMapInsane<K, V>
         boolean createdValue = false;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -493,7 +546,7 @@ public class ConcurrentHashMapInsane<K, V>
                     newValue = factory.value();
                 }
                 Entry<K, V> newEntry = new Entry<>(key, newValue, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return newValue;
                 }
@@ -507,8 +560,8 @@ public class ConcurrentHashMapInsane<K, V>
         Object[] currentArray = this.table;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -521,7 +574,7 @@ public class ConcurrentHashMapInsane<K, V>
                     e = e.getNext();
                 }
                 Entry<K, V> newEntry = new Entry<>(key, value, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return value;
                 }
@@ -544,8 +597,8 @@ public class ConcurrentHashMapInsane<K, V>
         boolean createdValue = false;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -566,7 +619,7 @@ public class ConcurrentHashMapInsane<K, V>
                     key = keyTransformer.value(key, newValue);
                 }
                 Entry<K, V> newEntry = new Entry<>(key, newValue, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return null;
                 }
@@ -576,34 +629,35 @@ public class ConcurrentHashMapInsane<K, V>
 
     @Override
     public boolean remove(Object key, Object value) {
-        int hash = this.hash(key);
-        Object[] currentArray = this.table;
-        //noinspection LabeledStatement
-        outer:
-        while (true) {
-            int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
-            if (o == RESIZED || o == RESIZING) {
-                currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
-            } else {
-                Entry<K, V> e = (Entry<K, V>) o;
-                while (e != null) {
-                    Object candidate = e.getKey();
-                    if (candidate.equals(key) && this.nullSafeEquals(e.getValue(), value)) {
-                        Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
-                        if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, replacement)) {
-                            this.addToSize(-1);
-                            return true;
-                        }
-                        //noinspection ContinueStatementWithLabel
-                        continue outer;
-                    }
-                    e = e.getNext();
-                }
-                return false;
-            }
-        }
+        throw new UnsupportedOperationException();
+//        int hash = this.hash(key);
+//        Object[] currentArray = this.table;
+//        //noinspection LabeledStatement
+//        outer:
+//        while (true) {
+//            int length = currentArray.length;
+//            int index = ConcurrentHashMapInsane.indexFor(hash, length);
+//            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+//            if (o == RESIZED || o == RESIZING) {
+//                currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
+//            } else {
+//                Entry<K, V> e = (Entry<K, V>) o;
+//                while (e != null) {
+//                    Object candidate = e.getKey();
+//                    if (candidate.equals(key) && this.nullSafeEquals(e.getValue(), value)) {
+//                        Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
+//                        if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, replacement)) {
+//                            this.addToSize(-1);
+//                            return true;
+//                        }
+//                        //noinspection ContinueStatementWithLabel
+//                        continue outer;
+//                    }
+//                    e = e.getNext();
+//                }
+//                return false;
+//            }
+//        }
     }
 
     private void addToSize(int value) {
@@ -669,9 +723,9 @@ public class ConcurrentHashMapInsane<K, V>
         do {
             resizeContainer = null;
             for (int i = 0; i < currentArray.length - 1; i++) {
-                Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+                Object o = ConcurrentLongSet.arrayAt(currentArray, i);
                 if (o == RESIZED || o == RESIZING) {
-                    resizeContainer = (ResizeContainer) ConcurrentHashMapInsane.arrayAt(currentArray, currentArray.length - 1);
+                    resizeContainer = (ResizeContainer) ConcurrentLongSet.arrayAt(currentArray, currentArray.length - 1);
                 } else if (o != null) {
                     Entry<K, V> e = (Entry<K, V>) o;
                     while (e != null) {
@@ -703,8 +757,8 @@ public class ConcurrentHashMapInsane<K, V>
     public V get(Object key) {
         int hash = this.hash(key);
         Object[] currentArray = this.table;
-        int index = ConcurrentHashMapInsane.indexFor(hash, currentArray.length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, currentArray.length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == RESIZED || o == RESIZING) {
             return this.slowGet(key, hash, index, currentArray);
         }
@@ -720,8 +774,8 @@ public class ConcurrentHashMapInsane<K, V>
     private V slowGet(Object key, int hash, int index, Object[] currentArray) {
         while (true) {
             int length = currentArray.length;
-            index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -743,8 +797,8 @@ public class ConcurrentHashMapInsane<K, V>
         Object[] currentArray = this.table;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -766,11 +820,11 @@ public class ConcurrentHashMapInsane<K, V>
         int hash = this.hash(key);
         Object[] currentArray = this.table;
         int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == null) {
             Entry<K, V> newEntry = new Entry<>(key, value, null);
-            if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, null, newEntry)) {
+            if (ConcurrentLongSet.casArrayAt(currentArray, index, null, newEntry)) {
                 this.addToSize(1);
                 return null;
             }
@@ -783,8 +837,8 @@ public class ConcurrentHashMapInsane<K, V>
         outer:
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -794,7 +848,7 @@ public class ConcurrentHashMapInsane<K, V>
                     if (candidate.equals(key)) {
                         V oldValue = e.getValue();
                         Entry<K, V> newEntry = new Entry<>(e.getKey(), value, this.createReplacementChainForRemoval((Entry<K, V>) o, e));
-                        if (!ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                        if (!ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                             //noinspection ContinueStatementWithLabel
                             continue outer;
                         }
@@ -803,7 +857,7 @@ public class ConcurrentHashMapInsane<K, V>
                     e = e.getNext();
                 }
                 Entry<K, V> newEntry = new Entry<>(key, value, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return null;
                 }
@@ -822,8 +876,8 @@ public class ConcurrentHashMapInsane<K, V>
             }
             this.resize(this.table, capacity + 1);
         }
-        if (map instanceof ConcurrentHashMapInsane<?, ?> && chunks > 1 && map.size() > 50000) {
-            ConcurrentHashMapInsane<K, V> incoming = (ConcurrentHashMapInsane<K, V>) map;
+        if (map instanceof ConcurrentLongSet<?, ?> && chunks > 1 && map.size() > 50000) {
+            ConcurrentLongSet<K, V> incoming = (ConcurrentLongSet<K, V>) map;
             Object[] currentArray = incoming.table;
             FutureTask<?>[] futures = new FutureTask<?>[chunks];
             int chunkSize = currentArray.length / chunks;
@@ -850,7 +904,7 @@ public class ConcurrentHashMapInsane<K, V>
 
     private void sequentialPutAll(Object[] currentArray, int start, int end) {
         for (int i = start; i < end; i++) {
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, i);
             if (o == RESIZED || o == RESIZING) {
                 throw new ConcurrentModificationException("can't iterate while resizing!");
             }
@@ -876,12 +930,12 @@ public class ConcurrentHashMapInsane<K, V>
         do {
             resizeContainer = null;
             for (int i = 0; i < currentArray.length - 1; i++) {
-                Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+                Object o = ConcurrentLongSet.arrayAt(currentArray, i);
                 if (o == RESIZED || o == RESIZING) {
-                    resizeContainer = (ResizeContainer) ConcurrentHashMapInsane.arrayAt(currentArray, currentArray.length - 1);
+                    resizeContainer = (ResizeContainer) ConcurrentLongSet.arrayAt(currentArray, currentArray.length - 1);
                 } else if (o != null) {
                     Entry<K, V> e = (Entry<K, V>) o;
-                    if (ConcurrentHashMapInsane.casArrayAt(currentArray, i, o, null)) {
+                    if (ConcurrentLongSet.casArrayAt(currentArray, i, o, null)) {
                         int removedEntries = 0;
                         while (e != null) {
                             removedEntries++;
@@ -922,8 +976,8 @@ public class ConcurrentHashMapInsane<K, V>
         int hash = this.hash(key);
         Object[] currentArray = this.table;
         int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == RESIZED || o == RESIZING) {
             return this.slowReplace(key, oldValue, newValue, hash, currentArray);
         }
@@ -934,7 +988,7 @@ public class ConcurrentHashMapInsane<K, V>
                 if (oldValue == e.getValue() || (oldValue != null && oldValue.equals(e.getValue()))) {
                     Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
                     Entry<K, V> newEntry = new Entry<>(key, newValue, replacement);
-                    return ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry) || this.slowReplace(key, oldValue, newValue, hash, currentArray);
+                    return ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry) || this.slowReplace(key, oldValue, newValue, hash, currentArray);
                 }
                 return false;
             }
@@ -948,8 +1002,8 @@ public class ConcurrentHashMapInsane<K, V>
         outer:
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -960,7 +1014,7 @@ public class ConcurrentHashMapInsane<K, V>
                         if (oldValue == e.getValue() || (oldValue != null && oldValue.equals(e.getValue()))) {
                             Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
                             Entry<K, V> newEntry = new Entry<>(key, newValue, replacement);
-                            if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                            if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                                 return true;
                             }
                             //noinspection ContinueStatementWithLabel
@@ -980,8 +1034,8 @@ public class ConcurrentHashMapInsane<K, V>
         int hash = this.hash(key);
         Object[] currentArray = this.table;
         int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == null) {
             return null;
         }
@@ -993,8 +1047,8 @@ public class ConcurrentHashMapInsane<K, V>
         outer:
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -1004,7 +1058,7 @@ public class ConcurrentHashMapInsane<K, V>
                     if (candidate.equals(key)) {
                         V oldValue = e.getValue();
                         Entry<K, V> newEntry = new Entry<>(e.getKey(), value, this.createReplacementChainForRemoval((Entry<K, V>) o, e));
-                        if (!ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                        if (!ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                             //noinspection ContinueStatementWithLabel
                             continue outer;
                         }
@@ -1019,57 +1073,81 @@ public class ConcurrentHashMapInsane<K, V>
 
     @Override
     public V remove(Object key) {
-        int hash = this.hash(key);
-        Object[] currentArray = this.table;
-        int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
-        if (o == RESIZED || o == RESIZING) {
-            return this.slowRemove(key, hash, currentArray);
-        }
-        Entry<K, V> e = (Entry<K, V>) o;
-        while (e != null) {
-            Object candidate = e.getKey();
-            if (candidate == key || candidate.equals(key)) {
-                Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, replacement)) {
-                    this.addToSize(-1);
-                    return e.getValue();
-                }
-                return this.slowRemove(key, hash, currentArray);
-            }
-            e = e.getNext();
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
-    private V slowRemove(Object key, int hash, Object[] currentArray) {
-        //noinspection LabeledStatement
-        outer:
-        while (true) {
+    public void remove(long key) {
+        int hash = Long.hashCode(key);
+        outer: while (true) {
+            Object[] currentArray = this.table;
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
-                currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
-            } else {
-                Entry<K, V> e = (Entry<K, V>) o;
-                while (e != null) {
-                    Object candidate = e.getKey();
-                    if (candidate.equals(key)) {
-                        Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
-                        if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, replacement)) {
-                            this.addToSize(-1);
-                            return e.getValue();
-                        }
-                        //noinspection ContinueStatementWithLabel
-                        continue outer;
+                continue; //restart
+                //this.slowRemove(key, hash, currentArray);
+            }
+
+            LongEntry e = (LongEntry) o;
+            LongEntry lo = e;
+            while (e != null) {
+                if (e.key == key) {
+                    LongEntry replacement = this.createReplacementChainForRemoval(lo, e);
+                    if (ConcurrentLongSet.casArrayAt(currentArray, index, lo, lo.next)) {
+                        this.addToSize(-1);
                     }
-                    e = e.getNext();
+                    //this.slowRemove(key, hash, currentArray);
+                    return;
                 }
-                return null;
+
+                e = e.next;
             }
         }
+    }
+
+//    private void slowRemove(long key, int hash, Object[] currentArray) {
+//        //noinspection LabeledStatement
+//        outer:
+//        while (true) {
+//            int length = currentArray.length;
+//            int index = ConcurrentHashMapInsane.indexFor(hash, length);
+//            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+//            if (o == RESIZED || o == RESIZING) {
+//                currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
+//            } else {
+//                Entry<K, V> e = (Entry<K, V>) o;
+//                while (e != null) {
+//                    Object candidate = e.getKey();
+//                    if (candidate.equals(key)) {
+//                        Entry<K, V> replacement = this.createReplacementChainForRemoval((Entry<K, V>) o, e);
+//                        if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, replacement)) {
+//                            this.addToSize(-1);
+//                        }
+//                        //noinspection ContinueStatementWithLabel
+//                        continue outer;
+//                    }
+//                    e = e.getNext();
+//                }
+//            }
+//        }
+//    }
+
+    private LongEntry createReplacementChainForRemoval(LongEntry original, LongEntry toRemove) {
+        if (original == toRemove) {
+            return original.next;
+        }
+        LongEntry replacement = null;
+        LongEntry e = original;
+        while (e != null) {
+            if (e != toRemove) {
+                LongEntry pr = replacement;
+                replacement = new LongEntry();
+                replacement.key = e.key;
+                replacement.next = pr;
+            }
+            e = e.next;
+        }
+        return replacement;
     }
 
     private Entry<K, V> createReplacementChainForRemoval(Entry<K, V> original, Entry<K, V> toRemove) {
@@ -1117,7 +1195,7 @@ public class ConcurrentHashMapInsane<K, V>
 
     private void sequentialForEachKeyValue(Procedure2<K, V> block, Object[] currentArray, int start, int end) {
         for (int i = start; i < end; i++) {
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, i);
             if (o == RESIZED || o == RESIZING) {
                 throw new ConcurrentModificationException("can't iterate while resizing!");
             }
@@ -1161,7 +1239,7 @@ public class ConcurrentHashMapInsane<K, V>
 
     private void sequentialForEachValue(Procedure<V> block, Object[] currentArray, int start, int end) {
         for (int i = start; i < end; i++) {
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, i);
             if (o == RESIZED || o == RESIZING) {
                 throw new ConcurrentModificationException("can't iterate while resizing!");
             }
@@ -1179,7 +1257,7 @@ public class ConcurrentHashMapInsane<K, V>
         int h = 0;
         Object[] currentArray = this.table;
         for (int i = 0; i < currentArray.length - 1; i++) {
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, i);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, i);
             if (o == RESIZED || o == RESIZING) {
                 throw new ConcurrentModificationException("can't compute hashcode while resizing!");
             }
@@ -1276,20 +1354,20 @@ public class ConcurrentHashMapInsane<K, V>
         private Entry<K, V> current;
 
         protected HashIterator() {
-            if (!ConcurrentHashMapInsane.this.isEmpty()) {
-                this.currentState = new IteratorState(ConcurrentHashMapInsane.this.table);
+            if (!ConcurrentLongSet.this.isEmpty()) {
+                this.currentState = new IteratorState(ConcurrentLongSet.this.table);
                 this.findNext();
             }
         }
 
         private void findNext() {
             while (this.index < this.currentState.end) {
-                Object o = ConcurrentHashMapInsane.arrayAt(this.currentState.currentTable, this.index);
+                Object o = ConcurrentLongSet.arrayAt(this.currentState.currentTable, this.index);
                 if (o == RESIZED || o == RESIZING) {
-                    Object[] nextArray = ConcurrentHashMapInsane.this.helpWithResizeWhileCurrentIndex(this.currentState.currentTable, this.index);
+                    Object[] nextArray = ConcurrentLongSet.this.helpWithResizeWhileCurrentIndex(this.currentState.currentTable, this.index);
                     int endResized = this.index + 1;
                     while (endResized < this.currentState.end) {
-                        if (ConcurrentHashMapInsane.arrayAt(this.currentState.currentTable, endResized) != RESIZED) {
+                        if (ConcurrentLongSet.arrayAt(this.currentState.currentTable, endResized) != RESIZED) {
                             break;
                         }
                         endResized++;
@@ -1345,7 +1423,7 @@ public class ConcurrentHashMapInsane<K, V>
             }
             K key = this.current.key;
             this.current = null;
-            ConcurrentHashMapInsane.this.remove(key);
+            ConcurrentLongSet.this.remove(key);
         }
     }
 
@@ -1378,22 +1456,22 @@ public class ConcurrentHashMapInsane<K, V>
 
         @Override
         public int size() {
-            return ConcurrentHashMapInsane.this.size();
+            return ConcurrentLongSet.this.size();
         }
 
         @Override
         public boolean contains(Object o) {
-            return ConcurrentHashMapInsane.this.containsKey(o);
+            return ConcurrentLongSet.this.containsKey(o);
         }
 
         @Override
         public boolean remove(Object o) {
-            return ConcurrentHashMapInsane.this.remove(o) != null;
+            return ConcurrentLongSet.this.remove(o) != null;
         }
 
         @Override
         public void clear() {
-            ConcurrentHashMapInsane.this.clear();
+            ConcurrentLongSet.this.clear();
         }
     }
 
@@ -1405,17 +1483,17 @@ public class ConcurrentHashMapInsane<K, V>
 
         @Override
         public int size() {
-            return ConcurrentHashMapInsane.this.size();
+            return ConcurrentLongSet.this.size();
         }
 
         @Override
         public boolean contains(Object o) {
-            return ConcurrentHashMapInsane.this.containsValue(o);
+            return ConcurrentLongSet.this.containsValue(o);
         }
 
         @Override
         public void clear() {
-            ConcurrentHashMapInsane.this.clear();
+            ConcurrentLongSet.this.clear();
         }
     }
 
@@ -1431,7 +1509,7 @@ public class ConcurrentHashMapInsane<K, V>
                 return false;
             }
             Map.Entry<K, V> e = (Map.Entry<K, V>) o;
-            Entry<K, V> candidate = ConcurrentHashMapInsane.this.getEntry(e.getKey());
+            Entry<K, V> candidate = ConcurrentLongSet.this.getEntry(e.getKey());
             return candidate != null && candidate.equals(e);
         }
 
@@ -1441,17 +1519,17 @@ public class ConcurrentHashMapInsane<K, V>
                 return false;
             }
             Map.Entry<K, V> e = (Map.Entry<K, V>) o;
-            return ConcurrentHashMapInsane.this.remove(e.getKey(), e.getValue());
+            return ConcurrentLongSet.this.remove(e.getKey(), e.getValue());
         }
 
         @Override
         public int size() {
-            return ConcurrentHashMapInsane.this.size();
+            return ConcurrentLongSet.this.size();
         }
 
         @Override
         public void clear() {
-            ConcurrentHashMapInsane.this.clear();
+            ConcurrentLongSet.this.clear();
         }
     }
 
@@ -1592,40 +1670,40 @@ public class ConcurrentHashMapInsane<K, V>
         }
     }
 
-    public static <NK, NV> ConcurrentHashMapInsane<NK, NV> newMap(Map<NK, NV> map) {
-        ConcurrentHashMapInsane<NK, NV> result = new ConcurrentHashMapInsane<>(map.size());
+    public static <NK, NV> ConcurrentLongSet<NK, NV> newMap(Map<NK, NV> map) {
+        ConcurrentLongSet<NK, NV> result = new ConcurrentLongSet<>(map.size());
         result.putAll(map);
         return result;
     }
 
     @Override
-    public ConcurrentHashMapInsane<K, V> withKeyValue(K key, V value) {
-        return (ConcurrentHashMapInsane<K, V>) super.withKeyValue(key, value);
+    public ConcurrentLongSet<K, V> withKeyValue(K key, V value) {
+        return (ConcurrentLongSet<K, V>) super.withKeyValue(key, value);
     }
 
     @Override
-    public ConcurrentHashMapInsane<K, V> withAllKeyValues(Iterable<? extends Pair<? extends K, ? extends V>> keyValues) {
-        return (ConcurrentHashMapInsane<K, V>) super.withAllKeyValues(keyValues);
+    public ConcurrentLongSet<K, V> withAllKeyValues(Iterable<? extends Pair<? extends K, ? extends V>> keyValues) {
+        return (ConcurrentLongSet<K, V>) super.withAllKeyValues(keyValues);
     }
 
     @Override
-    public ConcurrentHashMapInsane<K, V> withAllKeyValueArguments(Pair<? extends K, ? extends V>... keyValues) {
-        return (ConcurrentHashMapInsane<K, V>) super.withAllKeyValueArguments(keyValues);
+    public ConcurrentLongSet<K, V> withAllKeyValueArguments(Pair<? extends K, ? extends V>... keyValues) {
+        return (ConcurrentLongSet<K, V>) super.withAllKeyValueArguments(keyValues);
     }
 
     @Override
-    public ConcurrentHashMapInsane<K, V> withoutKey(K key) {
-        return (ConcurrentHashMapInsane<K, V>) super.withoutKey(key);
+    public ConcurrentLongSet<K, V> withoutKey(K key) {
+        return (ConcurrentLongSet<K, V>) super.withoutKey(key);
     }
 
     @Override
-    public ConcurrentHashMapInsane<K, V> withoutAllKeys(Iterable<? extends K> keys) {
-        return (ConcurrentHashMapInsane<K, V>) super.withoutAllKeys(keys);
+    public ConcurrentLongSet<K, V> withoutAllKeys(Iterable<? extends K> keys) {
+        return (ConcurrentLongSet<K, V>) super.withoutAllKeys(keys);
     }
 
     @Override
     public MutableMap<K, V> clone() {
-        return ConcurrentHashMapInsane.newMap(this);
+        return ConcurrentLongSet.newMap(this);
     }
 
     @Override
@@ -1697,8 +1775,8 @@ public class ConcurrentHashMapInsane<K, V>
         boolean createdValue = false;
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -1715,7 +1793,7 @@ public class ConcurrentHashMapInsane<K, V>
                     newValue = function.valueOf(parameter);
                 }
                 Entry<K, V> newEntry = new Entry<>(key, newValue, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return newValue;
                 }
@@ -1778,12 +1856,12 @@ public class ConcurrentHashMapInsane<K, V>
         int hash = this.hash(key);
         Object[] currentArray = this.table;
         int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == null) {
             V result = function.valueOf(factory.value());
             Entry<K, V> newEntry = new Entry<>(key, result, null);
-            if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, null, newEntry)) {
+            if (ConcurrentLongSet.casArrayAt(currentArray, index, null, newEntry)) {
                 this.addToSize(1);
                 return result;
             }
@@ -1796,8 +1874,8 @@ public class ConcurrentHashMapInsane<K, V>
         outer:
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -1808,7 +1886,7 @@ public class ConcurrentHashMapInsane<K, V>
                         V oldValue = e.getValue();
                         V newValue = function.valueOf(oldValue);
                         Entry<K, V> newEntry = new Entry<>(e.getKey(), newValue, this.createReplacementChainForRemoval((Entry<K, V>) o, e));
-                        if (!ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                        if (!ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                             //noinspection ContinueStatementWithLabel
                             continue outer;
                         }
@@ -1819,7 +1897,7 @@ public class ConcurrentHashMapInsane<K, V>
                 }
                 V result = function.valueOf(factory.value());
                 Entry<K, V> newEntry = new Entry<>(key, result, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return result;
                 }
@@ -1832,12 +1910,12 @@ public class ConcurrentHashMapInsane<K, V>
         int hash = this.hash(key);
         Object[] currentArray = this.table;
         int length = currentArray.length;
-        int index = ConcurrentHashMapInsane.indexFor(hash, length);
-        Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+        int index = ConcurrentLongSet.indexFor(hash, length);
+        Object o = ConcurrentLongSet.arrayAt(currentArray, index);
         if (o == null) {
             V result = function.value(factory.value(), parameter);
             Entry<K, V> newEntry = new Entry<>(key, result, null);
-            if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, null, newEntry)) {
+            if (ConcurrentLongSet.casArrayAt(currentArray, index, null, newEntry)) {
                 this.addToSize(1);
                 return result;
             }
@@ -1856,8 +1934,8 @@ public class ConcurrentHashMapInsane<K, V>
         outer:
         while (true) {
             int length = currentArray.length;
-            int index = ConcurrentHashMapInsane.indexFor(hash, length);
-            Object o = ConcurrentHashMapInsane.arrayAt(currentArray, index);
+            int index = ConcurrentLongSet.indexFor(hash, length);
+            Object o = ConcurrentLongSet.arrayAt(currentArray, index);
             if (o == RESIZED || o == RESIZING) {
                 currentArray = this.helpWithResizeWhileCurrentIndex(currentArray, index);
             } else {
@@ -1868,7 +1946,7 @@ public class ConcurrentHashMapInsane<K, V>
                         V oldValue = e.getValue();
                         V newValue = function.value(oldValue, parameter);
                         Entry<K, V> newEntry = new Entry<>(e.getKey(), newValue, this.createReplacementChainForRemoval((Entry<K, V>) o, e));
-                        if (!ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                        if (!ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                             //noinspection ContinueStatementWithLabel
                             continue outer;
                         }
@@ -1878,7 +1956,7 @@ public class ConcurrentHashMapInsane<K, V>
                 }
                 V result = function.value(factory.value(), parameter);
                 Entry<K, V> newEntry = new Entry<>(key, result, (Entry<K, V>) o);
-                if (ConcurrentHashMapInsane.casArrayAt(currentArray, index, o, newEntry)) {
+                if (ConcurrentLongSet.casArrayAt(currentArray, index, o, newEntry)) {
                     this.incrementSizeAndPossiblyResize(currentArray, length, o);
                     return result;
                 }

@@ -99,7 +99,7 @@ public class GoalActionConcept extends ActionConcept {
         lastBelief = b;
 
 
-        if (goalChange || (updateOnBeliefChange && beliefChange)) {
+        /*if (goalChange || (updateOnBeliefChange && beliefChange))*/ {
 
             Truth f = this.motor.motor(b, g);
             if (f!=null) {

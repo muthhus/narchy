@@ -319,6 +319,11 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
                 s * mul.y + add.y,
                 s * mul.z + add.z);
     }
+    public final void scaleAdd(float s, float mx, float my, float mz, Tuple3f add) {
+        set(s * mx + add.x,
+                s * my + add.y,
+                s * mz + add.z);
+    }
 
     /** this = add + s * mul1 * mul2 */
     public final void scaleAdd(float s, Tuple3f mul1, Tuple3f mul2, Tuple3f add) {

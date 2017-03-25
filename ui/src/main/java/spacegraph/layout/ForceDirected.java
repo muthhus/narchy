@@ -109,10 +109,11 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     protected void batch(List<Collidable> l) {
 
         float speed = repel.floatValue();
+        v3 t = v();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
-                repel(x, l.get(j), speed, maxRepelDist);
+                repel(x, l.get(j), speed, maxRepelDist, t);
             }
 
         }
@@ -141,11 +142,10 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     }
 
-    private static void repel(Collidable x, Collidable y, float speed, float maxDist) {
+    private static void repel(Collidable x, Collidable y, float speed, float maxDist, v3 delta) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
-        v3 delta = v();
         delta.sub(xp.transform(), yp.transform());
 
         float len = delta.normalize();
@@ -160,13 +160,15 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         float base = speed / ( Util.sqr( 1 + len ));
 
-        v3 yx = v(delta);
-        yx.scale(xp.mass() * base );
-        ((Dynamic) x).impulse(yx);
+        {
+            float s = xp.mass() * base;
+            ((Dynamic) x).impulse(delta.x * s, delta.y * s, delta.z * s);
+        }
 
-        v3 xy = v(delta);
-        xy.scale( -yp.mass() * base );
-        ((Dynamic) y).impulse(xy);
+        {
+            float s = -yp.mass() * base;
+            ((Dynamic) y).impulse(delta.x * s, delta.y * s, delta.z * s);
+        }
 
     }
 
