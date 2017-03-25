@@ -501,18 +501,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        }
 //        return false;
 //    }
+
     default boolean equivalent(@NotNull TermContainer sub) {
-        if (hashCodeSubTerms() == sub.hashCodeSubTerms()) {
-            int s = size();
-            if (s == sub.size()) {
-                for (int i = 0; i < s; i++) {
-                    if (!term(i).equals(sub.term(i)))
-                        return false;
-                }
-                return true;
-            }
-        }
-        return false;
+        return (hashCodeSubTerms() == sub.hashCodeSubTerms()) && equalTerms(sub);
     }
 
     /** allows the subterms to hold a different hashcode than hashCode when comparing subterms */
@@ -529,9 +520,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default boolean or(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
-            Term t = term(i);
-            //if (t.or(p))
-            if (p.test(t))
+            if (p.test(term(i)))
                 return true;
         }
         return false;
@@ -546,8 +535,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default boolean and(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
-            Term t = term(i);
-            if (!p.test(t)) {
+            if (!p.test(term(i))) {
                 return false;
             }
         }
@@ -558,8 +546,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         int s = size();
         int count = 0;
         for (int i = 0; i < s; i++) {
-            Term t = term(i);
-            if (match.test(t)) {
+            if (match.test(term(i))) {
                 count++;
             }
         }

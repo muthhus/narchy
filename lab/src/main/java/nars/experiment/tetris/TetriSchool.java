@@ -5,7 +5,6 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
-import nars.NSchool;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.gui.Vis;
@@ -33,17 +32,18 @@ import static nars.gui.Vis.stack;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
-public class TetriSchool extends NSchool implements Runnable {
+public class TetriSchool implements Runnable {
 
     private final TetrisState game;
 
 
     final Thread sim;
     private final List<SensorConcept> cells;
+    private final NAR nar;
     int updatePeriodMS = 200;
 
     public TetriSchool(NAR nar, int width, int height) {
-        super(nar);
+        this.nar = nar;
 
         cells = $.newArrayList(width*height);
 

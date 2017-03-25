@@ -155,7 +155,7 @@ public class Widget extends Stacking {
             );
     }
 
-    private static class DummyConsole extends ConsoleTerminal implements Runnable {
+    private static class  DummyConsole extends ConsoleTerminal implements Runnable {
 
         public DummyConsole() {
             super(40, 20);

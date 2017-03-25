@@ -185,65 +185,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     }
 
 
-    public static class EditTerminal extends DefaultVirtualTerminal {
-        public MultiWindowTextGUI gui;
-
-        public EditTerminal(int c, int r) {
-            super(new TerminalSize(c, r));
-
-
-            //term.clearScreen();
-            new Thread(() -> {
-
-                try {
-                    TerminalScreen screen = new TerminalScreen(this);
-                    screen.startScreen();
-                    gui = new MultiWindowTextGUI(
-                            new SeparateTextGUIThread.Factory(),
-                            screen);
-
-
-                    setCursorVisible(true);
-
-                    gui.setBlockingIO(false);
-                    gui.setEOFWhenNoWindows(false);
-
-
-                    final BasicWindow window = new BasicWindow();
-                    window.setPosition(new TerminalPosition(0,0));
-                    window.setSize(new TerminalSize(c-2,r-2));
-
-
-                    TextBox t = new TextBox("", TextBox.Style.MULTI_LINE);
-                    t.setPreferredSize(new TerminalSize(c-3,r-3));
-
-                    t.takeFocus();
-                    window.setComponent(t);
-
-
-                    gui.addWindow(window);
-                    gui.setActiveWindow(window);
-
-                    commit();
-                    gui.waitForWindowToClose(window);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-        }
-
-        public void commit() {
-            try {
-                gui.updateScreen();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-//    public static class Demo extends DefaultVirtualTerminal {
+    //    public static class Demo extends DefaultVirtualTerminal {
 //        public Demo(int c, int r) {
 //            super(c, r);
 //

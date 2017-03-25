@@ -27,7 +27,7 @@ public class TaskRule extends TaskMatch{
 
     public TaskRule(String input, String output, NAR nar) throws Narsese.NarseseException {
         super(input, nar);
-        this.output = $.$(output);
+        this.output = (Compound) nar.concepts.parseRaw(output);
     }
 
     @Override

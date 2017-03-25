@@ -155,10 +155,6 @@ public abstract class Unify extends Termunator implements Subst {
      */
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
-        if (start) {
-            termutes.clear();
-        }
-
         int s = now();
         boolean result;
         try {
@@ -174,8 +170,10 @@ public abstract class Unify extends Termunator implements Subst {
             finish = true;
         }
 
-        if (finish)
+        if (finish) {
             revert(s); //else: allows the set constraints to continue
+            termutes.clear();
+        }
 
         return result;
     }

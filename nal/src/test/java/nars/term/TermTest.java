@@ -458,7 +458,6 @@ public class TermTest {
         assertEquals(a, b);
 
         //todo: method results ignored ?
-        b.equals(n2.concept(a));
 
 //        assertEquals("re-normalizing doesn't affect: " + n2.concept(a), b,
 //                n2.concept(a));

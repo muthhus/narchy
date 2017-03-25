@@ -48,10 +48,6 @@ public class ArrayTermVector extends TermVector {
         return true;
     }
 
-    @Override
-    public final boolean equivalent(@NotNull TermContainer c) {
-        return (hash == c.hashCodeSubTerms()) && equalTerms(c);
-    }
 
     @Override
     @NotNull public final Term term(int i) {

@@ -216,7 +216,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.25f, 4);
+        //new Inperience(nar, 0.25f, 4);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

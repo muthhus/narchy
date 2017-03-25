@@ -54,7 +54,7 @@ public class Vis {
 
 
     public static Surface newInputEditor(NAR nar) {
-        return new ConsoleTerminal(new ConsoleSurface.EditTerminal(20,5));
+        return new ConsoleTerminal(new ConsoleTerminal.TextEditModel(20,5));
     }
 
     public static Grid beliefCharts(float window, NAR nar, Object... x) {

@@ -230,24 +230,7 @@ abstract public class NAgent implements NSense, NAct {
 
         long next = now + (dur * 3 / 2);
 
-        nar.input(
-
-            Streams.concat(
-
-                Streams.concat(
-                    Stream.of(happy),
-                    sensors.stream(),
-                    actions.stream()
-                ).map(f -> f.apply(nar)),
-
-                predict(next),
-
-                curious(next)
-
-            ),
-
-            priority.floatValue() * dur
-        );
+        nar.input( nextInput(next),  priority.floatValue() * dur );
 
 
 //        } else {
@@ -259,13 +242,37 @@ abstract public class NAgent implements NSense, NAct {
             logger.info(summary());
     }
 
+    protected Stream<Task> nextInput(long next) {
+        return Streams.concat(
+
+            Streams.concat(
+                Stream.of(happy),
+                sensorStream(),
+                actionStream()
+            ).map(f -> f.apply(nar)),
+
+            predict(next),
+
+            curious(next)
+
+        );
+    }
+
+    protected Stream<ActionConcept> actionStream() {
+        return actions.stream();
+    }
+
+    protected Stream<SensorConcept> sensorStream() {
+        return sensors.stream();
+    }
+
     protected Stream<Task> curious(long next) {
         float conf = curiosityConf.floatValue();
         float confMin = nar.confMin.floatValue();
         if (conf < confMin)
             return Stream.empty();
 
-        return actions.stream().map(action -> {
+        return actionStream().map(action -> {
 
             if (nar.random.nextFloat() < curiosityProb.floatValue()) {
                 return action.curiosity(conf, next, nar);
