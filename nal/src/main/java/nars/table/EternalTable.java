@@ -348,6 +348,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (revised != null) {
                 if (revised.equals(input)) {
                     //duplicate
+                    //TODO decide what to do here
                     return revised;
                 }
 

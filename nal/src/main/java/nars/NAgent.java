@@ -317,8 +317,13 @@ abstract public class NAgent implements NSense, NAct {
 
         @NotNull Compound happiness = happy.term();
 
+        int dur = nar.dur();
+
         predictors.add(
-                goal(happiness, t(1f, nar.confidenceDefault(BELIEF /*GOAL*/)), ETERNAL)
+                goal(happiness, t(1f, nar.confidenceDefault(BELIEF /*GOAL*/)),
+                    //ETERNAL
+                    now + dur
+                )
         );
 
 
@@ -345,7 +350,6 @@ abstract public class NAgent implements NSense, NAct {
 //                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
 //        );
 
-        int dur = nar.dur();
 
         //predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
         //predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
@@ -356,9 +360,9 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     quest((Compound) (action.term()),
-                            ETERNAL),
+                            ETERNAL)
                             //ETERNAL)
-                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 //                    question(impl(action, 0, happiness), now),
