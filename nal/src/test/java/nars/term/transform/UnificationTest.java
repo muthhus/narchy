@@ -97,7 +97,6 @@ public class UnificationTest {
                             assertTrue((n2) <= (yx.size()));
                             assertTrue((n1) <= (xy.size()));
                         }
-
                         assertFalse("incomplete: " + toString(), this.isEmpty());
 
                         this.xy.forEachVersioned((k, v) -> {

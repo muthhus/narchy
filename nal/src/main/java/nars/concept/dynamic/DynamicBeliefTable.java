@@ -31,8 +31,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input instanceof DynamicBeliefTask)
             return input; //dont insert its own dynamic belief task, causing a feedback loop
-        else
+        else {
             return super.add(input, concept, nar);
+        }
     }
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {

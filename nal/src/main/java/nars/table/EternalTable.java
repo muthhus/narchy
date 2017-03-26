@@ -163,7 +163,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task newBelief, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    private /*Revision*/Task tryRevision(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -176,7 +176,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         float bestRank = 0f, bestConf = 0f;
         Truth conclusion = null;
 
-        Truth newBeliefTruth = newBelief.truth();
+        Truth newBeliefTruth = input.truth();
 
 
         for (int i = 0; i < bsize; i++) {
@@ -185,13 +185,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x == null) //the array has trailing nulls from having extra capacity
                 break;
 
-            if (x.equals(newBelief)) {
-                if (x != newBelief)
-                    BudgetMerge.maxBlend.apply(x.budget(), newBelief.budget());
-                return newBelief;
+            if (x.equals(input)) {
+                if (x != input)
+                    BudgetMerge.maxBlend.apply(x.budget(), input.budget());
+                return x;
             }
 
-            if (!Revision.isRevisible(newBelief, x))
+            if (!Revision.isRevisible(input, x))
                 continue;
 
 
@@ -232,10 +232,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-        final float newBeliefWeight = newBelief.evi();
+        final float newBeliefWeight = input.evi();
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
         Compound t = compoundOrNull(Revision.intermpolate(
-                newBelief.term(), oldBelief.term(),
+                input.term(), oldBelief.term(),
                 aProp,
                 nar.random,
                 true
@@ -244,13 +244,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             return null;
 
         RevisionTask r = new RevisionTask(t,
-                newBelief, oldBelief,
+                input, oldBelief,
                 conclusion,
                 nar.time(),
                 ETERNAL, ETERNAL,
                 concept
         );
-        r.budget(oldBelief, newBelief);
+        r.budget(oldBelief, input);
         return r.log("Insertion Revision");
     }
 
@@ -346,12 +346,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             revised = tryRevision(input, concept, nar);
             if (revised != null) {
-                if (revised == input) {
-                    //duplicate, ignore it if it's a derivation, otherwise if it's input allow it to re-activate
-                    if (input.isInput())
-                        return input;
-                    else
-                        return null;
+                if (revised.equals(input)) {
+                    //duplicate
+                    return revised;
                 }
 
 //                    if (revised.isDeleted()) {

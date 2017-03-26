@@ -93,22 +93,20 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
         }
 
 
-        Task inserted = put(t);
+        return put(t);
 
         //commit();
 
-        if (inserted!=null) {
-            //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
-            if (inserted == t) {
-                return t;
-            } else if (inserted.equals(t)) {
-                //merged budget with an existing but unique instance
-                return inserted.isInput() ? t : null; //ignore duplicate derivations
-            }
-        }
-
-        //failed insert
-        return null;
+//        if (inserted!=null) {
+//            //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
+//            if (inserted.equals(t)) {
+//                //merged budget with an existing but unique instance
+//                return inserted.isInput() ? t : null; //ignore duplicate derivations
+//            }
+//        }
+//
+//        //failed insert
+//        return null;
     }
 
 

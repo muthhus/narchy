@@ -227,7 +227,7 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
 
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
@@ -239,9 +239,11 @@ public class Derivation extends Unify {
         this.forEachMatch = eachMatch;
 
         boolean finish = eachMatch!=null;
-        unify(x, y, !finish, finish);
+        boolean result = unify(x, y, !finish, finish);
 
         this.forEachMatch = null;
+
+        return result;
 
     }
 

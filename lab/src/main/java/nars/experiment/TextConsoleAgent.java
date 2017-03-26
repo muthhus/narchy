@@ -70,15 +70,15 @@ public class TextConsoleAgent extends NAgentX {
     public TextConsoleAgent(NAR nar) throws Narsese.NarseseException {
         super("term", nar);
 
-        new TaskRule("(term(%1,(%2,%3)) && term(%4,(%5,%3)))",
-                "((seq(%1,%4)-->(%2,%3)) && equal(sub(%5,%2),1))", nar) {
-            @Override
-            public boolean test(@NotNull Task task) {
-                return true;
-            }
-        };
-        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
-        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
+//        new TaskRule("(term(%1,(%2,%3)) && term(%4,(%5,%3)))",
+//                "((seq(%1,%4)-->(%2,%3)) && equal(sub(%5,%2),1))", nar) {
+//            @Override
+//            public boolean test(@NotNull Task task) {
+//                return true;
+//            }
+//        };
+//        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
+//        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
 
         SpaceGraph.window(console, 800, 600);
 

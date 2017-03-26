@@ -164,7 +164,7 @@ public abstract class Unify extends Termunator implements Subst {
             if (unify(x, y)) {
 
                 if (!finish) {
-                    result = true;
+                    result = true; //return to callee to continue in subsequent operation
                 } else {
                     @Nullable List<Termutator> t = termutes;
                     if (termutes != null) {

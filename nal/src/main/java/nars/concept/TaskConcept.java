@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
 
-/** concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests */
+/**
+ * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests
+ */
 public class TaskConcept extends CompoundConcept {
 
     @Nullable
@@ -29,10 +31,10 @@ public class TaskConcept extends CompoundConcept {
         super(term, termLinks, taskLinks, nar);
     }
 
-    @Deprecated public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
+    @Deprecated
+    public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
     }
-
 
 
     /**
@@ -63,9 +65,10 @@ public class TaskConcept extends CompoundConcept {
 
     @NotNull
     final QuestionTable questionsOrNew(@NotNull NAR nar) {
+        //TODO this isnt thread safe
         return questions == null ? (questions =
                 //new ArrayQuestionTable(state.questionCap(true)))
-                new HijackQuestionTable(state.questionCap(true), 2, BudgetMerge.maxBlend, nar.random))
+                new HijackQuestionTable(state.questionCap(true), 3, BudgetMerge.maxBlend, nar.random))
                 : questions;
 
     }
@@ -99,7 +102,7 @@ public class TaskConcept extends CompoundConcept {
 
     protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
 
-        return new DefaultBeliefTable( );
+        return new DefaultBeliefTable();
     }
 
     public HijackTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
@@ -133,7 +136,7 @@ public class TaskConcept extends CompoundConcept {
 
     public
     @Nullable
-    boolean processQuest(@NotNull Task task, @NotNull NAR nar) {
+    Task processQuest(@NotNull Task task, @NotNull NAR nar) {
         return processQuestion(task, nar);
     }
 
@@ -141,7 +144,7 @@ public class TaskConcept extends CompoundConcept {
      * To accept a new judgment as belief, and check for revisions and solutions
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
+    @Nullable Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
         return processBeliefOrGoal(belief, beliefsOrNew(nar), nar);
     }
 
@@ -150,7 +153,7 @@ public class TaskConcept extends CompoundConcept {
      * decide whether to actively pursue it
      * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
      */
-    public @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
+    @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
         return processBeliefOrGoal(goal, goalsOrNew(nar), nar);
     }
 
@@ -191,7 +194,7 @@ public class TaskConcept extends CompoundConcept {
      * @param displaced
      * @return the relevant task
      */
-    public boolean processQuestion(@NotNull Task q, @NotNull NAR nar) {
+    Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
 
         final QuestionTable questionTable;
         //final BeliefTable answerTable;
@@ -206,7 +209,7 @@ public class TaskConcept extends CompoundConcept {
         }
 
 
-        return questionTable.add(q, nar) != null;
+        return questionTable.add(q, nar);
     }
 
 
@@ -236,7 +239,6 @@ public class TaskConcept extends CompoundConcept {
     @Nullable
     public final Activation process(@NotNull Task input, @NotNull NAR nar) {
 
-        boolean accepted = false;
 
         Task inserted = null;
 
@@ -250,25 +252,26 @@ public class TaskConcept extends CompoundConcept {
                 break;
 
             case QUESTION:
-                accepted = processQuestion(input, nar);
+                inserted = processQuestion(input, nar);
                 break;
 
             case QUEST:
-                accepted = processQuest(input, nar);
+                inserted = processQuest(input, nar);
                 break;
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
-        if (inserted != null)
-            accepted = true;
-
-        if (accepted) {
-            return nar.activateTask(input, this, 1);
-        } else {
+        if (inserted == null)
             return null;
+
+        Activation a = nar.activateTask(inserted, this, 1);
+        if (input != inserted) {
+            return null; //dont process further aside from this re-activation
         }
+        return a;
+
     }
 
     @Override
@@ -280,13 +283,13 @@ public class TaskConcept extends CompoundConcept {
 
     public int taskCount() {
         int s = 0;
-        if (beliefs!=null)
+        if (beliefs != null)
             s += beliefs.size();
-        if (goals!=null)
+        if (goals != null)
             s += goals.size();
-        if (questions!=null)
+        if (questions != null)
             s += questions.size();
-        if (quests!=null)
+        if (quests != null)
             s += quests.size();
 
         return s;
