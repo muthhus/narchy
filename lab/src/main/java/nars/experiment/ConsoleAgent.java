@@ -1,14 +1,14 @@
 package nars.experiment;
 
 import com.googlecode.lanterna.TerminalPosition;
+import com.googlecode.lanterna.TextCharacter;
+import com.jogamp.opengl.GL2;
 import nars.*;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
-import nars.util.Loop;
-import nars.util.task.TaskRule;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.widget.console.ConsoleTerminal;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  * executes a unix shell and perceives the output as a grid of symbols
  * which can be interactively tagged by human, and optionally edited by NARS
  */
-public class TextConsoleAgent extends NAgentX {
+public abstract class ConsoleAgent extends NAgentX {
 
     final ConcurrentLinkedDeque<Task> queue = new ConcurrentLinkedDeque<Task>();
 
@@ -45,7 +45,18 @@ public class TextConsoleAgent extends NAgentX {
         }
     };
 
-    final ConsoleTerminal console = new ConsoleTerminal(term);
+    final ConsoleTerminal console = new ConsoleTerminal(term) {
+        @Override
+        protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
+            float cc = nar.pri($.p(col, row));
+            if (cc==cc) {
+                float s = 0.3f * cc;
+                gl.glColor3f(s,s,s);
+                return true;
+            }
+            return false;
+        }
+    };
 
 
     protected void input(Task t) {
@@ -67,7 +78,7 @@ public class TextConsoleAgent extends NAgentX {
         );
     }
 
-    public TextConsoleAgent(NAR nar) throws Narsese.NarseseException {
+    public ConsoleAgent(NAR nar) throws Narsese.NarseseException {
         super("term", nar);
 
 //        new TaskRule("(term(%1,(%2,%3)) && term(%4,(%5,%3)))",
@@ -85,23 +96,21 @@ public class TextConsoleAgent extends NAgentX {
         record.set(true);
     }
 
-    public void append(String s) {
-        synchronized (console) {
-            console.append(s);
-        }
-    }
 
     @Override
-    protected float act() {
-        return 0;
-    }
+    abstract protected float act();
 
     public static void main(String[] args) throws Narsese.NarseseException {
         Default n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true).durSeconds(0.1f));
         n.setSelf("I");
         n.logBudgetMin(System.out, 0.25f);
 
-        @NotNull TextConsoleAgent a = new TextConsoleAgent(n);
+        @NotNull ConsoleAgent a = new ConsoleAgent(n) {
+            @Override
+            protected float act() {
+                return 0;
+            }
+        };
 
         NAgentX.chart(a);
 

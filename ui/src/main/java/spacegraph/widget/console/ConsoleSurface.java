@@ -3,6 +3,7 @@ package spacegraph.widget.console;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.SeparateTextGUIThread;
@@ -82,7 +83,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         gl.glLineWidth(2f);
 
-        gl.glColor4f(0.75f, 0.75f, 0.75f, fgAlpha);
+        //gl.glColor4f(0.75f, 0.75f, 0.75f, fgAlpha);
 
         for (int row = 0; row < rows; row++) {
 
@@ -98,31 +99,29 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
                 TextCharacter c = charAt(col, row);
-                if (c == null)
-                    continue;
+
+                if (setBackgroundColor(gl, c, col, row)) {
+                    Draw.rect(gl,
+                            (float) (col+1)*16, 0,
+                            (float) 1*16, charAspect*20
+
+                    );
+                }
+
+//                if (c == null)
+//                    continue;
 
                 //TODO: Background color
 
-//                    TextColor backColor = c.getBackgroundColor();
-//                    if (backColor!=null) {
-//
-//                        gl.glColor4f(
-//                                backColor.get(),
-//                                backColor.green(), backColor.blue(), bgAlpha);
-//                        Draw.rect(gl,
-//                                (float) i, 0,
-//                                (float) 1*16, charAspect*20
-//                                ,-dz
-//                        );
-//                    }
 
 
                 char cc = visible(c.getCharacter());
                 if ((cc != 0) && (cc != ' ')) {
-                    //TextColor fg = c.fore;
 
+                    //TODO TextColor fg = c.getForegroundColor();
                     //TODO: if (!fg.equals(previousFG))
-                    //gl.glColor4f(fg.red(), fg.green(), fg.blue(), fgAlpha);
+
+                    gl.glColor4f(1f,1f,1f, fgAlpha);
 
                     Draw.textNext(gl, cc, col/charScaleX);
                 }
@@ -152,6 +151,15 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         gl.glPopMatrix();
 
+    }
+
+    /** return true to paint a character's background. if so, then it should set the GL color */
+    protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
+        if (c!=null) {
+            //..c.getBackgroundColor();
+        }
+
+        return false;
     }
 
     /** x,y aka col,row */
