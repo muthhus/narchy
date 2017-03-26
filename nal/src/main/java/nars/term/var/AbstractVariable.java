@@ -21,6 +21,7 @@
 package nars.term.var;
 
 
+import jcog.Texts;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
@@ -36,14 +37,12 @@ public abstract class AbstractVariable implements Variable {
 
     public final int id;
     protected transient final int hash;
-    @NotNull
-    private transient final String str;
 
     protected AbstractVariable(@NotNull Op type, int id) {
 
         this.id = id;
         this.hash = Terms.hashVar(type, id); //lower 16 bits reserved for the type, which includes all permutations of 2x 8-bit id'd common variables
-        this.str = type.ch + Integer.toString(id);
+
     }
 
     @Override
@@ -72,10 +71,9 @@ public abstract class AbstractVariable implements Variable {
             }
             //TODO check if this is already a common variable containing y
             return subst.putCommon(this, (Variable)y);
-        } else if (subst.matchType(xo) && !subst.matchType(y) ) {
-            /*
-            note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
-            */
+        } else if (subst.matchType(xo)
+                //&& !subst.matchType(y) //note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
+                ) {
             return subst.matchVarX(this, y);
         }
 
@@ -107,7 +105,7 @@ public abstract class AbstractVariable implements Variable {
     @NotNull
     @Override
     public String toString() {
-        return str;
+        return op().ch + Integer.toString(id); //Integer.toString(id);;
     }
 
     /**

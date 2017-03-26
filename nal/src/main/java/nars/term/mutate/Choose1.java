@@ -8,6 +8,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,7 +59,7 @@ public class Choose1 extends Termutator {
     }
 
     @Override
-    public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
+    public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
 
         @NotNull Term[] yy = this.yy;
 
@@ -75,7 +76,7 @@ public class Choose1 extends Termutator {
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
-                    if (!f.chain(chain, current)) {
+                    if (!f.mutate(chain, current)) {
                         f.revert(start);
                         return false;
                     }

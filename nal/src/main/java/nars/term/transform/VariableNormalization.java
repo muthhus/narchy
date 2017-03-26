@@ -25,7 +25,7 @@ import java.util.function.Function;
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
     @NotNull
-    private final Map<Variable, Variable /*Variable*/> rename;
+    public final Map<Variable /* Input Variable */, Variable /*Variable*/> map;
 
     //private boolean renamed;
 
@@ -33,6 +33,51 @@ public class VariableNormalization extends VariableTransform implements Function
         this(0);
     }*/
 
+    /** for use with compounds that have exactly one variable */
+    public static final VariableTransform singleVariableNormalization = new VariableTransform() {
+
+        @Override
+        public Term apply(@Nullable Compound containing, @NotNull Term t) {
+
+            //if (current instanceof Ellipsis)
+            //throw new RuntimeException("not allowed");
+            //return null;
+
+            if (t instanceof Variable)
+                return $.v(t.op(), 1);
+            else
+                return t;
+        }
+    };
+
+
+    @NotNull
+    @Override
+    public Variable apply(@NotNull Variable x) {
+        return newVariable(x, map.size()+1);
+    }
+
+    @Override
+    public final Term apply(@Nullable Compound ct, @NotNull Term v) {
+        if (v instanceof Variable)
+            return map.computeIfAbsent((Variable)v, this);
+        else
+            return v;
+    }
+
+    @NotNull
+    protected Variable newVariable(@NotNull Variable x, int serial) {
+        Variable y;
+        if (x instanceof GenericVariable) {
+            y = ((GenericVariable) x).normalize(serial); //HACK
+        } else {
+            y = $.v(x.op(), serial);
+            y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
+        }
+
+        return y ;
+
+    }
 
 
     public VariableNormalization(int size /* estimate */) {
@@ -40,7 +85,7 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     public VariableNormalization(@NotNull Map<Variable, Variable> r) {
-        rename = r;
+        map = r;
 
         //NOTE:
         //rename = new ConcurrentHashMap(size); //doesnt work being called recursively
@@ -82,55 +127,5 @@ public class VariableNormalization extends VariableTransform implements Function
 ////        }
 //    }
 
-    /** for use with compounds that have exactly one variable */
-    public static final VariableTransform singleVariableNormalization = new VariableTransform() {
-
-        @Override
-        public Term apply(@Nullable Compound containing, @NotNull Term t) {
-
-            //if (current instanceof Ellipsis)
-               //throw new RuntimeException("not allowed");
-                //return null;
-
-            if (t instanceof Variable)
-                return $.v(t.op(), 1);
-            else
-                return t;
-        }
-    };
-
-
-    @NotNull
-    @Override
-    public final Variable apply(@NotNull Variable v) {
-        Variable rvv = newVariable(v, rename.size()+1);
-
-        //track if modification occurred
-        //this.renamed |= (rvv!=v); //!rvv.equals(v);
-
-        return rvv;
-    }
-
-    @Override
-    public final Term apply(@Nullable Compound ct, @NotNull Term v) {
-        if (v instanceof Variable)
-            return rename.computeIfAbsent((Variable)v, this);
-        else
-            return v;
-    }
-
-    @NotNull
-    protected Variable newVariable(@NotNull Variable v, int serial) {
-        Variable u;
-        if (v instanceof GenericVariable) {
-            u = ((GenericVariable) v).normalize(serial); //HACK
-        } else {
-            u = $.v(v.op(), serial);
-            u = u.equals(v) ? v : u; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
-        }
-
-        return u ;
-
-    }
 
 }

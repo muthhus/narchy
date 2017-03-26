@@ -3,6 +3,8 @@ package nars.term.mutate;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * AIKR choicepoint used in deciding possible mutations to apply in deriving new compounds
  */
@@ -18,7 +20,7 @@ public abstract class Termutator  {
 
 
     /** match all termutations recursing to the next after each successful one */
-    public abstract boolean run(Unify f, Termutator[] chain, int current);
+    public abstract boolean mutate(Unify f, List<Termutator> chain, int current);
 
 //    /** call this to invoke the next termutator in the chain */
 //    protected static boolean next(@NotNull Unify f, Termutator[] chain, int next) {

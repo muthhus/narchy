@@ -98,7 +98,7 @@ public class QuestionTest {
             @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
 
             @Override
-            protected void onMatch(Task task, Map<Term, Term> xy) {
+            protected void eachMatch(Task task, Map<Term, Term> xy) {
                 System.out.println(task + " " + xy);
                 s[0] = xy.size();
             }

@@ -36,7 +36,7 @@ abstract public class OperationTaskMatch extends TaskMatch {
     }
 
     @Override
-    protected final void onMatch(Task task, @NotNull Map<Term, Term> xy) {
+    protected final void eachMatch(Task task, @NotNull Map<Term, Term> xy) {
         Term[] args = new Term[numArgs];
         xy.forEach((k, v) -> {
             int i = argIndex.getIfAbsent(k, -1);

@@ -16,10 +16,7 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static nars.$.*;
 import static org.junit.Assert.assertEquals;
@@ -140,24 +137,22 @@ public class TermutatorTest {
         //int blocked = 0;
         final int[] duplicates = {0};
 
-        t.run(f, new Termutator[] { t, new Termutator("evaluate") {
+        t.mutate(f, Lists.newArrayList( t, new Termutator("evaluate") {
 
-            @Override
-            public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
+            @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
                 if (s.add( f.xy.toString() )) {
                     actual[0]++;
                 } else {
                     duplicates[0]++;
                 }
-
                 return true;
             }
 
-            @Override
-            public int getEstimatedPermutations() {
+            @Override public int getEstimatedPermutations() {
                 return 0;
             }
-        }}, 0);
+
+        }), 0);
 
 
         String res = s.toString();

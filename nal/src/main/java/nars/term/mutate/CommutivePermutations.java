@@ -6,6 +6,8 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 /**
  * Created by me on 12/22/15.
  */
@@ -39,7 +41,7 @@ public final class CommutivePermutations extends Termutator {
     }
 
     @Override
-    public boolean run(@NotNull Unify f, Termutator[] chain, int current) {
+    public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
         int start = f.now();
 
         ShuffledSubterms p = new ShuffledSubterms(f.random,  x);
@@ -51,7 +53,7 @@ public final class CommutivePermutations extends Termutator {
             p.next();
 
             if (p.unifyLinear(y, f)) {
-                if (!f.chain(chain, current)) {
+                if (!f.mutate(chain, current)) {
                     f.revert(start);
                     return false;
                 }

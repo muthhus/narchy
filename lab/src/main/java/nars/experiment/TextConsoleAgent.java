@@ -77,7 +77,8 @@ public class TextConsoleAgent extends NAgentX {
                 return true;
             }
         };
-        nar.input("(term(f,(3,#1)) && term(f,(4,#1))).");
+        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
+        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
 
         SpaceGraph.window(console, 800, 600);
 

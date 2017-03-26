@@ -170,8 +170,8 @@ public interface TimeFunctions {
     @Nullable
     static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity, boolean merge) {
 
-        long beliefStart = p.belief.start();
         long taskStart = p.task.start();
+        long beliefStart = p.belief.start();
 
         if (beliefStart != ETERNAL && taskStart != ETERNAL) {
 
@@ -180,7 +180,6 @@ public interface TimeFunctions {
 
             Interval union = Interval.union(taskStart, taskEnd, beliefStart, beliefEnd);
             int dt = (int) (beliefEnd - taskStart); //TODO check valid int/long conversion
-            long start = occurrenceTarget(p.premise, earliestOccurrence);
 
             occReturn[0] = union.a;
 
@@ -1184,7 +1183,10 @@ public interface TimeFunctions {
                 throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 
             //TODO decide if this is correct
-            if (derived.op()==CONJ && occReturn[0]!=ETERNAL && occReturn[1] == ETERNAL)
+            if (
+                    o.temporal
+                        //o==CONJ //conjunctions only
+                    && occReturn[0]!=ETERNAL && occReturn[1] == ETERNAL)
                 occReturn[1] = occReturn[0] + n.dtRange();
 
             return (Compound) n;

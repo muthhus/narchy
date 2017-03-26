@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by me on 12/22/15.
@@ -63,7 +64,7 @@ public class Choose2 extends Termutator {
     }
 
     @Override
-    public boolean run(Unify versioneds, Termutator[] chain, int current) {
+    public boolean mutate(Unify versioneds, List<Termutator> chain, int current) {
 
         @NotNull Combinations ccc = this.comb;
         ccc.reset();
@@ -98,7 +99,7 @@ public class Choose2 extends Termutator {
                 if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
-                    if (!f.chain(chain, current)) {
+                    if (!f.mutate(chain, current)) {
                         f.revert(start);
                         return false;
                     }

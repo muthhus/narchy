@@ -40,12 +40,14 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 */
 public abstract class Unify extends Termunator implements Subst {
 
-    @NotNull public final Random random;
-
-    @Nullable public final Op type;
-
     @NotNull
-    private final List<Termutator> termutes;
+    public final Random random;
+
+    @Nullable
+    public final Op type;
+
+    @Nullable
+    private List<Termutator> termutes;
 
     @NotNull
     public final Versioning versioning;
@@ -56,8 +58,10 @@ public abstract class Unify extends Termunator implements Subst {
     /**
      * variables whose contents are disallowed to equal each other
      */
-    @NotNull public final Constraints constraints;
-    @NotNull public final VersionMap.Reassigner<Term, Term> reassignerXY;//, reassignerYX;
+    @NotNull
+    public final Constraints constraints;
+    @NotNull
+    public final VersionMap.Reassigner<Term, Term> reassignerXY;//, reassignerYX;
 
     @NotNull
     public final VersionMap<Term, Term> xy;
@@ -68,17 +72,18 @@ public abstract class Unify extends Termunator implements Subst {
         this(index, type, random, new Versioning(stackMax));
     }
 
-    /** call this to invoke the next termutator in the chain */
-    public final boolean chain(Termutator[] chain, int next) {
+    /**
+     * call this to invoke the next termutator in the chain
+     */
+    public final boolean mutate(List<Termutator> chain, int next) {
 
         //increment the version counter by one and detect if the limit exceeded.
         // this is to prevent infinite recursions in which no version incrementing
         // occurrs that would otherwise trigger overflow to interrupt it.
-        return versioning.nextChange() && chain[++next].run(this, chain, next);
-
+        return versioning.nextChange() && chain.get(++next).mutate(this, chain, next);
     }
 
-    protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term,Term> {
+    protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term, Term> {
 
         public Constraints(@NotNull Versioning context, int maxConstr) {
             super(context, new MatchConstraint[maxConstr]);
@@ -100,8 +105,6 @@ public abstract class Unify extends Termunator implements Subst {
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
         super();
-
-        this.termutes = $.newArrayList();
 
         this.index = index;
 
@@ -150,7 +153,7 @@ public abstract class Unify extends Termunator implements Subst {
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
      * of a matching context
-     *
+     * <p>
      * setting finish=false allows matching in pieces before finishing
      */
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
@@ -159,7 +162,21 @@ public abstract class Unify extends Termunator implements Subst {
         boolean result;
         try {
             if (unify(x, y)) {
-                result = finish ? run(this, null, -1) : true;
+
+                if (!finish) {
+                    result = true;
+                } else {
+                    @Nullable List<Termutator> t = termutes;
+                    if (termutes != null) {
+
+                        t.add(this); //call-back
+                        result = mutate(this, t, -2);
+
+                    } else {
+                        result = onMatch();
+                    }
+                }
+
             } else {
                 result = false;
             }
@@ -172,42 +189,26 @@ public abstract class Unify extends Termunator implements Subst {
 
         if (finish) {
             revert(s); //else: allows the set constraints to continue
-            termutes.clear();
+            this.termutes = null;
         }
+
 
         return result;
     }
 
     @Override
-    public final boolean run(@NotNull Unify f, Termutator[] ignored, int ignoredAlwaysNegativeOne) {
-        Termutator[] n = next();
-        if (n != null) {
-            return chain(n, -1); //combinatorial recurse starts here
-        } else {
-            return f.onMatch(); //ends here when termutes exhausted
-        }
+    public final boolean mutate(Unify f, List<Termutator> n, int seq) {
+        if (seq==-2)
+            return f.mutate(n, -1); //start combinatorial recurse
+        else
+            return f.onMatch(); //end combinatorial recurse
     }
 
-    @Nullable
-    private final Termutator[] next() {
-        List<Termutator> t = termutes;
-        int n = t.size();
-        if (n == 0) {
-            return null;
-        } else {
-            Termutator[] tt = t.toArray(new Termutator[n + 1]);
-            t.clear();
-
-            tt[tt.length - 1] = this; //add this as the final termutator (termunator)
-
-            return tt;
-        }
-    }
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
 
-        return  x.equals(y)
+        return x.equals(y)
                 ||
                 x.unify(y, this)
                 ||
@@ -229,9 +230,9 @@ public abstract class Unify extends Termunator implements Subst {
      */
     public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
         Term x2 = xy(x);
-            return (x2 != null) ?
-                    unify(x2, y) :
-                    putVarX(/* (Variable) */ x, y);
+        return (x2 != null) ?
+                unify(x2, y) :
+                putVarX(/* (Variable) */ x, y);
 
     }
 
@@ -281,6 +282,15 @@ public abstract class Unify extends Termunator implements Subst {
 
     public boolean addTermutator(@NotNull Termutator x) {
         List<Termutator> t = this.termutes;
+        if (t == null) {
+            this.termutes = t = $.newArrayList(4);
+        } else if (t.contains(x)) {
+            return true;
+        }
+
+        return t.add(x);
+
+        /*
         int s = t.size();
 
         for (int i = 0; i < s; i++) {
@@ -291,6 +301,7 @@ public abstract class Unify extends Termunator implements Subst {
         }
 
         return t.add(x);
+        */
     }
 
 
@@ -324,15 +335,11 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
-
-
-
-
     /**
      * returns true if the assignment was allowed, false otherwise
      */
     final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        return yx.tryPut(y,x);
+        return yx.tryPut(y, x);
     }
 
     /**
@@ -345,6 +352,7 @@ public abstract class Unify extends Termunator implements Subst {
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         return xy.tryPut(x, y);
     }
+
     public final void setXY(Term x /* usually a Variable */, @NotNull Term y) {
         xy.putConstant(x, y);
     }
@@ -356,11 +364,13 @@ public abstract class Unify extends Termunator implements Subst {
     public final void revert(int then) {
         versioning.revert(then);
     }
+
     public final void pop(int count) {
         versioning.pop(count);
     }
 
-    @NotNull public final Term yxResolve(@NotNull Term y) {
+    @NotNull
+    public final Term yxResolve(@NotNull Term y) {
         Term y1 = yx.get(y);
         return (y1 == null) ? y : y1;
     }

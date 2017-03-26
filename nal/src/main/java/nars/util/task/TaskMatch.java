@@ -9,7 +9,6 @@ import nars.term.util.InvalidTermException;
 import nars.util.SoftException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -42,29 +41,31 @@ abstract public class TaskMatch implements Consumer<Task> {
     }
 
     @Override
-    public void accept(@NotNull Task task) {
+    public void accept(@NotNull Task _x) {
 
-        task = nar.post(task);
+        Task x = nar.post(_x);
 
-        if (test(task)) {
-            Map<Term,Term> result = new HashMap();
-            final int[] matches = {0};
+        if (test(x)) {
             final SubUnify match = new SubUnify(nar.concepts, Op.VAR_PATTERN, nar.random, Param.SubUnificationMatchRetries) {
+
+                int count = 0;
+
                 @Override
                 public boolean onMatch() {
-                    xy.forEachVersioned((x,y)->{ result.put(x,y); return true; }  );
-                    matches[0]++;
-                    return true;
+                    eachMatch(x, xy);
+                    count++;
+                    return false; //only one, but true would allow multiple
                 }
+
             };
 
-            if (match.tryMatch(pattern, task.term()) && matches[0] > 0) {
-                try {
-                    onMatch(task, result);
-                } catch (InvalidTermException | InvalidTaskException e) {
-                    onError(e);
-                }
+            try {
+                match.tryMatch(pattern, x.term());
+            } catch (InvalidTermException | InvalidTaskException e) {
+                onError(e);
             }
+
+
         }
     }
 
@@ -72,5 +73,5 @@ abstract public class TaskMatch implements Consumer<Task> {
         //default: do nothing
     }
 
-    abstract protected void onMatch(Task task, Map<Term, Term> xy);
+    abstract protected void eachMatch(Task task, Map<Term, Term> xy);
 }

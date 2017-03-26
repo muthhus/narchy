@@ -1225,15 +1225,15 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         @Override
-        protected Variable newVariable(@NotNull Variable v, int serial) {
+        protected Variable newVariable(@NotNull Variable x, int serial) {
 
 
             int actualSerial = serial + offset;
 
-            if (v instanceof Ellipsis.EllipsisTransformPrototype) {
+            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
                 //special
 
-                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) v;
+                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) x;
 
 //                Term from = ep.from;
 //                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
@@ -1242,12 +1242,12 @@ public class PremiseRule extends GenericCompound {
 //
                 return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
 
-            } else if (v instanceof Ellipsis.EllipsisPrototype) {
-                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) v;
+            } else if (x instanceof Ellipsis.EllipsisPrototype) {
+                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) x;
                 return Ellipsis.EllipsisPrototype.make(actualSerial +
                                 (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
                         , ep.minArity);
-            } else if (v instanceof Ellipsis) {
+            } else if (x instanceof Ellipsis) {
 
                 throw new UnsupportedOperationException("?");
 //                int idOffset;
@@ -1269,7 +1269,7 @@ public class PremiseRule extends GenericCompound {
             } else {
                 return v(v.op(), actualSerial);
             }*/
-            return super.newVariable(v, actualSerial);
+            return super.newVariable(x, actualSerial);
         }
 
 //        @Override
