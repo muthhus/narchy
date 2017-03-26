@@ -104,7 +104,7 @@ public class SoNAR {
 
     public static void main(String[] args) throws LineUnavailableException, InterruptedException, Narsese.NarseseException {
         Default n = new Default();
-        n.core.conceptsFiredPerCycle.set(5);
+        n.deriver.conceptsFiredPerCycle.set(5);
         n.log();
         n.input("a:b. b:c. c:d. d:e. e:f. f:g. a:g?");
         n.loop(5);

@@ -14,7 +14,6 @@ import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
-import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
@@ -78,7 +77,7 @@ public interface NARBuilder {
 
         int maxConcepts = 96 * 1024;
 
-        int activeConcepts = 512;
+        int activeConcepts = 2048;
 
         Default nar = new Default(activeConcepts,
                 1, 1, 3, rng,
@@ -184,9 +183,9 @@ public interface NARBuilder {
 
         };
 
-        nar.core.conceptsFiredPerCycle.setValue(32);
-        nar.core.conceptsFiredPerBatch.setValue(8);
-        nar.core.derivationsInputPerCycle.setValue(48);
+        nar.deriver.conceptsFiredPerCycle.setValue(32);
+        nar.deriver.conceptsFiredPerBatch.setValue(8);
+        nar.deriver.derivationsInputPerCycle.setValue(48);
 
         nar.termVolumeMax.setValue(96);
 

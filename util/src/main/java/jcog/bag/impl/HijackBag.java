@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -407,7 +406,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         V y = update(key(bb), bb, scale);
 
         if (y != null)
-            range(priSafe(y, 0));
+            startsRange(priSafe(y, 0));
 
         return y;
     }
@@ -418,7 +417,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * this value will be updated for certain during a commit, so this value
      * only improves accuracy between commits.
      */
-    private float range(float p) {
+    private float startsRange(float p) {
         if (p != p)
             throw new RuntimeException("NaN prioritization");
 

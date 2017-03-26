@@ -32,11 +32,12 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final FireConcepts core;
+    public final FireConcepts deriver;
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
     public final PreferSimpleAndConfident derivationBudgeting;
+
     public final ConceptBagFocus focus;
 
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
@@ -78,16 +79,16 @@ public class Default extends NAR {
 
         derivationBudgeting = newDerivationBudgeting();
 
-        core = //exe.concurrent() ?
+        deriver = //exe.concurrent() ?
                 new FireConcepts.BufferedConceptBagFocus(this, newPremiseBuilder())
                 //:
                 //new DefaultConceptBagControl.DirectConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
         ;
 
 
-        core.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
-        core.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        core.conceptsFiredPerCycle.set(conceptsFirePerCycle);
+        deriver.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
+        deriver.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
+        deriver.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
     }
 
