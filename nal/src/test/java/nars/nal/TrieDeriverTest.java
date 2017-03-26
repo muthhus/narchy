@@ -4,7 +4,7 @@ import com.google.common.collect.Sets;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.PatternTermIndex;
 import org.apache.commons.math3.stat.Frequency;
@@ -174,7 +174,7 @@ public class TrieDeriverTest {
 
         assertEquals("no duplicates", registeredRules, setRules.size());
 
-        Set<BoolCondition> preconds = new HashSet();
+        Set<BoolPredicate> preconds = new HashSet();
         int totalPrecond = 0;
 
         out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());

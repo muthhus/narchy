@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;
@@ -34,7 +34,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     @NotNull
     @Override
-    protected BoolCondition build(BoolCondition eachMatch) {
+    protected BoolPredicate build(BoolPredicate eachMatch) {
         return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null);
     }
 

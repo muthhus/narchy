@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public class TrieDeriver implements Deriver {
 
     @NotNull
-    public final BoolCondition[] roots;
+    public final BoolPredicate[] roots;
     public final PremiseRuleSet rules;
 
 
@@ -79,8 +79,8 @@ public class TrieDeriver implements Deriver {
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);
 
-        @NotNull List<BoolCondition> bb = subtree(trie.trie.root);
-        this.roots = bb.toArray(new BoolCondition[bb.size()]);
+        @NotNull List<BoolPredicate> bb = subtree(trie.trie.root);
+        this.roots = bb.toArray(new BoolPredicate[bb.size()]);
 
         for (int i = 0; i < roots.length; i++) {
             roots[i] = build(roots[i]);
@@ -101,8 +101,8 @@ public class TrieDeriver implements Deriver {
     @Override
     public final void accept(@NotNull Derivation d) {
         int now = d.now();
-        for (BoolCondition r : roots) {
-            r.run(d);
+        for (BoolPredicate r : roots) {
+            r.test(d);
             d.revert(now);
         }
     }
@@ -114,13 +114,13 @@ public class TrieDeriver implements Deriver {
     final transient AtomicReference<MatchTermPrototype> matchParent = new AtomicReference<>(null);
 
     @NotNull
-    private List<BoolCondition> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+    private List<BoolPredicate> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
 
-        List<BoolCondition> bb = $.newArrayList(node.childCount());
+        List<BoolPredicate> bb = $.newArrayList(node.childCount());
 
         node.forEach(n -> {
 
-            BoolCondition branch = ifThen(
+            BoolPredicate branch = ifThen(
                     conditions(n.seq().subList(n.start(), n.end()), matchParent),
                     Fork.compile(subtree(n))
             );
@@ -132,7 +132,7 @@ public class TrieDeriver implements Deriver {
         return optimize(bb);
     }
 
-    protected static List<BoolCondition> optimize(List<BoolCondition> bb) {
+    protected static List<BoolPredicate> optimize(List<BoolPredicate> bb) {
 
         bb = factorSubOpToSwitch(bb, 0, 2);
         bb = factorSubOpToSwitch(bb, 1, 2);
@@ -141,13 +141,13 @@ public class TrieDeriver implements Deriver {
     }
 
     @NotNull
-    private static List<BoolCondition> factorSubOpToSwitch(@NotNull List<BoolCondition> bb, int subterm, int minToCreateSwitch) {
-        Map<PatternOp, BoolCondition> cases = $.newHashMap(8);
-        List<BoolCondition> removed = $.newArrayList(); //in order to undo
+    private static List<BoolPredicate> factorSubOpToSwitch(@NotNull List<BoolPredicate> bb, int subterm, int minToCreateSwitch) {
+        Map<PatternOp, BoolPredicate> cases = $.newHashMap(8);
+        List<BoolPredicate> removed = $.newArrayList(); //in order to undo
         bb.removeIf(p -> {
             if (p instanceof AndCondition) {
                 AndCondition ac = (AndCondition) p;
-                if (ac.or(x -> {
+                if (ac.OR(x -> {
                     if (x instanceof PatternOp) {
                         PatternOp so = (PatternOp) x;
                         if (so.subterm == subterm) {
@@ -181,7 +181,7 @@ public class TrieDeriver implements Deriver {
     public void print(@NotNull PrintStream out) {
         out.println("Fork {");
 
-        for (BoolCondition p : roots)
+        for (BoolPredicate p : roots)
             print(p, out, 2);
 
         out.println("}");
@@ -190,31 +190,31 @@ public class TrieDeriver implements Deriver {
     /**
      * final processing step before finalized usable form
      */
-    private static BoolCondition build(BoolCondition p) {
+    private static BoolPredicate build(BoolPredicate p) {
         /*if (p instanceof IfThen) {
             IfThen it = (IfThen) p;
             return new IfThen(build(it.cond), build(it.conseq) ); //HACK wasteful
         } else */
         if (p instanceof AndCondition) {
             AndCondition ac = (AndCondition) p;
-            BoolCondition[] termCache = ac.termCache;
+            BoolPredicate[] termCache = ac.termCache;
             for (int i = 0; i < termCache.length; i++) {
-                BoolCondition b = termCache[i];
+                BoolPredicate b = termCache[i];
                 termCache[i] = build(b);
             }
         } else if (p instanceof Fork) {
             Fork ac = (Fork) p;
-            BoolCondition[] termCache = ac.termCache;
+            BoolPredicate[] termCache = ac.termCache;
             for (int i = 0; i < termCache.length; i++) {
-                BoolCondition b = termCache[i];
+                BoolPredicate b = termCache[i];
                 termCache[i] = build(b);
             }
 
         } else if (p instanceof PatternOpSwitch) {
             PatternOpSwitch sw = (PatternOpSwitch) p;
-            BoolCondition[] proc = sw.proc;
+            BoolPredicate[] proc = sw.proc;
             for (int i = 0; i < proc.length; i++) {
-                BoolCondition b = proc[i];
+                BoolPredicate b = proc[i];
                 if (b != null)
                     proc[i] = build(b);
                 //else {
@@ -315,7 +315,7 @@ public class TrieDeriver implements Deriver {
             TermTrie.indent(indent);
             out.println("and {");
             AndCondition ac = (AndCondition) p;
-            for (BoolCondition b : ac.termCache) {
+            for (BoolPredicate b : ac.termCache) {
                 print(b, out, indent + 2);
             }
             TermTrie.indent(indent);
@@ -324,7 +324,7 @@ public class TrieDeriver implements Deriver {
             TermTrie.indent(indent);
             out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
-            for (BoolCondition b : ac.termCache) {
+            for (BoolPredicate b : ac.termCache) {
                 print(b, out, indent + 2);
             }
             TermTrie.indent(indent);
@@ -335,7 +335,7 @@ public class TrieDeriver implements Deriver {
             TermTrie.indent(indent);
             out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
-            for (BoolCondition b : sw.proc) {
+            for (BoolPredicate b : sw.proc) {
                 i++;
                 if (b == null) continue;
 
@@ -363,7 +363,7 @@ public class TrieDeriver implements Deriver {
 
 
     @NotNull
-    private static List<BoolCondition> conditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTermPrototype> matchParent) {
+    private static List<BoolPredicate> conditions(@NotNull Collection<Term> t, @NotNull AtomicReference<MatchTermPrototype> matchParent) {
 
         return t.stream().filter(x -> {
             if (x instanceof Conclude) {
@@ -380,14 +380,14 @@ public class TrieDeriver implements Deriver {
                     //derivationLinks.put(mt, dx);
                 }
                 return false;
-            } else if (x instanceof BoolCondition) {
+            } else if (x instanceof BoolPredicate) {
                 if (x instanceof MatchTermPrototype) {
                     matchParent.set((MatchTermPrototype) x);
                 }
                 //return true;
             }
             return true;
-        }).map(x -> (BoolCondition) x).collect(Collectors.toList());
+        }).map(x -> (BoolPredicate) x).collect(Collectors.toList());
     }
 
 
@@ -407,7 +407,7 @@ public class TrieDeriver implements Deriver {
 
 
     @Nullable
-    public static BoolCondition ifThen(@NotNull List<BoolCondition> cond, @Nullable BoolCondition conseq) {
+    public static BoolPredicate ifThen(@NotNull List<BoolPredicate> cond, @Nullable BoolPredicate conseq) {
 //
 //        BoolCondition cc = AndCondition.the(cond);
 //
@@ -415,7 +415,7 @@ public class TrieDeriver implements Deriver {
 
 
         //return conseq == null ? cc : new IfThen(cc, conseq);
-        List<BoolCondition> ccc = $.newArrayList(conseq != null ? conseq.size() : 0 + 1);
+        List<BoolPredicate> ccc = $.newArrayList(conseq != null ? conseq.size() : 0 + 1);
         ccc.addAll(cond);
         if (conseq != null)
             ccc.add(conseq);

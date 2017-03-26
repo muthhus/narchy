@@ -21,13 +21,13 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 
     //protected long now;
     final AtomicBoolean busy = new AtomicBoolean(false);
-    private final @NotNull Bag<X, PLink<X>> bag;
+    private final @NotNull Iterable<PLink<X>> input;
 
     public static void main(String[] args) {
         Default d = new Default(1024,50,2,2);
         d.input("(a --> b). (b --> c).  (c --> d).  (d-->e)! :|: ");
 
-        BagChart<Concept> tc = new Vis.ConceptBagChart(d.core.active, 1024, d);
+        BagChart<Concept> tc = new Vis.ConceptBagChart(d.focus(), 1024, d);
 
 
         SpaceGraph.window(tc, 800, 600);
@@ -38,7 +38,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 
     public void update() {
         if (busy.compareAndSet(false, true)) {
-            update(1f, 1f, bag, this, i -> {
+            update(1f, 1f, input, this, i -> {
                 @Nullable X ii = i.get();
                 return ii != null ? newItem(i) : null;
             });
@@ -56,9 +56,9 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Bag<X,PLink<X>> b, int limit) {
+    public BagChart(@NotNull Iterable<PLink<X>> b, int limit) {
         super();
-        this.bag = b;
+        this.input = b;
         this.limit = limit;
         update();
     }

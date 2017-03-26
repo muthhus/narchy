@@ -18,7 +18,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

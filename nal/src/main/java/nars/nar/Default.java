@@ -7,7 +7,8 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.DefaultConceptBagControl;
+import nars.control.ConceptBagFocus;
+import nars.control.FireConcepts;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.index.term.TermIndex;
@@ -31,11 +32,12 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final DefaultConceptBagControl core;
+    public final FireConcepts core;
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
     public final PreferSimpleAndConfident derivationBudgeting;
+    public final ConceptBagFocus focus;
 
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
 
@@ -70,20 +72,23 @@ public class Default extends NAR {
     public Default(int activeConcepts, int conceptsFirePerCycle, int taskLinksPerConcept, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
+        ConceptBagFocus f = new ConceptBagFocus(this, newConceptBag(activeConcepts));
+        this.focus = f;
+        setFocus(f);
+
         derivationBudgeting = newDerivationBudgeting();
 
         core = //exe.concurrent() ?
-                new DefaultConceptBagControl.BufferedConceptBagControl(this, newConceptBag(activeConcepts), newPremiseBuilder())
+                new FireConcepts.BufferedConceptBagFocus(this, newPremiseBuilder())
                 //:
                 //new DefaultConceptBagControl.DirectConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
         ;
 
-        core.active.capacity(activeConcepts);
+
         core.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
         core.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
         core.conceptsFiredPerCycle.set(conceptsFirePerCycle);
 
-        setControl(this.core);
     }
 
     public Deriver newDeriver() {

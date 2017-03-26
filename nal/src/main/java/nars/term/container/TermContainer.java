@@ -167,7 +167,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      */
     @Override
     default boolean containsTerm(@NotNull Termlike t) {
-        return !impossibleSubTerm(t) && or(t::equals);
+        return !impossibleSubTerm(t) && OR(t::equals);
     }
 
     default boolean containsTermRecursively(@NotNull Term b) {
@@ -517,7 +517,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * @param p
      */
     @Override
-    default boolean or(@NotNull Predicate<Term> p) {
+    default boolean OR(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
             if (p.test(term(i)))
@@ -532,7 +532,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * @param p
      */
     @Override
-    default boolean and(@NotNull Predicate<Term> p) {
+    default boolean AND(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
             if (!p.test(term(i))) {

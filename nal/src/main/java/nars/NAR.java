@@ -38,7 +38,7 @@ import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -85,7 +85,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control, Cycles<NAR> {
+public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, Cycles<NAR> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
@@ -109,7 +109,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     public final TermIndex concepts;
 
 
-    private Control control = Control.NullControl;
+    private Focus focus = Focus.NULL_FOCUS;
 
 
     @NotNull
@@ -273,8 +273,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     }
 
 
-    public void setControl(Control control) {
-        this.control = control;
+    public void setFocus(Focus focus) {
+        this.focus = focus;
     }
 
 
@@ -1480,16 +1480,16 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
     @Override
     public void activate(Concept c, float priToAdd) {
         if (priToAdd > Param.BUDGET_EPSILON)
-            control.activate(c, priToAdd);
+            focus.activate(c, priToAdd);
     }
 
     @Override
     public float pri(@NotNull Termed termed) {
-        return control.pri(termed);
+        return focus.pri(termed);
     }
 
     public Iterable<PLink<Concept>> conceptsActive() {
-        return control.conceptsActive();
+        return focus.conceptsActive();
     }
 
 
@@ -1665,13 +1665,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Control
         return self;
     }
 
-    public Control getControl() {
-        return control;
+    public Focus focus() {
+        return focus;
     }
 
     public final On onReset(Consumer<NAR> o) {
         return eventReset.on(o);
     }
 
+    @Override
+    public void sample(int max, Predicate<? super PLink<Concept>> c) {
+        focus.sample(max, c);
+    }
 
 }

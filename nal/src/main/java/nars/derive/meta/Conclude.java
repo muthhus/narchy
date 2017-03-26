@@ -17,7 +17,7 @@ import nars.term.util.InvalidTermException;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -34,7 +34,7 @@ import static nars.time.Tense.XTERNAL;
  * <p>
  * Each rule corresponds to a unique instance of this
  */
-public final class Conclude extends AtomicStringConstant implements BoolCondition {
+public final class Conclude extends AtomicStringConstant implements BoolPredicate<Derivation> {
 
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
@@ -99,7 +99,7 @@ public final class Conclude extends AtomicStringConstant implements BoolConditio
      * false to stop it
      */
     @Override
-    public final boolean run(@NotNull Derivation m) {
+    public final boolean test(@NotNull Derivation m) {
 
         NAR nar = m.nar;
 

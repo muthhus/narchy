@@ -9,7 +9,7 @@ import nars.term.atom.Atomic;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.truth.Truth;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

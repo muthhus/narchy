@@ -5,7 +5,7 @@ import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
-import nars.Control;
+import nars.Focus;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.premise.MatrixPremiseBuilder;
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * The default deterministic memory cycle implementation that is currently used as a standard
@@ -24,15 +25,15 @@ import java.util.function.Consumer;
  *
  * multithreading granularity at the concept (outermost loop)
  */
-public abstract class ConceptBagControl implements Control, Consumer<DerivedTask> {
+public class ConceptBagFocus implements Focus {
 
-    static final Logger logger = LoggerFactory.getLogger(ConceptBagControl.class);
+    static final Logger logger = LoggerFactory.getLogger(ConceptBagFocus.class);
 
-    final MatrixPremiseBuilder premiser;
-
-//    /** this will be scaled by the input priority factor for each concept */
-//    public static final ROBudget insertionBudget = new ROBudget(1f, 0.5f);
-
+    /**
+     * distinct from the NAR's
+     */
+    public final FloatParam activationRate = new FloatParam(1f);
+    protected float currentActivationRate = 1f;
 
     /**
      * concepts active in this cycle
@@ -43,23 +44,11 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
     @Deprecated
     public final transient @NotNull NAR nar;
 
-    /** distinct from the NAR's */
-    public final FloatParam activationRate = new FloatParam(1f);
-
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
-    protected float currentActivationRate = 1f;
-
-
-
-    //public final HitMissMeter meter = new HitMissMeter(ConceptBagControl.class.getSimpleName());
-
-
-    public ConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+    public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag) {
 
         this.nar = nar;
-
-        this.premiser = premiseBuilder;
 
         this.active = conceptBag;
 
@@ -74,14 +63,7 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
 
             } else {
                 active.commit();
-
-                try {
-                    cycle();
-                } catch (Exception e) {
-                    logger.error("cycle {}", e);
-                }
             }
-
 
         });
 
@@ -90,8 +72,6 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
         });
 
     }
-
-    protected abstract void cycle();
 
     //    /** called when a concept is displaced from the concept bag */
 //    protected void sleep(@NotNull Concept c) {
@@ -122,33 +102,13 @@ public abstract class ConceptBagControl implements Control, Consumer<DerivedTask
         return active;
     }
 
-
-    public class PremiseMatrix implements Consumer<NAR> {
-        private final int _tasklinks;
-        private final int batchSize;
-        private final MutableIntRange _termlinks;
-
-        public PremiseMatrix(int batchSize, int _tasklinks, MutableIntRange _termlinks) {
-            this.batchSize = batchSize;
-            this._tasklinks = _tasklinks;
-            this._termlinks = _termlinks;
-        }
-
-        @Override
-        public void accept(NAR nar) {
-            active.sample(batchSize, c -> {
-                premiser.newPremiseMatrix(c.get(),
-                        _tasklinks, _termlinks,
-                        ConceptBagControl.this, //input them within the current thread here
-                        nar
-                );
-                return true;
-            });
-        }
-
+    @Override
+    public void sample(int max, Predicate<? super PLink<Concept>> c) {
+        active.sample(max, c);
     }
 
-//    static final class BudgetSavings extends RawBudget {
+
+    //    static final class BudgetSavings extends RawBudget {
 //        public final long savedAt;
 //
 //        public BudgetSavings(@NotNull Budget value, long savedAt) {

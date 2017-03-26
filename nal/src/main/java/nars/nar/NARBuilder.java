@@ -76,9 +76,9 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 192 * 1024;
+        int maxConcepts = 96 * 1024;
 
-        int activeConcepts = 256;
+        int activeConcepts = 512;
 
         Default nar = new Default(activeConcepts,
                 1, 1, 3, rng,
@@ -141,10 +141,10 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 10;
+            final static int COMPRESS_ABOVE_COMPLEXITY = 32;
             final Compressor compressor = new Compressor(this, "_",
-                    8, 16,
-                    2f, 64, 32);
+                    12, 20,
+                    1f, 64, 16);
 
             @Override
             public Task pre(@NotNull Task t) {
@@ -202,7 +202,6 @@ public interface NARBuilder {
         //nar.stmLinkage.capacity.set(0);
 
         //nar.activationRate.setValue(0.5f);
-        nar.quaMin.setValue(0.01f);
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
 

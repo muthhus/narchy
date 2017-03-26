@@ -1,14 +1,15 @@
-package nars.util.task;
+package nars.task.util;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
+import nars.term.subst.SubUnify;
 import nars.term.transform.VariableNormalization;
+import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,7 @@ import static nars.term.Terms.compoundOrNull;
 /**
  * matches a belief pattern and creates an identity result
  */
-public class TaskRule extends TaskMatch{
+public class TaskRule extends TaskMatch {
 
     static final Logger logger = LoggerFactory.getLogger(TaskRule.class);
 
@@ -32,8 +33,13 @@ public class TaskRule extends TaskMatch{
     /** mapping of input variables to normalized variables */
     private final Map<Variable, Variable> io;
 
+    private final Term input;
+    private final Compound id;
+
     public TaskRule(String input, String output, NAR nar) throws Narsese.NarseseException {
-        super(input, nar);
+        super(nar);
+
+        this.input = $.$(input);
         this.outputRaw = (Compound) nar.concepts.parseRaw(output);
 
         VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */);
@@ -43,10 +49,62 @@ public class TaskRule extends TaskMatch{
             throw new RuntimeException("output pattern is not compound");
 
         this.io = varNorm.map;
+        this.id = $.impl($.p(this.input, outputRaw, this.output), $.varQuery(0));
+
+//        setTerm(new TermMatch(input) {
+//
+//            @Override
+//            public boolean test(Term p) {
+//
+//                return true;
+//            }
+//        });
+
+    }
+
+    private class MySubUnify extends SubUnify {
+
+        private final Task x;
+
+        public MySubUnify(Task x) {
+            super(TaskRule.this.nar.concepts, Op.VAR_PATTERN, TaskRule.this.nar.random, Param.SubUnificationMatchRetries);
+            this.x = x;
+        }
+
+        @Override
+        public boolean onMatch() {
+            accept(x, xy);
+            return true;
+        }
+
     }
 
     @Override
-    protected void eachMatch(Task X, Map<Term, Term> xy) {
+    public boolean test(Task x) {
+        if (super.test(x)) {
+
+            final SubUnify match = new MySubUnify(x);
+
+            try {
+                match.tryMatch(input, x.term());
+            } catch (InvalidTermException | InvalidTaskException e) {
+                onError(e);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return id.toString();
+    }
+
+    @Override
+    protected void accept(Task X, Map<Term, Term> xy) {
 
         Compound y = compoundOrNull(nar.concepts.transform(output, new MapSubst(xy)));
         if (y==null) return;

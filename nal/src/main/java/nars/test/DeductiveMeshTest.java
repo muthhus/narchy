@@ -106,11 +106,11 @@ public class DeductiveMeshTest {
         n.logBudgetMin(System.out, 0.1f);
 
 
-        n.onCycle(x -> {
-            if (n.time() == 1000) {
-                System.out.println(Arrays.toString(n.core.active.priHistogram(new double[10])));
-            }
-        });
+//        n.onCycle(x -> {
+//            if (n.time() == 1000) {
+//                System.out.println(Arrays.toString(n.core.active.priHistogram(new double[10])));
+//            }
+//        });
 
         test(n, new int[] { 3, 3 }, 2500);
 
@@ -149,9 +149,7 @@ public class DeductiveMeshTest {
         //n.stdout();
         //n.frame(5000);
 
-        int nc = ((Default) n).core.active.size();
-        String ts = timestamp(start);
-        long time = n.time();
+
 
         //n.stdout();
         //n.frame(55); //to print the ending

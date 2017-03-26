@@ -12,7 +12,7 @@ import static nars.Op.*;
 /**
  * Evaluates the truth of a premise
  */
-abstract public class Solve extends AtomicBoolCondition {
+abstract public class Solve extends AtomicPredicate<Derivation> {
 
     private final transient String id;
 

@@ -1,14 +1,14 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * requires both subterms to match a minimum bit structure
  */
-public final class SubTermsStructure extends AtomicBoolCondition {
+public final class SubTermsStructure extends AtomicPredicate<Derivation> {
 
     public final int bits;
     @NotNull
@@ -35,7 +35,7 @@ public final class SubTermsStructure extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation ff) {
+    public boolean test(@NotNull Derivation ff) {
         /*Compound t = ff.term;
         return !t.term(subterm).impossibleStructureMatch(bits);*/
         //if the OR produces a different result compared to subterms,

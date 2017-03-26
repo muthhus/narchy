@@ -598,8 +598,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Deprecated
     public Bag<K, V> commit() {
         float p = this.pressure;
-        pressure = 0;
-        commit(Bag.forget( size(), p, mass, temperature(), priEpsilon(), this::forget));
+        if (p > 0) {
+            pressure = 0;
+            return commit(Bag.forget(size(), p, mass, temperature(), priEpsilon(), this::forget));
+        }
         return this;
     }
 

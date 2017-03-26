@@ -9,7 +9,7 @@ import nars.budget.RawBudget;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

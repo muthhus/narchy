@@ -1,14 +1,14 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/27/15.
  */
-final public class TaskPunctuation extends AtomicBoolCondition {
+final public class TaskPunctuation extends AtomicPredicate<Derivation> {
 
     public final byte punc;
     public final String id;
@@ -17,28 +17,37 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     public static final TaskPunctuation Belief = new TaskPunctuation('.');
     public static final TaskPunctuation Goal = new TaskPunctuation('!');
 
-    public static final AtomicBoolCondition QuestionOrQuest = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o) {
+    public static final AtomicPredicate<Derivation> QuestionOrQuest = new AtomicPredicate<>() {
+        @Override
+        public boolean test(@NotNull Derivation o) {
             byte c = o.taskPunct;
             return c == Op.QUESTION || c == Op.QUEST;
         }
-        @Override public String toString() {
+
+        @Override
+        public String toString() {
             return "task:\"?@\"";
         }
     };
-    public static final AtomicBoolCondition Question = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o) {
+    public static final AtomicPredicate<Derivation> Question = new AtomicPredicate<>() {
+        @Override
+        public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUESTION;
         }
-        @Override public String toString() {
+
+        @Override
+        public String toString() {
             return "task:\"?\"";
         }
     };
-    public static final AtomicBoolCondition Quest = new AtomicBoolCondition() {
-        @Override public boolean run(@NotNull Derivation o) {
+    public static final AtomicPredicate<Derivation> Quest = new AtomicPredicate<>() {
+        @Override
+        public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUEST;
         }
-        @Override public String toString() {
+
+        @Override
+        public String toString() {
             return "task:\"@\"";
         }
     };
@@ -50,13 +59,18 @@ final public class TaskPunctuation extends AtomicBoolCondition {
 //        }
 //        @Override public String toString() { return "task:\".\""; }
 //    };
-    public static final AtomicBoolCondition NotQuestion = new AtomicBoolCondition()  {
-        @Override public boolean run(@NotNull Derivation o) {
-            byte p = o.taskPunct;
-            return (p != Op.QUESTION && p!= Op.QUEST);
-        }
-        @Override public String toString() { return "task:\".!\""; }
-    };
+    public static final AtomicPredicate<Derivation> NotQuestion = new AtomicPredicate<>() {
+    @Override
+    public boolean test(@NotNull Derivation o) {
+        byte p = o.taskPunct;
+        return (p != Op.QUESTION && p != Op.QUEST);
+    }
+
+    @Override
+    public String toString() {
+        return "task:\".!\"";
+    }
+};
 //    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
 //        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.BELIEF);
@@ -82,7 +96,7 @@ final public class TaskPunctuation extends AtomicBoolCondition {
     }
 
     @Override
-    public final boolean run(@NotNull Derivation m) {
+    public final boolean test(@NotNull Derivation m) {
         return m.taskPunct == punc;
     }
 

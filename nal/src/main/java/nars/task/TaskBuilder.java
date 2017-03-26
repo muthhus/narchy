@@ -11,7 +11,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

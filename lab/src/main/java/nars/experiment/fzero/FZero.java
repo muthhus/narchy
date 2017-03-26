@@ -6,7 +6,7 @@ import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
-import nars.util.task.TaskRule;
+import nars.task.util.TaskRule;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;

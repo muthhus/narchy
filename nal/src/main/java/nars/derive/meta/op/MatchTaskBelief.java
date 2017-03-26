@@ -5,8 +5,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.primitives.Bytes;
 import nars.$;
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.constraint.AndConstraint;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
@@ -29,7 +29,7 @@ import static org.eclipse.collections.impl.factory.Maps.immutable;
 
 
 @Deprecated
-public class MatchTaskBelief extends AtomicBoolCondition {
+public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
 
     @NotNull
@@ -55,13 +55,13 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         this.id = getClass().getSimpleName() + '(' + taskPattern + ',' + beliefPattern + ')';
 
 
-        List<BoolCondition> pre = $.newArrayList();
-        List<BoolCondition> code = $.newArrayList();
+        List<BoolPredicate> pre = $.newArrayList();
+        List<BoolPredicate> code = $.newArrayList();
 
         compile(taskPattern, beliefPattern, pre, code, index, constraints);
 
-        this.pre = pre.toArray(new BoolCondition[pre.size()]);
-        this.procedure = code.toArray(new BoolCondition[code.size()]);
+        this.pre = pre.toArray(new BoolPredicate[pre.size()]);
+        this.procedure = code.toArray(new BoolPredicate[code.size()]);
 
 
         //Term beliefPattern = pattern.term(1);
@@ -89,7 +89,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     @Override
-    public boolean run(Derivation m) {
+    public boolean test(Derivation m) {
         throw new RuntimeException("this should not be called");
     }
 
@@ -101,10 +101,10 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
-                                @NotNull List<BoolCondition> pre, @NotNull List<BoolCondition> code,
+                                @NotNull List<BoolPredicate> pre, @NotNull List<BoolPredicate> code,
                                 @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
-        BoolCondition preGuard = null;
+        BoolPredicate preGuard = null;
 
         //check for any self similarity
         if (task.equals(belief)) {
@@ -150,8 +150,8 @@ public class MatchTaskBelief extends AtomicBoolCondition {
 
     }
 
-    private static void compileTaskBelief(@NotNull List<BoolCondition> pre,
-                                          @NotNull List<BoolCondition> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+    private static void compileTaskBelief(@NotNull List<BoolPredicate> pre,
+                                          @NotNull List<BoolPredicate> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -296,7 +296,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
      * this would in theory be more efficient than performing a complete match for the redundancies
      * which we can determine as a precondition of the particular task/belief pair
      * before even beginning the match. */
-    static final class ComponentCondition extends AtomicBoolCondition {
+    static final class ComponentCondition extends AtomicPredicate<Derivation> {
 
         @NotNull
         private final String id;
@@ -314,7 +314,7 @@ public class MatchTaskBelief extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
 
 
             Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;

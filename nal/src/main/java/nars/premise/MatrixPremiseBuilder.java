@@ -56,8 +56,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
     public int newPremiseMatrix(@NotNull Concept c, int tasklinks, @NotNull MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
 
-        @NotNull Bag<Task,BLink<Task>> tasklinkBag = c.tasklinks();
-        @NotNull Bag<Term,BLink<Term>> termlinkBag = c.termlinks();
+        @NotNull Bag<Task, BLink<Task>> tasklinkBag = c.tasklinks();
+        @NotNull Bag<Term, BLink<Term>> termlinkBag = c.termlinks();
 
         tasklinkBag.commit();
         termlinkBag.commit();
@@ -67,16 +67,27 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         FasterList<BLink<Task>> tasksBuffer = (FasterList) $.newArrayList(tasklinksSampled);
         tasklinkBag.sample(tasklinksSampled, tasksBuffer::add);
 
-        int tasksBufferSize = tasksBuffer.size();
-        if (tasksBufferSize > 0) {
+        int numTaskLinks = tasksBuffer.size();
+        if (numTaskLinks > 0) {
 
             int termlinksSampled = (int) Math.ceil(termlinks.hi());
 
             FasterList<BLink<Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
             termlinkBag.sample(termlinksSampled, termsBuffer::add);
 
-            if (!termsBuffer.isEmpty())
-                return newPremiseMatrix(c, termlinks, target, tasksBuffer, termsBuffer, nar);
+            //if (!termsBuffer.isEmpty()) {
+
+            int countPerTasklink = 0;
+
+            //random starting position
+            int il = nar.random.nextInt(numTaskLinks);
+
+            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
+
+                BLink<Task> taskLink = tasksBuffer.get(il % numTaskLinks);
+
+                return newPremiseVector(c, taskLink, termlinks, target, termsBuffer, nar);
+            }
         } else {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} has zero tasklinks", c);
@@ -89,13 +100,9 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
      */
-    public int newPremiseMatrix(@NotNull Concept c, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<BLink<Task>> taskLinks, FasterList<BLink<Term>> termLinks, @NotNull NAR nar) {
+    public int newPremiseVector(@NotNull Concept c, BLink<Task> taskLink, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<BLink<Term>> termLinks, @NotNull NAR nar) {
 
         int count = 0;
-
-        int numTaskLinks = taskLinks.size();
-
-
 
 
         int termsBufferSize = termLinks.size();
@@ -104,79 +111,65 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
             //current termlink counter, as it cycles through what has been sampled, give it a random starting position
             int jl = nar.random.nextInt(termsBufferSize);
 
-            //random starting position
-            int il = nar.random.nextInt(numTaskLinks);
-
-            int countPerTasklink = 0;
 
             long now = nar.time();
 
-            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
 
-                BLink<Task> taskLink = taskLinks.get(il % numTaskLinks);
+            int termlinksPerForThisTask = termlinks.lerp(taskLink.priSafe(0));
 
-                int countPerTermlink = 0;
+            //if (Param.PREMISE_LOG)
+            //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
 
-                int termlinksPerForThisTask = termlinks.lerp(taskLink.priSafe(0));
+            //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
+            //            return null;
 
-                //if (Param.PREMISE_LOG)
-                //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
-
-                //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
-                //            return null;
-
-                Budget taskLinkCopy = taskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
-                if (taskLinkCopy == null) //deleted
-                    continue;
+            Budget taskLinkCopy = taskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
+            if (taskLinkCopy == null) //deleted
+                return 0;
 
 
-                Task task = (taskLink.get());
+            Task task = (taskLink.get());
 
-                long when;
-                long start = task.start();;
-                if (start == ETERNAL) {
+            long when;
+            long start = task.start();
 
-                    when = task.isGoal() ? now : ETERNAL;
+            if (start == ETERNAL) {
 
+                when = task.isGoal() ? now : ETERNAL;
+
+            } else {
+                //USE TASK's OCCURENCE find closest end-point to now
+                long end = task.end();
+                if ((now >= start) && (now <= end)) {
+                    when = now; //inner
                 } else {
-                    //USE TASK's OCCURENCE find closest end-point to now
-                    long end = task.end();
-                    if ((now >= start) && (now <= end)) {
-                        when = now; //inner
+                    if (Math.abs(now - start) <= Math.abs(now - end)) {
+                        when = start;
                     } else {
-                        if (Math.abs(now - start) <= Math.abs(now - end)) {
-                            when = start;
-                        } else {
-                            when = end;
-                        }
+                        when = end;
                     }
                 }
-
-                for (int j = 0; j < termsBufferSize && countPerTermlink < termlinksPerForThisTask; j++, jl++) {
-
-
-                    Derivation d = premise(c, task, taskLinkCopy, when, termLinks.get(jl % termsBufferSize).get(), now, nar, 1f, -1f, target);
-                    if (d != null) {
-                        deriver.accept(d);
-                        countPerTermlink++;
-                    }
-
-                }
-
-                countPerTasklink += countPerTermlink > 0 ? 1 : 0;
-
             }
 
-            count += countPerTasklink;
+            for (int j = 0; j < termsBufferSize && count < termlinksPerForThisTask; j++, jl++) {
 
+
+                Derivation d = premise(c, task, taskLinkCopy, when, termLinks.get(jl % termsBufferSize).get(), now, nar, -1f, target);
+                if (d != null) {
+                    deriver.accept(d);
+                    count++;
+                }
+
+            }
         } else {
             if (Param.DEBUG_EXTRA)
                 logger.warn("{} has zero termlinks", c);
         }
-
-
         return count;
     }
+
+
+
 
 }
 

@@ -406,8 +406,10 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     @Deprecated
     public Bag<X, BLink<X>> commit() {
         float p = this.pressure;
-        this.pressure = 0;
-        commit(Forget.forget(size(), p, mass, Forget::new));
+        if (p > 0) {
+            this.pressure = 0;
+            return commit(Forget.forget(size(), p, mass, Forget::new));
+        }
         return this;
     }
 

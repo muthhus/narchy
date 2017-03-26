@@ -187,8 +187,18 @@ public abstract class Param  {
     /**
      * budget quality threshold necessary to form tasks
      */
-    public final FloatParam quaMin = new FloatParam(Param.BUDGET_EPSILON, 0, 1f);
+    public final FloatParam quaMin = new FloatParam(0, 0, 1f);
 
+
+    /**
+     * controls the speed (0..+1.0) of budget propagating from compound
+     * terms to their subterms by adjusting the proportion of priority
+     * retained by a compound vs. its subterms during an activation
+
+     * values of 0 means all budget is transferred to subterms,
+     * values of 1 means no budget is transferred
+     */
+    public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
     public float confidenceDefault(byte punctuation) {
 

@@ -377,12 +377,30 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //    }
 
 
-
     @NotNull
     default double[] priHistogram(@NotNull double[] x) {
         int bins = x.length;
         forEach(budget -> {
             float p = priSafe(budget, 0);
+            int b = Util.bin(p, bins - 1);
+            x[b]++;
+        });
+        double total = 0;
+        for (double e : x) {
+            total += e;
+        }
+        if (total > 0) {
+            for (int i = 0; i < bins; i++)
+                x[i] /= total;
+        }
+        return x;
+    }
+
+    @NotNull
+    public static double[] priHistogram(Iterable<PLink> pp, @NotNull double[] x) {
+        int bins = x.length;
+        pp.forEach(y -> {
+            float p = y.priSafe(0);
             int b = Util.bin(p, bins - 1);
             x[b]++;
         });

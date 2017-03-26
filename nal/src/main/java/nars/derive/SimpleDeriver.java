@@ -1,7 +1,7 @@
 package nars.derive;
 
 import nars.$;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.PostCondition;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -40,10 +40,10 @@ public class SimpleDeriver implements Deriver {
         for (List<Term> r : unrolled) {
             for (Term p : r) {
 
-                if (p instanceof BoolCondition) {
+                if (p instanceof BoolPredicate) {
 
                     try {
-                        if (!((BoolCondition) p).run(m))
+                        if (!((BoolPredicate) p).test(m))
                             break;
 
                     } catch (Exception e) {

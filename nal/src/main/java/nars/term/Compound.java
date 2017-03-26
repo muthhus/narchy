@@ -655,7 +655,7 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean hasTemporal() {
         if (hasAny(Op.TemporalBits)) {
             int dt = dt();
-            return ((dt != DTERNAL) && isAny(Op.TemporalBits)) || or(Term::hasTemporal);
+            return ((dt != DTERNAL) && isAny(Op.TemporalBits)) || OR(Term::hasTemporal);
         }
         return false;
     }

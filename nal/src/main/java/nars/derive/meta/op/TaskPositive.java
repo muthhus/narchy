@@ -1,17 +1,17 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /** task truth is postiive */
-public class TaskPositive extends AtomicBoolCondition {
+public class TaskPositive extends AtomicPredicate<Derivation> {
 
     public static final TaskPositive the = new TaskPositive();
 
     @Override
-    public boolean run(@NotNull Derivation m) {
+    public boolean test(@NotNull Derivation m) {
         Truth t = m.premise.task.truth();
         return (t!=null && t.freq() >= 0.5f);
     }

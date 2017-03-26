@@ -24,8 +24,9 @@ import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 public abstract class JoglSpace implements GLEventListener, WindowListener {
 
-    final static int FPS_IDEAL = 25;
-    public static final int FPS_MIN = 5;
+    final static int FPS_IDEAL = 30;
+    public static final int FPS_MIN = 20; //min acceptable FPS
+
     protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL );
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);

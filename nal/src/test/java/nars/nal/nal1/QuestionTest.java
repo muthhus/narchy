@@ -8,14 +8,12 @@ import nars.term.Term;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
-import nars.util.task.OperationTaskMatch;
-import nars.util.task.TaskMatch;
-import nars.util.task.TaskStatistics;
+import nars.task.util.TaskMatch;
+import nars.task.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.DoubleSummaryStatistics;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -89,51 +87,51 @@ public class QuestionTest {
     }
 
 
-    @Test public void testQuestionHandler() throws Narsese.NarseseException {
-        NAR nar = new Terminal();
+//    @Test public void testQuestionHandler() throws Narsese.NarseseException {
+//        NAR nar = new Terminal();
+//
+//        final int[] s = {0};
+//        new TaskMatch("add(%1, %2, #x)", nar) {
+//
+//            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
+//
+//            @Override
+//            protected void accept(Task task, Map<Term, Term> xy) {
+//                System.out.println(task + " " + xy);
+//                s[0] = xy.size();
+//            }
+//        };
+//
+//        nar.ask($.$("add(1, 2, #x)"));
+//
+//        assertEquals(3, s[0]);
+//
+//    }
 
-        final int[] s = {0};
-        new TaskMatch("add(%1, %2, #x)", nar) {
-
-            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
-
-            @Override
-            protected void eachMatch(Task task, Map<Term, Term> xy) {
-                System.out.println(task + " " + xy);
-                s[0] = xy.size();
-            }
-        };
-
-        nar.ask($.$("add(1, 2, #x)"));
-
-        assertEquals(3, s[0]);
-
-    }
-
-    @Test public void testOperationHandler() throws Narsese.NarseseException {
-        NAR nar = new Terminal();
-
-        final int[] s = {0};
-        StringBuilder match = new StringBuilder();
-        new OperationTaskMatch( $.$("add(%1, %2, #x)"), nar) {
-
-            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
-
-            @Override
-            protected void onMatch(Term[] args) {
-                match.append(Arrays.toString(args)).append(' ');
-            }
-        };
-
-        nar.ask($.$("add(1, 2, #x)"));
-
-        assertTrue(match.toString().contains("[1, 2, #1026]"));
-
-        nar.ask($.$("add(1, #x)"));
-        nar.ask($.$("(#x --> add)"));
-
-        assertFalse(match.toString().contains("[1, #1026]"));
-    }
+//    @Test public void testOperationHandler() throws Narsese.NarseseException {
+//        NAR nar = new Terminal();
+//
+//        final int[] s = {0};
+//        StringBuilder match = new StringBuilder();
+//        new OperationTaskMatch( $.$("add(%1, %2, #x)"), nar) {
+//
+//            @Override public boolean test(@NotNull Task task) { return task.isQuestOrQuestion(); }
+//
+//            @Override
+//            protected void onMatch(Term[] args) {
+//                match.append(Arrays.toString(args)).append(' ');
+//            }
+//        };
+//
+//        nar.ask($.$("add(1, 2, #x)"));
+//
+//        assertTrue(match.toString().contains("[1, 2, #1026]"));
+//
+//        nar.ask($.$("add(1, #x)"));
+//        nar.ask($.$("(#x --> add)"));
+//
+//        assertFalse(match.toString().contains("[1, #1026]"));
+//    }
 
     /** tests whether the use of a question guides inference as measured by the speed to reach a specific conclusion */
     @Test public void questionDrivesInference() {

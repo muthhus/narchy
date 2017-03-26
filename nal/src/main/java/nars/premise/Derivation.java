@@ -4,7 +4,7 @@ import jcog.version.Versioned;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.task.DerivedTask;
 import nars.term.Compound;
@@ -53,7 +53,7 @@ public class Derivation extends Unify {
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
     @NotNull
-    private BoolCondition forEachMatch;
+    private BoolPredicate forEachMatch;
 
 
     /**
@@ -227,7 +227,7 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolCondition eachMatch, @Nullable MatchConstraint constraints) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch, @Nullable MatchConstraint constraints) {
 
         if (constraints != null) {
             if (this.constraints.set(constraints)==null)
@@ -248,7 +248,7 @@ public class Derivation extends Unify {
     }
 
     @Override public final boolean onMatch() {
-        return  (--matchesRemain > 0) && forEachMatch.run(this);
+        return  (--matchesRemain > 0) && forEachMatch.test(this);
     }
 
 

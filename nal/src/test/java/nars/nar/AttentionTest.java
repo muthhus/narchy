@@ -31,7 +31,7 @@ public class AttentionTest {
         //n.runWhileInputting(100);
         n.run(16);
         
-        int c = n.core.active.size();
+        int c = n.focus.active.size();
         assertTrue(c > 16);
 
         //n.trace(System.out);
@@ -39,13 +39,13 @@ public class AttentionTest {
         Set<Concept> uniqueconcepts = new HashSet();
         
         for (int i = 0; i < numConcepts; i++) {
-            Concept s = n.core.active.sample().get();
+            Concept s = n.focus.active.sample().get();
             uniqueconcepts.add(s);
         }
 
         assertTrue(uniqueconcepts.size() > 1);
 
-        int c2 = Iterables.size(n.core.active);
+        int c2 = Iterables.size(n.focus.active);
         assertEquals("does not affect # of concepts", c, c2);
     }
     

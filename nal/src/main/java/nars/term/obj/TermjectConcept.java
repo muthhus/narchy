@@ -120,13 +120,13 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     }
 
     @Override
-    public boolean and(Predicate<Term> v) {
-        return term().and(v);
+    public boolean AND(Predicate<Term> v) {
+        return term().AND(v);
     }
 
     @Override
-    public boolean or(Predicate<Term> v) {
-        return term().or(v);
+    public boolean OR(Predicate<Term> v) {
+        return term().OR(v);
     }
 
     @Override

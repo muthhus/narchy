@@ -116,13 +116,15 @@ public interface Termlike {
      *  returns true if all true
      *
      * @param v*/
-    boolean and(Predicate<Term> v);
+    boolean AND(Predicate<Term> v);
+
+
 
     /** recurses all subterms until the result of the predicate becomes true;
      *  returns true if any true
      *
      * @param v*/
-    boolean or(Predicate<Term> v);
+    boolean OR(Predicate<Term> v);
 
     /** total # of variables, excluding pattern variables */
     default int vars() {

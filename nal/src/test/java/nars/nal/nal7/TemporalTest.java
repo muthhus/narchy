@@ -6,6 +6,7 @@ import jcog.bag.PLink;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.control.ConceptBagFocus;
 import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -411,8 +412,8 @@ public class TemporalTest {
         n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         n.run(1);
 
-        Bag<Concept,PLink<Concept>> cb = n.core.active;
-        cb.print();
+        Bag<Concept,PLink<Concept>> cb = n.focus.active;
+
         assertTrue(5 <= cb.size());
         String abpill = "((a==>b)-->[pill])";
         assertTrue( Joiner.on(' ').join(cb).contains(abpill) );

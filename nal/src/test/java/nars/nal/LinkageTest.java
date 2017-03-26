@@ -157,7 +157,7 @@ public class LinkageTest extends AbstractNALTest {
                 //.stronglyConnectedSubgraphs()
                 .forEach( s -> System.out.println("\t" + s));
 
-            ((Default)nar).core.active.print();
+            ((Default)nar).focus.active.print();
             nar.forEachActiveConcept(Concept::print);
 
         }

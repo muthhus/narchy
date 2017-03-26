@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +16,7 @@ public enum AbstractPatternOp  {
         return c.getSimpleName() + "(p" + Integer.toString(subterm) + ",\"" + param + "\")";
     }
 
-    public static final class PatternOp extends AtomicBoolCondition {
+    public static final class PatternOp extends AtomicPredicate<Derivation> {
 
         public final int subterm;
         public final int opOrdinal;
@@ -38,14 +38,14 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff) {
+        public boolean test(@NotNull Derivation ff) {
             return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
     }
 
     /** tests op membership in a given vector */
-    public static final class PatternOpNot extends AtomicBoolCondition {
+    public static final class PatternOpNot extends AtomicPredicate<Derivation> {
 
         public final int subterm;
         public final int opBits;
@@ -65,14 +65,14 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff) {
+        public boolean test(@NotNull Derivation ff) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0opBit : ff.termSub1opBit)) == 0;
         }
     }
 
     /** tests op membership in a given vector */
-    public static final class PatternOpNotContained extends AtomicBoolCondition {
+    public static final class PatternOpNotContained extends AtomicPredicate<Derivation> {
 
         public final int subterm;
         public final int opBits;
@@ -92,7 +92,7 @@ public enum AbstractPatternOp  {
         }
 
         @Override
-        public boolean run(@NotNull Derivation ff) {
+        public boolean test(@NotNull Derivation ff) {
             //the bit must not be set in the structure
             return (opBits & (subterm == 0 ? ff.termSub0Struct : ff.termSub1Struct)) == 0;
         }

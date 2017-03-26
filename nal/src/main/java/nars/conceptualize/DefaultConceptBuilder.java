@@ -254,7 +254,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
-        return !subterms.or(x -> x instanceof Variable);
+        return !subterms.OR(x -> x instanceof Variable);
     }
 
 

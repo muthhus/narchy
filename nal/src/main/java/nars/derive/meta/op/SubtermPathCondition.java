@@ -1,6 +1,6 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.TaskBeliefSubterms;
 import nars.premise.Derivation;
 import nars.term.Compound;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 /**
  * Created by me on 10/6/16.
  */
-public abstract class SubtermPathCondition extends AtomicBoolCondition {
+public abstract class SubtermPathCondition extends AtomicPredicate<Derivation> {
     @NotNull
     public final byte[] aPath;
     @NotNull
@@ -77,7 +77,7 @@ public abstract class SubtermPathCondition extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation ff) {
+    public boolean test(@NotNull Derivation ff) {
 
         Term ta;
         if ((ta = resolve(ff, a, aPath)) == null)

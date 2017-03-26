@@ -18,7 +18,7 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;
-import nars.util.task.InvalidTaskException;
+import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -215,7 +215,7 @@ public class SynchronizedArrayList<E> extends AbstractList<E>
   @Override
   public Iterator<E> iterator()
   {
-    return new ArrayIterator<E>(_array);
+    return new ArrayIterator<>(_array);
   }
 
   @Override

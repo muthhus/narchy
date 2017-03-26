@@ -1,8 +1,9 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicBoolCondition;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.constraint.MatchConstraint;
+import nars.premise.Derivation;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 5/26/16.
  */
-abstract public class MatchTerm extends AtomicBoolCondition {
+abstract public class MatchTerm extends AtomicPredicate<Derivation> {
 
 
 //    @NotNull
@@ -21,11 +22,11 @@ abstract public class MatchTerm extends AtomicBoolCondition {
 
     public final @Nullable MatchConstraint constraints;
 
-    public final @Nullable BoolCondition eachMatch;
+    public final @Nullable BoolPredicate eachMatch;
 
     private final String idString;
 
-    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable BoolCondition eachMatch) {
+    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable BoolPredicate eachMatch) {
         //this.pid = pid;
         //this.id = id;
         this.idString = id.toString();

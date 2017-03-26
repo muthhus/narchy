@@ -13,6 +13,8 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.conceptualize.ConceptBuilder;
+import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.BoolPredicate;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -43,6 +45,7 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -199,8 +202,8 @@ public enum $ {
 
 
     @NotNull
-    public static Term impl(@NotNull Term a, @NotNull Term b) {
-        return compound(IMPL, a, b);
+    public static Compound impl(@NotNull Term a, @NotNull Term b) {
+        return (Compound) compound(IMPL, a, b);
     }
 
     @NotNull
@@ -1043,6 +1046,24 @@ public enum $ {
     /** instantiate new Javascript context */
     public final static NashornScriptEngine JS() {
         return (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
+    }
+
+    public static Term nonNull(@Nullable Term term) {
+        return term != null ? term : Term.Null;
+    }
+
+    public static <X> BoolPredicate<X> IF(Term t, Predicate<X> test) {
+        return new BoolPredicate.DefaultBoolPredicate<X>(t, test);
+    }
+    public static <X> BoolPredicate<X> AND(BoolPredicate<X> a, BoolPredicate<X> b) {
+        return new BoolPredicate.DefaultBoolPredicate<X>($.conj(a, b), (X x)->{
+            return a.test(x) && b.test(x);
+        });
+    }
+    public static <X> BoolPredicate<X> OR(BoolPredicate<X> a, BoolPredicate<X> b) {
+        return new BoolPredicate.DefaultBoolPredicate<X>($.disj(a, b), (X x)->{
+            return a.test(x) || b.test(x);
+        });
     }
 
     public static final class StaticTermBuilder extends TermIndex {

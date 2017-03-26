@@ -1,4 +1,4 @@
-package nars.util.task;
+package nars.task.util;
 
 import nars.Task;
 import nars.term.Termed;

@@ -15,17 +15,17 @@ import java.util.List;
 /**
  * Created by me on 12/31/15.
  */
-public final class AndCondition extends GenericCompound implements BoolCondition {
+public final class AndCondition extends GenericCompound implements BoolPredicate<Derivation> {
 
     @NotNull
-    public final BoolCondition[] termCache;
+    public final BoolPredicate[] termCache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
     }*/
-    public AndCondition(@NotNull Collection<BoolCondition> p) {
+    public AndCondition(@NotNull Collection<BoolPredicate> p) {
         super(Op.PROD, TermVector.the(p));
-        this.termCache = p.toArray(new BoolCondition[p.size()]);
+        this.termCache = p.toArray(new BoolPredicate[p.size()]);
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
     }
@@ -38,11 +38,11 @@ public final class AndCondition extends GenericCompound implements BoolCondition
 //    }
 
     @Override
-    public final boolean run(@NotNull Derivation m) {
+    public final boolean test(@NotNull Derivation m) {
         boolean result = true;
         int start = m.now();
-        for (BoolCondition x : termCache) {
-            boolean b = x.run(m);
+        for (BoolPredicate x : termCache) {
+            boolean b = x.test(m);
 //            if (m.now() > 0)
 //                System.out.println(m.now() + " " + x.getClass() + " " + m + " " + x + " = " + b);
             if (!b) {
@@ -55,7 +55,7 @@ public final class AndCondition extends GenericCompound implements BoolCondition
         return result;
     }
 
-    public static @Nullable BoolCondition the(@NotNull List<BoolCondition> cond) {
+    public static @Nullable BoolPredicate the(@NotNull List<BoolPredicate> cond) {
 
         //remove suffix 'TRUE'
         int s = cond.size();
@@ -73,9 +73,9 @@ public final class AndCondition extends GenericCompound implements BoolCondition
         return new AndCondition(cond);
     }
 
-    public @Nullable BoolCondition without(BoolCondition condition) {
+    public @Nullable BoolPredicate without(BoolPredicate condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        BoolCondition[] x = ArrayUtils.removeElement(termCache, condition);
+        BoolPredicate[] x = ArrayUtils.removeElement(termCache, condition);
         if (x.length == termCache.length)
             throw new RuntimeException("element missing for removal");
 

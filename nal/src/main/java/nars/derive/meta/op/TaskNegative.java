@@ -9,8 +9,8 @@ public final class TaskNegative extends TaskPositive {
     public static final TaskNegative the = new TaskNegative();
 
     @Override
-    public boolean run(@NotNull Derivation m) {
-        return !super.run(m);
+    public boolean test(@NotNull Derivation m) {
+        return !super.test(m);
     }
 
 }

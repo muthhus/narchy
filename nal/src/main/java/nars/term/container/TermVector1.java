@@ -187,7 +187,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override
-    public boolean or(@NotNull Predicate<Term> p) {
+    public boolean OR(@NotNull Predicate<Term> p) {
         return p.test(the);
     }
 
@@ -212,7 +212,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override
-    public boolean and(@NotNull Predicate<Term> p) {
+    public boolean AND(@NotNull Predicate<Term> p) {
         return p.test(the);
     }
 

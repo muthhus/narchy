@@ -2,8 +2,8 @@ package nars.derive.meta.op;
 
 import nars.$;
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.Conclude;
 import nars.derive.meta.Fork;
 import nars.derive.meta.constraint.MatchConstraint;
@@ -25,10 +25,10 @@ import static nars.derive.meta.op.MatchTaskBelief.compile;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTermPrototype extends AtomicBoolCondition {
+abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
 
     @Nullable
-    private BoolCondition eachMatch;
+    private BoolPredicate eachMatch;
 
     @Nullable
     public final MatchConstraint constraints;
@@ -92,11 +92,11 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
         conclude.add(x);
     }
 
-    public final @NotNull BoolCondition build() {
+    public final @NotNull BoolPredicate build() {
         if (this.eachMatch == null) {
 
 
-            BoolCondition om;
+            BoolPredicate om;
 
             switch (conclude.size()) {
                 case 0:
@@ -122,10 +122,10 @@ abstract public class MatchTermPrototype extends AtomicBoolCondition {
     }
 
     @NotNull
-    abstract protected BoolCondition build(BoolCondition eachMatch);
+    abstract protected BoolPredicate build(BoolPredicate eachMatch);
 
     @Override
-    public boolean run(Derivation derivation) {
+    public boolean test(Derivation derivation) {
         throw new UnsupportedOperationException("Use the instance that this builds, not this. it should not result in the deriver");
     }
 

@@ -365,14 +365,14 @@ public class CompoundConcept implements Concept, Termlike {
 
     @Deprecated
     @Override
-    public boolean and(@NotNull Predicate<Term> v) {
-        return term.and(v);
+    public boolean AND(@NotNull Predicate<Term> v) {
+        return term.AND(v);
     }
 
     @Deprecated
     @Override
-    public boolean or(@NotNull Predicate<Term> v) {
-        return term.or(v);
+    public boolean OR(@NotNull Predicate<Term> v) {
+        return term.OR(v);
     }
 
     @Deprecated

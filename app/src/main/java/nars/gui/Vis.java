@@ -93,20 +93,20 @@ public class Vis {
 
     public static Surface budgetHistogram(NAR nar, int bins) {
         if (nar instanceof Default) {
-            return budgetHistogram(((Default) nar).core.active, bins);
+            return budgetHistogram((Iterable)((Default) nar).focus().conceptsActive(), bins);
         } else { //if (nar instance)
             //return budgetHistogram(((Default2)nar).active, bins);
             return grid(); //TODO
         }
     }
 
-    public static Surface budgetHistogram(Bag bag, int bins) {
+    public static Surface budgetHistogram(Iterable<PLink> bag, int bins) {
         //new SpaceGraph().add(new Facial(
 
         double[] d = new double[bins];
         return //new GridSurface(VERTICAL,
                 Vis.pane("Concept Priority Distribution (0..1)", new HistogramChart(
-                        () -> bag.priHistogram(d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
+                        () -> Bag.priHistogram(bag, d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
 //                    if (c != null)
@@ -350,8 +350,6 @@ public class Vis {
 
     protected static class MyForceDirected extends ForceDirected {
 
-
-
         @Override
         public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
             super.solve(b, objects, timeStep);
@@ -385,7 +383,7 @@ public class Vis {
         int dur;
         final NAR nar;
 
-        public ConceptBagChart(Bag<Concept, PLink<Concept>> b, int count, NAR nar) {
+        public ConceptBagChart(Iterable<PLink<Concept>> b, int count, NAR nar) {
             super(b, count);
             this.now = nar.time();
             this.nar = nar;

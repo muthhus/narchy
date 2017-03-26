@@ -11,7 +11,7 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
-import nars.util.task.TaskStatistics;
+import nars.task.util.TaskStatistics;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;

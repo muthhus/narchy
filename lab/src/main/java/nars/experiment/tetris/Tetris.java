@@ -6,23 +6,20 @@ import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
-import nars.util.task.TaskStatistics;
+import nars.task.util.TaskStatistics;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import spacegraph.widget.meter.MatrixView;
 
 import java.util.List;
 
 import static nars.$.$;
-import static nars.Op.BELIEF;
 import static nars.experiment.tetris.impl.TetrisState.*;
 import static spacegraph.SpaceGraph.window;
 

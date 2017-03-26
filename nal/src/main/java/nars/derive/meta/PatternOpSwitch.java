@@ -10,13 +10,13 @@ import java.util.Map;
 /**
  * Created by me on 5/21/16.
  */
-public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements BoolCondition {
+public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements BoolPredicate<Derivation> {
 
-    public final BoolCondition[] proc = new BoolCondition[32]; //should be large enough
+    public final BoolPredicate[] proc = new BoolPredicate[32]; //should be large enough
     public final int subterm;
 
 
-    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, BoolCondition> cases) {
+    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, BoolPredicate> cases) {
         super('"' + cases.toString() + '"');
 
         this.subterm = subterm;
@@ -25,10 +25,10 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
     }
 
     @Override
-    public boolean run(@NotNull Derivation m) {
-        BoolCondition p = proc[m.subOp(subterm)];
+    public boolean test(@NotNull Derivation m) {
+        BoolPredicate p = proc[m.subOp(subterm)];
         if (p!=null) {
-            p.run(m);
+            p.test(m);
         }
         return true;
     }

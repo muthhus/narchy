@@ -101,7 +101,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before term matching
      */
-    public BoolCondition[] pre;
+    public BoolPredicate[] pre;
 
     public PostCondition[] postconditions;
 
@@ -504,7 +504,7 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) term(1)).terms();
 
 
-        Set<BoolCondition> pres =
+        Set<BoolPredicate> pres =
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
@@ -921,7 +921,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         //store to arrays
-        this.pre = pres.toArray(new BoolCondition[pres.size()]);
+        this.pre = pres.toArray(new BoolPredicate[pres.size()]);
 
         List<PostCondition> postConditions = newArrayList();
 
@@ -959,7 +959,7 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void opNot(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNot(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
 
         boolean prefiltered = false;
         if (t.equals(task)) {
@@ -975,7 +975,7 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    public static void opNotContained(Term task, Term belief, @NotNull Set<BoolCondition> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNotContained(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 
         boolean prefiltered = false;
@@ -1003,7 +1003,7 @@ public class PremiseRule extends GenericCompound {
 
     }
 
-    public boolean neqPrefilter(@NotNull Collection<BoolCondition> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2) {
+    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2) {
         TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
         if (tb != null) {
             //cheaper to compute this in precondition

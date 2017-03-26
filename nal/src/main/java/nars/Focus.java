@@ -6,11 +6,14 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Created by me on 12/27/16.
  */
-public interface Control {
+public interface Focus extends Iterable<PLink<Concept>> {
 
     /**
      * if the concept is active, returns the Concept while applying the boost factor to its budget
@@ -31,11 +34,23 @@ public interface Control {
 
     Iterable<PLink<Concept>> conceptsActive();
 
+    @NotNull
+    @Override
+    default Iterator<PLink<Concept>> iterator() {
+        return conceptsActive().iterator();
+    }
+
+    void sample(int max, Predicate<? super PLink<Concept>> c);
 
 
-    Control NullControl = new Control() {
+    Focus NULL_FOCUS = new Focus() {
         @Override
         public void activate(Concept term, float priToAdd) {
+
+        }
+
+        @Override
+        public void sample(int max, Predicate<? super PLink<Concept>> c) {
 
         }
 

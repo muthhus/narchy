@@ -2,7 +2,7 @@ package nars.budget;
 
 import jcog.bag.PLink;
 import jcog.math.MultiStatistics;
-import nars.Control;
+import nars.Focus;
 import nars.Op;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -10,6 +10,8 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+
+import java.util.function.Predicate;
 
 /**
  * Created by me on 1/12/17.
@@ -34,13 +36,18 @@ public class BudgetFairnessTest {
                 volumeIn(4,5)
         );
         Default d = new Default(1024, conceptsFirePerCycle, 1, 3);
-        Control c = d.getControl();
-        d.setControl(new Control() {
+        Focus c = d.focus();
+        d.setFocus(new Focus() {
             @Override
             public void activate(Concept term, float priToAdd) {
 
                 c.activate(term, priToAdd);
                 m.value(priToAdd, term.term());
+            }
+
+            @Override
+            public void sample(int max, Predicate<? super PLink<Concept>> p) {
+                c.sample(max, p);
             }
 
             @Override

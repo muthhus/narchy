@@ -436,7 +436,7 @@ public enum Terms { ;
 
 
     public static boolean allNegated(@NotNull TermContainer subterms) {
-        return subterms.hasAny(Op.NEG) && subterms.and((Term t) -> t.op() == NEG);
+        return subterms.hasAny(Op.NEG) && subterms.AND((Term t) -> t.op() == NEG);
     }
 
 

@@ -2,11 +2,10 @@ package nars.control;
 
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
-import jcog.meter.event.PeriodMeter;
+import jcog.event.On;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -19,54 +18,93 @@ import nars.task.DerivedTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 
-abstract public class DefaultConceptBagControl extends ConceptBagControl {
+abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
+
+
+    final MatrixPremiseBuilder premiser;
+
+
     /**
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
     @Range(min = 0, max = 64, unit = "Concept")
     public final @NotNull MutableInteger conceptsFiredPerCycle;
-    /** size of each sampled concept batch that adds up to conceptsFiredPerCycle.
-     *  reducing this value should provide finer-grained / higher-precision concept selection
-     *  since results between batches can affect the next one.
+    /**
+     * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
+     * reducing this value should provide finer-grained / higher-precision concept selection
+     * since results between batches can affect the next one.
      */
     public final @NotNull MutableInteger conceptsFiredPerBatch;
     public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
     public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
     public final MutableInteger derivationsInputPerCycle;
+    protected final NAR nar;
+    private final On on;
 
+    @Override public void run() {
+        new PremiseMatrix(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+    }
 
-    /** directly inptus each result upon derive, for single-thread  */
-    public static class DirectConceptBagControl extends DefaultConceptBagControl {
+    public class PremiseMatrix implements Consumer<NAR> {
+        private final int _tasklinks;
+        private final int batchSize;
+        private final MutableIntRange _termlinks;
 
-        public DirectConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, conceptBag, premiseBuilder);
+        public PremiseMatrix(int batchSize, int _tasklinks, MutableIntRange _termlinks) {
+            this.batchSize = batchSize;
+            this._tasklinks = _tasklinks;
+            this._termlinks = _termlinks;
         }
 
         @Override
-        protected void cycle() {
-            new PremiseMatrix(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+        public void accept(NAR nar) {
+            nar.focus().sample(batchSize, c -> {
+                premiser.newPremiseMatrix(c.get(),
+                        _tasklinks, _termlinks,
+                        FireConcepts.this, //input them within the current thread here
+                        nar
+                );
+                return true;
+            });
         }
+
+    }
+
+
+    /**
+     * directly inptus each result upon derive, for single-thread
+     */
+    public static class DirectConceptBagFocus extends FireConcepts {
+
+        public DirectConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+            super(nar, premiseBuilder);
+        }
+
+
 
         @Override
         public void accept(DerivedTask derivedTask) {
             nar.input(derivedTask);
         }
+
     }
 
     /**
      * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input
      */
-    public static class BufferedConceptBagControl extends DefaultConceptBagControl {
+    public static class BufferedConceptBagFocus extends FireConcepts {
 
-        /** pending derivations to be input after this cycle */
+        /**
+         * pending derivations to be input after this cycle
+         */
         final TaskHijackBag pending;
 
 
-
-        public BufferedConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, conceptBag, premiseBuilder);
+        public BufferedConceptBagFocus(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
+            super(nar, premiseBuilder);
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
                 @Override
@@ -80,14 +118,13 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
 //                }
             };
 
-            nar.onReset((n)->{
+            nar.onReset((n) -> {
                 pending.clear();
-                active.clear();
             });
         }
 
         @Override
-        protected void cycle() {
+        public void run() {
 
 
 //            AtomicReferenceArray<Task> all = pending.reset();
@@ -108,7 +145,7 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
 
             //pending.commit();
 
-            pending.capacity( inputsPerCycle * 8 );
+            pending.capacity(inputsPerCycle * 8);
             // * 1f/((float)Math.sqrt(active.capacity()))
 
             //float load = nar.exe.load();
@@ -128,7 +165,7 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
                 //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
 
                 nar.runLater(
-                    new PremiseMatrix(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
+                        new PremiseMatrix(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
                 );
 
             }
@@ -139,63 +176,24 @@ abstract public class DefaultConceptBagControl extends ConceptBagControl {
         @Override
         public void accept(DerivedTask d) {
             pending.put(d);
-
-//        if (nar.input(d)!=null) {
-//            meter.hit();
-//        } else {
-//            meter.miss();
-//        }
-        }
-
-    }
-
-    public static class ThrottledConceptBagControl extends BufferedConceptBagControl {
-
-        final static int WINDOW_SIZE = 16;
-        final PeriodMeter timing = new PeriodMeter("", WINDOW_SIZE);
-
-        public final FloatParam fps = new FloatParam();
-        long lastCycle;
-
-        public ThrottledConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder, float fps) {
-            super(nar, conceptBag, premiseBuilder);
-            this.fps.setValue(fps);
-            lastCycle = System.nanoTime();
-        }
-
-        public float actualFPS() {
-            double meanNS = timing.mean();
-            double fps = 1E9/meanNS;
-            return (float)fps;
-        }
-
-
-        @Override
-        protected void cycle() {
-            super.cycle();
-            long end = System.nanoTime();
-
-            timing.hit(end-lastCycle);
-
-
-            //System.out.println(this + " actualFPS = " + actualFPS()  + ", target=" + fps.floatValue());
-
-
-            lastCycle = end;
-
         }
 
     }
 
 
-        public DefaultConceptBagControl(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-        super(nar, conceptBag, premiseBuilder);
+
+
+    public FireConcepts(@NotNull NAR nar, MatrixPremiseBuilder premiseBuilder) {
+
+        this.nar = nar;
+        this.premiser = premiseBuilder;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(1);
         this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE);
 
 
+        this.on = nar.onCycle(this);
     }
 
 }

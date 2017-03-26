@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static jcog.math.Interval.unionLength;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -37,7 +38,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     final ObjectFloatHashMap<Termed> spread;
 
-    final static float parentRetention = 0.5f;
+    final float parentRetention;
 
     transient final int dur; //cache
     transient final float inPri; //cached priority value of input at input
@@ -63,6 +64,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         this.spread = spread;
 
+        this.parentRetention = nar.momentum.floatValue();
+
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
         this.inQua = in.qua();
         this.dur = nar.dur();
@@ -80,9 +83,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     }
 
-    private Consumer<BLink<Task>> newTaskLinkUpdate(Task in) {
-        return null;
-    }
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
@@ -203,9 +203,14 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                             long bs = bt.start();
                             if (bs != ETERNAL) {
                                 long be = bt.end();
-                                long timeDistance = Math.max(0, Interval.unionLength(inStart, inEnd, bs, be) - (inEnd - inStart) - (be - bs));
+                                long timeDistance = Math.max(0,
+                                    unionLength(inStart, inEnd, bs, be)
+                                            - (inEnd - inStart) //task range
+                                            - (be - bs)  //belief range
+                                            - dur
+                                ); //perceptual duration
 
-                                float borrow = change[0] / 2f; //boost with up to half of collected change
+                                float borrow = change[0] / n; //boost with up to 1/n of collected change
                                 change[0] -= borrow;
                                 subSubActivation += borrow;
 

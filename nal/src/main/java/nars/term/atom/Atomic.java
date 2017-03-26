@@ -37,13 +37,13 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean and(@NotNull Predicate<Term> v) {
+    default boolean AND(@NotNull Predicate<Term> v) {
         return v.test(this);
     }
 
     @Override
-    default boolean or(@NotNull Predicate<Term> v) {
-        return and(v); //re-use and, even though it's so similar
+    default boolean OR(@NotNull Predicate<Term> v) {
+        return AND(v); //re-use and, even though it's so similar
     }
 
 //    @Override

@@ -44,15 +44,11 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Derivation premise(@NotNull Termed c, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priFactor, float priMin, @NotNull Consumer<DerivedTask> target) {
-
-
+    public Derivation premise(@NotNull Termed concept, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
 
         Task belief = null;
 
         int dur = nar.dur();
-
-
 
         if (beliefTerm instanceof Compound) {
 
@@ -179,14 +175,13 @@ abstract public class PremiseBuilder {
                 //Math.max(taskPri, beliefBudget!=null ? beliefBudget.pri() : 0);
                 belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
 
-        pri*=priFactor;
         if (pri < priMin)
             return null;
 
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        return newPremise(c, task, beliefTerm, belief, pri, qua, target, nar);
+        return newPremise(concept, task, beliefTerm, belief, pri, qua, target, nar);
     }
 
     @Nullable abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);

@@ -14,7 +14,7 @@ public final class SolvePuncFromTask extends Solve {
     }
 
     @Override
-    public boolean run(@NotNull Derivation m) {
+    public boolean test(@NotNull Derivation m) {
         return measure(m, m.taskPunct);
     }
 }

@@ -103,7 +103,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
                             (float) (col+1)*16, 0,
-                            (float) 1*16, charAspect*20
+                            (float) 16, charAspect*20
 
                     );
                 }

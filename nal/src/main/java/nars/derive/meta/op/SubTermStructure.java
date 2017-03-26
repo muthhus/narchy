@@ -1,14 +1,14 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.AtomicBoolCondition;
+import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * requires a specific subterm to have minimum bit structure
  */
-public final class SubTermStructure extends AtomicBoolCondition {
+public final class SubTermStructure extends AtomicPredicate<Derivation> {
     public final int subterm;
     public final int bits;
     @NotNull
@@ -39,7 +39,7 @@ public final class SubTermStructure extends AtomicBoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation ff) {
+    public boolean test(@NotNull Derivation ff) {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);

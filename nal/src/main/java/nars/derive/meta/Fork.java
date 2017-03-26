@@ -14,12 +14,12 @@ import static nars.time.Tense.DTERNAL;
 
 
 /** parallel branching */
-public final class Fork extends GenericCompound implements BoolCondition {
+public final class Fork extends GenericCompound implements BoolPredicate<Derivation> {
 
     @NotNull
-    public final BoolCondition[] termCache;
+    public final BoolPredicate[] termCache;
 
-    protected Fork(@NotNull BoolCondition[] actions) {
+    protected Fork(@NotNull BoolPredicate[] actions) {
         super(CONJ, TermContainer.the(CONJ, DTERNAL, (Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
@@ -27,11 +27,11 @@ public final class Fork extends GenericCompound implements BoolCondition {
     }
 
     @Override
-    public boolean run(@NotNull Derivation m) {
+    public boolean test(@NotNull Derivation m) {
 
         int now = m.now();
-        for (BoolCondition s : termCache) {
-            s.run(m);
+        for (BoolPredicate s : termCache) {
+            s.test(m);
             m.revert(now);
         }
 
@@ -39,11 +39,11 @@ public final class Fork extends GenericCompound implements BoolCondition {
     }
 
     @Nullable
-    public static BoolCondition compile(@NotNull List<BoolCondition> t) {
-        return compile(t.toArray(new BoolCondition[t.size()]));
+    public static BoolPredicate compile(@NotNull List<BoolPredicate> t) {
+        return compile(t.toArray(new BoolPredicate[t.size()]));
     }
 
-    @Nullable public static BoolCondition compile(@NotNull BoolCondition[] n) {
+    @Nullable public static BoolPredicate compile(@NotNull BoolPredicate[] n) {
         switch (n.length) {
             case 0: return null;
             case 1: return n[0];

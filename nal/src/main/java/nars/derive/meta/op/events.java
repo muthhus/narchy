@@ -1,8 +1,8 @@
 package nars.derive.meta.op;
 
 import nars.Task;
-import nars.derive.meta.AtomicBoolCondition;
-import nars.derive.meta.BoolCondition;
+import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.BoolPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * True if the premise task and belief are both non-eternal events
  */
-abstract public class events extends AtomicBoolCondition {
+abstract public class events extends AtomicPredicate<Derivation> {
 
     /** task is before or simultaneous with belief which follows (T ... B) */
     public static final events nonEternal = new events() {
@@ -24,7 +24,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
             return deltaOcc(m.task, m.belief) !=ETERNAL; /* && d!=DTERNAL which is negative */
         }
 
@@ -39,7 +39,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
             long d = deltaOcc(m.task, m.belief);
             return d<=0 && d!=ETERNAL; /* && d!=DTERNAL which is negative */
         }
@@ -78,7 +78,7 @@ abstract public class events extends AtomicBoolCondition {
 //
 //    };
 
-//    public static final BoolCondition taskNotDTernal = new events() {
+//    public static final BoolCondition<Derivation> taskNotDTernal = new events() {
 //
 //        @Override
 //        public String toString() {
@@ -93,7 +93,7 @@ abstract public class events extends AtomicBoolCondition {
 //
 //    };
 
-    public static final BoolCondition beliefDTSimultaneous = new events() {
+    public static final BoolPredicate<Derivation> beliefDTSimultaneous = new events() {
 
         @Override
         public String toString() {
@@ -101,7 +101,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
             if (m.belief!=null) {
                 int dt = m.belief.dt();
                 return (dt == DTERNAL) || (dt == 0);
@@ -114,7 +114,7 @@ abstract public class events extends AtomicBoolCondition {
 //    /** true if the belief term is in the earliest position of a conjunction.
 //     * for parallel and eternal, automatically true.
 //     *  */
-//    public static BoolCondition beliefTermEarliest = new events() {
+//    public static BoolCondition<Derivation> beliefTermEarliest = new events() {
 //        @Override
 //        public @NotNull String toString() {
 //            return "beliefTermEarliest";
@@ -129,7 +129,7 @@ abstract public class events extends AtomicBoolCondition {
 //    };
 
 
-//    public static final BoolCondition taskConjDecomposable = new AtomicBoolCondition() {
+//    public static final BoolCondition<Derivation> taskConjDecomposable = new AtomicBoolCondition<Derivation>() {
 //        @Override
 //        public @NotNull String toString() {
 //            return "taskConjDecomposable";
@@ -198,7 +198,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
             Task b = m.belief;
             if (b==null)
                 return false;
@@ -220,7 +220,7 @@ abstract public class events extends AtomicBoolCondition {
         }
 
         @Override
-        public boolean run(@NotNull Derivation m) {
+        public boolean test(@NotNull Derivation m) {
 
             /* true if belief is present and both task and belief are eternal */
             Task b = m.belief;
@@ -236,7 +236,7 @@ abstract public class events extends AtomicBoolCondition {
                     (!bEternal && (bOcc <= tOcc));
         }
     };
-//    public static final @Nullable BoolCondition ifTermLinkBefore = new events() {
+//    public static final @Nullable BoolCondition<Derivation> ifTermLinkBefore = new events() {
 //
 //        @Override
 //        public String toString() {
