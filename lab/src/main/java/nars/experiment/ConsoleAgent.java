@@ -2,11 +2,15 @@ package nars.experiment;
 
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.jogamp.opengl.GL2;
 import nars.*;
+import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -29,34 +34,22 @@ public abstract class ConsoleAgent extends NAgentX {
 
     final AtomicBoolean record = new AtomicBoolean(false);
 
-    final ConsoleTerminal.TextEditModel term = new ConsoleTerminal.TextEditModel( 40, 20) {
 
-        @Override
-        public void putCharacter(char c) {
+    final ConsoleTerminal Rlabel = Vis.newInputEditor();
 
-            super.putCharacter(c);
+    /**
+     * editable by gui
+     */
+    final MyConsoleTerminal R = new MyConsoleTerminal(new MyTextEditModel(8, 8, () -> $.the(labelize(((ConsoleTerminal.TextEditModel) (Rlabel.term)).textBox.getText()))));
 
-            if (record.get()) {
-                TerminalPosition p = term.getCursorPosition();
-                Compound cc = $.func((Atomic) id, $.the(String.valueOf(c)),
-                        $.p($.the(p.getColumn()), $.the(p.getRow())));
-                input($.belief(cc, 1f, 0.9f).time(now).apply(nar));
-            }
-        }
-    };
+    final MyTextEditModel Wmodel = new MyTextEditModel(8, 8, () -> nar.self());
+    final MyConsoleTerminal W = new MyConsoleTerminal(Wmodel);
 
-    final ConsoleTerminal console = new ConsoleTerminal(term) {
-        @Override
-        protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
-            float cc = nar.pri($.p(col, row));
-            if (cc==cc) {
-                float s = 0.3f * cc;
-                gl.glColor3f(s,s,s);
-                return true;
-            }
-            return false;
-        }
-    };
+
+    static String labelize(String l) {
+        if (l == null || l.isEmpty()) return "sth";
+        return l;
+    }
 
 
     protected void input(Task t) {
@@ -78,11 +71,11 @@ public abstract class ConsoleAgent extends NAgentX {
         );
     }
 
-    public ConsoleAgent(NAR nar) throws Narsese.NarseseException {
+    public ConsoleAgent(NAR nar) {
         super("term", nar);
 
-        senseNumberDifference( $.func("cursor", $.the("term"), $.the("x")), () -> term.getCursorPosition().getColumn());
-        senseNumberDifference( $.func("cursor", $.the("term"), $.the("y")), () -> term.getCursorPosition().getRow());
+        //senseNumberDifference( $.func("cursor", R., $.the("x")), () -> R.term.getCursorPosition().getColumn());
+        //senseNumberDifference( $.func("cursor", $.the("term"), $.the("y")), () -> R.term.getCursorPosition().getRow());
 
 //        new TaskRule("(term(%1,(%2,%3)) && term(%4,(%5,%3)))",
 //                "((seq(%1,%4)-->(%2,%3)) && equal(sub(%5,%2),1))", nar) {
@@ -94,7 +87,55 @@ public abstract class ConsoleAgent extends NAgentX {
 //        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
 //        nar.input("(term(f,(3,1)) && term(f,(4,1))).");
 
-        SpaceGraph.window(console, 800, 600);
+        //SpaceGraph.window(new VSplit(Rlabel, R, 0.1f), 800, 600);
+        //SpaceGraph.window(new VSplit(label("context"), Rlabel, 0.1f), 800, 600);
+        //SpaceGraph.window(new LabeledPane("ctx", Rlabel), 400, 200);
+        SpaceGraph.window(Rlabel, 400, 200);
+        SpaceGraph.window(R, 600, 600);
+        SpaceGraph.window(W, 600, 600);
+
+        //Wmodel.setBacklogSize(0);
+        //Wmodel.textBox.setReadOnly(false);
+
+        actionTriState($.inh($.p("cursor", "x"), nar.self()), (d) -> {
+            int cx = W.cursorX(), cy = W.cursorY();
+            switch (d) {
+                case -1:
+                    ((MyTextEditModel) W.term).addInput(new KeyStroke(KeyType.ArrowLeft));
+                    break;
+
+                case +1:
+                    ((MyTextEditModel) W.term).addInput(new KeyStroke(KeyType.ArrowRight));
+                    break;
+
+            }
+        });
+        actionTriState($.inh($.p("cursor", "y"), nar.self()), (d) -> {
+            int cx = W.cursorX(), cy = W.cursorY();
+            switch (d) {
+                case -1:
+                    ((MyTextEditModel) W.term).addInput(new KeyStroke(KeyType.ArrowDown));
+                    break;
+                case +1:
+                    ((MyTextEditModel) W.term).addInput(new KeyStroke(KeyType.ArrowUp));
+                    break;
+
+                //case +1: Wmodel.setCursorPosition(cx, Math.min(Wmodel.getTerminalSize().getRows()-2, cy+1) ); break;
+            }
+        });
+        actionTriState($.inh($.p("write"), nar.self()), (d) -> {
+            switch (d) {
+                case +1:
+                    ((MyTextEditModel) W.term).inject('*');
+                    break;
+                case -1:
+                    //Wmodel.gui.handleInput(new com.googlecode.lanterna.input.KeyStroke(KeyType.Backspace));
+                    ((MyTextEditModel) W.term).addInput(new KeyStroke(KeyType.Delete));
+                    ((MyTextEditModel) W.term).inject(' ');
+                    break;
+            }
+
+        });
 
         record.set(true);
     }
@@ -104,9 +145,10 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true).durSeconds(0.1f));
+        Default n = NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.1f));
         n.setSelf("I");
         //n.logBudgetMin(System.out, 0.25f);
+        //n.log();
 
         @NotNull ConsoleAgent a = new ConsoleAgent(n) {
             @Override
@@ -117,7 +159,71 @@ public abstract class ConsoleAgent extends NAgentX {
 
         NAgentX.chart(a);
 
-        a.runRT(20);
+        a.runRT(0);
+    }
+
+    private class MyConsoleTerminal extends ConsoleTerminal {
+
+        private final Supplier<Term> id;
+
+        public MyConsoleTerminal(MyTextEditModel t) {
+            super(t);
+            this.id = t.label;
+        }
+
+        @Override
+        protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
+            float cc = nar.pri( ((MyTextEditModel)term).pixelTerm(col, row) );
+            if (cc == cc) {
+                float s = 0.3f * cc;
+                gl.glColor4f(s, 0, 0, 0.95f);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private class MyTextEditModel extends ConsoleTerminal.TextEditModel {
+
+        private final Supplier<Term> label;
+
+        public MyTextEditModel(int cols, int rows, Supplier<Term> label) {
+            super(cols, rows);
+            this.label = label;
+        }
+
+        @Override
+        public void run() {
+            super.run();
+            //textBox.setCaretWarp(true);
+        }
+
+        public void inject(char c) {
+            super.putCharacter(c);
+        }
+
+        @Override
+        public void putCharacter(char c) {
+
+            super.putCharacter(c);
+
+            if (record.get()) {
+                TerminalPosition p = getCursorPosition();
+                Compound cc = (Compound) $.prop( pixelTerm(p), $.quote(String.valueOf(c) ));
+                input($.belief(cc, 1f, 0.9f).time(now).apply(nar));
+            }
+        }
+
+        public @NotNull Compound pixelTerm(TerminalPosition p) {
+            //TODO cache this
+            int x = p.getColumn();
+            int y = p.getRow();
+            return pixelTerm(x, y);
+        }
+
+        public @NotNull Compound pixelTerm(int x, int y) {
+            return $.p(label.get(), $.the(x), $.the(y));
+        }
     }
 
 }

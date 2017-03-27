@@ -188,6 +188,8 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
      */
     public static class TextEditModel extends DefaultVirtualTerminal implements Runnable {
         public MultiWindowTextGUI gui;
+        public TextBox textBox;
+
 
         public TextEditModel(int c, int r) {
             super(new TerminalSize(c, r));
@@ -228,11 +230,11 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
                 window.setSize(new TerminalSize(size.getColumns() - 2, size.getRows() - 2));
 
 
-                TextBox t = new TextBox("", TextBox.Style.MULTI_LINE);
-                t.setPreferredSize(new TerminalSize(size.getColumns() - 3, size.getRows() - 3));
+                this.textBox = new TextBox("", TextBox.Style.MULTI_LINE);
+                textBox.setPreferredSize(new TerminalSize(size.getColumns() - 3, size.getRows() - 3));
 
-                t.takeFocus();
-                window.setComponent(t);
+                textBox.takeFocus();
+                window.setComponent(textBox);
 
 
                 gui.addWindow(window);

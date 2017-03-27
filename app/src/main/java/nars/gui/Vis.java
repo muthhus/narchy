@@ -53,7 +53,7 @@ public class Vis {
 
 
 
-    public static Surface newInputEditor(NAR nar) {
+    public static ConsoleTerminal newInputEditor() {
         return new ConsoleTerminal(new ConsoleTerminal.TextEditModel(20,5));
     }
 
