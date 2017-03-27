@@ -210,15 +210,17 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                                             - dur
                                 ); //perceptual duration
 
-                                float borrow = change[0] / n; //boost with up to 1/n of collected change
-                                change[0] -= borrow;
-                                subSubActivation += borrow;
+                                //float borrow = change[0] / n; //boost with up to 1/n of collected change
+                                ///change[0] -= borrow;
+                                //subSubActivation += borrow;
 
                                 //multiply by temporal relevancy
-                                subSubActivation = TruthPolation.evidenceDecay(
-                                        subSubActivation,
+                                subSubActivation = subSubActivation * (
+                                    0.1f + //min reduction
+                                    0.9f * TruthPolation.evidenceDecay(
+                                        1f,
                                         dur,
-                                        timeDistance);
+                                        timeDistance));
                             }
                         }
 

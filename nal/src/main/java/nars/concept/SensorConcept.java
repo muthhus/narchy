@@ -218,7 +218,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         @Override
         protected boolean save(Task t) {
-            return t instanceof SignalTask;
+            return true; //allow predictions, derivations etc
+            //return t instanceof SignalTask;
         }
 
         @Override

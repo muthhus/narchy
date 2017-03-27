@@ -128,9 +128,9 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
         @Override
         protected boolean save(Task t) {
-            if (t.isBelief())
-                return t instanceof SignalTask;
-            else
+//            if (t.isBelief())
+//                return t instanceof SignalTask;
+//            else
                 return true; //accept all goals
         }
 

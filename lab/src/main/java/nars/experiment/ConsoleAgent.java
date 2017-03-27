@@ -81,6 +81,9 @@ public abstract class ConsoleAgent extends NAgentX {
     public ConsoleAgent(NAR nar) throws Narsese.NarseseException {
         super("term", nar);
 
+        senseNumberDifference( $.func("cursor", $.the("term"), $.the("x")), () -> term.getCursorPosition().getColumn());
+        senseNumberDifference( $.func("cursor", $.the("term"), $.the("y")), () -> term.getCursorPosition().getRow());
+
 //        new TaskRule("(term(%1,(%2,%3)) && term(%4,(%5,%3)))",
 //                "((seq(%1,%4)-->(%2,%3)) && equal(sub(%5,%2),1))", nar) {
 //            @Override
@@ -103,7 +106,7 @@ public abstract class ConsoleAgent extends NAgentX {
     public static void main(String[] args) throws Narsese.NarseseException {
         Default n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true).durSeconds(0.1f));
         n.setSelf("I");
-        n.logBudgetMin(System.out, 0.25f);
+        //n.logBudgetMin(System.out, 0.25f);
 
         @NotNull ConsoleAgent a = new ConsoleAgent(n) {
             @Override

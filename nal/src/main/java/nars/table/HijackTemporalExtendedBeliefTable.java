@@ -16,7 +16,7 @@ import java.util.TreeMap;
 abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBeliefTable {
 
 
-    final TreeMap<Long, Task> history;
+    final TreeMap<Double, Task> history;
     private final int historicCapacity;
 
     public HijackTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity, Random r) {
@@ -63,24 +63,25 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     }
 
     public Task matchHistory(long when) {
+        Double dwhen = when + 0.5;
+
+        Task c, f;
         synchronized (history) {
-            if (history.isEmpty())
-                return null;
+            Map.Entry<Double, Task> ceil = history.ceilingEntry(dwhen);
+            Map.Entry<Double, Task> floor = history.floorEntry(dwhen);
+            c = ceil != null ? ceil.getValue() : null;
+            f = floor != null ? floor.getValue() : null;
+        }
 
-            Map.Entry<Long, Task> ceil = history.ceilingEntry(when);
-            Task c = ceil != null ? ceil.getValue() : null;
-            Map.Entry<Long, Task> floor = history.floorEntry(when);
-            Task f = floor != null ? floor.getValue() : null;
-            if (c == f)
+        if (c == f)
+            return c;
+        else {
+            //TODO find closest if both are non-null
+
+            if (c == null)
+                return f;
+            else
                 return c;
-            else {
-                //TODO find closest if both are non-null
-
-                if (c == null)
-                    return f;
-                else
-                    return c;
-            }
         }
     }
 
@@ -100,11 +101,15 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
         synchronized (history) {
             int toRemove = history.size() + 1 - historicCapacity;
             if (toRemove > 0) {
-                for (int i = 0; i < toRemove; i++)
-                    history.pollFirstEntry();
+                for (int i = 0; i < toRemove; i++) {
+                    Task t = history.pollFirstEntry().getValue();
+                    t.delete();
+                }
             }
 
-            history.put(x.mid(), x);
+            history.put(
+                x.mid() - 0.25 + ( 0.5 * (Math.abs(x.hashCode()/((double)(Integer.MAX_VALUE)))))  /** hash -> insignifcant differnece, HACK */
+                , x);
         }
     }
 
