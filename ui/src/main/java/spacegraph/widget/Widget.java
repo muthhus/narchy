@@ -8,12 +8,15 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
 import spacegraph.layout.Stacking;
+import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.slider.BaseSlider;
 import spacegraph.widget.slider.XYSlider;
+
+import java.util.Arrays;
 
 import static spacegraph.layout.Grid.*;
 
@@ -103,12 +106,22 @@ public class Widget extends Stacking {
 //    }
 
 
-    public void touch(@Nullable Finger finger) {
+
+
+    protected boolean onTouching(Finger finger) {
+
         touchedBy = finger;
-        if (finger == null) {
-            onTouch(null,null);
+
+        if (finger==null) {
+            return false;
+        } else if (finger.nextButtonDown!=null && finger.nextButtonDown.length > 0 && finger.nextButtonDown[0] == 3) {
+            finger.zoom(this);
+            return true;
         }
+
+        return false;
     }
+
 
 
     public static void main(String[] args) {

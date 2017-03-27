@@ -31,27 +31,32 @@ public abstract class AbstractButton extends Widget {
     }
 
     @Override
-    public void touch(@Nullable Finger finger) {
-        super.touch(finger);
+    public boolean onTouching(@Nullable Finger finger) {
+        if (super.onTouching(finger)) {
+            return true;
+        }
 
-        boolean pressed = false;
 
-        if (finger == null) {
+        boolean pressed = finger!=null && finger.buttonDown[1];
+
+        if (!pressed) {
             pushed = 0;
         } else {
-            if (enabled && finger.buttonDown[0]) {
+//            if (enabled && finger.buttonDown[0]) {
                 pushed = 0.1f;
-                pressed = true;
-            } else {
-                pushed = 0.05f;
-            }
+//                pressed = true;
+//            } else {
+//                pushed = 0.05f;
+//            }
         }
 
         boolean wasPressed = this.pressed;
         this.pressed = pressed;
         if (!pressed && wasPressed) {
             onClick();
+            return true;
         }
+        return false;
     }
 
     protected abstract void onClick();

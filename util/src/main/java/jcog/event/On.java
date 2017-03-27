@@ -9,13 +9,22 @@ import java.util.function.Consumer;
  */
 abstract public class On<V> {
 
-    public final Topic<V> topic;
+    public Topic<V> topic;
 
     On(Topic<V> t) {
         this.topic = t;
     }
 
     abstract public void off();
+
+    protected void off(Consumer<V> x) {
+
+        Topic<V> t = this.topic;
+        if (topic!=null) { //TODO use atomic operation here
+            topic = null;
+            t.disable(x);
+        }
+    }
 
     public static class Strong<V> extends On<V> {
 
@@ -28,7 +37,7 @@ abstract public class On<V> {
         }
 
         public void off() {
-            topic.disable(reaction);
+            off(reaction);
         }
 
         @Override
@@ -60,13 +69,15 @@ abstract public class On<V> {
         }
 
         public void off() {
-            topic.disable(this);
+
+            off(this);
+
         }
 
-        @Override
-        public String toString() {
-            return "On.weak:" + topic + "->" + reaction.get();
-        }
+//        @Override
+//        public String toString() {
+//            return "On.weak:" + topic + "->" + reaction.get();
+//        }
     }
 
 }

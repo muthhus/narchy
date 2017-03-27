@@ -51,7 +51,7 @@ public abstract class ConsoleAgent extends NAgentX {
             float cc = nar.pri($.p(col, row));
             if (cc==cc) {
                 float s = 0.3f * cc;
-                gl.glColor3f(s,s,s);
+                gl.glColor4f(s,0,0, 0.95f);
                 return true;
             }
             return false;
@@ -104,7 +104,7 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true).durSeconds(0.1f));
+        Default n = NARBuilder.newMultiThreadNAR(4, new RealTime.DSHalf(true).durSeconds(0.1f));
         n.setSelf("I");
         //n.logBudgetMin(System.out, 0.25f);
 
@@ -117,7 +117,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         NAgentX.chart(a);
 
-        a.runRT(20);
+        a.runRT(80);
     }
 
 }

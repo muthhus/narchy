@@ -965,20 +965,18 @@ public enum Draw {
             rightPos = (int) (hspec.charAt(9)) - offsetR;
 
             int curX, curY;
-            boolean penUp = true;
             ByteArrayList currentSeg = new ByteArrayList();
 
             for (int i = 0; i < spec.length() - 1; i += 2) {
                 if (spec.charAt(i + 1) == 'R' && spec.charAt(i) == ' ') {
-                    penUp = true;
                     segments.add(currentSeg.toArray());
                     currentSeg = new ByteArrayList();
                     continue;
                 }
 
-                curX = (int) (spec.charAt(i)) - offsetR; //0..20
+                curX = (spec.charAt(i)) - offsetR; //0..20
                 currentSeg.add((byte)curX);
-                curY = (int) (spec.charAt(i + 1)) - offsetR; //0..20
+                curY = (spec.charAt(i + 1)) - offsetR; //0..20
                 currentSeg.add((byte)(10 - curY)); //half above zero half below zero
             }
             if (!currentSeg.isEmpty())

@@ -39,9 +39,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
      */
     float charScaleY = 0.85f;
 
-
-    float bgAlpha = 0.35f;
-    float fgAlpha = 0.9f;
+    float fgAlpha = 1f;
 
 
     public ConsoleSurface(int cols, int rows) {
@@ -51,7 +49,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     public void resize(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
-        align(Align.Center, cols/1.5f, rows);
+        //align(Align.Center, cols/1.5f, rows);
     }
 
 
@@ -102,7 +100,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
-                        (float) (col - 0.5f) * 20/charScaleX, 0,
+                        (float) (col - 1 - 0.5f) * 20/charScaleX, 0,
                         (float) 20/charScaleX, charAspect*20
                     );
                 }
@@ -122,7 +120,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                     gl.glColor4f(1f,1f,1f, fgAlpha);
 
-                    Draw.textNext(gl, cc, col/charScaleX);
+                    Draw.textNext(gl, cc, (col/charScaleX));
                 }
             }
 

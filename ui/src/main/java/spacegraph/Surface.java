@@ -2,7 +2,9 @@ package spacegraph;
 
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 
@@ -16,7 +18,7 @@ import java.util.List;
 public class Surface {
 
 
-    protected v2 scaleGlobal;
+    public v2 scaleGlobal;
 
 
 
@@ -95,13 +97,15 @@ public class Surface {
      * or null if nothing absorbed the gesture
      */
     @Nullable
-    public Surface onTouch(v2 hitPoint, short[] buttons) {
+    public Surface onTouch(@Nullable Finger f) {
         //System.out.println(this + " " + hitPoint + " " + Arrays.toString(buttons));
 
         //1. test local reaction
-        boolean b = onTouching(hitPoint, buttons);
-        if (b)
+        boolean b = onTouching(f);
+
+        if (b) {
             return this;
+        }
 
         return null;
     }
@@ -110,7 +114,7 @@ public class Surface {
     /**
      * may be overridden to trap events on this surface (returning true), otherwise they pass through to any children
      */
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+    protected boolean onTouching(@Nullable Finger f) {
         return false;
     }
 

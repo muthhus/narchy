@@ -5,6 +5,7 @@ import com.jogamp.newt.event.KeyEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.widget.Windo;
@@ -78,33 +79,34 @@ import java.util.Objects;
 
     @Override
     public void stop() {
-        synchronized (scaleLocal) {
-            if (children!=null) {
+        if (children!=null) {
+            //synchronized (scaleLocal) {
                 children.forEach(Surface::stop);
                 children = null;
-            }
-            super.stop();
+                super.stop();
+            //}
         }
-
     }
 
     @Override @Nullable
-    public final Surface onTouch(v2 hitPoint, short[] buttons) {
-        Surface x = super.onTouch(hitPoint, buttons);
+    public final Surface onTouch(Finger f) {
+
+        Surface x = super.onTouch(f);
         if (x!=null || children == null)
             return x;
 
         //2. test children reaction
-        return onChildTouching(hitPoint, buttons);
+        return onChildTouching(f);
     }
 
-    protected final Surface onChildTouching(v2 hitPoint, short[] buttons) {
-        if (hitPoint == null) {
+    protected final Surface onChildTouching(Finger f) {
+        if ((f == null) || (f.nextHit == null)) {
             for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
-                children.get(i).onTouch(null, null);
+                children.get(i).onTouch(null);
             }
             return null;
         } else {
+            v2 hitPoint = f.nextHit;
 
             for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
                 Surface c = children.get(i);
@@ -127,12 +129,15 @@ import java.util.Objects;
 
                 float hx = subHit.x, hy = subHit.y;
                 if (!clipTouchBounds || (hx >= 0f && hx <= 1f && hy >= 0 && hy <= 1f)) {
-                    //subHit.add(c.translateLocal.x*csx, c.translateLocal.y*csy);
 
+                    f.nextHit = subHit; //HACK save
 
-                    Surface s = c.onTouch(subHit, buttons);
-                    if (s != null)
-                        return s; //FIFO
+                    Surface s = c.onTouch(f);
+
+                    f.nextHit = hitPoint; //HACK restore
+
+                } else {
+                    c.onTouch(null);
                 }
             }
         }

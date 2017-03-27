@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
+import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
@@ -67,12 +68,14 @@ public class BaseSlider extends Widget {
 
 
     @Override
-    protected boolean onTouching(v2 hitPoint, short[] buttons) {
+    protected boolean onTouching(Finger f) {
 
-        if (leftButton(buttons)) {
+        super.onTouching(f);
+
+        if (f!=null && f.buttonDown[1]==true) {
             //System.out.println(this + " touched " + hitPoint + " " + Arrays.toString(buttons));
 
-            _set(p(hitPoint));
+            _set(p(f.nextHit));
 
             return true;
         }

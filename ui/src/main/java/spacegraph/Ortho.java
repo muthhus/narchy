@@ -1,11 +1,14 @@
 package spacegraph;
 
+import com.jogamp.nativewindow.util.Point;
 import com.jogamp.newt.event.*;
+import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.GL2;
-import org.apache.commons.lang3.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
+
+import java.util.Arrays;
 
 import static spacegraph.Surface.Align.None;
 import static spacegraph.math.v3.v;
@@ -15,7 +18,7 @@ import static spacegraph.math.v3.v;
  */
 public class Ortho implements WindowListener, KeyListener, MouseListener {
 
-    protected final AnimVector2f translate;
+    public final AnimVector2f translate;
     boolean visible;
 
     final Finger finger;
@@ -34,17 +37,26 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     public Ortho(Surface content) {
 
+
         this.surface = content;
         surface.align = None;
 
         this.finger = newFinger();
-        this.scale = new AnimVector2f(3f);
+        this.scale = new AnimVector2f(5f);
         this.translate = new AnimVector2f(3f);
+
+
     }
 
     protected Finger newFinger() {
-        return new Finger(this);
+        return new Finger(this) {
+            @Override
+            public void zoom(Surface s) {
+
+            }
+        };
     }
+
 
 
     public Ortho translate(float x, float y) {
@@ -81,9 +93,15 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         surface.start(null);
         surface.layout();
         resized();
+
+        window.addFrameListener(f -> {
+            try {
+                surface.onTouch(finger);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
-
-
 
     public void render(GL2 gl) {
         gl.glPushMatrix();
@@ -92,7 +110,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
         surface.scaleLocal.set(scale);
         //surface.translateLocal.set(translate.x, translate.y);
-        surface.render(gl, v(1,1)
+        surface.render(gl, v(1, 1)
                 //(v2) v(window.getWidth(), window.getHeight())
                 //v(window.getWidth(),window.getHeight()).normalize().scale(Math.min(window.getWidth(),window.getHeight()))
         );
@@ -116,9 +134,9 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     private void resized() {
         //TODO resize preserving aspect, translation, etc
-        if (maximize && window!=null) {
+        if (maximize && window != null) {
             scale(window.getWidth(), window.getHeight());
-            translate(0,0);
+            translate(0, 0);
         }
     }
 
@@ -134,11 +152,11 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void windowDestroyed(WindowEvent e) {
-        visible = false;
         stop();
     }
 
     private void stop() {
+        visible = false;
         surface.stop();
     }
 
@@ -149,11 +167,12 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void windowLostFocus(WindowEvent e) {
-        updateMouse(null);
+        //updateMousePosition(null);
     }
 
     @Override
     public void windowRepaint(WindowUpdateEvent e) {
+
         visible = true;
     }
 
@@ -174,70 +193,95 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        updateMouse(e);
+        updateMousePosition(e);
+        updateMouseButtons(e, false);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        updateMouse(null);
+        finger.nextHit = null;
+        finger.nextButtonDown = null;
+        //updateMouse(null);
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        updateMouse(e);
+        updateMouseButtons(e, true);
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        short[] bd = e.getButtonsDown();
-        int ii = ArrayUtils.indexOf(bd, e.getButton());
-        bd[ii] = -1;
-        updateMouse(e, bd);
+        updateMouseButtons(e, false);
+    }
+
+    private void updateMouseButtons(MouseEvent e, boolean down) {
+        //TODO do a copy on write here, an interruption could accidentally click its own buttons and stuff
+        Arrays.fill(finger.buttonDown, false);
+
+        if (down) {
+            finger.nextButtonDown = e.getButtonsDown();
+            if (finger.nextButtonDown.length > 0) {
+                int which = finger.nextButtonDown[0];
+                if (which != -1)
+                    finger.buttonDown[which] = true;
+            }
+        }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        updateMouse(e);
+        updateMousePosition(e);
     }
 
-    private void updateMouse(MouseEvent e) {
-        updateMouse(e, e!=null ? e.getButtonsDown() : null);
+    private void updateMousePosition(MouseEvent e) {
+        updateMouse(e.getX(), e.getY());
     }
 
-    private boolean updateMouse(MouseEvent e, short[] buttonsDown) {
+    private boolean updateMouse(int ex, int ey) {
         float x, y;
 
-        if (e != null && !e.isConsumed()) {
+        //if (e != null && !e.isConsumed()) {
 
-            //screen coordinates
-            float sx = e.getX();
-            float sy = window.getHeight() - e.getY();
+        //screen coordinates
+        float sx = ex;
+        float sy = window.getHeight() - ey;
 
-            //screen to local
-            float lx = scale.x;
-            float ly = scale.y;
+        //screen to local
+        float lx = scale.x;
+        float ly = scale.y;
 
-            x = (sx - translate.x) / (lx);
-            y = (sy - translate.y) / (ly);
-            if (x >= 0 && y >= 0 && x<=1f && y<=1f) {
-                finger.update(e, x, y, buttonsDown);
-                return true;
+        x = (sx - translate.x) / (lx);
+        y = (sy - translate.y) / (ly);
+
+        if (x >= 0 && y >= 0 && x <= 1f && y <= 1f) {
+
+            finger.nextHit = new v2(x, y);
+
+            Ortho r = finger.root;
+            if (r != null) {
+                if (r.window != null) {
+                    GLWindow rww = r.window.window;
+                    if (rww != null) {
+                        Point p = rww.getLocationOnScreen(new Point());
+                        finger.pointer.set(p.getX() + ex, p.getY() + ey);
+                    }
+                }
             }
 
+            return true;
         }
 
-        x = y = Float.NaN;
-        finger.update(null, x, y, null);
+        finger.nextHit = null;
+
 
         return false;
     }
 
+
     @Override
     public void mouseDragged(MouseEvent e) {
-
-        updateMouse(e);
+        updateMousePosition(e);
     }
-
 
 
     @Override
