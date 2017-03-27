@@ -213,7 +213,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int hash = x.hashCode();
         int iStart = i(c, hash);
-        final long ticket = add ? Treadmill.start(id, hash) : Long.MIN_VALUE /* N/A for get or remove */;
+
+        //final long ticket = add ? Treadmill.start(id, hash) : Long.MIN_VALUE /* N/A for get or remove */;
+
         try {
 
             for (int retry = 0; retry < reprobes; retry++, dir = !dir) {
@@ -308,9 +310,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             t.printStackTrace(); //should not happen
         }
 
-        if (add) {
-            Treadmill.end(ticket);
-        }
+//        if (add) {
+//            Treadmill.end(ticket);
+//        }
 
         if (!merged) {
             if (found != null && (add || remove)) {

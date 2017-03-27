@@ -31,7 +31,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     @Override
     public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
         Task t = super.match(when, now, dur, against);
-        if (when < now) {
+
             Task h = matchHistory(when);
             if (h != null) {
                 float conf = h.conf(when, dur);
@@ -39,7 +39,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
                     t = ressurect(h);
                 }
             }
-        }
+
         return t;
     }
 

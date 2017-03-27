@@ -77,9 +77,7 @@ public interface NAct {
 
     /**
      * latches to either one of 2 states until it shifts to the other one. suitable for representing
-     * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
-     * procedures will be called only as necessary (when state changes).  the off procedure will not be called immediately.
-     * its initial state will remain indetermined until the first feedback is generated.
+     * push-buttons like keyboard keys. by default with no desire the state is off.   the off procedure will not be called immediately.
      */
     @Nullable
     default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
@@ -87,8 +85,8 @@ public interface NAct {
 
         ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
-                    //1f/6;
-                    1f / 4;
+                    1f/6;
+                    //1f / 4;
             //1f/3f;
 
             int ii;
