@@ -76,7 +76,7 @@ public interface NAct {
     }
 
     /**
-     * latches to either one of 2 states until it shifts to the other one. suitable for representing
+     * selects one of 2 states until it shifts to the other one. suitable for representing
      * push-buttons like keyboard keys. by default with no desire the state is off.   the off procedure will not be called immediately.
      */
     @Nullable
@@ -85,8 +85,8 @@ public interface NAct {
 
         ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
-                    1f/6;
-                    //1f / 4;
+                    // 1f/6;
+                     1f/4;
             //1f/3f;
 
             int ii;

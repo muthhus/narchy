@@ -11,6 +11,7 @@ import nars.Task;
 import nars.budget.BLink;
 import nars.budget.Budget;
 import nars.concept.Concept;
+import nars.control.FireConcepts;
 import nars.derive.Deriver;
 import nars.task.DerivedTask;
 import nars.term.Term;
@@ -167,7 +168,6 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         }
         return count;
     }
-
 
 
 

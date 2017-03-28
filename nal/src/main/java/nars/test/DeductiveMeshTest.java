@@ -10,7 +10,6 @@ import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -101,7 +100,7 @@ public class DeductiveMeshTest {
 
 
 
-        Default n = new Default(1024, 5, 2, 3);
+        Default n = new Default(1024, 5, 3);
         //n.nal(5);
         n.logBudgetMin(System.out, 0.1f);
 

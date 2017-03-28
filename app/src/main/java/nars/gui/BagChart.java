@@ -1,7 +1,6 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import jcog.bag.Bag;
 import jcog.bag.PLink;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -24,7 +23,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
     private final @NotNull Iterable<PLink<X>> input;
 
     public static void main(String[] args) {
-        Default d = new Default(1024,50,2,2);
+        Default d = new Default(1024,50, 2);
         d.input("(a --> b). (b --> c).  (c --> d).  (d-->e)! :|: ");
 
         BagChart<Concept> tc = new Vis.ConceptBagChart(d.focus(), 1024, d);

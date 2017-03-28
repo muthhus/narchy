@@ -32,7 +32,7 @@ public class Predict_NARS_Core {
         int thinkInterval = 24;
         float discretization = 7f;
 
-        NAR n = new Default(1000, 2, 4, 4);
+        NAR n = new Default(1000, 2, 4);
         //n.shortTermMemoryHistory.set(3);
         //n.param.duration.set(duration);
         //n.param.noiseLevel.set(0);

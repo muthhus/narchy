@@ -161,7 +161,7 @@ public class PatrickTests extends AbstractNALTest {
         the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
          */
 
-        Default n = new Default(1024, 16, 1, 3);
+        Default n = new Default(1024, 16, 3);
         n.DEFAULT_BELIEF_PRIORITY = 0.01f;
         n.termVolumeMax.setValue(16);
 
@@ -199,7 +199,7 @@ public class PatrickTests extends AbstractNALTest {
     @Test
     public void testPixelImage() throws Narsese.NarseseException {
 
-        Default n = new Default(1024, 16, 1, 3);
+        Default n = new Default(1024, 16, 3);
         //n.log();
         //n.truthResolution.setValue(0.05f);
         n.termVolumeMax.setValue(60);

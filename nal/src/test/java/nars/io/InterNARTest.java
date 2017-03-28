@@ -78,7 +78,7 @@ public class InterNARTest {
     }
 
     private static Default newNAR() {
-        return new Default(1024, 2, 1, 3, new XorShift128PlusRandom(System.nanoTime()),
+        return new Default(1024, 2, 3, new XorShift128PlusRandom(System.nanoTime()),
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
                 new RealTime.DSHalf(), new MultiThreadExecutor(3, 128, Executors.newCachedThreadPool()));
     }

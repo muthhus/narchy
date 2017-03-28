@@ -70,7 +70,7 @@ public class QueryVariableTest {
                 "<b --> a>" /* existing solution, to test finding existing solutions */;
 
 
-        NAR n = new Default(100, 4, 1, 3);
+        NAR n = new Default(100, 4, 3);
         n.nal(2);
         n.log()
                 .input("<a <-> b>. %1.0;0.5%",

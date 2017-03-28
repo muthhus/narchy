@@ -227,7 +227,7 @@ public class IRCAgent extends IRC {
 
         MultiThreadExecutor exe = new MultiThreadExecutor(2, 1024, true);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
+        Default nar = new Default(activeConcepts, conceptsPerFrame, 3, random,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),

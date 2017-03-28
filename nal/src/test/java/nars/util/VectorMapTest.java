@@ -16,7 +16,7 @@ import org.junit.Test;
 public class VectorMapTest {
 
     @NotNull
-    NAR n = new Default(100, 1, 1, 1);
+    NAR n = new Default(100, 1, 1);
 
     @Test
     public void testUniformVector() {

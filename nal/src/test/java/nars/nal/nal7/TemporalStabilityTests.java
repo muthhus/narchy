@@ -98,37 +98,37 @@ public class TemporalStabilityTests {
     };
 
     @Test public void testTemporalStabilityInh3() {
-        new T1(inheritencer, 1, 2, 5).test(200, new Default(1024, 8, 4, 3));
+        new T1(inheritencer, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
 
     @Test public void testTemporalStabilityImpl() {
-        new T1(implicator, 1, 2, 5).test(200, new Default(1024, 8, 4, 3));
+        new T1(implicator, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
     @Test public void testTemporalStabilityProd() {
-        new T1(productor, 1, 2, 5).test(200, new Default(1024, 8, 4, 3));
+        new T1(productor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
     @Test public void testTemporalStabilityBiProd() {
-        new T1(biproductor, 1, 2, 5).test(200, new Default(1024, 8, 4, 3));
+        new T1(biproductor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
     @Test public void testTemporalStabilityLinkedProd() {
-        new T1(linkedproductor, 1, 2, 5).test(200, new Default(1024, 8, 4, 3));
+        new T1(linkedproductor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
 
     @Test public void testTemporalStabilityLinkedInh() {
-        new T1(linkedinh, 1, 2, 5).test(200, new Default(1024, 8, 4, 3) );
+        new T1(linkedinh, 1, 2, 5).test(200, new Default(1024, 8, 3) );
     }
     @Test public void testTemporalStabilityLinkedImpl() {
-        new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 4, 3));
+        new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
     @Test public void testTemporalStabilityLinkedTemporalConj() {
-        new T1(linkedTempConj, 1, 2, 5).test(200, new Default(1024, 12, 4, 3));
+        new T1(linkedTempConj, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
     @Test public void testTemporalStabilityLinkedImplExt() {
-        new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 4, 3));
+        new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
     @Test public void testTemporalStabilityLinkedImplExt2() {
         Param.DEBUG = true;
-        @NotNull NAR n = new Default(1024, 3, 2, 3);
+        @NotNull NAR n = new Default(1024, 3, 3);
         int time = 80;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);
         T1 b = new T1(linkedinh, 1, 2, 5, 10);

@@ -2,20 +2,17 @@ package nars.nal.nal1;
 
 import nars.*;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
-import nars.task.util.TaskMatch;
 import nars.task.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.DoubleSummaryStatistics;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.IntFunction;
@@ -145,7 +142,7 @@ public class QuestionTest {
         DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
 
         IntFunction<NAR> narProvider = (seed) -> {
-            NAR d = new Default(512, 2, 1, 1);
+            NAR d = new Default(512, 2, 1);
             d.random.setSeed(seed);
             d.nal(4);
             return d;

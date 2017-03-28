@@ -210,7 +210,7 @@ public class TruthLab extends Grid {
 
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        NAR n = new Default(1000, 64, 1, 3);
+        NAR n = new Default(1000, 64, 3);
 
         SpaceGraph.window(
                 new TruthLab(n, $("(x)"), $("(y)"),

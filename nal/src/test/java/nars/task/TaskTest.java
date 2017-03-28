@@ -106,7 +106,7 @@ public class TaskTest {
     @Test
     public void testDoublePremiseMultiEvidence() {
 
-        Default d = new Default(100,1,1,3);
+        Default d = new Default(100,1, 3);
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");
 

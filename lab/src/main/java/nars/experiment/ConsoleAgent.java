@@ -3,12 +3,14 @@ package nars.experiment;
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import nars.*;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
@@ -36,7 +38,7 @@ public abstract class ConsoleAgent extends NAgentX {
     final TestConsole R = new TestConsole(
             $.the("it"),
             true, false,
-            8, 8);
+            4, 1);
     final TestConsole W;
 
 
@@ -81,7 +83,7 @@ public abstract class ConsoleAgent extends NAgentX {
         W = new TestConsole(
                 nar.self(),
                 true, true,
-                8, 8);
+                R.width(), R.height());
 
         //SpaceGraph.window(new VSplit(Rlabel, R, 0.1f), 800, 600);
         //SpaceGraph.window(new VSplit(label("context"), Rlabel, 0.1f), 800, 600);
@@ -90,8 +92,7 @@ public abstract class ConsoleAgent extends NAgentX {
         SpaceGraph.window(R, 600, 600);
         SpaceGraph.window(W, 600, 600);
 
-        //Wmodel.setBacklogSize(0);
-        //Wmodel.textBox.setReadOnly(false);
+        senseNumberDifference($.func((Atomic)id, $.the("joy")), happy);
 
     }
 
@@ -100,7 +101,8 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) {
-        Default n = NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.1f));
+        Default n = NARBuilder.newMultiThreadNAR(3,
+                new RealTime.CS(true).durSeconds(0.02f));
         n.setSelf("I");
         //n.logBudgetMin(System.out, 0.25f);
         //n.log();
@@ -108,13 +110,25 @@ public abstract class ConsoleAgent extends NAgentX {
         @NotNull ConsoleAgent a = new ConsoleAgent(n) {
             @Override
             protected float act() {
-                return 0;
+                //copy
+                return 2f * (Util.sqr(similarity(R.chars, W.chars) ) - 0.5f);
             }
         };
 
         NAgentX.chart(a);
 
         a.runRT(0);
+    }
+
+    private static float similarity(char[][] a, char[][] b) {
+        int total = 0, equal = 0;
+        for (int j = 0; j < a[0].length; j++) {
+            for (int i = 0; i < a.length; i++) {
+                equal+= (a[i][j] == b[i][j]) ? 1 : 0;
+                total++;
+            }
+        }
+        return (equal)/((float)total);
     }
 
     private class TestConsole extends ConsoleSurface {
@@ -129,11 +143,11 @@ public abstract class ConsoleAgent extends NAgentX {
         public TestConsole(Term id, boolean read, boolean write, int w, int h) {
             super(w, h);
             this.chars = new char[w][h];
-
-            terms = new Term[w][h];
+            this.terms = new Term[w][h];
             for (int x = 0; x< w; x++) {
                 for (int y = 0; y < h; y++) {
-                    terms[x][y] = $.prop($.p($.the(x), $.the(y)), id);
+                    chars[x][y] = ' ';
+                    terms[x][y] = $.inh($.p($.the(x), $.the(y)), id);
                 }
             }
             c[0] = 0;
@@ -142,7 +156,7 @@ public abstract class ConsoleAgent extends NAgentX {
             this.write = write;
 
             if (write) {
-                actionTriState($.inh($.p("cursor", "x"), id), (d) -> {
+                actionTriState($.func("cursor", $.the("x"), id), (d) -> {
                     switch (d) {
                         case -1:
                             left();
@@ -153,7 +167,7 @@ public abstract class ConsoleAgent extends NAgentX {
                             break;
                     }
                 });
-                actionTriState($.inh($.p("cursor", "y"), id), (d) -> {
+                actionTriState($.func("cursor", $.the("y"), id), (d) -> {
                     switch (d) {
                         case -1:
                             up();
@@ -165,10 +179,10 @@ public abstract class ConsoleAgent extends NAgentX {
                         //case +1: Wmodel.setCursorPosition(cx, Math.min(Wmodel.getTerminalSize().getRows()-2, cy+1) ); break;
                     }
                 });
-                actionTriState($.inh($.p("write"), nar.self()), (d) -> {
+                actionTriState($.func($.the("write"), id), d -> {
                     switch (d) {
                         case +1:
-                            write('*');
+                            write('x');
                             break;
                         case -1:
                             //Wmodel.gui.handleInput(new com.googlecode.lanterna.input.KeyStroke(KeyType.Backspace));
@@ -187,15 +201,12 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
 
-        final TextCharacter space = new TextCharacter(' ');
+        //final TextCharacter space = new TextCharacter(' ');
 
         @Override
         public TextCharacter charAt(int col, int row) {
             char c = chars[col][row];
-            if (c == 0)
-                return space;
-            else
-                return new TextCharacter(c);
+            return new TextCharacter(c);
         }
 
         @Override
@@ -235,19 +246,23 @@ public abstract class ConsoleAgent extends NAgentX {
             c[1] = Math.max(0, c[1]-1);
         }
         public void down() {
-            c[1] = Math.min(chars.length-1, c[1]+1);
+            c[1] = Math.min(chars[0].length-1, c[1]+1);
         }
         public void right() {
-            c[0] = Math.min(chars[0].length-1, c[0]+1);
+            c[0] = Math.min(chars.length-1, c[0]+1);
         }
 
         public void write(char value) {
-            chars[c[0]][c[1]] = value;
+            char prev = chars[this.c[0]][this.c[1]];
+
+            chars[this.c[0]][this.c[1]] = value;
 
             if (read) {
-                Term t = terms[c[0]][c[1]];
-                Compound cc = (Compound) $.prop( t, $.quote(String.valueOf(value) ));
-                input($.belief(cc, 1f, 0.9f).time(now).apply(nar));
+                Term t = terms[this.c[0]][this.c[1]];
+                if (prev!=value) {
+                    input($.belief($.inh(t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now).apply(nar));
+                }
+                input($.belief($.inh( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
             }
         }
 
@@ -282,6 +297,13 @@ public abstract class ConsoleAgent extends NAgentX {
 
             return false;
 
+        }
+
+        public int height() {
+            return chars[0].length;
+        }
+        public int width() {
+            return chars.length;
         }
     }
 

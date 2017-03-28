@@ -191,7 +191,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.DSHalf(true).durSeconds(0.05f), true))
+                3, new RealTime.CS(true).durSeconds(0.03f), true))
                 .runRT(0);
     }
 }

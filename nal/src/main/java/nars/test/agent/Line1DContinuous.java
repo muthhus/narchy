@@ -203,7 +203,7 @@ public class Line1DContinuous extends NAgent {
                 new SynchronousExecutor();
 
         Default nar = new Default(1024,
-                8, 1, 3, rng,
+                8, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
                 new FrameTime(), exe
         );

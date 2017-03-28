@@ -273,7 +273,7 @@ public class IRCNLP extends IRC {
         MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024 * 8, true);
         exe.sync(true);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 1, 3, random,
+        Default nar = new Default(activeConcepts, conceptsPerFrame, 3, random,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),

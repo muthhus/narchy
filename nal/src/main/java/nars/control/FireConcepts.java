@@ -6,16 +6,20 @@ import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.event.On;
+import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.impl.TaskHijackBag;
+import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -38,22 +42,49 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * since results between batches can affect the next one.
      */
     public final @NotNull MutableInteger conceptsFiredPerBatch;
-    public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
     public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
     public final MutableInteger derivationsInputPerCycle;
     protected final NAR nar;
     private final On on;
 
-    @Override public void run() {
-        new PremiseMatrix(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+    class PremiseVectorBatch implements Consumer<BLink<Concept>>{
+
+        public PremiseVectorBatch(int batchSize, NAR nar) {
+            nar.focus().sample(batchSize, c -> {
+                Concept concept = c.get();
+                
+                concept.tasklinks().commit();
+                concept.termlinks().commit();
+
+                @Nullable BLink<Task> taskLink = concept.tasklinks().sample();
+                if (taskLink!=null) {
+
+                    int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+
+                    FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+                    concept.termlinks().sample(termlinksPerForThisTask, termLinks::add);
+
+                    if (!termLinks.isEmpty())
+                        premiser.newPremiseVector(concept, taskLink, termlinksFiredPerFiredConcept,
+                                FireConcepts.this, termLinks, nar);
+                }
+
+                return true;
+            });
+        }
+
+        @Override
+        public void accept(BLink<Concept> conceptBLink) {
+
+        }
     }
 
-    public class PremiseMatrix implements Consumer<NAR> {
+    class PremiseMatrixBatch implements Consumer<NAR> {
         private final int _tasklinks;
         private final int batchSize;
         private final MutableIntRange _termlinks;
 
-        public PremiseMatrix(int batchSize, int _tasklinks, MutableIntRange _termlinks) {
+        public PremiseMatrixBatch(int batchSize, int _tasklinks, MutableIntRange _termlinks) {
             this.batchSize = batchSize;
             this._tasklinks = _tasklinks;
             this._termlinks = _termlinks;
@@ -78,12 +109,16 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * directly inptus each result upon derive, for single-thread
      */
     public static class DirectConceptBagFocus extends FireConcepts {
+        public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
 
         public DirectConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
             super(nar, premiseBuilder);
         }
 
-
+        @Override public void run() {
+            //new PremiseVector(derivationsInputPerCycle.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+            new PremiseMatrixBatch(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+        }
 
         @Override
         public void accept(DerivedTask derivedTask) {
@@ -164,8 +199,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
                 //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
 
-                nar.runLater(
-                        new PremiseMatrix(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
+                nar.runLater((n) ->
+                        new FireConcepts.PremiseVectorBatch(batchSize, n)
+                        //new PremiseMatrixBatch(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
                 );
 
             }
@@ -195,5 +231,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         this.on = nar.onCycle(this);
     }
+
 
 }

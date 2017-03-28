@@ -107,7 +107,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        NAR d = new Default(1024,8,2,3);
+        NAR d = new Default(1024,8, 3);
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");

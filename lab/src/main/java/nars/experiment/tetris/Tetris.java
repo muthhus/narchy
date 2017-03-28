@@ -674,7 +674,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
         //a.trace = true;
         NAgentX.chart(a);
 
-            Default m = new Default(512, 16, 2, 2, n.random,
+            Default m = new Default(512, 16, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
                     new RealTime.DSHalf().durSeconds(0.1f));
 

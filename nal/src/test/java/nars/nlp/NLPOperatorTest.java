@@ -19,7 +19,7 @@ public class NLPOperatorTest {
     public void testNLP1() throws IOException {
         //Param.DEBUG = true;
 
-        NAR n = new Default(1024,10,2,4);
+        NAR n = new Default(1024,10, 4);
         //n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         //n.quaMin.setValue(0.1f);

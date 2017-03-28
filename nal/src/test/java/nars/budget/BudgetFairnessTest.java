@@ -35,7 +35,7 @@ public class BudgetFairnessTest {
                 volumeIn(2,3),
                 volumeIn(4,5)
         );
-        Default d = new Default(1024, conceptsFirePerCycle, 1, 3);
+        Default d = new Default(1024, conceptsFirePerCycle, 3);
         Focus c = d.focus();
         d.setFocus(new Focus() {
             @Override

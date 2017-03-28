@@ -69,7 +69,7 @@ public class TermFunctionTest {
         //Param.DEBUG = true;
 
         int TIME = 256;
-        TestNAR t = new TestNAR(new Default(1024, 8,2,2));
+        TestNAR t = new TestNAR(new Default(1024, 8, 2));
         t.nar.termVolumeMax.setValue(16);
         //t.log();
         t.believe("(equal(complexity($1),$2) ==> c($1,$2))");

@@ -44,6 +44,9 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     transient final float inPri; //cached priority value of input at input
     transient final float inQua; //cached quality value of input at input
     transient final Term originTerm;
+
+    final float temporalSpecificity = 0.25f;
+
     /**
      * runs the task activation procedure
      */
@@ -216,8 +219,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
                                 //multiply by temporal relevancy
                                 subSubActivation = subSubActivation * (
-                                    0.1f + //min reduction
-                                    0.9f * TruthPolation.evidenceDecay(
+                                    (1f-temporalSpecificity) + //min reduction
+                                    (temporalSpecificity) * TruthPolation.evidenceDecay(
                                         1f,
                                         dur,
                                         timeDistance));

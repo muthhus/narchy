@@ -42,7 +42,7 @@ public class BenchmarkLine1DContinuous {
         exe = new InstrumentedExecutor( exe, 16 );
 
         Default nar = new Default(1024,
-                conceptsPerCycle, 1, 3, rng,
+                conceptsPerCycle, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, null),
                 new FrameTime().dur(1),
                 exe

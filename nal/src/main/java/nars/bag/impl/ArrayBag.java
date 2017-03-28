@@ -579,8 +579,8 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
     @Override
     public float pri(@NotNull BLink<X> key) {
-        //return key.pri();
-        throw new UnsupportedOperationException("TODO currently this bag works with PLink.pri() directly");
+        return key.pri();
+        //throw new UnsupportedOperationException("TODO currently this bag works with PLink.pri() directly");
     }
 
     @Override

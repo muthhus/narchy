@@ -80,7 +80,7 @@ public interface NARBuilder {
         int activeConcepts = 2048;
 
         Default nar = new Default(activeConcepts,
-                1, 1, 3, rng,
+                1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
