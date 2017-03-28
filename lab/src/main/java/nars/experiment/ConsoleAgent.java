@@ -5,6 +5,8 @@ import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import nars.*;
+import nars.concept.ActionConcept;
+import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -24,6 +26,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.stream.Stream;
 
+import static nars.Op.BELIEF;
+
 /**
  * executes a unix shell and perceives the output as a grid of symbols
  * which can be interactively tagged by human, and optionally edited by NARS
@@ -37,7 +41,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
     final TestConsole R = new TestConsole(
             $.the("it"),
-            true, false,
+            true,
             4, 1);
     final TestConsole W;
 
@@ -82,8 +86,8 @@ public abstract class ConsoleAgent extends NAgentX {
 
         W = new TestConsole(
                 nar.self(),
-                true, true,
-                R.width(), R.height());
+                true,
+                R.width(), R.height()).write('a','b',' ');
 
         //SpaceGraph.window(new VSplit(Rlabel, R, 0.1f), 800, 600);
         //SpaceGraph.window(new VSplit(label("context"), Rlabel, 0.1f), 800, 600);
@@ -101,8 +105,8 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) {
-        Default n = NARBuilder.newMultiThreadNAR(3,
-                new RealTime.CS(true).durSeconds(0.02f));
+        Default n = NARBuilder.newMultiThreadNAR(4,
+                new RealTime.CS(true).durSeconds(0.1f));
         n.setSelf("I");
         //n.logBudgetMin(System.out, 0.25f);
         //n.log();
@@ -111,7 +115,7 @@ public abstract class ConsoleAgent extends NAgentX {
             @Override
             protected float act() {
                 //copy
-                return 2f * (Util.sqr(similarity(R.chars, W.chars) ) - 0.5f);
+                return  (Util.sqr(similarity(R.chars, W.chars) ) );
             }
         };
 
@@ -140,22 +144,25 @@ public abstract class ConsoleAgent extends NAgentX {
         private boolean write;
 
 
-        public TestConsole(Term id, boolean read, boolean write, int w, int h) {
+        public TestConsole(Term id, boolean read, int w, int h) {
             super(w, h);
             this.chars = new char[w][h];
             this.terms = new Term[w][h];
             for (int x = 0; x< w; x++) {
                 for (int y = 0; y < h; y++) {
                     chars[x][y] = ' ';
-                    terms[x][y] = $.inh($.p($.the(x), $.the(y)), id);
+                    terms[x][y] = $.inst($.p($.the(x), $.the(y)), id);
                 }
             }
             c[0] = 0;
             c[1] = 0;
             this.read = read;
-            this.write = write;
 
-            if (write) {
+
+        }
+
+        public TestConsole write(char... vocabulary) {
+            write = true;
                 actionTriState($.func("cursor", $.the("x"), id), (d) -> {
                     switch (d) {
                         case -1:
@@ -179,20 +186,25 @@ public abstract class ConsoleAgent extends NAgentX {
                         //case +1: Wmodel.setCursorPosition(cx, Math.min(Wmodel.getTerminalSize().getRows()-2, cy+1) ); break;
                     }
                 });
-                actionTriState($.func($.the("write"), id), d -> {
-                    switch (d) {
-                        case +1:
-                            write('x');
-                            break;
-                        case -1:
-                            //Wmodel.gui.handleInput(new com.googlecode.lanterna.input.KeyStroke(KeyType.Backspace));
-                            write(' ');
-                            break;
-                    }
+                for (char c : vocabulary) {
+                    Compound ct = $.func($.the("write"), $.quote(String.valueOf(c)), id);
 
-                });
-            }
+//                    ActionConcept m = new GoalActionConcept(ct, nar(), (b, d) -> {
+//                        boolean next = d != null && d.expectation() > 0.75f;
+//                        if (next) {
+//                            write(c);
+//                            return $.t(1f, nar.confidenceDefault(BELIEF));
+//                        }
+//                        return $.t(0f, nar.confidenceDefault(BELIEF));
+//                    });
+//                    actions().add(m);
 
+                    actionToggle(ct, d -> {
+                        if (d) write(c);
+                    });
+                }
+
+            return this;
         }
 
         @Override
@@ -260,9 +272,9 @@ public abstract class ConsoleAgent extends NAgentX {
             if (read) {
                 Term t = terms[this.c[0]][this.c[1]];
                 if (prev!=value) {
-                    input($.belief($.inh(t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now).apply(nar));
+                    input($.belief((Compound)$.prop( t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now-nar.dur()).apply(nar));
                 }
-                input($.belief($.inh( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
+                input($.belief((Compound)$.prop( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
             }
         }
 

@@ -40,7 +40,6 @@ public interface NAct {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
         });
-
         actions().add(m);
         return m;
     }
