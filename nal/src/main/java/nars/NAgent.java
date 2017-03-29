@@ -56,7 +56,7 @@ abstract public class NAgent implements NSense, NAct {
      *  measured in priority integrated over the duration, in other words,
      *  the total normalized priority is equal to this value times the duration time.
      *  */
-    public final FloatParam priority = new FloatParam(1f, 0f, 2f);
+    public final FloatParam priority = new FloatParam(0.5f, 0f, 2f);
 
     public final List<SensorConcept> sensors = newArrayList();
 

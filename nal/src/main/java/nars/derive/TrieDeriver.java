@@ -30,8 +30,6 @@ public class TrieDeriver implements Deriver {
 
     @NotNull
     public final BoolPredicate[] roots;
-    public final PremiseRuleSet rules;
-
 
     /**
      * derivation term graph, gathered for analysis
@@ -73,8 +71,10 @@ public class TrieDeriver implements Deriver {
 //        this(new PremiseRuleSet(Lists.newArrayList(rule)));
 //    }
 
+    public TrieDeriver(BoolPredicate[] root) {
+        this.roots = root;
+    }
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
-        this.rules = ruleset;
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);

@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  */
 public class ProxyTerm<T extends Term> implements Term {
 
-    private final T ref;
+    public final T ref;
 
     public ProxyTerm(T t) {
         this.ref = t;

@@ -10,32 +10,33 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 
 /**
  * K=key, V = item/value of type Item
  */
-public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
+public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     /**
      * temperature parameter, in the range of 0..1.0 controls the target average priority that
      * forgetting should attempt to cause.
-     *
+     * <p>
      * higher temperature means faster forgetting allowing new items to more easily penetrate into
      * the bag.
-     *
+     * <p>
      * lower temperature means old items are forgotten more slowly
      * so new items have more difficulty entering.
      *
      * @return the update function to apply to a bag
      */
-    @Nullable public static <X> Consumer<X> forget(int s, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
+    @Nullable
+    public static <X> Consumer<X> forget(int s, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
 
-        float r = Util.unitize(((m + p) - (s * (1f - temperature))) / m );
+        float r = Util.unitize(((m + p) - (s * (1f - temperature))) / m);
         //float r = Util.unitize(p / (p + m) * temperature);
         return r >= priEpsilon ? f.valueOf(r) : null;
 
@@ -51,9 +52,13 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
      * gets the next value without removing changing it or removing it from any index.  however
      * the bag is cycled so that subsequent elements are different.
      */
-    @Nullable default V sample() {
+    @Nullable
+    default V sample() {
         Object[] result = new Object[1];
-        sample(1, (x) -> { result[0] = x; return true; } );
+        sample(1, (x) -> {
+            result[0] = x;
+            return true;
+        });
         return (V) result[0];
     }
 
@@ -67,7 +72,6 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     @Override
     @Nullable
     V remove(@NotNull K x);
-
 
 
     default V put(@NotNull V x) {
@@ -93,10 +97,8 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //        }
 
 
-
-    @Deprecated V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
-
-
+    @Deprecated
+    V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
 
 
 //    /**
@@ -107,14 +109,12 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //        top(c -> (each.test(c) && (toFire[0]--) > 0));
 
 
-
-
     /**
      * fills a collection with at-most N items, if an item passes the predicate.
      * returns how many items added
      */
     @Nullable
-    Bag<K,V> sample(int n, @NotNull Predicate<? super V> target);
+    Bag<K, V> sample(int n, @NotNull Predicate<? super V> target);
 
 
     /**
@@ -122,10 +122,13 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
      *
      * @return The number of items
      */
-    @Override int size();
+    @Override
+    int size();
 
 
-    /** when adjusting the priority of links directly, to correctly absorb the pressure difference, call this */
+    /**
+     * when adjusting the priority of links directly, to correctly absorb the pressure difference, call this
+     */
     default void pressurize(float f) {
 
     }
@@ -187,23 +190,32 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 
     }
 
-    /** returns the priority of a value, or NaN if such entry is not present */
+    /**
+     * returns the priority of a value, or NaN if such entry is not present
+     */
     float pri(@NotNull V key);
 
     default boolean active(@NotNull V key) {
         return priSafeOrNeg1(key) >= 0;
     }
 
-    default float priSafeOrZero(@NotNull V key) { return priSafe(key, 0);     }
-    default float priSafeOrNeg1(@NotNull V key) { return priSafe(key, -1);     }
+    default float priSafeOrZero(@NotNull V key) {
+        return priSafe(key, 0);
+    }
+
+    default float priSafeOrNeg1(@NotNull V key) {
+        return priSafe(key, -1);
+    }
 
     default float priSafe(@NotNull V key, float valueIfMissing) {
         float p = pri(key);
-        return (p==p) ? p : valueIfMissing;
+        return (p == p) ? p : valueIfMissing;
     }
 
 
-    /** resolves the key associated with a particular value */
+    /**
+     * resolves the key associated with a particular value
+     */
     @NotNull K key(V value);
 
 
@@ -215,7 +227,6 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //    default PLink<V> get() {
 //        return pop();
 //    }
-
 
 
     default void print() {
@@ -249,8 +260,6 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //        forEachEntry(x -> target.increment(x.getPriority()));
 //        return target.getResult();
 //    }
-
-
 
 
     /**
@@ -399,6 +408,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     @NotNull
     public static double[] priHistogram(Iterable<PLink> pp, @NotNull double[] x) {
         int bins = x.length;
+
         pp.forEach(y -> {
             float p = y.priSafe(0);
             int b = Util.bin(p, bins - 1);
@@ -415,15 +425,41 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         return x;
     }
 
-    @Deprecated Bag<K,V> commit();
+    /** double[histogramID][bin] */
+    @NotNull public static <X, Y> double[][] histogram(@NotNull Iterable<PLink<Y>> pp, @NotNull BiConsumer<PLink<Y>, double[][]> each, @NotNull double[][] d) {
 
+        pp.forEach(y -> {
+            each.accept(y, d);
+            //float p = y.priSafe(0);
+            //x[Util.bin(p, bins - 1)]++;
+        });
+
+        for (double[] e : d) {
+            double total = 0;
+            for (int i = 0, eLength = e.length; i < eLength; i++) {
+                total += e[i];
+            }
+            if (total > 0) {
+                for (int i = 0, eLength = e.length; i < eLength; i++) {
+                    double f = e[i];
+                    e[i] /= total;
+                }
+            }
+        }
+
+        return d;
+    }
+
+    @Deprecated
+    Bag<K, V> commit();
 
 
     /**
      * commits the next set of changes and updates budgeting
+     *
      * @return this bag
      */
-    @NotNull Bag<K,V> commit(Consumer<V> update);
+    @NotNull Bag<K, V> commit(Consumer<V> update);
 
 
     @Nullable Bag EMPTY = new Bag() {
@@ -543,12 +579,17 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
     }
 
 
-    /** samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed  */
-    @Nullable default V pop() {
+    /**
+     * samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed
+     */
+    @Nullable
+    default V pop() {
         V x = sample();
         return (x != null) ? remove(key(x)) : null;
     }
-    @Nullable default V pop(Predicate<? super V> each) {
+
+    @Nullable
+    default V pop(Predicate<? super V> each) {
         V x = sample();
         if (x != null) {
             if (each.test(x))
@@ -558,14 +599,14 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         return null;
     }
 
-    default Bag<K,V> copy(@NotNull Bag target, int limit) {
+    default Bag<K, V> copy(@NotNull Bag target, int limit) {
         return this.sample(limit, t -> {
             target.put(t);
             return true; //assume it worked
         });
     }
 
-    default Bag<K,V> capacity(int i) {
+    default Bag<K, V> capacity(int i) {
         setCapacity(i);
         return this;
     }
@@ -574,7 +615,7 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
         int i;
         for (i = 0; i < num; i++) {
             V x = pop(each);
-            if (x==null)
+            if (x == null)
                 break;
         }
         return i;
@@ -588,7 +629,6 @@ public interface Bag<K,V> extends Table<K, V>, Iterable<V> {
 //            return false;
 //        return true;
 //    }
-
 
 
     //TODO default @NotNull Bag<V> move(int limit, @NotNull Bag target) {

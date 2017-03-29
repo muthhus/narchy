@@ -93,7 +93,7 @@ public class Vis {
 
     public static Surface budgetHistogram(NAR nar, int bins) {
         if (nar instanceof Default) {
-            return budgetHistogram((Iterable)((Default) nar).focus().conceptsActive(), bins);
+            return budgetHistogram((Iterable)nar.focus().conceptsActive(), bins);
         } else { //if (nar instance)
             //return budgetHistogram(((Default2)nar).active, bins);
             return grid(); //TODO
@@ -104,9 +104,18 @@ public class Vis {
         //new SpaceGraph().add(new Facial(
 
         double[] d = new double[bins];
-        return //new GridSurface(VERTICAL,
-                Vis.pane("Concept Priority Distribution (0..1)", new HistogramChart(
-                        () -> Bag.priHistogram(bag, d), new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f)));
+        return col(
+                Vis.pane("Concept Priority Distribution (0..1)",
+                        new HistogramChart(
+                            () -> Bag.priHistogram(bag, d),
+                            new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
+                        ),
+                Vis.pane("Concept Volume",
+                        new HistogramChart(
+                                () -> Bag.priHistogram(bag, d),
+                                new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
+                )
+        );
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {
 //                    if (c != null)

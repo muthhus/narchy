@@ -5,15 +5,19 @@ package nars.derive;
  */
 public class DefaultDeriver  {
 
-    public static final Deriver the = Deriver.get(
-        "nal1.nal",
-        "nal2.nal",
-        "nal3.nal",
-        "nal4.nal",
-        "nal6.nal",
-        "induction.nal",
-        "misc.nal"
-    );
+    public static final Deriver the =
+        //new InstrumentedDeriver(
+            (TrieDeriver)Deriver.get(
+                "nal1.nal",
+                "nal2.nal",
+                "nal3.nal",
+                "nal4.nal",
+                "nal6.nal",
+                "induction.nal",
+                "misc.nal"
+            )
+        //)
+    ;
 
 
 //    @Override

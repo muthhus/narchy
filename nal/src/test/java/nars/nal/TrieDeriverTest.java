@@ -153,84 +153,84 @@ public class TrieDeriverTest {
 //    }
 
 
-    @Test
-    public void testRuleStatistics() {
-        List<PremiseRule> R = d.rules.rules;
-        int registeredRules = R.size();
-
-
-        Frequency f = new Frequency();
-        R.forEach(f::addValue);
-        Iterator<Map.Entry<Comparable<?>, Long>> ii = f.entrySetIterator();
-        while (ii.hasNext()) {
-            Map.Entry<Comparable<?>, Long> e = ii.next();
-            if (e.getValue() > 1) {
-                System.err.println("duplicate: " + e);
-            }
-        }
-        out.println("total: " + f.getSumFreq() + ", unique=" + f.getUniqueCount());
-
-        HashSet<PremiseRule> setRules = Sets.newHashSet(R);
-
-        assertEquals("no duplicates", registeredRules, setRules.size());
-
-        Set<BoolPredicate> preconds = new HashSet();
-        int totalPrecond = 0;
-
-        out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());
-
-        //preconds.forEach(p -> System.out.println(p));
-
-
-        //Set<TaskBeliefPair> ks = d.ruleIndex.keySet();
-//        System.out.println("Patterns: keys=" + ks.size() + ", values=" + d.ruleIndex.size());
-//        for (TaskBeliefPair pp : ks) {
-//            System.out.println(pp + " x " + d.ruleIndex.get(pp).size());
+//    @Test
+//    public void testRuleStatistics() {
+//        List<PremiseRule> R = d.rules.rules;
+//        int registeredRules = R.size();
 //
+//
+//        Frequency f = new Frequency();
+//        R.forEach(f::addValue);
+//        Iterator<Map.Entry<Comparable<?>, Long>> ii = f.entrySetIterator();
+//        while (ii.hasNext()) {
+//            Map.Entry<Comparable<?>, Long> e = ii.next();
+//            if (e.getValue() > 1) {
+//                System.err.println("duplicate: " + e);
+//            }
 //        }
-
-
-    }
-
-//    @Test public void testPostconditionSingletons() {
-////        System.out.println(PostCondition.postconditions.size() + " unique postconditions " + PostCondition.totalPostconditionsRequested);
-////        for (PostCondition p : PostCondition.postconditions.values()) {
-////            System.out.println(p);
+//        out.println("total: " + f.getSumFreq() + ", unique=" + f.getUniqueCount());
+//
+//        HashSet<PremiseRule> setRules = Sets.newHashSet(R);
+//
+//        assertEquals("no duplicates", registeredRules, setRules.size());
+//
+//        Set<BoolPredicate> preconds = new HashSet();
+//        int totalPrecond = 0;
+//
+//        out.println("total precondtions = " + totalPrecond + ", unique=" + preconds.size());
+//
+//        //preconds.forEach(p -> System.out.println(p));
+//
+//
+//        //Set<TaskBeliefPair> ks = d.ruleIndex.keySet();
+////        System.out.println("Patterns: keys=" + ks.size() + ", values=" + d.ruleIndex.size());
+////        for (TaskBeliefPair pp : ks) {
+////            System.out.println(pp + " x " + d.ruleIndex.get(pp).size());
+////
 ////        }
 //
+//
 //    }
-
-    @Test public void testPatternIndexContainsNoConcepts() {
-        PatternTermIndex p = d.rules.patterns;
-        assertTrue(ConceptBuilder.Null == p.conceptBuilder());
-//        //out.println(p.data);
-//        //out.println(p.atoms);
-//        p.forEach(t -> {
 //
-//            if (!(t instanceof TransformConcept))
-//                assertFalse( t instanceof Concept);
+////    @Test public void testPostconditionSingletons() {
+//////        System.out.println(PostCondition.postconditions.size() + " unique postconditions " + PostCondition.totalPostconditionsRequested);
+//////        for (PostCondition p : PostCondition.postconditions.values()) {
+//////            System.out.println(p);
+//////        }
+////
+////    }
 //
-//            //test all subterms are in the pattern index too
-//            t.term().recurseTerms((s, parent)->{
-//                if (s instanceof Variable)
-//                    return;
+//    @Test public void testPatternIndexContainsNoConcepts() {
+//        PatternTermIndex p = d.rules.patterns;
+//        assertTrue(ConceptBuilder.Null == p.conceptBuilder());
+////        //out.println(p.data);
+////        //out.println(p.atoms);
+////        p.forEach(t -> {
+////
+////            if (!(t instanceof TransformConcept))
+////                assertFalse( t instanceof Concept);
+////
+////            //test all subterms are in the pattern index too
+////            t.term().recurseTerms((s, parent)->{
+////                if (s instanceof Variable)
+////                    return;
+////
+////
+////                Termed sub = p.concept(s, false);
+////                if (sub == null) {
+////                    System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
+////                }
+////                assertNotNull(sub);
+////            });
+////
+////            //out.println(t);
+////        });
+////        //System.out.println("compounds: "+ p.internings + " internings, " + p.size() + " unique");
+//
+//    }
 //
 //
-//                Termed sub = p.concept(s, false);
-//                if (sub == null) {
-//                    System.out.println("subterm " + s + " of " + parent + " not in PatternIndex");
-//                }
-//                assertNotNull(sub);
-//            });
 //
-//            //out.println(t);
-//        });
-//        //System.out.println("compounds: "+ p.internings + " internings, " + p.size() + " unique");
-
-    }
-
-
-
 
 //
 //        FSTConfiguration conf = FSTConfiguration.createDefaultConfiguration();

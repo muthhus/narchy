@@ -361,6 +361,8 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             //return Hack.compare(toString(), y.toString());
 
         }
+        if (y instanceof ProxyTerm)
+            return compareTo(((ProxyTerm)y).ref);
 
         throw new RuntimeException("ordering exception: " + this + ", " + y);
     }

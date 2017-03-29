@@ -58,7 +58,7 @@ public class InterNARTest {
 
             Util.pause(CONNECTION_TIME);
 
-            int postCycles = 256;
+            int postCycles = 384;
             for (int i = 0; i < postCycles; i++) {
                 a.run(1);
                 b.run(1);
