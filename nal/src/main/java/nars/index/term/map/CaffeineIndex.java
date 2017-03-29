@@ -54,7 +54,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
     public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, boolean soft, @Nullable Executor exe) {
-        this(conceptBuilder, capacity, soft ? 0 : capacity, exe);
+        this(conceptBuilder, capacity, -1, exe);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
@@ -73,27 +73,26 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         if (Param.DEBUG)
             builder.recordStats();
 
-        Caffeine<Object, Object> subTermsBuilder = Caffeine.newBuilder();
+        Caffeine<Object, Object> subTermsBuilder = subCapacity > 0 ? Caffeine.newBuilder() : null;
 
         if (exe!=null) {
             builder.executor(exe);
-            subTermsBuilder.executor(exe);
         }
 
+        if (subCapacity > 0) {
+            subTermsBuilder.executor(exe);
 
-        if (subCapacity > 0)
-            subTermsBuilder.maximumSize(subCapacity);
-        else {
-            subTermsBuilder.weakValues();
-            //subTermsBuilder.softValues();
+            if (subCapacity == 0)
+                subTermsBuilder.maximumSize(subCapacity);
+            else {
+                subTermsBuilder.weakValues();
+                //subTermsBuilder.softValues();
+            }
         }
 
 
         this.concepts = builder.build();
-        this.subterms = subTermsBuilder.build();
-
-
-
+        this.subterms = subTermsBuilder!=null ? subTermsBuilder.build() : null;
 
         //else
           //  this.subterms = null;
@@ -113,24 +112,29 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public final TermContainer intern(@NotNull Term[] a) {
 
+
         TermContainer v = super.intern(a);
 
-        int len = a.length;
-        if (len < 2)
-            return v; //dont intern 1-element containers
+        if (subterms!=null) {
+            int len = a.length;
+            if (len < 2)
+                return v; //dont intern 1-element containers
 
-//        //HACK
-//        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
-//            return new TermVector2(x, y);
+            //        //HACK
+            //        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
+            //            return new TermVector2(x, y);
 
-//        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
-//        try {
-//            IO.writeTermContainer(d, a);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+            //        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
+            //        try {
+            //            IO.writeTermContainer(d, a);
+            //        } catch (IOException e) {
+            //            throw new RuntimeException(e);
+            //        }
 
-        return subterms.get(v, vv -> vv);
+            return subterms.get(v, vv -> vv);
+        } else {
+            return v;
+        }
 
 
         //return subterms!=null ? subterms.get(s, (ss) -> ss) :s;

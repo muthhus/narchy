@@ -88,7 +88,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public <X> X withBags(Term t, BiFunction<Bag<Term,BLink<Term>>,Bag<Task,BLink<Task>>,X> f) {
         Map sharedMap = newBagMap(t.volume());
         @NotNull Bag<Term,BLink<Term>> termbag = newBag(sharedMap, plusBlend);
-        @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap, maxBlend);
+        @NotNull Bag<Task,BLink<Task>> taskbag = newBag(sharedMap, plusBlend);
 
 
 //        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);

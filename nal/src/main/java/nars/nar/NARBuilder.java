@@ -84,7 +84,7 @@ public interface NARBuilder {
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, maxConcepts * 2,
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
                     exe
                     //null /* null = fork join common pool */
                 )
@@ -140,54 +140,54 @@ public interface NARBuilder {
 //                };
 //            }
 
-            final static int COMPRESS_ABOVE_COMPLEXITY = 32;
-            final Compressor compressor = new Compressor(this, "_",
-                    12, 20,
-                    1f, 64, 16);
-
-            @Override
-            public Task pre(@NotNull Task t) {
-                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
-                    return compressor.encode(t);
-                } else {
-                    //@NotNull Task encoded = compressor.encode(t);
-//                    if (!encoded.equals(t))
-//                        process(t); //input both forms
-                    //return encoded;
-
-                    return t; //dont affect input
-                }
-            }
-
-            @NotNull
-            @Override
-            public Term pre(@NotNull Term t) {
-                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
-                    return compressor.encode(t);
-                else
-                    return t;
-            }
-
-            @NotNull
-            @Override
-            public Task post(@NotNull Task t) {
-                return compressor.decode(t);
-            }
-
-            @Override
-            @NotNull
-            public Term post(@NotNull Term t) {
-                return compressor.decode(t);
-            }
+//            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
+//            final Compressor compressor = new Compressor(this, "_",
+//                    4, 20,
+//                    0.25f, 64, 16);
+//
+//            @Override
+//            public Task pre(@NotNull Task t) {
+//                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
+//                    return compressor.encode(t);
+//                } else {
+//                    //@NotNull Task encoded = compressor.encode(t);
+////                    if (!encoded.equals(t))
+////                        process(t); //input both forms
+//                    //return encoded;
+//
+//                    return t; //dont affect input
+//                }
+//            }
+//
+//            @NotNull
+//            @Override
+//            public Term pre(@NotNull Term t) {
+//                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
+//                    return compressor.encode(t);
+//                else
+//                    return t;
+//            }
+//
+//            @NotNull
+//            @Override
+//            public Task post(@NotNull Task t) {
+//                return compressor.decode(t);
+//            }
+//
+//            @Override
+//            @NotNull
+//            public Term post(@NotNull Term t) {
+//                return compressor.decode(t);
+//            }
 
 
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(32);
-        nar.deriver.conceptsFiredPerBatch.setValue(8);
-        nar.deriver.derivationsInputPerCycle.setValue(48);
+        nar.deriver.conceptsFiredPerCycle.setValue(128);
+        nar.deriver.conceptsFiredPerBatch.setValue(32);
+        nar.deriver.derivationsInputPerCycle.setValue(64);
 
-        nar.termVolumeMax.setValue(96);
+        nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
@@ -388,13 +388,13 @@ public interface NARBuilder {
     }
 
 
-    static class NARTune implements Runnable {
+    class NARTune implements Runnable {
         private final NAR nar;
         final static int outputs = 4, inputs = outputs;
         private final SimpleLSTM net;
 
         double[] prev, next, predict;
-        private float alpha = 0.05f;
+        private final float alpha = 0.05f;
 
         public NARTune(NAR nar) {
 
@@ -414,9 +414,9 @@ public interface NARBuilder {
         public void run() {
             double[] current = new double[outputs];
             current[0] = nar.emotion.learningVol();
-            current[1] = (float) nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
-            current[2] = (float) nar.emotion.busyPri.getMean();
-            current[3] = (float) nar.emotion.confident.getMean();
+            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
+            current[2] = nar.emotion.busyPri.getMean();
+            current[3] = nar.emotion.confident.getMean();
 
             double error = MathArrays.distance1(predict, current);
 

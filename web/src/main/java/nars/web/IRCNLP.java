@@ -12,6 +12,7 @@ import nars.budget.RawBLink;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.op.Command;
 import nars.bag.leak.LeakOut;
 import nars.op.mental.Inperience;
@@ -137,7 +138,7 @@ public class IRCNLP extends IRC {
         private final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
-            super(nar, 8, 0.03f);
+            super(nar, 8, 1f);
             this.nar = nar;
             this.channels = channels;
         }
@@ -223,7 +224,7 @@ public class IRCNLP extends IRC {
     void hear(String text, String src) {
         Hear.hear(nar, text, src, (t) -> {
             Compound f = $.func("SENTENCE", Hear.tokenize(t));
-            nar.believe(0.5f, f, Tense.Present, 1f, 0.8f );
+            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f );
             return null;
         });
     }
@@ -270,8 +271,7 @@ public class IRCNLP extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024 * 8, true);
-        exe.sync(true);
+        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024, true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 3, random,
 
@@ -306,7 +306,7 @@ public class IRCNLP extends IRC {
         nar.DEFAULT_QUEST_QUALITY = 0.5f;
 
         nar.confMin.setValue(0.01f);
-        nar.termVolumeMax.setValue(40);
+        nar.termVolumeMax.setValue(64);
         //nar.linkFeedbackRate.setValue(0.005f);
 
 
@@ -314,7 +314,7 @@ public class IRCNLP extends IRC {
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        new Inperience(nar, 0.01f, 8);
+        new Inperience(nar, 0.25f, 8);
 
         nar.loop(framesPerSecond);
 
@@ -323,10 +323,10 @@ public class IRCNLP extends IRC {
 
     public static void main(String[] args) throws Exception {
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(2048, 25, 300);
-
+        @NotNull Default n = //newRealtimeNAR(2048, 0, 2000);
+                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false));
 
 //        Control c = n.getControl();
 //        n.setControl(new ChainedControl(c) {
@@ -342,16 +342,16 @@ public class IRCNLP extends IRC {
 //        });
 
 
-        //Hear.wiki(n);
+        Hear.wiki(n);
 
         IRCNLP bot = new IRCNLP(n,
                 "experiment1", "irc.freenode.net",
-                "#123xyz"
+                //"#123xyz"
                 //"#netention"
-                //"#nars"
+                "#nars"
         );
 
-        n.truthResolution.setValue(0.02f);
+        n.truthResolution.setValue(0.01f);
 
         n.on("say", (Command)(x, aa, nn) -> {
             String msg = Joiner.on(' ').join(
@@ -469,8 +469,10 @@ public class IRCNLP extends IRC {
 
         );
 
+        n.loop();
 
         bot.start();
+
 
     }
 

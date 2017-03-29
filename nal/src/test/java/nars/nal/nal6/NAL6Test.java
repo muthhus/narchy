@@ -71,11 +71,11 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<<bird --> $x> ==> <robin --> $x>>"); //en("What can be said about bird can also be said about robin.");
         tester.believe("<<swimmer --> $y> ==> <robin --> $y>>", 0.70f, 0.90f); //en("What can be said about swimmer usually can also be said about robin.");
-        tester.mustBelieve(cycles, "<(&&,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 1.00f, 0.81f); //en("What can be said about bird and swimmer can also be said about robin.");
+        tester.mustBelieve(cycles*2, "<(&&,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 1.00f, 0.81f); //en("What can be said about bird and swimmer can also be said about robin.");
         //tester.mustBelieve(cycles, "<(||,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 0.70f, 0.81f); //en("What can be said about bird or swimmer can also be said about robin.");
-        tester.mustBelieve(cycles, "<<bird --> $1> ==> <swimmer --> $1>>", 1.00f, 0.36f); //en("I guess what can be said about bird can also be said about swimmer.");
-        tester.mustBelieve(cycles, "<<swimmer --> $1> ==> <bird --> $1>>", 0.70f, 0.45f); //en("I guess what can be said about swimmer can also be said about bird.");
-        tester.mustBelieve(cycles, "<<bird --> $1> <=> <swimmer --> $1>>", 0.70f, 0.45f); //en("I guess bird and swimmer share most properties.");
+        tester.mustBelieve(cycles*2, "<<bird --> $1> ==> <swimmer --> $1>>", 1.00f, 0.36f); //en("I guess what can be said about bird can also be said about swimmer.");
+        tester.mustBelieve(cycles*2, "<<swimmer --> $1> ==> <bird --> $1>>", 0.70f, 0.45f); //en("I guess what can be said about swimmer can also be said about bird.");
+        tester.mustBelieve(cycles*2, "<<bird --> $1> <=> <swimmer --> $1>>", 0.70f, 0.45f); //en("I guess bird and swimmer share most properties.");
 
     }
 
@@ -200,8 +200,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<$x --> flyer>,<$x --> [chirping]>, <($x, worms) --> food>) ==> <$x --> bird>>"); //en("If something can fly, chirp, and eats worms, then it is a bird.");
         tester.believe("<{Tweety} --> flyer>"); //en("Tweety can fly.");
-        tester.mustBelieve(cycles*4, "<(&&,<{Tweety} --> [chirping]>,<({Tweety},worms) --> food>) ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
-
+        tester.mustBelieve(cycles*6, "<(&&,<{Tweety} --> [chirping]>,<({Tweety},worms) --> food>) ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp and eats worms, then it is a bird.");
     }
 
 

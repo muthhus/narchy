@@ -29,7 +29,7 @@ public class BeliefPositive extends AtomicPredicate<Derivation> {
 
     public static final class BeliefNegative extends BeliefPositive {
 
-        public static final BeliefNegative theNeg = new BeliefNegative();
+        public static final BeliefNegative the = new BeliefNegative();
 
         @Override
         public boolean test(@NotNull Derivation m) {

@@ -63,10 +63,11 @@ abstract public class On<V> {
             topic.disable(this);
         }
 
-        @Override
-        public String toString() {
-            return "On.weak:" + topic + "->" + reaction.get();
-        }
+//        @Override
+//        public String toString() {
+//
+//            //return "On.weak:" + topic + "->" + reaction.get();
+//        }
     }
 
 }

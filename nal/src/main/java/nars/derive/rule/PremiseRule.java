@@ -273,24 +273,17 @@ public class PremiseRule extends GenericCompound {
 
         put(TaskPunctuation.class, rank--);
 
+        put(events.class, rank--);
+
         put(SubTermsStructure.class, rank--);
         put(SubTermStructure.class, rank--);
 
         put(TermNotEquals.class, rank--);
 
 
-        put(TaskPositive.class, rank--); //includes either positive or negative
-        put(TaskNegative.class, rank--); //includes either positive or negative
-
-        put(BeliefPositive.class, rank--);
-        put(BeliefPositive.BeliefNegative.class, rank--);
-
-        put(events.class, rank--);
-
-
-
 //        put(PatternOpNot.class, rank--);
 
+        put(TaskPositive.class, rank--); //includes both positive or negative
 
         put(Solve.class, rank--);
 
@@ -307,6 +300,7 @@ public class PremiseRule extends GenericCompound {
 
 
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
+        if ((b == BeliefPositive.thePos) || (b == BeliefPositive.BeliefNegative.the)) return TaskPositive.class;
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
@@ -325,6 +319,10 @@ public class PremiseRule extends GenericCompound {
 
         if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
+        if (b == events.beforeAfterOrEternal) return events.class;
+        if (b == events.nonEternal) return events.class;
+        if (b == events.beliefDTSimultaneous) return events.class;
+
         //if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
         //if (b == IfTermLinkBefore.ifBeliefBefore) return events.class;
 
@@ -348,7 +346,7 @@ public class PremiseRule extends GenericCompound {
 
             HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
             int c = Integer.compare(ps.getOrDefault(bc, -1), ps.getOrDefault(ac, -1));
-            return (c != 0) ? c : b.compareTo(a);
+            return (c != 0) ? c : b.toString().compareTo(a.toString());
         });
 
         return l;
@@ -853,7 +851,7 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add( BeliefPositive.BeliefNegative.theNeg);
+                            pres.add( BeliefPositive.BeliefNegative.the);
                             break;
                         case "positive":
                             pres.add( BeliefPositive.thePos);

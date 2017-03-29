@@ -51,10 +51,12 @@ abstract public class NAgent implements NSense, NAct {
 
     public final NAR nar;
 
-    /** master gain for this agent that all the tasks will be normalized as a fraction of per cycle.
+    /** master gain rate for this agent that all the tasks will be normalized as a fraction of per cycle.
      *  to control the relative priority of multiple active agents within a NAR.
      *  measured in priority integrated over the duration, in other words,
      *  the total normalized priority is equal to this value times the duration time.
+     *
+     *  the total priority delivered per duration = this priority * duration_length
      *  */
     public final FloatParam priority = new FloatParam(0.5f, 0f, 2f);
 
@@ -228,7 +230,8 @@ abstract public class NAgent implements NSense, NAct {
 //        if (load < 1) {
 
 
-        long next = now + (dur * 3 / 2);
+        long next = now + dur;
+                //(dur * 3 / 2);
 
         nar.input( nextInput(next),  priority.floatValue() * dur );
 

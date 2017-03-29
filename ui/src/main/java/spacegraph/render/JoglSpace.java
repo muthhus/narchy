@@ -90,8 +90,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 a.start();
                 logger.info("START {}", a);
             } else {
-                a.resume();
-                logger.info("RESUME {}", a);
+                //a.resume();
+                //logger.info("RESUME {}", a);
             }
 
 
@@ -107,10 +107,10 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                     boolean nowEmpty = windows.isEmpty();
 
                     a.remove(w);
-                    if (nowEmpty) {
-                        a.pause();
-                        logger.info("PAUSE {}", a);
-                    }
+//                    if (nowEmpty) {
+//                        a.pause();
+//                        logger.info("PAUSE {}", a);
+//                    }
                 }
             }
         });

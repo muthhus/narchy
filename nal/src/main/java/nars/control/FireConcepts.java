@@ -130,7 +130,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input
      */
-    public static class BufferedConceptBagFocus extends FireConcepts {
+    public static class FireConceptsBufferDerivations extends FireConcepts {
 
         /**
          * pending derivations to be input after this cycle
@@ -138,14 +138,16 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         final TaskHijackBag pending;
 
 
-        public BufferedConceptBagFocus(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
+        public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
             super(nar, premiseBuilder);
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
-                @Override
-                public float pri(@NotNull Task key) {
-                    return (1f + key.priSafe(0)) * (1f + key.qua());
-                }
+
+                //                @Override
+//                public float pri(@NotNull Task key) {
+//                    //return (1f + key.priSafe(0)) * (1f + key.qua());
+//                    //return (1f + key.priSafe(0)) * (1f + key.qua());
+//                }
 
 //                @Override
 //                public void onRemoved(@NotNull Task value) {
@@ -175,12 +177,12 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             int input = pending.pop(inputsPerCycle, ready::add);
             //System.out.println(input + " (" + Texts.n2(100f * input/((float)inputsPerCycle)) + "%) load, " + pending.size() + " remain");
 
-            nar.runLater(ready, nar::input, 16);
+            nar.runLater(ready, nar::input, 32);
             //ready.clear();
 
             //pending.commit();
 
-            pending.capacity(inputsPerCycle * 8);
+            pending.capacity(inputsPerCycle * 16);
             // * 1f/((float)Math.sqrt(active.capacity()))
 
             //float load = nar.exe.load();

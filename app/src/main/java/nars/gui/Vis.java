@@ -500,8 +500,8 @@ public class Vis {
             set( plot1, plot2, plot3, plot4 );
 
             //plot1.add("Conf", nar.emotion.confident::getSum);
-            plot2.add("Busy", nar.emotion.busyPri::getSum);
-            plot3.add("Lern", nar.emotion::learningPri, 0f, 1f);
+            plot2.add("Busy", nar.emotion.busyVol::getSum);
+            plot3.add("Lern", nar.emotion::learningVol, 0f, 1f);
 
             plot1.add("Dex", a::dexterity, 0f, 1f);
 

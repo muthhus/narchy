@@ -129,7 +129,7 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, maxBlend), nar);
+        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, plusBlend), nar);
     }
 
     @Override

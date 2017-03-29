@@ -225,19 +225,19 @@ public class IRCAgent extends IRC {
 
         Random random = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(2, 1024, true);
+        MultiThreadExecutor exe = new MultiThreadExecutor(4, 1024, true);
 
         Default nar = new Default(activeConcepts, conceptsPerFrame, 3, random,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
-                new RealTime.DSHalf().durSeconds(0.25f),
+                new RealTime.DSHalf().durSeconds(0.1f),
                 exe
         );
 
 
-        int volMax = 48;
+        int volMax = 64;
 
 //        //Multi nar = new Multi(3,512,
 //        Default nar = new Default(2048,
@@ -270,7 +270,7 @@ public class IRCAgent extends IRC {
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
         new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        new Inperience(nar, 0.003f, 8);
+        new Inperience(nar, 0.4f, 8);
 
         nar.loop(framesPerSecond);
 
