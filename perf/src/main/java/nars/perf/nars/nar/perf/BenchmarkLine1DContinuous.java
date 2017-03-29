@@ -2,6 +2,10 @@ package nars.perf.nars.nar.perf;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
+import nars.derive.InstrumentedDeriver;
+import nars.derive.TrieDeriver;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.test.agent.Line1DContinuous;
@@ -41,12 +45,19 @@ public class BenchmarkLine1DContinuous {
 
         exe = new InstrumentedExecutor( exe, 16 );
 
+        InstrumentedDeriver r = null ; //new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
+
         Default nar = new Default(1024,
                 conceptsPerCycle, 3, rng,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*64, false, null),
                 new FrameTime().dur(1),
                 exe
-        );
+        ) {
+            @Override
+            public Deriver newDeriver() {
+                return r == null ? super.newDeriver() : r;
+            }
+        };
         nar.termVolumeMax.set(46);
 
 
@@ -73,6 +84,10 @@ public class BenchmarkLine1DContinuous {
         l.print = false;
         //l.runRT(25, 15000).join();
         l.run(time);
+
+
+        if (r!=null)
+            r.print();
 
 
 //        NAR.printActiveTasks(nar, true);

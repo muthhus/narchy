@@ -43,9 +43,9 @@ public final class DefaultConceptState extends ConceptState {
         this.goalsMaxEte = goalsMaxEte;
         this.goalsMaxTemp = goalsMaxTemp;
         this.questionsMax = questionsMax;
-        this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/8));
+        this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
         this.termLinksCapacityMax = termlinksCapacity;
-        this.taskLinksCapacityMin = new MutableInteger(Math.max(1,taskLinksCapacity.intValue()/8));
+        this.taskLinksCapacityMin = new MutableInteger(Math.max(1,taskLinksCapacity.intValue()/2));
         this.taskLinksCapacityMax = taskLinksCapacity;
     }
 

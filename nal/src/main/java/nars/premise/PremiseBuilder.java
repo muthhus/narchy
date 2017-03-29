@@ -44,7 +44,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Derivation premise(@NotNull Termed concept, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
+    public Derivation premise(@NotNull Concept concept, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
 
         Task belief = null;
 
@@ -183,6 +183,8 @@ abstract public class PremiseBuilder {
 
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
+
+        nar.concepts.commit(concept);
 
         return newPremise(concept, task, beliefTerm, belief, pri, qua, target, nar);
     }

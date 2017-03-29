@@ -11,6 +11,10 @@ import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
+import nars.derive.InstrumentedDeriver;
+import nars.derive.TrieDeriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Compressor;
@@ -75,9 +79,9 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 96 * 1024;
+        int maxConcepts = 256 * 1024;
 
-        int activeConcepts = 2048;
+        int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
                 1, 3, rng,
@@ -93,8 +97,13 @@ public interface NARBuilder {
                 time,
                 exe) {
 
-
 //            @Override
+//            public Deriver newDeriver() {
+//                return new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
+//            }
+
+
+            //            @Override
 //            public MatrixPremiseBuilder newPremiseBuilder() {
 //                return new MatrixPremiseBuilder() {
 //                    @Override
@@ -183,14 +192,14 @@ public interface NARBuilder {
 
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(128);
+        nar.deriver.conceptsFiredPerCycle.setValue(768);
         nar.deriver.conceptsFiredPerBatch.setValue(32);
-        nar.deriver.derivationsInputPerCycle.setValue(64);
+        nar.deriver.derivationsInputPerCycle.setValue(384);
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;

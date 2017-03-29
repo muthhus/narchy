@@ -133,6 +133,61 @@ public interface NAct {
     }
 
     @Nullable
+    default ActionConcept actionTriStatePWM(@NotNull Compound s, @NotNull IntConsumer i) {
+
+
+        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
+
+
+            int ii;
+            if (d == null) {
+                ii = 0;
+            } else {
+                float f = d.freq();
+                if (f == 1f) {
+                    ii = +1;
+                } else if (f == 0) {
+                    ii = -1;
+                } else if (f > 0.5f) {
+                    ii = nar().random.nextFloat() <= ((f - 0.5f)*2f) ? +1 : 0;
+                } else if (f < 0.5f) {
+                    ii = nar().random.nextFloat() <= ((0.5f - f)*2f) ? -1 : 0;
+                } else
+                    ii = 0;
+            }
+
+            i.accept(ii);
+
+            float f;
+            switch (ii) {
+                case 1:
+                    f = 1f;
+                    break;
+                case 0:
+                    f = 0.5f;
+                    break;
+                case -1:
+                    f = 0f;
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+
+            return
+                    //d!=null ?
+                    $.t(f,
+                            //d.conf()
+                            nar().confidenceDefault(BELIEF)
+                    )
+                    //: null
+                    ;
+        });
+
+        actions().add(m);
+        return m;
+    }
+
+    @Nullable
     default ActionConcept actionToggle(@NotNull Compound s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }

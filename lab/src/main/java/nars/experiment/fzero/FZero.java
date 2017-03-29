@@ -112,11 +112,11 @@ public class FZero extends NAgentX {
 //            e.printStackTrace();
 //        }
 
-        actionToggle/*PWM*/($.func($.the("fwd"), $.the("fz")),
+        actionTogglePWM($.func($.the("fwd"), $.the("fz")),
             //(b)->{ fz.thrust = b; }
             () -> fz.thrust = true, () -> fz.thrust = false
         );
-        actionTriState($.func($.the("rot"), $.the("fz")), (dh) -> {
+        actionTriStatePWM($.func($.the("rot"), $.the("fz")), (dh) -> {
             switch (dh) {
                 case +1: fz.left = false; fz.right = true; break;
                 case 0: fz.left = fz.right = false; break;
@@ -192,7 +192,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.CS(true).durSeconds(0.15f), true))
+                3, new RealTime.CS(true).durSeconds(0.05f), true))
                 .runRT(0);
     }
 }

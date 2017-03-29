@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Texts;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.data.MutableIntRange;
@@ -180,9 +181,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             nar.runLater(ready, nar::input, 32);
             //ready.clear();
 
-            //pending.commit();
+            pending.commit();
 
-            pending.capacity(inputsPerCycle * 16);
+            pending.capacity(inputsPerCycle * 8);
             // * 1f/((float)Math.sqrt(active.capacity()))
 
             //float load = nar.exe.load();

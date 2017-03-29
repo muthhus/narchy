@@ -105,9 +105,10 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) {
-        Default n = NARBuilder.newMultiThreadNAR(4,
-                new RealTime.CS(true).durSeconds(0.1f));
+        Default n = NARBuilder.newMultiThreadNAR(2,
+                new RealTime.CS(true).durSeconds(0.05f));
         n.setSelf("I");
+        n.termVolumeMax.setValue(24);
         //n.logBudgetMin(System.out, 0.25f);
         //n.log();
 
@@ -118,6 +119,8 @@ public abstract class ConsoleAgent extends NAgentX {
                 return  (Util.sqr(similarity(R.chars, W.chars) ) );
             }
         };
+
+        a.trace = true;
 
         NAgentX.chart(a);
 
@@ -272,9 +275,9 @@ public abstract class ConsoleAgent extends NAgentX {
             if (read) {
                 Term t = terms[this.c[0]][this.c[1]];
                 if (prev!=value) {
-                    input($.belief((Compound)$.prop( t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now-nar.dur()).apply(nar));
+                    input($.belief((Compound)$.inh( t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now).apply(nar));
                 }
-                input($.belief((Compound)$.prop( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
+                input($.belief((Compound)$.inh( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
             }
         }
 

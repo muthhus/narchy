@@ -1,11 +1,10 @@
 package nars.index.term.map;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.RemovalCause;
-import com.github.benmanes.caffeine.cache.RemovalListener;
+import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.Param;
+import nars.concept.Concept;
+import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
@@ -52,6 +51,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 //    };
 
 
+    final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
+        if (v instanceof WiredConcept) return 0;
+        return v.volume();
+    };
+
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
     public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, boolean soft, @Nullable Executor exe) {
         this(conceptBuilder, capacity, -1, exe);
@@ -65,9 +69,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
-        if (capacity > 0)
-            builder.maximumSize(capacity);
-        else
+        if (capacity > 0) {
+            //builder.maximumSize(capacity);
+            builder.maximumWeight(capacity * 12);
+            builder.weigher(w);
+        } else
             builder.softValues();
 
         if (Param.DEBUG)
@@ -175,6 +181,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         } else {
             return concepts.getIfPresent(key);
         }
+    }
+
+    @Override
+    public void commit(Concept c) {
+        //concepts.getIfPresent(c.term());
     }
 
     //    protected Termed theCompoundCreated(@NotNull Compound x) {

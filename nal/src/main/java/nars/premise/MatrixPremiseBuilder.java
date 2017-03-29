@@ -60,6 +60,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
         @NotNull Bag<Task, BLink<Task>> tasklinkBag = c.tasklinks();
         @NotNull Bag<Term, BLink<Term>> termlinkBag = c.termlinks();
 
+
         tasklinkBag.commit();
         termlinkBag.commit();
 
