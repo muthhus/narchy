@@ -94,7 +94,7 @@ public interface ByteSeq {
     }
 
 
-    final class WindowByteSeq extends RawByteSeq /*implements CharSequence*/ {
+    public class WindowByteSeq extends RawByteSeq /*implements CharSequence*/ {
         final int start;
         final int end;
 

@@ -38,7 +38,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    public static final int historicCapMultiplier = 8;
+    public static final int historicCapMultiplier = 4;
 
     //private boolean latchLastValue = true;
 
@@ -58,7 +58,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier, nar.random);
+        return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
     }
 
     //    /** originating from this sensor, or a future prediction */

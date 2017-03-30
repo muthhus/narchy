@@ -1,5 +1,8 @@
 package nars.index.term;
 
+import jcog.bag.impl.HijackMemoize;
+import jcog.list.FasterList;
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -20,6 +23,8 @@ import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.task.util.InvalidTaskException;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,6 +34,7 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
@@ -330,45 +336,57 @@ public abstract class TermIndex extends TermBuilder {
             return x;
         } else {
 
-            Term y;
-
-            try {
-                int vars = x.vars();
-                int pVars = x.varPattern();
-                int totalVars = vars + pVars;
-
-                if (totalVars > 0) {
-                    y = transform(x,
-                            (vars == 1 && pVars == 0) ?
-                                    VariableNormalization.singleVariableNormalization //special case for efficiency
-                                    :
-                                    new VariableNormalization(totalVars /* estimate */)
-                    );
-                } else {
-                    y = x;
-                }
-
-
-            } catch (InvalidTermException e) {
-
-                if (Param.DEBUG_EXTRA)
-                    logger.warn("normalize {} : {}", x, e);
-
-                return InvalidCompound;
-            }
-
-            if (y instanceof Compound) {
-
-                //if (c!=null) {
-                //c = compoundOrNull($.unneg((Compound) c));
-                ((Compound) y).setNormalized();
-                //}
-            }
-
-            return y;
+            return normalize.apply(x);
         }
 
     }
+
+
+
+    public @Nullable Function<Compound,Term> _normalize = (x) -> {
+
+        Term y;
+
+        try {
+            int vars = x.vars();
+            int pVars = x.varPattern();
+            int totalVars = vars + pVars;
+
+            if (totalVars > 0) {
+                y = transform(x,
+                        (vars == 1 && pVars == 0) ?
+                                VariableNormalization.singleVariableNormalization //special case for efficiency
+                                :
+                                new VariableNormalization(totalVars /* estimate */)
+                );
+            } else {
+                y = x;
+            }
+
+
+        } catch (InvalidTermException e) {
+
+            if (Param.DEBUG_EXTRA)
+                logger.warn("normalize {} : {}", x, e);
+
+            return InvalidCompound;
+        }
+
+        if (y instanceof Compound) {
+
+            //if (c!=null) {
+            //c = compoundOrNull($.unneg((Compound) c));
+            ((Compound) y).setNormalized();
+            //}
+        }
+
+        return y;
+    };
+
+    final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
+            2048, 2, new XorShift128PlusRandom(1),
+            this._normalize
+    );
 
 
 //    private boolean cacheNormalization(@NotNull Compound src) {

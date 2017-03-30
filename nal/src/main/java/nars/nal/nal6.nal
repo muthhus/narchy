@@ -11,17 +11,17 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neq(S,P), time(dtSum)                               |- (S ==>+- P), (Belief:Deduction)
-        //, Permute:Backward
+    (M ==> P), (S ==> M), neqRCom(S,P), neqRCom(M,P), time(dtSum)                               |- (S ==>+- P), (Belief:Deduction, Permute:Backward)
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
-        //, Permute:Backward
 
-    (M ==> P), (M ==> S), neq(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
-        //, Permute:Backward
+    (P ==> M), (S ==> M), neqRCom(S,P), neqRCom(M,P),  time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction, Permute:Backward)
 
-    (P ==> M), (M ==> S), neq(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
-        //, Permute:Backward
+
+    (M ==> P), (M ==> S), neqRCom(S,P), neqRCom(M,P),  time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction, Permute:Backward)
+
+
+    (P ==> M), (M ==> S), neqRCom(S,P), neqRCom(M,P),  time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification, Permute:Backward)
+
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
 //If when S happens, P happens, and before P happens, S has happened, then they are truth-related equivalent

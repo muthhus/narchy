@@ -43,7 +43,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     public static final float FPS = 20f;
 
-    private static final float DUR = 0.2f;
+    private static final float DUR = 0.05f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;
@@ -676,7 +676,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             Default m = new Default(512, 16, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
-                    new RealTime.DSHalf().durSeconds(0.1f));
+                    new RealTime.DSHalf().durSeconds(0.05f));
 
             float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);

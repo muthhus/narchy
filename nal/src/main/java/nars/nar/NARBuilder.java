@@ -192,14 +192,14 @@ public interface NARBuilder {
 
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(768);
+        nar.deriver.conceptsFiredPerCycle.setValue(512);
         nar.deriver.conceptsFiredPerBatch.setValue(32);
-        nar.deriver.derivationsInputPerCycle.setValue(384);
+        nar.deriver.derivationsInputPerCycle.setValue(256);
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
@@ -216,8 +216,8 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, false, 6);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, false, 3);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 6);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

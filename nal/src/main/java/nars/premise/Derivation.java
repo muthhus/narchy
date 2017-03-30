@@ -81,7 +81,6 @@ public class Derivation extends Unify {
     public final int termSub0Struct;
     public final int termSub1Struct;
 
-    public final boolean overlap;
 
     @Nullable
     public final Truth taskTruth;
@@ -111,7 +110,9 @@ public class Derivation extends Unify {
 
     @Nullable
     public final Consumer<DerivedTask> target;
-    public final boolean cyclic;
+
+    public final boolean cyclic, overlap;
+    //public final float overlapAmount;
     public final DerivationBudgeting budgeting;
 
 
@@ -195,6 +196,7 @@ public class Derivation extends Unify {
         //NOT: this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
 
         this.overlap = belief != null ? Stamp.overlapping(task, belief) : cyclic;
+        //this.overlapAmount = belief!=null ? Stamp.overlapFraction(task.stamp(), belief.stamp()) : (cyclic? 1f : 0f);
 
         this.termSub0Struct = taskTerm.structure();
 

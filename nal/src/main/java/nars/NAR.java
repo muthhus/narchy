@@ -24,6 +24,7 @@ import nars.index.term.TermIndex;
 import nars.op.Operator;
 import nars.task.ImmutableTask;
 import nars.task.TaskBuilder;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -38,7 +39,6 @@ import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
-import nars.task.util.InvalidTaskException;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -748,7 +748,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             }
         }
 
-        /*if (isCommand)*/ {
+        /*if (isCommand)*/
+        {
             eventTaskProcess.emit(cmd);
             return null;
         }
@@ -838,7 +839,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 //    }
 
     public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() ->
-        new ObjectFloatHashMap<>()
+            new ObjectFloatHashMap<>()
     );
 
     public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
@@ -1273,7 +1274,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
                 public void accept(NAR m) {
                     //if (timeCondition.test(m.time())) {
                     if (m.time() == when) {
-                        eventCycleStart.disable((Consumer)this);
+                        eventCycleStart.disable((Consumer) this);
                         m.input(x);
                     }
                 }
@@ -1390,12 +1391,16 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      * a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame.
      */
-    @NotNull public final On onCycle(@NotNull Consumer<NAR> each) {
+    @NotNull
+    public final On onCycle(@NotNull Consumer<NAR> each) {
         return eventCycleStart.on(each);
     }
 
-    /** avoid using lambdas with this, instead use an interface implementation of the class that is expected to be garbage collected */
-    @NotNull public final On onCycleWeak(@NotNull Consumer<NAR> each) {
+    /**
+     * avoid using lambdas with this, instead use an interface implementation of the class that is expected to be garbage collected
+     */
+    @NotNull
+    public final On onCycleWeak(@NotNull Consumer<NAR> each) {
         return eventCycleStart.onWeak(each);
     }
 
@@ -1442,6 +1447,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         List<Task> t = $.newArrayList(256);
         float priTotal = 0;
         Iterator<Task> xx = taskStream.iterator();
+
         while (xx.hasNext()) {
             Task x = xx.next();
             if (x == null)
@@ -1454,6 +1460,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             t.add(x);
             priTotal += p;
         }
+
         if (t.isEmpty())
             return;
 

@@ -96,12 +96,6 @@ public class CompoundConcept implements Concept, Termlike {
         this.meta = newMeta;
     }
 
-    @NotNull
-    @Override
-    public <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
-        throw new UnsupportedOperationException();
-    }
-
 
     @Override
     public @Nullable Map<Object, Object> meta() {

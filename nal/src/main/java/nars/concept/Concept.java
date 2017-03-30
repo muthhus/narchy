@@ -60,6 +60,7 @@ public interface Concept extends Termed {
      */
     void setMeta(@NotNull Map newMeta);
 
+
     /**
      * follows Map.compute() semantics
      */
@@ -67,9 +68,13 @@ public interface Concept extends Termed {
     default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
         @Nullable Map meta = meta();
         if (meta == null) {
-            Object v;
-            put(key, v = value.apply(key, null));
-            return (C) v;
+            if (value!=null) {
+                Object v;
+                put(key, v = value.apply(key, null));
+                return (C) v;
+            } else {
+                return null;
+            }
         } else {
             return (C) meta.compute(key, value);
         }

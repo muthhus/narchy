@@ -75,7 +75,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap, tCap * historicCapMultiplier, nar.random);
+        return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
     }
 
     @Override
@@ -83,8 +83,6 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         return EternalTable.EMPTY;
     }
 
-    @Override
-    public abstract Task apply(NAR nar);
 
     /** produces a curiosity exploratoin task */
     @Nullable public abstract Task curiosity(float conf, long next, NAR nar);

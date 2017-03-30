@@ -233,6 +233,7 @@ abstract public class NAgent implements NSense, NAct {
         long next = now + dur;
                 //(dur * 3 / 2);
 
+
         nar.input( nextInput(next),  priority.floatValue() * dur );
 
 

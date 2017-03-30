@@ -609,10 +609,10 @@ public enum $ {
     public static Term compound(@NotNull Op op, @NotNull Collection<Term> subterms) {
         return compound(op, DTERNAL, subterms);
     }
-    @Nullable
-    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-        return terms.the(op, dt, subterms);
-    }
+//    @Nullable
+//    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+//        return terms.the(op, dt, subterms);
+//    }
     @Nullable
     public static Term compound(@NotNull Op op, int dt, @NotNull Collection<Term> subterms) {
         return compound(op, dt, subterms.toArray(new Term[subterms.size()]));

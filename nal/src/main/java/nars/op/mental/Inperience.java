@@ -280,7 +280,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
     }
 
     @Nullable
-    public static Compound reify(@NotNull Task s, Term self) {
+    public Compound reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + (1)];
@@ -296,8 +296,8 @@ public class Inperience extends Leak<Task, BLink<Task>> {
         return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), false));
     }
 
-    @Nullable static Term reify(@NotNull Compound term) {
-        return $.terms.transform(term, queryToDepVar);
+    @Nullable Term reify(@NotNull Compound term) {
+        return nar.concepts.transform(term, queryToDepVar);
     }
 
     /**

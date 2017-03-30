@@ -9,6 +9,7 @@ import nars.concept.TaskConcept;
 import nars.op.Command;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
+import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -61,6 +62,65 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     /** occurrence ending time */
     @Override
     long end();
+
+    /**
+     * amount of evidence aka evidence weight
+     * @param when time
+     * @param dur duration period across which evidence can decay before and after its defined start/stop time
+     * @return value >= 0 indicating the evidence
+     */
+    default float evi(long when, int dur) {
+
+        Truth t = truth();
+        long a = start();
+        float cw = t.evi();
+
+        if (a == ETERNAL)
+            return cw;
+        else if (when == ETERNAL)
+            return t.eternalizedEvi();
+        else {
+            long z = end();
+
+            if ((when >= a) && (when <= z)) {
+
+                //full confidence
+
+            } else {
+                //nearest endpoint of the interval
+                if (dur > 0)
+                    cw = TruthPolation.evidenceDecay(cw, dur, Math.min(Math.abs(a - when), Math.abs(z - when)));
+                else
+                    cw = 0;
+
+                if (eternalizable()) {
+                    float et = t.eternalizedEvi();
+                    if (et > cw)
+                        cw = et;
+                }
+            }
+
+            return cw;
+
+        }
+
+    }
+
+    static boolean eternalizable() {
+
+        //return term.varIndep() > 0;
+        //return term.vars() > 0;
+        return false;
+        //return true;
+        //return op().temporal;
+
+
+        //Op op = term.op();
+        //return op ==IMPL || op ==EQUI || term.vars() > 0;
+        //return op.statement || term.vars() > 0;
+    }
+
+
 
     static boolean equivalentTo(@NotNull Task a, @NotNull Task b, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
 
@@ -553,13 +613,6 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
 
-    /**
-     * amount of evidence aka evidence weight
-     * @param when time
-     * @param dur duration period across which evidence can decay before and after its defined start/stop time
-     * @return value >= 0 indicating the evidence
-     */
-    float evi(long when, int dur);
 
 
     default long mid() {

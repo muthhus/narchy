@@ -170,6 +170,4 @@ public class NAL1Test extends AbstractNALTest {
     }
 
 
-
-
 }

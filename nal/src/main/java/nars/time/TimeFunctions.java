@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.$.terms;
+
 import static nars.Op.*;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
@@ -96,7 +96,7 @@ public interface TimeFunctions {
     /**
      * does nothing but set DTternal; the input tasks will be considered to be eternal
      */
-    @Nullable TimeFunctions dternal = (derived, p, d, occReturn, confScale) -> dt(derived, DTERNAL, occReturn);
+    @Nullable TimeFunctions dternal = (derived, p, d, occReturn, confScale) -> dt(derived, DTERNAL, occReturn, p);
 
     @NotNull
     static Compound dtDiff(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
@@ -153,7 +153,7 @@ public interface TimeFunctions {
             occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
         }
 
-        return deriveDT(derived, polarity, dt, occReturn);
+        return deriveDT(derived, polarity, dt, occReturn, p);
     }
 
     /**
@@ -204,7 +204,7 @@ public interface TimeFunctions {
                 }
 
 
-                return deriveDT(derived, polarity, dt, occReturn);
+                return deriveDT(derived, polarity, dt, occReturn, p);
 
 
             }
@@ -384,7 +384,7 @@ public interface TimeFunctions {
                         occReturn[0] = p.task.start() + Math.min(occA, occB);
                     }
                     int dt = occB - occA;
-                    return deriveDT(derived, +1, dt, occReturn);
+                    return deriveDT(derived, +1, dt, occReturn, p);
                 }
             }
         }
@@ -464,7 +464,7 @@ public interface TimeFunctions {
 
                 occReturn[1] = occReturn[0] + derived.dtRange();
 
-                derived = deriveDT(derived, +0, dt, occReturn);
+                derived = deriveDT(derived, +0, dt, occReturn, p);
             } else {
                 //TODO this should not happen
                 return null;
@@ -682,16 +682,16 @@ public interface TimeFunctions {
 
 
         int dtdt = ((Compound) dtTerm).dt();
-        return deriveDT(derived, polarity, dtdt, occReturn);
+        return deriveDT(derived, polarity, dtdt, occReturn, p);
 
     }
 
     @NotNull
-    static Compound deriveDT(@NotNull Compound derived, int polarity, int eventDelta, @NotNull long[] occReturn) {
+    static Compound deriveDT(@NotNull Compound derived, int polarity, int eventDelta, @NotNull long[] occReturn, Derivation p) {
 
         int dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
 
-        return dt(derived, dt, occReturn);
+        return dt(derived, dt, occReturn, p);
     }
 
 
@@ -838,7 +838,7 @@ public interface TimeFunctions {
         if (derived == null)
             return null;
 
-        return deriveDT(derived, 1, eventDelta, occReturn);
+        return deriveDT(derived, 1, eventDelta, occReturn, p);
     }
 
 
@@ -1098,7 +1098,7 @@ public interface TimeFunctions {
                 t, derived.subterms());*/
 
             if (derived.size() == 2 || t == 0)
-                derived = dt(derived, t, occReturn);
+                derived = dt(derived, t, occReturn, p);
 
 //            int nt = derived.t();
 //            if (occ > TIMELESS) {
@@ -1165,8 +1165,7 @@ public interface TimeFunctions {
     }
 
 
-    @NotNull
-    static Compound dt(@NotNull Compound derived, int dt, long[] occReturn) {
+    static Compound dt(@NotNull Compound derived, int dt, long[] occReturn, Derivation p) {
         Op o = derived.op();
         if (!o.temporal) {
             dt = DTERNAL;
@@ -1178,7 +1177,7 @@ public interface TimeFunctions {
 //        }
         if (derived.dt() != dt) {
             TermContainer ds = derived.subterms();
-            @NotNull Term n = terms.the(o, dt, ds);
+            @NotNull Term n = p.index.the(o, dt, ds);
             if (!(n instanceof Compound))
                 throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 

@@ -69,7 +69,7 @@ public class GoalActionConcept extends ActionConcept {
 //        }
 
 
-        float resolution = this.resolution.floatValue();
+        //float resolution = this.resolution.floatValue();
 
 
         Truth lastFeedback = currentFeedback;
@@ -85,13 +85,16 @@ public class GoalActionConcept extends ActionConcept {
 //        }
         if (currentFeedback != null) {
             long now = nar.time();
-            SignalTask s = new SignalTask(term(), BELIEF, currentFeedback,
+
+
+
+            SignalTask B = new SignalTask(term(), BELIEF, currentFeedback,
                     now,
                     now,
                     nar.time.nextStamp());
-            s.budget(nar);
-            this.currentFeedbackTask = s;
-            return s;
+            B.budget(nar);
+            this.currentFeedbackTask = B;
+            return B;
         }
 
         return null;

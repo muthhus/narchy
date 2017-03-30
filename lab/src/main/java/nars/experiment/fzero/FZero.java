@@ -1,5 +1,8 @@
 package nars.experiment.fzero;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.graph.MutableGraph;
 import jcog.Util;
 import nars.*;
 import nars.nar.NARBuilder;
@@ -7,7 +10,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.task.util.TaskRule;
+import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
+import org.jgrapht.DirectedGraph;
 
 import static nars.$.t;
 
@@ -32,6 +37,15 @@ public class FZero extends NAgentX {
         senseNumberDifference($.func("angVel", $.the("fz")), ()->(float)fz.playerAngle).resolution(0.02f);
         senseNumberDifference($.func("accel", $.the("fz")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
+
+        TermGraph.StatementGraph tg = new TermGraph.StatementGraph(nar);
+        nar.onCycle(r -> {
+            MutableGraph<Term> s = tg.snapshot(
+                    $.newArrayList(actions.get(0).term(), actions.get(1).term(), happy.term()),
+                    nar);
+            System.out.println(s);
+        });
+
 
 //        try {
 //            new TaskRule("(%1 &&+0 fz:joy)", "(%1 ==>+0 fz:happy)", nar) {

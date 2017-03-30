@@ -26,8 +26,8 @@
 
     (A --> B), (B --> C), neqRCom(A,C), neqRCom(B,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
     (A --> B), (A --> C), neqRCom(B,C), neqRCom(A,C) |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backward)
-    (A --> C), (B --> C), neqRCom(A,B) |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqRCom(A,C) |- (C --> A), (Belief:Exemplification, Goal:Weak)
+    (A --> C), (B --> C), neqRCom(A,B), neqRCom(A,C) |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backward)
+    (A --> B), (B --> C), neqRCom(A,C), neqRCom(B,C) |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backward)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),

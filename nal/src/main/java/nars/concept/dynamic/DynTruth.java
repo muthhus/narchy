@@ -85,7 +85,7 @@ public final class DynTruth implements Truthed {
             return null;
 
         //HACK try to reconstruct the term because it may be invalid
-        c = compoundOrNull($.terms.the(c.op(), c.dt(), c.terms()));
+        c = compoundOrNull(nar.concepts.the(c.op(), c.dt(), c.terms()));
         if (c == null)
             return null;
 
