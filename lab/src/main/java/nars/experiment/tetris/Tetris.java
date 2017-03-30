@@ -41,7 +41,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
 
-    public static final float FPS = 20f;
+    public static final float FPS = 0f;
 
     private static final float DUR = 0.05f;
 

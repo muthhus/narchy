@@ -190,8 +190,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         }
 
         //if (Param.DEBUG) {
-            if (t.containsTerm(Term.True) || t.containsTerm(Term.False))
-                throw new InvalidTaskException(t, "term contains True or False");
+        if (t.containsTerm(Term.True) || t.containsTerm(Term.False))
+            throw new InvalidTaskException(t, "term contains True or False");
         //}
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
@@ -293,7 +293,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
                 System.err.println
                         ("should conceptualize to TaskConcept: " + c);
             //else
-                return null;
+            return null;
         }
         return (TaskConcept) c;
     }
@@ -331,8 +331,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (Param.ANSWER_REPORTING && isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                new ArrayBag<>(BudgetMerge.maxBlend,
-                        new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
+                    new ArrayBag<>(BudgetMerge.maxBlend,
+                            new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(mid(), nar.dur());
 
@@ -635,14 +635,14 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         char sep = '\t'; //','
 
         a
-            .append(term().toString()).append(sep)
-            .append("\"" + punc() + "\"").append(sep)
-            .append(truth()!=null ? Texts.n2(truth().freq()) : " ").append(sep)
-            .append(truth()!=null ? Texts.n2(truth().conf()) : " ").append(sep)
-            .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
-            .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
-            .append(proof().replace("\n", "  ")).append(sep)
-            .append('\n');
+                .append(term().toString()).append(sep)
+                .append("\"" + punc() + "\"").append(sep)
+                .append(truth()!=null ? Texts.n2(truth().freq()) : " ").append(sep)
+                .append(truth()!=null ? Texts.n2(truth().conf()) : " ").append(sep)
+                .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
+                .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
+                .append(proof().replace("\n", "  ")).append(sep)
+                .append('\n');
 
     }
 

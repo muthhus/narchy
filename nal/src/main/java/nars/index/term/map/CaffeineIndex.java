@@ -234,49 +234,5 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         onRemove(value);
     }
 
-    private static class FastTriple<X,Y,Z>  {
-
-        private final int hash;
-        private final X left;
-        private final Y middle;
-        private final Z right;
-
-        public FastTriple(X left, Y middle, Z right) {
-            this.left = left;
-            this.middle = middle;
-            this.right = right;
-
-            this.hash = Util.hashCombine(left.hashCode(), middle.hashCode(), right.hashCode());
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            FastTriple f = (FastTriple) obj;
-            return left.equals(left) && middle.equals(f.middle) && right.equals(right);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-    }
-
-    Function<FastTriple<Op, FasterList<Term>, Integer>,Term> _build = (C) -> {
-        return super.the(C.left, C.right, C.middle.array());
-    };
-
-    final Function<FastTriple<Op, FasterList<Term>, Integer>,Term> build = new HijackMemoize<>(
-            64384, 3, new XorShift128PlusRandom(1),
-            this._build
-    );
-
-    @Override
-    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
-        if (u.length < 2)
-            return super.the(op, dt, u);
-
-        return build.apply(new FastTriple( op, new FasterList(u), dt ));
-    }
-
 
 }

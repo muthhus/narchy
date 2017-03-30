@@ -38,13 +38,13 @@ public class FZero extends NAgentX {
         senseNumberDifference($.func("accel", $.the("fz")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-        TermGraph.StatementGraph tg = new TermGraph.StatementGraph(nar);
-        nar.onCycle(r -> {
-            MutableGraph<Term> s = tg.snapshot(
-                    $.newArrayList(actions.get(0).term(), actions.get(1).term(), happy.term()),
-                    nar);
-            System.out.println(s);
-        });
+//        TermGraph.StatementGraph tg = new TermGraph.StatementGraph(nar);
+//        nar.onCycle(r -> {
+//            MutableGraph<Term> s = tg.snapshot(
+//                    $.newArrayList(actions.get(0).term(), actions.get(1).term(), happy.term()),
+//                    nar);
+//            System.out.println(s);
+//        });
 
 
 //        try {

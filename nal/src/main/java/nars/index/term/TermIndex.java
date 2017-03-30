@@ -1,8 +1,5 @@
 package nars.index.term;
 
-import jcog.bag.impl.HijackMemoize;
-import jcog.list.FasterList;
-import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -10,6 +7,7 @@ import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.TermBuilder;
 import nars.premise.Derivation;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,10 +19,7 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
-import nars.task.util.InvalidTaskException;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -34,7 +29,6 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
@@ -329,21 +323,20 @@ public abstract class TermIndex extends TermBuilder {
     }
 
 
-    @Nullable
-    public final Term normalize(@NotNull Compound x) {
-
-        if (x.isNormalized()) {
-            return x;
-        } else {
-
-            return normalize.apply(x);
-        }
-
-    }
+//    private boolean cacheNormalization(@NotNull Compound src) {
+//        return false;
+//    }
 
 
+//    @Nullable
+//    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
+//        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
+//            return src;
+//        else
+//            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
+//    }
 
-    public @Nullable Function<Compound,Term> _normalize = (x) -> {
+    public Term normalize(Compound x) {
 
         Term y;
 
@@ -381,27 +374,7 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         return y;
-    };
-
-    final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-            2048, 2, new XorShift128PlusRandom(1),
-            this._normalize
-    );
-
-
-//    private boolean cacheNormalization(@NotNull Compound src) {
-//        return false;
-//    }
-
-
-//    @Nullable
-//    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
-//        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
-//            return src;
-//        else
-//            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
-//    }
-
+    }
 
     @Nullable
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
@@ -655,7 +628,6 @@ public abstract class TermIndex extends TermBuilder {
             }
 
 
-
             newSubs = subsChanged ? ss : null;
 
 
@@ -678,10 +650,11 @@ public abstract class TermIndex extends TermBuilder {
             }
 
             if (swap) {
-                Term x = newSubs[0];  newSubs[0] = newSubs[1]; newSubs[1] = x;
+                Term x = newSubs[0];
+                newSubs[0] = newSubs[1];
+                newSubs[1] = x;
             }
         }
-
 
 
         boolean dtChanged = (pdt != DTERNAL && o.temporal);
@@ -740,7 +713,8 @@ public abstract class TermIndex extends TermBuilder {
         }
     }
 
-    @Nullable public Compound eval(Compound x) {
+    @Nullable
+    public Compound eval(Compound x) {
 
         //eval before normalizing
         Compound z = compoundOrNull(x.eval(this));

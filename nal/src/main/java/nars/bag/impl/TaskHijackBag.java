@@ -80,13 +80,14 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
         long now = n.time();
         int dur = n.dur();
-        if (lastForget + dur < now) {
+        /*if (lastForget + dur < now)*/ {
+            int s = capacity();
             update(x -> {
-                long s = x.start();
+                //long s = x.start();
                 long e = x.end();
                 if (e < now) {
                     //forget old tasks
-                    x.budget().priMult( x.qua() );
+                    x.budget().priMult( 1f - ((1f - x.qua())/s) );
                 }
             });
             lastForget = now;
