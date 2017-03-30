@@ -531,7 +531,7 @@ public class TemporalTest {
 
         n.log();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
-        n.run(25);
+        n.run(155);
 
         TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
         n.forEachActiveConcept(d::add);

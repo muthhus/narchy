@@ -1,12 +1,18 @@
 package nars.experiment.arkanoid;
 
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
+import nars.concept.SensorConcept;
+import nars.gui.Vis;
 import nars.task.DerivedTask;
+import nars.term.Term;
 import nars.video.*;
+import spacegraph.SpaceGraph;
 
 import static nars.Op.*;
 
@@ -40,7 +46,7 @@ public class Arkancide extends NAgentX {
 
             Arkancide a = null;
             try {
-                a = new Arkancide(n, cam);
+                a = new Arkancide(n, cam, true);
 
 
             } catch (Narsese.NarseseException e) {
@@ -69,7 +75,7 @@ public class Arkancide extends NAgentX {
     }
 
 
-    public Arkancide(NAR nar, boolean cam) throws Narsese.NarseseException {
+    public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
         super($.the("noid"), nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
@@ -91,8 +97,8 @@ public class Arkancide extends NAgentX {
 
         maxPaddleSpeed = 15 * noid.BALL_VELOCITY;
 
-        //float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
-        //float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
+        float resX = Math.max(0.01f, 1f/visW); //dont need more resolution than 1/pixel_width
+        float resY = Math.max(0.01f, 1f/visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
             CameraSensor cc = senseCamera("noid", noid, visW, visH);
@@ -100,13 +106,18 @@ public class Arkancide extends NAgentX {
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
-        } else {
+        }
+        if (numeric) {
             //nar.termVolumeMax.set(12);
             senseNumber( "x(paddle)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "x(ball)", new FloatPolarNormalized(()->noid.ball.x, noid.getWidth()/2));//.resolution(resX);
-            senseNumber( "y(ball)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2));//.resolution(resY);
+            SensorConcept xb = senseNumber("x(ball)", new FloatPolarNormalized(() -> noid.ball.x, noid.getWidth() / 2)).resolution(4 * resX);
+            SensorConcept yb = senseNumber( "y(ball)", new FloatPolarNormalized(()->noid.ball.y, noid.getHeight()/2)).resolution(4 * resY);
             senseNumber("vx(ball)", new FloatPolarNormalized(()->noid.ball.velocityX));
             senseNumber("vy(ball)", new FloatPolarNormalized(()->noid.ball.velocityY));
+
+            SpaceGraph.window(Vis.beliefCharts(200,
+                    Lists.newArrayList(new Term[] { xb.term(), yb.term() }),
+                    nar), 600, 600);
         }
 
         /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {

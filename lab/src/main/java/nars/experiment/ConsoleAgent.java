@@ -7,13 +7,16 @@ import jcog.Util;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
+import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
+import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.widget.console.ConsoleSurface;
@@ -23,7 +26,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -96,10 +101,29 @@ public abstract class ConsoleAgent extends NAgentX {
         SpaceGraph.window(R, 600, 600);
         SpaceGraph.window(W, 600, 600);
 
+//        nar.runLater(()->{
+//            SpaceGraph.window(Vis.beliefCharts(200,
+//                    ()->W.terms().peek(System.out::println).iterator(),
+//                    nar), 600, 600);
+//        });
+
+
+        NAgentX.chart(this);
+
         senseNumberDifference($.func((Atomic)id, $.the("joy")), happy);
 
     }
 
+    @Override
+    protected Stream<Task> predict(long next) {
+        return Stream.concat(
+           Stream.concat(
+               W.input(),
+               R.input()
+           ),
+           super.predict(next)
+        );
+    }
 
     @Override
     abstract protected float act();
@@ -122,9 +146,9 @@ public abstract class ConsoleAgent extends NAgentX {
 
         a.trace = true;
 
-        NAgentX.chart(a);
 
-        a.runRT(0);
+
+        a.runRT(0).join();
     }
 
     private static float similarity(char[][] a, char[][] b) {
@@ -141,20 +165,25 @@ public abstract class ConsoleAgent extends NAgentX {
     private class TestConsole extends ConsoleSurface {
 
         final char[][] chars;
-        final Term terms[][];
+        final Compound terms[][];
         private final boolean read;
+        private final Signal[][] beliefs;
         int c[] = new int[2];
         private boolean write;
+
 
 
         public TestConsole(Term id, boolean read, int w, int h) {
             super(w, h);
             this.chars = new char[w][h];
-            this.terms = new Term[w][h];
+            this.terms = new Compound[w][h];
+            this.beliefs = new Signal[w][h];
             for (int x = 0; x< w; x++) {
                 for (int y = 0; y < h; y++) {
                     chars[x][y] = ' ';
-                    terms[x][y] = $.inst($.p($.the(x), $.the(y)), id);
+                    terms[x][y] = $.inh($.p($.the(x), $.the(y)), id);
+                    beliefs[x][y] = new Signal(BELIEF);
+                    believe((char)0, x, y);
                 }
             }
             c[0] = 0;
@@ -261,23 +290,42 @@ public abstract class ConsoleAgent extends NAgentX {
             c[1] = Math.max(0, c[1]-1);
         }
         public void down() {
-            c[1] = Math.min(chars[0].length-1, c[1]+1);
+            c[1] = Math.min(rows(), c[1]+1);
         }
+
+        public int rows() {
+            return chars[0].length-1;
+        }
+
         public void right() {
-            c[0] = Math.min(chars.length-1, c[0]+1);
+            c[0] = Math.min(cols() -1, c[0]+1);
+        }
+
+        public int cols() {
+            return chars.length;
         }
 
         public void write(char value) {
-            char prev = chars[this.c[0]][this.c[1]];
+            int cx = this.c[0];
+            int cy = this.c[1];
+            char prev = chars[cx][cy];
 
-            chars[this.c[0]][this.c[1]] = value;
+            chars[cx][cy] = value;
+        }
 
-            if (read) {
-                Term t = terms[this.c[0]][this.c[1]];
-                if (prev!=value) {
-                    input($.belief((Compound)$.inh( t, $.quote(String.valueOf(prev))), 0f, 0.9f).time(now).apply(nar));
-                }
-                input($.belief((Compound)$.inh( t, $.quote(String.valueOf(value) )), 1f, 0.9f).time(now).apply(nar));
+        protected void believe(char prev, int cx, int cy) {
+            char value = chars[cx][cy];
+
+            if (prev == 0 || (value!=prev)) {
+//                Task prevBelief = beliefs[cx][cy];
+//                if (prevBelief!=null) {
+//                    //..
+//                }
+
+                beliefs[cx][cy].set(
+                        $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
+                        $.t(1f, 0.9f),
+                        nar);
             }
         }
 
@@ -318,8 +366,25 @@ public abstract class ConsoleAgent extends NAgentX {
             return chars[0].length;
         }
         public int width() {
-            return chars.length;
+            return cols();
         }
+
+        public Stream<Task> input() {
+            return IntStream.range(0, rows()*cols()).mapToObj(i -> {
+                int x = i / rows();
+                int y = i % cols();
+                return beliefs[x][y].get();
+            }).filter(Objects::nonNull);
+        }
+
+        public Stream<Term> terms() {
+            return IntStream.range(0, rows()*cols()).mapToObj(i -> {
+                int x = i / rows();
+                int y = i % cols();
+                return terms[x][y];
+            });
+        }
+
     }
 
 //    private class MyTextEditModel extends ConsoleTerminal.TextEditModel {

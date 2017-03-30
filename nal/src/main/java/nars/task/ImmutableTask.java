@@ -31,7 +31,7 @@ public class ImmutableTask extends RawBudget implements Task {
     public final Compound term;
     public final Truth truth;
     public final byte punc;
-    public final long creation, start, end;
+    private final long creation, start, end;
     public final long[] stamp;
     final int hash;
 
@@ -231,7 +231,7 @@ public class ImmutableTask extends RawBudget implements Task {
     }
 
     public Task clone(Compound x) {
-        ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start, end, stamp);
+        ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start(), end(), stamp);
         t.budgetSafe(this);
         return t;
     }

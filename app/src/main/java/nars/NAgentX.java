@@ -141,7 +141,7 @@ abstract public class NAgentX extends NAgent {
 
     public static void chart(NAgentX a) {
         NAR nar = a.nar;
-        a.nar.runLater(() -> {
+        //a.nar.runLater(() -> {
             window( grid(
 
                 grid(
@@ -185,7 +185,7 @@ abstract public class NAgentX extends NAgent {
                             64, 6) )
                 )
             ), 600, 400);
-        });
+       // });
     }
 
     public static void chart(NAgent a) {

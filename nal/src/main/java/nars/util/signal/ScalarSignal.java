@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
+import static nars.Op.BELIEF;
+
 
 /**
  * Generates temporal tasks in reaction to the change in a scalar numeric value
@@ -26,69 +28,42 @@ import java.util.function.Function;
  * when NAR wants to update the signal, it will call Function.apply. it can return
  * an update Task, or null if no change
  */
-public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
+public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleSupplier {
 
 
+    private final Compound term;
     /**
      * resolution of the output freq value
      */
     float resolution = Param.DEFAULT_SENSOR_RESOLUTION;
 
 
-
-    @NotNull
-    private final Compound term;
     private final FloatFunction<Term> value;
     @NotNull
     private final FloatToObjectFunction<Truth> truthFloatFunction;
 
-    public FloatSupplier pri;
 
     public float currentValue = Float.NaN;
 
-    boolean inputIfSame;
-    int maxTimeBetweenUpdates;
-    int minTimeBetweenUpdates;
-
-    byte punc = '.';
-
-    public long lastInputTime;
 
     public final static FloatToFloatFunction direct = n -> n;
 
-    @Nullable public SignalTask current;
 
 
     public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction) {
+        super(BELIEF);
 
-        this.term = t.term();
+        this.term = t;
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
 
-        pri(1);
 
         this.lastInputTime = n.time() - 1;
 
         this.currentValue = Float.NaN;
     }
 
-    @NotNull
-    public ScalarSignal pri(FloatSupplier p) {
-        this.pri = p;
-        return this;
-    }
-    @NotNull
-    public ScalarSignal pri(float p) {
-        pri(()->p);
-        return this;
-    }
-
-    @NotNull
-    public ScalarSignal punc(byte c) {
-        this.punc = c;
-        return this;
-    }
 
     public byte punc() { return punc; }
 
@@ -130,24 +105,15 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 
         if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
-            SignalTask t = task(next, currentValue,
-                    now - Math.round(nar.dur()), now,
-                    this.current, nar);
+            Truth nextTruth = truthFloatFunction.valueOf(next);
+            if (nextTruth == null)
+                return null;
+
+            Task t = set(term, nextTruth, nar);
             if (t!=null) {
-                //Task prevStart = this.current;
-
-//                if (prevStart!=null && t.occurrence() - prevStart.occurrence() > latchResolution) {
-//                    //input a cloned version of the previous task as an intermediate task, squarewave approximation
-//                    prevEnd = newInputTask(prevStart.truth(), now, now-1);
-//                } else {
-//                    prevEnd = null; //dont generate an intermediate task
-//                }
-
-                this.current = t;
-                this.lastInputTime = now;
                 this.currentValue = next;
-                return t;
             }
+            return t;
         }
 
         //nothing new was input, continue previous task if exists
@@ -183,34 +149,7 @@ public class ScalarSignal implements Function<NAR, Task>, DoubleSupplier {
 //        return v;
 //    }
 
-    @Nullable
-    protected SignalTask task(float next, float prevV, long start, long end, Task previous, NAR nar) {
 
-        Truth t = truthFloatFunction.valueOf(next);
-        if (t == null)
-            return null;
-
-
-        SignalTask s = new SignalTask(term(), punc, t, start, end, nar.time.nextStamp());
-        s.budget(pri.asFloat() * deltaFactor(previous, t), nar);
-
-        //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
-        //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
-        //.log(this);
-        return s;
-    }
-
-    /** factor to reduce priority for similar truth value
-     *  TODO revise
-     * */
-    protected float deltaFactor(@Nullable Truthed a, Truth b) {
-        return 1f;
-
-//        if (a == null)
-//            return 1f;
-//
-//        return Math.abs(a.freq() - b.freq());
-    }
 
     /** provides an immediate truth assessment with the last known signal value */
     @Nullable public final Truth truth() {

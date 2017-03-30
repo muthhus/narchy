@@ -140,13 +140,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     @NotNull
-    static boolean subtermOfTheOther(@NotNull Compound a, @NotNull Compound b, boolean recurse, boolean excludeVariables) {
+    public static boolean isSubtermOfTheOther(@NotNull Term a, @NotNull Term b, boolean recurse, boolean excludeVariables) {
 
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
             return false;
 
         if (recurse)
-            return a.containsTermRecursively(b) || b.containsTermRecursively(a);
+            return (a instanceof Compound && ((Compound)a).containsTermRecursively(b) ||
+                    (b instanceof Compound && ((Compound)b).containsTermRecursively(a)));
         else
             return a.containsTerm(b) || b.containsTerm(a);
     }

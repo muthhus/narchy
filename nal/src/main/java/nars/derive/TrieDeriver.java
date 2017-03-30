@@ -1,5 +1,6 @@
 package nars.derive;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;
@@ -51,6 +52,7 @@ public class TrieDeriver implements Deriver {
             for (PostCondition result : rule.postconditions) {
 
                 List<Term> c = rule.conditions(result);
+
                 PremiseRule existing = trie.put(c, rule);
 
                 if (existing != null)
@@ -115,6 +117,7 @@ public class TrieDeriver implements Deriver {
 
     @NotNull
     private List<BoolPredicate> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+
 
         List<BoolPredicate> bb = $.newArrayList(node.childCount());
 

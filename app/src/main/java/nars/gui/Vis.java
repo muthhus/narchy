@@ -57,11 +57,11 @@ public class Vis {
         return new ConsoleTerminal(new ConsoleTerminal.TextEditModel(20,5));
     }
 
-    public static Grid beliefCharts(float window, NAR nar, Object... x) {
+    public static Grid beliefCharts(int window, NAR nar, Object... x) {
         return beliefCharts(window, Lists.newArrayList(x), nar);
     }
 
-    public static Grid beliefCharts(float window, Iterable<?> ii, NAR nar) {
+    public static Grid beliefCharts(int window, Iterable ii, NAR nar) {
 
         return new BeliefChartsGrid(ii, nar, window);
     }
@@ -532,10 +532,11 @@ public class Vis {
 
     private static class BeliefChartsGrid extends Grid implements Consumer<NAR> {
 
-        private final float window;
+        private final int window;
+        private final On on;
         long[] btRange;
 
-        public BeliefChartsGrid(Iterable<?> ii, NAR nar, float window) {
+        public BeliefChartsGrid(Iterable<?> ii, NAR nar, int window) {
             super(VERTICAL);
 
             btRange = new long[2];
@@ -547,19 +548,26 @@ public class Vis {
 
             if (!s.isEmpty()) {
                 set(s);
-                nar.onCycleWeak(this);
+                on = nar.onCycle(this);
             } else {
+                on = null;
                 set(label("(empty)"));
             }
 
         }
 
         @Override
+        public void stop() {
+            if (on!=null)
+                on.off();
+        }
+
+        @Override
         public void accept(NAR nar) {
             long now = nar.time();
             int dur = nar.dur();
-            btRange[0] = now - (long) Math.ceil(window * dur);
-            btRange[1] = now + (long) Math.ceil(window * dur);
+            btRange[0] = now - (window * dur);
+            btRange[1] = now + (window * dur);
         }
     }
 }

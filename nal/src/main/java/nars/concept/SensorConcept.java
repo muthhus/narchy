@@ -165,11 +165,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this;
     }
 
-    @NotNull
-    public <S extends SensorConcept> S punc(byte c) {
-        sensor.punc(c);
-        return (S)this;
-    }
+
 
     @Override
     public float asFloat() {

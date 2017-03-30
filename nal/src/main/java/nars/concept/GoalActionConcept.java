@@ -10,6 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
+import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,10 +26,14 @@ import static nars.time.Tense.DTERNAL;
 public class GoalActionConcept extends ActionConcept {
 
     public final FloatParam resolution;
-    private SignalTask currentFeedbackTask;
+    private final Signal feedback;
+
 
     public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
+
+        this.feedback = new Signal(BELIEF);
+
         resolution = n.truthResolution;
         this.motor = motor;
         this.goals = newBeliefTable(nar, false); //pre-create
@@ -83,21 +88,9 @@ public class GoalActionConcept extends ActionConcept {
 //                //continue it
 //            }
 //        }
-        if (currentFeedback != null) {
-            long now = nar.time();
+        return feedback.set(term(), currentFeedback, nar);
 
 
-
-            SignalTask B = new SignalTask(term(), BELIEF, currentFeedback,
-                    now,
-                    now,
-                    nar.time.nextStamp());
-            B.budget(nar);
-            this.currentFeedbackTask = B;
-            return B;
-        }
-
-        return null;
     }
 
 

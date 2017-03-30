@@ -11,6 +11,7 @@ import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
+import nars.util.signal.Signal;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +20,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.BELIEF;
 import static nars.concept.SensorConcept.historicCapMultiplier;
 
 
@@ -30,6 +32,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     final TruthAccumulator
             beliefIntegrated = new TruthAccumulator(),
             goalIntegrated = new TruthAccumulator();
+
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
@@ -48,15 +51,13 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     }
 
     public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
-        int dur = nar.dur();
-        int lookAhead = 0;
-        long now = nar.time() - lookAhead * dur;
-        long nowEnd = now + dur;
+        long now = nar.time();
+        long when = now + nar.dur();
         CuriosityTask t = new CuriosityTask(term, punc,
                 $.t(nar.random.nextFloat(), conf),
                 now,
                 now,
-                nowEnd,
+                when,
                 new long[] { nar.time.nextStamp() }
         );
         t.budget( nar);

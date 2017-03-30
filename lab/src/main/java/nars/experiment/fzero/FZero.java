@@ -206,7 +206,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.CS(true).durSeconds(0.05f), true))
-                .runRT(0);
+                3, new RealTime.CS(true).durSeconds(0.02f), true))
+                .runRT(0).join();
     }
 }

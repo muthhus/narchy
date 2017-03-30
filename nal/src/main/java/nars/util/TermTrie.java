@@ -6,6 +6,7 @@ import jcog.trie.TrieNode;
 import jcog.trie.TrieSequencer;
 import nars.term.Term;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,13 +95,9 @@ abstract public class TermTrie<K extends Term, V> {
     }
 
 
-    public interface ObjectFloater<K> {
-        float value(K k);
-    }
-
     //TODO use the compiled rule trie
     @NotNull
-    @Deprecated public SummaryStatistics costAnalyze(@NotNull ObjectFloater<K> costFn, @Nullable PrintStream o) {
+    @Deprecated public SummaryStatistics costAnalyze(@NotNull FloatFunction<K> costFn, @Nullable PrintStream o) {
 
         SummaryStatistics termCost = new SummaryStatistics();
         SummaryStatistics sequenceLength = new SummaryStatistics();
@@ -123,7 +120,7 @@ abstract public class TermTrie<K extends Term, V> {
         return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
     }
 
-    public static <K,V> void costAnalyze(@NotNull ObjectFloater<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
+    public static <K,V> void costAnalyze(@NotNull FloatFunction<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
 
         int nc = root.childCount();
         if (nc > 0)
@@ -140,7 +137,7 @@ abstract public class TermTrie<K extends Term, V> {
             sequenceLength.addValue(sqn.size());
 
             for (K k : sqn) {
-                termCost.addValue( costFn.value(k) );
+                termCost.addValue( costFn.floatValueOf(k) );
             }
 
             //indent(from * 4);

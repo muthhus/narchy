@@ -325,8 +325,8 @@ abstract public class NAgent implements NSense, NAct {
 
         predictors.add(
                 goal(happiness, t(1f, nar.confidenceDefault(BELIEF /*GOAL*/)),
-                    //ETERNAL
-                    now + dur
+                    ETERNAL
+                    //now + dur
                 )
         );
 

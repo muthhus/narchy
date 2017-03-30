@@ -24,12 +24,12 @@ public abstract class SubtermPathCondition extends AtomicPredicate<Derivation> {
     protected final int b;
     @NotNull
     protected final String id;
+//
+//    public SubtermPathCondition(@NotNull TaskBeliefSubterms x) {
+//        this(x.aPath, x.a, x.bPath, x.b);
+//    }
 
-    public SubtermPathCondition(@NotNull TaskBeliefSubterms x) {
-        this(x.aPath, x.a, x.bPath, x.b);
-    }
-
-    public SubtermPathCondition(@NotNull byte[] aPath, int a, @NotNull byte[] bPath, int b) {
+    public SubtermPathCondition(@NotNull byte[] aPath, int a, @NotNull byte[] bPath, int b, String tag) {
         this.bPath = bPath;
         this.a = a;
         this.aPath = aPath;
@@ -37,6 +37,7 @@ public abstract class SubtermPathCondition extends AtomicPredicate<Derivation> {
         String s = getClass().getSimpleName() + '(' +
                 Integer.toString(a) + ((aPath.length > 0) ?  ':' + Arrays.toString(aPath) + ',' : ",") +
                 Integer.toString(b) + ((bPath.length > 0) ?  ':' + Arrays.toString(bPath) : "")+
+                (tag!=null && !tag.isEmpty() ? (tag + ",") : "") +
                 ')';
         s = s.replace('[', '(').replace(']',')'); //make the path into a product ( )
         this.id = s;

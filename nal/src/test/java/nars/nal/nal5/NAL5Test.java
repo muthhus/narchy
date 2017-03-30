@@ -373,7 +373,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(<robin --> [flying]> ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((&&,swimmer:robin,<robin --> [flying]>) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
-        tester.mustBelieve(cycles,"swimmer:robin",1.00f,0.45f); //.en("I guess robin swims.");
+        tester.mustBelieve(cycles*2,"swimmer:robin",1.00f,0.45f); //.en("I guess robin swims.");
 
     }
 

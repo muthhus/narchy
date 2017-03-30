@@ -28,6 +28,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final int FPS_MIN = 20; //min acceptable FPS
 
     protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL );
+    static {
+        a.start();
+    }
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
@@ -81,37 +84,39 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
     private static void animate(GLWindow w) {
-        //synchronized (a) {
 
-            if (!windows.add(w))
-                return;
+        if (!windows.add(w))
+            return;
 
-            if (!a.isStarted()) {
-                a.start();
-                logger.info("START {}", a);
-            } else {
-                //a.resume();
-                //logger.info("RESUME {}", a);
-            }
-
-
-            a.add(w);
-        //}
+//        synchronized (a) {
+//
+//            if (!a.isStarted()) {
+//                a.start();
+//                logger.info("START {}", a);
+//            } else if (a.isPaused()) {
+//                a.resume();
+//                logger.info("RESUME {}", a);
+//            }
+//
+//        }
+        a.add(w);
 
         w.addWindowListener(new WindowAdapter() {
 
             @Override
             public void windowDestroyed(WindowEvent e) {
                 if (windows.remove(w)) {
-
-                    boolean nowEmpty = windows.isEmpty();
-
+                    //synchronized (a) {
                     a.remove(w);
-//                    if (nowEmpty) {
-//                        a.pause();
-//                        logger.info("PAUSE {}", a);
-//                    }
                 }
+//                        boolean nowEmpty = windows.isEmpty();
+//
+//                        if (nowEmpty) {
+//                            a.pause();
+//                            logger.info("PAUSE {}", a);
+//                        }
+//                    }
+//                }
             }
         });
     }

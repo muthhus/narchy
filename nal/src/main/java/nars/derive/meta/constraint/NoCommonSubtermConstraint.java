@@ -4,7 +4,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.term.container.TermContainer.subtermOfTheOther;
+import static nars.term.container.TermContainer.isSubtermOfTheOther;
 
 /** ensures the compared terms are not equal and share no (1st-level only, or recursively) terms in common.
  *  variables excluded */
@@ -20,7 +20,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
     /** comparison between two compounds */
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-        return subtermOfTheOther(x, y, recurse, true);
+        return isSubtermOfTheOther(x, y, recurse, true);
     }
 
     @NotNull @Override protected boolean invalid(Term x, Compound y) {
