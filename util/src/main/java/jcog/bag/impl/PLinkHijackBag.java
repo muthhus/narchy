@@ -6,6 +6,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.function.Consumer;
+
+import static jcog.bag.PLink.EPSILON_DEFAULT;
 
 /**
  * Created by me on 2/17/17.
@@ -27,6 +30,39 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
         return value.get();
     }
 
+    @NotNull
+    @Override
+    public HijackBag<X, PLink<X>> commit() {
+        flatForget(this);
+        return this;
+    }
+
+    public static void flatForget(HijackBag<?,? extends PLink> b) {
+        int s = b.size();
+        if (s > 0) {
+
+            double p = b.pressure.get() /* MULTIPLIER TO ANTICIPATE NEXT period */;
+            //float ideal = s * b.temperature();
+
+            if (p > EPSILON_DEFAULT) {
+                if (b.pressure.compareAndSet(p, 0)) {
+
+                    b.commit(null); //precommit to get accurate mass
+                    float mass = b.mass;
+
+                    float deduction = //(float) ((p + mass) - ideal);
+                            ((float) p / ((float) p + mass)) / s;
+                    if (deduction > EPSILON_DEFAULT) {
+                        b.commit(x -> x.priSub(deduction));
+                    }
+                }
+
+            }
+        }
+
+    }
+
+
     @Override
     protected float merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
         incoming.priMult(scale);
@@ -39,7 +75,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected float priEpsilon() {
-        return PLink.EPSILON_DEFAULT;
+        return EPSILON_DEFAULT;
     }
 
     @Override

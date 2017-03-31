@@ -384,7 +384,7 @@ public class PremiseRule extends GenericCompound {
 
         StringBuilder i =
                 new StringBuilder().append("Truth(").append(beliefLabel).append(',')
-                        .append(desireLabel).append(",punc:\"").append(puncOverride == 0 ? '_' : puncOverride)
+                        .append(desireLabel).append(",punc:\"").append(puncOverride == 0 ? '_' : ((char)puncOverride))
                         .append('\"');
         if (!beliefProjected)
             i.append(",unprojBelief");
@@ -560,7 +560,7 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "neq":
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y); //should the constraints be ommited in this case?
                     break;
 
@@ -574,14 +574,14 @@ public class PremiseRule extends GenericCompound {
 
                 case "neqCom":
                     //includes neq:
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, false));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, false));
 
                     break;
                 case "neqRCom":
                     //includes neq:
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, true));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, true));
                     break;
@@ -605,6 +605,7 @@ public class PremiseRule extends GenericCompound {
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y);
                     constraints.put(X, new OpConstraint(Op.SETe));
                     constraints.put(Y, new OpConstraint(Op.SETe));
@@ -614,6 +615,7 @@ public class PremiseRule extends GenericCompound {
 
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y);
                     constraints.put(X, new OpConstraint(Op.SETi));
                     constraints.put(Y, new OpConstraint(Op.SETi));

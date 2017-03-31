@@ -30,9 +30,6 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
     @Nullable
     private BoolPredicate eachMatch;
 
-    @Nullable
-    public final MatchConstraint constraints;
-
 
     @NotNull
     protected final Term pid;
@@ -49,21 +46,16 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
 
 
 
-    public MatchTermPrototype(@NotNull Term id, Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
+    public MatchTermPrototype(@NotNull Term id, Term pattern) {
         this.id = this.pid = id;
 
         this.pattern = pattern;
-        this.constraints = constraints!=null ? compile(constraints) : null;
     }
 
 
     @Nullable
-    public static Term id(@NotNull PatternTermIndex index, @NotNull Term pattern, @Nullable ImmutableMap<Term, MatchConstraint> constraints) {
-        return (constraints == null) ?
-                //no constraints
-                pattern :
-                //constraints stored in atomic string
-                (Compound) (index.the(Op.SECTe, pattern, seteMap(constraints.castToMap(), $.ToStringToTerm)));
+    public static Term id(@NotNull Term pattern) {
+        return pattern;
     }
 
 

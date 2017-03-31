@@ -121,6 +121,8 @@ abstract public class NAgent implements NSense, NAct {
         this.id = id;
         this.nar = nar;
 
+        this.now = nar.time();
+
         this.happy = new SensorConcept(
                 id == null ? p("happy") : $.inh(id, $.the("happy")),
                 nar,
@@ -229,11 +231,14 @@ abstract public class NAgent implements NSense, NAct {
 //        if (load < 1) {
 
 
-        long next = now + dur;
-                //(dur * 3 / 2);
+        long next = now
+                //+dur
+                //+(dur * 3 / 2);
+        ;
 
 
-        nar.input( nextInput(next),  priority.floatValue() * dur );
+        long frameTime = now - lastNow;
+        nar.input( nextInput(next),  priority.floatValue() * frameTime/dur );
 
 
 //        } else {
@@ -451,15 +456,15 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     @NotNull
-    public Loop runRT(float fps) {
-        return runRT(fps, -1);
+    public Loop runFPS(float fps) {
+        return runFPS(fps, -1);
     }
 
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
     @NotNull
-    public Loop runRT(float fps, int stopTime) {
+    public Loop runFPS(float fps, int stopTime) {
 
         init();
 

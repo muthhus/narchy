@@ -20,7 +20,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
     /** comparison between two compounds */
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-        return isSubtermOfTheOther(x, y, recurse, true);
+        return x.equals(y) || isSubtermOfTheOther(x, y, recurse, true);
     }
 
     @NotNull @Override protected boolean invalid(Term x, Compound y) {

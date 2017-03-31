@@ -727,7 +727,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            }
 
 
-        a.runRT(FPS).join();
+        a.runFPS(FPS).join();
 
 
 //        NARController meta = new NARController(nar, loop, t);

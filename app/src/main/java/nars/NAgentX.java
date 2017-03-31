@@ -110,7 +110,7 @@ abstract public class NAgentX extends NAgent {
         else
             chart(a);
 
-        a.runRT(0, endTime).join();
+        a.runFPS(0, endTime).join();
 
         return nar;
 

@@ -10,6 +10,7 @@ import nars.attention.Forget;
 import nars.budget.BudgetMerge;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -30,6 +31,13 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
     @Override
     public void forEach(int max, @NotNull Consumer<? super Task> action) {
         super.forEach(max, action);
+    }
+
+    @NotNull
+    @Override
+    public HijackBag<Task, Task> commit() {
+        BLinkHijackBag.flatForget(this);
+        return this;
     }
 
     @Override

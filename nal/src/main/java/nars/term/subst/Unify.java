@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import jcog.list.FasterList;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -83,21 +84,44 @@ public abstract class Unify extends Termunator implements Subst {
         return versioning.nextChange() && chain.get(++next).mutate(this, chain, next);
     }
 
-    protected final class Constraints extends Versioned<MatchConstraint> implements BiPredicate<Term, Term> {
+    public final class Constraints extends VersionMap<Term,List<MatchConstraint>> implements BiPredicate<Term, Term> {
 
         public Constraints(@NotNull Versioning context, int maxConstr) {
-            super(context, new MatchConstraint[maxConstr]);
+            super(context, maxConstr);
+        }
+
+        public boolean add(Term x, MatchConstraint m) {
+
+            Term y = xy.get(x);
+            if (y!=null) {
+                //check that constraint isnt violated by existing conditions:
+                if (m.invalid(x, y, Unify.this))
+                    return false;
+            }
+
+            List<MatchConstraint> ccc = get(x);
+            if (ccc == null)
+                ccc = $.newArrayList(1);
+            else {
+                int s = ccc.size();
+                FasterList ddd = new FasterList(s + 1); //clone
+                ddd.addAll(ccc);
+                ccc = ddd;
+            }
+            ccc.add(m);
+            return tryPut(x, ccc);
         }
 
         @Override
         public boolean test(@NotNull Term x, @NotNull Term y) {
-            int s = size;
-            if (s > 0) {
-                MatchConstraint[] ccc = items;
-                for (; s > 0; ) {
-                    if (ccc[--s].invalid(x, y, Unify.this))
-                        return false;
-                }
+            List<MatchConstraint> ccc = get(x);
+            if (ccc==null)
+                return true;
+
+            int s = ccc.size();
+            for (int i = 0; i < s; i++) {
+                if (ccc.get(i).invalid(x, y, Unify.this))
+                    return false;
             }
             return true;
         }
@@ -251,7 +275,6 @@ public abstract class Unify extends Termunator implements Subst {
             if (putYX((Variable) y, x)) {
                 if (y instanceof CommonVariable) {
                     if (!putXY((Variable) y, x)) {
-                        pop(2);
                         return false;
                     }
                 }
@@ -310,7 +333,6 @@ public abstract class Unify extends Termunator implements Subst {
         if (putXY(x, y)) {
             if (x instanceof CommonVariable) {
                 if (!putYX(x, y)) {
-                    pop(2);
                     return false;
                 }
             }
@@ -325,7 +347,6 @@ public abstract class Unify extends Termunator implements Subst {
         @NotNull Term common = CommonVariable.make((Variable) x, (Variable) y);
         if (putXY(x, common)) {
             if (!putYX(y, common)) {
-                pop(2);
                 return false;
             }
             return true;
@@ -365,9 +386,9 @@ public abstract class Unify extends Termunator implements Subst {
         versioning.revert(then);
     }
 
-    public final void pop(int count) {
-        versioning.pop(count);
-    }
+//    public final void pop(int count) {
+//        versioning.pop(count);
+//    }
 
     @NotNull
     public final Term yxResolve(@NotNull Term y) {

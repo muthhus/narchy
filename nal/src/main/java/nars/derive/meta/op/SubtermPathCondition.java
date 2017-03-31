@@ -36,7 +36,7 @@ public abstract class SubtermPathCondition extends AtomicPredicate<Derivation> {
         String s = getClass().getSimpleName() + '(' +
                 Integer.toString(a) + ((aPath.length > 0) ?  ':' + Arrays.toString(aPath) + ',' : ",") +
                 Integer.toString(b) + ((bPath.length > 0) ?  ':' + Arrays.toString(bPath) : "")+
-                (tag!=null && !tag.isEmpty() ? (tag + ",") : "") +
+                (tag!=null && !tag.isEmpty() ? (",\"" + tag + '\"') : "") +
                 ')';
         s = s.replace('[', '(').replace(']',')'); //make the path into a product ( )
         this.id = s;

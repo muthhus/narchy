@@ -30,7 +30,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
     }
 
     public static void flatForget(BudgetHijackBag<?,? extends Budgeted> b) {
-        double p = b.pressure.get() * 2 /* MULTIPLIER TO ANTICIPATE NEXT period */;
+        double p = b.pressure.get() /* MULTIPLIER TO ANTICIPATE NEXT period */;
         int s = b.size();
 
 
@@ -42,11 +42,10 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
                     float mass = b.mass;
 
                     float over = //(float) ((p + mass) - ideal);
-                            Math.min(0.25f, (float) p / (mass));
-                    float overEach = over / s;
-                    if (overEach >= Param.BUDGET_EPSILON) {
+                            ((float) p / ((float)p + mass) / s);
+                    if (over >= Param.BUDGET_EPSILON) {
                         b.commit(x -> {
-                            x.budget().priSub(overEach * (1f - x.qua()));
+                            x.budget().priSub(over * (1f - x.qua()));
                         });
                     }
                 }

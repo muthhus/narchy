@@ -20,18 +20,16 @@ abstract public class MatchTerm extends AtomicPredicate<Derivation> {
     @NotNull
     public final Term pattern;
 
-    public final @Nullable MatchConstraint constraints;
 
     public final @Nullable BoolPredicate eachMatch;
 
     private final String idString;
 
-    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable MatchConstraint constraints, @Nullable BoolPredicate eachMatch) {
+    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable BoolPredicate eachMatch) {
         //this.pid = pid;
         //this.id = id;
         this.idString = id.toString();
         this.pattern = pattern;
-        this.constraints = constraints;
         this.eachMatch = eachMatch;
     }
 

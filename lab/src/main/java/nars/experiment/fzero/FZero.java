@@ -1,20 +1,10 @@
 package nars.experiment.fzero;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.graph.EndpointPair;
-import com.google.common.graph.MutableValueGraph;
 import jcog.Util;
 import nars.*;
-import nars.concept.ActionConcept;
 import nars.nar.NARBuilder;
-import nars.term.Term;
 import nars.time.RealTime;
-import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
 
 import static nars.$.t;
 
@@ -223,6 +213,6 @@ public class FZero extends NAgentX {
     public static void main(String[] args) {
         new FZero(NARBuilder.newMultiThreadNAR(
                 3, new RealTime.CS(true).durSeconds(0.02f), true))
-                .runRT(0).join();
+                .runFPS(0).join();
     }
 }

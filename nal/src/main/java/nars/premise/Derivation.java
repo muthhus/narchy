@@ -229,12 +229,7 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch, @Nullable MatchConstraint constraints) {
-
-        if (constraints != null) {
-            if (this.constraints.set(constraints)==null)
-                throw new RuntimeException("constraints not set");
-        }
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
 
         matchesRemain = matchesMax;
 

@@ -184,7 +184,13 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         //@Nullable ListMultimap<Term, MatchConstraint> c){
 
 
-        ImmutableMap<Term, MatchConstraint> cc = initConstraints(constraints);
+        //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
+        if (constraints!=null) {
+            constraints.forEach((t, c) -> {
+                pre.add(new AddConstraint(t, c));
+            });
+        }
+
         if (task!=null && belief!=null) {
 
             //match both
@@ -192,20 +198,20 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
             if (taskFirst(task, belief)) {
                 //task first
-                code.add(new MatchOneSubtermPrototype(task, cc, 0, false, index));
-                code.add(new MatchOneSubtermPrototype(belief, cc, 1, true, index));
+                code.add(new MatchOneSubtermPrototype(task, 0, false, index));
+                code.add(new MatchOneSubtermPrototype(belief, 1, true, index));
             } else {
                 //belief first
-                code.add(new MatchOneSubtermPrototype(belief, cc, 1, false, index));
-                code.add(new MatchOneSubtermPrototype(task, cc, 0, true, index));
+                code.add(new MatchOneSubtermPrototype(belief, 1, false, index));
+                code.add(new MatchOneSubtermPrototype(task, 0, true, index));
             }
 
         } else if (belief!=null) {
             //match belief only
-            code.add(new MatchOneSubtermPrototype(belief, cc, 1, true, index));
+            code.add(new MatchOneSubtermPrototype(belief, 1, true, index));
         } else if (task!=null) {
             //match task only
-            code.add(new MatchOneSubtermPrototype(task, cc, 0, true, index));
+            code.add(new MatchOneSubtermPrototype(task, 0, true, index));
         } else {
             throw new RuntimeException("invalid");
         }
@@ -254,7 +260,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
 
     @Nullable
-    static ImmutableMap<Term, MatchConstraint> initConstraints(@NotNull ListMultimap<Term, MatchConstraint> c) {
+    static ImmutableMap<Term, MatchConstraint> compact(@NotNull ListMultimap<Term, MatchConstraint> c) {
         if (c.isEmpty()) return null;
 
         Map<Term, MatchConstraint> con = $.newHashMap(c.size());
@@ -382,6 +388,29 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
             MatchConstraint cN = mm.get(assignee);
             return (cN != null) && cN.invalid(assignee, value, f);
+        }
+    }
+
+    public static class AddConstraint extends AtomicPredicate<Derivation> {
+        private final Compound id;
+        private final Term t;
+        private final MatchConstraint c;
+
+        public AddConstraint(Term t, MatchConstraint c) {
+            this.id = $.func("constrain", t, $.the(c.toString()));
+            this.t = t;
+            this.c = c;
+        }
+
+        @Override
+        public boolean test(Derivation p) {
+            return p.constraints.add(t, c);
+        }
+
+        @NotNull
+        @Override
+        public String toString() {
+            return id.toString();
         }
     }
 

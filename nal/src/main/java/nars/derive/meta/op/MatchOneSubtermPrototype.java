@@ -2,12 +2,9 @@ package nars.derive.meta.op;
 
 import nars.Op;
 import nars.derive.meta.BoolPredicate;
-import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;
-import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 5/21/16.
@@ -21,13 +18,12 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     private final boolean finish;
 
-    public MatchOneSubtermPrototype(@NotNull Term x, @Nullable ImmutableMap<Term, MatchConstraint> constraints, int subterm, boolean finish, @NotNull PatternTermIndex index) {
+    public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish, @NotNull PatternTermIndex index) {
         super(
                 (subterm == 0 ?
-                        index.the(Op.PROD, id(index, x, constraints), Op.Imdex) :
-                        index.the(Op.PROD, Op.Imdex, id(index, x, constraints))),
-                x
-                , constraints);
+                        index.the(Op.PROD, id(x), Op.Imdex) :
+                        index.the(Op.PROD, Op.Imdex, id(x))),
+                x);
         this.subterm = subterm;
         this.finish = finish;
     }
@@ -35,7 +31,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
     @NotNull
     @Override
     protected BoolPredicate build(BoolPredicate eachMatch) {
-        return new MatchOneSubterm(id, subterm, pattern, constraints, finish ? eachMatch : null);
+        return new MatchOneSubterm(id, subterm, pattern, finish ? eachMatch : null);
     }
 
 }

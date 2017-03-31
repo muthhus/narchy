@@ -5,13 +5,9 @@ import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import nars.*;
-import nars.concept.ActionConcept;
-import nars.concept.GoalActionConcept;
-import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -23,7 +19,6 @@ import spacegraph.widget.console.ConsoleSurface;
 import spacegraph.widget.console.ConsoleTerminal;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -148,7 +143,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
 
 
-        a.runRT(0).join();
+        a.runFPS(0).join();
     }
 
     private static float similarity(char[][] a, char[][] b) {
