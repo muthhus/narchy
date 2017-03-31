@@ -43,10 +43,10 @@ public enum Op {
     SECTi("|", true, 3, Args.GTETwo),
 
     /** extensional difference */
-    DIFFe("-", 3, Args.Two),
+    DIFFe("-", true, 3, Args.Two),
 
     /** intensional difference */
-    DIFFi("~", 3, Args.Two),
+    DIFFi("~", true, 3, Args.Two),
 
     /** PRODUCT */
     PROD("*", 4, Args.GTEZero),

@@ -38,12 +38,12 @@ public class Line1D {
 //                }
 //            });
 
-            n.termVolumeMax.setValue(32);
+            n.termVolumeMax.setValue(12);
 
             Line1DSimplest a = new Line1DSimplest(n);
             n.onCycle(() -> {
                 a.i.setValue(
-                    0.5f * (Math.sin(n.time()/40f) + 1f)
+                    0.5f * (Math.sin(n.time()/80f) + 1f)
                     //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                     //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
@@ -53,7 +53,7 @@ public class Line1D {
 
             return a;
 
-        }, 20, 1, -1);
+        }, 20, 3, -1);
 
     }
 
