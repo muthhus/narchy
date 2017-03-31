@@ -43,7 +43,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     }
 
     @Override
-    protected float temperature() {
+    public float temperature() {
         return 0.5f;
     }
 

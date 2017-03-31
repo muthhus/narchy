@@ -105,7 +105,7 @@ public abstract class Param  {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 64;
+    public final static int UnificationStackMax = 96;
 
     /**
      * upper and lower limits for # of termutations derived, determined by premise's priority

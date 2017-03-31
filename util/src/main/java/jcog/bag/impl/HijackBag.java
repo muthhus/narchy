@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
@@ -21,6 +23,7 @@ import java.util.stream.Stream;
  * Created by me on 2/17/17.
  */
 public abstract class HijackBag<K, V> implements Bag<K, V> {
+
 
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
 
@@ -73,7 +76,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      * pressure from outside trying to enter
      */
-    public float pressure;
+    public final AtomicDouble pressure = new AtomicDouble();
     public float mass;
     float priMin;
     float priMax;
@@ -108,7 +111,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public void pressurize(float f) {
-        pressure += f;
+        pressure.addAndGet(f);
     }
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
@@ -178,7 +181,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public AtomicReferenceArray<V> reset() {
         if (!size.compareAndSet(0, 0)) {
             AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
-            pressure = 0;
+            this.pressure.set(0);
             this.priMax = 0;
             this.priMin = 0;
             return prevMap;
@@ -254,7 +257,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                                 }
 
                             } else { //put
-                                pressure += merge(ii, adding, scale);
+                                pressurize( merge(ii, adding, scale) );
 
                                 targetIndex = -1;
                                 added = ii;
@@ -285,7 +288,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
                         //insert to empty
                         if (map.compareAndSet(targetIndex, null, adding)) {
-                            pressure += merge(null, adding, scale);
+                            pressurize(merge(null, adding, scale));
                             added = adding;
                         }
 
@@ -293,7 +296,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         if (replace(adding, target)) {
                             if (map.compareAndSet(targetIndex, target, adding)) { //inserted
                                 //pressure -= targetPri;
-                                pressure += merge(null, adding, scale);
+                                pressurize(merge(null, adding, scale));
                                 found = target;
                                 added = adding;
                             }
@@ -325,7 +328,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 onAdded(added);
             } else if (add) {
                 //rejected: add but not added and not merged
-                pressure += pri(adding) * scale;
+                pressurize(pri(adding) * scale );
             }
 
 
@@ -598,9 +601,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     @Deprecated
     public Bag<K, V> commit() {
-        float p = this.pressure;
+        float p = (float)this.pressure.getAndSet(0);
         if (p > 0) {
-            pressure = 0;
             return commit(Bag.forget(size(), p, mass, temperature(), priEpsilon(), this::forget));
         }
         return this;
@@ -609,7 +611,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      * higher value means faster forgetting
      */
-    protected float temperature() {
+    public float temperature() {
         return 0.5f;
     }
 

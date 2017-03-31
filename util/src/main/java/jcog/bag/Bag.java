@@ -35,10 +35,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     @Nullable
     public static <X> Consumer<X> forget(int s, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
-
         float r = Util.unitize(((m + p) - (s * (1f - temperature))) / m);
         //float r = Util.unitize(p / (p + m) * temperature);
-        return r >= priEpsilon ? f.valueOf(r) : null;
+        return r >= priEpsilon*s ? f.valueOf(r) : null;
 
     }
 

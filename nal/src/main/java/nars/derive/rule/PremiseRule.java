@@ -560,26 +560,28 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "neq":
-
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y); //should the constraints be ommited in this case?
                     break;
 
 
                 case "neqAndCom":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //includes neq:
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     constraints.put(Y, new CommonSubtermConstraint(X));
                     constraints.put(X, new CommonSubtermConstraint(Y));
                     break;
 
                 case "neqCom":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
+                    //includes neq:
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, false));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, false));
 
                     break;
                 case "neqRCom":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
+                    //includes neq:
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, true));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, true));
                     break;
@@ -603,20 +605,20 @@ public class PremiseRule extends GenericCompound {
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
+                    neq(constraints, X, Y);
                     constraints.put(X, new OpConstraint(Op.SETe));
                     constraints.put(Y, new OpConstraint(Op.SETe));
                     pres.add(new SubTermsStructure(Op.SETe.bit));
                     ////additionally prohibits the two terms being equal
-                    neq(constraints, X, Y);
                     break;
 
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
+                    neq(constraints, X, Y);
                     constraints.put(X, new OpConstraint(Op.SETi));
                     constraints.put(Y, new OpConstraint(Op.SETi));
                     pres.add(new SubTermsStructure(Op.SETi.bit));
                     //additionally prohibits the two terms being equal
-                    neq(constraints, X, Y);
                     break;
 
 

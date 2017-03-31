@@ -1,6 +1,10 @@
 package nars.bag.impl;
 
+import jcog.bag.Bag;
+import jcog.bag.Priority;
+import jcog.bag.impl.HijackBag;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;
@@ -72,26 +76,18 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
     }
 
 
-    long lastForget = ETERNAL;
+    //long lastForget = ETERNAL;
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
+        BLinkHijackBag.flatForget(this );
+
         //new Forget( Util.unitize(1f/capacity() + forgetRate) )
 
-        long now = n.time();
-        int dur = n.dur();
-        /*if (lastForget + dur < now)*/ {
-            int s = capacity();
-            update(x -> {
-                //long s = x.start();
-                long e = x.end();
-                if (e < now) {
-                    //forget old tasks
-                    x.budget().priMult( 1f - ((1f - x.qua())/s) );
-                }
-            });
-            lastForget = now;
-        }
+//        int dur = n.dur();
+//        /*if (lastForget + dur < now)*/ {
+//            lastForget = now;
+//        }
 
 
         return put(t);
@@ -109,6 +105,36 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 //        //failed insert
 //        return null;
     }
+
+//    public static void flatForget(TaskHijackBag b, @NotNull NAR n) {
+//        double p = b.pressure.get();
+//        int s = b.size();
+//
+//        float ideal = b.size() * b.temperature();
+//        if (p > ideal/2f) {
+//            if (b.pressure.compareAndSet(p, 0)) {
+//
+//                b.commit(null); //precommit to get accurate mass
+//                float mass = b.mass;
+//
+//                float over = (float) ((p + mass) - ideal);
+//                float overEach = over / s;
+//                if (overEach >= Param.BUDGET_EPSILON) {
+//                    long now = n.time();
+//                    b.commit(x -> {
+//                        //long s = x.start();
+//                        long e = x.end();
+//                        if (e < now) {
+//                            //forget old tasks
+//                            //x.budget().priMult(1f - ((1f - x.qua()) / s));
+//                            x.budget().priSub(overEach * (1f - x.qua()));
+//                        }
+//                    });
+//                }
+//            }
+//
+//        }
+//    }
 
 
 }

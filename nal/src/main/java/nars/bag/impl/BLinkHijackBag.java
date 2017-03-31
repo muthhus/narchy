@@ -1,9 +1,12 @@
 package nars.bag.impl;
 
+import jcog.bag.Bag;
+import nars.NAR;
 import nars.Param;
 import nars.attention.Forget;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -26,7 +29,38 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
         this.map.set(EMPTY_ARRAY);
     }
 
+    public static void flatForget(BudgetHijackBag<?,? extends Budgeted> b) {
+        double p = b.pressure.get() * 2 /* MULTIPLIER TO ANTICIPATE NEXT period */;
+        int s = b.size();
 
+
+            //float ideal = s * b.temperature();
+            if (p > Param.BUDGET_EPSILON * s) {
+                if (b.pressure.compareAndSet(p, 0)) {
+
+                    b.commit(null); //precommit to get accurate mass
+                    float mass = b.mass;
+
+                    float over = //(float) ((p + mass) - ideal);
+                            Math.min(0.25f, (float) p / (mass));
+                    float overEach = over / s;
+                    if (overEach >= Param.BUDGET_EPSILON) {
+                        b.commit(x -> {
+                            x.budget().priSub(overEach * (1f - x.qua()));
+                        });
+                    }
+                }
+
+            }
+
+    }
+
+    @Override
+    public Bag<K, BLink<K>> commit() {
+        flatForget(this);
+        return this;
+        //return super.commit();
+    }
 
     @Override
     protected Consumer<BLink<K>> forget(float rate) {
@@ -54,7 +88,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
     }
 
     @Override
-    protected float temperature() {
+    public float temperature() {
         return 0.5f;
     }
 

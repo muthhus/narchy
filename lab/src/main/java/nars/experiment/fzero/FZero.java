@@ -52,25 +52,25 @@ public class FZero extends NAgentX {
         senseNumberDifference($.inh($.the("fz"), $.the("accel")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-        TermGraph.ImplGraph tg = new TermGraph.ImplGraph(nar);
-        nar.onCycle(r -> {
-            MutableValueGraph<Term,Float> s = tg.snapshot(
-                    Iterables.concat(
-                        Iterables.transform(actions, ActionConcept::term),
-                        Lists.newArrayList(happy.term())
-                    ),
-                    nar);
-            Set<EndpointPair<Term>> ee = s.edges();
-
-            if (!ee.isEmpty()) {
-                System.out.println(ee.size() + " implication edges");
-                System.out.println(Joiner.on("\n").join(
-                        Iterables.transform(ee, e ->
-                                "\t" + e + "=" + s.edgeValue(e.nodeU(), e.nodeV())
-                        )
-                ));
-            }
-        });
+//        TermGraph.ImplGraph tg = new TermGraph.ImplGraph(nar);
+//        nar.onCycle(r -> {
+//            MutableValueGraph<Term,Float> s = tg.snapshot(
+//                    Iterables.concat(
+//                        Iterables.transform(actions, ActionConcept::term),
+//                        Lists.newArrayList(happy.term())
+//                    ),
+//                    nar);
+//            Set<EndpointPair<Term>> ee = s.edges();
+//
+//            if (!ee.isEmpty()) {
+//                System.out.println(ee.size() + " implication edges");
+//                System.out.println(Joiner.on("\n").join(
+//                        Iterables.transform(ee, e ->
+//                                "\t" + e + "=" + s.edgeValue(e.nodeU(), e.nodeV())
+//                        )
+//                ));
+//            }
+//        });
 
 
 //        try {
