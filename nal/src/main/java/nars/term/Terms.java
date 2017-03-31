@@ -13,8 +13,10 @@ import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -514,32 +516,34 @@ public enum Terms { ;
      * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
      */
     @Nullable
-    public static Iterator<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
-        FasterList<Term> oi = getUniqueRepeats(c, score, minCount);
+    public static MutableSet<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+        MutableSet<Term> oi = getUniqueRepeats(c, score, minCount);
         if (oi == null)
             return null;
 
-        oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
+        //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
         //keep terms which are not contained by other terms in the list
         //renive terms which are contained by other terms in the list
 
-        return Iterators.filter(oi.iterator(), b -> {
-            return !oi.anySatisfy(
+        oi.removeIf(b -> {
+            return oi.anySatisfy(
                 a -> (a != b) &&
                      (a instanceof Compound) &&
                      ((Compound) a).containsTermRecursively(b)
             );
         });
+
+        return oi;
     }
 
-    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+    @Nullable static MutableSet<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c, score);
         int us = uniques.size();
         if (us == 0)
             return null;
 
-        FasterList<Term> oi = (FasterList) $.newArrayList(us);
+        MutableSet<Term> oi = new UnifiedSet();
 
         uniques.forEachWithOccurrences((Term t, int count) -> {
             if (count >= minCount) {

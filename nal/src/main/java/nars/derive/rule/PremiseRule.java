@@ -1012,18 +1012,17 @@ public class PremiseRule extends GenericCompound {
 
     }
 
-    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2) {
-        return neqPrefilter(pres, task, belief, arg1, arg2, neq);
-    }
 
     /**
      * returns whether the prefilter was successful, otherwise a constraint must be tested
      */
-    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2, Function<TaskBeliefSubterms, BoolPredicate> filter) {
+    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2, Function<TaskBeliefSubterms, BoolPredicate[]> filter) {
         TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
         if (tb != null) {
             //cheaper to compute this in precondition
-            pres.add(filter.apply(tb));
+            BoolPredicate[] bp = filter.apply(tb);
+            for (BoolPredicate b : bp)
+                pres.add(b);
             return true;
         }
 
@@ -1031,22 +1030,26 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    final static Function<TaskBeliefSubterms, BoolPredicate> neq
-            = (p) -> TermNotEquals.the(p, com.google.common.base.Objects::equal);
-
-    final static Function<TaskBeliefSubterms, BoolPredicate> neqCom
-            = (p) -> TermNotEquals.the(p, (a, b) -> {
-        return a.equals(b) || TermContainer.isSubtermOfTheOther(a, b, false, true);
-    });
+    @NotNull private static BoolPredicate the_equals(TaskBeliefSubterms p) {
+        return TermNotEquals.the(p, com.google.common.base.Objects::equal);
+    }
 
 
-    final static Function<TaskBeliefSubterms, BoolPredicate> neqRCom
-            = (p) -> TermNotEquals.the(p, (a, b) -> {
-        return a.equals(b) || TermContainer.isSubtermOfTheOther(a, b, true, true);
-    });
+    final static Function<TaskBeliefSubterms, BoolPredicate[]> neq = (p) -> new BoolPredicate[]{
+        the_equals(p)
+    };
+
+    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqCom = (p) -> new BoolPredicate[]{
+        the_equals(p),
+        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, false, true))
+    };
+
+    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqRCom = (p) -> new BoolPredicate[]{
+        the_equals(p),
+        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, true, true))
+    };
 
 
-    //TermNotEquals.the(p, com.google.common.base.Objects::equal);
 
     /**
      * for each calculable "question reverse" rule,

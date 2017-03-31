@@ -98,42 +98,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //        return this;
 //    }
 
-    /** commits every N cycles only */
-    @NotNull
-    public SensorConcept every(int minCycles) {
-        timing(minCycles, minCycles);
-        return this;
-    }
-
-    
-    /**
-     * adjust min/max temporal resolution of feedback input
-     * ex:
-     *          min=0, max=2 : update every 2 cycles, or immediately if changed
-     *          max=2, min=0 : update no sooner than 2 cycles
-     *          max=2, min=4 : update no sooner than 2 cycles, and no later than 4
-     */
-    @NotNull
-    public SensorConcept timing(int minCycles, int maxCycles) {
-        sensor.minTimeBetweenUpdates(minCycles);
-        sensor.maxTimeBetweenUpdates(maxCycles);
-        return this;
-    }
-
-//    public Task desire(@Nullable Truth t, float pri, int dur) {
-//        if (this.desire==null || !this.desire.truth().equals(t)) {
-//            if (this.desire != null) {
-//                this.desire.delete(nar);
-//            }
-//
-//            if (t!=null) {
-//                this.desire = new TaskBuilder(term(), Symbols.GOAL, t).budget(pri, dur).log("Sensor Goal");
-//                //policy(policy(), nar.time()); //trigger capacity update
-//                sensor.nar.inputLater(this.desire);
-//            }
-//        }
-//        return this.desire;
-//    }
 
     @Override
     public EternalTable newEternalTable(int eCap) {

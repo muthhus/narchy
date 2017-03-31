@@ -123,7 +123,7 @@ abstract public class NAgent implements NSense, NAct {
         this.nar = nar;
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : $.func("happy", id),
+                id == null ? p("happy") : $.inh(id, $.the("happy")),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 
@@ -363,14 +363,13 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()),
-                            ETERNAL)
-                            //ETERNAL)
+                    quest((Compound) (action.term()), ETERNAL)
+
                     //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
-//                    question(impl(action, 0, happiness), now),
-//                    question(impl(neg(action), 0, happiness), now)
+//                    question(impl(action, 0, happiness), ETERNAL),
+//                    question(impl(neg(action), 0, happiness), ETERNAL)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),

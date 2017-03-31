@@ -1008,7 +1008,15 @@ public enum $ {
         }
         return nextInner;
     }
-
+    public static @Nullable Compound inhRecurse(@NotNull Term... t) {
+        int tl = t.length;
+        @NotNull Term bottom = t[--tl];
+        Compound nextInner = $.inh(t[--tl], bottom); //wrap innermost item in product too, for fairness
+        while (nextInner!=null && tl > 0) {
+            nextInner = $.inh(t[--tl], nextInner);
+        }
+        return nextInner;
+    }
     public static void logLevel(Class logClass, Level l) {
         ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logClass)).setLevel(l);
     }

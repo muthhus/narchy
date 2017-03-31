@@ -1,18 +1,20 @@
 package nars.experiment.fzero;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.graph.MutableGraph;
+import com.google.common.graph.EndpointPair;
+import com.google.common.graph.MutableValueGraph;
 import jcog.Util;
 import nars.*;
+import nars.concept.ActionConcept;
 import nars.nar.NARBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
-import nars.task.util.TaskRule;
 import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.DirectedGraph;
+
+import java.util.Set;
 
 import static nars.$.t;
 
@@ -33,18 +35,42 @@ public class FZero extends NAgentX {
                 .setResolution(0.05f)
                 .priTotal(4f);
 
-        senseNumberDifference($.inh($.the("joy"), $.the("fz")), happy);
-        senseNumberDifference($.func("angVel", $.the("fz")), ()->(float)fz.playerAngle).resolution(0.02f);
-        senseNumberDifference($.func("accel", $.the("fz")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
+        actionTogglePWM($.inh($.the("fz"), $.the("fwd")),
+                //(b)->{ fz.thrust = b; }
+                () -> fz.thrust = true, () -> fz.thrust = false
+        );
+        actionTriStatePWM($.inh($.the("fz"), $.the("rot") ), (dh) -> {
+            switch (dh) {
+                case +1: fz.left = false; fz.right = true; break;
+                case 0: fz.left = fz.right = false; break;
+                case -1: fz.left = true; fz.right = false; break;
+            }
+        });
+
+        senseNumberDifference($.inh($.the("fz"), $.the("joy")), happy);
+        senseNumberDifference($.inh($.the("fz"), $.the("angVel")), ()->(float)fz.playerAngle).resolution(0.02f);
+        senseNumberDifference($.inh($.the("fz"), $.the("accel")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-//        TermGraph.StatementGraph tg = new TermGraph.StatementGraph(nar);
-//        nar.onCycle(r -> {
-//            MutableGraph<Term> s = tg.snapshot(
-//                    $.newArrayList(actions.get(0).term(), actions.get(1).term(), happy.term()),
-//                    nar);
-//            System.out.println(s);
-//        });
+        TermGraph.ImplGraph tg = new TermGraph.ImplGraph(nar);
+        nar.onCycle(r -> {
+            MutableValueGraph<Term,Float> s = tg.snapshot(
+                    Iterables.concat(
+                        Iterables.transform(actions, ActionConcept::term),
+                        Lists.newArrayList(happy.term())
+                    ),
+                    nar);
+            Set<EndpointPair<Term>> ee = s.edges();
+
+            if (!ee.isEmpty()) {
+                System.out.println(ee.size() + " implication edges");
+                System.out.println(Joiner.on("\n").join(
+                        Iterables.transform(ee, e ->
+                                "\t" + e + "=" + s.edgeValue(e.nodeU(), e.nodeV())
+                        )
+                ));
+            }
+        });
 
 
 //        try {
@@ -126,17 +152,7 @@ public class FZero extends NAgentX {
 //            e.printStackTrace();
 //        }
 
-        actionTogglePWM($.func($.the("fwd"), $.the("fz")),
-            //(b)->{ fz.thrust = b; }
-            () -> fz.thrust = true, () -> fz.thrust = false
-        );
-        actionTriStatePWM($.func($.the("rot"), $.the("fz")), (dh) -> {
-            switch (dh) {
-                case +1: fz.left = false; fz.right = true; break;
-                case 0: fz.left = fz.right = false; break;
-                case -1: fz.left = true; fz.right = false; break;
-            }
-        });
+
 
 //        action( new BeliefActionConcept($.inh($.the("fwd"), $.the("fz")), nar, (b) -> {
 //            if (b!=null) {
@@ -199,9 +215,9 @@ public class FZero extends NAgentX {
 
 
 
-        return (float) Math.pow(Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float)fz.power))/FZeroGame.FULL_POWER +
+        return Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float)fz.power))/FZeroGame.FULL_POWER +
                         //((float)fz.vehicleMetrics[0][6]/100f)+
-                        deltaDistance), -1f, +1f), 3);
+                        deltaDistance), -1f, +1f);
     }
 
     public static void main(String[] args) {

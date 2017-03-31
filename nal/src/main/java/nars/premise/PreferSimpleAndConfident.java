@@ -109,7 +109,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         {
             beliefCompl = belief.complexity();
             parentComplexity =
-                    (int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
+                    //(int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
+                    Math.max(taskCompl, beliefCompl);
         } else {
             beliefCompl = 0;
             parentComplexity = taskCompl;
@@ -127,7 +128,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 //        } else {
 //            penaltyComplexity = 1;
 //        }
-        int derivationPenalty = 1;
+        int derivationPenalty = 0;
         return
                 //Util.sqr(Util.unitize( //sharpen
                 1f - Util.unitize(

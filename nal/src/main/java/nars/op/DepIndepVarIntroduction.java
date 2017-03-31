@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,16 +53,15 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Nullable
     @Override
-    protected Iterator<Term> select(Compound input) {
+    protected MutableSet<Term> select(Compound input) {
         return Terms.substAllRepeats(input, depIndepScore, 2);
     }
 
-    static final Variable i0 = varIndep("i0");
-    static final Variable d0 = varDep("d0");
 
     @Nullable
     @Override
-    protected Term[] next(@NotNull Compound input, @NotNull Term selected) {
+    protected Term next(@NotNull Compound input, @NotNull Term selected, int order) {
+
 
         if (selected == Imdex)
             return null;
@@ -119,12 +119,12 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         if (!depOrIndep) {
             //at least one impl/equiv must have both sides covered
             return (m.anySatisfy(b -> b == 0b11)) ?
-                    new Term[] { i0 } : null;
+                    $.varIndep(order) : null;
 
         } else {
             //at least one conjunction must contain >=2 path instances
             return m.anySatisfy(b -> b >= 2) ?
-                    new Term[] { d0 } : null;
+                    $.varDep(order) : null;
         }
 
     }

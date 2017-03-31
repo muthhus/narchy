@@ -29,7 +29,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private final NAR nar;
 
-    private static final int radix = 2;
+    private static final int radix = 3;
     private final List<PixelConcept> pixels;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
@@ -57,17 +57,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         pixels = encode((x, y) ->
                         $.inh(
                                 //$.inh(
-
+                                root,
 
                                 //$.secte
                                     radix > 1 ?
-                                        $.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
-                                        //$.p( zipCoords(coord(x, width), coord(y, height)) ) :
+                                        //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
+                                        $.p( zipCoords(coord(x, width), coord(y, height)) ) :
                                         //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                         //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                        $.p( $.the(x), $.the(y) ),
+                                        $.p( $.the(x), $.the(y) )
 
-                                root
+
 
                         )
                 , brightnessToTruth);
@@ -97,8 +97,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         for (int i = 0; i < m; i++) {
             Term xy;
             char levelPrefix =
-                (char)('a' + (m-1 - i)); //each level given a different scale prefix
-                //'p';
+                //(char)('a' + (m-1 - i)); //each level given a different scale prefix
+                'p';
 
             if (i >= sx && i >=sy) {
                 xy = $.the(levelPrefix + x[ix++].toString() + y[iy++].toString());

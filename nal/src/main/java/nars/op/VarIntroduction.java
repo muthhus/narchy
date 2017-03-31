@@ -3,10 +3,14 @@ package nars.op;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.subst.MapSubst;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
@@ -29,42 +33,56 @@ public abstract class VarIntroduction {
 
         int max = maxResults;
 
-        Iterator<Term> selections = select(c);
-        while (selections.hasNext()) {
+        Set<Term> selections = select(c);
+        if (selections.isEmpty())
+            return;
 
-            Term s = selections.next();
-
-            Term[] dd = next(c, s);
-
-            if (dd != null) {
-                int replacements = dd.length;
-                if (replacements > 0) {
-
-                    if (replacements > 1)
-                        throw new UnsupportedOperationException("TODO"); //choose one randomly
-
-                    Term d = dd[0];
-
-                    Term newContent = $.terms.replace(c, s, d);
-
-                    if ((newContent instanceof Compound) && !newContent.equals(c)) {
-                        each.accept((Compound) newContent);
-                        if (--max <= 0)
-                            return;
-                    }
-                }
-            }
+        Map<Term,Term> substs = new UnifiedMap(selections.size());
+        int o = 0;
+        for (Term u : selections) {
+            Term v = next(c, u, o++);
+            if (v == null)
+                return;
+            substs.put(u, v);
         }
+
+        Term newContent = $.terms.replace(c, substs);
+
+        if ((newContent instanceof Compound) && !newContent.equals(c)) {
+            each.accept((Compound) newContent);
+            if (--max <= 0)
+                return;
+        }
+
+//        while (selections.hasNext()) {
+//
+//            Term s = selections.next();
+//
+//
+//
+//            if (dd != null) {
+//                int replacements = dd.length;
+//                if (replacements > 0) {
+//
+//                    if (replacements > 1)
+//                        throw new UnsupportedOperationException("TODO"); //choose one randomly
+//
+//                    Term d = dd[0];
+//
+//
+//                }
+//            }
+//        }
     }
 
 
 
     @Nullable
-    abstract protected Iterator<Term> select(Compound input);
+    abstract protected Set<Term> select(Compound input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
-    abstract protected Term[] next(@NotNull Compound input, @NotNull Term selection);
+    abstract protected Term next(@NotNull Compound input, @NotNull Term selection, int order);
     /*{
         return $.varQuery("c" + iteration);
     }*/

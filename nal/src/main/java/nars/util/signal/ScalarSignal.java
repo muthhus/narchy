@@ -75,53 +75,42 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
     @Override
     public Task apply(@NotNull NAR nar) {
 
-        long now = nar.time();
+        //long now = nar.time();
 
         //update previous task: extend its end time to current time
-        if (current!=null && current.isDeleted())  {
-            currentValue = Float.NaN; //force re-input
-        }
+//        if (current!=null && current.isDeleted())  {
+//            currentValue = Float.NaN; //force re-input
+//        }
 
-        int timeSinceLastInput = (int) (now - lastInputTime);
+        //int timeSinceLastInput = (int) (now - lastInputTime);
 
 
         float next = value.floatValueOf(term);
-        if (next!=next) {
-            invalidate();
-            this.current = null;
+        return set(term,
+                (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null,
+                nar);
 
-            return null; //all
-        }// ow the value function to prevent input by returning NaN
+//        int maxT = this.maxTimeBetweenUpdates;
+//        boolean limitsMaxTime = maxT > 0;
+//        int minT = this.minTimeBetweenUpdates;
+//        boolean limitsMinTime = minT > 0;
+
+//        boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
+//        boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
+//        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(next, currentValue, resolution);
+
+        //if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
 
 
-        int maxT = this.maxTimeBetweenUpdates;
-        boolean limitsMaxTime = maxT > 0;
-        int minT = this.minTimeBetweenUpdates;
-        boolean limitsMinTime = minT > 0;
 
-        boolean tooSoon = (limitsMinTime && (timeSinceLastInput < minT));
-        boolean lateEnough = (limitsMaxTime && (timeSinceLastInput >= maxT));
-        boolean different = (currentValue != currentValue /* NaN */) || !Util.equals(next, currentValue, resolution);
+        //}
 
-        if ((inputIfSame || different || lateEnough) && (!tooSoon)) {
+//        //nothing new was input, continue previous task if exists
+//        if (current!=null && !current.isDeleted()) {
+//            current.setEnd(now);
+//        }
 
-            Truth nextTruth = truthFloatFunction.valueOf(next);
-            if (nextTruth == null)
-                return null;
-
-            Task t = set(term, nextTruth, nar);
-            if (t!=null) {
-                this.currentValue = next;
-            }
-            return t;
-        }
-
-        //nothing new was input, continue previous task if exists
-        if (current!=null && !current.isDeleted()) {
-            current.setEnd(now);
-        }
-
-        return null;
+//        return null;
     }
 
 
@@ -137,9 +126,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         return this;
     }
 
-    public void invalidate() {
-        this.currentValue = Float.NaN;
-    }
+
 
 
 //    protected float conf(float v) {
@@ -173,28 +160,4 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
     }
 
 
-//    /** sets minimum time between updates, even if nothing changed. zero to disable this */
-//    @NotNull
-//    public Sensor maxTimeBetweenUpdates(int dt) {
-//        this.maxTimeBetweenUpdates = dt;
-//        return this;
-//    }
-
-    @NotNull
-    public ScalarSignal minTimeBetweenUpdates(int dt) {
-        this.minTimeBetweenUpdates = dt;
-        return this;
-    }
-
-    @NotNull
-    public ScalarSignal maxTimeBetweenUpdates(int dt) {
-        this.maxTimeBetweenUpdates = dt;
-        return this;
-    }
-    //        public void on() {
-//
-//        }
-//        public void off() {
-//
-//        }
 }

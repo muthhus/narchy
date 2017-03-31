@@ -20,8 +20,8 @@ public class Signal {
     public FloatSupplier pri;
 
     boolean inputIfSame;
-    int maxTimeBetweenUpdates;
-    int minTimeBetweenUpdates;
+//    int maxTimeBetweenUpdates;
+//    int minTimeBetweenUpdates;
 
     final byte punc;
 

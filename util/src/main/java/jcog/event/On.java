@@ -1,5 +1,8 @@
 package jcog.event;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.function.Consumer;
@@ -39,6 +42,8 @@ abstract public class On<V> {
 
     public static class Weak<V> extends On<V> implements Consumer<V> {
 
+        protected static final Logger logger = LoggerFactory.getLogger(Weak.class);
+
         public final WeakReference<Consumer<V>> reaction;
 
 
@@ -52,7 +57,12 @@ abstract public class On<V> {
         public void accept(V v) {
             Consumer<V> c = reaction.get();
             if (c != null) {
-                c.accept(v);
+                try {
+                    c.accept(v);
+                } catch (Throwable any) {
+                    logger.error(" {}", any);
+                    off();
+                }
             } else {
                 //reference has been lost, so unregister:
                 off();

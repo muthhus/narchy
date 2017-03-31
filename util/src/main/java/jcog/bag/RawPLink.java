@@ -16,7 +16,7 @@ public class RawPLink<X> implements PLink<X> {
     }
 
     @Override
-    public final boolean equals(@NotNull Object that) {
+    public boolean equals(@NotNull Object that) {
         if (this==that)
             return true;
 
