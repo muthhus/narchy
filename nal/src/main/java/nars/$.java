@@ -13,7 +13,6 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.conceptualize.ConceptBuilder;
-import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;

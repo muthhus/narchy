@@ -1,6 +1,5 @@
 package nars.derive.meta.op;
 
-import com.google.common.base.Objects;
 import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.TaskBeliefSubterms;
 import nars.term.Term;
@@ -8,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 /**
  * Created by me on 12/17/15.

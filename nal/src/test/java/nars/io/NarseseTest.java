@@ -3,13 +3,13 @@ package nars.io;
 import nars.*;
 import nars.index.TermBuilder;
 import nars.nar.Terminal;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.truth.Truth;
-import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -8,12 +8,9 @@ import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
@@ -21,7 +18,7 @@ import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.gui.Vis.*;
+import static nars.gui.Vis.MyForceDirected;
 import static nars.gui.Vis.reflect;
 import static spacegraph.layout.Grid.col;
 

@@ -1,12 +1,7 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
-import jcog.Util;
-import jcog.bag.impl.HijackMemoize;
-import jcog.list.FasterList;
-import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.concept.Concept;
 import nars.concept.WiredConcept;
@@ -14,17 +9,11 @@ import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.term.util.InvalidTermException;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Triple;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed> {

@@ -1,29 +1,23 @@
 package nars.attention;
 
 import jcog.bag.Bag;
-import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.budget.BLink;
-import nars.budget.Budgeted;
 import nars.budget.RawBLink;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.index.term.tree.TermKey;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static jcog.math.Interval.unionLength;
 import static nars.time.Tense.ETERNAL;

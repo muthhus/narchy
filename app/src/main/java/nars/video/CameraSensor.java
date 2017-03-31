@@ -1,16 +1,12 @@
 package nars.video;
 
-import com.google.common.base.Joiner;
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
-import nars.NAgent;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;

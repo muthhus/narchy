@@ -19,10 +19,8 @@ package nars.kif;
 import nars.NAR;
 import nars.nar.Default;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf

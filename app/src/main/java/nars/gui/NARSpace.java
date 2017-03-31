@@ -3,16 +3,13 @@ package nars.gui;
 import jcog.event.On;
 import jcog.list.FasterList;
 import nars.NAR;
-import nars.nar.Default;
 import nars.term.Term;
-import nars.test.DeductiveMeshTest;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
 import spacegraph.space.ListSpace;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 

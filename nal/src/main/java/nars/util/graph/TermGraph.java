@@ -7,7 +7,6 @@ import com.google.common.graph.ValueGraphBuilder;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
-import jcog.random.XORShiftRandom;
 import nars.*;
 import nars.concept.Concept;
 import nars.term.Term;
@@ -15,7 +14,9 @@ import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;

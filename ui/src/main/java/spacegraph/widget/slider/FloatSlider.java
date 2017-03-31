@@ -5,7 +5,6 @@ import jcog.Texts;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
-import spacegraph.render.Draw;
 import spacegraph.widget.Label;
 
 /**

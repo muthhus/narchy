@@ -4,8 +4,6 @@ import nars.nar.Default;
 import nars.time.Tense;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by me on 3/30/17.
  */

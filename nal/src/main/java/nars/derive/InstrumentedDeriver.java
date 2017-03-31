@@ -1,14 +1,11 @@
 package nars.derive;
 
-import jcog.meter.event.HitMeter;
 import jcog.meter.event.PeriodMeter;
 import nars.$;
 import nars.derive.meta.AndCondition;
 import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.Fork;
-import nars.premise.Derivation;
 import nars.term.ProxyTerm;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;

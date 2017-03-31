@@ -2,7 +2,6 @@ package spacegraph.input;
 
 import com.jogamp.newt.event.KeyEvent;
 import spacegraph.SpaceGraph;
-import spacegraph.render.JoglPhysics;
 
 /**
  * Created by me on 11/20/16.

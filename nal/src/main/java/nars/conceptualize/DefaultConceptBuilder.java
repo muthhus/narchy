@@ -36,7 +36,6 @@ import java.util.function.BiFunction;
 
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
-import static nars.budget.BudgetMerge.maxBlend;
 import static nars.budget.BudgetMerge.plusBlend;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;

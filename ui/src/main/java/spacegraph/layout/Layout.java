@@ -7,9 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
-import spacegraph.widget.Windo;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 

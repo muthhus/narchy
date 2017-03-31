@@ -2,12 +2,12 @@ package nars.nal.nal1;
 
 import nars.*;
 import nars.nar.Default;
+import nars.task.util.TaskStatistics;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
-import nars.task.util.TaskStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,7 +18,8 @@ import java.util.function.BiFunction;
 import java.util.function.IntFunction;
 
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 5/24/16.

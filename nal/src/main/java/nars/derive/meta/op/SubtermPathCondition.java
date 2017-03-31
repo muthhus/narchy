@@ -1,7 +1,6 @@
 package nars.derive.meta.op;
 
 import nars.derive.meta.AtomicPredicate;
-import nars.derive.meta.TaskBeliefSubterms;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;

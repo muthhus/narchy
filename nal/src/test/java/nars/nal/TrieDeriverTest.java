@@ -1,20 +1,8 @@
 package nars.nal;
 
-import com.google.common.collect.Sets;
-import nars.conceptualize.ConceptBuilder;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.BoolPredicate;
-import nars.derive.rule.PremiseRule;
-import nars.index.term.PatternTermIndex;
-import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
-
-import java.util.*;
-
-import static java.lang.System.out;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 12/12/15.

@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-
 import static nars.Op.*;
 import static nars.index.TermBuilder.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;

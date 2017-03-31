@@ -2,14 +2,9 @@ package spacegraph.layout;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.opengl.GL2;
-import edu.cmu.sphinx.linguist.util.LRUCache;
 import jcog.list.FasterList;
-import org.apache.commons.collections4.map.LRUMap;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
-import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
@@ -17,8 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
-import static spacegraph.layout.TreeChart.WeightedString.w;
 
 /**
  * @author Tadas Subonis <tadas.subonis@gmail.com>

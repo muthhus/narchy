@@ -9,24 +9,16 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
-import spacegraph.Ortho;
-import spacegraph.SpaceGraph;
-import spacegraph.Surface;
 import spacegraph.render.Draw;
-import spacegraph.layout.Grid;
 import spacegraph.widget.Label;
 import spacegraph.widget.Widget;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.lang.Math.PI;
-import static java.util.stream.Collectors.toList;
 import static nars.time.Tense.ETERNAL;
-import static spacegraph.layout.Grid.VERTICAL;
 
 
 public class BeliefTableChart extends Widget implements Consumer<NAR> {

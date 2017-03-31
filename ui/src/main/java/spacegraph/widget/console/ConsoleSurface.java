@@ -1,20 +1,9 @@
 package spacegraph.widget.console;
 
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.TextColor;
-import com.googlecode.lanterna.gui2.BasicWindow;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.SeparateTextGUIThread;
-import com.googlecode.lanterna.gui2.TextBox;
-import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
-
-import java.io.IOException;
 
 /**
  * Created by me on 4/1/16.

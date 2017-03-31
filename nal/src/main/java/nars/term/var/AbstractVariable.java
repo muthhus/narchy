@@ -21,7 +21,6 @@
 package nars.term.var;
 
 
-import jcog.Texts;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;

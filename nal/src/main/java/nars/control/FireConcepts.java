@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Texts;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.data.MutableIntRange;

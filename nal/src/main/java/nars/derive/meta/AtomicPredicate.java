@@ -1,11 +1,8 @@
 package nars.derive.meta;
 
-import nars.$;
 import nars.Op;
 import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Predicate;
 
 /**
  * to form the derivater trie, each precondition must provide a key (by: toString())

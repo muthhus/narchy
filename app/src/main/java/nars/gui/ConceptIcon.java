@@ -1,11 +1,9 @@
 package nars.gui;
 
-import com.jogamp.opengl.GL2;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
-import spacegraph.render.Draw;
 import spacegraph.widget.Label;
 
 /**

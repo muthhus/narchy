@@ -6,7 +6,6 @@ import jcog.bag.PLink;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.control.ConceptBagFocus;
 import nars.io.NarseseTest;
 import nars.nar.Default;
 import nars.nar.Terminal;

@@ -7,11 +7,9 @@ import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.task.GeneratedTask;
-import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
-import nars.util.signal.Signal;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +18,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.BELIEF;
 import static nars.concept.SensorConcept.historicCapMultiplier;
 
 

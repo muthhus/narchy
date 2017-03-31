@@ -1,7 +1,7 @@
 package nars.derive.meta;
 
-import nars.term.Term;
 import nars.term.ProxyTerm;
+import nars.term.Term;
 
 import java.util.function.Predicate;
 

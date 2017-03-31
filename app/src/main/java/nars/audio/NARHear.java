@@ -8,15 +8,14 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Narsese;
 import nars.concept.SensorConcept;
-import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
 import spacegraph.audio.WaveCapture;
 import spacegraph.render.Draw;
-import spacegraph.widget.slider.FloatSlider;
 import spacegraph.widget.meter.MatrixView;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.util.List;
 

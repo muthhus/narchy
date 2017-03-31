@@ -1,10 +1,8 @@
 package nars.term;
 
-import com.google.common.collect.Iterators;
 import jcog.Texts;
 import jcog.Util;
 import jcog.data.sorted.SortedList;
-import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.term.atom.Atom;

@@ -1,15 +1,11 @@
 package nars.util.signal;
 
-import jcog.Util;
-import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.truth.Truthed;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;

@@ -50,9 +50,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.jogamp.opengl.util.gl2.GLUT.STROKE_MONO_ROMAN;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;
 import static spacegraph.render.JoglSpace.glut;

@@ -19,11 +19,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
-import static nars.budget.BudgetMerge.maxBlend;
 import static nars.budget.BudgetMerge.plusBlend;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */

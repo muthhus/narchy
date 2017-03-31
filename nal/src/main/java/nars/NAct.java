@@ -17,7 +17,6 @@ import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 
 /**
  * Created by me on 9/30/16.

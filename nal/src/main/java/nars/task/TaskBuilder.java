@@ -6,12 +6,12 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import nars.task.util.InvalidTaskException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

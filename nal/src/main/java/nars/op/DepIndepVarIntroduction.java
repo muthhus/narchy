@@ -6,19 +6,15 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.transform.Functor;
-import nars.term.var.Variable;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import static nars.$.varDep;
-import static nars.$.varIndep;
 import static nars.Op.*;
 
 /**

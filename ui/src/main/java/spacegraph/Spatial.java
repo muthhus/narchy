@@ -4,7 +4,6 @@ import com.jogamp.opengl.GL2;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
-import spacegraph.phys.Dynamic;
 import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.phys.constraint.TypedConstraint;

@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Param;
 import nars.budget.Budgeted;
 import nars.concept.Concept;
-import nars.term.Term;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

@@ -16,7 +16,6 @@ import nars.task.ImmutableTask;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import nars.util.Loop;
 import org.jetbrains.annotations.NotNull;

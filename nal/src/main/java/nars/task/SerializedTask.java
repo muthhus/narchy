@@ -1,7 +1,6 @@
 package nars.task;
 
 import jcog.data.byt.ByteSeq;
-import jcog.data.byt.DynByteSeq;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;

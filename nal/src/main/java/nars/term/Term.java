@@ -48,7 +48,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static nars.time.Tense.DTERNAL;
 

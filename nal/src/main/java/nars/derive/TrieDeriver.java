@@ -1,6 +1,5 @@
 package nars.derive;
 
-import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;

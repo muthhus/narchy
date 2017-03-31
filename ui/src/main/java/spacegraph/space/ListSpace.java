@@ -4,8 +4,6 @@ import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import spacegraph.AbstractSpace;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 

@@ -3,12 +3,10 @@ package nars.op;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.MapSubst;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;

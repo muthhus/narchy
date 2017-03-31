@@ -9,7 +9,6 @@ import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
 import nars.table.SensorBeliefTable;
-import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

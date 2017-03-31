@@ -2,17 +2,14 @@ package nars.index.term.map;
 
 import jcog.Util;
 import jcog.bag.impl.HijackMemoize;
-import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.Op;
-import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
