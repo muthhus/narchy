@@ -17,6 +17,7 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import spacegraph.Surface;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meta.WindowButton;
+import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -27,6 +28,7 @@ import java.util.function.Supplier;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
 
 /**
@@ -70,20 +72,20 @@ abstract public class NAgentX extends NAgent {
 //
 //    }
 
-    private static void print(NAR nar, NAgentX a) {
-        //NAR.printActiveTasks(nar, true);
-        //NAR.printActiveTasks(nar, false);
-
-        nar.forEachTask(x -> {
-            System.out.println(x);
-            //if (x.isQuestOrQuestion())
-            ///System.out.println(x.proof());
-        });
-
-        nar.printConceptStatistics();
-        new TaskStatistics().add(nar).print(System.out);
-
-    }
+//    private static void print(NAR nar, NAgentX a) {
+//        //NAR.printActiveTasks(nar, true);
+//        //NAR.printActiveTasks(nar, false);
+//
+//        nar.forEachTask(x -> {
+//            System.out.println(x);
+//            //if (x.isQuestOrQuestion())
+//            ///System.out.println(x.proof());
+//        });
+//
+//        nar.printConceptStatistics();
+//        new TaskStatistics().add(nar).print(System.out);
+//
+//    }
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
         return runRT(init, fps, 1, -1);
@@ -149,7 +151,18 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
                     new WindowButton( "focus", () -> (((Default)nar).focus) ),
                     new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
-                    new WindowButton( "deriverFilter", () -> ((Default)nar).derivationBudgeting )
+                    new WindowButton( "deriverFilter", () -> ((Default)nar).derivationBudgeting ),
+                    new WindowButton( "mix", () -> {
+                        Default d = (Default) nar;
+                        return col(
+                            new FloatSlider(d.mix._gain.get(d.deriver))  {
+                                @Override public String labelText() {  return "deriver " + super.labelText(); }
+                            },
+                            new FloatSlider(d.mix._gain.get(a)) {
+                                @Override public String labelText() {  return "agent " + super.labelText(); }
+                            }
+                        );
+                    })
                 ),
 
                 grid(

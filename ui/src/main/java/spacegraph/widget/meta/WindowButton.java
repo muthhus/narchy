@@ -48,12 +48,15 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
             if (enabled) {
                 if (space == null) {
                     space = SpaceGraph.window(spacer.get(), 0, 0);
+
                     int sx = Finger.pointer.getX();
                     int sy = Finger.pointer.getY();
                     int nx = sx - width/2;
                     int ny = sy - height/2;
                     space.show(this.toString(), width,height, nx, ny);
+                    //space.window.setTitle(label.value());
                     space.addWindowListener(this);
+
                 }
             } else {
                 if (this.space!=null) {

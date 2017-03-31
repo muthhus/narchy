@@ -3,6 +3,7 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.bag.Bag;
+import nars.util.data.Mix;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
 import jcog.data.MutableInteger;
@@ -123,6 +124,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     private NARLoop loop;
+
+    public final Mix<Object,Task> mix = new Mix();
+
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index

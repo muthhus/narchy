@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CheckBox extends ToggleButton {
 
     public String text;
-    private final Label label;
+    protected final Label label;
 
     public CheckBox(String text) {
         this.text = text;

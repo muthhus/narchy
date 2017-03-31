@@ -148,6 +148,8 @@ abstract public class NAgent implements NSense, NAct {
 
         curiosityConf = new FloatParam(nar.confMin.floatValue() * 5);
         curiosityProb = new FloatParam(0.5f);
+
+        nar.mix.gain(this, 1f);
     }
 
     @NotNull
@@ -238,7 +240,10 @@ abstract public class NAgent implements NSense, NAct {
 
 
         long frameTime = now - lastNow;
-        nar.input( nextInput(next),  priority.floatValue() * frameTime/dur );
+        nar.input(
+                nar.mix.input(this, nextInput(next))
+                //,  priority.floatValue() * frameTime/dur
+        );
 
 
 //        } else {
@@ -263,7 +268,7 @@ abstract public class NAgent implements NSense, NAct {
 
             curious(next)
 
-        );
+        ).filter(Objects::nonNull);
     }
 
     protected Stream<ActionConcept> actionStream() {

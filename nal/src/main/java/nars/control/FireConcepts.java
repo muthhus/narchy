@@ -54,20 +54,21 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 Concept concept = c.get();
                 
                 concept.tasklinks().commit();
-                concept.termlinks().commit();
 
                 @Nullable BLink<Task> taskLink = concept.tasklinks().sample();
-                if (taskLink!=null) {
+                if (taskLink == null)
+                    return true; //continue
 
-                    int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+                concept.termlinks().commit();
 
-                    FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-                    concept.termlinks().sample(termlinksPerForThisTask, termLinks::add);
+                int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
 
-                    if (!termLinks.isEmpty())
-                        premiser.newPremiseVector(concept, taskLink, termlinksFiredPerFiredConcept,
-                                FireConcepts.this, termLinks, nar);
-                }
+                FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+                concept.termlinks().sample(termlinksPerForThisTask, termLinks::add);
+
+                if (!termLinks.isEmpty())
+                    premiser.newPremiseVector(concept, taskLink, termlinksFiredPerFiredConcept,
+                            FireConcepts.this, termLinks, nar);
 
                 return true;
             });
@@ -105,27 +106,27 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     }
 
 
-    /**
-     * directly inptus each result upon derive, for single-thread
-     */
-    public static class DirectConceptBagFocus extends FireConcepts {
-        public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
-
-        public DirectConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, premiseBuilder);
-        }
-
-        @Override public void run() {
-            //new PremiseVector(derivationsInputPerCycle.intValue(), termlinksFiredPerFiredConcept).accept(nar);
-            new PremiseMatrixBatch(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
-        }
-
-        @Override
-        public void accept(DerivedTask derivedTask) {
-            nar.input(derivedTask);
-        }
-
-    }
+//    /**
+//     * directly inptus each result upon derive, for single-thread
+//     */
+//    public static class DirectConceptBagFocus extends FireConcepts {
+//        public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
+//
+//        public DirectConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
+//            super(nar, premiseBuilder);
+//        }
+//
+//        @Override public void run() {
+//            //new PremiseVector(derivationsInputPerCycle.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+//            new PremiseMatrixBatch(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
+//        }
+//
+//        @Override
+//        public void accept(DerivedTask derivedTask) {
+//            nar.input(derivedTask);
+//        }
+//
+//    }
 
     /**
      * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input
@@ -141,7 +142,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
             super(nar, premiseBuilder);
 
+            nar.mix.gain(this, 1f);
+
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
+
 
                 //                @Override
 //                public float pri(@NotNull Task key) {
@@ -177,7 +181,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             int input = pending.pop(inputsPerCycle, ready::add);
             //System.out.println(input + " (" + Texts.n2(100f * input/((float)inputsPerCycle)) + "%) load, " + pending.size() + " remain");
 
-            nar.runLater(ready, nar::input, 32);
+            if (!ready.isEmpty()) {
+                nar.runLater((n) -> {
+                    n.input(n.mix.input(FireConceptsBufferDerivations.this, ready.stream()));
+                });
+            }
+
+            //nar.runLater(ready, nar::input, 32);
             //ready.clear();
 
             pending.commit();
