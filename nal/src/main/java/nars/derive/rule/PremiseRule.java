@@ -276,13 +276,14 @@ public class PremiseRule extends GenericCompound {
 
         put(TaskPunctuation.class, rank--);
 
-        put(TermNotEquals.class, rank--);
-
         put(SubTermsStructure.class, rank--);
         put(SubTermStructure.class, rank--);
 
         put(events.class, rank--);
 
+        put(MatchTaskBelief.AddConstraint.class, rank--);
+
+        put(TermNotEquals.class, rank--);
 
 //        put(PatternOpNot.class, rank--);
 
@@ -567,7 +568,7 @@ public class PremiseRule extends GenericCompound {
 
                 case "neqAndCom":
                     //includes neq:
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     constraints.put(Y, new CommonSubtermConstraint(X));
                     constraints.put(X, new CommonSubtermConstraint(Y));
                     break;

@@ -29,6 +29,11 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
         this.map.set(EMPTY_ARRAY);
     }
 
+    @Override
+    protected Consumer<BLink<K>> forget(float rate) {
+        return new Forget(rate);
+    }
+
     public static void flatForget(BudgetHijackBag<?,? extends Budgeted> b) {
         double p = b.pressure.get() /* MULTIPLIER TO ANTICIPATE NEXT period */;
         int s = b.size();
@@ -54,17 +59,12 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
 
     }
 
-    @Override
-    public Bag<K, BLink<K>> commit() {
-        flatForget(this);
-        return this;
-        //return super.commit();
-    }
+//    @Override
+//    public Bag<K, BLink<K>> commit() {
+//        //flatForget(this);
+//        //return this;
+//    }
 
-    @Override
-    protected Consumer<BLink<K>> forget(float rate) {
-        return new Forget(rate);
-    }
 
     @Override
     public void onRemoved(@NotNull BLink<K> v) {
@@ -86,10 +86,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
         return Param.BUDGET_EPSILON;
     }
 
-    @Override
-    public float temperature() {
-        return 0.5f;
-    }
+
 
 
 }

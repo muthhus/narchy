@@ -33,12 +33,12 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
         super.forEach(max, action);
     }
 
-    @NotNull
-    @Override
-    public HijackBag<Task, Task> commit() {
-        BLinkHijackBag.flatForget(this);
-        return this;
-    }
+//    @NotNull
+//    @Override
+//    public HijackBag<Task, Task> commit() {
+//        //BLinkHijackBag.flatForget(this);
+//        //return this;
+//    }
 
     @Override
     public void onRemoved(@NotNull Task value) {

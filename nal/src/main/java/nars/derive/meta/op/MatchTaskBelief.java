@@ -185,11 +185,9 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
 
         //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
-        if (constraints!=null) {
-            constraints.forEach((t, c) -> {
-                pre.add(new AddConstraint(t, c));
-            });
-        }
+        constraints.forEach((t, c) -> {
+            pre.add(new AddConstraint(t, c));
+        });
 
         if (task!=null && belief!=null) {
 

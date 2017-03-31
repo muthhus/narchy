@@ -648,7 +648,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 ////        nar.believe("seq(#1,#2,TRUE)");
 ////        nar.believe("seq(#1,#2,FALSE)");
 //
-//        //nar.log();
+        //n.log();
 //        //nar.logSummaryGT(System.out, 0.1f);
 //
 ////		nar.log(System.err, v -> {

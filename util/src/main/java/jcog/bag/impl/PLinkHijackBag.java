@@ -30,12 +30,12 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
         return value.get();
     }
 
-    @NotNull
-    @Override
-    public HijackBag<X, PLink<X>> commit() {
-        flatForget(this);
-        return this;
-    }
+//    @NotNull
+//    @Override
+//    public HijackBag<X, PLink<X>> commit() {
+//        flatForget(this);
+//        return this;
+//    }
 
     public static void flatForget(HijackBag<?,? extends PLink> b) {
         int s = b.size();
@@ -78,10 +78,6 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
         return EPSILON_DEFAULT;
     }
 
-    @Override
-    public float temperature() {
-        return 0.5f;
-    }
 
     @Override
     public PForget forget(float rate) {
