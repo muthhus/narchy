@@ -70,8 +70,10 @@ public abstract class TermGraph {
                 Iterator<Term> ii = next.iterator();
                 while (ii.hasNext()) {
                     Term t = ii.next();
-                    recurseTerm(nar, when, g, done, next, t);
                     ii.remove();
+                    if (!done.add(t))
+                        continue;
+                    recurseTerm(nar, when, g, done, next, t);
                 }
             } while (!next.isEmpty() && g.nodes().size() < maxSize);
 
@@ -79,8 +81,7 @@ public abstract class TermGraph {
         }
 
         void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done,  Set<Term> next, Term t) {
-            if (!done.add(t))
-                return; //already tried
+
 
             Concept tc = nar.concept(t);
             if (tc == null)
@@ -91,16 +92,18 @@ public abstract class TermGraph {
                     if ((m.op() == IMPL) && (m.containsTerm(t))) {
                         Compound l = (Compound) m;
                         Term s = l.term(0);
-                        boolean se = s.equalsOrContains(t);
 
                         Term p = l.term(1);
-                        boolean pe = p.equalsOrContains(t);
 
-                        if (se || pe) {
-                            next.add(s);
-                            next.add(p);
-                            impl(g, nar, when, l, s, p);
-                        }
+                        //if (!g.nodes().contains(s) || !done.contains(p)) {
+                            boolean se = s.equalsOrContains(t);
+                            boolean pe = p.equalsOrContains(t);
+                            if (se || pe) {
+                                next.add(s);
+                                next.add(p);
+                                impl(g, nar, when, l, s, p);
+                            }
+                        //}
                     }
                 }
             );
