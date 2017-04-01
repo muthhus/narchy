@@ -69,9 +69,10 @@ public class Versioning extends FasterList<Versioned> {
         Versioned[] ii = this.items;
         if (ii.length == this.size) {
             return false;
+        } else {
+            ii[this.size++] = newItem;
+            return true;
         }
-        ii[this.size++] = newItem;
-        return true;
     }
 
 }

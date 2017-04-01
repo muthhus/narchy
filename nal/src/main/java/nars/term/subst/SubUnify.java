@@ -20,15 +20,13 @@ public class SubUnify extends Unify {
 
     @Nullable private Term result;
 
-    int retries;
 
-    public SubUnify(TermIndex index, Op type, Random r, int tries) {
+    public SubUnify(TermIndex index, Op type, Random r) {
         super(index, type, r, Param.SubUnificationStackMax);
-        this.retries = tries;
     }
 
-    public SubUnify(@NotNull Unify parent, @Nullable Op type, int tries) {
-        this(parent.index, type, parent.random, tries);
+    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
+        this(parent.index, type, parent.random);
     }
 
 

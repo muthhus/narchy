@@ -57,18 +57,8 @@ public class Derivation extends Unify {
 
 
     /**
-     * only continues termuting while matchesRemain > 0
-     */
-    int matchesRemain;
-
-    final int matchesMax;
-
-
-    /**
      * cached values
      */
-
-
     /** op ordinals: 0=task, 1=belief */
     public final byte termSub0op;
     public final byte termSub1op;
@@ -118,11 +108,10 @@ public class Derivation extends Unify {
 
     public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
                       DerivationBudgeting b,
-                      int matchMax, int stack) {
+                      int stack) {
         super(nar.concepts, VAR_PATTERN, nar.random, stack);
 
         this.budgeting = b;
-        this.matchesMax = matchMax;
 
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
@@ -231,7 +220,6 @@ public class Derivation extends Unify {
      */
     public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
 
-        matchesRemain = matchesMax;
 
         this.forEachMatch = eachMatch;
 

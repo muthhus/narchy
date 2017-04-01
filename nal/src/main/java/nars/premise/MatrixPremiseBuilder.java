@@ -48,7 +48,6 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
         return new Derivation(nar, p, each,
                 budgeting,
-                Util.lerp(p.qua(), Param.UnificationMatchesMax, 1),
                 Param.UnificationStackMax
         );
     }
