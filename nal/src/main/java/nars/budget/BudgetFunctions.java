@@ -45,12 +45,19 @@ public final class BudgetFunctions extends UtilityFunctions {
     public static float truthToQuality(@NotNull Truthed t) {
         //float exp = t.expectation();
 
+        //promote polarity
+        float exp = t.expectation();
+        if (exp < 0.5f) {
+            exp = 1f - exp;
+        }
+        return exp;
+
         //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
         //return Math.max(exp, (1.0f - exp) * 0.75f);
 
         //return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
 
-        return t.conf();
+        //return t.conf();
     }
 
     // /**

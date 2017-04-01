@@ -4,89 +4,25 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
-import jcog.bag.impl.HijackBag;
-import jcog.bag.impl.PLinkHijackBag;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Set;
 
-import static nars.Op.NEG;
+import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 public abstract class TermGraph {
-
-    public static final class ImplLink extends RawPLink<Term> {
-
-        final boolean subjNeg;
-        final boolean predNeg;
-
-        public ImplLink(Term o, float p, boolean subjNeg, boolean predNeg) {
-            super(o, p);
-            this.subjNeg = subjNeg;
-            this.predNeg = predNeg;
-        }
-
-        @Override
-        public boolean equals(@NotNull Object that) {
-            return super.equals(that) && ((ImplLink)that).subjNeg == subjNeg;
-        }
-
-        @Override
-        public int hashCode() {
-            return super.hashCode() * (subjNeg ? -1 : +1);
-        }
-
-    }
-
-    class ConceptVertex  {
-
-        //these are like more permanent set of termlinks for the given context they are stored by
-        final HijackBag<Term, ImplLink> in;
-        final HijackBag<Term, ImplLink> out;
-
-        public ConceptVertex(Random rng) {
-            in = new MyPLinkHijackBag(rng);
-            out = new MyPLinkHijackBag(rng);
-        }
-
-        private class MyPLinkHijackBag extends PLinkHijackBag {
-            public MyPLinkHijackBag(Random rng) {
-                super(32, 4, rng);
-            }
-
-            @Override
-            public float pri(@NotNull PLink key) {
-                float p = key.pri();
-                return Math.max(p - 0.5f, 0.5f - p); //most polarizing
-            }
-
-            @Override
-            protected float merge(@Nullable PLink existing, @NotNull PLink incoming, float scale) {
-
-                //average:
-                if (existing != null) {
-                    float pAdd = incoming.priSafe(0);
-                    existing.priAvg(pAdd, scale);
-                    return 0;
-                } else {
-                    return 0;
-                }
-
-            }
-        }
-    }
-
 
     protected TermGraph() {
 
@@ -96,84 +32,24 @@ public abstract class TermGraph {
 
         final static String VERTEX = "V";
 
-        public ImplGraph(NAR nar) {
+        public ImplGraph() {
             super();
-            nar.onTask(t -> {
-                if (t.isBelief())
-                    task(nar, t);
-            });
+//            nar.onTask(t -> {
+//                if (t.isBelief())
+//                    task(nar, t);
+//            });
 
-        }
-
-        public void task(NAR nar, Task t) {
-            int dt = t.dt();
-            if (t.op() == Op.EQUI) {
-                impl(nar, t, dt, t.term(0), t.term(1));
-                impl(nar, t, dt, t.term(1), t.term(0));
-            } else if (t.op() == Op.IMPL) {
-                impl(nar, t, dt, t.term(0), t.term(1));
-            }
-        }
-
-        public void impl(NAR nar, Task t, int dt, Term subj, Term pred) {
-            if (dt == DTERNAL)
-                dt = 0;
-            if (dt < 0) {
-                //TODO reverse implication
-                impl(nar, t, -dt, pred, subj);
-                return;
-            }
-
-            Concept sc = nar.concept(subj);
-            if (sc == null) return;
-
-            Concept pc = nar.concept(pred);
-            if (pc == null) return;
-
-            //if (sc.equals(pc)) return; //self-loop, maybe allow
-
-            Truth tt = t.truth();
-            float val;
-            boolean subjNeg, predNeg;
-            int dur = nar.dur();
-            float conf = TruthPolation.evidenceDecay( t.evi(nar.time(), dur), dur,  dt);
-
-            if (tt.freq() >= 0.5f) {
-                val = TruthFunctions.expectation(tt.freq(), conf);
-                predNeg = false;
-            } else {
-                val = 1f - TruthFunctions.expectation(1f - tt.freq(), conf);
-                predNeg = true;
-            }
-
-            subjNeg = (subj.op()==NEG);
-
-            if (val > Param.BUDGET_EPSILON) {
-                ConceptVertex sv = sc.meta(VERTEX,
-                        (k, p) -> {
-                            if (p==null)
-                                p = new ConceptVertex(nar.random);
-                            return p;
-                        });
-                sv.out.put(new ImplLink(pc.term(), val, subjNeg, predNeg));
-
-                ConceptVertex pv = pc.meta(VERTEX,
-                        (k, p) -> {
-                            if (p==null)
-                                p = new ConceptVertex(nar.random);
-                            return p;
-                        });
-                pv.in.put(new ImplLink(sc.term(), val, subjNeg, predNeg));
-            }
         }
 
         protected boolean accept(Task t) {
             //example:
-            return t.op() == Op.IMPL;
+            return t.op() == IMPL;
         }
 
-        public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar) {
-            MutableValueGraph<Term, Float> g = ValueGraphBuilder.directed().allowsSelfLoops(false).build();
+        public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar, long when) {
+            MutableValueGraph<Term, Float> g = ValueGraphBuilder
+                    .directed()
+                    .allowsSelfLoops(true).build();
 
             //TODO bag for pending concepts to visit?
             Set<Term> next = Sets.newConcurrentHashSet();
@@ -184,7 +60,7 @@ public abstract class TermGraph {
                 Iterator<Term> ii = next.iterator();
                 while (ii.hasNext()) {
                     Term t = ii.next();
-                    recurseTerm(nar, g, next, t);
+                    recurseTerm(nar, when, g, next, t);
                     ii.remove();
                 }
             } while (!next.isEmpty() && g.nodes().size() < maxSize);
@@ -192,33 +68,134 @@ public abstract class TermGraph {
             return g;
         }
 
-        public void recurseTerm(NAR nar, MutableValueGraph<Term,Float> g, Set<Term> next, Term t) {
+        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> next, Term t) {
+            if (!g.addNode(t))
+                return; //already tried
+
             Concept tc = nar.concept(t);
             if (tc == null)
                 return; //ignore non-conceptualized
 
-            ConceptVertex v = tc.get(VERTEX);
-            if (v != null) {
-                if (g.addNode(t)) {
+            tc.termlinks().forEachKey(m -> {
 
-                    v.in.forEach(x -> {
-                        Term tt = x.get();
-                        if (!tt.equals(t)) {
-                            if (g.putEdgeValue($.negIf(tt, x.subjNeg), $.negIf(t, x.predNeg), x.pri())==null)
-                                next.add(tt);
+                    if ((m.op() == IMPL) && (m.containsTerm(t))) {
+                        Compound l = (Compound) m;
+                        Term s = l.term(0);
+                        boolean se = s.equalsOrContains(t);
+                        next.add(s);
+                        Term p = l.term(1);
+                        boolean pe = p.equalsOrContains(t);
+                        next.add(p);
+
+                        if ((se || pe) && !(next.add(s) && next.add(p))) {
+                            impl(g, nar, when, l, s, p);
                         }
-                    });
-                    v.out.forEach(x -> {
-                        Term tt = x.get();
-                        if (!tt.equals(t)) {
-                            if (g.putEdgeValue($.negIf(t, x.subjNeg), $.negIf(tt, x.predNeg), x.pri())==null)
-                                next.add(tt);
-                        }
-                    });
+                    }
                 }
+            );
+        }
+
+        private void impl(MutableValueGraph<Term, Float> g, NAR nar, long when, Compound l, Term subj, Term pred) {
+            Concept c = nar.concept(l);
+            if (c == null)
+                return;
+
+            int dur = nar.dur();
+            Task t = c.beliefs().match(when, dur);
+            if (t == null)
+                return;
+
+            int dt = t.dt();
+            boolean reverse;
+            if (dt!=DTERNAL && (dt < 0)) {
+                dt = -dt; reverse = true;
+            } else {
+                reverse = false;
             }
+            float conf = dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
+
+            float freq = t.freq();
+            boolean neg;
+            float val = (TruthFunctions.expectation(freq, conf) - 0.5f) * 2f;
+            if (val < 0f) {
+                val = -val;
+                neg = true;
+            } else {
+                neg = false;
+            }
+            if (val < Param.BUDGET_EPSILON)
+                return;
+
+            Term S = reverse ? pred : subj;
+            Term P = reverse ? $.negIf(subj, neg) : $.negIf(pred, neg);
+            g.putEdgeValue(S, P, val + g.edgeValueOrDefault(
+                    S, P, 0f
+            ));
+
         }
 
     }
 
 }
+
+//    public static final class ImplLink extends RawPLink<Term> {
+//
+//        final boolean subjNeg;
+//        final boolean predNeg;
+//
+//        public ImplLink(Term o, float p, boolean subjNeg, boolean predNeg) {
+//            super(o, p);
+//            this.subjNeg = subjNeg;
+//            this.predNeg = predNeg;
+//        }
+//
+//        @Override
+//        public boolean equals(@NotNull Object that) {
+//            return super.equals(that) && ((ImplLink)that).subjNeg == subjNeg;
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            return super.hashCode() * (subjNeg ? -1 : +1);
+//        }
+//
+//    }
+//
+//    class ConceptVertex  {
+//
+//        //these are like more permanent set of termlinks for the given context they are stored by
+//        final HijackBag<Term, ImplLink> in;
+//        final HijackBag<Term, ImplLink> out;
+//
+//        public ConceptVertex(Random rng) {
+//            in = new MyPLinkHijackBag(rng);
+//            out = new MyPLinkHijackBag(rng);
+//        }
+//
+//        private class MyPLinkHijackBag extends PLinkHijackBag {
+//            public MyPLinkHijackBag(Random rng) {
+//                super(32, 4, rng);
+//            }
+//
+//            @Override
+//            public float pri(@NotNull PLink key) {
+//                float p = key.pri();
+//                return Math.max(p - 0.5f, 0.5f - p); //most polarizing
+//            }
+//
+//            @Override
+//            protected float merge(@Nullable PLink existing, @NotNull PLink incoming, float scale) {
+//
+//                //average:
+//                if (existing != null) {
+//                    float pAdd = incoming.priSafe(0);
+//                    existing.priAvg(pAdd, scale);
+//                    return 0;
+//                } else {
+//                    return 0;
+//                }
+//
+//            }
+//        }
+//    }
+

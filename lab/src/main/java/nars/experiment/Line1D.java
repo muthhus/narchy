@@ -69,19 +69,19 @@ public class Line1D {
 
             return a;
 
-        }, 20, 1, -1);
+        }, 20, 3, -1);
 
     }
 
     public static void implAccelerator(NAR n, NAgent a) {
-        TermGraph.ImplGraph tg = new TermGraph.ImplGraph(n);
+        TermGraph.ImplGraph tg = new TermGraph.ImplGraph();
         n.onCycle(r -> {
             MutableValueGraph<Term, Float> s = tg.snapshot(
                     Iterables.concat(
                             Iterables.transform(a.actions, ActionConcept::term),
                             Lists.newArrayList(a.happy.term())
                     ),
-                    n);
+                    n, n.time());
             Set<EndpointPair<Term>> ee = s.edges();
 
             if (!ee.isEmpty()) {
@@ -90,16 +90,13 @@ public class Line1D {
                 ff.addAll(ee);
                 ff.sort((aa, bb) -> { //TODO faster
                     float av = s.edgeValue(aa.nodeU(), aa.nodeV());
-                    av = Math.max(av - 0.5f, 0.5f - av);
                     float bv = s.edgeValue(bb.nodeU(), bb.nodeV());
-                    bv = Math.max(bv - 0.5f, 0.5f - bv);
                     int o = Float.compare(bv, av);
                     if (o == 0) {
                         return Integer.compare(aa.hashCode(), bb.hashCode());
                     }
                     return o;
                 });
-
 
                 System.out.println(ee.size() + " total implication edges");
                 ff.subList(0, Math.min(ff.size(), 10)).forEach(e -> {

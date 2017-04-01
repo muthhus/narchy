@@ -147,4 +147,7 @@ public interface Termlike {
                 hasAny(t == null ? Op.VariableBits : t.bit);
     }
 
+    default boolean equalsOrContains(Term t) {
+        return equals(t) || containsTerm(t);
+    }
 }
