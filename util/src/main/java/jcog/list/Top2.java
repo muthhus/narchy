@@ -2,8 +2,6 @@ package jcog.list;
 
 import org.eclipse.collections.api.block.function.Function;
 
-import java.util.List;
-
 /**
  * Created by me on 3/14/17.
  */

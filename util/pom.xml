@@ -266,10 +266,12 @@
             <version>2.5.1</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>2.7.20</version>
+            <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>byte-buddy</artifactId>
@@ -293,6 +295,20 @@
                 <!--<version>1.6.6</version>-->
                 <!--&lt;!&ndash;<scope>test</scope>&ndash;&gt;-->
             <!--</dependency>-->
+        <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+        <!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher -->
+        <!--<dependency>-->
+            <!--<groupId>org.junit.platform</groupId>-->
+            <!--<artifactId>junit-platform-launcher</artifactId>-->
+            <!--<version>1.0.0-M3</version>-->
+        <!--</dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine -->
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>4.12.0-M3</version>
+        </dependency>
 
 
         <!--<dependency>-->
@@ -301,12 +317,12 @@
         <!--<version>3.4.1</version>-->
         <!--<scope>test</scope>-->
         <!--</dependency>-->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>junit</groupId>-->
+            <!--<artifactId>junit</artifactId>-->
+            <!--<version>4.12</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

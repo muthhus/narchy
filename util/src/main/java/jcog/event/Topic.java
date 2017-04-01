@@ -1,8 +1,6 @@
 
 package jcog.event;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.lang.reflect.Field;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
