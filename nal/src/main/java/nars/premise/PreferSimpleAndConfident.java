@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.Task;
 import nars.budget.Budget;
+import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.UtilityFunctions;
@@ -68,7 +69,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         final float quaMin = d.quaMin;
 
         if (truth!=null) { //belief and goal:
-            q *= confidencePreservationFactor(truth, d);
+            q *= BudgetFunctions.truthToQuality(truth);
+                    //confidencePreservationFactor(truth, d);
             if (q < quaMin) return null;
         } else {
             q *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
@@ -76,10 +78,8 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         }
 
         p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
-        //if (q < quaMin) return null;
+        if (q < quaMin) return null;
 
-//        if (truth!=null)
-//            p *= polarizationFactor( truth );
 
         p *= puncFactor(punc).floatValue();
 
@@ -91,11 +91,11 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         return $.b(p, q);
     }
 
-    static float polarizationFactor(@Nullable Truth truth) {
-        float f = truth.freq();
-        float polarization = 2f * Math.max(f - 0.5f, 0.5f - f);
-        return Math.max(0.5f, polarization);
-    }
+//    static float polarizationFactor(@Nullable Truth truth) {
+//        float f = truth.freq();
+//        float polarization = 2f * Math.max(f - 0.5f, 0.5f - f);
+//        return Math.max(0.5f, polarization);
+//    }
 
     /**
      * occam's razor: penalize relative complexity growth

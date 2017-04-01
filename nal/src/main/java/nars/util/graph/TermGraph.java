@@ -55,7 +55,7 @@ public abstract class TermGraph {
             Set<Term> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
-            int maxSize = 1024;
+            int maxSize = 32;
             do {
                 Iterator<Term> ii = next.iterator();
                 while (ii.hasNext()) {
@@ -82,12 +82,13 @@ public abstract class TermGraph {
                         Compound l = (Compound) m;
                         Term s = l.term(0);
                         boolean se = s.equalsOrContains(t);
-                        next.add(s);
+
                         Term p = l.term(1);
                         boolean pe = p.equalsOrContains(t);
-                        next.add(p);
 
-                        if ((se || pe) && !(next.add(s) && next.add(p))) {
+                        if (se || pe) {
+                            next.add(s);
+                            next.add(p);
                             impl(g, nar, when, l, s, p);
                         }
                     }
@@ -128,9 +129,7 @@ public abstract class TermGraph {
 
             Term S = reverse ? pred : subj;
             Term P = reverse ? $.negIf(subj, neg) : $.negIf(pred, neg);
-            g.putEdgeValue(S, P, val + g.edgeValueOrDefault(
-                    S, P, 0f
-            ));
+            g.putEdgeValue(S, P, val + g.edgeValueOrDefault( S, P, 0f ) );
 
         }
 

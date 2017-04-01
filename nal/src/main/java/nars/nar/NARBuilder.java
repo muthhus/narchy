@@ -198,11 +198,11 @@ public interface NARBuilder {
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 0.5f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
 
         //nar.stmLinkage.capacity.set(0);
 
