@@ -46,21 +46,31 @@ public abstract class TermGraph {
             return t.op() == IMPL;
         }
 
+        ;
         public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar, long when) {
-            MutableValueGraph<Term, Float> g = ValueGraphBuilder
-                    .directed()
-                    .allowsSelfLoops(true).build();
+            return snapshot(null, sources, nar, when);
+        }
+
+        public MutableValueGraph<Term, Float> snapshot(MutableValueGraph<Term, Float> g, Iterable<? extends Term> sources, NAR nar, long when) {
+
+            if (g == null) {
+                g = ValueGraphBuilder
+                        .directed()
+                        .allowsSelfLoops(true).build();
+            }
+
+            Set<Term> done = Sets.newConcurrentHashSet();
 
             //TODO bag for pending concepts to visit?
             Set<Term> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
-            int maxSize = 32;
+            int maxSize = 128;
             do {
                 Iterator<Term> ii = next.iterator();
                 while (ii.hasNext()) {
                     Term t = ii.next();
-                    recurseTerm(nar, when, g, next, t);
+                    recurseTerm(nar, when, g, done, next, t);
                     ii.remove();
                 }
             } while (!next.isEmpty() && g.nodes().size() < maxSize);
@@ -68,8 +78,8 @@ public abstract class TermGraph {
             return g;
         }
 
-        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> next, Term t) {
-            if (!g.addNode(t))
+        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done,  Set<Term> next, Term t) {
+            if (!done.add(t))
                 return; //already tried
 
             Concept tc = nar.concept(t);
