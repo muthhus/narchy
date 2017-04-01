@@ -73,15 +73,9 @@ public abstract class Unify extends Termunator implements Subst {
         this(index, type, random, new Versioning(stackMax));
     }
 
-    /**
-     * call this to invoke the next termutator in the chain
-     */
-    public final boolean mutate(List<Termutator> chain, int next) {
 
-        //increment the version counter by one and detect if the limit exceeded.
-        // this is to prevent infinite recursions in which no version incrementing
-        // occurrs that would otherwise trigger overflow to interrupt it.
-        return versioning.nextChange() && chain.get(++next).mutate(this, chain, next);
+    public final void mutate(List<Termutator> chain, int next) {
+        chain.get(++next).mutate(this, chain, next);
     }
 
     public final class Constraints extends VersionMap<Term,List<MatchConstraint>> implements BiPredicate<Term, Term> {
@@ -151,7 +145,7 @@ public abstract class Unify extends Termunator implements Subst {
     /**
      * called each time all variables are satisfied in a unique way
      */
-    public abstract boolean onMatch();
+    public abstract void onMatch();
 
 
     @Override
@@ -180,7 +174,7 @@ public abstract class Unify extends Termunator implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
         int s = now();
         boolean result;
@@ -194,10 +188,10 @@ public abstract class Unify extends Termunator implements Subst {
                     if (termutes != null) {
 
                         t.add(this); //call-back
-                        result = mutate(this, t, -2);
+                        mutate(this, t, -2);
 
                     } else {
-                        result = onMatch();
+                        onMatch();
                     }
                 }
 
@@ -217,15 +211,14 @@ public abstract class Unify extends Termunator implements Subst {
         }
 
 
-        return result;
     }
 
     @Override
-    public final boolean mutate(Unify f, List<Termutator> n, int seq) {
+    public final void mutate(Unify f, List<Termutator> n, int seq) {
         if (seq==-2)
-            return f.mutate(n, -1); //start combinatorial recurse
+            f.mutate(n, -1); //start combinatorial recurse
         else
-            return f.onMatch(); //end combinatorial recurse
+            f.onMatch(); //end combinatorial recurse
     }
 
 

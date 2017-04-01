@@ -35,7 +35,7 @@ public class UnifyTest {
         Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
 
             @Override
-            public boolean onMatch() {
+            public void onMatch() {
 
                 assertTrue(matches);
 
@@ -48,8 +48,6 @@ public class UnifyTest {
                 assertEquals(
                         "(a-->b) (?1-->b) -?>",
                         a + " " + b + " -?>"  /*+ " remaining power"*/);
-
-                return true;
             }
         };
 

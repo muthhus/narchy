@@ -114,11 +114,11 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
      */
     public static float complexityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
         int parentComplexity;
-        int taskCompl = task.volume();
+        int taskCompl = task.complexity();
         if (belief != null) // && parentBelief.complexity() > parentComplexity)
         {
             int beliefCompl;
-            beliefCompl = belief.volume();
+            beliefCompl = belief.complexity();
             parentComplexity =
                     //(int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
                     Math.max(taskCompl, beliefCompl);
@@ -143,10 +143,10 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
                 //Util.sqr(Util.unitize( //sharpen
 
             1f -
-                (float)Math.sqrt(
+                //(float)Math.sqrt(
                     Util.unitize(
                     ((float)parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
-                )
+                //)
                     //Math.max(0, (float)(derivedComplexity - parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity))
                     //((float) parentComplexity) / (parentComplexity + derivedComplexity)
                     //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))

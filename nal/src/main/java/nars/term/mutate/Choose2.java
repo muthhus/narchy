@@ -64,7 +64,7 @@ public class Choose2 extends Termutator {
     }
 
     @Override
-    public boolean mutate(Unify versioneds, List<Termutator> chain, int current) {
+    public void mutate(Unify versioneds, List<Termutator> chain, int current) {
 
         @NotNull Combinations ccc = this.comb;
         ccc.reset();
@@ -83,6 +83,8 @@ public class Choose2 extends Termutator {
         int[] c = null;
         while (ccc.hasNext() || !phase) {
 
+            if (!f.versioning.nextChange()) return; else start++; //consume 1 stack
+
             c = phase ? ccc.next() : c;
             phase = !phase;
 
@@ -99,11 +101,7 @@ public class Choose2 extends Termutator {
                 if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
 
-                    if (!f.mutate(chain, current)) {
-                        f.revert(start);
-                        return false;
-                    }
-
+                    f.mutate(chain, current);
                 }
 
             }
@@ -113,7 +111,7 @@ public class Choose2 extends Termutator {
 
         }
 
-        return true;
+
     }
 
 }

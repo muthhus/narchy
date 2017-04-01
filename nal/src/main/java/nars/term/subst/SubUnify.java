@@ -36,7 +36,7 @@ public class SubUnify extends Unify {
      * terminates after the first match
      */
     @Override
-    public boolean onMatch() {
+    public void onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
         if (xterm != null) {
             Subst s;
@@ -58,15 +58,15 @@ public class SubUnify extends Unify {
             }
         }
 
-        return (result == null) && --retries > 0;
+        //return (result == null) && --retries > 0;
 
     }
 
-    public boolean tryMatch(@NotNull Term x, @NotNull Term y) {
+    public void tryMatch(@NotNull Term x, @NotNull Term y) {
         this.xterm = null;
         this.target = null;
         this.result = null;
-        return unify(x, y, true, true);
+        unify(x, y, true, true);
     }
 
     @Nullable

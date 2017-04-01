@@ -20,7 +20,7 @@ public abstract class Termutator  {
 
 
     /** match all termutations recursing to the next after each successful one */
-    public abstract boolean mutate(Unify f, List<Termutator> chain, int current);
+    public abstract void mutate(Unify f, List<Termutator> chain, int current);
 
 //    /** call this to invoke the next termutator in the chain */
 //    protected static boolean next(@NotNull Unify f, Termutator[] chain, int next) {

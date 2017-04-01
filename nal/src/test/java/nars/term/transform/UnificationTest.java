@@ -90,7 +90,7 @@ public class UnificationTest {
 //            }
 
                 @Override
-                public boolean onMatch() {
+                public void onMatch() {
 
                     if (shouldSub) {
                         if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
@@ -113,8 +113,6 @@ public class UnificationTest {
                         //assertFalse("match found but should not have", true);
                     }
 
-
-                    return true;
                 }
             };
             sub.unifyAll(t1, t2);

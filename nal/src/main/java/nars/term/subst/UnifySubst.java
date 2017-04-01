@@ -38,7 +38,7 @@ public class UnifySubst extends Unify {
     }
 
     @Override
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
         this.a = x;
         this.matches = 0;
 
@@ -46,7 +46,6 @@ public class UnifySubst extends Unify {
             super.unify(x, y, start, finish);
         }
 
-        return start;
     }
 
 
@@ -55,7 +54,7 @@ public class UnifySubst extends Unify {
     }
 
 
-    @Override public boolean onMatch() {
+    @Override public void onMatch() {
 
         //TODO combine these two blocks to use the same sub-method
 
@@ -86,7 +85,7 @@ public class UnifySubst extends Unify {
 //            return false;
 
 
-        return matches < maxMatches; //determines how many
+        //return matches < maxMatches; //determines how many
     }
 
 

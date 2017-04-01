@@ -29,8 +29,8 @@ public class TermutatorTest {
 
     final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
         @Override
-        public boolean onMatch() {
-            return true;
+        public void onMatch() {
+
         }
     };
 
@@ -139,13 +139,13 @@ public class TermutatorTest {
 
         t.mutate(f, Lists.newArrayList( t, new Termutator("evaluate") {
 
-            @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+            @Override public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
                 if (s.add( f.xy.toString() )) {
                     actual[0]++;
                 } else {
                     duplicates[0]++;
                 }
-                return true;
+
             }
 
             @Override public int getEstimatedPermutations() {

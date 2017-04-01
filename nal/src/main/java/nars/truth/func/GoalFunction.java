@@ -32,19 +32,27 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    Goduction() {
+    //@AllowOverlap
+    Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : TruthFunctions.desireStrongOriginal(T, B, minConf);
+            return (T == null || B == null) ? null : desireDed(T, B, minConf);
         }
     },
 
-    @SinglePremise StructuralGoduction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null) ? null : TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
-        }
-    },
+//    Goduction() {
+//        @Nullable
+//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+//            return (T == null || B == null) ? null : TruthFunctions.desireStrongOriginal(T, B, minConf);
+//        }
+//    },
+
+//    @SinglePremise StructuralGoduction() {
+//        @Nullable
+//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+//            return (T == null) ? null : TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
+//        }
+//    },
 
 
     @SinglePremise
@@ -61,13 +69,7 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
-    Deduction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireDed(T, B, minConf);
-        }
-    },
+
 
 //    //EXPERIMENTAL
 //    Abduction() {

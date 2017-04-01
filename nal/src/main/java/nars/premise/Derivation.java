@@ -229,23 +229,24 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
+    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
 
         matchesRemain = matchesMax;
 
         this.forEachMatch = eachMatch;
 
         boolean finish = eachMatch!=null;
-        boolean result = unify(x, y, !finish, finish);
+        unify(x, y, !finish, finish);
 
         this.forEachMatch = null;
 
-        return result;
+
 
     }
 
-    @Override public final boolean onMatch() {
-        return  (--matchesRemain > 0) && forEachMatch.test(this);
+    @Override public final void onMatch() {
+        forEachMatch.test(this);
+        //return  (--matchesRemain > 0) && ;
     }
 
 

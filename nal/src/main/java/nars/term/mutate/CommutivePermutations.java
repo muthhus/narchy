@@ -41,7 +41,7 @@ public final class CommutivePermutations extends Termutator {
     }
 
     @Override
-    public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+    public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
         int start = f.now();
 
         ShuffledSubterms p = new ShuffledSubterms(f.random,  x);
@@ -50,19 +50,17 @@ public final class CommutivePermutations extends Termutator {
 
         while (p.hasNext()) {
 
+            if (!f.versioning.nextChange()) return; else start++; //consume 1 stack
+
             p.next();
 
             if (p.unifyLinear(y, f)) {
-                if (!f.mutate(chain, current)) {
-                    f.revert(start);
-                    return false;
-                }
+                f.mutate(chain, current);
             }
 
             f.revert(start);
         }
 
-        return true;
     }
 
 

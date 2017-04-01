@@ -116,6 +116,7 @@ public class Line1D {
 
                             System.out.println(
                                     Texts.n4(s.edgeValue(subj, pred)) + "\t(" + e.source() + "==>" + e.target() + ")"
+
                             );
                         }
 

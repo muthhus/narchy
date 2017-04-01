@@ -168,7 +168,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("goto({t003}). :|:")
                 .input("(goto(#1) &&+5 at(SELF,#1))!")
-                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
+                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.31f, 9)
         ;
     }
 
@@ -237,7 +237,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .input("--(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S <=> R)
-                .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0);
+                .mustDesire(cycles, "(S)", 0.0f, 0.81f, 0);
 
     }
 
@@ -514,7 +514,7 @@ public class NAL8Test extends AbstractNALTest {
             
             .input("on({t002},{t003}). :|:")
             .input("(on({t002},#1) &&+0 at(SELF,#1))!")
-            .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.23f, 5);
+            .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.11f, 8);
 
         //tester.mustNotOutput(time, selfAtT3, GOAL, 0, 1f, 0, 1f, ETERNAL);
     }
