@@ -7,6 +7,7 @@ import nars.Task;
 import nars.budget.Budget;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,6 +78,9 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
         //if (q < quaMin) return null;
 
+//        if (truth!=null)
+//            p *= polarizationFactor( truth );
+
         p *= puncFactor(punc).floatValue();
 
         FloatParam off = opFactor(conclusion);
@@ -87,13 +91,21 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         return $.b(p, q);
     }
 
+    static float polarizationFactor(@Nullable Truth truth) {
+        float f = truth.freq();
+        float polarization = 2f * Math.max(f - 0.5f, 0.5f - f);
+        return Math.max(0.5f, polarization);
+    }
+
     /**
      * occam's razor: penalize relative complexity growth
      * @return a value between 0 and 1 that priority will be scaled by
      */
     public static float complexityFactorAbsolute(Compound conclusion, byte punc, Task task, Task belief) {
         //return 1f / (1f + conclusion.complexity());
-        return 1f / (1f + (float)Math.sqrt(conclusion.complexity()));
+        return 1f / (1f + (float)Math.sqrt(
+                conclusion.volume()
+        ));
     }
 
     /**
@@ -102,11 +114,11 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
      */
     public static float complexityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
         int parentComplexity;
-        int taskCompl = task.complexity();
+        int taskCompl = task.volume();
         if (belief != null) // && parentBelief.complexity() > parentComplexity)
         {
             int beliefCompl;
-            beliefCompl = belief.complexity();
+            beliefCompl = belief.volume();
             parentComplexity =
                     //(int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
                     Math.max(taskCompl, beliefCompl);

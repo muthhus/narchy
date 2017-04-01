@@ -17,6 +17,7 @@ import nars.truth.Truth;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
+import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
@@ -60,10 +61,10 @@ public class Recog2D extends NAgentX {
 
     int image;
     final int maxImages = 4;
-    static int duration = 10;
-    int imagePeriod = duration * 12;
-    static int fps = 50;
-    float goalInfluence = 0.5f; //how much goal feedback will influence beliefs, <=1
+    static int duration = 4;
+    int imagePeriod = duration * 16;
+    static int fps = 30;
+    float goalInfluence = 1f; //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -102,10 +103,12 @@ public class Recog2D extends NAgentX {
 
 
         //retina
-        //Sensor2D sp = senseCameraRetina("x", () -> canvas, w, h, v -> $.t(v, alpha));
+        Sensor2D spR = senseCameraRetina($.p(id, $.the("full")).toString(),
+                () -> canvas, w, h, v -> $.t(v, nar.confDefault(BELIEF)));
 
         //still
-        CameraSensor sp = senseCamera(id.toString(), new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
+        CameraSensor sp = senseCamera($.p(id, $.the("zoom")).toString(),
+                new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
         sp.priTotal(32);
 
         //nar.log();
@@ -361,7 +364,7 @@ public class Recog2D extends NAgentX {
                 for (int j = 0, oLength = o.length; j < oLength; j++) {
                     float y = o[j];
                     //nar.goal(
-                    float c = nar.confidenceDefault(BELIEF) * (1f - errSum);
+                    float c = nar.confDefault(BELIEF) * (1f - errSum);
                     if (c > 0) {
                         nar.believe(
                                 outs.outVector[j], Tense.Present, y, c);

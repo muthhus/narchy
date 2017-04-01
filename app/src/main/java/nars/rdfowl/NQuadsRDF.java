@@ -323,7 +323,7 @@ public abstract class NQuadsRDF {
             Compound term = /*$.inst*/ compoundOrNull($.inh($.p(subject, object), predicate));
             if (term == null)
                 throw new NullPointerException();
-            Task t = new TaskBuilder(term, BELIEF, $.t(1f, nar.confidenceDefault(BELIEF))).apply(nar);
+            Task t = new TaskBuilder(term, BELIEF, $.t(1f, nar.confDefault(BELIEF))).apply(nar);
             return t;
         } catch (Exception e) {
             logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
@@ -437,7 +437,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new TaskBuilder((Compound)belief, BELIEF, $.t(1f, nar.confidenceDefault(BELIEF)))
+            return new TaskBuilder((Compound)belief, BELIEF, $.t(1f, nar.confDefault(BELIEF)))
                     .eternal().apply(nar);
         }
 

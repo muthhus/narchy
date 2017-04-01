@@ -22,7 +22,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 120;
+    final int cycles = 720;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -1074,10 +1074,10 @@ public class NAL7Test extends AbstractNALTest {
             $.11;.81$ ((a-->b) &&+4 (c==>d)). 1⋈5 %1.0;.81% {1⋈5: 3;5} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfter)),((%1 &&+- %2),((Intersection-->Belief))))
         */
         test()
-                .inputAt(1, "((a-->b) &&+4 (c==>d)). :|:")
+                .inputAt(1, "((a-->b) &&+4 (c-->d)). :|:")
                 .inputAt(10, "(d-->e). :|:")
-                .mustBelieve(cycles, "(((a-->b) &&+4 (c==>#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
-                .mustNotOutput(cycles, "(((a-->b) &&+4 (c==>#1)) &&+9 (#1-->e))", BELIEF, ETERNAL, 1);
+                .mustBelieve(cycles, "(((a-->b) &&+4 (c-->#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
+                .mustNotOutput(cycles, "(((a-->b) &&+4 (c-->#1)) &&+9 (#1-->e))", BELIEF, ETERNAL, 1);
 
     }
     @Test public void testInductionInterval2() {

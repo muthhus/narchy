@@ -36,7 +36,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 
         float dr = 1f / (indices - 1);
 
-        return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confidenceDefault(Op.BELIEF) ) ;
+        return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confDefault(Op.BELIEF) ) ;
     };
 
     /** TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity */
@@ -53,7 +53,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 
         //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
 
-        Truth tt = $.t( b/(dv), n.confidenceDefault(Op.BELIEF) ) ;
+        Truth tt = $.t( b/(dv), n.confDefault(Op.BELIEF) ) ;
         return tt;
     };
 
@@ -73,7 +73,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Compound... states) {
 
 
-        this.conf = nar.confidenceDefault(Op.BELIEF);
+        this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
         this.nar = nar;
 

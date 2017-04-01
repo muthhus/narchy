@@ -39,7 +39,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
     public CameraSensor(Term root, P src, NAR nar) {
-        this(root, src, nar, (v) -> $.t(v, nar.confidenceDefault(BELIEF)));
+        this(root, src, nar, (v) -> $.t(v, nar.confDefault(BELIEF)));
     }
 
     public CameraSensor(Term root, P src, NAR nar, FloatToObjectFunction<Truth> brightnessToTruth) {

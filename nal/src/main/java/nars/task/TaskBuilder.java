@@ -75,7 +75,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 
     public TaskBuilder(@NotNull Compound t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
-        this(t, punct, $.t(freq, nar.confidenceDefault(punct)));
+        this(t, punct, $.t(freq, nar.confDefault(punct)));
     }
 
     //    public MutableTask(@NotNull String compoundTermString, byte punct, float freq, float conf) throws Narsese.NarseseException {

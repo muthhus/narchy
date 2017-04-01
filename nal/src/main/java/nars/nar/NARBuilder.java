@@ -187,11 +187,13 @@ public interface NARBuilder {
 
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(256);
+        nar.deriver.conceptsFiredPerCycle.setValue(512);
         nar.deriver.conceptsFiredPerBatch.setValue(32);
-        nar.deriver.derivationsInputPerCycle.setValue(192);
+        nar.deriver.derivationsInputPerCycle.setValue(256);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(48);
+
+        //Param.HORIZON = 4; //EXPERIMENTAL
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);

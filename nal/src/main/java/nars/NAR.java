@@ -415,17 +415,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
-        return believe(term, tense, freq, confidenceDefault(BELIEF));
+        return believe(term, tense, freq, confDefault(BELIEF));
     }
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, long when, float freq) {
-        return believe(term, when, freq, confidenceDefault(BELIEF));
+        return believe(term, when, freq, confDefault(BELIEF));
     }
 
     @NotNull
     public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
-        return goal(term, tense, freq, confidenceDefault(GOAL));
+        return goal(term, tense, freq, confDefault(GOAL));
     }
 
 
@@ -499,7 +499,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @NotNull
     public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) {
-        return believe(term, trueOrFalse, confidenceDefault(BELIEF));
+        return believe(term, trueOrFalse, confDefault(BELIEF));
     }
 
     @NotNull
@@ -509,7 +509,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @NotNull
     public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse) {
-        return goal(term, trueOrFalse, confidenceDefault(BELIEF));
+        return goal(term, trueOrFalse, confDefault(BELIEF));
     }
 
     @NotNull

@@ -206,6 +206,6 @@ public enum GoalFunction implements TruthOperator {
     }
 
     private static float defaultConfidence(@NotNull NAR m) {
-        return m.confidenceDefault(Op.GOAL);
+        return m.confDefault(Op.GOAL);
     }
 }

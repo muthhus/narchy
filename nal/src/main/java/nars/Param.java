@@ -200,7 +200,7 @@ public abstract class Param  {
      */
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
-    public float confidenceDefault(byte punctuation) {
+    public float confDefault(byte punctuation) {
 
         switch (punctuation) {
             case BELIEF:

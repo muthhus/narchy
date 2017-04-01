@@ -110,7 +110,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
         //int q = 0;
 
         float minConf = nar.confMin.floatValue();
-        float baseConf = nar.confidenceDefault(Op.BELIEF);
+        float baseConf = nar.confDefault(Op.BELIEF);
         //float basePri = nar.priorityDefault(Symbols.BELIEF);
         //float baseDur = nar.durabilityDefault(Symbols.BELIEF);
 

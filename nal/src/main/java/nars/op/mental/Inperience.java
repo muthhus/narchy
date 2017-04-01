@@ -232,7 +232,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
                 ImmutableTask e = new ImmutableTask(
                         r,
                         BELIEF,
-                        $.t(1, nar.confidenceDefault(BELIEF)),
+                        $.t(1, nar.confDefault(BELIEF)),
                         now, start, end,
                         task.stamp()
                 );

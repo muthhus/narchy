@@ -1284,7 +1284,7 @@ public class Narsese extends BaseParser<Object> {
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))
-                t = t.withConf(m.confidenceDefault(punct));
+                t = t.withConf(m.confDefault(punct));
 
             return makeTask(m, (float[]) x[0], (Compound) content, punct, t, (Tense) x[4]);
         }

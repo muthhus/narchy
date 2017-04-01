@@ -23,27 +23,28 @@ import java.util.Set;
 
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 public abstract class TermGraph {
 
     public static final class ImplLink extends RawPLink<Term> {
 
-        public final boolean neg;
+        final boolean subjNeg;
+        final boolean predNeg;
 
-        public ImplLink(Term o, float p, boolean neg) {
+        public ImplLink(Term o, float p, boolean subjNeg, boolean predNeg) {
             super(o, p);
-            this.neg = neg;
+            this.subjNeg = subjNeg;
+            this.predNeg = predNeg;
         }
 
         @Override
         public boolean equals(@NotNull Object that) {
-            return super.equals(that) && ((ImplLink)that).neg == neg;
+            return super.equals(that) && ((ImplLink)that).subjNeg == subjNeg;
         }
 
         @Override
         public int hashCode() {
-            return super.hashCode() * (neg ? -1 : +1);
+            return super.hashCode() * (subjNeg ? -1 : +1);
         }
 
     }
@@ -72,17 +73,14 @@ public abstract class TermGraph {
 
             @Override
             protected float merge(@Nullable PLink existing, @NotNull PLink incoming, float scale) {
+
                 //average:
-
-
-                float pOrig;
                 if (existing != null) {
                     float pAdd = incoming.priSafe(0);
-                    pOrig = existing.priSafe(0);
                     existing.priAvg(pAdd, scale);
-                    return existing.priSafe(0) - pOrig;
+                    return 0;
                 } else {
-                    return incoming.priSafe(0);
+                    return 0;
                 }
 
             }
@@ -136,17 +134,19 @@ public abstract class TermGraph {
 
             Truth tt = t.truth();
             float val;
-            boolean neg;
+            boolean subjNeg, predNeg;
             int dur = nar.dur();
             float conf = TruthPolation.evidenceDecay( t.evi(nar.time(), dur), dur,  dt);
 
-            //if (tt.freq() >= 0.5f) {
+            if (tt.freq() >= 0.5f) {
                 val = TruthFunctions.expectation(tt.freq(), conf);
-            /*} else {
-                val = -TruthFunctions.expectation(1f - tt.freq(), conf);
-            }*/
+                predNeg = false;
+            } else {
+                val = 1f - TruthFunctions.expectation(1f - tt.freq(), conf);
+                predNeg = true;
+            }
 
-            neg = (subj.op()==NEG);
+            subjNeg = (subj.op()==NEG);
 
             if (val > Param.BUDGET_EPSILON) {
                 ConceptVertex sv = sc.meta(VERTEX,
@@ -155,7 +155,7 @@ public abstract class TermGraph {
                                 p = new ConceptVertex(nar.random);
                             return p;
                         });
-                sv.out.put(new ImplLink(pc.term(), val, neg));
+                sv.out.put(new ImplLink(pc.term(), val, subjNeg, predNeg));
 
                 ConceptVertex pv = pc.meta(VERTEX,
                         (k, p) -> {
@@ -163,7 +163,7 @@ public abstract class TermGraph {
                                 p = new ConceptVertex(nar.random);
                             return p;
                         });
-                pv.in.put(new ImplLink(sc.term(), val, neg));
+                pv.in.put(new ImplLink(sc.term(), val, subjNeg, predNeg));
             }
         }
 
@@ -204,14 +204,14 @@ public abstract class TermGraph {
                     v.in.forEach(x -> {
                         Term tt = x.get();
                         if (!tt.equals(t)) {
-                            if (g.putEdgeValue($.negIf(tt, x.neg), t, x.pri())==null)
+                            if (g.putEdgeValue($.negIf(tt, x.subjNeg), $.negIf(t, x.predNeg), x.pri())==null)
                                 next.add(tt);
                         }
                     });
                     v.out.forEach(x -> {
                         Term tt = x.get();
                         if (!tt.equals(t)) {
-                            if (g.putEdgeValue($.negIf(t, x.neg), tt, x.pri())==null)
+                            if (g.putEdgeValue($.negIf(t, x.subjNeg), $.negIf(tt, x.predNeg), x.pri())==null)
                                 next.add(tt);
                         }
                     });

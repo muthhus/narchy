@@ -5,5 +5,5 @@ package jcog.bag;
  */
 public interface PLink<X> extends Link<X>, Priority {
 
-    float EPSILON_DEFAULT = 0.00001f;
+    float EPSILON_DEFAULT = 0.000001f;
 }

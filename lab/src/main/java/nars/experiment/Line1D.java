@@ -101,7 +101,7 @@ public class Line1D {
                 });
 
 
-                //System.out.println(ee.size() + " total implication edges");
+                System.out.println(ee.size() + " total implication edges");
                 ff.subList(0, Math.min(ff.size(), 10)).forEach(e -> {
                             Term subj = e.nodeU();
                             Term pred = e.nodeV();
@@ -114,9 +114,9 @@ public class Line1D {
                             if (cpred != null)
                                 n.activate(cpred, 0.1f);
 
-//                            System.out.println(
-//                                    Texts.n4(s.edgeValue(subj, pred)) + "\t(" + e.source() + "==>" + e.target() + ")"
-//                            );
+                            System.out.println(
+                                    Texts.n4(s.edgeValue(subj, pred)) + "\t(" + e.source() + "==>" + e.target() + ")"
+                            );
                         }
 
                 );

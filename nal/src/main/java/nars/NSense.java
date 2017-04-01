@@ -40,7 +40,7 @@ public interface NSense {
 
     @NotNull
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value)  {
-        return sense(term, value, (x) -> $.t(x, nar().confidenceDefault(Op.BELIEF)));
+        return sense(term, value, (x) -> $.t(x, nar().confDefault(Op.BELIEF)));
     }
 
     @NotNull
@@ -62,7 +62,7 @@ public interface NSense {
      * learning rate
      */
     default float alpha() {
-        return nar().confidenceDefault(Op.BELIEF);
+        return nar().confDefault(Op.BELIEF);
     }
 
     /**
@@ -175,7 +175,7 @@ public interface NSense {
 
     default SensorConcept senseNumber(Compound id, FloatSupplier v) {
         SensorConcept c = new SensorConcept(id, nar(), v,
-                (x) -> t(x, nar().confidenceDefault(Op.BELIEF))
+                (x) -> t(x, nar().confDefault(Op.BELIEF))
         );
         sensors().add(c);
         return c;

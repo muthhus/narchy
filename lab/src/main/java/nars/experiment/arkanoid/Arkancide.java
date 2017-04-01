@@ -46,7 +46,7 @@ public class Arkancide extends NAgentX {
 
             Arkancide a = null;
             try {
-                a = new Arkancide(n, cam, true);
+                a = new Arkancide(n, cam, false);
 
 
             } catch (Narsese.NarseseException e) {
@@ -55,7 +55,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10, 1, -1);
+        }, 40, 2, -1);
 
 
 //        nar.forEachActiveConcept(c -> {

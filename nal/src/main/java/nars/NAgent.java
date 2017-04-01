@@ -321,7 +321,7 @@ abstract public class NAgent implements NSense, NAct {
         int dur = nar.dur();
 
         predictors.add(
-                goal(happiness, t(1f, nar.confidenceDefault(BELIEF /*GOAL*/)),
+                goal(happiness, t(1f, nar.confDefault(BELIEF /*GOAL*/)),
                     ETERNAL
                     //now + dur
                 )
@@ -593,6 +593,6 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public final float alpha() {
-        return nar.confidenceDefault(BELIEF);
+        return nar.confDefault(BELIEF);
     }
 }

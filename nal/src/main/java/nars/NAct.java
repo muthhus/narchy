@@ -70,7 +70,7 @@ public interface NAct {
             off.run();
         }
 
-        return $.t(freq, nar().confidenceDefault(BELIEF) /*d.conf()*/);
+        return $.t(freq, nar().confDefault(BELIEF) /*d.conf()*/);
     }
 
     /**
@@ -121,7 +121,7 @@ public interface NAct {
                     //d!=null ?
                     $.t(f,
                             //d.conf()
-                            nar().confidenceDefault(BELIEF)
+                            nar().confDefault(BELIEF)
                     )
                     //: null
                     ;
@@ -176,7 +176,7 @@ public interface NAct {
                     //d!=null ?
                     $.t(f,
                             //d.conf()
-                            nar().confidenceDefault(BELIEF)
+                            nar().confDefault(BELIEF)
                     )
                     //: null
                     ;
@@ -215,7 +215,7 @@ public interface NAct {
 
             boolean next = d != null && d.freq() >= 0.5f;
 
-            float alpha = nar().confidenceDefault(BELIEF);
+            float alpha = nar().confDefault(BELIEF);
             int v;
             int s;
             if (!next) {

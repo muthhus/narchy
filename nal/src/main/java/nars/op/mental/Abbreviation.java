@@ -83,7 +83,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
         this.termPrefix = termPrefix;
         this.setCapacity(capacity);
         this.abbreviationConfidence =
-                new MutableFloat(nar.confidenceDefault(BELIEF));
+                new MutableFloat(nar.confDefault(BELIEF));
         //new MutableFloat(1f - nar.truthResolution.floatValue());
         //new MutableFloat(nar.confidenceDefault(Symbols.BELIEF));
         volume = new MutableIntRange(volMin, volMax);

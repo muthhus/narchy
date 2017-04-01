@@ -26,7 +26,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 2500;
+        int time = 5500;
 
         //Global.DEBUG = true;
 
@@ -40,7 +40,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.believe("<{tom} --> cat>",1.0f,0.9f); //en("tom is a cat");
         tester.believe("likes({tom},{sky})",1.0f,0.9f); //en("tom likes the sky");
 
-        tester.input( "$0.9$ likes(cat,[blue])?"); //cats like blue?
+        tester.input( "likes(cat,[blue])?"); //cats like blue?
 
         //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
         tester.mustBelieve(time, "likes(cat,[blue])",
