@@ -1,5 +1,6 @@
 package jcog.bag;
 
+import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,11 @@ public interface Priority extends Prioritized {
 
     default void priAdd(float toAdd) {
         setPriority(priSafe(0) + toAdd);
+    }
+
+    default void priAvg(float pOther, float rate) {
+        float cu = priSafe(0);
+        setPriority(Util.lerp(rate, (cu + pOther)/2f, cu));
     }
 
     default float priAddOverflow(float toAdd) {

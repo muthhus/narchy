@@ -514,7 +514,7 @@ public class NAL8Test extends AbstractNALTest {
             
             .input("on({t002},{t003}). :|:")
             .input("(on({t002},#1) &&+0 at(SELF,#1))!")
-            .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.81f, 0);
+            .mustDesire(cycles, "at(SELF,{t003})", 1.0f, 0.23f, 5);
 
         //tester.mustNotOutput(time, selfAtT3, GOAL, 0, 1f, 0, 1f, ETERNAL);
     }

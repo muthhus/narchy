@@ -247,7 +247,14 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(~, boy, girl) --> [strong]>", 0.9f, 0.9f); //.en("What differs boys from girls are being strong.");
         tester.mustBelieve(cycles, "<boy --> [strong]>", 0.90f ,0.73f); //.en("Boys are strong.");
-
+    }
+    @Test
+    public void testDifference()  {
+        TestNAR tester = test();
+        tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
+        tester.believe("<dinosaur --> bird>",0.7f,0.9f); //.en("Dinosaur is somewhat bird-like.");
+        tester.mustBelieve(cycles, "bird:(swan ~ dinosaur)", 0.27f ,0.81f); //.en("Boys are strong.");
+        tester.mustBelieve(cycles, "bird:(dinosaur ~ swan)", 0.07f ,0.81f); //.en("Boys are strong.");
     }
     
     @Test public void testNoCommonSubterm1() {

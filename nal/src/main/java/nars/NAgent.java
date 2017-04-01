@@ -50,14 +50,7 @@ abstract public class NAgent implements NSense, NAct {
 
     public final NAR nar;
 
-    /** master gain rate for this agent that all the tasks will be normalized as a fraction of per cycle.
-     *  to control the relative priority of multiple active agents within a NAR.
-     *  measured in priority integrated over the duration, in other words,
-     *  the total normalized priority is equal to this value times the duration time.
-     *
-     *  the total priority delivered per duration = this priority * duration_length
-     *  */
-    public final FloatParam priority = new FloatParam(0.5f, 0f, 2f);
+
 
     public final List<SensorConcept> sensors = newArrayList();
 
@@ -70,10 +63,6 @@ abstract public class NAgent implements NSense, NAct {
     public final SensorConcept happy;
 
 
-    /**
-     * strength of 'happy' goals and feedbacks, and also predictions
-     */
-    public final FloatParam ambition = new FloatParam(1f, 0, 1f);
 
     /**
      * lookahead time in durations (multiples of duration)
@@ -144,7 +133,6 @@ abstract public class NAgent implements NSense, NAct {
                 return new EternalTable(1); //for storing the eternal happiness goal
             }
         };
-        happy.pri(ambition);
 
         curiosityConf = new FloatParam(nar.confMin.floatValue() * 5);
         curiosityProb = new FloatParam(0.5f);
@@ -557,7 +545,7 @@ abstract public class NAgent implements NSense, NAct {
         }
 
         return result
-            .budget(ambition.floatValue(), nar)
+            .budget(nar)
         ;
     }
 

@@ -166,7 +166,7 @@ public class IntervalTree<K extends Comparable<? super K>, V> {
 	@NotNull
 	public Set<Between<K>> keySet() {
 		if(root != null){
-			Set<Between<K>> s = new HashSet(1);
+			Set<Between<K>> s = new HashSet(1); //ArrayUnenforcedSet?
 			root.keySet(s);
 			return s;
 		} else {

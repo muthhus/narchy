@@ -249,11 +249,6 @@ public class TermReductionsTest {
         assertEquals(False, diffe(p, p));
     }
 
-    @Test
-    public void testDiffCommutative() throws Narsese.NarseseException {
-        assertEquals(diffi(q, p), diffi(p, q));
-        assertEquals(diffe(q, p), diffe(p, q));
-    }
 
     @Test
     public void testDifferenceSorted() throws Narsese.NarseseException {

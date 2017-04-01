@@ -29,8 +29,10 @@
      (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
 
      (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
+     (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
 
      (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
+     (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
 
 
 //NAL3 single premise decompose

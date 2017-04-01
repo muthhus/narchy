@@ -4,21 +4,25 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
+import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
 import nars.*;
 import nars.concept.Concept;
+import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
 import static nars.Op.NEG;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 public abstract class TermGraph {
@@ -51,10 +55,38 @@ public abstract class TermGraph {
         final HijackBag<Term, ImplLink> out;
 
         public ConceptVertex(Random rng) {
-            in = new PLinkHijackBag(32, 4, rng);
-            out = new PLinkHijackBag(32, 4, rng);
+            in = new MyPLinkHijackBag(rng);
+            out = new MyPLinkHijackBag(rng);
         }
 
+        private class MyPLinkHijackBag extends PLinkHijackBag {
+            public MyPLinkHijackBag(Random rng) {
+                super(32, 4, rng);
+            }
+
+            @Override
+            public float pri(@NotNull PLink key) {
+                float p = key.pri();
+                return Math.max(p - 0.5f, 0.5f - p); //most polarizing
+            }
+
+            @Override
+            protected float merge(@Nullable PLink existing, @NotNull PLink incoming, float scale) {
+                //average:
+
+
+                float pOrig;
+                if (existing != null) {
+                    float pAdd = incoming.priSafe(0);
+                    pOrig = existing.priSafe(0);
+                    existing.priAvg(pAdd, scale);
+                    return existing.priSafe(0) - pOrig;
+                } else {
+                    return incoming.priSafe(0);
+                }
+
+            }
+        }
     }
 
 
@@ -86,7 +118,9 @@ public abstract class TermGraph {
         }
 
         public void impl(NAR nar, Task t, int dt, Term subj, Term pred) {
-            if (dt != ETERNAL && dt < 0) {
+            if (dt == DTERNAL)
+                dt = 0;
+            if (dt < 0) {
                 //TODO reverse implication
                 impl(nar, t, -dt, pred, subj);
                 return;
@@ -101,24 +135,27 @@ public abstract class TermGraph {
             //if (sc.equals(pc)) return; //self-loop, maybe allow
 
             Truth tt = t.truth();
-            float scale;
+            float val;
             boolean neg;
-            if (tt.freq() >= 0.5f) {
-                scale = TruthFunctions.expectation(tt.freq(), tt.conf());
-            } else {
-                scale = -TruthFunctions.expectation(1f - tt.freq(), tt.conf());
-            }
+            int dur = nar.dur();
+            float conf = TruthPolation.evidenceDecay( t.evi(nar.time(), dur), dur,  dt);
+
+            //if (tt.freq() >= 0.5f) {
+                val = TruthFunctions.expectation(tt.freq(), conf);
+            /*} else {
+                val = -TruthFunctions.expectation(1f - tt.freq(), conf);
+            }*/
 
             neg = (subj.op()==NEG);
 
-            if (scale > Param.BUDGET_EPSILON) {
+            if (val > Param.BUDGET_EPSILON) {
                 ConceptVertex sv = sc.meta(VERTEX,
                         (k, p) -> {
                             if (p==null)
                                 p = new ConceptVertex(nar.random);
                             return p;
                         });
-                sv.out.put(new ImplLink(pc.term(), scale, neg));
+                sv.out.put(new ImplLink(pc.term(), val, neg));
 
                 ConceptVertex pv = pc.meta(VERTEX,
                         (k, p) -> {
@@ -126,7 +163,7 @@ public abstract class TermGraph {
                                 p = new ConceptVertex(nar.random);
                             return p;
                         });
-                pv.in.put(new ImplLink(sc.term(), scale, neg));
+                pv.in.put(new ImplLink(sc.term(), val, neg));
             }
         }
 

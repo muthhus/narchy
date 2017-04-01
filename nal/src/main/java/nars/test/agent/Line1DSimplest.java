@@ -27,7 +27,7 @@ public class Line1DSimplest extends NAgent {
      * the current value
      */
     public final FloatParam o = new FloatParam(0.5f, 0, 1f);
-    private final SensorConcept in;
+    public final SensorConcept in;
 
 
     public Line1DSimplest(NAR n) {
