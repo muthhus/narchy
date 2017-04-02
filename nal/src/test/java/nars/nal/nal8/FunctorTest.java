@@ -9,7 +9,7 @@ import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 
-public class TermFunctionTest {
+public class FunctorTest {
 
     @Test
     public void testImmediateTransformOfInput() { //as opposed to deriver's use of it
@@ -34,7 +34,7 @@ public class TermFunctionTest {
     @Test
     public void testAdd1() {
         Default d = new Default();
-        d.log();
+
         d.input("add(1,2,#x)!");
         d.run(16);
         d.input("add(4,5,#x)!");
@@ -44,7 +44,7 @@ public class TermFunctionTest {
     @Test
     public void testAdd1Temporal() {
         Default d = new Default();
-        d.log();
+
         d.input("add(1,2,#x)! :|:");
         d.run(16);
         d.input("add(4,5,#x)! :|:");
@@ -56,7 +56,7 @@ public class TermFunctionTest {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default());
-        t.log();
+        //t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         //t.believe("--(2<->3)");
         t.ask("c3(x:y)");
@@ -69,10 +69,11 @@ public class TermFunctionTest {
     public void testFunctor2() {
         //Param.DEBUG = true;
 
-        int TIME = 512;
-        TestNAR t = new TestNAR(new Default(1024, 8, 2));
-        t.nar.termVolumeMax.setValue(32);
-        //t.log();
+        int TIME = 128;
+        TestNAR t = new TestNAR(new Default(1024, 32, 2));
+
+        //Param.DEBUG = true; t.log();
+
         t.believe("(equal(complexity($1),$2) ==> c($1,$2))");
         t.ask("c(x, 1)");
         t.ask("c(x, 2)");

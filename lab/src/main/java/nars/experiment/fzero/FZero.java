@@ -43,7 +43,7 @@ public class FZero extends NAgentX {
         senseNumberDifference($.inh($.the("fz"), $.the("accel")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
         //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-        implAccelerator(nar, this);
+        //implAccelerator(nar, this);
 
 
 //        try {
@@ -195,7 +195,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.CS(true).durSeconds(0.06f), true))
+                3, new RealTime.CS(true).durSeconds(0.02f), true))
                 .runFPS(0).join();
     }
 }

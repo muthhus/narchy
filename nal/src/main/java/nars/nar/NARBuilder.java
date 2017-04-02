@@ -76,7 +76,7 @@ public interface NARBuilder {
 
         int maxConcepts = 256 * 1024;
 
-        int activeConcepts = 1024;
+        int activeConcepts = 4096;
 
         Default nar = new Default(activeConcepts,
                 1, 3, rng,
@@ -191,9 +191,7 @@ public interface NARBuilder {
         nar.deriver.conceptsFiredPerBatch.setValue(16);
         nar.deriver.derivationsInputPerCycle.setValue(256);
 
-        nar.termVolumeMax.setValue(72);
-
-        //Param.HORIZON = 4; //EXPERIMENTAL
+        nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
@@ -201,8 +199,8 @@ public interface NARBuilder {
         float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.stmLinkage.capacity.set(0);
 
@@ -213,8 +211,8 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 12);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 6);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 32);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

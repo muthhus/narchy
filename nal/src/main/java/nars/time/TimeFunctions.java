@@ -347,18 +347,26 @@ public interface TimeFunctions {
             if (taskStart!=ETERNAL) {
 
 
-//                long now = p.nar.time();
-//                if (taskStart < now) {
-//                    taskStart = now; //imminanentize the eschaton
-//                }
+                long now = p.nar.time();
+
+                assert(occReturn[1] != ETERNAL);
+
+                    //occReturn[1] = occReturn[0]; //HACK
 
                 if (taskStart > occReturn[0]) {
-                    if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0]; //HACK
+
                     long range = occReturn[1] - occReturn[0];
 
                     occReturn[0] = taskStart;
                     occReturn[1] = taskStart + range;
-                }
+                } /*else if (taskStart < now) {
+                    long range = occReturn[1] - occReturn[0];
+
+                    taskStart = now; //imminanentize the eschaton
+                    occReturn[0] = now;
+                    occReturn[1] = now+ range;
+                }*/
+
             }
 
         }
