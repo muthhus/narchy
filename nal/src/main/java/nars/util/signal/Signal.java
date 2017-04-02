@@ -34,7 +34,7 @@ public class Signal {
     }
 
 
-    public Task set(Compound term, Truth nextTruth, NAR nar) {
+    public Task set(Compound term, Truth nextTruth, long stamp, NAR nar) {
 
         long now = nar.time();
         if (current != null) {
@@ -59,7 +59,7 @@ public class Signal {
 
         SignalTask t = task(term, nextTruth,
                 now, now,
-                this.current, nar);
+                this.current, stamp, nar);
         if (t == null) {
             this.current = null;
             return null;
@@ -70,10 +70,10 @@ public class Signal {
     }
 
     @Nullable
-    protected SignalTask task(Compound term, Truth t, long start, long end, Task previous, NAR nar) {
+    protected SignalTask task(Compound term, Truth t, long start, long end, Task previous, long stamp, NAR nar) {
 
 
-        SignalTask s = new SignalTask(term, punc, t, start, end, nar.time.nextStamp());
+        SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
         s.budget(pri.asFloat() * deltaFactor(previous, t), nar);
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;

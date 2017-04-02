@@ -48,10 +48,19 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new ScalarSignal(n, term, this, truth);
+        this.sensor = new ScalarSignal(n, term, this, truth) {
+            @Override
+            protected long nextStamp(@NotNull NAR nar) {
+                return SensorConcept.this.nextStamp(nar);
+            }
+        };
 
         this.signal = signal;
         this.beliefs = new SensorBeliefTable();
+    }
+
+    protected long nextStamp(@NotNull NAR nar) {
+        return nar.time.nextStamp();
     }
 
     @Override

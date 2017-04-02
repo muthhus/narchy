@@ -194,16 +194,28 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         private final int x, y;
         private float bufferedValue;
+        private long nextStamp;
 
         public PixelConcept(Compound cell, FloatToObjectFunction<Truth> brightnessToTruth, int x, int y) {
             super(cell, nar, null, brightnessToTruth);
             this.x = x;
             this.y = y;
             this.bufferedValue = Float.NaN;
+            frameStamp();
             setSignal(()->bufferedValue);
         }
 
+        private void frameStamp() {
+            nextStamp = nar.time.nextStamp();
+        }
+
+        @Override
+        protected long nextStamp(@NotNull NAR nar) {
+            return nextStamp;
+        }
+
         boolean update() {
+            frameStamp();
             bufferedValue = src.brightness(x, y);
             return currentValue!=currentValue || !Util.equals(currentValue, bufferedValue, resolution);
         }

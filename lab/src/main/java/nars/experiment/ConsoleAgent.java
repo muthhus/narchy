@@ -165,7 +165,7 @@ public abstract class ConsoleAgent extends NAgentX {
         private final Signal[][] beliefs;
         int c[] = new int[2];
         private boolean write;
-
+        private long nextStamp;
 
 
         public TestConsole(Term id, boolean read, int w, int h) {
@@ -173,6 +173,9 @@ public abstract class ConsoleAgent extends NAgentX {
             this.chars = new char[w][h];
             this.terms = new Compound[w][h];
             this.beliefs = new Signal[w][h];
+
+            nextStamp = nar.time.nextStamp();
+
             for (int x = 0; x< w; x++) {
                 for (int y = 0; y < h; y++) {
                     chars[x][y] = ' ';
@@ -320,6 +323,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 beliefs[cx][cy].set(
                         $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
                         $.t(1f, 0.9f),
+                        nextStamp,
                         nar);
             }
         }
@@ -365,6 +369,7 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         public Stream<Task> input() {
+            nextStamp = nar.time.nextStamp();
             return IntStream.range(0, rows()*cols()).mapToObj(i -> {
                 int x = i / rows();
                 int y = i % cols();

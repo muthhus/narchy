@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Map;
@@ -79,7 +80,7 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     }
 
     @Override
-    protected void in(@NotNull byte[] data, @NotNull InetSocketAddress from) {
+    protected void in(DatagramPacket p, @NotNull byte[] data, @NotNull InetSocketAddress from) {
         Session<S> ss = sessions.get(from, this::session);
         ss.touch();
         ss.api.accept(data);

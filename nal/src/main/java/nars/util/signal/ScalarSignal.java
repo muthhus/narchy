@@ -27,6 +27,7 @@ import static nars.Op.BELIEF;
 public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleSupplier {
 
 
+
     private final Compound term;
     /**
      * resolution of the output freq value
@@ -84,6 +85,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         float next = value.floatValueOf(term);
         return set(term,
                 (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null,
+                nextStamp(nar),
                 nar);
 
 //        int maxT = this.maxTimeBetweenUpdates;
@@ -109,6 +111,9 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        return null;
     }
 
+    protected long nextStamp(@NotNull NAR nar) {
+        return nar.time.nextStamp();
+    }
 
 
     @Nullable

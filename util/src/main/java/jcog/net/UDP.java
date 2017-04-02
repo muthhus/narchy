@@ -80,7 +80,7 @@ public class UDP  {
             try {
                 DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
                 in.receive(p);
-                in(Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()), (InetSocketAddress) p.getSocketAddress());
+                in(p, Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()), (InetSocketAddress) p.getSocketAddress());
             } catch (Exception e) {
                 logger.error("{}", e);
             }
@@ -164,7 +164,7 @@ public class UDP  {
         }
     }
 
-    protected void in(byte[] data, InetSocketAddress from) {
+    protected void in(DatagramPacket p, byte[] data, InetSocketAddress from) {
 
     }
 

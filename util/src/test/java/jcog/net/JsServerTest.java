@@ -5,6 +5,7 @@ import jcog.Util;
 import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 
+import java.net.DatagramPacket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -22,7 +23,7 @@ public class JsServerTest {
 
         StringBuilder sb = new StringBuilder();
         UDP client = new UDP(10001) {
-            @Override protected void in(byte[] data, InetSocketAddress from) {
+            @Override protected void in(DatagramPacket p, byte[] data, InetSocketAddress from) {
                 sb.append(from + ": " + data.length + " \"" + new String(data) + "\" = bytes:" + Arrays.toString(data) );
             }
         };

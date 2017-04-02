@@ -87,7 +87,7 @@ public class GoalActionConcept extends ActionConcept {
 //                //continue it
 //            }
 //        }
-        return feedback.set(term(), currentFeedback, nar);
+        return feedback.set(term(), currentFeedback, nar.time.nextStamp(), nar);
 
 
     }

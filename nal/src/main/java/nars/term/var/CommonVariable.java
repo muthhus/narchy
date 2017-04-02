@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 public final class CommonVariable extends GenericNormalizedVariable {
 
 
-
     CommonVariable(@NotNull Op type, int a, int b) {
         super(type, multiVariable(a, b));
     }
