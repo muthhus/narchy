@@ -31,7 +31,7 @@ public class InterNARTest {
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 30;
+        final int CONNECTION_TIME = 50;
 
         Param.ANSWER_REPORTING = false;
 

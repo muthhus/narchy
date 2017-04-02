@@ -80,8 +80,8 @@ public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implemen
     }
 
     @Override
-    protected void in(DatagramPacket p, @NotNull byte[] data, @NotNull InetSocketAddress from) {
-        Session<S> ss = sessions.get(from, this::session);
+    protected void in(DatagramPacket p, @NotNull byte[] data) {
+        Session<S> ss = sessions.get((InetSocketAddress) p.getSocketAddress() , this::session);
         ss.touch();
         ss.api.accept(data);
     }

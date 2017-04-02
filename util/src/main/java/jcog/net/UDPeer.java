@@ -320,7 +320,7 @@ public class UDPeer extends UDP {
     }
 
 
-    public final Bag<InetSocketAddress, UDProfile> them;
+    public final Bag<Integer, UDProfile> them;
     public final PLinkHijackBag<Msg> seen;
 
     public UDPeer( int port) throws SocketException, UnknownHostException {
@@ -335,7 +335,7 @@ public class UDPeer extends UDP {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        them = new HijackBag<InetSocketAddress, UDProfile>(4, rng) {
+        them = new HijackBag<Integer, UDProfile>(4, rng) {
 
             @Override
             public void onAdded(UDProfile p) {
@@ -366,10 +366,12 @@ public class UDPeer extends UDP {
 
             @NotNull
             @Override
-            public InetSocketAddress key(UDProfile value) {
-                return value.addr;
+            public Integer key(UDProfile value) {
+                return value.id;
             }
+
         };
+
         them.setCapacity(PEERS_CAPACITY);
 
         seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4, rng);
@@ -439,7 +441,7 @@ public class UDPeer extends UDP {
     }
 
     @Override
-    protected void in(DatagramPacket p, byte[] data, InetSocketAddress from) {
+    protected void in(DatagramPacket p, byte[] data) {
         Msg m = Msg.get(data);
         if (m == null)
             return;
@@ -466,7 +468,7 @@ public class UDPeer extends UDP {
 
         //System.out.println(this + " recv " + m + " from " + from + "(" + summary() + ")");
 
-        @Nullable UDProfile connected = them.get(from);
+        @Nullable UDProfile connected = them.get(m.id());
 
         switch (m.cmd()) {
             case PONG:
@@ -474,7 +476,7 @@ public class UDPeer extends UDP {
                 //continues = false;
                 break;
             case PING:
-                sendPong(from, m); //continue below
+                sendPong((InetSocketAddress) p.getSocketAddress(), m); //continue below
                 break;
             case WHO:
                 m.dataAddresses(this::ping);
@@ -491,7 +493,7 @@ public class UDPeer extends UDP {
         if (connected==null) {
             if (them.size() < them.capacity()) {
                 //ping them to consider adding as peer
-                ping(from);
+                ping((InetSocketAddress) p.getSocketAddress());
             }
         } else {
             connected.lastMessage = now;

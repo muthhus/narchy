@@ -23,8 +23,8 @@ public class JsServerTest {
 
         StringBuilder sb = new StringBuilder();
         UDP client = new UDP(10001) {
-            @Override protected void in(DatagramPacket p, byte[] data, InetSocketAddress from) {
-                sb.append(from + ": " + data.length + " \"" + new String(data) + "\" = bytes:" + Arrays.toString(data) );
+            @Override protected void in(DatagramPacket p, byte[] data) {
+                sb.append( ": " + data.length + " \"" + new String(data) + "\" = bytes:" + Arrays.toString(data) );
             }
         };
 
