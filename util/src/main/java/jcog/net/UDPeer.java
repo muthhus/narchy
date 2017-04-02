@@ -430,7 +430,7 @@ public class UDPeer extends UDP {
      *
      * @return how many sent
      */
-    public int send(Msg o, float pri, boolean onlyIfNotSeen) {
+    public int say(Msg o, float pri, boolean onlyIfNotSeen) {
 
         if (them.isEmpty()) {
             //System.err.println(this + " without any peers to broadcast");
@@ -444,10 +444,10 @@ public class UDPeer extends UDP {
 
             final int[] count = {0};
             them.sample((int) Math.ceil(pri * them.size()), (to) -> {
-//                if (o.originEquals(to.addrBytes))
-//                    return false;
+                //logger.debug("({} =/> {})", o, to.addr);
+                if (o.originEquals(to.addrBytes))
+                    return false;
 
-                logger.debug("({} =/> {})", o, to.addr);
                 outBytes(bytes, to.addr);
                 count[0]++;
                 return true;
@@ -470,7 +470,7 @@ public class UDPeer extends UDP {
     }
 
     public int say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return send(new Msg(SAY, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
+        return say(new Msg(SAY, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
     }
 
     /**
@@ -485,7 +485,7 @@ public class UDPeer extends UDP {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + id + ')';
+        return getClass().getSimpleName() + '(' + LongString.toString(id) + ')';
     }
 
     @Override
@@ -550,10 +550,12 @@ public class UDPeer extends UDP {
             connected.lastMessage = now;
         }
 
-        if (continues) {
-            if (!seen)
-                send(m, pri, false /* did a test locally already */);
-        }
+
+        //direct bounce:
+            //if (continues) {
+            //    if (!seen)
+            //        send(m, pri, false /* did a test locally already */);
+            //}
     }
 
     protected void receive(Msg m) {
@@ -603,7 +605,7 @@ public class UDPeer extends UDP {
     protected void sendPong(InetSocketAddress from, Msg ping) {
         Msg p = ping.clone(PONG,null);
 
-        logger.debug("({} =/> {})", p, from);
+        //logger.debug("({} =/> {})", p, from);
 
         send(p, from);
     }

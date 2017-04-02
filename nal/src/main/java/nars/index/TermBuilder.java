@@ -79,6 +79,10 @@ public abstract class TermBuilder {
 
     }
 
+    public Term the(@NotNull Op op, int dt, List<Term> sub) {
+        int ss = sub.size();
+        return the(op, dt, sub.toArray(new Term[ss]));
+    }
 
     /**
      * main entry point for compound construction - creates an immutable result

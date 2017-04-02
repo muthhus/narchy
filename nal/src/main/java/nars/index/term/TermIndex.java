@@ -187,11 +187,12 @@ public abstract class TermIndex extends TermBuilder {
         TermContainer subs = crc.subterms();
 
         int len = subs.size();
-        List<Term> sub = $.newArrayList(len /* estimate */);
 
 
         boolean changed = false;
         Op cop = crc.op();
+
+        CompoundBuilder sub = new CompoundBuilder(cop, crc.dt(), len);
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(cop);
@@ -252,11 +253,11 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         Term transformed;
-        int ss = sub.size();
+
 //        if (!changed || (ss == len && crc.equalTerms(sub)))
 //            transformed = crc;
 //        else {
-        transformed = the(cop, crc.dt(), sub.toArray(new Term[ss]));
+        transformed = the(sub);
         //}
 
 //        //cache the result
@@ -266,6 +267,9 @@ public abstract class TermIndex extends TermBuilder {
         return transformed;
     }
 
+    protected Term the(CompoundBuilder t) {
+        return the(t.op, t.dt, t.toArray(new Term[t.size()]));
+    }
 
 //    @NotNull
 //    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
@@ -381,10 +385,7 @@ public abstract class TermIndex extends TermBuilder {
         if (!t.testSuperTerm(src)) {
             return src;
         } else {
-            int dt = src.dt();
-
-            TermContainer tc = transform(src, src, dt, t);
-            return (tc == null) ? null : ((tc != src) ? the(src.op(), dt, tc) : src);
+            return transform(src.op(), src.dt(), src, t);
         }
     }
 
@@ -393,32 +394,33 @@ public abstract class TermIndex extends TermBuilder {
         if (src.dt() == newDT)
             return transform(src, t); //no dt change, use non-DT changing method that has early fail
         else {
-            TermContainer subs = transform(src, src, newDT, t);
-            return subs == null ? null : the(src.op(), newDT, subs);
+            return transform(src.op(), newDT, src, t);
         }
     }
 
     @Nullable
-    private TermContainer transform(@NotNull TermContainer src, Compound superterm, int dt, @NotNull CompoundTransform t) {
+    private Term transform(Op op, int dt, @NotNull Compound src, @NotNull CompoundTransform t) {
 
         int modifications = 0;
 
-        Op superOp = superterm.op();
-        boolean filterTrueAndFalse = disallowTrueOrFalse(superOp);
+        boolean filterTrueAndFalse = disallowTrueOrFalse(op);
 
         int s = src.size();
-        Term[] target = new Term[s];
+        CompoundBuilder target = new CompoundBuilder(op, dt, s);
         for (int i = 0; i < s; i++) {
 
             Term x = src.term(i), y;
 
-            y = t.apply(superterm, x);
+            y = t.apply(src, x);
 
-            if (y == x && x instanceof Compound) {
-                y = transform((Compound) x, t); //recurse
-                if (y == null)
-                    return null;
-            }
+            if (y == null)
+                return null;
+
+            if ( y instanceof Compound )
+                y = transform((Compound) y, t); //recurse
+
+            if (y == null)
+                return null;
 
             if (y != x) {
                 if (filterTrueAndFalse && isTrueOrFalse(y)) {
@@ -434,12 +436,13 @@ public abstract class TermIndex extends TermBuilder {
                 //}
             }
 
-            target[i] = y;
+            target.add(y);
         }
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
-        return modifications == 0 ? src : TermContainer.the(superOp, dt, target);
+        return (modifications > 0 || op!=src.op() || dt!=src.dt()) ?
+                the(target) : src;
     }
 
     static boolean disallowTrueOrFalse(Op superOp) {
