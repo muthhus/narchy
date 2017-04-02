@@ -36,6 +36,9 @@ public class UDP  {
             //.disableHtmlEscaping()
             .create();
 
+    private final int port;
+
+
     public UDP(String host, int port) throws SocketException, UnknownHostException {
         this(InetAddress.getByName(host), port);
     }
@@ -54,6 +57,11 @@ public class UDP  {
         }
         this.in = iin;
         this.thread = null;
+        this.port = -1;
+    }
+
+    public int port() {
+        return port;
     }
 
     public UDP(@Nullable InetAddress a, int port) throws SocketException {
@@ -61,11 +69,11 @@ public class UDP  {
         in.setTrafficClass(0x10 /*IPTOS_LOWDELAY*/); //https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setTrafficClass-int-
         in.setSendBufferSize(DEFAULT_socket_BUFFER_SIZE);
         in.setReceiveBufferSize(DEFAULT_socket_BUFFER_SIZE);
+        this.port = port;
 
         this.thread = new Thread(this::recv);
 
-        logger.info("{} started {} {}", this, in, in.getLocalSocketAddress());
-        //logger.info("buffer sizes: send={} recv={}", in.getSendBufferSize(), in.getReceiveBufferSize());
+        logger.info("{} started {} {} {} {}", this, in, in.getLocalSocketAddress(), in.getInetAddress(), in.getRemoteSocketAddress());
 
         thread.start();
     }

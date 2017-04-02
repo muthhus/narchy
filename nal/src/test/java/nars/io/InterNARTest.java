@@ -31,7 +31,7 @@ public class InterNARTest {
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 50;
+        final int CONNECTION_TIME = 30;
 
         Param.ANSWER_REPORTING = false;
 
@@ -50,7 +50,9 @@ public class InterNARTest {
 
             InterNAR bi = new InterNAR(b, 1, nextPort.incrementAndGet());
 
-            bi.ping(ai.me());
+            Util.pause(CONNECTION_TIME);
+
+            bi.ping(ai.port());
 
             Util.pause(CONNECTION_TIME);
 

@@ -1,5 +1,6 @@
 package jcog.net;
 
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import jcog.bag.Bag;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.net.*;
 import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 /**
@@ -34,8 +37,10 @@ public class UDPeer extends UDP {
 
     private static final byte DEFAULT_PING_TTL = 3;
 
-    protected final InetSocketAddress me;
-    private final byte[] meBytes;
+    public final int id = ThreadLocalRandom.current().nextInt();
+
+    //protected final InetSocketAddress me;
+    //private final byte[] meBytes;
 
     /** max # of active links */
     final static int PEERS_CAPACITY = 4;
@@ -44,15 +49,18 @@ public class UDPeer extends UDP {
     final static int SEEN_CAPACITY = 4096;
 
 
+
+
     public static class Msg extends DynByteSeq {
 
         final static int TTL_BYTE = 0;
         final static int CMD_BYTE = 1;
-        final static int PORT_BYTE = 2;
-        final static int ORIGIN_BYTE = 4;
-        final static int DATA_START_BYTE = 20;
+        final static int ID_BYTE = 2;
+        final static int PORT_BYTE = 6;
+        final static int ORIGIN_BYTE = 8;
+        final static int DATA_START_BYTE = 24;
 
-        final static int HEADER_SIZE = DATA_START_BYTE /* ESTIMATE */;
+        final static int HEADER_SIZE = DATA_START_BYTE;
 
         final int hash;
 
@@ -62,17 +70,26 @@ public class UDPeer extends UDP {
             hash = hash();
         }
 
-        private void init(byte cmd, byte ttl, InetSocketAddress origin) {
-            write(ttl);
-            write(cmd);
+        private void init(byte cmd, byte ttl, int id,  InetSocketAddress origin) {
+            writeByte(ttl);
+            writeByte(cmd);
+            writeInt(id);
 
-            writeShort(origin.getPort());
-            write(origin.getAddress().getAddress());
+            if (origin!=null) {
+                writeShort(origin.getPort());
+                write(origin.getAddress().getAddress());
+            } else {
+                writeShort(0 );
+                for (int i= 0; i < ADDRESS_BYTES-2; i++) //HACK
+                    writeByte(0);
+            }
+
+
         }
 
-        public Msg(byte cmd, byte ttl, InetSocketAddress origin, byte... payload) {
+        public Msg(byte cmd, byte ttl, int id,  InetSocketAddress origin, byte... payload) {
             super(HEADER_SIZE);
-            init(cmd, ttl, origin);
+            init(cmd, ttl, id, origin);
 
             if (payload.length > 0)
                 write(payload);
@@ -80,18 +97,18 @@ public class UDPeer extends UDP {
             hash = hash();
         }
 
-        public Msg(byte cmd, byte ttl, InetSocketAddress origin, int payload) {
+        public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, int payload) {
             super(HEADER_SIZE);
-            init(cmd, ttl, origin);
+            init(cmd, ttl, id, origin);
 
             writeInt(payload);
 
             hash = hash();
         }
 
-        public Msg(byte cmd, byte ttl, InetSocketAddress origin, long payload) {
+        public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, long payload) {
             super(HEADER_SIZE);
-            init(cmd, ttl, origin);
+            init(cmd, ttl, id, origin);
 
             writeLong(payload);
 
@@ -142,14 +159,30 @@ public class UDPeer extends UDP {
         }
 
         /** clones a new copy with different command */
-        public Msg cmd(byte newCmd) {
+        public Msg clone(byte newCmd) {
             byte[] b = bytes.clone();
             b[CMD_BYTE] = newCmd;
             return new Msg(b);
         }
-        public Msg cmd(byte newCmd, @Nullable byte[] newOrigin) {
+
+        public Msg clone(byte newCmd, @Nullable byte[] newOrigin) {
             byte[] b = bytes.clone();
             b[CMD_BYTE] = newCmd;
+
+            if (newOrigin != null) {
+                System.arraycopy(newOrigin, 0, b, PORT_BYTE, ADDRESS_BYTES);
+            } else {
+                Arrays.fill(b, PORT_BYTE, ADDRESS_BYTES, (byte)0);
+            }
+            return new Msg(b);
+        }
+
+        public Msg clone(byte newCmd, int id, @Nullable byte[] newOrigin) {
+            byte[] b = bytes.clone();
+            b[CMD_BYTE] = newCmd;
+
+            System.arraycopy(Ints.toByteArray(id), 0, b, ID_BYTE, 4);
+
             if (newOrigin != null) {
                 System.arraycopy(newOrigin, 0, b, PORT_BYTE, ADDRESS_BYTES);
             } else {
@@ -168,6 +201,13 @@ public class UDPeer extends UDP {
 
         public byte[] data(int start, int end) {
             return Arrays.copyOfRange(bytes, DATA_START_BYTE + start, DATA_START_BYTE + end );
+        }
+
+        public int id() {
+            byte[] b = bytes;
+            return Ints.fromBytes(
+                b[ID_BYTE], b[ID_BYTE+1], b[ID_BYTE+2], b[ID_BYTE+3]
+            );
         }
 
         /** the payload as a long */
@@ -221,6 +261,10 @@ public class UDPeer extends UDP {
             }
 
         }
+
+        public int port() {
+            return Shorts.fromBytes(bytes[PORT_BYTE], bytes[PORT_BYTE+1]);
+        }
     }
 
     /** profile of another peer */
@@ -231,16 +275,28 @@ public class UDPeer extends UDP {
 
         /** ping time, in ms */
         final SynchronizedDescriptiveStatistics pingTime = new SynchronizedDescriptiveStatistics(PING_WINDOW);
+        private final int id;
 
         long lastMessage = Long.MIN_VALUE;
         public byte[] addrBytes;
         private long latency;
 
 
-        public UDProfile(InetSocketAddress addr, long initialPingTime) {
+        public UDProfile(int id, InetSocketAddress addr, long initialPingTime) {
+            this.id = id;
             this.addr = addr;
             this.addrBytes = bytes(addr);
             onPing(initialPingTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return id == ((UDProfile)obj).id;
         }
 
         public void onPing(long time) {
@@ -268,14 +324,14 @@ public class UDPeer extends UDP {
     public final PLinkHijackBag<Msg> seen;
 
     public UDPeer( int port) throws SocketException, UnknownHostException {
-        super(java.net.InetAddress.getLocalHost().getHostName(), port);
+        super(port);
+        //super( InetAddress.getLocalHost().getCanonicalHostName(), port);
 
-        this.me =  new InetSocketAddress( in.getInetAddress(), port );
+        //this.me =  new InetSocketAddress( in.getInetAddress(), port );
         /*this.me = new InetSocketAddress(
                 InetAddress.getByName("[0:0:0:0:0:0:0:0]"),
                 port);*/
-
-        this.meBytes = bytes(me);
+        //this.meBytes = bytes(me);
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom(System.currentTimeMillis());
 
@@ -283,12 +339,14 @@ public class UDPeer extends UDP {
 
             @Override
             public void onAdded(UDProfile p) {
-                System.out.println(UDPeer.this + " connected " + p + "( " + summary() + ")");
+                //System.out.println(UDPeer.this + " connected " + p + "( " + summary() + ")");
+                UDPeer.this.onAddRemove(p, true);
             }
 
             @Override
             public void onRemoved(@NotNull UDPeer.UDProfile p) {
-                System.out.println(UDPeer.this + " disconnected " + p );
+                //System.out.println(UDPeer.this + " disconnected " + p );
+                UDPeer.this.onAddRemove(p, false);
             }
 
             @Override
@@ -317,6 +375,9 @@ public class UDPeer extends UDP {
         seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4, rng);
     }
 
+    protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
+
+    }
 
 
     /** broadcast
@@ -361,20 +422,20 @@ public class UDPeer extends UDP {
     }
 
     public int say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return send(new Msg(SAY, (byte)ttl, me, msg ), 1f, onlyIfNotSeen);
+        return send(new Msg(SAY, (byte)ttl, id, null, msg ), 1f, onlyIfNotSeen);
     }
 
     /** send to a specific known recipient */
     public void send(Msg o, InetSocketAddress to) {
-        InetSocketAddress a = o.origin();
-        if (a != null && a.equals(to))
-            return;
+//        InetSocketAddress a = o.origin();
+//        if (a != null && a.equals(to))
+//            return;
         outBytes(o.array(), to);
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + me + ')';
+        return getClass().getSimpleName() + '(' + id + ')';
     }
 
     @Override
@@ -383,12 +444,12 @@ public class UDPeer extends UDP {
         if (m == null)
             return;
 
-        if (m.origin()==null) {
+        if (m.port()==0) {
             //rewrite origin with the actual packet origin
-            m = m.cmd(m.cmd(), bytes(new InetSocketAddress(p.getAddress(), p.getPort())) );
+            m = m.clone(m.cmd(), bytes(new InetSocketAddress(p.getAddress(), p.getPort())) );
         }
 
-        if (m.originEquals(meBytes)) {
+        if (m.id()==id && m.cmd()!=PONG) {
             //throw new RuntimeException("received by originator");
             return;
         }
@@ -409,7 +470,7 @@ public class UDPeer extends UDP {
 
         switch (m.cmd()) {
             case PONG:
-                connected = recvPong(m, connected, now);
+                connected = recvPong(p, m, connected, now);
                 //continues = false;
                 break;
             case PING:
@@ -456,22 +517,22 @@ public class UDPeer extends UDP {
         return in + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ")";
     }
 
-    public @Nullable UDProfile recvPong(Msg m, @Nullable UDProfile connected, long now) {
+    public @Nullable UDProfile recvPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
 
         long sent = m.dataLong(); //TODO should be Long
         long latency = now - (sent);
         if (connected != null) {
             connected.onPing(latency);
         } else {
-            InetSocketAddress origin = m.origin();
-            connected = them.put(new UDProfile(origin, latency));
+            if (id == m.id())
+                connected = them.put(new UDProfile(m.id(), (InetSocketAddress)p.getSocketAddress(), latency));
         }
         return connected;
     }
 
     /** ping same host, different port */
     public void ping(int port) {
-        ping(new InetSocketAddress(me.getAddress(), port));
+        ping(new InetSocketAddress(port));
     }
 
     public void ping(String host, int port) {
@@ -479,18 +540,12 @@ public class UDPeer extends UDP {
     }
 
     public void ping(@Nullable InetSocketAddress to) {
-        if (to!=null && to.equals(me))
-            return;
-        send(new Msg(PING, DEFAULT_PING_TTL, null, System.currentTimeMillis()), to);
+        send(new Msg(PING, DEFAULT_PING_TTL, id, null, System.currentTimeMillis()), to);
     }
 
 
     protected void sendPong(InetSocketAddress from, Msg ping) {
-        send(ping.cmd(PONG, null), from);
-    }
-
-    public InetSocketAddress me() {
-        return me;
+        send(ping.clone(PONG, null), from);
     }
 
 }

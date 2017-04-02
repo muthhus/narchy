@@ -29,7 +29,7 @@ public abstract class UDPNetworkSimulation {
             //System.out.println("round " + j);
 
             for (int i = 0; i < size; i++) {
-                peers[i].ping(peers[ (i + 1) % size ].me());
+                peers[i].ping(peers[ (i + 1) % size ].port());
                 //peers[i].ping(peers[ (i + 2) % size ].me());
             }
 
@@ -70,7 +70,7 @@ public abstract class UDPNetworkSimulation {
                 @Override public void run() {
                     actuallySend(o, to);
                 }
-            }, delay(me, to, o.length()));
+            }, delay((InetSocketAddress) in.getLocalSocketAddress(), to, o.length()));
         }
     }
 
