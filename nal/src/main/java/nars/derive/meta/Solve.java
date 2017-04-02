@@ -68,7 +68,7 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
 
                 float eFactor = m.nar.derivedEvidenceGain.asFloat();
                 if (eFactor != 1) {
-                    if ((t = t.eviMult(eFactor))==null)
+                    if ((t = t.eviMult(eFactor, m.nar.dur()))==null)
                         return false;
                 }
 

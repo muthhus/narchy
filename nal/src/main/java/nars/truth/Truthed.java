@@ -19,10 +19,10 @@ public interface Truthed  {
 //        return (freq() - 0.5f) * conf() * 2f;
 //    }
 
-    /** balanced form of expectation, where -infinity = no, +infinity = yes, and 0 = maybe */
-    default float motivation() {
-        return (freq() - 0.5f) * evi() * 2f;
-    }
+//    /** balanced form of expectation, where -infinity = no, +infinity = yes, and 0 = maybe */
+//    default float motivation() {
+//        return (freq() - 0.5f) * evi(dur) * 2f;
+//    }
 
     default float conf() {
         Truth t = truth();
@@ -33,18 +33,19 @@ public interface Truthed  {
         return t == null ? Float.NaN : t.freq();
     }
 
-    static float confSum(@NotNull Iterable<? extends Truthed> beliefs) {
-        float t = 0;
-        for (Truthed s : beliefs)
-            t += s.truth().conf();
-        return t;
-    }
-    static float confWeightSum(@NotNull Iterable<? extends Truthed> beliefs) {
-        float t = 0;
-        for (Truthed s : beliefs)
-            t += s.truth().evi();
-        return t;
-    }
+//    static float confSum(@NotNull Iterable<? extends Truthed> beliefs) {
+//        float t = 0;
+//        for (Truthed s : beliefs)
+//            t += s.truth().conf();
+//        return t;
+//    }
+
+//    static float confWeightSum(@NotNull Iterable<? extends Truthed> beliefs) {
+//        float t = 0;
+//        for (Truthed s : beliefs)
+//            t += s.truth().evi(dur);
+//        return t;
+//    }
 
     static float freqMean(@NotNull Iterable<? extends Truthed> beliefs) {
 
@@ -58,9 +59,10 @@ public interface Truthed  {
         return count == 0 ? 0.5f : t / count;
     }
 
-    /** weight of evidence ( confidence converted to weight, 'c2w()' ) */
-    default float evi() {
-        return c2w(conf());
+    /** weight of evidence ( confidence converted to weight, 'c2w()' )
+     * @param dur*/
+    default float evi(float dur) {
+        return c2w(conf(), dur);
     }
 
 

@@ -45,9 +45,6 @@ public class GoalActionConcept extends ActionConcept {
     }
 
 
-    private Truth currentFeedback;
-
-
     @Override
     public Task apply(NAR nar) {
 
@@ -61,35 +58,13 @@ public class GoalActionConcept extends ActionConcept {
 //            tdb = tdg = null;
 //        }
 
-
-        Truth b = beliefIntegrated.commitSum();
-//        if (tdb != null) {
-//            b = (b != null) ? Revision.revise(b, tdb) : tdb;
-//        }
-
-        Truth g = goalIntegrated.commitSum();
-//        if (tdg!=null) {
-//            g = (g != null) ? Revision.revise(g, tdg) : tdg;
-//        }
-
-
-        //float resolution = this.resolution.floatValue();
-
-
-        Truth lastFeedback = currentFeedback;
-
-        this.currentFeedback = this.motor.motor(b, g);
-
-//        if (lastFeedback!=null) {
-//            if (currentFeedback == null) {
-//                //cancel it: lastFeedback.setEnd()
-//            } else if (currentFeedback.equals(lastFeedback, resolution)) {
-//                //continue it
-//            }
-//        }
-        return feedback.set(term(), currentFeedback, nar.time.nextStamp(), nar);
-
-
+        int dur = nar.dur();
+        return feedback.set(term(),
+                this.motor.motor(
+                        beliefIntegrated.commitAverage(dur),
+                        goalIntegrated.commitAverage(dur)),
+                nar.time.nextStamp(),
+                nar);
     }
 
 
@@ -100,182 +75,182 @@ public class GoalActionConcept extends ActionConcept {
 
 
 
-    Truth[] linkTruth(long when, long now, float minConf) {
-        List<Truth> belief = $.newArrayList(0);
-        List<Truth> goal = $.newArrayList(0);
-
-        int dur = nar.dur();
-
-        int numTermLinks = termlinks().size();
-        if (numTermLinks > 0) {
-            float termLinkFeedbackRate = 1f / numTermLinks; //conf to priority boost conversion rate
-            termlinks().forEach(tll -> {
-                float g = linkTruth(tll.get(), belief, goal, when, now, dur);
-                if (g > 0)
-                    tll.priAdd(g * termLinkFeedbackRate);
-            });
-        }
-        int numTaskLinks = tasklinks().size();
-        if (numTaskLinks > 0) {
-            float taskLinkFeedbackRate = 1f / numTaskLinks; //conf to priority boost conversion rate
-            tasklinks().forEach(tll -> {
-                Task task = tll.get();
-                if (!task.isDeleted()) {
-                    float g = linkTruth(task.term(), belief, goal, when, now, dur);
-                    if (g > 0)
-                        tll.priAdd(g * taskLinkFeedbackRate);
-                }
-            });
-        }
-
-
-        Truth b = Revision.revise(belief, minConf);
-        Truth g = Revision.revise(goal, minConf);
-        //System.out.println(belief.size() + "=" + b + "\t" + goal.size() + "=" + g);
-
-        return new Truth[]{b, g};
-
-    }
-
-    private float linkTruth(Term t, List<Truth> belief, List<Truth> goal, long when, long now, int dur) {
-        float gain = 0;
-
-        t = nar.post(t);
-
-        Compound thisTerm = term();
-        if (t.op() == IMPL) {
-            //    B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-
-            Compound ct = (Compound) t;
-            Term postCondition = ct.term(1);
-
-            if (postCondition.equals(thisTerm)) {
-
-
-                //a termlink to an implication in which the postcondition is this concept
-                Concept implConcept = nar.concept(t);
-                if (implConcept != null) {
-
-                    //TODO match the task and subtract the dt
-                    Task it = implConcept.beliefs().match(when, now, dur); //implication belief
-                    if (it != null) {
-                        int dt = it.dt();
-                        if (dt == DTERNAL)
-                            dt = 0;
-
-                        Truth itt = it.truth();
-                        Term preCondition = nar.post(ct.term(0));
-
-                        gain += linkTruthImpl(itt, preCondition, when - dt, now, belief, goal, nar);
-                    }
-                }
-            }
-        } else if (t.op() == CONJ) {
-            //TODO
-        } else if (t.op() == EQUI) {
-            //TODO
-            Compound c = (Compound) t;
-            Term other = null;
-            boolean first = false;
-
-            //TODO handle negated case
-
-            if (c.term(0).equals(thisTerm)) {
-                other = c.term(1);
-                first = true;
-            } else if (c.term(1).equals(thisTerm)) {
-                other = c.term(0);
-                first = false;
-            }
-
-            if (other != null && !other.equals(thisTerm)) {
-
-                //a termlink to an implication in which the postcondition is this concept
-                Concept equiConcept = nar.concept(t);
-                if (equiConcept != null) {
-
-                    //TODO refactor to: linkTruthEqui
-
-
-                    //TODO match the task and subtract the dt
-                    Task it = equiConcept.beliefs().match(when, now, dur); //implication belief
-                    if (it != null) {
-                        int dt = it.dt();
-                        if (dt == DTERNAL)
-                            dt = 0;
-                        if (!first)
-                            dt = -dt;
-
-                        long whenActual = when + dt;
-
-                        Truth itt = it.truth();
-
-
-                        Concept otherConcept = nar.concept(other);
-                        if (otherConcept != null) {
-                            //    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
-
-                            Truth pbt = otherConcept.belief(whenActual, now, nar.dur());
-                            if (pbt != null) {
-                                Truth y = TruthFunctions.analogy(pbt, itt, 0);
-                                if (y != null) {
-                                    belief.add(y);
-                                    gain += y.conf();
-                                }
-                            }
-
-                            Truth pgt = otherConcept.belief(whenActual, now, nar.dur());
-                            if (pgt != null) {
-                                Truth y = TruthFunctions.deduction(pbt, itt, 0);
-                                if (y != null) {
-                                    goal.add(y);
-                                    gain += y.conf();
-                                }
-
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
-        return gain;
-    }
-
-
-    public static float linkTruthImpl(Truth itt, Term preCondition, long when, long now, List<Truth> belief, List<Truth> goal, NAR nar) {
-        float gain = 0;
-
-        boolean preCondNegated = preCondition.op() == NEG;
-
-        Concept preconditionConcept = nar.concept(preCondition);
-        if (preconditionConcept != null) {
-
-            //belief = deduction(pbt, it)
-            Truth pbt = preconditionConcept.belief(when, now, nar.dur());
-            if (pbt != null) {
-                Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), itt, 0 /* gather anything */);
-                if (y != null) {
-                    belief.add(y);
-                    gain += y.conf();
-                }
-            }
-
-            //goal = induction(pgt, it)
-            Truth pgt = preconditionConcept.goal(when, now, nar.dur());
-            if (pgt != null) {
-                Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), itt, 0 /* gather anything */);
-                if (y != null) {
-                    goal.add(y);
-                    gain += y.conf();
-                }
-            }
-
-        }
-
-        return gain;
-    }
+//    Truth[] linkTruth(long when, long now, float minConf) {
+//        List<Truth> belief = $.newArrayList(0);
+//        List<Truth> goal = $.newArrayList(0);
+//
+//        int dur = nar.dur();
+//
+//        int numTermLinks = termlinks().size();
+//        if (numTermLinks > 0) {
+//            float termLinkFeedbackRate = 1f / numTermLinks; //conf to priority boost conversion rate
+//            termlinks().forEach(tll -> {
+//                float g = linkTruth(tll.get(), belief, goal, when, now, dur);
+//                if (g > 0)
+//                    tll.priAdd(g * termLinkFeedbackRate);
+//            });
+//        }
+//        int numTaskLinks = tasklinks().size();
+//        if (numTaskLinks > 0) {
+//            float taskLinkFeedbackRate = 1f / numTaskLinks; //conf to priority boost conversion rate
+//            tasklinks().forEach(tll -> {
+//                Task task = tll.get();
+//                if (!task.isDeleted()) {
+//                    float g = linkTruth(task.term(), belief, goal, when, now, dur);
+//                    if (g > 0)
+//                        tll.priAdd(g * taskLinkFeedbackRate);
+//                }
+//            });
+//        }
+//
+//
+//        Truth b = Revision.revise(belief, minConf);
+//        Truth g = Revision.revise(goal, minConf);
+//        //System.out.println(belief.size() + "=" + b + "\t" + goal.size() + "=" + g);
+//
+//        return new Truth[]{b, g};
+//
+//    }
+//
+//    private float linkTruth(Term t, List<Truth> belief, List<Truth> goal, long when, long now, int dur) {
+//        float gain = 0;
+//
+//        t = nar.post(t);
+//
+//        Compound thisTerm = term();
+//        if (t.op() == IMPL) {
+//            //    B, (A ==> C), task(positive), time(decomposeBelief) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+//
+//            Compound ct = (Compound) t;
+//            Term postCondition = ct.term(1);
+//
+//            if (postCondition.equals(thisTerm)) {
+//
+//
+//                //a termlink to an implication in which the postcondition is this concept
+//                Concept implConcept = nar.concept(t);
+//                if (implConcept != null) {
+//
+//                    //TODO match the task and subtract the dt
+//                    Task it = implConcept.beliefs().match(when, now, dur); //implication belief
+//                    if (it != null) {
+//                        int dt = it.dt();
+//                        if (dt == DTERNAL)
+//                            dt = 0;
+//
+//                        Truth itt = it.truth();
+//                        Term preCondition = nar.post(ct.term(0));
+//
+//                        gain += linkTruthImpl(itt, preCondition, when - dt, now, belief, goal, nar);
+//                    }
+//                }
+//            }
+//        } else if (t.op() == CONJ) {
+//            //TODO
+//        } else if (t.op() == EQUI) {
+//            //TODO
+//            Compound c = (Compound) t;
+//            Term other = null;
+//            boolean first = false;
+//
+//            //TODO handle negated case
+//
+//            if (c.term(0).equals(thisTerm)) {
+//                other = c.term(1);
+//                first = true;
+//            } else if (c.term(1).equals(thisTerm)) {
+//                other = c.term(0);
+//                first = false;
+//            }
+//
+//            if (other != null && !other.equals(thisTerm)) {
+//
+//                //a termlink to an implication in which the postcondition is this concept
+//                Concept equiConcept = nar.concept(t);
+//                if (equiConcept != null) {
+//
+//                    //TODO refactor to: linkTruthEqui
+//
+//
+//                    //TODO match the task and subtract the dt
+//                    Task it = equiConcept.beliefs().match(when, now, dur); //implication belief
+//                    if (it != null) {
+//                        int dt = it.dt();
+//                        if (dt == DTERNAL)
+//                            dt = 0;
+//                        if (!first)
+//                            dt = -dt;
+//
+//                        long whenActual = when + dt;
+//
+//                        Truth itt = it.truth();
+//
+//
+//                        Concept otherConcept = nar.concept(other);
+//                        if (otherConcept != null) {
+//                            //    B, (A <=> C), belief(positive), time(decomposeBelief), neqCom(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+//
+//                            Truth pbt = otherConcept.belief(whenActual, now, nar.dur());
+//                            if (pbt != null) {
+//                                Truth y = TruthFunctions.analogy(pbt, itt, 0);
+//                                if (y != null) {
+//                                    belief.add(y);
+//                                    gain += y.conf();
+//                                }
+//                            }
+//
+//                            Truth pgt = otherConcept.belief(whenActual, now, nar.dur());
+//                            if (pgt != null) {
+//                                Truth y = TruthFunctions.deduction(pbt, itt, 0);
+//                                if (y != null) {
+//                                    goal.add(y);
+//                                    gain += y.conf();
+//                                }
+//
+//                            }
+//
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return gain;
+//    }
+//
+//
+//    public static float linkTruthImpl(Truth itt, Term preCondition, long when, long now, List<Truth> belief, List<Truth> goal, NAR nar) {
+//        float gain = 0;
+//
+//        boolean preCondNegated = preCondition.op() == NEG;
+//
+//        Concept preconditionConcept = nar.concept(preCondition);
+//        if (preconditionConcept != null) {
+//
+//            //belief = deduction(pbt, it)
+//            Truth pbt = preconditionConcept.belief(when, now, nar.dur());
+//            if (pbt != null) {
+//                Truth y = TruthFunctions.deduction(pbt.negIf(preCondNegated), itt, 0 /* gather anything */);
+//                if (y != null) {
+//                    belief.add(y);
+//                    gain += y.conf();
+//                }
+//            }
+//
+//            //goal = induction(pgt, it)
+//            Truth pgt = preconditionConcept.goal(when, now, nar.dur());
+//            if (pgt != null) {
+//                Truth y = TruthFunctions.induction(pgt.negIf(preCondNegated), itt, 0, /* gather anything */dur);
+//                if (y != null) {
+//                    goal.add(y);
+//                    gain += y.conf();
+//                }
+//            }
+//
+//        }
+//
+//        return gain;
+//    }
 
 //    @Override
 //    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {

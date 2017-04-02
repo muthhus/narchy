@@ -27,7 +27,7 @@ public enum GoalFunction implements TruthOperator {
     Weak() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireWeakOriginal(T, B, minConf);
+            return (T == null || B == null) ? null : desireWeakOriginal(T, B, minConf, m.dur());
         }
     },
 
@@ -64,7 +64,7 @@ public enum GoalFunction implements TruthOperator {
     Induction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireInd(T, B, minConf);
+            return (T == null || B == null) ? null : desireInd(T, B, minConf, m.dur());
         }
     },
 

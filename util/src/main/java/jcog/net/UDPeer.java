@@ -523,14 +523,11 @@ public class UDPeer extends UDP {
             return;
         }
 
+        InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
+
         switch (cmd) {
             case PING:
-                InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
                 sendPong(remote, m); //continue below
-                if (connected==null && them.size() < them.capacity()) {
-                    //ping them to consider adding as peer
-                    ping(remote);
-                }
                 break;
             case WHO:
                 m.dataAddresses(this::ping);
@@ -545,7 +542,10 @@ public class UDPeer extends UDP {
 
 
         if (connected == null) {
-
+            if (them.size() < them.capacity()) {
+                //ping them to consider adding as peer
+                ping(remote);
+            }
         } else {
             connected.lastMessage = now;
         }

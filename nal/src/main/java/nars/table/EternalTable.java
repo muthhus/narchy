@@ -178,6 +178,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Truth newBeliefTruth = input.truth();
 
+        int dur = nar.dur();
 
         for (int i = 0; i < bsize; i++) {
             Task x = (Task) list[i];
@@ -209,7 +210,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
+            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, bestConf, dur);
 
             //avoid a weak or duplicate truth
             if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
@@ -232,8 +233,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-        final float newBeliefWeight = input.evi();
-        float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
+        final float newBeliefWeight = input.evi(dur);
+        float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi(dur));
         Compound t = compoundOrNull(Revision.intermpolate(
                 input.term(), oldBelief.term(),
                 aProp,
@@ -250,7 +251,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 ETERNAL, ETERNAL,
                 concept
         );
-        r.budget(oldBelief, input);
+        r.budget(oldBelief, input, dur);
         return r.log("Insertion Revision");
     }
 

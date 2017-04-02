@@ -199,8 +199,8 @@ public interface Truth extends Truthed {
 
 
 
-    default Truth eviMult(float f) {
-        return (f == 1f) ? this : withConf(w2c(evi() * f));
+    default Truth eviMult(float f, int dur) {
+        return (f == 1f) ? this : withConf(w2c(evi(dur) * f,  dur));
     }
 
     @Nullable Truth withConf(float f);
@@ -233,9 +233,9 @@ public interface Truth extends Truthed {
         return negate ? negated() : this;
     }
 
-    default float eternalizedConf() {
-        return TruthFunctions.eternalize(conf());
-    }
+//    default float eternalizedConf() {
+//        return TruthFunctions.eternalize(conf());
+//    }
 //    default float eternalizedConfWeight() {
 //        //TODO does this simplify?
 //        return c2w(TruthFunctions.eternalize(conf()));
@@ -272,9 +272,9 @@ public interface Truth extends Truthed {
         return conf(); //c2w(w2c(conf)) = conf
     }
 
-    default Truth eternalized() {
-        return $.t(freq(), eternalizedConf());
-    }
+//    default Truth eternalized() {
+//        return $.t(freq(), eternalizedConf());
+//    }
 
 
 //    static <T extends Truthed> T minConf(T a, T b) {

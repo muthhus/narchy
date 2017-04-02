@@ -23,7 +23,6 @@ package nars.truth;
 import jcog.Util;
 import nars.$;
 import nars.Param;
-import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,23 +30,25 @@ import java.util.List;
 
 import static jcog.Util.clamp;
 import static nars.$.t;
+import static nars.util.UtilityFunctions.and;
+import static nars.util.UtilityFunctions.or;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules
  */
-public final class TruthFunctions extends UtilityFunctions {
+public final class TruthFunctions  {
     public static final float MAX_CONF = 1f - Param.TRUTH_EPSILON;
 
     /* ----- Single argument functions, called in MatchingRules ----- */
     /**
      * {<A ==> B>} |- <B ==> A>
      * @param t Truth value of the premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth conversion(@NotNull Truth t, float minConf) {
+    public static Truth conversion(@NotNull Truth t, float minConf, int dur) {
         float w = and(t.freq(), t.conf());
-        float c = w2c(w);
+        float c = w2c(w, dur);
         return t(1, c, minConf);
     }
 
@@ -77,11 +78,11 @@ public final class TruthFunctions extends UtilityFunctions {
     /**
      * {<A ==> B>} |- <(--, B) ==> (--, A)>
      * @param t Truth value of the premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth contraposition(@NotNull Truth t, float minConf) {
-        float c = w2c(and(1 - t.freq(), t.conf()));
+    public static Truth contraposition(@NotNull Truth t, float minConf, int dur) {
+        float c = w2c(and(1 - t.freq(), t.conf()), dur);
         return (c < minConf) ? null : t(0, c);
     }
 
@@ -162,11 +163,11 @@ public final class TruthFunctions extends UtilityFunctions {
      * {<S ==> M>, <P ==> M>} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
+     * @param dur
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    @Nullable
-    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float c = w2c(and(b.freq(), a.conf(), b.conf()));
+    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
+        float c = w2c(and(b.freq(), a.conf(), b.conf()), dur);
         return (c < minConf) ? null : t(a.freq(), c);
     }
 
@@ -189,29 +190,29 @@ public final class TruthFunctions extends UtilityFunctions {
      * {<M ==> S>, <M ==> P>} |- <S ==> P>
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        return abduction(v2, v1, minConf);
+    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf, int dur) {
+        return abduction(v2, v1, minConf, dur);
     }
 
     /**
      * {<M ==> S>, <P ==> M>} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
+    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
+        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()), dur);
         return c < minConf ? null : t(1, c);
     }
 
 
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        return comparison(a, b, false, minConf);
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
+        return comparison(a, b, false, minConf, dur);
     }
 
     /**
@@ -221,7 +222,7 @@ public final class TruthFunctions extends UtilityFunctions {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf, int dur) {
         float f1 = a.freq();
         if (invertA) f1 = 1 - f1;
 
@@ -229,7 +230,7 @@ public final class TruthFunctions extends UtilityFunctions {
 
 
         float f0 = or(f1, f2);
-        float c = w2c(and(f0, a.conf(), b.conf()));
+        float c = w2c(and(f0, a.conf(), b.conf()), dur);
         if (c < minConf)
             return null;
 
@@ -262,21 +263,21 @@ public final class TruthFunctions extends UtilityFunctions {
         float c = and(a.conf(), b.conf(), bFreq);
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
+//    /**
+//     * A function specially designed for desire value [To be refined]
+//     */
+//    @Nullable public static Truth desireWeakNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
+//        float aFreq = a.freq();
+//        float bFreq = b.freq();
+//        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
+//        return c < minConf ? null : desire(aFreq, bFreq, c);
+//    }
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireWeakNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float aFreq = a.freq();
+    public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
         float bFreq = b.freq();
-        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
-        return c < minConf ? null : desire(aFreq, bFreq, c);
-    }
-    /**
-     * A function specially designed for desire value [To be refined]
-     */
-    @Nullable public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float bFreq = b.freq();
-        float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f));
+        float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f, dur));
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
     @NotNull static Truth desire(float f1, float f2, float c) {
@@ -301,11 +302,11 @@ public final class TruthFunctions extends UtilityFunctions {
      * A function specially designed for desire value [To be refined]
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
-        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
+    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf, int dur) {
+        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()), dur);
         return c < minConf ? null : t(v1.freq(), c);
     }
 
@@ -421,12 +422,11 @@ public final class TruthFunctions extends UtilityFunctions {
      * {(&&, <#x() ==> M>, <#x() ==> P>), S ==> M} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
+     * @param dur
      * @return Truth value of the conclusion
      */
-    @Nullable
-    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        float c1 = a.conf();
-        float v0c = w2c(c1);
+    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
+        float v0c = w2c(a.conf(), dur);
         //since in analogy it will be and() with it, if it's already below then stop
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
     }
@@ -465,9 +465,9 @@ public final class TruthFunctions extends UtilityFunctions {
 
 
 
-    public static float eternalize(float conf) {
-        return w2c(conf);
-    }
+//    public static float eternalize(float conf) {
+//        return w2c(conf);
+//    }
 
 
     /**
@@ -475,9 +475,9 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param c confidence, in [0, 1)
      * @return The corresponding weight of evidence, a non-negative real number
      */
-    public static float c2w(float c) {
+    public static float c2w(float c, float horizon) {
         c = clamp(c, 0, MAX_CONF);
-        return Param.HORIZON * c / (1f - c);
+        return horizon * c / (1f - c);
     }
 
     /**
@@ -485,8 +485,8 @@ public final class TruthFunctions extends UtilityFunctions {
      * @param w Weight of evidence, a non-negative real number
      * @return The corresponding confidence, in [0, 1)
      */
-    public static float w2c(float w) {
-        return clamp(w / (w + Param.HORIZON), 0, MAX_CONF);
+    public static float w2c(float w, float horizon) {
+        return clamp(w / (w + horizon), 0, MAX_CONF);
     }
 
     public static float confAnd(@NotNull Iterable<? extends Truthed> tt) {

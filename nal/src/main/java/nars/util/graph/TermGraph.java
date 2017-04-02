@@ -125,7 +125,7 @@ public abstract class TermGraph {
             } else {
                 reverse = false;
             }
-            float conf = dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
+            float conf = dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(dur), dur, dt), nar.dur()) : t.conf();
 
             float freq = t.freq();
             boolean neg;

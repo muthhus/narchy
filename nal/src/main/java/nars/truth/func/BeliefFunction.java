@@ -43,7 +43,7 @@ public enum BeliefFunction implements TruthOperator {
     StructuralAbduction() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
-            return (B != null) ? TruthFunctions.abduction(B, defaultTruth(m), minConf) : null;
+            return (B != null) ? TruthFunctions.abduction(B, defaultTruth(m), minConf, m.dur()) : null;
         }
     },
 
@@ -69,7 +69,7 @@ public enum BeliefFunction implements TruthOperator {
     Induction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T, B, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.induction(T, B, minConf, m.dur());
         }
     },
 
@@ -91,7 +91,7 @@ public enum BeliefFunction implements TruthOperator {
     Abduction() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf, m.dur());
         }
     },
 
@@ -105,7 +105,7 @@ public enum BeliefFunction implements TruthOperator {
     Comparison() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : TruthFunctions.comparison(T, B, minConf);
+            return ((B == null) || (T == null)) ? null : TruthFunctions.comparison(T, B, minConf, m.dur());
         }
     },
 
@@ -119,7 +119,7 @@ public enum BeliefFunction implements TruthOperator {
     Conversion() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (B == null) ? null : TruthFunctions.conversion(B, minConf);
+            return (B == null) ? null : TruthFunctions.conversion(B, minConf, m.dur());
         }
     },
 
@@ -135,7 +135,7 @@ public enum BeliefFunction implements TruthOperator {
     Contraposition() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null) ? null : TruthFunctions.contraposition(T, minConf);
+            return (T == null) ? null : TruthFunctions.contraposition(T, minConf, m.dur());
         }
     },
 
@@ -202,14 +202,14 @@ public enum BeliefFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.anonymousAnalogy(T,B,minConf);
+            return TruthFunctions.anonymousAnalogy(T,B,minConf, m.dur());
         }
     },
     Exemplification() {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             if (B == null || T == null) return null;
-            return TruthFunctions.exemplification(T, B, minConf);
+            return TruthFunctions.exemplification(T, B, minConf, m.dur());
         }
     },
 
@@ -290,7 +290,7 @@ public enum BeliefFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
             if (B == null) return null;
-            return TruthFunctions.abduction(B, $.t(1f, defaultConfidence(m)), minConf);
+            return TruthFunctions.abduction(B, $.t(1f, defaultConfidence(m)), minConf, m.dur());
         }
     },
 

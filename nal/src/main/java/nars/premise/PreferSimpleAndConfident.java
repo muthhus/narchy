@@ -153,12 +153,12 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             ;
     }
 
-    protected float confidencePreservationFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
-        float w = truth.evi();
-        return 1f - unitize(
-                (conclude.premiseEvidence - w) / (conclude.premiseEvidence + w)
-            //truth.conf() / w2c( conclude.premiseEvidence )
-        );
-    }
+//    protected float confidencePreservationFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
+//        float w = truth.evi(dur);
+//        return 1f - unitize(
+//                (conclude.premiseEvidence - w) / (conclude.premiseEvidence + w)
+//            //truth.conf() / w2c( conclude.premiseEvidence )
+//        );
+//    }
 
 }

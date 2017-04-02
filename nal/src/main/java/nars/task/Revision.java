@@ -32,11 +32,11 @@ public class Revision {
     public static final Logger logger = LoggerFactory.getLogger(Revision.class);
 
     @Nullable
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf) {
-        float w1 = a.evi() * factor;
-        float w2 = b.evi() * factor;
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf, int dur) {
+        float w1 = a.evi(dur) * factor;
+        float w2 = b.evi(dur) * factor;
         float w = (w1 + w2);
-        float c = w2c(w);
+        float c = w2c(w, dur);
         return c < minConf ?
                 null :
                 $.t(
@@ -46,18 +46,18 @@ public class Revision {
     }
 
     @Nullable
-    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf) {
+    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf, int dur) {
         float f = 0;
         float w = 0;
         for (Truthed x : aa) {
-            float e = x.evi();
+            float e = x.evi(dur);
             w += e;
             f += x.freq() * e;
         }
         if (w <= 0)
             return null;
 
-        float c = w2c(w);
+        float c = w2c(w, dur);
         return c < minConf ? null :
                 $.t(
                   (f) / w,
@@ -65,13 +65,12 @@ public class Revision {
                 );
     }
 
-    @Nullable
-    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
-        float w1 = a.evi();
-        float w2 = b.evi();
+    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf, int dur) {
+        float w1 = a.evi(dur);
+        float w2 = b.evi(dur);
         float w = (w1+w2) * evidenceFactor;
 
-        if (w2c(w) >= minConf) {
+        if (w2c(w, dur) >= minConf) {
             //find the right balance of frequency
             float w1f = aFrequencyBalance * w1;
             float w2f = (1f-aFrequencyBalance) * w2;
@@ -88,7 +87,7 @@ public class Revision {
 //
 //            w -= fError;
 
-            float c = w2c(w);
+            float c = w2c(w, dur);
             if (c >= minConf) {
                 return $.t(f, c);
             }
@@ -99,19 +98,20 @@ public class Revision {
     }
 
 
-    @Nullable
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
-        return revise(a, b, 1f, 0f);
+
+
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, int dur) {
+        return revise(a, b, 1f, 0f, dur);
     }
 
 
 
 
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
+    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose, int dur) {
         assert (a.punc() == b.punc());
 
-        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
-        float bw = b.evi();
+        float aw = a.isQuestOrQuestion() ? 0 : a.evi(dur); //question
+        float bw = b.evi(dur);
 
         float aProp = aw / (aw + bw);
 
@@ -257,8 +257,9 @@ public class Revision {
         if ((b == null) || !b.isBeliefOrGoal())
             return t;
 
-        float tw = t.evi();
-        float bw = b.evi();
+        int dur = p.nar.dur();
+        float tw = t.evi(dur);
+        float bw = b.evi(dur);
 
         //randomize choice by confidence
         return p.random.nextFloat() < tw/(tw+bw) ? t : b;

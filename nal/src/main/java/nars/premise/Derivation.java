@@ -146,7 +146,7 @@ public class Derivation extends Unify {
         this.taskPunct = task.punc();
 
 
-
+        int dur = nar.dur();
         if (belief == null) {
             this.beliefTruth = this.beliefTruthRaw = null;
         } else {
@@ -156,7 +156,7 @@ public class Derivation extends Unify {
                 //??
             } else {
                 //project
-                beliefTruth = belief.truth(start, nar.dur(), confMin); //project belief truth to task's time
+                beliefTruth = belief.truth(start, dur, confMin); //project belief truth to task's time
             }
             this.beliefTruth = beliefTruth;
         }
@@ -202,9 +202,9 @@ public class Derivation extends Unify {
 
         this.target = c;
 
-        float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
+        float premiseEvidence = task.isBeliefOrGoal() ? task.evi(dur) : 0;
         if (belief!=null)
-            premiseEvidence = Math.max(premiseEvidence, belief.evi());
+            premiseEvidence = Math.max(premiseEvidence, belief.evi(dur));
         this.premiseEvidence = premiseEvidence;
 
     }

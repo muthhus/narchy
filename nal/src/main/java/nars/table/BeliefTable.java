@@ -216,10 +216,10 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return t != null ? t.expectation() : 0.5f;
     }
 
-    default float motivation(long when, int dur) {
-        Truth t = truth(when, dur);
-        return t != null ? t.motivation() : 0;
-    }
+//    default float motivation(long when, int dur) {
+//        Truth t = truth(when, dur);
+//        return t != null ? t.motivation() : 0;
+//    }
 
     default float freq(long when, int dur) {
         Truth t = truth(when, dur);

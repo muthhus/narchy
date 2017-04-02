@@ -66,8 +66,8 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     public void accept(NAR nar) {
         long now = nar.time();
         int dur = nar.dur();
-        beliefIntegrated.add( belief( now, dur ));
-        goalIntegrated.add( goal( now, dur ));
+        beliefIntegrated.add( belief( now, dur ), dur);
+        goalIntegrated.add( goal( now, dur ), dur);
     }
 
     @Override

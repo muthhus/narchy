@@ -9,8 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.sqr;
-import static nars.Param.TRUTH_EPSILON;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -32,8 +30,6 @@ public enum TruthPolation  {
         //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
 
     }
-
-    final static float MIN_ILLUMINATION = c2w(TRUTH_EPSILON);
 
     @Nullable
     public static Truth truth(long when, int dur, @NotNull Task... tasks) {
@@ -61,16 +57,13 @@ public enum TruthPolation  {
         float weightedValue = illWei[1];
 
         if (topEternal!=null) {
-            float ew = topEternal.evi();
+            float ew = topEternal.evi(dur);
             illumination += ew;
             weightedValue += ew * topEternal.freq();
         }
 
-        if (illumination < MIN_ILLUMINATION)
-            return null;
-
         float f = weightedValue / illumination;
-        float c = w2c(illumination);
+        float c = w2c(illumination, dur);
 
         return $.t(f, c);
     }

@@ -468,8 +468,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Interval timeOverlap = ai.intersection(bi);
 
         if (timeOverlap != null) {
-            float aw = a.evi();
-            float bw = b.evi();
+            float aw = a.evi(dur);
+            float bw = b.evi(dur);
 
             float aa = aw * (1 + ai.length());
             float bb = bw * (1 + bi.length());
@@ -490,11 +490,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             Interval union = ai.union(bi);
             float timeDiscount = rangeEquality + (1f-rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
 
-            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
+            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin, dur);
             if (t!=null) {
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
-                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, dur);
             }
         }
 

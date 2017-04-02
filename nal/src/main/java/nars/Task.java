@@ -73,7 +73,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
         Truth t = truth();
         long a = start();
-        float cw = t.evi();
+        float cw = t.evi(dur);
 
         if (a == ETERNAL)
             return cw;
@@ -596,7 +596,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     default float conf(long when, int dur) {
         float cw = evi(when, dur);
-        return cw == cw ? w2c(cw) : Float.NaN;
+        return cw == cw ? w2c(cw, dur) : Float.NaN;
     }
 
     @Nullable
@@ -604,7 +604,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         float cw = evi(when, dur);
         if (cw == cw && cw > 0) {
 
-            float conf = w2c(cw);
+            float conf = w2c(cw, dur);
             if (conf > minConf) {
                 return $.t(freq(), conf);
             }
@@ -765,16 +765,16 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         return this;
     }
 
-    default Task eternalized() {
-        if (isEternal()) {
-            return this;
-        } else {
-            Truth t = truth();
-            ImmutableTask y = ImmutableTask.Eternal(term(), punc(), t!=null ? t.eternalized() : null, creation(), stamp());
-            y.budgetSafe(budget());
-            return y;
-        }
-    }
+//    default Task eternalized() {
+//        if (isEternal()) {
+//            return this;
+//        } else {
+//            Truth t = truth();
+//            ImmutableTask y = ImmutableTask.Eternal(term(), punc(), t!=null ? t.eternalized() : null, creation(), stamp());
+//            y.budgetSafe(budget());
+//            return y;
+//        }
+//    }
 
     default boolean contains(long when) {
         long start = start();

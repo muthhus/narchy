@@ -36,17 +36,17 @@ public class BeliefActionConcept extends ActionConcept {
     @Override
     public Task apply(NAR nar) {
 
-        Truth belief = beliefIntegrated.commitAverage();
+        int dur = nar.dur();
+        Truth belief = beliefIntegrated.commitAverage(dur);
         action.accept(belief);
 
-        Truth goal = goalIntegrated.commitAverage();
+        Truth goal = goalIntegrated.commitAverage(dur);
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
             Truth t = $.t(goal.freq(), goal.conf() * rate);
             if (t!=null) {
                 long now = nar.time();
-                int dur = nar.dur();
                 return new ImmutableTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
             }
         }
