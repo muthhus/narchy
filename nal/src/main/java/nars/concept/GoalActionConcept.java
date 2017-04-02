@@ -1,22 +1,15 @@
 package nars.concept;
 
 import jcog.data.FloatParam;
-import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.task.Revision;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
-import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 
 /**

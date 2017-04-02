@@ -43,7 +43,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     public static final float FPS = 0f;
 
-    private static final float DUR = 0.05f;
+    private static final float DUR = 0.04f;
 
     /** priority shared by all tetris field pixels */
     public final FloatParam pixelPri;
@@ -521,11 +521,11 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
-        //Param.HORIZON = 1/100f;
 
-        Time clock = new RealTime.DSHalf(true).durSeconds(DUR);
+        Time clock = new RealTime.CS(true)
+                .durSeconds(DUR);
         NAR n =
-                NARBuilder.newMultiThreadNAR(-1, clock);
+                NARBuilder.newMultiThreadNAR(3, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 //        n.onTask((t)->{
@@ -676,7 +676,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             Default m = new Default(512, 16, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
-                    new RealTime.DSHalf().durSeconds(0.15f));
+                    new RealTime.DSHalf().durSeconds(0.2f));
 
             float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);

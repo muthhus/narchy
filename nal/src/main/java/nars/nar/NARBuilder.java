@@ -56,8 +56,8 @@ public interface NARBuilder {
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
-                new DefaultConceptState("sleep", 16, 16, 6, 16, 8),
-                new DefaultConceptState("awake", 16, 16, 6, 32, 24)
+                new DefaultConceptState("sleep", 16, 16, 3, 16, 8),
+                new DefaultConceptState("awake", 16, 16, 4, 24, 12)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {
@@ -79,7 +79,7 @@ public interface NARBuilder {
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                1, 4, rng,
+                1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -188,10 +188,10 @@ public interface NARBuilder {
         };
 
         nar.deriver.conceptsFiredPerCycle.setValue(512);
-        nar.deriver.conceptsFiredPerBatch.setValue(32);
+        nar.deriver.conceptsFiredPerBatch.setValue(16);
         nar.deriver.derivationsInputPerCycle.setValue(256);
 
-        nar.termVolumeMax.setValue(48);
+        nar.termVolumeMax.setValue(72);
 
         //Param.HORIZON = 4; //EXPERIMENTAL
 

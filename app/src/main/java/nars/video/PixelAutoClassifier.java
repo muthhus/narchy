@@ -127,6 +127,8 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
         //List<Task> tasks = $.newArrayList();
 
+        int dur = nar.dur();
+
         for (int i = 0; i < nw; ) {
             for (int j = 0; j < nh; ) {
 
@@ -167,7 +169,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
                         if (features != null) {
                             //if (features.length < maxStatesPerRegion) {
                                 evi /= features.length;
-                                if ((pixConf[i][j] = (baseConf * w2c(evi))) >= minConf) {
+                                if ((pixConf[i][j] = (baseConf * w2c(evi, dur))) >= minConf) {
                                     po = features;
                                 }
                             //}
