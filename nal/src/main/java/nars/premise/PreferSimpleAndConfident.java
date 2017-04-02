@@ -8,7 +8,6 @@ import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

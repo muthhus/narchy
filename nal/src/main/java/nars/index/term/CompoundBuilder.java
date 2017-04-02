@@ -1,12 +1,8 @@
 package nars.index.term;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import nars.Op;
-import nars.index.TermBuilder;
-import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
-import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.hashCombine;
 

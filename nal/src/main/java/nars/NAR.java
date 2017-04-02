@@ -3,7 +3,6 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.bag.Bag;
-import nars.util.data.Mix;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
 import jcog.data.MutableInteger;
@@ -39,6 +38,7 @@ import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.util.Cycles;
+import nars.util.data.Mix;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;

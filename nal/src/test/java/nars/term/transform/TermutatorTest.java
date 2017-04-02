@@ -98,7 +98,7 @@ public class TermutatorTest {
     @Test public void testChoose2_4() {
 
         Set<String> series = new HashSet();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             series.add(
                     assertTermutatorProducesUniqueResults(
                             new Choose2(f, e1,

@@ -56,11 +56,12 @@ public class TermFunctionTest {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default());
+        t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         //t.believe("--(2<->3)");
         t.ask("c3(x:y)");
         //t.ask("c3((x))");
-        t.mustBelieve(128, "c3(x:y)", 1f, 0.81f);
+        t.mustBelieve(512, "c3(x:y)", 1f, 0.81f);
         t.run(true);
     }
 
@@ -68,9 +69,9 @@ public class TermFunctionTest {
     public void testFunctor2() {
         //Param.DEBUG = true;
 
-        int TIME = 256;
+        int TIME = 512;
         TestNAR t = new TestNAR(new Default(1024, 8, 2));
-        t.nar.termVolumeMax.setValue(16);
+        t.nar.termVolumeMax.setValue(32);
         //t.log();
         t.believe("(equal(complexity($1),$2) ==> c($1,$2))");
         t.ask("c(x, 1)");

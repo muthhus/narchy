@@ -1,22 +1,15 @@
 package nars.bag.impl;
 
-import jcog.bag.Bag;
-import jcog.bag.Priority;
-import jcog.bag.impl.HijackBag;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 2/17/17.

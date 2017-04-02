@@ -1,13 +1,15 @@
 package nars.index.term;
 
-import nars.*;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
+import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.TermBuilder;
 import nars.premise.Derivation;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -26,11 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.term.Term.False;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -136,20 +136,20 @@ public abstract class TermIndex extends TermBuilder {
 //        }
 //    }
 
-    @NotNull
-    private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
-        try {
-            return super.the(o, dt, u);
-            //return t == null ? False : t;
-        } catch (@NotNull InvalidTermException | InvalidTaskException x) {
-            if (Param.DEBUG_EXTRA) {
-                logger.warn("{x} : {} {} {}", x, o, dt, u);
-            }
-        } catch (Throwable e) {
-            logger.error("{x} : {} {} {}", e, o, dt, u);
-        }
-        return False; //place a False placeholder so that a repeat call will not have to discover this manually
-    }
+//    @NotNull
+//    private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
+//        try {
+//            return super.the(o, dt, u);
+//            //return t == null ? False : t;
+//        } catch (@NotNull InvalidTermException | InvalidTaskException x) {
+//            if (Param.DEBUG_EXTRA) {
+//                logger.warn("{x} : {} {} {}", x, o, dt, u);
+//            }
+//        } catch (Throwable e) {
+//            logger.error("{x} : {} {} {}", e, o, dt, u);
+//        }
+//        return False; //place a False placeholder so that a repeat call will not have to discover this manually
+//    }
 
 
     /**

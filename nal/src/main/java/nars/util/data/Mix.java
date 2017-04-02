@@ -1,6 +1,5 @@
 package nars.util.data;
 
-import jcog.bag.Prioritized;
 import jcog.data.FloatParam;
 import nars.budget.Budgeted;
 

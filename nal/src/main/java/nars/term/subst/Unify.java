@@ -2,7 +2,6 @@ package nars.term.subst;
 
 import jcog.list.FasterList;
 import jcog.version.VersionMap;
-import jcog.version.Versioned;
 import jcog.version.Versioning;
 import nars.$;
 import nars.Op;

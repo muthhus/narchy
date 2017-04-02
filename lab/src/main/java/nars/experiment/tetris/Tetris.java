@@ -671,12 +671,12 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
         Tetris a = new MyTetris(n);
-        //a.trace = true;
+        a.trace = true;
         NAgentX.chart(a);
 
             Default m = new Default(512, 16, 2, n.random,
                     new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
-                    new RealTime.DSHalf().durSeconds(0.05f));
+                    new RealTime.DSHalf().durSeconds(0.15f));
 
             float metaLearningRate = 0.75f;
             m.confMin.setValue(0.01f);

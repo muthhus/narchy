@@ -1,7 +1,5 @@
 package nars.bag.impl;
 
-import jcog.bag.Bag;
-import nars.NAR;
 import nars.Param;
 import nars.attention.Forget;
 import nars.budget.BLink;

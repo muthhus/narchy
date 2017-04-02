@@ -53,7 +53,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
         if (v instanceof WiredConcept) return 0;
-        return v.volume();
+        int vol = v.volume();
+        //return vol;
+        return vol*vol;
     };
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
@@ -71,7 +73,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
             //builder.maximumSize(capacity);
-            builder.maximumWeight(capacity * 12);
+            builder.maximumWeight(capacity * 100);
             builder.weigher(w);
         } else
             builder.softValues();
