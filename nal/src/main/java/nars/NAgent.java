@@ -2,7 +2,6 @@ package nars;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
@@ -18,6 +17,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.Loop;
+import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -51,7 +51,6 @@ abstract public class NAgent implements NSense, NAct {
     public final NAR nar;
 
 
-
     public final List<SensorConcept> sensors = newArrayList();
 
     public final List<ActionConcept> actions = newArrayList();
@@ -63,7 +62,6 @@ abstract public class NAgent implements NSense, NAct {
     public final SensorConcept happy;
 
 
-
     /**
      * lookahead time in durations (multiples of duration)
      */
@@ -71,6 +69,9 @@ abstract public class NAgent implements NSense, NAct {
 
 
     public final FloatParam predictorProbability = new FloatParam(1f);
+    private final Mix.MixStream sense;
+    private final Mix.MixStream ambition;
+    private final Mix.MixStream motor;
 
 
     private boolean initialized;
@@ -83,7 +84,6 @@ abstract public class NAgent implements NSense, NAct {
     public final FloatParam curiosityProb;
 
     public final List<Task> predictors = newArrayList();
-
 
 
     public boolean trace = false;
@@ -137,7 +137,9 @@ abstract public class NAgent implements NSense, NAct {
         curiosityConf = new FloatParam(nar.confMin.floatValue() * 5);
         curiosityProb = new FloatParam(0.5f);
 
-        nar.mix.gain(this, 1f);
+        this.sense = nar.mix.stream(id + " sensor");
+        this.ambition = nar.mix.stream(id + " ambition");
+        this.motor = nar.mix.stream(id + " motor");
     }
 
     @NotNull
@@ -224,40 +226,38 @@ abstract public class NAgent implements NSense, NAct {
         long next = now
                 //+dur
                 //+(dur * 3 / 2);
-        ;
-
+                ;
 
         long frameTime = now - lastNow;
+
         nar.input(
-                nar.mix.input(this, nextInput(next))
-                //,  priority.floatValue() * frameTime/dur
+                ambition.input(
+                        Stream.concat(
+                            Stream.of(happy.apply(nar)),
+                            predict(now)
+                        )
+                )
         );
-
-
-//        } else {
-//            logger.warn("sensor overwhelm: load={}",load);
-//        }
+        nar.input(
+                motor.input(
+                        Stream.concat(
+                                actionStream().map(a -> a.apply(nar)),
+                                curious(next))
+                )
+        );
+        nar.input(
+            sense.input(nextInput(nar, next))
+        );
 
 
         if (trace)
             logger.info(summary());
     }
 
-    protected Stream<Task> nextInput(long next) {
-        return Streams.concat(
-
-            Streams.concat(
-                Stream.of(happy),
-                sensorStream(),
-                actionStream()
-            ).map(f -> f.apply(nar)),
-
-            predict(next),
-
-            curious(next)
-
-        ).filter(Objects::nonNull);
+    protected Stream<Task> nextInput(NAR nar, long when) {
+        return sensors.stream().map(s -> s.apply(nar));
     }
+
 
     protected Stream<ActionConcept> actionStream() {
         return actions.stream();
@@ -322,8 +322,8 @@ abstract public class NAgent implements NSense, NAct {
 
         predictors.add(
                 goal(happiness, t(1f, nar.confDefault(BELIEF /*GOAL*/)),
-                    ETERNAL
-                    //now + dur
+                        ETERNAL
+                        //now + dur
                 )
         );
 
@@ -385,7 +385,6 @@ abstract public class NAgent implements NSense, NAct {
 
 //                    question(impl(happiness, -dur, action), now),
 //                    question(impl(neg(happiness), -dur, action), now)
-
 
 
 //                    question(seq(action, dur, happiness), now),
@@ -466,7 +465,6 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-
     protected Stream<Task> predict(long next) {
 
 
@@ -476,7 +474,7 @@ abstract public class NAgent implements NSense, NAct {
         int dur = nar.dur();
         int num = predictors.size();
 
-        float pp =  predictorProbability.floatValue();
+        float pp = predictorProbability.floatValue();
 
         return IntStream.range(0, num).mapToObj(i -> {
             if (nar.random.nextFloat() > pp)
@@ -495,9 +493,10 @@ abstract public class NAgent implements NSense, NAct {
         });
     }
 
-    /** average confidence of actions
-     *  see: http://www.dictionary.com/browse/dexterity?s=t
-     * */
+    /**
+     * average confidence of actions
+     * see: http://www.dictionary.com/browse/dexterity?s=t
+     */
     public float dexterity() {
         float m = 0;
         int n = actions.size();
@@ -545,8 +544,8 @@ abstract public class NAgent implements NSense, NAct {
         }
 
         return result
-            .budget(nar)
-        ;
+                .budget(nar)
+                ;
     }
 
     public float rewardSum() {

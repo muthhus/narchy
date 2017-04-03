@@ -4,10 +4,10 @@ import jcog.data.FloatParam;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
 import nars.gui.BagChart;
+import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.task.util.TaskStatistics;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Time;
@@ -17,7 +17,6 @@ import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunctio
 import spacegraph.Surface;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meta.WindowButton;
-import spacegraph.widget.slider.FloatSlider;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -154,14 +153,7 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton( "deriverFilter", () -> ((Default)nar).derivationBudgeting ),
                     new WindowButton( "mix", () -> {
                         Default d = (Default) nar;
-                        return col(
-                            new FloatSlider(d.mix._gain.get(d.deriver))  {
-                                @Override public String labelText() {  return "deriver " + super.labelText(); }
-                            },
-                            new FloatSlider(d.mix._gain.get(a)) {
-                                @Override public String labelText() {  return "agent " + super.labelText(); }
-                            }
-                        );
+                        return new MixBoard(d, d.mix);
                     })
                 ),
 

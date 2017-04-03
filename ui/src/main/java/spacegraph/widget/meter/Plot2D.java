@@ -249,11 +249,7 @@ public class Plot2D extends Surface {
     public float[] backgroundColor = { 0, 0, 0, 0.75f };
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
-
-
         if (minValue != maxValue) {
-
-            //float m = 0; //margin
 
             gl.glColor4f(1f,1f,1f, 1f); //gray
 
@@ -264,8 +260,8 @@ public class Plot2D extends Surface {
             float H = 1.0f;
             Draw.line(gl, 0, H, W, H);
 
-            Draw.text(gl, n2(minValue), 0.1f, 0, 0, 0, Draw.TextAlignment.Left);
-            Draw.text(gl, n2(maxValue), 0.1f, 0, H, 0, Draw.TextAlignment.Left);
+            Draw.text(gl, n2(minValue), 0.04f, 0, 0, 0, Draw.TextAlignment.Left);
+            Draw.text(gl, n2(maxValue), 0.04f, 0, H, 0, Draw.TextAlignment.Left);
 
 
             for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
@@ -305,7 +301,7 @@ public class Plot2D extends Surface {
                 gl.glEnd();
 
                 gl.glLineWidth(2);
-                Draw.text(gl, s.name, 0.1f, W, ny, 0, Draw.TextAlignment.Right);
+                Draw.text(gl, s.name, 0.04f, W, ny, 0, Draw.TextAlignment.Right);
 
             }
         }

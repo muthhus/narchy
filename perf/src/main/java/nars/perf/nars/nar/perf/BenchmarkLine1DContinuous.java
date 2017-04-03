@@ -34,7 +34,7 @@ public class BenchmarkLine1DContinuous {
     @BenchmarkMode(Mode.AverageTime)
     public void line1d() {
 
-        int time = 100;
+        int time = 2500;
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
         int conceptsPerCycle = 16;

@@ -16,6 +16,7 @@ import nars.concept.Concept;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
+import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -135,12 +136,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
          * pending derivations to be input after this cycle
          */
         final TaskHijackBag pending;
+        private final Mix.MixStream in;
 
 
         public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
             super(nar, premiseBuilder);
 
-            nar.mix.gain(this, 1f);
+
+
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
 
@@ -160,6 +163,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             nar.onReset((n) -> {
                 pending.clear();
             });
+
+            this.in = nar.mix.stream("FireConcepts");
         }
 
         @Override
@@ -181,7 +186,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             if (!ready.isEmpty()) {
                 nar.runLater((n) -> {
-                    n.input(n.mix.input(FireConceptsBufferDerivations.this, ready.stream()));
+                    n.input(in.input(ready.stream()));
                 });
             }
 

@@ -76,7 +76,7 @@ public interface NARBuilder {
 
         int maxConcepts = 256 * 1024;
 
-        int activeConcepts = 4096;
+        int activeConcepts = 2048;
 
         Default nar = new Default(activeConcepts,
                 1, 3, rng,
@@ -187,11 +187,11 @@ public interface NARBuilder {
 
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(512);
-        nar.deriver.conceptsFiredPerBatch.setValue(16);
-        nar.deriver.derivationsInputPerCycle.setValue(256);
+        nar.deriver.conceptsFiredPerCycle.setValue(256);
+        nar.deriver.conceptsFiredPerBatch.setValue(8);
+        nar.deriver.derivationsInputPerCycle.setValue(64);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(72);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
