@@ -54,7 +54,7 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    protected Stream<Task> nextInput(long when) {
+    protected Stream<Task> nextInput(NAR nar, long when) {
         List<Task> q = $.newArrayList(queue.size());
         Iterator<Task> qq = queue.iterator();
         while (qq.hasNext()) {
@@ -63,7 +63,7 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         return Stream.concat(
-                super.nextInput(when),
+                super.nextInput(nar, when),
                 q.stream()
         );
     }
@@ -143,7 +143,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
 
 
-        a.runFPS(0).join();
+        a.runRT(0).join();
     }
 
     private static float similarity(char[][] a, char[][] b) {

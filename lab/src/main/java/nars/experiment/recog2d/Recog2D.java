@@ -11,7 +11,9 @@ import nars.NAgentX;
 import nars.Param;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
+import nars.nar.NARBuilder;
 import nars.term.Termed;
+import nars.time.RealTime;
 import nars.time.Tense;
 import nars.truth.Truth;
 import nars.video.CameraSensor;
@@ -61,9 +63,9 @@ public class Recog2D extends NAgentX {
 
     int image;
     final int maxImages = 4;
-    static int duration = 1;
-    int imagePeriod = duration * 16;
-    static int fps = 25;
+    static int durFPS = 3;
+    int imagePeriod = 200;
+    static int fps = 6;
     float goalInfluence = 1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
@@ -103,8 +105,8 @@ public class Recog2D extends NAgentX {
 
 
         //retina
-        Sensor2D spR = senseCameraRetina($.p(id, $.the("full")).toString(),
-                () -> canvas, w, h, v -> $.t(v, nar.confDefault(BELIEF)));
+//        Sensor2D spR = senseCameraRetina($.p(id, $.the("full")).toString(),
+//                () -> canvas, w, h, v -> $.t(v, nar.confDefault(BELIEF)));
 
         //still
         CameraSensor sp = senseCamera($.p(id, $.the("zoom")).toString(),
@@ -300,7 +302,11 @@ public class Recog2D extends NAgentX {
     }
 
     public static void main(String[] arg) {
-        NAgentX.runRT(Recog2D::new, fps, duration, -1);
+        Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
+                2,
+                new RealTime.DSHalf(true).durFPS(durFPS)));
+        a.runRT(fps);
+        NAgentX.chart(a);
     }
 
     public static class Training {

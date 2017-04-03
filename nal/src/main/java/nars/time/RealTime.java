@@ -2,6 +2,7 @@ package nars.time;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Timer;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -9,7 +10,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created by me on 7/2/15.
  */
 public abstract class RealTime implements Time {
-
 
 
     private final int unitsPerSecod;
@@ -20,6 +20,8 @@ public abstract class RealTime implements Time {
 
     final AtomicLong nextStamp = new AtomicLong(1);
     private int dur = 1;
+
+    static final public Timer timer = new Timer("Realtime");
 
 
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {
@@ -103,6 +105,11 @@ public abstract class RealTime implements Time {
     @Override
     public int dur() {
         return dur;
+    }
+
+    public Time durFPS(float fps) {
+        durSeconds(1f/fps);
+        return this;
     }
 
     /** decisecond (0.1) accuracy */

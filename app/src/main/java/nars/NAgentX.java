@@ -1,11 +1,11 @@
 package nars;
 
+import jcog.bag.Bag;
 import jcog.data.FloatParam;
+import jcog.event.On;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
-import nars.gui.BagChart;
-import nars.gui.MixBoard;
-import nars.gui.Vis;
+import nars.gui.*;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Term;
@@ -15,6 +15,7 @@ import nars.truth.Truth;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
+import spacegraph.math.Color3f;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meta.WindowButton;
 
@@ -111,7 +112,7 @@ abstract public class NAgentX extends NAgent {
         else
             chart(a);
 
-        a.runFPS(0, endTime).join();
+        a.runRT(0, endTime).join();
 
         return nar;
 
@@ -177,7 +178,31 @@ abstract public class NAgentX extends NAgent {
                 ),
 
                 grid(
-                    new WindowButton( "conceptBudget", Vis.budgetHistogram(nar, 64) ),
+                    new WindowButton( "conceptBudget",
+                            ()->{
+                                int period = 64;
+
+
+                                double[] d = new double[10];
+                                return new HistogramChart(
+                                        ()->d,
+                                        //()->h.uniformProb(32, 0, 1.0)
+                                        new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
+
+                                    int iteration = 0;
+                                    On on = nar.onCycle((r) -> {
+                                        Bag.priHistogram(nar.conceptsActive(), d);
+                                    });
+
+                                    @Override
+                                    public Surface hide() {
+                                        on.off();
+                                        return this;
+                                    }
+                                };
+                            }
+                        //Vis.budgetHistogram(nar, 64)
+                    ),
                     new WindowButton( "conceptTreeMap", () -> {
 
                         BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 128, 0.75f), 128, nar);

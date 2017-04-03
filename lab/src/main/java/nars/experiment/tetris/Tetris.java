@@ -9,6 +9,7 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -40,8 +41,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-
-    public static final float FPS = 0f;
 
     private static final float DUR = 0.04f;
 
@@ -522,8 +521,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new RealTime.CS(true)
-                .durSeconds(DUR);
+        Time clock = new FrameTime();
         NAR n =
                 NARBuilder.newMultiThreadNAR(3, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -727,7 +725,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            }
 
 
-        a.runFPS(FPS).join();
+        a.runCycles(10000);
 
 
 //        NARController meta = new NARController(nar, loop, t);

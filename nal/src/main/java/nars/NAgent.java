@@ -15,6 +15,7 @@ import nars.task.ImmutableTask;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.data.Mix;
@@ -23,9 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -202,12 +201,6 @@ abstract public class NAgent implements NSense, NAct {
     private void cycle() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-        long lastNow = this.now;
-        long now = nar.time();
-        int dur = nar.dur();
-        if (now - lastNow < dur) {
-            return; //only execute at most one agent frame per duration
-        }
 
         this.now = now;
 
@@ -227,8 +220,6 @@ abstract public class NAgent implements NSense, NAct {
                 //+dur
                 //+(dur * 3 / 2);
                 ;
-
-        long frameTime = now - lastNow;
 
         nar.input(
                 ambition.input(
@@ -426,9 +417,6 @@ abstract public class NAgent implements NSense, NAct {
 //        );
 
 
-        nar.runLater(() -> {
-            nar.onCycle(this::cycle);
-        });
 
         //System.out.println(Joiner.on('\n').join(predictors));
     }
@@ -437,29 +425,51 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * synchronous execution managed by existing NAR's
      */
-    @NotNull
-    public NAgent run(final int cycles) {
+    public NAgent runCycles(final int cycles) {
 
         init();
 
+        nar.onCycle((n)->{
+
+            long lastNow = this.now;
+            long now = nar.time();
+            int dur = nar.dur();
+            if (now - lastNow < dur) {
+                return; //only execute at most one agent frame per duration
+            }
+
+            cycle();
+
+        });
         nar.run(cycles);
 
         return this;
     }
 
     @NotNull
-    public Loop runFPS(float fps) {
-        return runFPS(fps, -1);
+    public Loop runRT(float fps) {
+        return runRT(fps, -1);
     }
 
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
     @NotNull
-    public Loop runFPS(float fps, int stopTime) {
+    public Loop runRT(float fps, int stopTime) {
 
         init();
 
+        Timer t = RealTime.timer;
+        t.scheduleAtFixedRate( new TimerTask() {
+            @Override public void run() {
+                cycle();
+            }
+        }, 0, Math.round(1000f/fps));
+
+
+//        nar.onReset(nn->{
+//            t.cancel();
+//        });
         return nar.loop(fps);
 
     }

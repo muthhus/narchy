@@ -405,7 +405,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     }
 
     @NotNull
-    public static double[] priHistogram(Iterable<PLink> pp, @NotNull double[] x) {
+    public static double[] priHistogram(Iterable<? extends PLink> pp, @NotNull double[] x) {
         int bins = x.length;
 
         pp.forEach(y -> {

@@ -115,12 +115,12 @@ public class Vis {
                         new HistogramChart(
                             () -> Bag.priHistogram(bag, d),
                             new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
-                        ),
-                Vis.pane("Concept Volume",
-                        new HistogramChart(
-                                () -> Bag.priHistogram(bag, d),
-                                new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
-                )
+                        )
+//                Vis.pane("Concept Volume",
+//                        new HistogramChart(
+//                                () -> Bag.priHistogram(bag, d),
+//                                new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
+//                )
         );
 
 //                PanelSurface.of("Concept Durability Distribution (0..1)", new HistogramChart(nar, c -> {

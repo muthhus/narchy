@@ -7,7 +7,6 @@ import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;
-import static nars.experiment.Line1D.implAccelerator;
 
 /**
  * Created by me on 3/21/17.
@@ -195,7 +194,9 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
         new FZero(NARBuilder.newMultiThreadNAR(
-                3, new RealTime.CS(true).durSeconds(0.02f), true))
-                .runFPS(0).join();
+                3,
+                new RealTime.CS(true)
+                    .durFPS(20f), true)
+        ).runRT(10f);
     }
 }

@@ -1682,7 +1682,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     public final On onReset(Consumer<NAR> o) {
-        return eventReset.on(o);
+        return eventReset.onWeak(o);
     }
 
     @Override

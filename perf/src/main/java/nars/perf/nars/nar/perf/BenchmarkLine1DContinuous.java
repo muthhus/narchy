@@ -2,10 +2,8 @@ package nars.perf.nars.nar.perf;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.derive.InstrumentedDeriver;
-import nars.derive.TrieDeriver;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.test.agent.Line1DContinuous;
@@ -83,7 +81,7 @@ public class BenchmarkLine1DContinuous {
 
         l.print = false;
         //l.runRT(25, 15000).join();
-        l.run(time);
+        l.runCycles(time);
 
 
         if (r!=null)
