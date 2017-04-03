@@ -480,7 +480,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         /*if (isEmpty())
             return null;*/
 
-        int jLimit = (int) Math.ceil(c * SCAN_ITERATIONS);
+        int jLimit = (int) Math.ceil(c / ((float)reprobes/2));
 
         int i = random.nextInt(c), j = 0;
 

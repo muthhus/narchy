@@ -1,5 +1,7 @@
 package nars.control;
 
+import jcog.bag.BagFlow;
+import jcog.bag.PLink;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -30,6 +32,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     final MatrixPremiseBuilder premiser;
 
 
+
     /**
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
@@ -50,24 +53,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         public PremiseVectorBatch(int batchSize, NAR nar) {
             nar.focus().sample(batchSize, c -> {
-                Concept concept = c.get();
-                
-                concept.tasklinks().commit();
-
-                @Nullable BLink<Task> taskLink = concept.tasklinks().sample();
-                if (taskLink == null)
-                    return true; //continue
-
-                concept.termlinks().commit();
-
-                int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
-
-                FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-                concept.termlinks().sample(termlinksPerForThisTask, termLinks::add);
-
-                if (!termLinks.isEmpty())
-                    premiser.newPremiseVector(concept, taskLink, termlinksFiredPerFiredConcept,
-                            FireConcepts.this, termLinks, nar);
+                if (premiseVector(nar, c.get(), FireConcepts.this)) return true; //continue
 
                 return true;
             });
@@ -77,6 +63,27 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         public void accept(BLink<Concept> conceptBLink) {
 
         }
+    }
+
+    public boolean premiseVector(NAR nar, Concept c, Consumer<DerivedTask> target) {
+
+        c.tasklinks().commit();
+
+        @Nullable BLink<Task> taskLink = c.tasklinks().sample();
+        if (taskLink == null)
+            return true;
+
+        c.termlinks().commit();
+
+        int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+
+        FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+        c.termlinks().sample(termlinksPerForThisTask, termLinks::add);
+
+        if (!termLinks.isEmpty())
+            premiser.newPremiseVector(c, taskLink, termlinksFiredPerFiredConcept,
+                    target, termLinks, nar);
+        return false;
     }
 
     class PremiseMatrixBatch implements Consumer<NAR> {
@@ -132,6 +139,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsBufferDerivations extends FireConcepts {
 
+        /** flow from concept bag to derived task bag */
+        final BagFlow flow;
+
         /**
          * pending derivations to be input after this cycle
          */
@@ -141,8 +151,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
             super(nar, premiseBuilder);
-
-
 
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
@@ -165,61 +173,73 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             });
 
             this.in = nar.mix.stream("FireConcepts");
+
+            this.flow = new BagFlow<PLink<Concept>,Task>(
+                ((ConceptBagFocus)nar.focus()).active,
+                pending,
+                nar.exe, (concept, target) -> {
+                    premiseVector(nar, concept.get(), target::put);
+                    return true;
+                },
+            nar::input);
+
         }
 
         @Override
         public void run() {
 
-
-//            AtomicReferenceArray<Task> all = pending.reset();
-//            if (all!=null) {
-//                nar.input(HijackBag.stream(all));
-//            }
-
-
-            //update concept bag
             int inputsPerCycle = derivationsInputPerCycle.intValue();
-
-            final List<Task> ready = $.newArrayList(inputsPerCycle);
-            int input = pending.pop(inputsPerCycle, ready::add);
-            //System.out.println(input + " (" + Texts.n2(100f * input/((float)inputsPerCycle)) + "%) load, " + pending.size() + " remain");
-
-            if (!ready.isEmpty()) {
-                nar.runLater((n) -> {
-                    n.input(in.input(ready.stream()));
-                });
-            }
-
-            //nar.runLater(ready, nar::input, 32);
-            //ready.clear();
-
-            pending.commit();
-
             pending.capacity(inputsPerCycle * 8);
-            // * 1f/((float)Math.sqrt(active.capacity()))
+            pending.commit();
+            this.flow.update();
 
-            //float load = nar.exe.load();
-            int cpf = Math.round(conceptsFiredPerCycle.floatValue());
-            ///Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
-
-            //int cbs = nar.exe.concurrent() ? conceptsFiredPerBatch.intValue() : cpf /* all of them in one go if non-concurrent */;
-            int cbs = conceptsFiredPerBatch.intValue();
-
-            //logger.info("firing {} concepts (exe load={})", cpf, load);
-
-            while (cpf > 0) {
-
-                int batchSize = Math.min(cpf, cbs);
-                cpf -= cbs;
-
-                //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
-
-                nar.runLater((n) ->
-                        new FireConcepts.PremiseVectorBatch(batchSize, n)
-                        //new PremiseMatrixBatch(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
-                );
-
-            }
+////            AtomicReferenceArray<Task> all = pending.reset();
+////            if (all!=null) {
+////                nar.input(HijackBag.stream(all));
+////            }
+//
+//
+//            //update concept bag
+//
+//            final List<Task> ready = $.newArrayList(inputsPerCycle);
+//            int input = pending.pop(inputsPerCycle, ready::add);
+//            //System.out.println(input + " (" + Texts.n2(100f * input/((float)inputsPerCycle)) + "%) load, " + pending.size() + " remain");
+//
+//            if (!ready.isEmpty()) {
+//                nar.runLater((n) -> {
+//                    n.input(in.input(ready.stream()));
+//                });
+//            }
+//
+//            //nar.runLater(ready, nar::input, 32);
+//            //ready.clear();
+//
+//            pending.commit();
+//
+//            // * 1f/((float)Math.sqrt(active.capacity()))
+//
+//            //float load = nar.exe.load();
+//            int cpf = Math.round(conceptsFiredPerCycle.floatValue());
+//            ///Math.round(conceptsFiredPerCycle.floatValue() * (1f - load));
+//
+//            //int cbs = nar.exe.concurrent() ? conceptsFiredPerBatch.intValue() : cpf /* all of them in one go if non-concurrent */;
+//            int cbs = conceptsFiredPerBatch.intValue();
+//
+//            //logger.info("firing {} concepts (exe load={})", cpf, load);
+//
+//            while (cpf > 0) {
+//
+//                int batchSize = Math.min(cpf, cbs);
+//                cpf -= cbs;
+//
+//                //List<PLink<Concept>> toFire = $.newArrayList(batchSize);
+//
+//                nar.runLater((n) ->
+//                        new FireConcepts.PremiseVectorBatch(batchSize, n)
+//                        //new PremiseMatrixBatch(batchSize, tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept)
+//                );
+//
+//            }
 
 
         }
