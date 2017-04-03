@@ -12,6 +12,7 @@ import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.MultiThreadExecutor;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
@@ -25,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/8/16.
  */
+@Ignore
 public class InterNARTest {
 
     final static AtomicInteger nextPort = new AtomicInteger(10000);

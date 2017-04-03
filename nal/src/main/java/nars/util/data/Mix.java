@@ -36,6 +36,11 @@ public class Mix<K, P extends Budgeted>  {
             return x.peek(this);
         }
 
+        public P input(P x) {
+            accept(x);
+            return x;
+        }
+
         @Override
         public void accept(P xx) {
             if (xx == null)

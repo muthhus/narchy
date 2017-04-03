@@ -146,7 +146,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
          * pending derivations to be input after this cycle
          */
         final TaskHijackBag pending;
-        private final Mix.MixStream in;
+        private final Mix<Object,Task>.MixStream in;
 
 
         public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
@@ -181,7 +181,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     premiseVector(nar, concept.get(), target::put);
                     return true;
                 },
-            nar::input);
+                x->nar.input(in.input(x)));
 
         }
 
@@ -189,9 +189,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         public void run() {
 
             int inputsPerCycle = derivationsInputPerCycle.intValue();
-            pending.capacity(inputsPerCycle * 8);
+            pending.capacity(inputsPerCycle * 4);
             pending.commit();
-            this.flow.update();
+            this.flow.update(0.05f, 0.65f);
 
 ////            AtomicReferenceArray<Task> all = pending.reset();
 ////            if (all!=null) {

@@ -211,12 +211,15 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                                 ///change[0] -= borrow;
                                 //subSubActivation += borrow;
 
+                                //lower value (< 1) means activation is less temporally 'specific' than a higher value (> 1)
+                                final float DECAY_RATE = 0.5f;
+
                                 //multiply by temporal relevancy
                                 subSubActivation = subSubActivation * (
                                     (1f-temporalSpecificity) + //min reduction
                                     (temporalSpecificity) * TruthPolation.evidenceDecay(
                                         1f,
-                                        dur,
+                                        (int) Math.ceil(dur / DECAY_RATE),
                                         timeDistance));
                             }
                         }

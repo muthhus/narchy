@@ -73,6 +73,9 @@ public class PeriodMeter extends FunctionMeter<Double> {
     public void hitNano(long nanos) {
         hit(nanos / 1.0E9);
     }
+    public void hitNano(double nanos) {
+        hit(nanos / 1.0E9);
+    }
 
     public void clear() {
         if (stat instanceof DescriptiveStatistics)
