@@ -109,7 +109,7 @@ public abstract class Param  {
     public final static int UnificationStackMax = 64;
 
 
-    public final static int SubUnificationStackMax = UnificationStackMax/2;
+    public final static int SubUnificationStackMax = UnificationStackMax;
 
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components

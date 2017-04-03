@@ -15,6 +15,7 @@ public class DefaultDeriver  {
                 "nal6.nal",
                 "induction.nal",
                 "misc.nal"
+                //"relation_introduction.nal"
             )
         //)
     ;

@@ -262,7 +262,6 @@ public class NAL5Test extends AbstractNALTest {
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
         //tester.mustBelieve(cycles*2," (||,<robin --> swimmer>,<robin --> [flying]>)",1.00f,0.81f); //.en("Robin can fly or swim.");
         tester.mustBelieve(cycles*2," (&&,(--,<robin --> swimmer>),(--,<robin --> [flying]>))",0.00f,0.81f); //.en("Robin can fly or swim.");
-
     }
 
 

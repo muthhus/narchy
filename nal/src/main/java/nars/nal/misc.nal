@@ -8,8 +8,6 @@
      (&&,X,A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-
-     //not working right:
      ((&&,X,A..+) &&+- Z), Z, time(decomposeTaskComponents) |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
      (Z &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
@@ -17,7 +15,6 @@
 
      (&&,X,A..+), B, task("!"), time(decomposeTaskSubset) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
         (&&,(--,%X),A..+), B,  task("!"), time(decomposeTaskSubset), belief(negative) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
-        // ^ check this negation condition
 
      X, (&&,X,A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
         X, (&&,(--,%X),A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
@@ -126,32 +123,15 @@
 
 ////composition on one side of a statement:
 
-    (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    (W --> (|,B,A..+)), (W --> B), neqRCom(W,A..+), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((&,B,A..+) --> W), (B --> W), neqRCom(W,A..+), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
-    (W --> (-,S,B)), (W --> B), neqCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
-    ((~,S,B) --> W), (B --> W), neqCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
+    (W --> (-,S,B)), (W --> B), neqRCom(W,S), task("?") |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
+    ((~,S,B) --> W), (B --> W), neqRCom(W,S), task("?") |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
 
 
 //disjunction
-    (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
-
-
-
-//Relation introduction (wastepaper experimental)
-//   (A --> C), (B --> D) |- ((A,B) --> (C,D)), (Belief:Intersection)
-//   (A --> C), (A --> D) |- ((A,A) --> {C,D}), (Belief:Intersection)
-//   (C --> A), (D --> A) |- ({C,D} --> (A,A)), (Belief:Intersection)
-
-//          #_#R[(A --> C) (B --> D) |- ((* A B) --> (* C D)) :post (:t/intersection)] //            ;this one cant be allowed due to control reasons:
-//          #R[(A --> C) (A --> D) |- ((* A A) --> (* C D)) :post (:t/intersection)]
-//         #R[(A --> C) (B --> C) |- ((* A B) --> (* C C)) :post (:t/intersection)]
-//         #R[({A} --> C) (A --> D) |- ((* {A} A) --> (* C D)) :post (:t/intersection)]
-//          #R[(A --> C) ({A} --> D) |- ((* A {A}) --> (* C D)) :post (:t/intersection)]
-//         #R[(A --> [C]) (B --> C) |- ((* A B) --> (* [C] C)) :post (:t/intersection)]
-//         #R[(A --> C) (B --> [C]) |- ((* A B) --> (* C [C])) :post (:t/intersection)]
+   (&&,(--,%B),(--,%A)), B, task("?") |- (||,%B,%A), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 
 
