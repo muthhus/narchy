@@ -31,20 +31,12 @@ public class BagFlow<X,Y> {
         this.batchDivisor = procs <= 1 ? 1f : (procs * 4f);
 
         this.in = in;
-
         inRate = new PeriodMeter("in->out", 32);
         this.inToOut = inToOut;
 
         this.out = out;
         outRate = new PeriodMeter("output", 32);
-        this.eachOut = (x) -> {
-            long start = nanoTime();
-            {
-                eachOut.accept(x);
-            }
-            long end = nanoTime();
-            outRate.hitNano(end-start);
-        };
+        this.eachOut = eachOut;
     }
 
 
@@ -62,15 +54,14 @@ public class BagFlow<X,Y> {
 
         //total time=
         //      inAvg * I + outAvg * O
-        //      I <= in.size
-        //      O <= out.size
+        //          I <= in.size
+        //          O <= out.size
 
 
 
         double iAvg = inRate.mean();
         double oAvg = outRate.mean();
 
-        //TODO calculate
         int toTransfer, toDrain;
         toTransfer = Math.min(in.size(), Math.max(1, (int)Math.ceil((totalSec*ioBalance)/iAvg)));
 
