@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.bag.Bag;
 import jcog.bag.BagFlow;
 import jcog.bag.PLink;
 import jcog.data.MutableIntRange;
@@ -49,21 +50,21 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     protected final NAR nar;
     private final On on;
 
-    class PremiseVectorBatch implements Consumer<BLink<Concept>>{
-
-        public PremiseVectorBatch(int batchSize, NAR nar) {
-            nar.focus().sample(batchSize, c -> {
-                if (premiseVector(nar, c.get(), FireConcepts.this)) return true; //continue
-
-                return true;
-            });
-        }
-
-        @Override
-        public void accept(BLink<Concept> conceptBLink) {
-
-        }
-    }
+//    class PremiseVectorBatch implements Consumer<BLink<Concept>>{
+//
+//        public PremiseVectorBatch(int batchSize, NAR nar) {
+//            nar.focus().sample(batchSize, c -> {
+//                if (premiseVector(nar, c.get(), FireConcepts.this)) return true; //continue
+//
+//                return true;
+//            });
+//        }
+//
+//        @Override
+//        public void accept(BLink<Concept> conceptBLink) {
+//
+//        }
+//    }
 
     public boolean premiseVector(NAR nar, Concept c, Consumer<DerivedTask> target) {
 
@@ -112,27 +113,28 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     }
 
 
-//    /**
-//     * directly inptus each result upon derive, for single-thread
-//     */
-//    public static class DirectConceptBagFocus extends FireConcepts {
-//        public final MutableInteger tasklinksFiredPerFiredConcept = new MutableInteger(1);
-//
-//        public DirectConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag, MatrixPremiseBuilder premiseBuilder) {
-//            super(nar, premiseBuilder);
-//        }
-//
-//        @Override public void run() {
-//            //new PremiseVector(derivationsInputPerCycle.intValue(), termlinksFiredPerFiredConcept).accept(nar);
-//            new PremiseMatrixBatch(derivationsInputPerCycle.intValue(), tasklinksFiredPerFiredConcept.intValue(), termlinksFiredPerFiredConcept).accept(nar);
-//        }
-//
-//        @Override
-//        public void accept(DerivedTask derivedTask) {
-//            nar.input(derivedTask);
-//        }
-//
-//    }
+    /**
+     * directly inptus each result upon derive, for single-thread
+     */
+    public static class FireConceptsDirect extends FireConcepts {
+
+        public FireConceptsDirect(@NotNull NAR nar, MatrixPremiseBuilder premiseBuilder) {
+            super(nar, premiseBuilder);
+        }
+
+        @Override public void run() {
+            nar.focus().sample(conceptsFiredPerCycle.intValue(), c -> {
+                premiseVector(nar, c.get(), nar::input);
+                return true;
+            });
+        }
+
+        @Override
+        public void accept(DerivedTask derivedTask) {
+            nar.input(derivedTask);
+        }
+
+    }
 
     /**
      * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input

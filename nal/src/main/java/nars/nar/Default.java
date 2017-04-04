@@ -79,10 +79,10 @@ public class Default extends NAR {
 
         derivationBudgeting = newDerivationBudgeting();
 
-        deriver = //exe.concurrent() ?
+        deriver = exe.concurrent() ?
                 new FireConcepts.FireConceptsBufferDerivations(this, newPremiseBuilder())
-                //:
-                //new DefaultConceptBagControl.DirectConceptBagControl(this, newDeriver(), newConceptBag(activeConcepts), newPremiseBuilder());
+                :
+                new FireConcepts.FireConceptsDirect(this, newPremiseBuilder());
         ;
 
 
