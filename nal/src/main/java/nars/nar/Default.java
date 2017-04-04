@@ -80,9 +80,9 @@ public class Default extends NAR {
         derivationBudgeting = newDerivationBudgeting();
 
         deriver = exe.concurrent() ?
-                new FireConcepts.FireConceptsBufferDerivations(this, newPremiseBuilder())
+                new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
                 :
-                new FireConcepts.FireConceptsDirect(this, newPremiseBuilder());
+                new FireConcepts.FireConceptsDirect(newPremiseBuilder(), this);
         ;
 
 

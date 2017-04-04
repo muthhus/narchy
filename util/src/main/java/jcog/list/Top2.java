@@ -7,7 +7,7 @@ import org.eclipse.collections.api.block.function.Function;
  */
 public final class Top2<T> {
 
-    public T a = null, b = null;
+    public T a, b;
     public float aa = Float.NEGATIVE_INFINITY, bb = Float.NEGATIVE_INFINITY;
 
     public Top2(Function<T, Float> rank, Iterable<T> from) {

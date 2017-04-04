@@ -49,7 +49,7 @@ public abstract class UDPNetworkSimulation {
         new UDPNetworkSimulation(4) {
             @Override
             long delay(InetSocketAddress from, InetSocketAddress to, int length) {
-                return 25 + (int)/*Util.sqr*/(Math.abs(from.getPort() - to.getPort())) * 50;
+                return 25 + Math.abs(from.getPort() - to.getPort()) * 50;
             }
         };
     }

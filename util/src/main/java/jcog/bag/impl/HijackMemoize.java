@@ -27,6 +27,7 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
         this.func = f;
     }
 
+    @Override
     @Nullable public V apply(@NotNull K k) {
         PLink<Pair<K, V>> exists = get(k);
         if (exists!=null) {

@@ -185,8 +185,8 @@ public class RTree2DTest {
 
             CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.getRoot();
 
-            System.out.println("[" + type + "] searched " + root.searchCount + " nodes, returning " + foundCount + " entries");
-            System.out.println("[" + type + "] evaluated " + root.bboxEvalCount + " b-boxes, returning " + foundCount + " entries");
+            System.out.println("[" + type + "] searched " + CounterNode.searchCount + " nodes, returning " + foundCount + " entries");
+            System.out.println("[" + type + "] evaluated " + CounterNode.bboxEvalCount + " b-boxes, returning " + foundCount + " entries");
         }
     }
 

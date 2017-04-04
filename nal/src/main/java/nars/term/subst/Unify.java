@@ -336,7 +336,7 @@ public abstract class Unify extends Termunator implements Subst {
 
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
-        @NotNull Term common = CommonVariable.make((Variable) x, (Variable) y);
+        @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
         if (putXY(x, common)) {
             if (!putYX(y, common)) {
                 return false;

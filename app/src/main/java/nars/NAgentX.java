@@ -5,7 +5,10 @@ import jcog.data.FloatParam;
 import jcog.event.On;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
-import nars.gui.*;
+import nars.gui.BagChart;
+import nars.gui.HistogramChart;
+import nars.gui.MixBoard;
+import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Term;
@@ -28,7 +31,6 @@ import java.util.function.Supplier;
 
 import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
 
 /**
@@ -206,8 +208,7 @@ abstract public class NAgentX extends NAgent {
                     ),
                     new WindowButton( "conceptTreeMap", () -> {
 
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 128, 0.75f), 128, nar);
-
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 128, 1f/nar.dur()), 64, nar);
 
                         return tc;
                     }),

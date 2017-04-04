@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,7 +93,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
 
-    private static int i(int c, int hash) {
+    @Contract(pure=true) private static int i(int c, int hash) {
         return (int) (Integer.toUnsignedLong(hash) % c);
     }
 
@@ -243,7 +244,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
                     } else {
                         K y = key(ii);
-                        if (y == x || y.equals(x)) { //existing
+                        if (y == x || equals(y, x)) { //existing
 
                             if (!add) {
 
@@ -379,8 +380,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      * can override in subclasses for custom equality test
      */
-    protected boolean equals(Object x, K y) {
-        return x.equals(y);
+    protected boolean equals(K known, Object incoming) {
+        return incoming.equals(known);
     }
 
     @Nullable

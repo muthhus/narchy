@@ -1,5 +1,6 @@
 package nars.term.var;
 
+import nars.$;
 import nars.Op;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
     }
 
 
-    public static @NotNull GenericNormalizedVariable make(@NotNull Variable v1, @NotNull Variable v2) {
+    public static @NotNull Variable common(@NotNull Variable v1, @NotNull Variable v2) {
 
 
 //        if (v1 instanceof CommonVariable) {
@@ -25,6 +26,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
         int a = v1.id();
         int b = v2.id();
+
         if (a == b) {
             //throw new RuntimeException("variables equal");
         }
@@ -37,10 +39,20 @@ public final class CommonVariable extends GenericNormalizedVariable {
         }
 
         Op type = v1.op();
-        if (v2.op()!=type)
-            throw new RuntimeException("differing types");
+        assert(v2.op()==type);
 
-        return new CommonVariable(type, a, b);
+        if (a > 127 || b > 127) {
+            //one of these will not fit in a normalized variable,
+            //it is probably common already. so default to
+            //a generic variable
+            return $.v(v1.op(),
+             v1.toString().substring(1) /* remove leading variable char */  +
+                  v2.toString()
+            );
+            //throw new RuntimeException("variable oob");
+        } else {
+            return new CommonVariable(type, a, b);
+        }
     }
 
     public int[] multiVariables() {

@@ -3,16 +3,12 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.RawPLink;
-import jcog.data.FloatParam;
 import nars.Focus;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 /**
@@ -23,12 +19,9 @@ import java.util.function.Predicate;
  */
 public class ConceptBagFocus implements Focus {
 
-    static final Logger logger = LoggerFactory.getLogger(ConceptBagFocus.class);
-
     /**
      * distinct from the NAR's
      */
-    public final FloatParam activationRate = new FloatParam(1f);
     protected float currentActivationRate = 1f;
 
     /**
@@ -40,33 +33,16 @@ public class ConceptBagFocus implements Focus {
     @Deprecated
     public final transient @NotNull NAR nar;
 
-    public final AtomicBoolean clear = new AtomicBoolean(false);
 
     public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag) {
 
         this.nar = nar;
 
         this.active = conceptBag;
+    }
 
-        nar.onCycle(()->{
-
-            currentActivationRate = activationRate.floatValue();
-
-            //while clear is enabled, keep active clear
-            if (clear.get()) {
-
-                active.clear();
-
-            } else {
-                active.commit();
-            }
-
-        });
-
-        nar.onReset((n)->{
-            active.clear();
-        });
-
+    public void setActivationRate(float currentActivationRate) {
+        this.currentActivationRate = currentActivationRate;
     }
 
     //    /** called when a concept is displaced from the concept bag */

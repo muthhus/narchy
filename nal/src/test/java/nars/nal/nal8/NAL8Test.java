@@ -168,7 +168,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .input("goto({t003}). :|:")
                 .input("(goto(#1) &&+5 at(SELF,#1))!")
-                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.31f, 9)
+                .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
         ;
     }
 

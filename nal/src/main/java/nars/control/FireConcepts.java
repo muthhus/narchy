@@ -1,14 +1,14 @@
 package nars.control;
 
-import jcog.bag.Bag;
 import jcog.bag.BagFlow;
 import jcog.bag.PLink;
+import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.event.On;
 import jcog.list.FasterList;
-import nars.$;
+import nars.Focus;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -23,12 +23,15 @@ import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 
+/** controls an active focus of concepts */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
+    public final AtomicBoolean clear = new AtomicBoolean(false);
+    public final FloatParam activationRate = new FloatParam(1f);
 
     final MatrixPremiseBuilder premiser;
 
@@ -49,6 +52,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     public final MutableInteger derivationsInputPerCycle;
     protected final NAR nar;
     private final On on;
+    private final Focus source;
 
 //    class PremiseVectorBatch implements Consumer<BLink<Concept>>{
 //
@@ -118,11 +122,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsDirect extends FireConcepts {
 
-        public FireConceptsDirect(@NotNull NAR nar, MatrixPremiseBuilder premiseBuilder) {
-            super(nar, premiseBuilder);
+        public FireConceptsDirect(@NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
+            this(nar.focus(), premiseBuilder, nar);
         }
 
-        @Override public void run() {
+        public FireConceptsDirect(@NotNull Focus focus, @NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
+            super(focus, premiseBuilder, nar);
+        }
+
+        @Override public void fire() {
             nar.focus().sample(conceptsFiredPerCycle.intValue(), c -> {
                 premiseVector(nar, c.get(), nar::input);
                 return true;
@@ -139,7 +147,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input
      */
-    public static class FireConceptsBufferDerivations extends FireConcepts {
+    public static class FireConceptsBuffered extends FireConcepts {
 
         /** flow from concept bag to derived task bag */
         final BagFlow flow;
@@ -148,11 +156,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
          * pending derivations to be input after this cycle
          */
         final TaskHijackBag pending;
+
         private final Mix<Object,Task>.MixStream in;
 
+        public FireConceptsBuffered(@NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
+            this(nar.focus(), premiseBuilder, nar);
+        }
 
-        public FireConceptsBufferDerivations(@NotNull NAR nar, @NotNull MatrixPremiseBuilder premiseBuilder) {
-            super(nar, premiseBuilder);
+        public FireConceptsBuffered(@NotNull Focus focus, @NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
+            super(focus, premiseBuilder, nar);
 
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
@@ -188,7 +200,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
         @Override
-        public void run() {
+        public void fire() {
 
             int inputsPerCycle = derivationsInputPerCycle.intValue();
             pending.capacity(inputsPerCycle * 4);
@@ -256,9 +268,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
 
-    public FireConcepts(@NotNull NAR nar, MatrixPremiseBuilder premiseBuilder) {
+    public FireConcepts(@NotNull Focus source, MatrixPremiseBuilder premiseBuilder, NAR nar) {
 
         this.nar = nar;
+        this.source = source;
         this.premiser = premiseBuilder;
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
@@ -269,5 +282,21 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         this.on = nar.onCycle(this);
     }
 
+    @Override
+    public void run() {
+        ConceptBagFocus f = (ConceptBagFocus) this.source;
 
+        f.setActivationRate( activationRate.floatValue() );
+
+        //while clear is enabled, keep active clear
+        if (clear.get()) {
+            f.active.clear();
+        } else {
+            f.active.commit();
+        }
+
+        fire();
+    }
+
+    abstract protected void fire();
 }

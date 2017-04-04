@@ -1,7 +1,6 @@
 package nars.gui;
 
 import jcog.event.On;
-import jcog.meter.event.PeriodMeter;
 import nars.$;
 import nars.NAR;
 import nars.util.data.Mix;
@@ -12,7 +11,6 @@ import spacegraph.widget.slider.FloatSlider;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 
 /**
  * Created by me on 4/3/17.

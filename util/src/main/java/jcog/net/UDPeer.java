@@ -366,7 +366,7 @@ public class UDPeer extends UDP {
     public final Bag<InetSocketAddress, UDProfile> them;
     public final PLinkHijackBag<Msg> seen;
 
-    public UDPeer(int port) throws SocketException, UnknownHostException {
+    public UDPeer(int port) throws SocketException {
         super(port);
         //super( InetAddress.getLocalHost().getCanonicalHostName(), port);
 
@@ -404,7 +404,7 @@ public class UDPeer extends UDP {
 
             @Override
             public float pri(@NotNull UDPeer.UDProfile key) {
-                return (float) (1f / (1f + key.latency() / 20f));
+                return 1f / (1f + key.latency() / 20f);
             }
 
             @NotNull
