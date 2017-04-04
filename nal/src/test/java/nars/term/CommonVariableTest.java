@@ -76,5 +76,10 @@ public class CommonVariableTest {
         Variable c123 = CommonVariable.common(c12, p3.normalize(3));
         assertEquals("%770%3 class nars.term.var.GenericVariable", (c123 + " " + c123.getClass()));
 
+        //duplicate: already included
+        Variable c122 = CommonVariable.common(c12, p2.normalize(2));
+        assertEquals("%770 class nars.term.var.CommonVariable", (c122 + " " + c122.getClass()));
+
+
     }
 }

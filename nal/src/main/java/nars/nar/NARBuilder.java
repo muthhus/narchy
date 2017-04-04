@@ -86,9 +86,8 @@ public interface NARBuilder {
                 new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
                     exe
                     //null /* null = fork join common pool */
-                )
+                ),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
-                ,
                 time,
                 exe) {
 

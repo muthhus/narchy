@@ -15,13 +15,21 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
         this.type = type;
     }
 
-    /** to combine multiple variables into a unique hash;
+    /** form a unique hash of 2 component variables
      *  this limits # of variables to 127 (or is it the full 255) per term */
     @Contract(pure = true)
     public static int multiVariable(int a, int b) {
         assert(a < 128);
         assert(b < 128);
         return ((a+1) << 8) | (b+1);
+    }
+
+    /** extract multivariable component */
+    public static int multiVariable(int x, boolean firstOrSecond) {
+        return firstOrSecond ?
+                ((x >> 8) & 0x000000ff)-1
+                :
+                ((x) & 0x000000ff)-1;
     }
 
 

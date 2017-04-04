@@ -12,7 +12,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
     }
 
 
-    public static @NotNull Variable common(@NotNull Variable v1, @NotNull Variable v2) {
+    public static @NotNull Variable common(@NotNull Variable A, @NotNull Variable B) {
 
 
 //        if (v1 instanceof CommonVariable) {
@@ -24,11 +24,54 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //            //System.out.println(v1 + " " + v2);
 //        }
 
-        int a = v1.id();
-        int b = v2.id();
+        boolean aCommon = (A instanceof CommonVariable);
+        boolean bCommon = (B instanceof CommonVariable);
+        if (aCommon || bCommon) {
+
+            if (aCommon && B instanceof AbstractVariable) {
+                int a = A.id();
+                int b = B.id();
+
+                //check to see if b is included in a
+                int a1 = multiVariable(a, true);
+                int a2 = multiVariable(a, false);
+                if ((a1 == b) || (a2 == b))
+                    return A;
+
+            } else if (bCommon && A instanceof AbstractVariable) {
+
+                int a = A.id();
+                int b = B.id();
+
+                //check to see if a is included in b
+                int b1 = multiVariable(b, true);
+                int b2 = multiVariable(b, false);
+                if ((b1 == a) || (b2 == a))
+                    return B;
+
+            }
+
+            if (A.compareTo(B) < 0) {
+                Variable v = A; //swap lexically
+                A = B;
+                B = v;
+            }
+
+            //one or both of these will not fit in a normalized variable,
+            //so default to a String-based generic variable
+            return $.v(A.op(),
+                    A.toString().substring(1) /* remove leading variable char */  +
+                            B.toString()
+            );
+            //throw new RuntimeException("variable oob");
+        }
+
+        int a = A.id();
+        int b = B.id();
 
         if (a == b) {
-            //throw new RuntimeException("variables equal");
+            throw new RuntimeException("variables equal");
+            //return A;
         }
 
         //lexical ordering: swap
@@ -38,21 +81,12 @@ public final class CommonVariable extends GenericNormalizedVariable {
             b = t;
         }
 
-        Op type = v1.op();
-        assert(v2.op()==type);
+        Op type = A.op();
+        assert(B.op()==type);
 
-        if (a > 127 || b > 127) {
-            //one of these will not fit in a normalized variable,
-            //it is probably common already. so default to
-            //a generic variable
-            return $.v(v1.op(),
-             v1.toString().substring(1) /* remove leading variable char */  +
-                  v2.toString()
-            );
-            //throw new RuntimeException("variable oob");
-        } else {
+
             return new CommonVariable(type, a, b);
-        }
+
     }
 
     public int[] multiVariables() {
