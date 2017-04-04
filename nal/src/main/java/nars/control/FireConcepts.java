@@ -52,7 +52,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     public final MutableInteger derivationsInputPerCycle;
     protected final NAR nar;
     private final On on;
-    private final Focus source;
+    public final Focus source;
 
 //    class PremiseVectorBatch implements Consumer<BLink<Concept>>{
 //
@@ -131,7 +131,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
         @Override public void fire() {
-            nar.focus().sample(conceptsFiredPerCycle.intValue(), c -> {
+            source.sample(conceptsFiredPerCycle.intValue(), c -> {
                 premiseVector(nar, c.get(), nar::input);
                 return true;
             });

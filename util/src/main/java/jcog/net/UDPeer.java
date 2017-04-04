@@ -594,7 +594,7 @@ public class UDPeer extends UDP {
     }
 
     public void ping(String host, int port) {
-        throw new UnsupportedOperationException("TODO");
+        ping(new InetSocketAddress(host, port));
     }
 
     public void ping(@Nullable InetSocketAddress to) {
