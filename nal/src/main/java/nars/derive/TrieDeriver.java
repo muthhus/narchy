@@ -30,6 +30,7 @@ public class TrieDeriver implements Deriver {
 
     @NotNull
     public final BoolPredicate[] roots;
+    public final PremiseRuleSet rules;
 
     /**
      * derivation term graph, gathered for analysis
@@ -45,10 +46,10 @@ public class TrieDeriver implements Deriver {
         @Override
         public void index(@Nullable PremiseRule rule) {
 
-            if (rule == null || rule.postconditions == null)
+            if (rule == null || rule.POST == null)
                 throw new RuntimeException("Null rule");
 
-            for (PostCondition result : rule.postconditions) {
+            for (PostCondition result : rule.POST) {
 
                 List<Term> c = rule.conditions(result);
 
@@ -74,8 +75,12 @@ public class TrieDeriver implements Deriver {
 
     public TrieDeriver(BoolPredicate[] root) {
         this.roots = root;
+        this.rules = null;
     }
+
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
+
+        this.rules = ruleset;
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);

@@ -120,6 +120,8 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    @SinglePremise
+    @AllowOverlap
     BeliefStructuralDeduction() {
         @Nullable
         @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {

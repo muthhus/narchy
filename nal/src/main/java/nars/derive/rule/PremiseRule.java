@@ -98,12 +98,11 @@ public class PremiseRule extends GenericCompound {
 //    };
 
 
-    /**
-     * conditions which can be tested before term matching
-     */
-    public BoolPredicate[] pre;
+    /** conditions which can be tested before unification */
+    public BoolPredicate[] PRE;
 
-    public PostCondition[] postconditions;
+    /** consequences applied after unification */
+    public PostCondition[] POST;
 
 //    public PatternCompound pattern;
 
@@ -187,7 +186,7 @@ public class PremiseRule extends GenericCompound {
 //        }
 //
 
-        if (postconditions.length == 0)
+        if (POST.length == 0)
             throw new RuntimeException(this + " has no postconditions");
 //        if (!getTask().hasVarPattern())
 //            throw new RuntimeException("rule's task term pattern has no pattern variable");
@@ -209,7 +208,7 @@ public class PremiseRule extends GenericCompound {
 
         //PREFIX
         {
-            addAll(s, pre);
+            addAll(s, PRE);
 
             s.add(truth);
 
@@ -271,23 +270,29 @@ public class PremiseRule extends GenericCompound {
         int rank = 50;
 
 
-        put("PatternOp0", rank--);
         put("PatternOp1", rank--);
+        put("PatternOp0", rank--);
 
         put(TaskPunctuation.class, rank--);
 
         put(SubTermsStructure.class, rank--);
-        put(SubTermStructure.class, rank--);
-
-        put(events.class, rank--);
 
         put(MatchTaskBelief.AddConstraint.class, rank--);
 
+        put(SubTermStructure.class, rank--);
+
+        put(PatternOpNot.class, rank--);
+
+
         put(TermNotEquals.class, rank--);
+        put(events.class, rank--);
 
 //        put(PatternOpNot.class, rank--);
 
+
         put(TaskPositive.class, rank--); //includes both positive or negative
+
+
 
         put(Solve.class, rank--);
 
@@ -319,7 +324,7 @@ public class PremiseRule extends GenericCompound {
         if (b instanceof TermNotEquals) return TermNotEquals.class;
 
 //        if (b instanceof PatternOpNot) return PatternOpNot.class;
-//        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
+        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
 
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
         //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
@@ -561,48 +566,35 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "neq":
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y); //should the constraints be ommited in this case?
                     break;
 
 
                 case "neqAndCom":
                     //includes neq:
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     constraints.put(Y, new CommonSubtermConstraint(X));
                     constraints.put(X, new CommonSubtermConstraint(Y));
                     break;
 
                 case "neqCom":
                     //includes neq:
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, false));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, false));
 
                     break;
                 case "neqRCom":
                     //includes neq:
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
                     constraints.put(Y, new NoCommonSubtermConstraint(X, true));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, true));
                     break;
 
-
-//                case "neqRec":
-//                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-//
-//                    constraints.put(X, new NoCommonRecursiveSubtermConstraint(Y));
-//                    constraints.put(Y, new NoCommonRecursiveSubtermConstraint(X));
-//                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y);
-//                    break;
-
                 case "notSet":
                     opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
                     break;
-
-//                case "hasNoDepVar":
-//                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.VAR_DEP.bit);
-//                    break;
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
@@ -935,7 +927,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         //store to arrays
-        this.pre = pres.toArray(new BoolPredicate[pres.size()]);
+        this.PRE = pres.toArray(new BoolPredicate[pres.size()]);
 
         List<PostCondition> postConditions = newArrayList();
 
@@ -953,8 +945,8 @@ public class PremiseRule extends GenericCompound {
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
             throw new RuntimeException("postcondition duplicates:\n\t" + postConditions);
 
-        postconditions = postConditions.toArray(new PostCondition[postConditions.size()]);
-        if (postconditions.length == 0) {
+        POST = postConditions.toArray(new PostCondition[postConditions.size()]);
+        if (POST.length == 0) {
             System.out.println(Arrays.toString(postcons));
             //throw new RuntimeException("no postconditions");
         }

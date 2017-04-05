@@ -1,19 +1,62 @@
 package nars.nal;
 
+import com.google.common.collect.HashMultimap;
+import jcog.data.sorted.SortedList;
+import jcog.table.ArrayListTable;
+import nars.$;
+import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
+import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.PostCondition;
+import nars.term.Term;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Created by me on 12/12/15.
  */
 public class TrieDeriverTest {
 
-    final static TrieDeriver d = (TrieDeriver) Deriver.get("nal1.nal");
+    final static TrieDeriver d =
+            //(TrieDeriver) Deriver.get("nal1.nal");
+            (TrieDeriver) DefaultDeriver.the;
 
     @Test public void printCompiledRuleTree() {
 
         d.print(System.out);
+
+        HashMultimap<Term,PostCondition> mapping = HashMultimap.create();
+        d.rules.rules.forEach(x -> {
+            for (PostCondition p : x.POST) {
+
+                List<Term> c = x.conditions(p);
+                for (Term b : c) {
+                    mapping.put(b, p);
+                }
+            }
+        });
+
+        List<ObjectIntPair<Term>> s = $.newArrayList();
+        mapping.keySet().forEach((k) -> {
+            s.add(PrimitiveTuples.pair(k, mapping.get(k).size()));
+        });
+        s.sort((a,b) -> {
+           int i = Integer.compare(a.getTwo(), b.getTwo());
+           if (i == 0)
+               return a.getOne().compareTo(b.getOne());
+           return i;
+        });
+        s.forEach(x -> {
+            System.out.println(x);
+        });
+
+
     }
 
 //    @Test public void printRuleSet() {

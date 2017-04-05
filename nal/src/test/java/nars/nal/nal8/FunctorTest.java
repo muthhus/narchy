@@ -69,7 +69,7 @@ public class FunctorTest {
     public void testFunctor2() {
         //Param.DEBUG = true;
 
-        int TIME = 128;
+        int TIME = 512;
         TestNAR t = new TestNAR(new Default(1024, 32, 2));
 
         //Param.DEBUG = true; t.log();
