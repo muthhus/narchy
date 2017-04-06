@@ -33,7 +33,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
      * @throws SocketException
      * @throws UnknownHostException
      */
-    public InterNAR(NAR nar, float outRate, int port) throws SocketException, UnknownHostException {
+    public InterNAR(NAR nar, float outRate, int port) throws SocketException {
         super(port);
         this.nar = nar;
         this.out = new LeakOut(nar, 16, outRate) {

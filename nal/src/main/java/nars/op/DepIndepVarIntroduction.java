@@ -25,7 +25,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 
     private DepIndepVarIntroduction() {
-        super(1);
+        super();
     }
 
 //    @Override

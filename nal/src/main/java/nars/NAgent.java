@@ -470,7 +470,7 @@ abstract public class NAgent implements NSense, NAct {
 //        nar.onReset(nn->{
 //            t.cancel();
 //        });
-        return nar.loop(fps);
+        return nar.loop();
 
     }
 

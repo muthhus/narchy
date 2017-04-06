@@ -150,10 +150,7 @@ public class MultiThreadExecutor extends Executioner {
             }
         }*/
 
-        Consumer[] vv;
-        //synchronized (nar.eventCycleStart) {
-            vv = nar.eventCycleStart.getCachedNullTerminatedArray();
-        //}
+        Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];

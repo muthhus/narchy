@@ -114,15 +114,14 @@ public abstract class Spatial<X> implements Active {
     }
 
     /** schedules this node for removal from the engine, where it will call stop(s) to complete the removal */
-    @Override public boolean hide() {
-        if (order > -1 || preactive) {
-            order = -1;
-            preactive = false;
-            return true;
-        }
-        return false;
+    @Override public void hide() {
+        order = -1;
+        preactive = false;
     }
 
+    public boolean hidden() {
+        return !(order > -1 || preactive);
+    }
     //abstract public Iterable<Collidable> bodies();
     abstract public void forEachBody(Consumer<Collidable> c);
 

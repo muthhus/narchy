@@ -40,57 +40,40 @@ public abstract class TermVector implements TermContainer {
 
     public TermVector(Term... terms) {
 
-        if (terms.length > Param.COMPOUND_SUBTERMS_MAX)
-            throw new UnsupportedOperationException("too many subterms (" + terms.length + " > " + Param.COMPOUND_SUBTERMS_MAX);
-
+        assert(terms.length <= Param.COMPOUND_SUBTERMS_MAX);
 
 //         if (Param.DEBUG) {
 //             for (Term x : terms)
 //                 if (x == null) throw new NullPointerException();
 //         }
 
-        /**
-         0: depVars
-         1: indepVars
-         2: queryVars
-         3: patternVar
-         4: volume
-         5: struct
-         */
         int[] meta = new int[6];
         this.hash = Terms.hashSubterms(terms, meta);
-
-        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
         final int vD = meta[0];  this.varDeps = (byte)vD;
         final int vI = meta[1];  this.varIndeps = (byte)vI;
         final int vQ = meta[2];  this.varQuerys = (byte)vQ;
-
-        int varTot = vD + vI + vQ ;
+        final int vP = meta[3];  this.varPatterns = (byte)vP;   //varTot+=NO
 
         final int vol = meta[4] + 1;
         this.volume = (short)( vol );
 
+        int varTot = vD + vI + vQ ;
         final int cmp = vol - varTot - vP;
         this.complexity = (short)(cmp);
 
         this.structure = meta[5];
     }
 
-
-
     @NotNull
     public static TermVector1 the(@NotNull Term the) {
         return new TermVector1(the);
     }
 
-
-
     @NotNull
     public static TermVector the2(@NotNull Term[] xy) {
         return new TermVector2(xy);
     }
-
 
     @NotNull
     public static TermContainer the(@NotNull Term... t) {
@@ -205,11 +188,6 @@ public abstract class TermVector implements TermContainer {
 
     @Override
     public final int hashCode() {
-        return hash;
-    }
-
-    @Override
-    public final int hashCodeSubTerms() {
         return hash;
     }
 

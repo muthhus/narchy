@@ -17,6 +17,6 @@ public interface Active {
     boolean active();
     boolean preactive();
 
-    boolean hide();
+    void hide();
 
 }

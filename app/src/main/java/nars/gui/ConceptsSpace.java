@@ -9,8 +9,11 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.time.RealTime;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
+import spacegraph.Spatial;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
@@ -42,13 +45,19 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
                 return ConceptsSpace.this.include(x.term());
             }
 
+            @Override
+            public void onRemoved(@NotNull BLink<Concept> value) {
+                ConceptWidget cw = widgetGet(value.get());
+                if (cw!=null)
+                    cw.hide();
+            }
         };
     }
 
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
 
-        Function<Term,ConceptWidget> materializer = materializer();
+
 
         long now = nar.time();
 
@@ -57,14 +66,33 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             Concept concept = b.get();
 
             displayNext.add(
-                space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
+                widgetGetOrCreate(concept)
+                //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
             );
 
         });
 
     }
 
-    private Function<Term, ConceptWidget> materializer() {
+    public ConceptWidget widgetGet(Concept concept) {
+        return concept.get(this);
+    }
+
+    public ConceptWidget widgetGetOrCreate(Concept concept) {
+        return concept.meta(this, (k,p) -> {
+            if (p == null) {
+                ConceptWidget c = materializer().apply(concept);
+                c.concept = concept;
+                c.activate();
+                return c;
+            } else {
+                ((Spatial)p).activate();
+                return p;
+            }
+        });
+    }
+
+    private Function<Termed, ConceptWidget> materializer() {
         return t -> new ConceptWidget(nar, t, maxEdgesPerNode);
     }
 

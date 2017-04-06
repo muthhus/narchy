@@ -42,7 +42,7 @@ public class TestNAR  {
 //    boolean showFail = true;
 //    boolean showSuccess;
 //    boolean showExplanations;
-    final boolean showOutput = false;
+    final static boolean showOutput = false;
 
     /** holds must (positive) conditions */
     final List<NARCondition> requires = $.newArrayList();

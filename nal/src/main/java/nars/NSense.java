@@ -191,7 +191,7 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) throws Narsese.NarseseException {
+    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
         return senseNumberBi($.the(id), v);
     }
 

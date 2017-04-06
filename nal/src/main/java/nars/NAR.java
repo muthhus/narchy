@@ -1639,7 +1639,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public NAR output(@NotNull OutputStream o) throws IOException {
+    public NAR output(@NotNull OutputStream o) {
         return output(o, x -> x.isDeleted() ? null : x);
     }
 

@@ -315,8 +315,8 @@ public enum $ {
         return terms.instprop(subject, predicate);
     }
     @Nullable
-    public static Term prop(Term subject, Term predicate) {
-        return terms.prop(subject, predicate);
+    public static Compound prop(Term subject, Term predicate) {
+        return (Compound) terms.prop(subject, predicate);
     }
 
 //    public static Term term(final Op op, final Term... args) {

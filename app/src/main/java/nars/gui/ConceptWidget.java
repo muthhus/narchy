@@ -118,15 +118,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         this.space = space;
 
 
-
-
         Concept c = concept;
 
         if (c != null) {
 
 
             edges.forEach(x -> {
-                if (null==space.space.getIfActive(x.get().term())) {
+                if (null == space.space.getIfActive(x.get().term())) {
                     //the target of this edge has disappeared
                     x.delete();
                 } else {
@@ -146,7 +144,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 
         } else {
             edges.clear();
-            hide();
+            delete();
         }
 
 //            float lastConceptForget = instance.getLastForgetTime();
@@ -235,22 +233,23 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
         Termed ttt = tgt.get();
         Term tt = ttt.term();
         if (!tt.equals(key)) {
-            ConceptWidget at = (ConceptWidget) space.space.getIfActive(tt);
-            if (at != null) {
-
-                TermEdge ate = new TermEdge(at);
-                ate.add(tgt, !(ttt instanceof Task));
-                edges.put(new RawPLink(ate, pri));
-
+            Concept c = space.nar.concept(tt);
+            if (c != null) {
+                ConceptWidget at = space.widgetGet(c);
+                if (at != null && !at.hidden()) {
+                    TermEdge ate = new TermEdge(at);
+                    ate.add(tgt, !(ttt instanceof Task));
+                    edges.put(new RawPLink(ate, pri));
+                }
             }
         }
     }
 
-    public ConceptWidget setConcept(Concept concept, long when) {
-        this.concept = concept;
-        //icon.update(concept, when);
-        return this;
-    }
+//    public ConceptWidget setConcept(Concept concept, long when) {
+//        this.concept = concept;
+//        //icon.update(concept, when);
+//        return this;
+//    }
 
     public static class TermEdge extends EDraw<Term, ConceptWidget> implements Termed {
 
@@ -322,13 +321,13 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         0.1f + 0.9f * ff.pri(); //0.9f;
 
-                this.attraction = 4f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0.25f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
-            this.attractionDist = 5.0f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+            this.attractionDist = 3f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
     }
 
@@ -392,14 +391,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
 //                    0.9f, conceptWidget.shapeColor);
 
             Concept c = conceptWidget.concept;
-            if (c!=null) {
+            if (c != null) {
                 Truth belief = c.belief(space.now, space.dur);
                 if (belief == null) belief = zero;
                 Truth goal = c.goal(space.now, space.dur);
                 if (goal == null) goal = zero;
 
                 float angle = 45 + belief.freq() * 180f + (goal.freq() - 0.5f) * 90f;
-                Draw.hsb(angle/360f, 0.5f, 0.25f + 0.5f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
+                Draw.hsb(angle / 360f, 0.5f, 0.25f + 0.5f * or(belief.conf(), goal.conf()), 0.9f, conceptWidget.shapeColor);
             }
 
         }

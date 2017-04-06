@@ -276,10 +276,8 @@ public class MySTMClustered extends STMClustered {
 
 
             return compoundOrNull(
-                nar.concepts.the(CONJ, dt, new Term[] {
-                    $.negIf(early.term(), negated),
-                    $.negIf(late.term(), negated)
-            } ));
+                nar.concepts.the(CONJ, dt, $.negIf(early.term(), negated),
+                        $.negIf(late.term(), negated)));
 
         } else {
 

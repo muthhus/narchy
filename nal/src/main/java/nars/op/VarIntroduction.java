@@ -18,18 +18,15 @@ import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
  */
 public abstract class VarIntroduction {
 
-    final int maxResults;
 
-    public VarIntroduction(int maxResults) {
-        this.maxResults = maxResults;
+    public VarIntroduction() {
+
     }
 
     public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
 
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test
-
-        int max = maxResults;
 
         Set<Term> selections = select(c);
         if (selections.isEmpty())
@@ -48,8 +45,7 @@ public abstract class VarIntroduction {
 
         if ((newContent instanceof Compound) && !newContent.equals(c)) {
             each.accept((Compound) newContent);
-            if (--max <= 0)
-                return;
+
         }
 
 //        while (selections.hasNext()) {

@@ -47,9 +47,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
                     float over = //(float) ((p + mass) - ideal);
                             ((float) p / ((float)p + mass) / s);
                     if (over >= Param.BUDGET_EPSILON) {
-                        b.commit(x -> {
-                            x.budget().priSub(over * (1f - x.qua()));
-                        });
+                        b.commit(x -> x.budget().priSub(over * (1f - x.qua())));
                     }
                 }
 

@@ -31,7 +31,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
     final List<Ortho> orthos = new FasterList<>(1);
 
-    final List<AbstractSpace<X,Spatial<X>>> inputs = new FasterList<>(1);
+    final List<AbstractSpace<X, Spatial<X>>> inputs = new FasterList<>(1);
 
     final Cache<X, Spatial<X>> atoms;
     final List<Ortho> preAdd = new FasterList();
@@ -65,19 +65,17 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
                 Caffeine.newBuilder()
-                //.softValues().build();
-                .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
-                    v.hide();
-                    v.delete();
-                })
-                .maximumSize(cacheCapacity)
-                //.weakValues()
-                .build();
+                        //.softValues().build();
+                        .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
+                            v.delete();
+                        })
+                        .maximumSize(cacheCapacity)
+                        //.weakValues()
+                        .build();
 
         this.atoms = atoms;
 
     }
-
 
 
     public SpaceGraph(AbstractSpace<X, ?>... cc) {
@@ -108,7 +106,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-
     public SpaceGraph ortho(Surface ortho) {
         return add(new Ortho(ortho).maximize());
     }
@@ -123,24 +120,24 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     private void _add(Ortho c) {
-        this.orthos.add( c);
+        this.orthos.add(c);
         c.start(this);
     }
 
-    public SpaceGraph add(AbstractSpace<X,Spatial<X>> c) {
+    public SpaceGraph add(AbstractSpace<X, Spatial<X>> c) {
         if (inputs.add(c))
             c.start(this);
         return this;
     }
 
-    public void remove(AbstractSpace<X,?> c) {
+    public void remove(AbstractSpace<X, ?> c) {
         if (inputs.remove(c)) {
             c.stop();
         }
     }
 
 
-    public @NotNull  <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
+    public @NotNull <Y extends Spatial<X>> Y getOrAdd(X x, Function<X, Y> materializer) {
         Spatial y = atoms.get(x, materializer);
         y.activate();
         return (Y) y;
@@ -153,7 +150,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-
     public SpaceGraph setGravity(v3 v) {
         dyn.setGravity(v);
         return this;
@@ -161,7 +157,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
 
 
     public static float r(float range) {
-        return (-0.5f + (float)Math.random())*2f*range;
+        return (-0.5f + (float) Math.random()) * 2f * range;
     }
 
 
@@ -181,7 +177,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-
     protected void initInput() {
 
         //default 3D input controls
@@ -192,7 +187,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    @Override final public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
+    @Override
+    final public void forEachIntSpatial(IntObjectProcedure<Spatial<X>> each) {
         int n = 0;
         for (int i = 0, inputsSize = inputs.size(); i < inputsSize; i++) {
             n += inputs.get(i).forEachWithInt(n, each);
@@ -208,7 +204,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     @Override
     protected void update() {
 
-        this.inputs.forEach( this::update );
+        this.inputs.forEach(this::update);
 
         super.update();
 
@@ -235,7 +231,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    final void update(AbstractSpace<X,Spatial<X>> s) {
+    final void update(AbstractSpace<X, Spatial<X>> s) {
 
         s.forEach(x -> x.update(dyn));
 
@@ -246,7 +242,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     void print(AbstractSpace s) {
         System.out.println();
         //+ active.size() + " active, "
-        System.out.println(s + ": "   + this.atoms.estimatedSize() + " cached; "+ "\t" + dyn.summary());
+        System.out.println(s + ": " + this.atoms.estimatedSize() + " cached; " + "\t" + dyn.summary());
         /*s.forEach(System.out::println);
         dyn.objects().forEach(x -> {
             System.out.println("\t" + x.getUserPointer());
@@ -254,18 +250,18 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         System.out.println();
     }
 
-    public ListSpace<X,?> add(Spatial<X>... s) {
+    public ListSpace<X, ?> add(Spatial<X>... s) {
         ListSpace<X, Spatial<X>> l = new ListSpace<>(s);
         add(l);
         return l;
     }
 
     public static SpaceGraph window(Surface s, int w, int h) {
-        SpaceGraph win = new SpaceGraph(new ZoomOrtho( s )
-            //.scale(Math.min(w,h))
+        SpaceGraph win = new SpaceGraph(new ZoomOrtho(s)
+                //.scale(Math.min(w,h))
                 .maximize()
         );
-        if (w>0 && h > 0) {
+        if (w > 0 && h > 0) {
 
             win.show(w, h);
         }
@@ -278,9 +274,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
             s.show(w, h);
             return s;
         } else if (o instanceof Spatial) {
-            return window(((Spatial)o), w, h);
+            return window(((Spatial) o), w, h);
         } else if (o instanceof Surface) {
-            return window(((Surface)o), w, h);
+            return window(((Surface) o), w, h);
         } else {
             return window(new ReflectionSurface(o), w, h);
         }
@@ -296,7 +292,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return win;
     }
 
-    @Deprecated public SpaceGraph with(BroadConstraint b) {
+    @Deprecated
+    public SpaceGraph with(BroadConstraint b) {
         dyn.addBroadConstraint(b);
         return this;
     }

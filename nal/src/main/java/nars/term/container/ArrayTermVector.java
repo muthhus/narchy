@@ -37,7 +37,7 @@ public class ArrayTermVector extends TermVector {
             Term x = terms[i];
 
             if (x == y) {
-                continue;
+                //continue;
             } else if (!x.equals(y)) {
                 return false;
             } else {

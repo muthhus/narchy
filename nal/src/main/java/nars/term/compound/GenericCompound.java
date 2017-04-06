@@ -146,8 +146,6 @@ public class GenericCompound implements Compound {
 
         if (this == that)
             return true;
-        if (hash != that.hashCode())
-            return false;
 
         Compound cthat;
         if (that instanceof Compound) {

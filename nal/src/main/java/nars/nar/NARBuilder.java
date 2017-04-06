@@ -56,8 +56,8 @@ public interface NARBuilder {
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
-                new DefaultConceptState("sleep", 16, 16, 3, 16, 8),
-                new DefaultConceptState("awake", 16, 16, 4, 24, 12)
+                new DefaultConceptState("sleep", 16, 16, 3, 32, 32),
+                new DefaultConceptState("awake", 16, 16, 4, 48, 48)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, BLink<Term>>, Bag<Task, BLink<Task>>, X> f) {

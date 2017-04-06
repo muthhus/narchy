@@ -122,7 +122,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     float right;
 
     public float zNear = 0.5f;
-    public float zFar = 600;
+    public float zFar = 1200;
 
 
     protected boolean stepping = true;
@@ -209,8 +209,12 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         gl.glShadeModel(GL_SMOOTH);
 
-        gl.glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        gl.glHint(GL_LINE_SMOOTH_HINT,
+                //GL_NICEST
+                GL_FASTEST);
+        gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT,
+                //GL_NICEST
+                GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -221,7 +225,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
         gl.glEnable(GL_DEPTH_TEST);
         gl.glDepthFunc(GL_LEQUAL);
-
 
         //gl.glEnable(GL2.GL_TEXTURE_2D); // Enable Texture Mapping
 
@@ -460,7 +463,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 //        stack.quats.pop();
     }
 
-    private final float[] matTmp = new float[16];
 
     public final float[] mat4f = new float[16];
 

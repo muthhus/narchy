@@ -165,7 +165,7 @@ public abstract class Param  {
 
 
     /** derivation confidence (by evidence) multiplier.  normal=1.0, <1.0= under-confident, >1.0=over-confident */
-    @NotNull public FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
+    @NotNull public final FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
 
 
 
