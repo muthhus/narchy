@@ -78,7 +78,6 @@ public class ListenerMixer implements StereoSoundProducer {
 
         Arrays.fill(leftBuf, 0);
         Arrays.fill(rightBuf, 0);
-        float maxAmplitude = 0;
 
         for (int i = 0; i < s && i >= 0; ) {
             Sound sound = sounds.get(i);

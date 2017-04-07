@@ -38,11 +38,11 @@ public class MIDI {
 
         SoNAR s = new SoNAR(d);
 
-        d.onCycle(()->{
-            s.termListeners.forEach((x, v) -> {
-                System.out.println(v);
-            });
-        });
+//        d.onCycle(()->{
+//            s.termListeners.forEach((x, v) -> {
+//                System.out.println(v);
+//            });
+//        });
 
         s.samples("/home/me/wav");
         for (int i = 36; i <= 51; i ++) {
