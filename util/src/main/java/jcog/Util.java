@@ -20,7 +20,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import jcog.data.LongString;
+import jcog.io.BinTxt;
 import jcog.list.FasterList;
 import jcog.math.OneDHaar;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1386,8 +1386,8 @@ public enum Util { ;
         long a = u.getLeastSignificantBits();
         long b = u.getMostSignificantBits();
         StringBuilder sb = new StringBuilder(6);
-        LongString.append(sb, a);
-        LongString.append(sb, b);
+        BinTxt.append(sb, a);
+        BinTxt.append(sb, b);
         return sb.toString();
     }
     public static CharSequence uuid64() {
@@ -1395,7 +1395,7 @@ public enum Util { ;
         long a = u.getLeastSignificantBits();
         long b = u.getMostSignificantBits();
         long c = a ^ b;
-        return LongString.toString(c);
+        return BinTxt.toString(c);
     }
 
     /** http://www.qat.com/using-waitnotify-instead-thread-sleep-java/ */

@@ -20,7 +20,7 @@
  */
 package nars.truth;
 
-import jcog.data.LongString;
+import jcog.io.BinTxt;
 import nars.Op;
 import nars.Param;
 import nars.Task;
@@ -201,7 +201,7 @@ public interface Stamp {
             if (ev[i] == Long.MAX_VALUE && i == len - 1) {
                 buffer.append(';'); //trailing cyclic value
             } else {
-                LongString.append(buffer, ev[i]);
+                BinTxt.append(buffer, ev[i]);
             }
             if (i < (len - 1)) {
                 buffer.append(Op.STAMP_SEPARATOR);

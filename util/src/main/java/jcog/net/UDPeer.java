@@ -7,8 +7,8 @@ import jcog.bag.Bag;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
-import jcog.data.LongString;
 import jcog.data.byt.DynByteSeq;
+import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
@@ -163,7 +163,7 @@ public class UDPeer extends UDP {
         @Override
         public String toString() {
 
-            return LongString.toString(id()).toString() + ' ' +
+            return BinTxt.toString(id()).toString() + ' ' +
                     ((char)cmd()) + '+' + ttl() +
                     '[' + dataLength() + ']';
 
@@ -485,7 +485,7 @@ public class UDPeer extends UDP {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + LongString.toString(id) + ')';
+        return getClass().getSimpleName() + '(' + BinTxt.toString(id) + ')';
     }
 
     @Override

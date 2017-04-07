@@ -21,10 +21,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
-import spacegraph.layout.Flatten;
-import spacegraph.layout.ForceDirected;
-import spacegraph.layout.Grid;
-import spacegraph.layout.Stacking;
+import spacegraph.layout.*;
 import spacegraph.math.Color3f;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.broad.Broadphase;
@@ -235,7 +232,7 @@ public class Vis {
 //                            }
 //                        }
 
-                        new Flatten()
+                        //new Flatten(),
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
@@ -243,7 +240,7 @@ public class Vis {
 //                        }
 
 
-                        //new Spiral()
+                        new Spiral()
 //                        //new FastOrganicLayout()
                 )
         ) {
@@ -253,7 +250,7 @@ public class Vis {
 //            }
         };
 
-        s.dyn.addBroadConstraint(new MyForceDirected());
+        //s.dyn.addBroadConstraint(new MyForceDirected());
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 

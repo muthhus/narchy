@@ -18,9 +18,13 @@ public class Audio implements Runnable {
     public final int maxChannels;
     private final SonarSample silentSample;
     private final SourceDataLine sdl;
+
     private final int rate = 44100;
+    private final int bufferSize = rate / 32;
+
     private final ListenerMixer listenerMixer;
-    private final int bufferSize = rate / 4;
+
+
     private final ByteBuffer soundBuffer = ByteBuffer.allocate(bufferSize * 4);
     private final float[] leftBuf, rightBuf;
     //private float amplitude = 1;
@@ -104,9 +108,11 @@ public class Audio implements Runnable {
 
         private final SoundProducer producer;
         final float distanceFactor = 1.0f;
+        private final float balance;
 
-        DefaultSource(SoundProducer p) {
-            producer = p;
+        DefaultSource(SoundProducer p, float balance) {
+            this.producer = p;
+            this.balance = balance;
         }
 
         @Override
@@ -116,13 +122,13 @@ public class Audio implements Runnable {
 
         @Override
         public float getX(float alpha) {
-            return 0;
+            return balance;
         }
     }
 
 
-    public void play(SoundProducer p, float volume, float priority) {
-        play(p, new DefaultSource(p), volume, priority);
+    public void play(SoundProducer p, float volume, float priority, float balance) {
+        play(p, new DefaultSource(p, balance), volume, priority);
     }
 
     public void play(SoundProducer p, SoundSource soundSource, float volume, float priority) {

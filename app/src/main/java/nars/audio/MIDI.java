@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.audio.granular.Granulize;
 
 import javax.sound.midi.*;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package spacegraph.audio.demo;
+package spacegraph.audio.granular;
 
 import spacegraph.audio.Audio;
 import spacegraph.audio.SoundListener;
