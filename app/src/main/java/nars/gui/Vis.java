@@ -232,7 +232,7 @@ public class Vis {
 //                            }
 //                        }
 
-                        //new Flatten(),
+                        new Flatten()
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
@@ -240,7 +240,7 @@ public class Vis {
 //                        }
 
 
-                        new Spiral()
+                        //new Spiral()
 //                        //new FastOrganicLayout()
                 )
         ) {
@@ -250,7 +250,7 @@ public class Vis {
 //            }
         };
 
-        //s.dyn.addBroadConstraint(new MyForceDirected());
+        s.dyn.addBroadConstraint(new MyForceDirected());
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 

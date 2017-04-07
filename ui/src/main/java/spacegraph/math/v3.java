@@ -31,13 +31,14 @@
 
 package spacegraph.math;
 
+import spacegraph.phys.BulletGlobals;
+
 import java.util.Random;
 
 /**
- * A 3-element vector that is represented by single-precision floating point 
+ * A 3-element vector that is represented by single-precision floating point
  * x,y,z coordinates.  If this value represents a normal, then it should
  * be normalized.
- *
  */
 public class v3 extends Tuple3f implements java.io.Serializable {
 
@@ -45,72 +46,72 @@ public class v3 extends Tuple3f implements java.io.Serializable {
     static final long serialVersionUID = -7031930069184524614L;
 
 
-
     /**
      * Constructs and initializes a Vector3f from the specified xyz coordinates.
+     *
      * @param x the x coordinate
      * @param y the y coordinate
      * @param z the z coordinate
      */
-    public v3(float x, float y, float z)
-    {
-        super(x,y,z);
+    public v3(float x, float y, float z) {
+        super(x, y, z);
     }
 
 
     /**
      * Constructs and initializes a Vector3f from the array of length 3.
+     *
      * @param v the array of length 3 containing xyz in order
      */
-    public v3(float[] v)
-    {
-       super(v);
+    public v3(float[] v) {
+        super(v);
     }
 
 
     /**
      * Constructs and initializes a Vector3f from the specified Vector3f.
+     *
      * @param v1 the Vector3f containing the initialization x y z data
      */
-    public v3(v3 v1)
-    {
-       super(v1);
+    public v3(v3 v1) {
+        super(v1);
     }
 
 
     /**
      * Constructs and initializes a Vector3f from the specified Vector3d.
+     *
      * @param v1 the Vector3d containing the initialization x y z data
      */
-    public v3(Vector3d v1)
-    {
-       super(v1);
+    public v3(Vector3d v1) {
+        super(v1);
     }
 
 
     /**
      * Constructs and initializes a Vector3f from the specified Tuple3f.
+     *
      * @param t1 the Tuple3f containing the initialization x y z data
-     */  
+     */
     public v3(Tuple3f t1) {
-       super(t1);
+        super(t1);
     }
 
 
     /**
      * Constructs and initializes a Vector3f from the specified Tuple3d.
+     *
      * @param t1 the Tuple3d containing the initialization x y z data
-     */  
+     */
     public v3(Tuple3d t1) {
-       super(t1);
+        super(t1);
     }
 
 
     /**
      * Constructs and initializes a Vector3f to (0,0,0).
      */
-    public v3()
-    {
+    public v3() {
         super();
     }
 
@@ -121,6 +122,7 @@ public class v3 extends Tuple3f implements java.io.Serializable {
     public static v3 v() {
         return new v3();
     }
+
     public static v3 v(v3 base, float mult) {
         v3 v = v();
         v.scale(mult, base);
@@ -138,31 +140,31 @@ public class v3 extends Tuple3f implements java.io.Serializable {
 
     /**
      * Returns the squared length of this vector.
+     *
      * @return the squared length of this vector
      */
-    public final float lengthSquared()
-    {
-        return (this.x*this.x + this.y*this.y + this.z*this.z);
+    public final float lengthSquared() {
+        return (this.x * this.x + this.y * this.y + this.z * this.z);
     }
 
     /**
      * Returns the length of this vector.
+     *
      * @return the length of this vector
      */
-    public final float length()
-    {
+    public final float length() {
         return (float)
-             Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
+                Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
     }
 
 
-  /**
+    /**
      * Sets this vector to be the vector cross product of vectors v1 and v2.
+     *
      * @param v1 the first vector
      * @param v2 the second vector
      */
-    public final v3 cross(v3 v1, v3 v2)
-    {
+    public final v3 cross(v3 v1, v3 v2) {
 
 
         float v1z = v1.z;
@@ -171,50 +173,52 @@ public class v3 extends Tuple3f implements java.io.Serializable {
         float v1y = v1.y;
         float v1x = v1.x;
         float v2x = v2.x;
-        set( v1y * v2z - v1z * v2y,
-             v2x * v1z - v2z * v1x,
-             v1x * v2y - v1y * v2x);
+        set(v1y * v2z - v1z * v2y,
+                v2x * v1z - v2z * v1x,
+                v1x * v2y - v1y * v2x);
 
         return this;
 
     }
 
- /**
-   * Computes the dot product of this vector and vector v1.
-   * @param v1 the other vector
-   * @return the dot product of this vector and v1
-   */
-  public final float dot(v3 v1)
-    {
-      return (this.x*v1.x + this.y*v1.y + this.z*v1.z);
+    /**
+     * Computes the dot product of this vector and vector v1.
+     *
+     * @param v1 the other vector
+     * @return the dot product of this vector and v1
+     */
+    public final float dot(v3 v1) {
+        return (this.x * v1.x + this.y * v1.y + this.z * v1.z);
     }
 
-   /**
+    /**
      * Sets the value of this vector to the normalization of vector v1.
+     *
      * @param v1 the un-normalized vector
      */
-    public final void normalize(v3 v1)
-    {
+    public final void normalize(v3 v1) {
         float norm = (float) (1.0 / Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z));
-        set( v1.x*norm,
-             v1.y*norm,
-             v1.z*norm);
+        set(v1.x * norm,
+                v1.y * norm,
+                v1.z * norm);
     }
 
     /**
      * Normalizes this vector in place.
      */
-    public final float normalize()
-    {
+    public final float normalize() {
 
-        float norm = (float)Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-        set(this.x / norm,
-            this.y / norm,
-            this.z / norm);
+        float norm = (float) Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        if (norm >= BulletGlobals.FLT_EPSILON) {
+
+            set(this.x / norm,
+                    this.y / norm,
+                    this.z / norm);
+        }
         return norm;
     }
 
-    public final v3 normalized()     {
+    public final v3 normalized() {
         normalize();
         return this;
     }
@@ -223,19 +227,19 @@ public class v3 extends Tuple3f implements java.io.Serializable {
 //        return normalized().scale(scale);
 //    }
 
-  /** 
-    *   Returns the angle in radians between this vector and the vector
-    *   parameter; the return value is constrained to the range [0,PI]. 
-    *   @param v1    the other vector 
-    *   @return   the angle in radians in the range [0,PI] 
-    */   
-   public final float angle(v3 v1)
-   { 
-      double vDot = this.dot(v1) / ( this.length()*v1.length() );
-      if( vDot < -1.0) vDot = -1.0;
-      if( vDot >  1.0) vDot =  1.0;
-      return((float) (Math.acos( vDot )));
-   }
+    /**
+     * Returns the angle in radians between this vector and the vector
+     * parameter; the return value is constrained to the range [0,PI].
+     *
+     * @param v1 the other vector
+     * @return the angle in radians in the range [0,PI]
+     */
+    public final float angle(v3 v1) {
+        double vDot = this.dot(v1) / (this.length() * v1.length());
+        if (vDot < -1.0) vDot = -1.0;
+        if (vDot > 1.0) vDot = 1.0;
+        return ((float) (Math.acos(vDot)));
+    }
 
     public static float dist(v3 a, v3 b) {
         v3 x = new v3(a);

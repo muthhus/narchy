@@ -1017,6 +1017,10 @@ public abstract class Dynamics<X> extends Collisions<X> {
         //return array[index];
     }
 
+    public void removeAnimation(Animated a) {
+        animations.remove(a);
+    }
+
     private static class InplaceSolverIslandCallback extends Islands.IslandCallback {
         public ContactSolverInfo solverInfo;
         public Constrainer solver;

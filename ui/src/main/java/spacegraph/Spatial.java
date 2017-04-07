@@ -136,7 +136,7 @@ public abstract class Spatial<X> implements Active {
     }
 
     public void stabilize(v3 boundsMin, v3 boundsMax) {
-        v3 zero = v(0,0,0);
+        //v3 zero = v(0,0,0);
 
         forEachBody(b -> {
             v3 t = b.worldTransform;

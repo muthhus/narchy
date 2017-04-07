@@ -111,7 +111,7 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 
 
     public void play() {
-		playOffset = rng.nextInt();
+		playOffset = Math.abs(rng.nextInt());
 		playTime = now;
 		isPlaying = true;
 	}
@@ -119,6 +119,20 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 	/** continue */
 	public void cont() {
 		isPlaying = true;
+	}
+
+	@Override
+	public String toString() {
+		return "Granulize{" +
+				"sampleRate=" + sampleRate +
+				", now=" + now +
+				", playTime=" + playTime +
+				", amplitude=" + amplitude +
+				", stretchFactor=" + stretchFactor +
+				", pitchFactor=" + pitchFactor +
+				", isPlaying=" + isPlaying +
+				", playOffset=" + playOffset +
+				'}';
 	}
 
 	@Override
@@ -135,7 +149,7 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 	private int calculateCurrentBufferIndex() {
         float sf = stretchFactor.floatValue();
 
-		return Math.round(playOffset + (now - playTime) / sf) % sourceBuffer.length;
+		return Math.abs(Math.round(playOffset + (now - playTime) / sf)) % sourceBuffer.length;
 	}
 
 	public Granulize setStretchFactor(float stretchFactor) {

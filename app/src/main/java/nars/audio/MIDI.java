@@ -1,9 +1,11 @@
 package nars.audio;
 
+import jcog.Util;
 import jcog.learn.markov.MarkovTrack;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
+import nars.Narsese;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -15,25 +17,42 @@ import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.granular.Granulize;
 
 import javax.sound.midi.*;
+import javax.sound.sampled.LineUnavailableException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static nars.audio.MIDI.MidiInReceiver.channelKey;
+
 
 /**
  * generic MIDI input interface
  */
 public class MIDI {
-    public static void main(String[] arg) {
-        Default d = NARBuilder.newMultiThreadNAR(2,
+    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException {
+        Default d = NARBuilder.newMultiThreadNAR(1,
             new RealTime.CS().durFPS(30f)
         );
-        d.termVolumeMax.setValue(16);
-
-        //d.log();
-        //Vis.conceptsWindow3D(d, 8, 8).show(800, 600);
-
+        d.nal(4);
+        d.termVolumeMax.setValue(12);
         MIDI(d);
 
-        new NAgentX(d) {
+        SoNAR s = new SoNAR(d);
+
+        d.onCycle(()->{
+            s.termListeners.forEach((x, v) -> {
+                System.out.println(v);
+            });
+        });
+
+        s.samples("/home/me/wav");
+        for (int i = 36; i <= 51; i ++) {
+            Compound on =
+                    channelKey(9, i);
+                    //$.inh(channelKey(9, i), $.the("on"));
+            System.out.println(on);
+            s.listen(on);
+        }
+        new NAgentX("MIDI", d) {
 
             @Override
             public synchronized void init() {
@@ -46,6 +65,8 @@ public class MIDI {
                 return 0;
             }
         }.runRT(4f);
+
+        //d.loop();
 
     }
 
@@ -88,7 +109,7 @@ public class MIDI {
         return device.getDeviceInfo().getName().startsWith("MPD218");
     }
 
-    private static class MidiInReceiver implements Receiver {
+    public static class MidiInReceiver implements Receiver {
 
         private final MidiDevice device;
         private final NAR nar;
@@ -115,16 +136,16 @@ public class MIDI {
                 int cmd = s.getCommand();
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
-                        t = $.inh (channelKey(s), $.the("on"));
+                        t = $.inh(channelKey(s), $.the("on"));
                         freq = 0f;
                         conf = 0.5f;
                         break;
                     case ShortMessage.NOTE_ON:
                         t = $.inh(channelKey(s), $.the("on"));
                         freq = 1f;
-                        conf = 0.5f + 0.5f * s.getData2()/64f;
+                        conf = Util.clamp(0.5f + 0.5f * s.getData2()/64f, 0f, 0.9f);
                         break;
-                        case ShortMessage.CONTROL_CHANGE:
+                        //case ShortMessage.CONTROL_CHANGE:
                 }
             }
 
@@ -133,8 +154,12 @@ public class MIDI {
             }
         }
 
-        public @NotNull Compound channelKey(ShortMessage s) {
-            return $.p($.the(s.getChannel()), $.the(s.getData1() /* key */));
+        public static @NotNull Compound channelKey(ShortMessage s) {
+            return channelKey(s.getChannel(), s.getData1() /* key */);
+        }
+
+        public static @NotNull Compound channelKey(int channel, int key) {
+            return $.p($.the(channel), $.the(key));
         }
 
         @Override

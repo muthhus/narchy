@@ -32,7 +32,7 @@ public class SoNAR {
     final Map<String, SonarSample> samples = new ConcurrentHashMap<>();
 
     public SoNAR(NAR n) throws LineUnavailableException {
-        this(n, new Audio(64));
+        this(n, new Audio(16));
     }
 
     public SonarSample sample(String file) {
@@ -48,8 +48,13 @@ public class SoNAR {
     /** gets a random sample from what is loaded */
     public SonarSample sampleRandom() {
         List<SonarSample> l = samples.values().stream().collect(Collectors.toList());         //HACK
-        if (l!=null && !l.isEmpty())
-            return l.get(Math.abs(nar.random.nextInt(l.size())));
+        if (l!=null && !l.isEmpty()) {
+            SonarSample s;
+            do {
+                s = l.get(Math.abs(Math.abs(nar.random.nextInt()) % l.size()));
+            } while (s == null);
+            return s;
+        }
         else
             return null;
     }
@@ -77,33 +82,37 @@ public class SoNAR {
         termListeners.computeIfAbsent(k, kk->{
 
             Granulize g = new Granulize(sampleRandom(), 0.25f, 1.5f);
-            audio.play(g, 0.1f, 1f, (float) (Math.random() - 0.5f));
+            audio.play(g, 0.1f, 0.5f, (float) (Math.random() - 0.5f));
             return g;
         });
 
     }
 
-    protected void update() {
+    protected synchronized void update() {
         termListeners.forEach(this::update);
     }
 
-    private void update(Term k, Granulize v) {
+    private boolean update(Term k, Granulize v) {
         Concept c = nar.concept(k);
         if (c!=null) {
             float p = nar.pri(k);
-            v.setAmplitude(p);
+            if (p==p && p > 0) {
+                v.setAmplitude(p);
 
-            Truth b = c.belief(nar.time(), nar.dur());
-            if (b!=null)
-                v.setStretchFactor((b.expectation() - 0.5f) * 2f);
-            
-            //v.setStretchFactor();
-            v.pitchFactor.setValue(1f + (c.volume()));
-            //g.setStretchFactor(1f/(1f+kk.volume()/4f));
-
-        } else {
-            v.stop();
+                //            Truth b = c.belief(nar.time(), nar.dur());
+                //            if (b!=null)
+                //                v.setStretchFactor((b.expectation() - 0.5f) * 2f);
+                //
+                //v.setStretchFactor();
+                v.pitchFactor.setValue(1f + (c.volume()));
+                //g.setStretchFactor(1f/(1f+kk.volume()/4f));
+                return true;
+            }
         }
+
+        v.setAmplitude(0f);
+        //v.stop();
+        return false;
     }
 
     public void join() throws InterruptedException {

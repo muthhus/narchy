@@ -28,7 +28,7 @@ import static spacegraph.layout.Grid.col;
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
-    public static final float UPDATE_RATE = 0.5f;
+    public static final float UPDATE_RATE = 0.1f;
     public final NAR nar;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
@@ -48,8 +48,10 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             @Override
             public void onRemoved(@NotNull BLink<Concept> value) {
                 ConceptWidget cw = widgetGet(value.get());
-                if (cw!=null)
+                if (cw!=null) {
                     cw.hide();
+                    cw.delete();
+                }
             }
         };
     }
@@ -59,7 +61,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
 
-        long now = nar.time();
+        //long now = nar.time();
 
         bag.forEach((BLink<Concept> b) ->{
 

@@ -44,10 +44,11 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
 
     @Override
     public void onChange(ToggleButton t, boolean enabled) {
+        SpaceGraph space = this.space;
         synchronized (spacer) {
             if (enabled) {
                 if (space == null) {
-                    space = SpaceGraph.window(spacer.get(), 0, 0);
+                    space = this.space = SpaceGraph.window(spacer.get(), 0, 0);
 
                     int sx = Finger.pointer.getX();
                     int sy = Finger.pointer.getY();
@@ -59,7 +60,7 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
 
                 }
             } else {
-                if (this.space!=null) {
+                if (space!=null) {
                     GLWindow win = this.space.window;
                     this.space = null;
                     if (win != null && win.getWindowHandle() != 0)

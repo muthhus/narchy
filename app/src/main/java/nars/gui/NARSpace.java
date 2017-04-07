@@ -7,6 +7,7 @@ import nars.term.Term;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
+import spacegraph.phys.util.Animated;
 import spacegraph.space.ListSpace;
 
 import java.util.Collection;
@@ -17,7 +18,7 @@ import java.util.List;
  * thread-safe visualization of capacity-bound NAR data buffers
  * TODO extract to superclass: BufferedListSpace
  */
-public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends ListSpace<X, Y> {
+public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends ListSpace<X, Y> implements Animated {
 
 
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
@@ -44,6 +45,12 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
         this.nar = nar;
     }
 
+    @Override
+    public boolean animate(float dt) {
+        if (dt > 0)
+            updateIfNotBusy(this::update);
+        return true;
+    }
 
     @Override
     public final void stop() {
@@ -52,6 +59,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
             active.forEach(Active::hide);
             active.clear();
             on.off();
+            space.dyn.removeAnimation(this);
+
             on = null;
         }
     }
@@ -69,7 +78,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public void start(SpaceGraph space) {
         this.space = space;
-        on = nar.onCycle(nn -> updateIfNotBusy(this::update));
+        space.dyn.addAnimation(this);
+        //on = nar.onCycle(nn -> updateIfNotBusy(this::update));
     }
 
 
@@ -81,6 +91,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
         List<Y> next = new FasterList(prev.size() /* estimate */);
         get(next);
+
+        //System.out.println(space.dyn.summary() + " " +  prev.size() + " prev " + next.size() + " next");
 
         this.active = next;
     }

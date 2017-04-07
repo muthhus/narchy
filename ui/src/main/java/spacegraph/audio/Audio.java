@@ -153,7 +153,7 @@ public class Audio implements Runnable {
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
         synchronized (listenerMixer) {
-            float maxAmplitude = listenerMixer.read(leftBuf, rightBuf, rate);
+            listenerMixer.read(leftBuf, rightBuf, rate);
             ////            if (maxAmplitude > targetAmplitude) targetAmplitude = maxAmplitude;
         }
 

@@ -1,5 +1,7 @@
 package jcog.io;
 
+import com.google.common.primitives.Ints;
+
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -66,7 +68,7 @@ public class BinTxt {
                     if (value == 0) {
                         stringBuff.append('z');
                     } else {
-                        stringBuff.append(encodeChunk(value));
+                        encodeChunk(value, stringBuff);
                     }
                     Arrays.fill(chunk, (byte) 0);
                     chunkIndex = 0;
@@ -78,22 +80,21 @@ public class BinTxt {
                 int numPadded = chunk.length - chunkIndex;
                 Arrays.fill(chunk, chunkIndex, chunk.length, (byte)0);
                 int value = byteToInt(chunk);
-                char[] encodedChunk = encodeChunk(value);
-                for(int i = 0 ; i < encodedChunk.length - numPadded; i++) {
-                    stringBuff.append(encodedChunk[i]);
-                }
+                encodeChunk(value, stringBuff);
+//                for(int i = 0 ; i < encodedChunk.length - numPadded; i++) {
+//                    stringBuff.append(encodedChunk[i]);
+//                }
             }
 
             return stringBuff.toString();
         }
 
-        private static char[] encodeChunk(int value) {
-            char[] encodedChunk = new char[5];
-            for(int i = 0 ; i < encodedChunk.length; i++) {
-                encodedChunk[i] = (char) ((value / BASE85_POW[4 - i]) + ASCII_SHIFT);
+        private static void encodeChunk(int value, StringBuilder target) {
+            assert(value > 0);
+            for(int i = 0 ; i < 5; i++) {
+                target.append( (char) ((value / BASE85_POW[4 - i]) + ASCII_SHIFT) );
                 value = value % BASE85_POW[4 - i];
             }
-            return encodedChunk;
         }
 
         /**
@@ -170,19 +171,20 @@ public class BinTxt {
         }
 
         private static int byteToInt(byte[] value) {
-            if (value == null || value.length != 4) {
-                throw new IllegalArgumentException("You cannot create an int without exactly 4 bytes.");
-            }
-            return ByteBuffer.wrap(value).getInt();
+//            if (value == null || value.length != 4) {
+//                throw new IllegalArgumentException("You cannot create an int without exactly 4 bytes.");
+//            }
+            return Ints.fromBytes(value[0], value[1], value[2], value[3] ); //ByteBuffer.wrap(value).getInt();
         }
 
         private static byte[] intToByte(int value) {
-            return new byte[] {
-                    (byte) (value >>> 24),
-                    (byte) (value >>> 16),
-                    (byte) (value >>> 8),
-                    (byte) (value)
-            };
+            return Ints.toByteArray(value);
+//            return new byte[] {
+//                    (byte) (value >>> 24),
+//                    (byte) (value >>> 16),
+//                    (byte) (value >>> 8),
+//                    (byte) (value)
+//            };
         }
 
 

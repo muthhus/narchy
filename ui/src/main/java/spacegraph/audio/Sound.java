@@ -54,8 +54,7 @@ public class Sound implements SoundSource, Comparable
         amplitude = volume / (1.0f + dist); //TODO i added /dist divisor
     }
 
-    public void read(float[] buf, int readRate)
-    {
+    public void read(float[] buf, int readRate)    {
         producer.read(buf, readRate);
     }
 
@@ -64,8 +63,7 @@ public class Sound implements SoundSource, Comparable
         producer.skip(samplesToSkip, readRate);
     }
 
-    public final boolean isLive()
-    {
+    public final boolean isLive()    {
         return producer.isLive();
     }
 

@@ -63,11 +63,16 @@ public class ListenerMixer implements StereoSoundProducer {
 
     @Override
     @SuppressWarnings("unchecked")
-    public float read(float[] leftBuf, float[] rightBuf, int readRate) {
+    public void read(float[] leftBuf, float[] rightBuf, int readRate) {
+
+        int s = sounds.size();
+        if (s == 0)
+            return;
+
         if (buf.length != leftBuf.length)
             buf = new float[leftBuf.length];
 
-        if (sounds.size() > maxChannels) {
+        if (s > maxChannels) {
             Collections.sort(sounds);
         }
 
@@ -75,7 +80,7 @@ public class ListenerMixer implements StereoSoundProducer {
         Arrays.fill(rightBuf, 0);
         float maxAmplitude = 0;
 
-        for (int i = 0; i < sounds.size() && i >= 0; ) {
+        for (int i = 0; i < s && i >= 0; ) {
             Sound sound = sounds.get(i);
 
             if (i < maxChannels) {
@@ -95,12 +100,10 @@ public class ListenerMixer implements StereoSoundProducer {
 
                     float lb = leftBuf[j];
                     lb += bj * lp;
-                    if (lb > maxAmplitude) maxAmplitude = lb;
                     leftBuf[j] = lb;
 
                     float rb = rightBuf[j];
                     rb += bj * rp;
-                    if (rb > maxAmplitude) maxAmplitude = rb;
                     rightBuf[j] = rb;
                 }
             } else {
@@ -113,7 +116,6 @@ public class ListenerMixer implements StereoSoundProducer {
                 i++;
         }
 
-        return maxAmplitude;
     }
 
     @Override

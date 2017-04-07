@@ -17,7 +17,7 @@ abstract public class AbstractSpace<X, Y>  {
 
     //final AtomicBoolean busy = new AtomicBoolean(true);
     private long now;
-    private float dt;
+    private long dt;
 
     final List<SpaceTransform> transforms = new FasterList();
 
@@ -48,10 +48,13 @@ abstract public class AbstractSpace<X, Y>  {
      */
     public void updateIfNotBusy(Runnable proc) {
         if (busy.compareAndSet(false, true)) {
-            float last = this.now;
-            this.dt = (this.now = now()) - last;
-            proc.run();
-            busy.set(false);
+            try {
+                long last = this.now;
+                this.dt = (this.now = now()) - last;
+                proc.run();
+            } finally {
+                busy.set(false);
+            }
         }
     }
 

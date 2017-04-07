@@ -102,7 +102,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     public static float complexityFactorAbsolute(Compound conclusion, byte punc, Task task, Task belief) {
         //return 1f / (1f + conclusion.complexity());
         return 1f / (1f + (float)Math.sqrt(
-                conclusion.volume()
+                conclusion.complexity()
         ));
     }
 

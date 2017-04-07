@@ -49,6 +49,21 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     }
 
+    @Override
+    public void delete() {
+        if (shape!=null) {
+            shape.setUserPointer(null);
+            shape = null;
+        }
+        if (body!=null) {
+            body.destroy();
+            body = null;
+        }
+
+        super.delete();
+
+    }
+
     protected String label(X x) {
         return x!=null ? x.toString() : super.toString();
     }
