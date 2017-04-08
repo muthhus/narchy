@@ -76,8 +76,7 @@ public class Narsese extends BaseParser<Object> {
 //                        throwable);
 
             // FIXME: is there any case at all where context.getMatcher() is null?
-            @SuppressWarnings("ConstantConditions")
-            final boolean match = matcher.match(context);
+            @SuppressWarnings("ConstantConditions") final boolean match = matcher.match(context);
 //
 //            final MatchContextEvent<T> postMatchEvent = match
 //                    ? new MatchSuccessEvent<>(context)
@@ -103,6 +102,7 @@ public class Narsese extends BaseParser<Object> {
     //private final Map<String,Term> termCache = new HashMap();
 
     static final Class parser;
+
     static {
         Class p;
         try {
@@ -118,7 +118,7 @@ public class Narsese extends BaseParser<Object> {
             //() -> Grappa.createParser(Narsese.class)
             () -> {
                 try {
-                    return (Narsese)parser.newInstance();
+                    return (Narsese) parser.newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
@@ -132,7 +132,8 @@ public class Narsese extends BaseParser<Object> {
 
     public TermBuilder T = $.terms; //HACK
 
-    @NotNull public static Narsese the() {
+    @NotNull
+    public static Narsese the() {
         return parsers.get();
     }
 
@@ -181,7 +182,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     public static float quality(NAR nar, byte p, @Nullable Truth t) {
-        return t!=null ? BudgetFunctions.truthToQuality(t) : nar.qualityDefault(p);
+        return t != null ? BudgetFunctions.truthToQuality(t) : nar.qualityDefault(p);
     }
 
     public static boolean isPunctuation(char c) {
@@ -201,7 +202,7 @@ public class Narsese extends BaseParser<Object> {
                 zeroOrMore( //1 or more?
                         //sequence(
                         //firstOf(
-                                //LineComment(),
+                        //LineComment(),
                         s(),
                         Task()
                         //)
@@ -342,11 +343,11 @@ public class Narsese extends BaseParser<Object> {
 
                 s(),
 
-                optional( SentencePunctuation(punc), s() ),
+                optional(SentencePunctuation(punc), s()),
 
-                optional( Tense(tense), s() ),
+                optional(Tense(tense), s()),
 
-                optional( Truth(truth, tense), s() ),
+                optional(Truth(truth, tense), s()),
 
                 push(new Object[]{budget.get(), term.get(), punc.get(), truth.get(), tense.get()})
                 //push(getTask(budget, term, punc, truth, tense))
@@ -543,10 +544,6 @@ public class Narsese extends BaseParser<Object> {
                         ),
 
 
-
-
-
-
                         seq(COMPOUND_TERM_OPENER, s(),
                                 firstOf(
 
@@ -612,7 +609,7 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 COMPOUND_TERM_CLOSER,
 
-                push(T.the(CONJ, 0, ((Compound)popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */ )
+                push(T.the(CONJ, 0, ((Compound) popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */)
         );
     }
 
@@ -625,8 +622,8 @@ public class Narsese extends BaseParser<Object> {
                 Term(true, false),
                 s(),
                 firstOf(
-                        seq( OpTemporal(), CycleDelta() ),
-                        seq( OpTemporalParallel(), push(0) /* dt=0 */ )
+                        seq(OpTemporal(), CycleDelta()),
+                        seq(OpTemporalParallel(), push(0) /* dt=0 */)
                 ),
                 s(),
                 Term(true, false),
@@ -784,18 +781,17 @@ public class Narsese extends BaseParser<Object> {
         return sequence(
                 dquote(), //leading quote
                 firstOf(
-                    //multi-line TRIPLE quotes
-                    seq( regex("\"\"[\\s\\S]+\"\"\""), push( $.the( '\"' + match() ) ) ),
+                        //multi-line TRIPLE quotes
+                        seq(regex("\"\"[\\s\\S]+\"\"\""), push($.the('\"' + match()))),
 
-                    //one quote
-                    seq(
-                            //regex("[\\s\\S]+\""),
-                            regex("(?:[^\"\\\\]|\\\\.)*\""),
-                            push( $.the( '\"' + match() ) ) )
+                        //one quote
+                        seq(
+                                //regex("[\\s\\S]+\""),
+                                regex("(?:[^\"\\\\]|\\\\.)*\""),
+                                push($.the('\"' + match())))
                 )
         );
     }
-
 
 
     Rule Ellipsis() {
@@ -827,7 +823,6 @@ public class Narsese extends BaseParser<Object> {
         //TODO handle \" escape
         return zeroOrMore(noneOf("\""));
     }
-
 
 
     Rule AnyString() {
@@ -925,12 +920,16 @@ public class Narsese extends BaseParser<Object> {
         return firstOf(
                 seq("<|>", push(EQUI)),
                 seq("=|>", push(IMPL)),
-                seq("&|",  push(CONJ))
+                seq("&|", push(CONJ))
         );
     }
 
     Rule sepArgSep() {
-        return sequence(s(), /*optional*/(ARGUMENT_SEPARATOR), s());
+        return firstOf(
+                        ss(),
+                        seq(s(), optional(ARGUMENT_SEPARATOR), s())
+                );
+
     }
 
 
@@ -1033,7 +1032,7 @@ public class Narsese extends BaseParser<Object> {
 //        if (stack.isEmpty())
 //            return null;
 
-        List vectorterms = $.newArrayList( stack.size() );
+        List vectorterms = $.newArrayList(stack.size());
 
         while (!stack.isEmpty()) {
             Object p = pop();
@@ -1062,7 +1061,7 @@ public class Narsese extends BaseParser<Object> {
             if (p instanceof String) {
                 //throw new RuntimeException("string not expected here");
                 //Term t = $.the((String) p);
-                vectorterms.add($.the((String)p));
+                vectorterms.add($.the((String) p));
             } else if (p instanceof Term) {
                 vectorterms.add(p);
             } else if (p instanceof Op) {
@@ -1090,15 +1089,17 @@ public class Narsese extends BaseParser<Object> {
         return x;
     }
 
-    final static Cache<Pair<Op,ImmutableList<Term>>, Term> termCache = Caffeine.newBuilder()
+    final static Cache<Pair<Op, ImmutableList<Term>>, Term> termCache = Caffeine.newBuilder()
             .weakValues()
             //.maximumSize(1024 * 32)
             .build();
 
-    /** place-holder for invalid term. this value should never leave this class */
+    /**
+     * place-holder for invalid term. this value should never leave this class
+     */
     public final static AtomicSingleton NarseseNull = new AtomicSingleton("");
 
-    final Function<Pair<Op,ImmutableList<Term>>, Term> termBuilder = (k) ->{
+    final Function<Pair<Op, ImmutableList<Term>>, Term> termBuilder = (k) -> {
         ImmutableList<Term> args = k.getTwo();
         Term x = T.the(k.getOne(), args.toArray(new Term[args.size()]));
         return x == null ? NarseseNull : x;
@@ -1137,8 +1138,19 @@ public class Narsese extends BaseParser<Object> {
     /**
      * whitespace, optional
      */
-    Rule s() {
-        return zeroOrMore(anyOf(" \t\f\n\r"));
+    public Rule s() {
+        return zeroOrMore(whitespace());
+    }
+
+    /**
+     * whitespace, requried
+     */
+    public Rule ss() {
+        return oneOrMore(whitespace());
+    }
+
+    public Rule whitespace() {
+        return anyOf(" \t\f\n\r");
     }
 
 //    Rule sNonNewLine() {
@@ -1167,12 +1179,12 @@ public class Narsese extends BaseParser<Object> {
         return i[0];
     }
 
-    public static void tasks(String input, Collection<Task> c, Collection<NarseseException> e, NAR m)  {
+    public static void tasks(String input, Collection<Task> c, Collection<NarseseException> e, NAR m) {
         tasks(input, c::add, e::add, m);
     }
 
     public static void tasks(String input, Consumer<Task> c, NAR m) {
-        tasks(input, c, (e) -> c.accept( Command.error(e) ), m );
+        tasks(input, c, (e) -> c.accept(Command.error(e)), m);
     }
 
     /**
@@ -1204,7 +1216,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * supplies the source array of objects that can construct a Task
      */
-    void tasksRaw(CharSequence input, Consumer<Object[]> c)  {
+    void tasksRaw(CharSequence input, Consumer<Object[]> c) {
 
         ParsingResult r = inputParser.run(input);
 
@@ -1272,15 +1284,16 @@ public class Narsese extends BaseParser<Object> {
         /*if (!(content instanceof Compound)) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
             //return Command.task($.func("log", content));
-        } else */{
+        } else */
+        {
 
             Object px = x[2];
 
             byte punct =
                     px instanceof Byte ?
-                        ((Byte) x[2]).byteValue()
-                                    :
-                        (byte)(((Character) x[2]).charValue());
+                            ((Byte) x[2]).byteValue()
+                            :
+                            (byte) (((Character) x[2]).charValue());
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))
@@ -1320,7 +1333,6 @@ public class Narsese extends BaseParser<Object> {
 
         throw new NarseseException(s.toString(), r, errorCause);
     }
-
 
 
     @NotNull

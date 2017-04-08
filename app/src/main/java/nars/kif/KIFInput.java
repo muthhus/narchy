@@ -16,8 +16,14 @@
  */
 package nars.kif;
 
+import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
+import nars.nar.Terminal;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.atom.Atomic;
 
 import java.util.Iterator;
 import java.util.List;
@@ -81,91 +87,15 @@ public class KIFInput implements Runnable {
     public void run() {
         while (formulaIterator.hasNext()) {
 
-            Formula f = formulaIterator.next();
-            if (f == null) {
+            Formula x = formulaIterator.next();
+            if (x == null) {
                 break;
             }
 
-            String root = f.car(); //root operate
+            Compound y = formulaToTerm(x);
 
-            List<String> args = f.argumentsToArrayList(1);
-
-            /**
-             *
-             *
-             * https://github.com/opencog/opencog/blob/04db8e557a2d67da9025fe455095d2cda0261ea7/opencog/python/sumo/sumo.py
-             * def special_link_type(predicate):
-             mapping = {
-             '=>':types.ImplicationLink,
-             '<=>':types.EquivalenceLink,
-             'and':types.AndLink,
-             'or':types.OrLink,
-             'not':types.NotLink,
-             'instance':types.MemberLink,
-             # This might break some of the formal precision of SUMO, but who cares
-             'attribute':types.InheritanceLink,
-             'member':types.MemberLink,
-             'subclass':types.InheritanceLink,
-             'exists':types.ExistsLink,
-             'forall':types.ForAllLink,
-             'causes':types.PredictiveImplicationLink
-             *
-             */
-
-            switch (root) {
-                case "subclass":
-                    if (includeSubclass) {
-                        if (args.size() != 2) {
-                            System.err.println("subclass expects 2 arguments");
-                        } else {
-                            nar.input("(" + args.get(0) + " --> " + args.get(1) + ").");
-                        }
-                    }
-                    break;
-                case "instance":
-                    if (includeInstance) {
-                        if (args.size() != 2) {
-                            System.err.println("instance expects 2 arguments");
-                        } else {
-                            nar.input("(" + args.get(0) + " -{- " + args.get(1) + ").");
-                        }
-                    }
-                    break;
-                case "relatedInternalConcept":
-                        /*(documentation relatedInternalConcept EnglishLanguage "Means that the two arguments are related concepts within the SUMO, i.e. there is a significant similarity of meaning between them. To indicate a meaning relation between a SUMO concept and a concept from another source, use the Predicate relatedExternalConcept.")            */
-                    if (includeRelatedInternalConcept) {
-                        if (args.size() != 2) {
-                            System.err.println("relatedInternalConcept expects 2 arguments");
-                        } else {
-                            nar.input("(" + args.get(0) + " <-> " + args.get(1) + ").");
-                        }
-                    }
-                    break;
-                case "disjoint":
-                    //"(||," <term> {","<term>} ")"      // disjunction
-                    if (includeDisjoint) {
-                        nar.input("(||," + args.get(0) + "," + args.get(1) + ").");
-                    }
-                    break;
-                case "disjointRelation":
-                    if (includeDisjoint) {
-                        nar.input("(||," + args.get(0) + "," + args.get(1) + ").");
-                    }
-                    break;
-                case "subrelation":
-                    //for now, use similarity+inheritance but more clear expression is possible
-                    if (includeSubrelation) {
-                        //emit("(" + a.get(0) + " <-> " + a.get(1) + ").");
-                        nar.input("(" + args.get(0) + " --> " + args.get(1) + ").");
-                    }
-                    break;
-//                case "=>":
-//                    break;
-                default:
-                    //System.out.println("unknown: " + root);
-                    break;
-            }
-
+            if (y!=null)
+                nar.believe(y);
 
             //  => Implies
             //  <=> Equivalance
@@ -174,9 +104,156 @@ public class KIFInput implements Runnable {
 
     }
 
+    public Compound formulaToTerm(Formula x) {
+        String root = x.car(); //root operate
+
+        List<String> args = x.argumentsToArrayList(1);
+
+        /**
+         *
+         *
+         * https://github.com/opencog/opencog/blob/04db8e557a2d67da9025fe455095d2cda0261ea7/opencog/python/sumo/sumo.py
+         * def special_link_type(predicate):
+         mapping = {
+         '=>':types.ImplicationLink,
+         '<=>':types.EquivalenceLink,
+         'and':types.AndLink,
+         'or':types.OrLink,
+         'not':types.NotLink,
+         'instance':types.MemberLink,
+         # This might break some of the formal precision of SUMO, but who cares
+         'attribute':types.InheritanceLink,
+         'member':types.MemberLink,
+         'subclass':types.InheritanceLink,
+         'exists':types.ExistsLink,
+         'forall':types.ForAllLink,
+         'causes':types.PredictiveImplicationLink
+         *
+         */
+
+        Compound y = null;
+        switch (root) {
+            case "subclass":
+                if (includeSubclass) {
+                    if (args.size() != 2) {
+                        System.err.println("subclass expects 2 arguments");
+                    } else {
+                        try {
+                            y = $.$("(" + args.get(0) + " --> " + args.get(1) + ")");
+                        } catch (Narsese.NarseseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+            case "instance":
+                if (includeInstance) {
+                    if (args.size() != 2) {
+                        System.err.println("instance expects 2 arguments");
+                    } else {
+                        try {
+                            y = $.$("({" + args.get(0) + "} --> " + args.get(1) + ")");
+                        } catch (Narsese.NarseseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+            case "relatedInternalConcept":
+                    /*(documentation relatedInternalConcept EnglishLanguage "Means that the two arguments are related concepts within the SUMO, i.e. there is a significant similarity of meaning between them. To indicate a meaning relation between a SUMO concept and a concept from another source, use the Predicate relatedExternalConcept.")            */
+                if (includeRelatedInternalConcept) {
+                    if (args.size() != 2) {
+                        System.err.println("relatedInternalConcept expects 2 arguments");
+                    } else {
+                        try {
+                            y = $.$("(" + args.get(0) + " <-> " + args.get(1) + ").");
+                        } catch (Narsese.NarseseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+            case "disjoint":
+                //"(||," <term> {","<term>} ")"      // disjunction
+                if (includeDisjoint) {
+                    try {
+                        y = $.$("(||," + args.get(0) + "," + args.get(1) + ").");
+                    } catch (Narsese.NarseseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+//                case "disjointRelation":
+//                    if (includeDisjoint) {
+//                        nar.input("(||," + args.get(0) + "," + args.get(1) + ").");
+//                    }
+//                    break;
+//                case "subrelation":
+//                    //for now, use similarity+inheritance but more clear expression is possible
+//                    if (includeSubrelation) {
+//                        //emit("(" + a.get(0) + " <-> " + a.get(1) + ").");
+//                        nar.input("(" + args.get(0) + " --> " + args.get(1) + ").");
+//                    }
+//                    break;
+                case "=>":
+                    Formula condition = x.cddrAsFormula();
+                    if (condition!=null) {
+                        Compound conditionTerm = formulaToTerm(condition);
+                        if (conditionTerm!=null) {
+                            Formula action = x.cddrAsFormula();
+                            if (action != null) {
+                                Compound actionTerm = formulaToTerm(action);
+                                if (actionTerm!=null) {
+                                    y = $.impl(conditionTerm, actionTerm);
+                                }
+                            }
+                        }
+                    }
+
+
+                    break;
+
+//            case "domain":
+//                Term subj = $.the(args.get(0));
+//                Term quantity = $.the(args.get(0));
+//                Term type = $.the(args.get(0));
+//                break;
+            case "contraryAttribute":
+                if (args!=null && args.size() >=2) {
+                    Term a = $.the(args.get(0));
+                    Term b = $.the(args.get(1));
+                    y = (Compound) $.equi($.prop($.varIndep(0), a), $.neg($.prop($.varIndep(0), b)));
+                }
+                break;
+            case "documentation":
+                if (args!=null && args.size() >=2) {
+                    Term subj = $.the(args.get(0));
+                    Atomic lang = $.the(args.get(1));
+                    Term desc = $.quote(args.get(2));
+                    try {
+                        y = $.func(lang, subj, desc);
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        y = null;
+                    }
+                }
+                break;
+            default:
+                try {
+                    String xy = x.toString();
+                    y = $.$(xy); //HACK
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
+                //System.out.println("unknown: " + x);
+                break;
+        }
+        return y;
+    }
+
 
     public static void main(String[] args) throws Exception {
-        Default d = new Default();
+        NAR d = new Terminal();
         d.log();
         KIFInput k = new KIFInput(d, "/home/me/sumo/Merge.kif");
         k.run();

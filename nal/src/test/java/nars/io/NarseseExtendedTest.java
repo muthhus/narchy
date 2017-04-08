@@ -214,14 +214,14 @@ public class NarseseExtendedTest {
 //        }
     }
 
-//    @Test public void testOptionalCommas() {
-//        Term pABC1 = $.$("(a b c)");
-//        Term pABC2 = $.$("(a,b,c)");
-//        assertEquals(pABC1, pABC2);
-//
-//        Term pABC11 = $.$("(a      b c)");
-//        assertEquals(pABC1, pABC11);
-//    }
+    @Test public void testOptionalCommas() throws Narsese.NarseseException {
+        Term pABC1 = $.$("(a b c)");
+        Term pABC2 = $.$("(a,b,c)");
+        assertEquals(pABC1, pABC2);
+
+        Term pABC11 = $.$("(a      b c)");
+        assertEquals(pABC1, pABC11);
+    }
 
 
     @Test public void testTripleQuote() throws Narsese.NarseseException {

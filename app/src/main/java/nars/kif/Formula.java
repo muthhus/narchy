@@ -853,12 +853,12 @@ public class Formula implements Comparable {
         Formula sform = new Formula();
 
         form.theFormula = f;
-        s = normalizeVariables(s).intern();
+        s = normalizeVariables(s);//.intern();
         sform.read(s);
-        s = sform.toString().trim().intern();
+        s = sform.toString().trim();//.intern();
 
         form.theFormula = normalizeVariables(theFormula);
-        f = form.toString().trim().intern();
+        f = form.toString().trim();//.intern();
         // System.out.println("INFO in Formula.equals(): Comparing " + s + " to " + f);
         return (f == null ? s == null : f.equals(s));
     }
