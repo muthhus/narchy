@@ -479,12 +479,7 @@ public class Formula implements Comparable {
      */
     public Formula cdrAsFormula() {
         String thisCdr = cdr();
-        if (listP(thisCdr)) {
-            Formula f = new Formula();
-            f.read(thisCdr);
-            return f;
-        }
-        return null;
+        return the(thisCdr);
     }
 
     /**
@@ -528,7 +523,10 @@ public class Formula implements Comparable {
      * @return a Formula, or null.
      */
     public Formula cddrAsFormula() {
-        String thisCddr = cddr();
+        return the(cddr());
+    }
+
+    public static Formula the(String thisCddr) {
         if (listP(thisCddr)) {
             Formula f = new Formula();
             f.read(thisCddr);
@@ -5722,6 +5720,10 @@ public class Formula implements Comparable {
                 }
             }
         }
+    }
+
+    public Formula carAsFormula() {
+        return the(car());
     }
 
 }  // Formula.java

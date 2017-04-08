@@ -414,8 +414,8 @@ public enum Texts {
                 try {
                     return Integer.parseInt(s);
                 } catch (NumberFormatException e) {
-                    //return ifMissing;
-                    throw new RuntimeException("non-integer case should have been caught earlier");
+                    return ifMissing;
+                    //throw new RuntimeException("non-integer case should have been caught earlier");
                 }
         }
     }

@@ -19,14 +19,22 @@ package nars.kif;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.Task;
 import nars.nar.Terminal;
+import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
+import nars.term.var.Variable;
 
-import java.util.Iterator;
-import java.util.List;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf
@@ -41,41 +49,21 @@ public class KIFInput implements Runnable {
 
     private final Iterator<Formula> formulaIterator;
     private final NAR nar;
+    private final PrintStream output;
 
     private boolean includeSubclass = true;
     private boolean includeInstance = true;
     private boolean includeRelatedInternalConcept = true;
     private boolean includeDisjoint = true;
-    private boolean includeSubrelation = true;
+    private final boolean includeDoc = false;
 
     public KIFInput(NAR nar, String kifPath) throws Exception {
 
         this.nar = nar;
 
+        this.output = new PrintStream(new FileOutputStream("/tmp/kif.nal"));
         kif = new KIF(kifPath);
         formulaIterator = kif.getFormulas().iterator();
-
-    }
-
-    public void setIncludeDisjoint(boolean includeDisjoint) {
-        this.includeDisjoint = includeDisjoint;
-    }
-
-    public void setIncludeRelatedInternalConcept(boolean includeRelatedInternalConcept) {
-        this.includeRelatedInternalConcept = includeRelatedInternalConcept;
-    }
-
-    public void setIncludeInstance(boolean includeInstance) {
-        this.includeInstance = includeInstance;
-    }
-
-    public void setIncludeSubclass(boolean includeSubclass) {
-        this.includeSubclass = includeSubclass;
-    }
-
-    public void setIncludeSubrelation(boolean includeSubrelation) {
-        this.includeSubrelation = includeSubrelation;
-
     }
 
     public void start() {
@@ -85,6 +73,7 @@ public class KIFInput implements Runnable {
 
     @Override
     public void run() {
+        Set<Compound> beliefs = new TreeSet();
         while (formulaIterator.hasNext()) {
 
             Formula x = formulaIterator.next();
@@ -92,22 +81,50 @@ public class KIFInput implements Runnable {
                 break;
             }
 
-            Compound y = formulaToTerm(x);
+            Compound y = compoundOrNull(formulaToTerm(x));
 
-            if (y!=null)
-                nar.believe(y);
+            if (y != null)
+                beliefs.add(y);
 
             //  => Implies
             //  <=> Equivalance
                 /*Unknown operators: {=>=466, rangeSubclass=5, inverse=1, relatedInternalConcept=7, documentation=128, range=29, exhaustiveAttribute=1, trichotomizingOn=4, subrelation=22, not=2, partition=12, contraryAttribute=1, subAttribute=2, disjoint=5, domain=102, disjointDecomposition=2, domainSubclass=9, <=>=70}*/
         }
 
+        //nar.input( beliefs.stream().map(x -> task(x)) );
+        long[] stamp = { new Random().nextLong() };
+        for (Compound x : beliefs) {
+
+//            Task y = new ImmutableTask(x, BELIEF, $.t(1f, 0.9f), ETERNAL, ETERNAL, ETERNAL, stamp);
+            System.out.println(x);
+            output.println(x + ".");
+            output.flush();
+        }
+        //nar.believe(y);
     }
 
-    public Compound formulaToTerm(Formula x) {
+    public Term formulaToTerm(String sx) {
+        sx = sx.replace("?", "#"); //query var to indepvar HACK
+
+        Formula f = Formula.the(sx);
+        if (f != null)
+            return formulaToTerm(f);
+        else
+            try {
+                return $.$(sx);
+            } catch (Narsese.NarseseException e) {
+                return $.quote(sx);
+            }
+    }
+
+    public Term formulaToTerm(Formula x) {
         String root = x.car(); //root operate
 
-        List<String> args = x.argumentsToArrayList(1);
+        List<String> sargs = IntStream.range(1, x.listLength()).mapToObj(x::getArgument).collect(Collectors.toList());
+        List<Term> args = sargs != null ? sargs.stream().map(this::formulaToTerm).collect(Collectors.toList()) : Collections.emptyList();
+
+        if (args.isEmpty())
+            return formulaToTerm(x.car());
 
         /**
          *
@@ -152,7 +169,7 @@ public class KIFInput implements Runnable {
                         System.err.println("instance expects 2 arguments");
                     } else {
                         try {
-                            y = $.$("({" + args.get(0) + "} --> " + args.get(1) + ")");
+                            y = $.$("(" + args.get(0) + " --> [" + args.get(1) + "])");
                         } catch (Narsese.NarseseException e) {
                             e.printStackTrace();
                         }
@@ -174,7 +191,6 @@ public class KIFInput implements Runnable {
                 }
                 break;
             case "disjoint":
-                //"(||," <term> {","<term>} ")"      // disjunction
                 if (includeDisjoint) {
                     try {
                         y = $.$("(||," + args.get(0) + "," + args.get(1) + ").");
@@ -195,60 +211,111 @@ public class KIFInput implements Runnable {
 //                        nar.input("(" + args.get(0) + " --> " + args.get(1) + ").");
 //                    }
 //                    break;
-                case "=>":
-                    Formula condition = x.cddrAsFormula();
-                    if (condition!=null) {
-                        Compound conditionTerm = formulaToTerm(condition);
-                        if (conditionTerm!=null) {
-                            Formula action = x.cddrAsFormula();
-                            if (action != null) {
-                                Compound actionTerm = formulaToTerm(action);
-                                if (actionTerm!=null) {
-                                    y = $.impl(conditionTerm, actionTerm);
-                                }
-                            }
-                        }
+            case "=>":
+                y = impl(args.get(0), args.get(1), true);
+                break;
+            case "<=>":
+                y = impl(args.get(0), args.get(1), false);
+                break;
+
+            case "domain":
+                //TODO use the same format as Range, converting quantity > 1 to repeats in an argument list
+                if (args.size() >= 3) {
+                    Term subj = (args.get(0));
+                    Term quantity = (args.get(1));
+                    Term type = (args.get(2));
+                    try {
+                        y = $.func("domain", subj, $.p(type, quantity));
+                    } catch (Exception ignored) {
+
                     }
 
-
-                    break;
-
-//            case "domain":
-//                Term subj = $.the(args.get(0));
-//                Term quantity = $.the(args.get(0));
-//                Term type = $.the(args.get(0));
-//                break;
+                }
+                break;
+            case "range":
+                if (args.size() == 2) {
+                    Term subj = args.get(0);
+                    Term range = args.get(1);
+                    Variable rr = $.v(VAR_INDEP, "R" + Integer.toString(Math.abs(subj.hashCode()), 36));
+                    y = $.impl($.inh($.p( rr ), subj), $.inh(rr, range));
+                } else {
+                    System.err.println("unexpected range format");
+                }
+                break;
             case "contraryAttribute":
-                if (args!=null && args.size() >=2) {
-                    Term a = $.the(args.get(0));
-                    Term b = $.the(args.get(1));
+                if (args.size() >= 2) {
+                    Term a = args.get(0);
+                    Term b = args.get(1);
                     y = (Compound) $.equi($.prop($.varIndep(0), a), $.neg($.prop($.varIndep(0), b)));
                 }
                 break;
             case "documentation":
-                if (args!=null && args.size() >=2) {
-                    Term subj = $.the(args.get(0));
-                    Atomic lang = $.the(args.get(1));
-                    Term desc = $.quote(args.get(2));
-                    try {
-                        y = $.func(lang, subj, desc);
-                    } catch (Exception e) {
-                        //e.printStackTrace();
-                        y = null;
+                if (includeDoc) {
+                    if (args.size() >= 2) {
+                        Term subj = args.get(0);
+                        Term lang = args.get(1);
+                        Term desc = $.quote(args.get(2));
+                        try {
+                            y = $.inh($.p(subj, desc), lang);
+                        } catch (Exception e) {
+                            //e.printStackTrace();
+                            y = null;
+                        }
                     }
                 }
                 break;
             default:
-                try {
-                    String xy = x.toString();
-                    y = $.$(xy); //HACK
-                } catch (Narsese.NarseseException e) {
-                    e.printStackTrace();
-                }
                 //System.out.println("unknown: " + x);
                 break;
         }
+
+        if (y == null) {
+
+            if (x.car().equals("documentation") && !includeDoc)
+                return null;
+
+            Term z = formulaToTerm(x.car());
+            if (args.isEmpty())
+                return z;
+            try {
+
+                if (z != null) {
+                    switch (z.toString()) {
+                        case "and":
+                            y = (Compound) $.conj(args.toArray(new Term[args.size()]));
+                            break;
+                        case "or":
+                            y = (Compound) $.disj(args.toArray(new Term[args.size()]));
+                            break;
+                        case "not":
+                            y = (Compound) $.neg(args.get(0));
+                            break;
+                        default:
+                            y = $.inh($.p(args), z); //HACK
+                            break;
+                    }
+
+                }
+            } catch (Exception e) {
+                return null;
+            }
+
+        }
+
         return y;
+    }
+
+    public Compound impl(Term conditionTerm, Term actionTerm, boolean implOrEquiv) {
+        try {
+            return
+                    implOrEquiv ?
+                            $.impl(conditionTerm, actionTerm) :
+                            (Compound) $.equi(conditionTerm, actionTerm)
+                    ;
+        } catch (Exception ignore) {
+
+        }
+        return null;
     }
 
 
