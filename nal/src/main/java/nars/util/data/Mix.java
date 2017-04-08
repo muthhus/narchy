@@ -8,6 +8,7 @@ import nars.budget.Budgeted;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 public class Mix<K, P extends Budgeted>  {
 
 
-    public class MixStream extends FloatParam implements Consumer<P> {
+    public static class MixStream<K,P extends Budgeted> extends FloatParam implements Consumer<P>, Function<P,P> {
 
         public final PeriodMeter priMeterIn, priMeterOut;
         public final PeriodMeter quaMeter;
@@ -32,13 +33,20 @@ public class Mix<K, P extends Budgeted>  {
             quaMeter = new PeriodMeter( "qua", window);
         }
 
-        public Stream<P> input(Stream<P> x) {
+        public Stream<P> apply(Stream<P> x) {
             return x.peek(this);
         }
 
-        public P input(P x) {
+        @Override public P apply(P x) {
             accept(x);
             return x;
+        }
+
+//        public final void input(P x, Consumer<P> target) {
+//            target.accept(apply(x));
+//        }
+        public final void input(Stream<P> x, Consumer<Stream<P>> target) {
+            target.accept(apply(x));
         }
 
         @Override
@@ -49,16 +57,15 @@ public class Mix<K, P extends Budgeted>  {
             float g = floatValue();
 
             Budget budget = xx.budget();
-            priMeterIn.hit(budget.priSafe(0));
-            priMeterOut.hit(budget.priSafe(0) * g);
+            float p = budget.priSafe(0);
+            priMeterIn.hit(p);
+            priMeterOut.hit(p * g);
             quaMeter.hit(budget.qua());
 
-            if (g <= 0) {
+            if (p <= 0 || g <= 0) {
 
             } else {
-                if (g != 1f) { //TODO epsilon?
-                    budget.priMult(g);
-                }
+                budget.priMult(g);
             }
 
         }

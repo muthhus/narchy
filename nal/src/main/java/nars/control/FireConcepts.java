@@ -157,7 +157,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
          */
         final TaskHijackBag pending;
 
-        private final Mix<Object,Task>.MixStream in;
+        private final Mix.MixStream<Object,Task> in;
 
         public FireConceptsBuffered(@NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
             this(nar.focus(), premiseBuilder, nar);
@@ -195,7 +195,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     premiseVector(nar, concept.get(), target::put);
                     return true;
                 },
-                x->nar.input(in.input(x)));
+                x->nar.input(in.apply(x)));
 
         }
 

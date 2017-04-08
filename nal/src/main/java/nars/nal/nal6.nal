@@ -56,23 +56,25 @@
     //Note: the P && S subterm of the conclusion may get rewritten with appropraite 'dt' as per dtCombinePre/dtCombinePost.
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
-    (P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
-        (P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Intersection)
+                        //(Belief:Union)
+        //(P ==> M), (S ==> M), neq(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
     (M ==> P), (M ==> S), neq(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
-        (M ==> P), (M ==> S), neq(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
+        //(M ==> P), (M ==> S), neq(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance again
 
-    //TODO versions with negated S subterms
 
     (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
-        (%S ==> %M), ((||,%S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==>+- %M), (Belief:DecomposePositiveNegativeNegative)
+        (S ==> M), ((&&,(--,%S),A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
+        //(%S ==> %M), ((||,%S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==>+- %M), (Belief:DecomposePositiveNegativeNegative)
 
     (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-        (%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
+        (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegativeN)
+        //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     (M ==> (&&,S,A..+)),       S, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
     (M ==> (&&,(--,%S),A..+)), S, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
@@ -87,15 +89,15 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), task(positive), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), task(positive), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), task(negative), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), task(negative), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), task(positive), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), task(positive), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
-    B, (C ==> A), task(negative), belief(positive), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
-        B, (C ==> A), task(negative), belief(negative), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
+    B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+    //B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
+        //B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
     B, (A <=> C), time(decomposeBeliefLate), neq(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
 
@@ -112,10 +114,10 @@
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), task(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
-    B, (C && (--,%A)), task(positive), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:Strong)
-        B, (C && A), task(negative), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:StrongN)
-        B, (C && (--,%A)), task(negative), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
+    B, (C && A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
+    B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:Strong)
+        //B, (C && A), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:StrongN)
+        //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
 
 
@@ -138,6 +140,7 @@
 
 
 //conditional abduction TODO this needs to be 'dt' sensitive
+
     ((&&,M,X,A..*) ==> C), (Y ==> C), time(decomposeTask) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), time(decomposeTask) |- M, (Belief:Abduction)
 
@@ -149,43 +152,43 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    //((&&,A..+) ==> C), M, time(dtTask), neqRec(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    ((&&,A..+) ==> C), M, time(dtTaskExact), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neq(C,M), notImplEqui(M), notEqui(C)  |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neq(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,M), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqRCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 
 
 //conditional abduction by dependent variable
 
-    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), task(positive) |- (X --> B), (Belief:Abduction)
-        ((X --> R) ==> Z), ((&&,(#Y --> B),--(#Y --> R),A..*) ==> Z), task(negative) |- (X --> B), (Belief:AbductionN)
+    ((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z)  |- (X --> B), (Belief:Abduction)
+        ((X --> R) ==> Z), ((&&,(#Y --> B),--(#Y --> R),A..*) ==> Z) |- (X --> B), (Belief:AbductionN)
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), task(positive), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:Deduction)
-        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z), task(negative), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:DeductionN)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:Deduction)
+        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z), time(dtBeliefExact) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:DeductionN)
 
 
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
-    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), task(positive), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:Deduction)
-        (B --> K), (&&,(#X --> L),((--,($Y --> K)) ==> A)), task(negative), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:DeductionN)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), task(positive), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogy)
-        (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)), task(negative), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogyN)
+    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:Deduction)
+        (B --> K), (&&,(#X --> L),((--,($Y --> K)) ==> A)), time(dtBeliefExact) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:DeductionN)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogy)
+        (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)), time(dtBeliefExact) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogyN)
 
 
 //precondition combiner inference rule (variable_unification6):
 //  TODO can these also apply to goals somehow?
 //  TODO negative versions
 
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
-    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtCombine) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
-    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtCombine) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtTminB) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Induction)
+    ((&&,C,A..+) ==> Z), ((&&,C,B..+) ==> Z), neq(A..+,B..+), time(dtBminT) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Induction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtTminB) |- ((&&,A..+) ==>+- (&&,B..+)), (Belief:Abduction)
+    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+), time(dtBminT) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
     //(X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (?1 ==>+- Y), (Punctuation:Question)

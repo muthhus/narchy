@@ -134,7 +134,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
             if (start == ETERNAL) {
 
-                when = task.isGoal() ? now : ETERNAL;
+                when = //task.isGoal() ? now : ETERNAL;
+                    ETERNAL;
 
             } else {
                 //USE TASK's OCCURENCE find closest end-point to now

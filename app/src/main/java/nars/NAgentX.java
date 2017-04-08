@@ -142,7 +142,7 @@ abstract public class NAgentX extends NAgent {
 
     public static void chart(NAgentX a) {
         NAR nar = a.nar;
-        //a.nar.runLater(() -> {
+        a.nar.runLater(() -> {
             window( grid(
 
                 grid(
@@ -213,7 +213,7 @@ abstract public class NAgentX extends NAgent {
                             64, 6) )
                 )
             ), 600, 400);
-       // });
+        });
     }
 
     public static void chart(NAgent a) {
@@ -251,43 +251,48 @@ abstract public class NAgentX extends NAgent {
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
-    protected CameraSensor senseCamera(String id, Container w, int pw, int ph) {
+    protected CameraSensor senseCamera(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
         return senseCamera(id, w, pw, ph, (v) -> t(v, alpha()));
     }
 
-    protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         return senseCamera(id, new Scale(w, pw, ph), pixelTruth);
     }
 
-    protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         return senseCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
     }
 
-    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) {
+    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
         return senseCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha()));
     }
 
-    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         return senseCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
     }
 
-    protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
         return senseCamera(id, pb, pixelTruth);
     }
 
-    protected Sensor2D<WaveletBag> senesCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) {
+    protected Sensor2D<WaveletBag> senesCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         WaveletBag pb = new WaveletBag(w, pw, ph);
         return senseCamera(id, pb, pixelTruth);
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
-        return senseCamera(id, new CameraSensor<>($.the(id), bc, nar, pixelTruth));
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
+        return senseCamera($.$(id), bc, pixelTruth);
+    }
+
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
+        return senseCamera(id.toString(), new CameraSensor<>(id, bc, this, pixelTruth));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {
-        sense(c);
+        //sense(c);
+
         cam.put(id, c);
         return c;
     }

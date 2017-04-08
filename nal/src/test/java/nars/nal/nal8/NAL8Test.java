@@ -590,7 +590,7 @@ public class NAL8Test extends AbstractNALTest {
     public void temporal_goal_detachment_3_valid_negate()  {
         test()
                 .input("--(use)! :|:")
-                .inputAt(2, "( (hold) &&+5 --(use) ).")
+                .inputAt(1, "( (hold) &&+5 --(use) ).")
                 .mustDesire(cycles, "(hold)", 1f, 0.81f, 0)
                 .mustNotOutput(cycles, "(use)", GOAL, ETERNAL) //not eternal, we have a temporal basis here
         ;
@@ -911,7 +911,7 @@ public class NAL8Test extends AbstractNALTest {
 
     }
     @Test
-    public void testInhibitionReverse()  {
+    public void testInhibitionInverse()  {
         test()
                 .goal("(--,(reward))")
                 .believe("((good) ==> (reward))", 1, 0.9f)
@@ -940,11 +940,24 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
                 .mustDesire(cycles, "(good)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.75f, 1f, ETERNAL)
+                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0f, 1f, ETERNAL)
                 .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0.75f, 1f, ETERNAL);
+                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
     }
 
+    @Test
+    public void testInhibitionReverse()  {
+        //deisreDed, and its negative counterpart for the negated belief
+        test()
+                //.log()
+                .goal("(reward)")
+                .believe("((reward) ==> (good))", 1, 0.9f)
+                .believe("((--,(reward)) ==> (bad))", 1, 0.9f)
+                .mustDesire(cycles, "(good)", 1.0f, 0.45f)
+                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.0f, 1f, ETERNAL)
+                .mustDesire(cycles, "(bad)", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0.0f, 1f, ETERNAL);
+    }
 
     @Test public void testNegatedImplicationS() {
 

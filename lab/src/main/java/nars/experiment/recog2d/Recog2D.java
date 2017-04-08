@@ -5,10 +5,7 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.learn.MLP;
-import nars.$;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
@@ -63,10 +60,10 @@ public class Recog2D extends NAgentX {
 
     int image;
     final int maxImages = 4;
-    static int durFPS = 3;
-    int imagePeriod = 200;
-    static int fps = 6;
-    float goalInfluence = 1f/(maxImages); //how much goal feedback will influence beliefs, <=1
+    static int durFPS = 10;
+    int imagePeriod = 16;
+    static int fps = 10;
+    float goalInfluence = 1f; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -75,7 +72,7 @@ public class Recog2D extends NAgentX {
         Param.DEBUG = false;
     }
 
-    public Recog2D(NAR n) {
+    public Recog2D(NAR n) throws Narsese.NarseseException {
         super("x", n);
 
 
@@ -109,9 +106,8 @@ public class Recog2D extends NAgentX {
 //                () -> canvas, w, h, v -> $.t(v, nar.confDefault(BELIEF)));
 
         //still
-        CameraSensor sp = senseCamera($.p(id, $.the("zoom")).toString(),
+        CameraSensor sp = senseCamera($.p(id, $.the("zoom")),
                 new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
-        sp.priTotal(32);
 
         //nar.log();
 
@@ -301,9 +297,9 @@ public class Recog2D extends NAgentX {
         g.drawString(s, Math.round(w / 2f - sb.getCenterX()), Math.round(h / 2f - sb.getCenterY()));
     }
 
-    public static void main(String[] arg) {
+    public static void main(String[] arg) throws Narsese.NarseseException {
         Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
-                2,
+                3,
                 new RealTime.DSHalf(true).durFPS(durFPS)));
         a.runRT(fps);
         NAgentX.chart(a);

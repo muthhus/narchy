@@ -102,7 +102,6 @@ public class Arkancide extends NAgentX {
 
         if (cam) {
             CameraSensor cc = senseCamera("noid", noid, visW, visH);
-            cc.priTotal(2f);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);

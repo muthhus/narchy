@@ -23,29 +23,13 @@ import static nars.Op.*;
 public class DepIndepVarIntroduction extends VarIntroduction {
 
 
-
-    private DepIndepVarIntroduction() {
-        super();
-    }
-
-//    @Override
-//    public void accept(@NotNull Task task) {
-//
-//        if (task.cyclic())
-//            return; //avoids reprocessing the same
-//
-//        super.accept(task);
-//    }
-
-
-
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
     private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
 
-    private static final Predicate<Term> condition = subterm -> !subterm.isAny(DepOrIndepBits);
-
     /** sum by complexity if passes include filter */
-    private static final ToIntFunction<Term> depIndepScore = sub -> condition.test(sub) ? 1 : 0;
+    private static final ToIntFunction<Term> depIndepScore = t ->
+            t.hasAny(DepOrIndepBits | Op.NEG.bit) ? 0 : 1;
+            //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
 
     @Nullable
     @Override
@@ -53,11 +37,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return Terms.substAllRepeats(input, depIndepScore, 2);
     }
 
-
     @Nullable
     @Override
     protected Term next(@NotNull Compound input, @NotNull Term selected, int order) {
-
 
         if (selected == Imdex)
             return null;
@@ -110,17 +92,16 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             }
         }
 
-        int iteration = 0;
 
         if (!depOrIndep) {
             //at least one impl/equiv must have both sides covered
             return (m.anySatisfy(b -> b == 0b11)) ?
-                    $.varIndep(order) : null;
+                    $.v(VAR_INDEP, "x" + order) /*varIndep(order)*/ : null;
 
         } else {
             //at least one conjunction must contain >=2 path instances
             return m.anySatisfy(b -> b >= 2) ?
-                    $.varDep(order) : null;
+                    $.v(VAR_DEP, "x" + order)  /* $.varDep(order) */ : null;
         }
 
     }

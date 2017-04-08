@@ -16,14 +16,13 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
-    public FZero(NAR nar) {
+    public FZero(NAR nar) throws Narsese.NarseseException {
         super("fz", nar);
 
         this.fz =  new FZeroGame();
 
         senseCamera("fz", ()->fz.image, 40, 32, (v) -> t(v, alpha()))
-                .setResolution(0.05f)
-                .priTotal(4f);
+                .setResolution(0.02f);
 
         actionTogglePWM($.inh($.the("fz"), $.the("fwd")),
                 //(b)->{ fz.thrust = b; }
@@ -192,7 +191,7 @@ public class FZero extends NAgentX {
                         deltaDistance), -1f, +1f);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
                 3,
                 new RealTime.CS(true)

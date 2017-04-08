@@ -3,6 +3,9 @@ package nars;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.event.ArrayTopic;
+import jcog.event.On;
+import jcog.event.Topic;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
@@ -25,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -68,9 +72,9 @@ abstract public class NAgent implements NSense, NAct {
 
 
     public final FloatParam predictorProbability = new FloatParam(1f);
-    private final Mix.MixStream sense;
-    private final Mix.MixStream ambition;
-    private final Mix.MixStream motor;
+    private final Mix.MixStream<String, Task> sense;
+    private final Mix.MixStream<String, Task> ambition;
+    private final Mix.MixStream<String, Task> motor;
 
 
     private boolean initialized;
@@ -221,25 +225,16 @@ abstract public class NAgent implements NSense, NAct {
                 //+(dur * 3 / 2);
                 ;
 
-        nar.input(
-                ambition.input(
-                        Stream.concat(
-                            Stream.of(happy.apply(nar)),
-                            predict(now)
-                        )
-                )
-        );
-        nar.input(
-                motor.input(
-                        Stream.concat(
-                                actionStream().map(a -> a.apply(nar)),
-                                curious(next))
-                )
-        );
-        nar.input(
-            sense.input(nextInput(nar, next))
-        );
 
+        ambition.input(predict(now), nar::input);
+        ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
+
+        motor.input(actionStream().map(a -> a.apply(nar)), nar::input);
+        motor.input(curious(next), nar::input);
+
+        sense.input(nextInput(nar, next), nar::input);
+
+        eventFrame.emit(this);
 
         if (trace)
             logger.info(summary());
@@ -313,8 +308,8 @@ abstract public class NAgent implements NSense, NAct {
 
         predictors.add(
                 goal(happiness, t(1f, nar.confDefault(BELIEF /*GOAL*/)),
-                        ETERNAL
-                        //now + dur
+                        //ETERNAL
+                        now + dur
                 )
         );
 
@@ -351,7 +346,9 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()), ETERNAL)
+                    quest((Compound) (action.term()),
+                            now + dur)
+                            //ETERNAL)
 
                     //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
@@ -417,7 +414,6 @@ abstract public class NAgent implements NSense, NAct {
 //        );
 
 
-
         //System.out.println(Joiner.on('\n').join(predictors));
     }
 
@@ -429,7 +425,7 @@ abstract public class NAgent implements NSense, NAct {
 
         init();
 
-        nar.onCycle((n)->{
+        nar.onCycle((n) -> {
 
             long lastNow = this.now;
             long now = nar.time();
@@ -460,11 +456,12 @@ abstract public class NAgent implements NSense, NAct {
         init();
 
         Timer t = RealTime.timer;
-        t.scheduleAtFixedRate( new TimerTask() {
-            @Override public void run() {
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
                 cycle();
             }
-        }, 0, Math.round(1000f/fps));
+        }, 0, Math.round(1000f / fps));
 
 
 //        nar.onReset(nn->{
@@ -603,5 +600,12 @@ abstract public class NAgent implements NSense, NAct {
 
     public final float alpha() {
         return nar.confDefault(BELIEF);
+    }
+
+
+    private final Topic<NAgent> eventFrame = new ArrayTopic();
+
+    public On onFrame(Consumer<NAgent> each) {
+        return eventFrame.on(each);
     }
 }

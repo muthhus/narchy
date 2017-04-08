@@ -42,14 +42,11 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
             super(term, punc, truth, creation, start, end, stamp);
         }
-
-
-
     }
 
     public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
         long now = nar.time();
-        long when = now + nar.dur();
+        long when = now;// + nar.dur();
         CuriosityTask t = new CuriosityTask(term, punc,
                 $.t(nar.random.nextFloat(), conf),
                 now,

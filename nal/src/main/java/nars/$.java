@@ -253,6 +253,7 @@ public enum $ {
         return $.p((Term[]) $.the(t));
     }
 
+    /** warning: generic variable */
     public static @NotNull Variable v(@NotNull Op type, @NotNull String name) {
 
 //        if (name.length()==1) {

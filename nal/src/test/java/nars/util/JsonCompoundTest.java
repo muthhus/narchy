@@ -13,10 +13,10 @@ import org.junit.Test;
  */
 public class JsonCompoundTest {
 
-    @Test
-    public void testJsonArray() throws Narsese.NarseseException {
+    //TODO make into a test
+    @Test public void testJsonArray() throws Narsese.NarseseException {
         Default d = new Default();
-        d.log();
+        //d.log();
 
         new TaskRule("(json,%1):{x(%2)}", "X(%1,%2)", d);
 

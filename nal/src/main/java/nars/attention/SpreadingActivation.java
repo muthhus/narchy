@@ -83,11 +83,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
+            case PROD:
             case SETe:
             case SETi:
             case IMGe:
             case IMGi:
-            case PROD:
+                return 1;
+
             case DIFFe:
             case DIFFi:
             case SECTi:
@@ -96,11 +98,11 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
             case SIM:
             case INH:
-                return 2;
+                return 3;
 
             case EQUI:
                 //return (host.vars() > 0) ? 3 : 2;
-                return 2;
+                return 3;
 
             case IMPL:
             case CONJ:

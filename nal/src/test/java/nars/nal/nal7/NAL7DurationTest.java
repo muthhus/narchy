@@ -39,7 +39,7 @@ public class NAL7DurationTest {
         //n.log();
         n.inputAt( 0,"a:x. :|:");
         n.inputAt(10,"a:y. :|:");
-        n.run(256);
+        n.run(512);
 
         assertDuration(n, "(x<->y)", 5, 5);
         assertDuration(n, "((x|y)-->a)", 5, 5);

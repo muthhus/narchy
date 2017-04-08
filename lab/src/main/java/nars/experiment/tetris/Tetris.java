@@ -37,15 +37,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            new MultiThreadExecutioner(3, 1024*8);
 
 
-    public final FloatParam timePerFall = new FloatParam(2f, 1f, 8f);
+    public final FloatParam timePerFall = new FloatParam(2f, 1f, 32f);
 
     public static final int tetris_width = 6;
     public static final int tetris_height = 12;
-
-    private static final float DUR = 0.04f;
-
-    /** priority shared by all tetris field pixels */
-    public final FloatParam pixelPri;
 
     //private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
@@ -136,9 +131,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
 
-        senseCamera("tetris", pixels = new CameraSensor($.the("tetris"), this, nar));
+        senseCamera("tetris", pixels = new CameraSensor($.the("tetris"), this, this));
 
-        pixelPri = pixels.totalPriority;
 
         actions(nar, state, actions);
 

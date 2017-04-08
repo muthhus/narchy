@@ -19,7 +19,6 @@ public class NARio extends NAgentX {
 
     private final MarioComponent mario;
 
-    public final FloatParam eyesOpen;
 
     private SensorConcept vx;
 
@@ -71,9 +70,7 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
-        sc.setResolution(0.02f);
-        sc.priTotal(4f);
-        this.eyesOpen = sc.totalPriority;
+        sc.setResolution(0.04f);
 
         //new CameraGasNet($.the("camF"), cc, this, 64);
 
