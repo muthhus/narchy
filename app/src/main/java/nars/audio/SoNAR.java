@@ -7,6 +7,7 @@ import nars.nar.Default;
 import nars.term.Term;
 import nars.truth.Truth;
 import spacegraph.audio.Audio;
+import spacegraph.audio.Sound;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
 import spacegraph.audio.sample.SonarSample;
@@ -27,17 +28,18 @@ import static nars.$.$;
 public class SoNAR {
 
     private final NAR nar;
-    private final Audio audio;
+    public final Audio audio;
 
     final Map<String, SonarSample> samples = new ConcurrentHashMap<>();
 
     public SoNAR(NAR n) throws LineUnavailableException {
-        this(n, new Audio(16));
+        this(n, new Audio(64));
     }
 
     public SonarSample sample(String file) {
         return samples.computeIfAbsent(file, SampleLoader::load);
     }
+
     public void samples(String dirPath) {
         for (File f : new File(dirPath).listFiles()) {
             String path = f.getAbsolutePath();
@@ -45,17 +47,18 @@ public class SoNAR {
         }
     }
 
-    /** gets a random sample from what is loaded */
+    /**
+     * gets a random sample from what is loaded
+     */
     public SonarSample sampleRandom() {
         List<SonarSample> l = samples.values().stream().collect(Collectors.toList());         //HACK
-        if (l!=null && !l.isEmpty()) {
+        if (l != null && !l.isEmpty()) {
             SonarSample s;
             do {
                 s = l.get(Math.abs(Math.abs(nar.random.nextInt()) % l.size()));
             } while (s == null);
             return s;
-        }
-        else
+        } else
             return null;
     }
 
@@ -75,15 +78,16 @@ public class SoNAR {
 
     }
 
-    /** updated each cycle */
-    final Map<Term, Granulize> termListeners = new ConcurrentHashMap();
+    /**
+     * updated each cycle
+     */
+    final Map<Term, Sound<Granulize>> termListeners = new ConcurrentHashMap();
 
     public void listen(Term k) {
-        termListeners.computeIfAbsent(k, kk->{
-
+        termListeners.computeIfAbsent(k, kk -> {
             Granulize g = new Granulize(sampleRandom(), 0.25f, 1.5f);
-            audio.play(g, 0.1f, 0.5f, (float) (Math.random() - 0.5f));
-            return g;
+
+            return audio.play(g, 0.25f, 0.5f, (float) (Math.random() - 0.5f));
         });
 
     }
@@ -92,19 +96,33 @@ public class SoNAR {
         termListeners.forEach(this::update);
     }
 
-    private boolean update(Term k, Granulize v) {
+    private boolean update(Term k, Sound<Granulize> s) {
+        Granulize v = s.producer;
         Concept c = nar.concept(k);
-        if (c!=null) {
+        if (c != null) {
             float p = nar.pri(k);
-            if (p==p && p > 0) {
-                v.setAmplitude(p);
+            if (p == p && p > 0) {
 
-                //            Truth b = c.belief(nar.time(), nar.dur());
-                //            if (b!=null)
-                //                v.setStretchFactor((b.expectation() - 0.5f) * 2f);
+                //v.setAmplitude(0.1f * p);
+
+                Truth b = c.belief(nar.time(), nar.dur());
+                if (b != null) {
+                    //System.out.println(c + " "+ b);
+                    float stretchFactor = (b.freq() - 0.5f) * 2f;
+                    if (stretchFactor > 0 && stretchFactor < 0.25f) stretchFactor = 0.25f;
+                    else if (stretchFactor < 0 && stretchFactor > -0.25f) stretchFactor = -0.25f;
+                    v.setStretchFactor(stretchFactor);
+                    v.setAmplitude(b.conf());
+                    v.play();
+                } else {
+                    v.stop();
+                    v.setStretchFactor(1f);
+                    v.setAmplitude(0f);
+                }
+
                 //
                 //v.setStretchFactor();
-                v.pitchFactor.setValue(1f + (c.volume()));
+                v.pitchFactor.setValue(1f/Math.log(c.volume()));
                 //g.setStretchFactor(1f/(1f+kk.volume()/4f));
                 return true;
             }

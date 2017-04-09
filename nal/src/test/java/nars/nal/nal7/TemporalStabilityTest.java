@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.util.data.TimeMap;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ abstract public class TemporalStabilityTest {
 
     private boolean stopOnFirstError = true;
 
-    public void test(int cycles, @NotNull NAR n) {
+    public void test(int cycles, @NotNull NAR n) throws Narsese.NarseseException {
 
         //n.log();
         n.onCycle(f -> {
@@ -86,5 +87,5 @@ abstract public class TemporalStabilityTest {
     /**
      * inputs the tasks for a test
      */
-    abstract public void input(NAR n);
+    abstract public void input(NAR n) throws Narsese.NarseseException;
 }

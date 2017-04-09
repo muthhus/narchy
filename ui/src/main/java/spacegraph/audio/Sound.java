@@ -2,14 +2,14 @@ package spacegraph.audio;
 
 
 /** Auditory element */
-public class Sound implements SoundSource, Comparable
+public class Sound<S extends SoundProducer> implements SoundSource, Comparable
 {
     private static final double l10 = Math.log(10);
     
-    private final SoundProducer producer;
-    private final SoundSource source;
-    private final float volume;
-    private final float priority;
+    public final S producer;
+    public final SoundSource source;
+    public float volume;
+    public float priority;
     
     private float x, y, z;
     private float score;
@@ -17,7 +17,7 @@ public class Sound implements SoundSource, Comparable
     public float pan;
     public float amplitude;
     
-    public Sound(SoundProducer producer, SoundSource source, float volume, float priority)
+    public Sound(S producer, SoundSource source, float volume, float priority)
     {
         this.producer = producer;
         this.source = source;

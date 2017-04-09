@@ -2,6 +2,7 @@ package nars.gui;
 
 import com.google.common.collect.Iterables;
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.bag.Bagregate;
 import nars.budget.BLink;
@@ -109,7 +110,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
         Param.DEBUG = true;
 
@@ -203,10 +204,18 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             col(
                 reflect( new CycleView(n) ),
                 new PushButton("+", () -> {
-                    n.input("x:h! :|:");
+                    try {
+                        n.input("x:h! :|:");
+                    } catch (Narsese.NarseseException e) {
+                        e.printStackTrace();
+                    }
                 }),
                 new PushButton("-", () -> {
-                    n.input("--x:h! :|:");
+                    try {
+                        n.input("--x:h! :|:");
+                    } catch (Narsese.NarseseException e) {
+                        e.printStackTrace();
+                    }
                 })
             ),
         400, 400);

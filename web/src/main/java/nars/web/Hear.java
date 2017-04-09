@@ -38,7 +38,7 @@ public class Hear extends Loop {
     float offConf = 0.1f; //nar.confidenceDefault(BELIEF) * confFactor/2f;
 
     /** set wordDelayMS to 0 to disable twenglish function */
-    public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
+    public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) throws Narsese.NarseseException {
         return hear(nar, msg, src, (m) -> {
             if (wordDelayMS > 0) {
                 List<Term> tokens = tokenize(m);
@@ -49,11 +49,11 @@ public class Hear extends Loop {
         });
     }
 
-    public static Loop hear(NAR nar, String msg, String src, Function<String,Loop> ifNotNarsese) {
+    public static Loop hear(NAR nar, String msg, String src, Function<String,Loop> ifNotNarsese) throws Narsese.NarseseException {
         @NotNull List<Task> parsed = $.newArrayList();
         @NotNull List<Narsese.NarseseException> errors = $.newArrayList();
 
-        Narsese.the().tasks(msg, parsed, errors, nar);
+        Narsese.the().tasks(msg, parsed, nar);
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
             logger.info("narsese: {}", parsed);
@@ -149,7 +149,7 @@ public class Hear extends Loop {
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });

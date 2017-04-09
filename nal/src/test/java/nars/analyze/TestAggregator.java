@@ -1,6 +1,7 @@
 package nars.analyze;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
@@ -64,7 +65,7 @@ public class TestAggregator extends RunListener {
                 + ',' + m + '}';
     }
 
-    protected void describe(@NotNull Description d, boolean success) {
+    protected void describe(@NotNull Description d, boolean success) throws Narsese.NarseseException {
 
 
         String si = '<' + getDescriptionTerm(d) + " --> [" +
@@ -110,7 +111,7 @@ public class TestAggregator extends RunListener {
         }
 
     }
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws Narsese.NarseseException {
         Default da = new Default(128, 1, 3);
         //da.memory.realTime();
         NAR nar = da;

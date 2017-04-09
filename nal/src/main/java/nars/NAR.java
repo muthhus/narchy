@@ -299,10 +299,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse) {
+    public List<Task> tasks(@NotNull String parse) throws NarseseException {
         List<Task> result = newArrayList(1);
         List<NarseseException> exc = newArrayList(0);
-        Narsese.the().tasks(parse, result, exc, this);
+        Narsese.the().tasks(parse, result, this);
 
         if (!exc.isEmpty())
             exc.forEach(e -> logger.error("parse error: {}", e));
@@ -312,7 +312,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     @NotNull
-    public List<Task> input(@NotNull String text) {
+    public List<Task> input(@NotNull String text) throws NarseseException {
         List<Task> l = tasks(text);
         input(l);
         return l;
@@ -1220,7 +1220,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 //    }
 
     @NotNull
-    public NAR input(@NotNull String... ss) {
+    public NAR input(@NotNull String... ss) throws NarseseException {
         for (String s : ss)
             input(s);
         return this;
@@ -1228,7 +1228,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     @NotNull
-    public NAR inputAt(long time, @NotNull String... tt) {
+    public NAR inputAt(long time, @NotNull String... tt) throws NarseseException {
         //LongPredicate timeCondition = t -> t == time;
 
         List<Task> yy = newArrayList(tt.length);

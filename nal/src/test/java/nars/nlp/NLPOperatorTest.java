@@ -1,6 +1,7 @@
 package nars.nlp;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.op.Command;
 import org.junit.Ignore;
@@ -16,7 +17,7 @@ public class NLPOperatorTest {
 
 
     @Test @Ignore
-    public void testNLP1() throws IOException {
+    public void testNLP1() throws IOException, Narsese.NarseseException {
         //Param.DEBUG = true;
 
         NAR n = new Default(1024,10, 4);

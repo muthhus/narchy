@@ -9,7 +9,7 @@ import org.junit.Test;
 public class DecisionTest {
 
     @Test
-    public void testDecision1() {
+    public void testDecision1() throws Narsese.NarseseException {
         NAR n = new Default();
         n.input("(add($x, $x, #y) ==>+0 zero($x)).");
         n.input("add(0,0,#y)!");

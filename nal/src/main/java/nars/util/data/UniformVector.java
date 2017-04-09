@@ -1,6 +1,7 @@
 package nars.util.data;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,9 +61,13 @@ public class UniformVector  {
         }
         
         System.arraycopy(data, 0, lastData, 0, data.length);
-        
-        nar.input(s.toString());
-        
+
+        try {
+            nar.input(s.toString());
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
+        }
+
     }
 
     public boolean different(float a, float b) {

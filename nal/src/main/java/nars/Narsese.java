@@ -20,7 +20,6 @@ import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
-import nars.op.Command;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -1170,7 +1169,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(String input, Collection<Task> c, NAR m) {
+    public static int tasks(String input, Collection<Task> c, NAR m) throws NarseseException {
         int[] i = new int[1];
         tasks(input, t -> {
             c.add(t);
@@ -1179,62 +1178,45 @@ public class Narsese extends BaseParser<Object> {
         return i[0];
     }
 
-    public static void tasks(String input, Collection<Task> c, Collection<NarseseException> e, NAR m) {
-        tasks(input, c::add, e::add, m);
-    }
-
-    public static void tasks(String input, Consumer<Task> c, NAR m) {
-        tasks(input, c, (e) -> c.accept(Command.error(e)), m);
-    }
 
     /**
      * gets a stream of raw immutable task-generating objects
      * which can be re-used because a Memory can generate them
      * ondemand
      */
-    public static void tasks(String input, Consumer<Task> c, Consumer<NarseseException> onError, NAR m) {
+    public static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
         @NotNull Narsese p = the();
         p.T = m.concepts;
         try {
-            p.tasksRaw(input, o -> {
-                Task t = null;
-                try {
-                    t = decodeTask(m, o);
-                } catch (NarseseException e) {
-                    onError.accept(e);
+
+            ParsingResult r = p.inputParser.run(input);
+
+            int size = r.getValueStack().size();
+
+            for (int i = size - 1; i >= 0; i--) {
+                Object o = r.getValueStack().peek(i);
+
+                Object[] y;
+                if (o instanceof Task) {
+                    y = (new Object[]{o});
+                } else if (o instanceof Object[]) {
+                    y = ((Object[]) o);
+                } else {
+                    throw new NarseseException("Parse error: " + input);
                 }
+                Task t = decodeTask(m, y);
                 if (t != null) {
                     c.accept(t);
                 }
-            });
+            }
+
         } finally {
             p.T = $.terms;
         }
     }
 
 
-    /**
-     * supplies the source array of objects that can construct a Task
-     */
-    void tasksRaw(CharSequence input, Consumer<Object[]> c) {
 
-        ParsingResult r = inputParser.run(input);
-
-        int size = r.getValueStack().size();
-
-        for (int i = size - 1; i >= 0; i--) {
-            Object o = r.getValueStack().peek(i);
-
-            if (o instanceof Task) {
-                c.accept(new Object[]{o});
-            } else if (o instanceof Object[]) {
-                c.accept((Object[]) o);
-            } else {
-                c.accept(new Object[]{Command.error(new NarseseException("Parse error: " + input))});
-                break;
-            }
-        }
-    }
 
 
     //r.getValueStack().clear();

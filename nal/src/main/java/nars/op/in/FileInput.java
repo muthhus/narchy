@@ -2,6 +2,7 @@ package nars.op.in;
 
 import com.google.common.io.Files;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
  */
 public class FileInput {
 
-    public static @NotNull Collection<Task> load(@NotNull NAR p, @NotNull File input) throws IOException {
+    public static @NotNull Collection<Task> load(@NotNull NAR p, @NotNull File input) throws IOException, Narsese.NarseseException {
         List<Task> t = tasks(p, input);
         p.input(t);
         return t;
     }
-    public static List<Task> tasks(@NotNull final NAR nar, @NotNull File input) throws IOException {
+    public static List<Task> tasks(@NotNull final NAR nar, @NotNull File input) throws IOException, Narsese.NarseseException {
         return nar.tasks(load(input));
     }
 

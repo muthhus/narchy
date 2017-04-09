@@ -311,13 +311,17 @@ public class Line1DSimplestTest {
 
     }
 
-    @Test public void testSequenceLearning() {
+    @Test public void testSequenceLearning() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
         Default n = new Default(1024, 16, 3);
         n.on("say", (Command) (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
-                n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");
+                try {
+                    n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
         });
 
         n.log();

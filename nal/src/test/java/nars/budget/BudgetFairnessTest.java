@@ -3,6 +3,7 @@ package nars.budget;
 import jcog.bag.PLink;
 import jcog.math.MultiStatistics;
 import nars.Focus;
+import nars.Narsese;
 import nars.Op;
 import nars.concept.Concept;
 import nars.nar.Default;
@@ -20,7 +21,7 @@ public class BudgetFairnessTest {
 
 
     @Test
-    public void test1() {
+    public void test1() throws Narsese.NarseseException {
         //TODO partitioned subgraph memory generator
         int subgraphs = 3;
         int vocabularySize = 3;

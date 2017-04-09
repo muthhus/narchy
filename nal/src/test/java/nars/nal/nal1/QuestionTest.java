@@ -196,7 +196,7 @@ public class QuestionTest {
 
 
     @Test @Ignore
-    public void testMathBackchain() {
+    public void testMathBackchain() throws Narsese.NarseseException {
         NAR n = new Default();
         n.log();
 

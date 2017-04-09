@@ -880,7 +880,7 @@ public class UnificationTest {
     }
 
     @Test
-    public void testIndVarConnectivity() {
+    public void testIndVarConnectivity() throws Narsese.NarseseException {
 
         String c = "(<$x --> bird> ==> <$x --> animal>).";
 

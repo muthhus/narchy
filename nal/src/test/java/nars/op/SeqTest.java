@@ -3,6 +3,7 @@ package nars.op;
 import com.google.common.base.Joiner;
 import jcog.list.CircularArrayList;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.nar.Default;
 import nars.term.Compound;
@@ -22,7 +23,7 @@ public class SeqTest {
 
 
     @Test
-    public void test1() {
+    public void test1() throws Narsese.NarseseException {
         NAR n = new Default();
         Seq s = new Seq().on(n);
         n.log();

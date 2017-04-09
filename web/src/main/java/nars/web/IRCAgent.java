@@ -2,6 +2,7 @@ package nars.web;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.Task;
 import nars.budget.BLink;
@@ -171,7 +172,7 @@ public class IRCAgent extends IRC {
 //
 //    }
 
-    void hear(String text, String src) {
+    void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, hearTwenglish ? wordDelayMS : -1);
     }
 

@@ -1,11 +1,12 @@
 package nars.audio;
 
 import jcog.Util;
-import jcog.learn.markov.MarkovTrack;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -13,13 +14,17 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Tense;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.audio.granular.Granulize;
+import spacegraph.SpaceGraph;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
-import java.util.ArrayList;
+
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.audio.MIDI.MidiInReceiver.channelKey;
 
@@ -28,15 +33,20 @@ import static nars.audio.MIDI.MidiInReceiver.channelKey;
  * generic MIDI input interface
  */
 public class MIDI {
-    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException {
-        Default d = NARBuilder.newMultiThreadNAR(1,
-            new RealTime.CS().durFPS(30f)
+    final static float input_NOTE_PRI = 1f;
+
+    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException, FileNotFoundException {
+        Default d = NARBuilder.newMultiThreadNAR(4,
+            new RealTime.CS(true).durFPS(25f)
         );
-        d.nal(4);
-        d.termVolumeMax.setValue(12);
-        MIDI(d);
+        //d.nal(4);
+        d.termVolumeMax.setValue(48);
+        MidiInReceiver midi = MIDI(d);
+
+        d.mix.stream("Derive").setValue(0.25f);
 
         SoNAR s = new SoNAR(d);
+        //s.audio.record("/tmp/midi2.raw");
 
 //        d.onCycle(()->{
 //            s.termListeners.forEach((x, v) -> {
@@ -44,19 +54,28 @@ public class MIDI {
 //            });
 //        });
 
-        s.samples("/home/me/wav");
-        for (int i = 36; i <= 51; i ++) {
-            Compound on =
-                    channelKey(9, i);
-                    //$.inh(channelKey(9, i), $.the("on"));
-            System.out.println(on);
-            s.listen(on);
-        }
+        s.samples("/home/me/wav/legoweltkord");
+
         new NAgentX("MIDI", d) {
+
+            final List<SensorConcept> keys = $.newArrayList();
 
             @Override
             public synchronized void init() {
                 super.init();
+
+                for (int i = 36; i <= 51; i ++) {
+                    Compound key =
+                        channelKey(9, i);
+
+                    Compound on2 =
+                            $.inh(key, $.the("on"));
+
+                    keys.add(senseNumber(on2, midi.key(key) ));
+                    s.listen(on2);
+                }
+
+                SpaceGraph.window(Vis.beliefCharts(64, keys, nar), 500, 500);
                 NAgentX.chart(this);
             }
 
@@ -64,19 +83,18 @@ public class MIDI {
             protected float act() {
                 return 0;
             }
-        }.runRT(4f);
+        }.runRT(32f);
 
         //d.loop();
 
     }
 
-    public static void MIDI(NAR nar) {
+    public static MidiInReceiver MIDI(NAR nar) {
         // Obtain information about all the installed synthesizers.
         MidiDevice device;
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
 
-        List<Synthesizer> synthInfos = new ArrayList();
-        List<MidiDevice> midis = new ArrayList();
+
 
         for (int i = 0; i < infos.length; i++) {
             try {
@@ -90,7 +108,7 @@ public class MIDI {
                 System.out.println("\trx: " + device.getReceivers());
 
                 if (receive(device)) {
-                    new MidiInReceiver(device, nar);
+                    return new MidiInReceiver(device, nar);
                 }
 
                 /*if (device instanceof Synthesizer) {
@@ -103,6 +121,7 @@ public class MIDI {
             }
         }
 
+        return null;
     }
 
     public static boolean receive(MidiDevice device) {
@@ -110,6 +129,8 @@ public class MIDI {
     }
 
     public static class MidiInReceiver implements Receiver {
+
+        public final Map<Term,FloatParam> key = new ConcurrentHashMap<>();
 
         private final MidiDevice device;
         private final NAR nar;
@@ -128,8 +149,6 @@ public class MIDI {
         @Override
         public void send(MidiMessage m, long timeStamp) {
 
-            float freq = 0.5f, conf = 0f;
-
             Compound t = null;
             if (m instanceof ShortMessage) {
                 ShortMessage s = (ShortMessage)m;
@@ -137,21 +156,27 @@ public class MIDI {
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
                         t = $.inh(channelKey(s), $.the("on"));
-                        freq = 0f;
-                        conf = 0.5f;
+                        key(t, 0f);
+                        //System.out.println(key(t));
                         break;
                     case ShortMessage.NOTE_ON:
                         t = $.inh(channelKey(s), $.the("on"));
-                        freq = 1f;
-                        conf = Util.clamp(0.5f + 0.5f * s.getData2()/64f, 0f, 0.9f);
+                        key(t, s.getData2()/64f);
+                        //System.out.println(key(t));
                         break;
                         //case ShortMessage.CONTROL_CHANGE:
                 }
             }
 
-            if (t!=null) {
-                nar.believe(t, Tense.Present, freq, conf);
-            }
+        }
+
+        public FloatParam key(Compound t) {
+            return key.computeIfAbsent(t, tt -> new FloatParam());
+        }
+
+        public void key(Compound t, float v) {
+            MutableFloat m = key(t);
+            m.setValue(v);
         }
 
         public static @NotNull Compound channelKey(ShortMessage s) {

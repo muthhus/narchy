@@ -524,7 +524,7 @@ public class TemporalTest {
     }
 
     @Test
-    public void testNonCommutivityImplConcept() {
+    public void testNonCommutivityImplConcept() throws Narsese.NarseseException {
         Param.DEBUG = true;
         NAR n = new Default();
 

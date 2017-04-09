@@ -186,7 +186,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 pending.clear();
             });
 
-            this.in = nar.mix.stream("FireConcepts");
+            this.in = nar.mix.stream("Derive");
 
             this.flow = new BagFlow<PLink<Concept>,Task>(
                 ((ConceptBagFocus)nar.focus()).active,

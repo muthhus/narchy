@@ -40,7 +40,7 @@ public class TuffySmokesTest {
         }
     }
 
-    static void input(NAR n) {
+    static void input(NAR n) throws Narsese.NarseseException {
         n.input("<(Anna&Bob) --> Friends>. %1.00;0.99%");
         n.input("<(Anna&Edward) --> Friends>. %1.00;0.99%");
         n.input("<(Anna&Frank) --> Friends>. %1.00;0.99%");
@@ -56,7 +56,7 @@ public class TuffySmokesTest {
         n.input("<Bob --> Smokes>. %0.00;0.99%"); //NOT
     }
 
-    static void axioms(NAR n) {
+    static void axioms(NAR n) throws Narsese.NarseseException {
 
         // only positive side of => corresponds to ==> in NAL, so we have to
         // translate

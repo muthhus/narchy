@@ -49,7 +49,8 @@ public class KIFInput implements Runnable {
 
     private final Iterator<Formula> formulaIterator;
     private final NAR nar;
-    private final PrintStream output;
+
+    private PrintStream output;
 
     private boolean includeSubclass = true;
     private boolean includeInstance = true;
@@ -61,9 +62,13 @@ public class KIFInput implements Runnable {
 
         this.nar = nar;
 
-        this.output = new PrintStream(new FileOutputStream("/tmp/kif.nal"));
         kif = new KIF(kifPath);
         formulaIterator = kif.getFormulas().iterator();
+
+        this.output = new PrintStream(new FileOutputStream(
+                //"/tmp/kif.nal"
+            "/home/me/s/logic/src/main/java/spimedb/logic/sumo_merged.kif.nal"
+        ));
     }
 
     public void start() {
@@ -91,15 +96,15 @@ public class KIFInput implements Runnable {
                 /*Unknown operators: {=>=466, rangeSubclass=5, inverse=1, relatedInternalConcept=7, documentation=128, range=29, exhaustiveAttribute=1, trichotomizingOn=4, subrelation=22, not=2, partition=12, contraryAttribute=1, subAttribute=2, disjoint=5, domain=102, disjointDecomposition=2, domainSubclass=9, <=>=70}*/
         }
 
-        //nar.input( beliefs.stream().map(x -> task(x)) );
-        long[] stamp = { new Random().nextLong() };
-        for (Compound x : beliefs) {
 
-//            Task y = new ImmutableTask(x, BELIEF, $.t(1f, 0.9f), ETERNAL, ETERNAL, ETERNAL, stamp);
+        //nar.input( beliefs.stream().map(x -> task(x)) );
+
+//        long[] stamp = { new Random().nextLong() };
+        for (Compound x : beliefs) {
             System.out.println(x);
-            output.println(x + ".");
-            output.flush();
+            output.println(x + "."); output.flush();
         }
+
         //nar.believe(y);
     }
 
@@ -150,6 +155,7 @@ public class KIFInput implements Runnable {
 
         Compound y = null;
         switch (root) {
+            case "subrelation":
             case "subclass":
                 if (includeSubclass) {
                     if (args.size() != 2) {
@@ -190,6 +196,7 @@ public class KIFInput implements Runnable {
                     }
                 }
                 break;
+            case "disjointRelation":
             case "disjoint":
                 if (includeDisjoint) {
                     try {

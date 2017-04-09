@@ -2,6 +2,7 @@ package nars.perf.nars.nar.perf;
 
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -38,7 +39,7 @@ public class TestBenchmark1 {
 
     @Benchmark
     @BenchmarkMode(value = Mode.SingleShotTime)
-    public void testExecution() {
+    public void testExecution() throws Narsese.NarseseException {
         NAR n = new Default();
         //n.log();
         n.input("a:b!");

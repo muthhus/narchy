@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.table.BeliefTable;
@@ -56,7 +57,7 @@ public class BeliefTableTest  {
 
 
     @Test
-    public void testExpectation() {
+    public void testExpectation() throws Narsese.NarseseException {
 
         assertEquals(0.859f, new DefaultTruth(0.9f,0.9f).expectation(), 0.001f);
 

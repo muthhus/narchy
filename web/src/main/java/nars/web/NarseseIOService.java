@@ -5,6 +5,7 @@ import io.undertow.websockets.core.WebSocketChannel;
 import jcog.data.byt.DynByteSeq;
 import nars.IO;
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import org.slf4j.Logger;
@@ -48,7 +49,11 @@ public class NarseseIOService extends WebsocketService {
 
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
-        Hear.hear(nar, message.getData(), "ui", 25);
+        try {
+            Hear.hear(nar, message.getData(), "ui", 25);
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
+        }
     }
 
 

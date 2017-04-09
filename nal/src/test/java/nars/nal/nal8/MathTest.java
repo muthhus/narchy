@@ -1,6 +1,7 @@
 package nars.nal.nal8;
 
 
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class MathTest {
 //        t.next();
 //    }
     @Test
-    public void testImplVarAdd1() {
+    public void testImplVarAdd1() throws Narsese.NarseseException {
         Param.DEBUG = true;
         Default t = new Default();
         t.log();

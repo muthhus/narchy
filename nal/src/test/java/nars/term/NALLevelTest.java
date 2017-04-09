@@ -2,6 +2,7 @@ package nars.term;
 
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.test.analyze.EventCount;
@@ -15,7 +16,7 @@ public class NALLevelTest {
 
 
     @Test
-    public void testLevel1vs8() {
+    public void testLevel1vs8() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
         NAR nDefault = new Default();

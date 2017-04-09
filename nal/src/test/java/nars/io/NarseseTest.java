@@ -32,7 +32,7 @@ public class NarseseTest {
     }
 
     @NotNull
-    static List<Task> tasks(@NotNull String s)  {
+    static List<Task> tasks(@NotNull String s) throws Narsese.NarseseException {
         //TODO n.task(s) when the parser is replaced
         //return p.parseTask(s, true);
         List<Task> l = $.newArrayList(1);
@@ -41,7 +41,7 @@ public class NarseseTest {
     }
 
 
-    static Task task(@NotNull String s) {
+    static Task task(@NotNull String s) throws Narsese.NarseseException {
         List<Task> l = tasks(s);
         if (l.size() != 1)
             throw new RuntimeException("Expected 1 task, got: " + l);
@@ -91,7 +91,7 @@ public class NarseseTest {
 //        testTruth("%1.0%", 1f, 0.9f);
 //    }
 
-    public static void testTruth(String t, float freq, float conf) {
+    public static void testTruth(String t, float freq, float conf) throws Narsese.NarseseException {
         String s = "a:b. " + t;
 
         Truth truth = task(s).truth();
@@ -521,7 +521,7 @@ public class NarseseTest {
         assertEquals(imageTerm, ti.toString());
     }
 
-    private void taskParses(@NotNull String s) {
+    private void taskParses(@NotNull String s) throws Narsese.NarseseException {
         Task t = task(s);
         assertNotNull(t);
 //        Task u = oldParser.parseTaskOld(s, true);
@@ -537,7 +537,7 @@ public class NarseseTest {
 
 
     @Test
-    public void testMultiline() {
+    public void testMultiline() throws Narsese.NarseseException {
         String a = "<a --> b>.";
         assertEquals(1, tasks(a).size());
 

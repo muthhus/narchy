@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Terminal;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -9,7 +10,7 @@ import org.junit.Test;
 public class BasicRulesTest {
 
     @Test
-    public void testNAL1() {
+    public void testNAL1() throws Narsese.NarseseException {
         //Deriver d = Deriver.defaults;
 
         Terminal n = new Terminal(16);
@@ -32,7 +33,7 @@ public class BasicRulesTest {
         n.run(150);
     }
 
-    @Test public void testSubstitution() {
+    @Test public void testSubstitution() throws Narsese.NarseseException {
         // (($1 --> M) ==> C), (S --> M), substitute($1,S) |- C, (Truth:Deduction, Order:ForAllSame)
         NAR n = new Terminal(16);
         n.input("<<$1 --> M> ==> <C1 --> C2>>. <S --> M>.");
@@ -45,7 +46,7 @@ public class BasicRulesTest {
 
     }
 
-    @Test public void testSubstitution2() {
+    @Test public void testSubstitution2() throws Narsese.NarseseException {
         // (($1 --> M) ==> C), (S --> M), substitute($1,S) |- C, (Truth:Deduction, Order:ForAllSame)
         NAR n = new Terminal(16);
         n.input("<<$1 --> happy> ==> <$1--> dead>>. <S --> happy>.");

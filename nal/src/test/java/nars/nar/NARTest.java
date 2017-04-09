@@ -42,7 +42,7 @@ public class NARTest {
 //    }
 
     @Test @Ignore
-    public void testMemoryTransplant() {
+    public void testMemoryTransplant() throws Narsese.NarseseException {
 
         Default nar = new Default(1000, 1, 5);
         //DefaultAlann nar = new DefaultAlann(m, 32);

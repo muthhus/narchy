@@ -1,6 +1,7 @@
 package nars.nal.nal8;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import org.junit.Test;
@@ -9,7 +10,7 @@ public class OperatorTest {
 
 
     @Test
-    public void testSliceAssertEtc() {
+    public void testSliceAssertEtc() throws Narsese.NarseseException {
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/slice
         //_.slice(array, [start=0], [end=array.length])
 

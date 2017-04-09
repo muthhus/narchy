@@ -127,14 +127,14 @@ public class Audio implements Runnable {
     }
 
 
-    public void play(SoundProducer p, float volume, float priority, float balance) {
-        play(p, new DefaultSource(p, balance), volume, priority);
+    public <S extends SoundProducer> Sound<S> play(S p, float volume, float priority, float balance) {
+        return play(p, new DefaultSource(p, balance), volume, priority);
     }
 
-    public void play(SoundProducer p, SoundSource soundSource, float volume, float priority) {
+    public <S extends SoundProducer> Sound<S> play(S p, SoundSource soundSource, float volume, float priority) {
 //        if (!alive)
 //            return;
-        listenerMixer.addSoundProducer(p, soundSource, volume, priority);
+        return listenerMixer.addSoundProducer(p, soundSource, volume, priority);
     }
 
     public List<Sound> getSounds() {

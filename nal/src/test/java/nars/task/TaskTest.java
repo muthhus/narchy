@@ -104,7 +104,7 @@ public class TaskTest {
 
 
     @Test
-    public void testDoublePremiseMultiEvidence() {
+    public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
         Default d = new Default(100,1, 3);
         d.nal(2);

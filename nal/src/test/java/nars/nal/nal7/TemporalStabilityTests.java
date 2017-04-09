@@ -1,6 +1,7 @@
 package nars.nal.nal7;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
@@ -40,7 +41,7 @@ public class TemporalStabilityTests {
         }
 
         @Override
-        public void input(@NotNull NAR n) {
+        public void input(@NotNull NAR n) throws Narsese.NarseseException {
             int j = 0;
             for (int i : whens.toSortedArray()) {
                 n.inputAt(i, eventer.valueOf(j++) + ". :|:");
@@ -97,37 +98,39 @@ public class TemporalStabilityTests {
         return "(" + c + " &&+5 " + d + ")";
     };
 
-    @Test public void testTemporalStabilityInh3() {
+    @Test public void testTemporalStabilityInh3() throws Narsese.NarseseException {
         new T1(inheritencer, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
 
-    @Test public void testTemporalStabilityImpl() {
+    @Test public void testTemporalStabilityImpl() throws Narsese.NarseseException {
         new T1(implicator, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
-    @Test public void testTemporalStabilityProd() {
+    @Test public void testTemporalStabilityProd() throws Narsese.NarseseException {
         new T1(productor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
-    @Test public void testTemporalStabilityBiProd() {
+    @Test public void testTemporalStabilityBiProd() throws Narsese.NarseseException {
         new T1(biproductor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
-    @Test public void testTemporalStabilityLinkedProd() {
+    @Test public void testTemporalStabilityLinkedProd() throws Narsese.NarseseException {
         new T1(linkedproductor, 1, 2, 5).test(200, new Default(1024, 8, 3));
     }
 
-    @Test public void testTemporalStabilityLinkedInh() {
+    @Test public void testTemporalStabilityLinkedInh() throws Narsese.NarseseException {
         new T1(linkedinh, 1, 2, 5).test(200, new Default(1024, 8, 3) );
     }
-    @Test public void testTemporalStabilityLinkedImpl() {
+    @Test public void testTemporalStabilityLinkedImpl() throws Narsese.NarseseException {
         new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
-    @Test public void testTemporalStabilityLinkedTemporalConj() {
+    @Test public void testTemporalStabilityLinkedTemporalConj() throws Narsese.NarseseException {
         new T1(linkedTempConj, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
-    @Test public void testTemporalStabilityLinkedImplExt() {
+    @Test public void testTemporalStabilityLinkedImplExt() throws Narsese.NarseseException {
         new T1(linkedimpl, 1, 2, 5).test(200, new Default(1024, 12, 3));
     }
-    @Test public void testTemporalStabilityLinkedImplExt2() {
-        Param.DEBUG = true;
+    @Test public void testTemporalStabilityLinkedImplExt2() throws Narsese.NarseseException {
+
+        //Param.DEBUG = true;
+
         @NotNull NAR n = new Default(1024, 3, 3);
         int time = 80;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);

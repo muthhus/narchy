@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class TemporalInductionTest {
 
     @Test
-    public void testTemporalInduction() {
+    public void testTemporalInduction() throws Narsese.NarseseException {
 
         String task = "<a --> b>. :|:";
         String task2 = "<c --> d>. :|:";
@@ -67,7 +67,7 @@ public class TemporalInductionTest {
         assertEquals("(b-->a). 5 %0.0;.90%", b.match(n.time(), dur).toStringWithoutBudget());
     }
 
-    @Test public void testTemporalRevisionOfTemporalRelation() {
+    @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {
 
         NAR n = new Default();
 
@@ -82,7 +82,7 @@ public class TemporalInductionTest {
         //Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());
     }
-    @Test public void testQuestionProjection() {
+    @Test public void testQuestionProjection() throws Narsese.NarseseException {
 
         NAR n = new Default();
 
@@ -105,7 +105,7 @@ public class TemporalInductionTest {
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());
     }
 
-    @Test public void testInductionStability() {
+    @Test public void testInductionStability() throws Narsese.NarseseException {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
         NAR d = new Default(1024,8, 3);
         d.input("a:b. :|:");

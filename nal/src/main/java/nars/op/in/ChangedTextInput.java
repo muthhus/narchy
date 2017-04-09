@@ -1,6 +1,7 @@
 package nars.op.in;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,7 @@ public class ChangedTextInput {
 		nar = n;
 	}
 
-	public boolean set(@NotNull String s) {
+	public boolean set(@NotNull String s) throws Narsese.NarseseException {
 		return enable() && set(nar.tasks(s));
 	}
 

@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
+import nars.Narsese;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.gui.Vis;
@@ -52,21 +53,33 @@ public class TetriSchool implements Runnable {
             @Override
             public int spawn_block() {
                 int b = super.spawn_block();
-                nar.input("tetris(block," + b + "). :|:");
+                try {
+                    nar.input("tetris(block," + b + "). :|:");
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
                 return b;
             }
 
             @Override
             public void reset() {
                 super.reset();
-                nar.input("tetris(reset). :|:");
+                try {
+                    nar.input("tetris(reset). :|:");
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void next() {
                 super.next();
 
-                nar.input("tetris(time," + game.time + " ). :|:");
+                try {
+                    nar.input("tetris(time," + game.time + " ). :|:");
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
                 cells.forEach(d -> nar.input(d.apply(nar)));
             }
         };

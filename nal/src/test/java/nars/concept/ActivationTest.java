@@ -1,6 +1,7 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Narsese;
 import nars.nar.Default;
 import org.junit.Test;
 
@@ -10,7 +11,7 @@ import org.junit.Test;
 public class ActivationTest {
 
     @Test
-    public void testDerivedBudgets() {
+    public void testDerivedBudgets() throws Narsese.NarseseException {
 
         NAR n= new Default();
 

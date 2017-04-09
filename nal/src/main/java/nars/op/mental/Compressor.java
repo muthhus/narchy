@@ -439,7 +439,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
     }
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
         Default n = new Default();
         Compressor c = new Compressor(n, "_", 4, 8, 0.5f, 8, 32);
 

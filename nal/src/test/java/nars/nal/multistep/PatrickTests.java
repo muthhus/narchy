@@ -138,7 +138,7 @@ public class PatrickTests extends AbstractNALTest {
 
     @Ignore
     @Test
-    public void testConditioningWithoutAnticipation() {
+    public void testConditioningWithoutAnticipation() throws Narsese.NarseseException {
         /*
         <a --> A>. :|: <b --> B>. :|: %0% <c --> C>. %0%
         8

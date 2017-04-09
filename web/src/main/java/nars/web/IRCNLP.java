@@ -221,7 +221,7 @@ public class IRCNLP extends IRC {
 //
 //    }
 
-    void hear(String text, String src) {
+    void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
             Compound f = $.func("SENTENCE", Hear.tokenize(t));
             nar.believe(0.5f, f, Tense.Present, 1f, 0.9f );

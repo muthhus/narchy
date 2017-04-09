@@ -2,6 +2,7 @@ package nars.gui;
 
 import com.jogamp.opengl.GL2;
 import jcog.bag.PLink;
+import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
     final AtomicBoolean busy = new AtomicBoolean(false);
     private final @NotNull Iterable<PLink<X>> input;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Narsese.NarseseException {
         Default d = new Default(1024,50, 2);
         d.input("(a --> b). (b --> c).  (c --> d).  (d-->e)! :|: ");
 

@@ -1,5 +1,6 @@
 package nars.nal.nal8;
 
+import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.test.TestNAR;
@@ -12,7 +13,7 @@ import static org.junit.Assert.assertTrue;
 public class FunctorTest {
 
     @Test
-    public void testImmediateTransformOfInput() { //as opposed to deriver's use of it
+    public void testImmediateTransformOfInput() throws Narsese.NarseseException { //as opposed to deriver's use of it
         Default d = new Default();
 
 
@@ -32,7 +33,7 @@ public class FunctorTest {
     }
 
     @Test
-    public void testAdd1() {
+    public void testAdd1() throws Narsese.NarseseException {
         Default d = new Default();
 
         d.input("add(1,2,#x)!");
@@ -42,7 +43,7 @@ public class FunctorTest {
     }
 
     @Test
-    public void testAdd1Temporal() {
+    public void testAdd1Temporal() throws Narsese.NarseseException {
         Default d = new Default();
 
         d.input("add(1,2,#x)! :|:");
