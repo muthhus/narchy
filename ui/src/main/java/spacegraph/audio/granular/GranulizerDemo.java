@@ -2,7 +2,6 @@ package spacegraph.audio.granular;
 
 import spacegraph.audio.Audio;
 import spacegraph.audio.SoundListener;
-import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
 
 import javax.sound.sampled.LineUnavailableException;

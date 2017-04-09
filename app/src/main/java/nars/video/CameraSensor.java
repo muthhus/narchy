@@ -1,10 +1,8 @@
 package nars.video;
 
-import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.Task;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
@@ -17,7 +15,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;

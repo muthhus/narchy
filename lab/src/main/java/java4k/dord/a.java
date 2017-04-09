@@ -23,7 +23,6 @@ package java4k.dord;
 
 import java4k.GamePanel;
 
-import java.applet.Applet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

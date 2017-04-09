@@ -15,7 +15,6 @@ import nars.util.Loop;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 

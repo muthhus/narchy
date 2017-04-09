@@ -1,7 +1,6 @@
 package nars.term;
 
 import nars.Op;
-import nars.nar.Terminal;
 import nars.term.var.CommonVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;

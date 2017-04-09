@@ -48,7 +48,6 @@ import spacegraph.phys.util.AnimVector3f;
 
 import java.util.function.Consumer;
 
-import static com.jogamp.opengl.GL.GL_NICEST;
 import static com.jogamp.opengl.GL2.*;
 import static spacegraph.math.v3.v;
 

@@ -1,20 +1,15 @@
 package nars.experiment.arkanoid;
 
 
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
-import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import nars.task.DerivedTask;
 import nars.term.Term;
-import nars.video.*;
+import nars.video.CameraSensor;
 import spacegraph.SpaceGraph;
-
-import static nars.Op.*;
 
 public class Arkancide extends NAgentX {
 

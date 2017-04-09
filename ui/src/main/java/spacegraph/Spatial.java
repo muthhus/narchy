@@ -12,8 +12,6 @@ import spacegraph.render.JoglPhysics;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static spacegraph.math.v3.v;
-
 /**
  * volumetric subspace.
  * an atom (base unit) of spacegraph physics-simulated virtual matter

@@ -1,19 +1,13 @@
 package nars.nal;
 
 import com.google.common.collect.HashMultimap;
-import jcog.data.sorted.SortedList;
-import jcog.table.ArrayListTable;
 import nars.$;
 import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.PostCondition;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.List;

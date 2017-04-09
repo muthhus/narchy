@@ -19,9 +19,7 @@ package nars.kif;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Task;
 import nars.nar.Terminal;
-import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -32,9 +30,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static nars.Op.*;
+import static nars.Op.VAR_INDEP;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * http://sigmakee.cvs.sourceforge.net/viewvc/sigmakee/sigma/suo-kif.pdf

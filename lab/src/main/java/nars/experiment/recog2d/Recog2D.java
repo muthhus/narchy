@@ -16,11 +16,10 @@ import nars.truth.Truth;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
-import nars.video.Sensor2D;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.Draw;
 import spacegraph.layout.Grid;
+import spacegraph.render.Draw;
 import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;

@@ -455,7 +455,7 @@ public class NarseseTest {
 
     @Test
     public void testCompleteTask() throws Narsese.NarseseException {
-        taskParses("$0.80;0.50;0.95$ <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
+        taskParses("$0.80;0.95$ <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
     }
 
     @Test public void testNonNegativeIntegerAtoms() throws Narsese.NarseseException {

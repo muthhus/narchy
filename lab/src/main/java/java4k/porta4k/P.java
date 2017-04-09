@@ -1,12 +1,10 @@
 package java4k.porta4k;
 
 import java4k.GamePanel;
-import java4k.pitfall4k.a;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
-import java.applet.Applet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 

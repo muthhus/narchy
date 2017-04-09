@@ -23,7 +23,6 @@ package java4k.wolfenstein4k;
 
 import java4k.GamePanel;
 
-import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;

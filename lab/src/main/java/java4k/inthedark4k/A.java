@@ -43,7 +43,6 @@ package java4k.inthedark4k;
 
 import java4k.GamePanel;
 
-import java.applet.Applet;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;

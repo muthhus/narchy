@@ -9,11 +9,11 @@ import nars.experiment.tetris.impl.TetrisState;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.task.util.TaskStatistics;
 import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
-import nars.task.util.TaskStatistics;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
 import spacegraph.widget.meter.MatrixView;
@@ -22,7 +22,6 @@ import java.util.List;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
-import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 7/28/16.

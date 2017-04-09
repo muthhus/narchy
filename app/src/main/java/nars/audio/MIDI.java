@@ -1,6 +1,5 @@
 package nars.audio;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
@@ -13,14 +12,12 @@ import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
-import nars.time.Tense;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
-
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
