@@ -54,8 +54,8 @@ public class GoalActionConcept extends ActionConcept {
         int dur = nar.dur();
         return feedback.set(term(),
                 this.motor.motor(
-                        beliefIntegrated.commitAverage(dur),
-                        goalIntegrated.commitAverage(dur)),
+                        beliefIntegrated.commitAverage(),
+                        goalIntegrated.commitAverage()),
                 nar.time.nextStamp(),
                 nar);
     }

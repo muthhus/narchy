@@ -43,12 +43,11 @@ public final class TruthFunctions  {
     /**
      * {<A ==> B>} |- <B ==> A>
      * @param t Truth value of the premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth conversion(@NotNull Truth t, float minConf, int dur) {
+    public static Truth conversion(@NotNull Truth t, float minConf) {
         float w = and(t.freq(), t.conf());
-        float c = w2c(w, dur);
+        float c = w2c(w);
         return t(1, c, minConf);
     }
 
@@ -78,11 +77,10 @@ public final class TruthFunctions  {
     /**
      * {<A ==> B>} |- <(--, B) ==> (--, A)>
      * @param t Truth value of the premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth contraposition(@NotNull Truth t, float minConf, int dur) {
-        float c = w2c(and(1 - t.freq(), t.conf()), dur);
+    public static Truth contraposition(@NotNull Truth t, float minConf) {
+        float c = w2c(and(1 - t.freq(), t.conf()));
         return (c < minConf) ? null : t(0, c);
     }
 
@@ -163,11 +161,10 @@ public final class TruthFunctions  {
      * {<S ==> M>, <P ==> M>} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
-     * @param dur
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
-        float c = w2c(and(b.freq(), a.conf(), b.conf()), dur);
+    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float c = w2c(and(b.freq(), a.conf(), b.conf()));
         return (c < minConf) ? null : t(a.freq(), c);
     }
 
@@ -190,29 +187,27 @@ public final class TruthFunctions  {
      * {<M ==> S>, <M ==> P>} |- <S ==> P>
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf, int dur) {
-        return abduction(v2, v1, minConf, dur);
+    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        return abduction(v2, v1, minConf);
     }
 
     /**
      * {<M ==> S>, <P ==> M>} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
-        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()), dur);
+    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
         return c < minConf ? null : t(1, c);
     }
 
 
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
-        return comparison(a, b, false, minConf, dur);
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        return comparison(a, b, false, minConf);
     }
 
     /**
@@ -222,7 +217,7 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf, int dur) {
+    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
         float f1 = a.freq();
         if (invertA) f1 = 1 - f1;
 
@@ -230,7 +225,7 @@ public final class TruthFunctions  {
 
 
         float f0 = or(f1, f2);
-        float c = w2c(and(f0, a.conf(), b.conf()), dur);
+        float c = w2c(and(f0, a.conf(), b.conf()));
         if (c < minConf)
             return null;
 
@@ -275,9 +270,9 @@ public final class TruthFunctions  {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
+    public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
         float bFreq = b.freq();
-        float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f, dur));
+        float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f));
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
     @NotNull static Truth desire(float f1, float f2, float c) {
@@ -302,11 +297,10 @@ public final class TruthFunctions  {
      * A function specially designed for desire value [To be refined]
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf, int dur) {
-        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()), dur);
+    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
         return c < minConf ? null : t(v1.freq(), c);
     }
 
@@ -422,11 +416,10 @@ public final class TruthFunctions  {
      * {(&&, <#x() ==> M>, <#x() ==> P>), S ==> M} |- <S ==> P>
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
-     * @param dur
      * @return Truth value of the conclusion
      */
-    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf, int dur) {
-        float v0c = w2c(a.conf(), dur);
+    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
+        float v0c = w2c(a.conf());
         //since in analogy it will be and() with it, if it's already below then stop
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
     }
@@ -470,12 +463,16 @@ public final class TruthFunctions  {
 //    }
 
 
+    public static float c2w(float c) {
+        return c2w(c, Param.HORIZON);
+    }
+
     /**
      * A function to convert confidence to weight
      * @param c confidence, in [0, 1)
      * @return The corresponding weight of evidence, a non-negative real number
      */
-    public static float c2w(float c, float horizon) {
+    private static float c2w(float c, float horizon) {
         c = clamp(c, 0, MAX_CONF);
         return horizon * c / (1f - c);
     }
@@ -485,7 +482,11 @@ public final class TruthFunctions  {
      * @param w Weight of evidence, a non-negative real number
      * @return The corresponding confidence, in [0, 1)
      */
-    public static float w2c(float w, float horizon) {
+    public static float w2c(float w) {
+        return w2c(w, Param.HORIZON);
+    }
+
+    private static float w2c(float w, float horizon) {
         return clamp(w / (w + horizon), 0, MAX_CONF);
     }
 

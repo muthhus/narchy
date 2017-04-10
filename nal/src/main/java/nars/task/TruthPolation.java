@@ -57,13 +57,13 @@ public enum TruthPolation  {
         float weightedValue = illWei[1];
 
         if (topEternal!=null) {
-            float ew = topEternal.evi(dur);
+            float ew = topEternal.evi();
             illumination += ew;
             weightedValue += ew * topEternal.freq();
         }
 
         float f = weightedValue / illumination;
-        float c = w2c(illumination, dur);
+        float c = w2c(illumination);
 
         return $.t(f, c);
     }

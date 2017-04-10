@@ -169,7 +169,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
                         if (features != null) {
                             //if (features.length < maxStatesPerRegion) {
                                 evi /= features.length;
-                                if ((pixConf[i][j] = (baseConf * w2c(evi, dur))) >= minConf) {
+                                if ((pixConf[i][j] = (baseConf * w2c(evi))) >= minConf) {
                                     po = features;
                                 }
                             //}

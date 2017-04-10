@@ -30,9 +30,6 @@ public abstract class Param  {
     /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
-
-
-
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
@@ -65,11 +62,11 @@ public abstract class Param  {
 
 
 
-//    /**
-//     * Evidential Horizon, the amount of future evidence to be considered (during revision).
-//     * Must be >=1.0, usually 1 .. 2
-//     */
-//    public static float HORIZON = 1f;
+    /**
+     * Evidential Horizon, the amount of future evidence to be considered (during revision).
+     * Must be >=1.0, usually 1 .. 2
+     */
+    public static float HORIZON = 1f;
 
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
     /**

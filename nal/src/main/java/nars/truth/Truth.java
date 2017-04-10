@@ -200,7 +200,7 @@ public interface Truth extends Truthed {
 
 
     default Truth eviMult(float f, int dur) {
-        return (f == 1f) ? this : withConf(w2c(evi(dur) * f,  dur));
+        return (f == 1f) ? this : withConf(w2c(evi() * f));
     }
 
     @Nullable Truth withConf(float f);

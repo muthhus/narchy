@@ -59,10 +59,9 @@ public interface Truthed  {
         return count == 0 ? 0.5f : t / count;
     }
 
-    /** weight of evidence ( confidence converted to weight, 'c2w()' )
-     * @param dur*/
-    default float evi(float dur) {
-        return c2w(conf(), dur);
+    /** weight of evidence ( confidence converted to weight, 'c2w()' )  */
+    default float evi() {
+        return c2w(conf());
     }
 
 

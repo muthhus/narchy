@@ -34,7 +34,7 @@ public class RevectionTest {
         //assertEquals(a.truth(), TruthPolation.truth(0, a, a)); //same item
 
         //System.out.println( TruthPolation.truth(0, a, b) );
-        assertEquals(Revision.revise(a, b, 1), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)));
+        assertEquals(Revision.revise(a, b), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)));
 
     }
 
@@ -48,7 +48,7 @@ public class RevectionTest {
 
 
         Truth pt = TruthPolation.truth(0, 1, a.apply(n), b.apply(n));
-        @Nullable Truth rt = Revision.revise(a, b, 1);
+        @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
         assertTrue(pt.conf() < rt.conf()); //revection result will be less than eternal revision
@@ -60,7 +60,7 @@ public class RevectionTest {
     public void testRevisionEquivalence2Instant() throws Narsese.NarseseException {
         TaskBuilder a = t(1f, 0.5f, 0);
         TaskBuilder b = t(0f, 0.5f, 0);
-        assertEquals( Revision.revise(a, b, 1), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)) );
+        assertEquals( Revision.revise(a, b), TruthPolation.truth(0, 1, a.apply(n), b.apply(n)) );
     }
 
     @Test
@@ -234,7 +234,7 @@ public class RevectionTest {
         long at = 5;
 
         int dur = n.dur();
-        float outConf = w2c( c2w(inConf, dur)*repeats, dur );
+        float outConf = w2c( c2w(inConf)*repeats);
 
         BeliefAnalysis b = null;
         try {

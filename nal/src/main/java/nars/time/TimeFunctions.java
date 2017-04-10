@@ -865,7 +865,7 @@ public interface TimeFunctions {
         Task task = p.task;
         Task belief = p.belief;
 
-        long occ = occInterpolate(task, belief, p.nar.dur()); //reset
+        long occ = occInterpolate(task, belief); //reset
 
 
         Compound tt = (Compound) p.taskTerm.unneg();
@@ -1146,7 +1146,7 @@ public interface TimeFunctions {
 
     };
 
-    static long occInterpolate(@NotNull Task t, @Nullable Task b, int dur) {
+    static long occInterpolate(@NotNull Task t, @Nullable Task b) {
 
         long to = t.start();
         if (b == null) {
@@ -1162,8 +1162,8 @@ public interface TimeFunctions {
 
         //if (to != ETERNAL && bo != ETERNAL) {
 
-        float tw = t.evi(dur);
-        float bw = b.evi(dur);
+        float tw = t.evi();
+        float bw = b.evi();
         return Util.lerp((tw) / (bw + tw), to, bo);
 //        } else {
 //            return bo != ETERNAL ? bo : to;

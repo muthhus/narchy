@@ -58,9 +58,9 @@ public class AnswerTask extends ImmutableTask {
     }
 
     @Nullable
-    public AnswerTask budget(@NotNull Task a, @NotNull Task b, int dur) {
-        float ae = a.evi(dur);
-        return budget(a, b, ae / (ae + b.evi(dur)));
+    public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
+        float ae = a.evi();
+        return budget(a, b, ae / (ae + b.evi()));
     }
 
     @Nullable

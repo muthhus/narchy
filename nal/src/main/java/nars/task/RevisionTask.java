@@ -103,8 +103,8 @@ public class RevisionTask extends AnswerTask  {
         float newBeliefContribution;
         if (parentNewBelief.isBeliefOrGoal()) {
             int dur = nar.dur();
-            float newBeliefConf = parentNewBelief.evi(dur);
-            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi(dur));
+            float newBeliefConf = parentNewBelief.evi();
+            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi());
         } else {
             //question/quest
             newBeliefContribution = 0.5f;

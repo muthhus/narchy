@@ -73,7 +73,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
         Truth t = truth();
         long a = start();
-        float cw = t.evi(dur);
+        float cw = t.evi();
 
         if (a == ETERNAL)
             return cw;
@@ -596,7 +596,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     default float conf(long when, int dur) {
         float cw = evi(when, dur);
-        return cw == cw ? w2c(cw, dur) : Float.NaN;
+        return cw == cw ? w2c(cw) : Float.NaN;
     }
 
     @Nullable
@@ -604,7 +604,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         float cw = evi(when, dur);
         if (cw == cw && cw > 0) {
 
-            float conf = w2c(cw, dur);
+            float conf = w2c(cw);
             if (conf > minConf) {
                 return $.t(freq(), conf);
             }

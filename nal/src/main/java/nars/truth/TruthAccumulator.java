@@ -15,45 +15,45 @@ public class TruthAccumulator extends AtomicReference<double[]> {
         commit();
     }
 
-    @Nullable public Truth commitAverage(int dur) {
-        return truth(commit(), false, dur);
+    @Nullable public Truth commitAverage() {
+        return truth(commit(), false);
     }
-    @Nullable public Truth commitSum(int dur) {
-        return truth(commit(), true, dur);
+    @Nullable public Truth commitSum() {
+        return truth(commit(), true);
     }
 
     protected double[] commit() {
         return getAndSet(new double[3]);
     }
 
-    public Truth peekSum(int dur) {
-        return truth(get(), true, dur);
+    public Truth peekSum() {
+        return truth(get(), true);
     }
-    @Nullable public Truth peekAverage(int dur) {
-        return truth(get(), false, dur);
+    @Nullable public Truth peekAverage() {
+        return truth(get(), false);
     }
 
     @Nullable
-    protected static Truth truth(double[] fc, boolean sumOrAverage, int dur) {
+    protected static Truth truth(double[] fc, boolean sumOrAverage) {
         if (fc == null)
             return null;
         int n = (int)fc[2];
 
         double e = fc[1];
-        float c = w2c((sumOrAverage) ? ((float)e) : ((float)e)/n, dur );
+        float c = w2c((sumOrAverage) ? ((float)e) : ((float)e)/n);
         if (c <= Param.TRUTH_EPSILON)
             return null;
 
         return $.t((float)(fc[0]/e), c);
     }
 
-    public void add(@Nullable Truth t, int dur) {
+    public void add(@Nullable Truth t) {
         double fe, e;
         if (t == null) {
             e = fe = 0; //just record a zero
         } else {
             double f = t.freq();
-            e = t.evi(dur);
+            e = t.evi();
             fe = f * e;
         }
         getAndUpdate(fc->{

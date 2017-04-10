@@ -420,7 +420,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
                 return null; //nothing to merge with
             }
 
-            Task merged = merge(input, b, now, confMin, dur);
+            Task merged = merge(input, b, now, confMin);
             if (merged == null) {
                 return null; //merge failed
             }
@@ -436,7 +436,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
             Task b = matchMerge(l, now, a, dur);
             if (b != null) {
-                Task merged = merge(a, b, now, confMin, dur);
+                Task merged = merge(a, b, now, confMin);
 
                 a.delete();  //delete a after the merge, so that its budget revises
 
@@ -459,7 +459,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     /**
      * t is the target time of the new merged task
      */
-    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, int dur) {
+    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
 
 
         Interval ai = new Interval( a.start() , a.end() );
@@ -468,8 +468,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Interval timeOverlap = ai.intersection(bi);
 
         if (timeOverlap != null) {
-            float aw = a.evi(dur);
-            float bw = b.evi(dur);
+            float aw = a.evi();
+            float bw = b.evi();
 
             float aa = aw * (1 + ai.length());
             float bb = bw * (1 + bi.length());
@@ -490,11 +490,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             Interval union = ai.union(bi);
             float timeDiscount = rangeEquality + (1f-rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
 
-            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin, dur);
+            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
             if (t!=null) {
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
-                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, dur);
+                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
             }
         }
 
@@ -512,7 +512,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = merge(a, s.b, now, a.conf(), dur);
+        Task c = merge(a, s.b, now, a.conf());
         return c != null ? c : a;
     }
 

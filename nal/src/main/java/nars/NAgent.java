@@ -520,12 +520,12 @@ abstract public class NAgent implements NSense, NAct {
             if (!nonCuriosityTasks.isEmpty()) {
                 Truth d = TruthPolation.truth(null, now, dur, nonCuriosityTasks);
                 if (d != null)
-                    m += d.evi(dur);
+                    m += d.evi();
 
                 nonCuriosityTasks.clear();
             }
         }
-        return w2c(m / n, dur);
+        return w2c(m / n);
     }
 
 

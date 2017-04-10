@@ -37,10 +37,10 @@ public class BeliefActionConcept extends ActionConcept {
     public Task apply(NAR nar) {
 
         int dur = nar.dur();
-        Truth belief = beliefIntegrated.commitAverage(dur);
+        Truth belief = beliefIntegrated.commitAverage();
         action.accept(belief);
 
-        Truth goal = goalIntegrated.commitAverage(dur);
+        Truth goal = goalIntegrated.commitAverage();
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
