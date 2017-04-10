@@ -73,7 +73,7 @@ public class Choose1 extends Termutator {
         Term xEllipsis = this.xEllipsis;
         for (Term x = this.x; l >=0; l--) {
 
-            if (!f.versioning.nextChange()) return; else start++; //consume 1 stack
+            if (!f.versioning.nextChange()) return;
 
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {

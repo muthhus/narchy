@@ -11,7 +11,7 @@ public class Versioning extends FasterList<Versioned> {
     private int ttl;
 
     @Deprecated public Versioning(int capacity) {
-        this(capacity, capacity*4);
+        this(capacity, capacity*8);
     }
 
     public Versioning(int capacity, int ttl) {

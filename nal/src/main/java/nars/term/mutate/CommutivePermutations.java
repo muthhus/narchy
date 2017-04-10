@@ -50,7 +50,7 @@ public final class CommutivePermutations extends Termutator {
 
         while (p.hasNext()) {
 
-            if (!f.versioning.nextChange()) return; else start++; //consume 1 stack
+            if (!f.versioning.nextChange()) return;
 
             p.next();
 

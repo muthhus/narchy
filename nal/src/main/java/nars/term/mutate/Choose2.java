@@ -83,7 +83,7 @@ public class Choose2 extends Termutator {
         int[] c = null;
         while (ccc.hasNext() || !phase) {
 
-            if (!f.versioning.nextChange()) return; else start++; //consume 1 stack
+            if (!f.versioning.nextChange()) return;
 
             c = phase ? ccc.next() : c;
             phase = !phase;
