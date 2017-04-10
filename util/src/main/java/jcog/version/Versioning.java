@@ -8,8 +8,15 @@ import org.jetbrains.annotations.Nullable;
 public class Versioning extends FasterList<Versioned> {
 
 
-    public Versioning(int capacity) {
+    private int ttl;
+
+    @Deprecated public Versioning(int capacity) {
+        this(capacity, capacity*4);
+    }
+
+    public Versioning(int capacity, int ttl) {
         super(0, new Versioned[capacity]);
+        this.ttl = ttl;
     }
 
     @NotNull
@@ -66,6 +73,9 @@ public class Versioning extends FasterList<Versioned> {
 
     @Override
     public final boolean add(@Nullable Versioned newItem) {
+        if (--ttl<=0)
+            return false;
+
         Versioned[] ii = this.items;
         if (ii.length == this.size) {
             return false;
