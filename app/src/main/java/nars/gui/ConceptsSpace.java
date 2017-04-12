@@ -50,7 +50,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             public void onRemoved(@NotNull BLink<Concept> value) {
                 ConceptWidget cw = widgetGet(value.get());
                 if (cw!=null) {
-                    cw.hide();
+                    //cw.hide();
                     cw.delete();
                 }
             }
@@ -74,6 +74,8 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             );
 
         });
+
+        //System.out.println(nar.time() + " " + displayNext.size() );
 
     }
 
@@ -112,7 +114,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     public static void main(String[] args) throws Narsese.NarseseException {
 
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //Default n = new Default(64, 3, 1, 3);
         Default n = NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.2f));
@@ -128,6 +130,8 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        n.inputAt(3, "c:b.");
 
         //new DeductiveChainTest(n, 8,  2048, inh);
+
+        n.loop(1f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
@@ -145,7 +149,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 64, 8) {
+        NARSpace cs = new ConceptsSpace(n, 32, 8) {
 //            @Override
 //            protected boolean include(Term term) {
 //
@@ -169,7 +173,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //                            }
 //                        }
 
-                        new Flatten()
+                        //new Flatten()
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
@@ -221,7 +225,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         400, 400);
 
         //n.log();
-        n.loop(2f);
+        //n.loop(2f);
 
 
 

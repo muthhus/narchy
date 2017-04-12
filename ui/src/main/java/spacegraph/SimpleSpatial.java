@@ -51,10 +51,10 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     @Override
     public void delete() {
-        if (shape!=null) {
-            shape.setUserPointer(null);
-            shape = null;
-        }
+//        if (shape!=null) {
+//            shape.setUserPointer(null);
+//            shape = null;
+//        }
         if (body!=null) {
             body.destroy();
             body = null;

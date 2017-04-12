@@ -129,6 +129,9 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @param z the z coordinate
      */
     public void set(float x, float y, float z) {
+//        if ((x!=x) || (y!=y) || (z!=z))
+//            throw new UnsupportedOperationException();
+
         this.x = x;
         this.y = y;
         this.z = z;

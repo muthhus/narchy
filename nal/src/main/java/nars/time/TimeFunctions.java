@@ -855,18 +855,14 @@ public interface TimeFunctions {
      */
     @NotNull TimeFunctions Auto = (derived, p, d, occReturn, confScale) -> {
 
-
         @NotNull PremiseRule rule = d.rule;
         Term tp = rule.getTask();
         Term bp = rule.getBelief();
-
-        //ConceptProcess premise = p.premise;
 
         Task task = p.task;
         Task belief = p.belief;
 
         long occ = occInterpolate(task, belief); //reset
-
 
         Compound tt = (Compound) p.taskTerm.unneg();
         Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;

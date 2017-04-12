@@ -111,7 +111,8 @@ abstract public class Loop implements Runnable {
             long delayable = (beforeTime + periodMS) - afterTime;
             if (delayable > 0) {
                 //logger.info("delay {}", delayable);
-                Util.pause(delayable);
+                //Util.pause(delayable);
+                Util.sleep(delayable);
             }
 
             this.frameTime.addValue(frameTime);
