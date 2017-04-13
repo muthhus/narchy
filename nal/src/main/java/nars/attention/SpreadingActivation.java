@@ -39,7 +39,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     transient final float inQua; //cached quality value of input at input
     transient final Term originTerm;
 
-    final float temporalSpecificity = 0.25f;
+    final float temporalSpecificity = 0.1f;
+
+    /** 0.5 = forward/backward termlinking is balanced.
+     *  > 0.5 = more towards the forward link (ie, origin -> subterms)
+     *  < 0.5 = more towards the backward link (ie, subterms -> origin)
+     */
+    private static final float TERMLINK_BALANCE = 0.5f;
 
     /**
      * runs the task activation procedure
@@ -141,7 +147,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             kk = k;
         }
 
-        termBidi(kk, v, v);
+        termBidi(kk, v * TERMLINK_BALANCE, v * (1f - TERMLINK_BALANCE));
     }
 
     @Nullable
@@ -277,9 +283,9 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             termlink(origin, tgtTerm, tlForward);
 
         if (tgt != origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
-            if (!originTerm.equals(tgtTerm)) {
+            //if (!originTerm.equals(tgtTerm)) {
                 termlink((Concept) tgt, originTerm, tlReverse);
-            }
+            //}
         }
 
     }
