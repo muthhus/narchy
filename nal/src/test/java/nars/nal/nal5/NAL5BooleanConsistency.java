@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
                     }
                 };
 
-                //d.log();
+                d.log();
 
                 String[] outcomes = {
                         "(x --> both_false)",

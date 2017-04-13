@@ -1169,7 +1169,14 @@ public class NAL7Test extends AbstractNALTest {
 
         ;
     }
-
+//    @Test public void inductNegativesConjunction() {
+//        test()
+//                .log()
+//                .input("--(i).")
+//                .input("--(j).")
+//                .mustBelieve(cycles, "(--(i) && --(j))", 1f, 0.81f);
+//
+//    }
 //    @Test public void dontUnifyNegated() {
 //        /*
 //        shouldn't happen:

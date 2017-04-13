@@ -232,7 +232,7 @@ abstract public class events extends AtomicPredicate<Derivation> {
             long tOcc = m.task.start();
             boolean tEternal = (tOcc == ETERNAL);
             return tEternal ?
-                    (bEternal && m.task.term().compareTo(b.term()) < 0) : //enforce lexical ordering so that the reverse isnt also computed
+                    (bEternal) : //enforce lexical ordering so that the reverse isnt also computed
                     (!bEternal && (bOcc <= tOcc));
         }
     };
