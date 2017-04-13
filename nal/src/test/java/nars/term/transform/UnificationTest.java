@@ -81,7 +81,8 @@ public class UnificationTest {
             AtomicBoolean subbed = new AtomicBoolean(false);
 
             final Term finalT = t1;
-            Unify sub = new Unify($.terms /* new Indexes.DefaultTermIndex(256, new XorShift128PlusRandom(1)) */, type, nar.random, Param.UnificationStackMax) {
+            Unify sub = new Unify($.terms, type,
+                    nar.random, Param.UnificationStackMax*8) {
 
 //            @Override
 //            public void onPartial() {
@@ -93,11 +94,7 @@ public class UnificationTest {
                 public void onMatch() {
 
                     if (shouldSub) {
-//                        if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
-//                            assertTrue((n2) <= (yx.size()));
-//                            assertTrue((n1) <= (xy.size()));
-//                        }
-//                        assertFalse("incomplete: " + toString(), this.isEmpty());
+
 
                         this.xy.forEachVersioned((k, v) -> {
                             if (matchType(k))
@@ -105,7 +102,21 @@ public class UnificationTest {
                             return true;
                         });
 
-                        subbed.set(true);
+                        if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
+                            if (((n2) <= (yx.size())) &&
+                                    ((n1) <= (xy.size()))) {
+                                subbed.set(true);
+
+                            } else {
+                                System.out.println("incomplete:\n\t" + xy + "\n\t" + yx);
+                            }
+                        } else {
+                            subbed.set(true);
+                        }
+
+//                        assertFalse("incomplete: " + toString(), this.isEmpty());
+
+
 
                     } else {
                         //HACK there should be incomplete assignments even though this says it matched
@@ -833,7 +844,8 @@ public class UnificationTest {
     }
 
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testImageRelationAfterEllipsis() {
         test(Op.VAR_PATTERN,
                 "<A --> (/, B, %X..+, _)>",
