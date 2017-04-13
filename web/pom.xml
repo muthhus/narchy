@@ -120,7 +120,6 @@
       <groupId>opennars</groupId>
       <artifactId>app</artifactId>
       <version>1.8-SNAPSHOT</version>
-      <scope>compile</scope>
     </dependency>
 
 
