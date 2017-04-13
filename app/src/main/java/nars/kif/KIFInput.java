@@ -19,7 +19,10 @@ package nars.kif;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Op;
+import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -27,6 +30,7 @@ import nars.term.var.Variable;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,10 +66,11 @@ public class KIFInput implements Runnable {
         kif = new KIF(kifPath);
         formulaIterator = kif.getFormulas().iterator();
 
-        this.output = new PrintStream(new FileOutputStream(
-                //"/tmp/kif.nal"
-            "/home/me/s/logic/src/main/java/spimedb/logic/sumo_merged.kif.nal"
-        ));
+//        this.output = new PrintStream(new FileOutputStream(
+//                //"/tmp/kif.nal"
+//            "/home/me/s/logic/src/main/java/spimedb/logic/sumo_merged.kif.nal"
+//        ));
+        this.output = System.out;
     }
 
     public void start() {
@@ -98,8 +103,12 @@ public class KIFInput implements Runnable {
 
 //        long[] stamp = { new Random().nextLong() };
         for (Compound x : beliefs) {
-            System.out.println(x);
-            output.println(x + "."); output.flush();
+            output.println(x + ".");
+            /*try {
+                nar.input("$0.01$ " + x + ".");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
         }
 
         //nar.believe(y);
@@ -240,7 +249,7 @@ public class KIFInput implements Runnable {
                 if (args.size() == 2) {
                     Term subj = args.get(0);
                     Term range = args.get(1);
-                    Variable rr = $.v(VAR_INDEP, "R" + Integer.toString(Math.abs(subj.hashCode()), 36));
+                    Variable rr = nextVar(VAR_INDEP);
                     y = $.impl($.inh($.p( rr ), subj), $.inh(rr, range));
                 } else {
                     System.err.println("unexpected range format");
@@ -250,7 +259,8 @@ public class KIFInput implements Runnable {
                 if (args.size() >= 2) {
                     Term a = args.get(0);
                     Term b = args.get(1);
-                    y = (Compound) $.equi($.prop($.varIndep(0), a), $.neg($.prop($.varIndep(0), b)));
+                    Variable v0 = nextVar(VAR_INDEP);
+                    y = (Compound) $.equi($.prop(v0, a), $.neg($.prop(v0, b)));
                 }
                 break;
             case "documentation":
@@ -309,6 +319,16 @@ public class KIFInput implements Runnable {
         return y;
     }
 
+    private Variable nextVar(Op v) {
+        return $.v(v, nextVar());
+    }
+
+    private final AtomicInteger serial = new AtomicInteger(0);
+
+    private String nextVar() {
+        return Integer.toString(Math.abs(serial.incrementAndGet()), 36);
+    }
+
     public Compound impl(Term conditionTerm, Term actionTerm, boolean implOrEquiv) {
         try {
             return
@@ -324,10 +344,17 @@ public class KIFInput implements Runnable {
 
 
     public static void main(String[] args) throws Exception {
-        NAR d = new Terminal();
-        d.log();
+        NAR d = new Default();
+
         KIFInput k = new KIFInput(d, "/home/me/sumo/Merge.kif");
         k.run();
+
+//        d.clear();
+//        d.log();
+//        d.input("[Phrase]:\"this is\".");
+//        d.run(500);
+//        d.conceptsActive().forEach(System.out::println);
+        //d.concept("[Phrase]").print();
 
     }
 }

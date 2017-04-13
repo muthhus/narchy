@@ -312,7 +312,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     @NotNull
-    public List<Task> input(@NotNull String text) throws NarseseException {
+    public List<Task> input(@NotNull String text) throws NarseseException, InvalidTaskException {
         List<Task> l = tasks(text);
         input(l);
         return l;

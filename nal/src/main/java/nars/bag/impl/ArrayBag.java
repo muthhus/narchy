@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 
 /**
  * A bag implemented as a combination of a Map and a SortedArrayList
+ * TODO extract a version of this which will work for any Prioritized, not only BLink
  */
 public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, BLink<X>> {
 
