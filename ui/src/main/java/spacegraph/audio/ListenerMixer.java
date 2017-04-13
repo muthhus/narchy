@@ -6,11 +6,10 @@ import jcog.list.SynchronizedArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
-public class ListenerMixer implements StereoSoundProducer {
-    public final List<Sound> sounds = new SynchronizedArrayList<>(Sound.class);
-
+public class ListenerMixer extends CopyOnWriteArrayList<Sound> implements StereoSoundProducer {
 
     private float[] buf = new float[0];
 
@@ -28,27 +27,19 @@ public class ListenerMixer implements StereoSoundProducer {
 
     public <S extends SoundProducer> Sound<S> addSoundProducer(S producer, SoundSource soundSource, float volume, float priority) {
         Sound s = new Sound(producer, soundSource, volume, priority);
-        sounds.add(s);
+        add(s);
         return s;
     }
 
     public void update(float alpha) {
         boolean updating = (soundListener != null);
 
-        for (int i = 0; ; ) {
-            if ((i >= 0) && (i < sounds.size())) {
-                Sound sound = sounds.get(i);
-                if (updating)
-                    sound.update(soundListener, alpha);
+        this.removeIf(sound -> {
+            if (updating)
+                sound.update(soundListener, alpha);
 
-                if (!sound.isLive()) {
-                    sounds.remove(i);
-                } else {
-                    i++;
-                }
-            } else
-                break;
-        }
+            return !sound.isLive();
+        });
 
 //        for (Iterator it = sounds.iterator(); it.hasNext();)         {
 //
@@ -67,7 +58,8 @@ public class ListenerMixer implements StereoSoundProducer {
     @SuppressWarnings("unchecked")
     public void read(float[] leftBuf, float[] rightBuf, int readRate) {
 
-        int s = sounds.size();
+        int s = size();
+
         if (s == 0)
             return;
 
@@ -75,14 +67,14 @@ public class ListenerMixer implements StereoSoundProducer {
             buf = new float[leftBuf.length];
 
         if (s > maxChannels) {
-            Collections.sort(sounds);
+            Collections.sort(this);
         }
 
         Arrays.fill(leftBuf, 0);
         Arrays.fill(rightBuf, 0);
 
         for (int i = 0; i < s && i >= 0; ) {
-            Sound sound = sounds.get(i);
+            Sound sound = get(i);
 
             if (i < maxChannels) {
                 float[] buf = this.buf;
@@ -111,17 +103,14 @@ public class ListenerMixer implements StereoSoundProducer {
                 sound.skip(leftBuf.length, readRate);
             }
 
-            if (!sound.isLive())
-                sounds.remove(i);
-            else
-                i++;
+            i++;
         }
 
     }
 
     @Override
     public void skip(int samplesToSkip, int readRate) {
-        for (Sound sound : sounds) {
+        for (Sound sound : this) {
             sound.skip(samplesToSkip, readRate);
         }
     }

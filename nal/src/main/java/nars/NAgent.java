@@ -455,7 +455,7 @@ abstract public class NAgent implements NSense, NAct {
 
         init();
 
-        Timer t = RealTime.timer;
+        Timer t = RealTime.real;
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

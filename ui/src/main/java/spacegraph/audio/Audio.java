@@ -137,14 +137,9 @@ public class Audio implements Runnable {
         return listenerMixer.addSoundProducer(p, soundSource, volume, priority);
     }
 
-    public List<Sound> getSounds() {
-        return listenerMixer.sounds;
-    }
 
     public void clientTick(float alpha) {
-        synchronized (listenerMixer) {
-            listenerMixer.update(alpha);
-        }
+        listenerMixer.update(alpha);
     }
 
     public void tick() {
@@ -152,10 +147,9 @@ public class Audio implements Runnable {
 
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
         //        targetAmplitude = (targetAmplitude - 1) * 0.9f + 1;
-        synchronized (listenerMixer) {
-            listenerMixer.read(leftBuf, rightBuf, rate);
-            ////            if (maxAmplitude > targetAmplitude) targetAmplitude = maxAmplitude;
-        }
+        listenerMixer.read(leftBuf, rightBuf, rate);
+        ////            if (maxAmplitude > targetAmplitude) targetAmplitude = maxAmplitude;
+
 
         soundBuffer.clear();
         int max16 = 32767;
@@ -196,8 +190,10 @@ public class Audio implements Runnable {
     @Override
     public void run() {
         while (alive) {
-            clientTick(alpha);
-            tick();
+            synchronized (listenerMixer) {
+                clientTick(alpha);
+                tick();
+            }
             Thread.yield();
         }
     }

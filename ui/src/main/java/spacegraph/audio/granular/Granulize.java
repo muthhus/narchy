@@ -10,6 +10,7 @@ import java.util.Random;
 public class Granulize extends Granulator implements SoundProducer, SoundProducer.Amplifiable {
 
 	private final float[] sourceBuffer;
+	private final Random rng;
 	private float now;
 	private float playTime;
 
@@ -28,18 +29,16 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 	private boolean isPlaying;
 	private int playOffset = -1;
 
-	final Random rng = new XorShift128PlusRandom(1);
-
-
-
-    public Granulize(SonarSample s, float grainSizeSecs, float windowSizeFactor) {
-        this(s.buf, s.rate, grainSizeSecs, windowSizeFactor);
+    public Granulize(SonarSample s, float grainSizeSecs, float windowSizeFactor, Random rng) {
+        this(s.buf, s.rate, grainSizeSecs, windowSizeFactor, rng);
     }
 
-	public Granulize(float[] buffer, float sampleRate, float grainSizeSecs, float windowSizeFactor) {
+	public Granulize(float[] buffer, float sampleRate, float grainSizeSecs, float windowSizeFactor, Random rng) {
 		super(buffer, sampleRate, grainSizeSecs, windowSizeFactor);
 
 		sourceBuffer = buffer;
+
+		this.rng = rng;
 
 		play();
 	}
@@ -111,9 +110,11 @@ public class Granulize extends Granulator implements SoundProducer, SoundProduce
 
 
     public void play() {
-		playOffset = Math.abs(rng.nextInt());
-		playTime = now;
-		isPlaying = true;
+    	if (!isPlaying) {
+			playOffset = Math.abs(rng.nextInt());
+			playTime = now;
+			isPlaying = true;
+		}
 	}
 
 	/** continue */

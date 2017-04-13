@@ -1,16 +1,18 @@
 package spacegraph.audio.sample;
 
+import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.SoundProducer;
 
 
 public class SamplePlayer implements SoundProducer {
+    @NotNull
     private final SonarSample sample;
     private float pos;
     public boolean alive = true;
     private final float rate;
 
     
-    public SamplePlayer(SonarSample sample, float rate)
+    public SamplePlayer(@NotNull SonarSample sample, float rate)
     {
         this.rate = rate;
         this.sample = sample;
@@ -37,6 +39,7 @@ public class SamplePlayer implements SoundProducer {
             pos+=step;
         }
 
+
         return 1;
     }
 
@@ -45,9 +48,8 @@ public class SamplePlayer implements SoundProducer {
     {
         float step = sample.rate/readRate;
         pos+=step*samplesToSkip;
-        
-        if (pos>=sample.buf.length)
-        {
+
+        if (alive && pos>=sample.buf.length) {
             alive = false;
         }
     }

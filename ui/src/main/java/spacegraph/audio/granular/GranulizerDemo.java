@@ -1,5 +1,6 @@
 package spacegraph.audio.granular;
 
+import jcog.random.XorShift128PlusRandom;
 import spacegraph.audio.Audio;
 import spacegraph.audio.SoundListener;
 import spacegraph.audio.sample.SampleLoader;
@@ -15,7 +16,7 @@ public enum GranulizerDemo {
         Audio audio = new Audio(4);
 
         Granulize ts =
-            new Granulize(SampleLoader.load("/tmp/awake.wav"), 0.25f, 0.9f)
+            new Granulize(SampleLoader.load("/tmp/awake.wav"), 0.25f, 0.9f, new XorShift128PlusRandom(1))
                     .setStretchFactor(0.25f);
 
         audio.play(ts, SoundListener.zero, 1, 1);

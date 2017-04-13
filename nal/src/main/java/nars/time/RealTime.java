@@ -21,7 +21,6 @@ public abstract class RealTime implements Time {
     final AtomicLong nextStamp = new AtomicLong(1);
     private int dur = 1;
 
-    static final public Timer timer = new Timer("Realtime");
 
 
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {

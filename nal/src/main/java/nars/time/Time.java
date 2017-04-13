@@ -1,11 +1,14 @@
 package nars.time;
 
 import java.io.Serializable;
+import java.util.Timer;
 
 /**
  * Time state
  */
 public interface Time extends Serializable {
+
+	Timer real = new Timer("Realtime");
 
 	/** called when memory reset */
 	void clear();
