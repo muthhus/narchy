@@ -1170,4 +1170,20 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void dontUnifyNegated() {
+        /*
+        shouldn't happen:
+
+        $.50;.95$ (((--,(i))&&(--,(j)))==>(x-->both_false)). %1.0;.90% {0: 2}
+        $.50;.95$ (j). %0.0;.90% {0: 6}
+
+            $.08;.82$ (x-->both_false). %1.0;.73% {200: 2;6}
+                ((%1,((--,%2)==>%3),time(decomposeBeliefLate)),(subIfUnifiesAny(%3,%2,%1),((DeductionN-->Belief),(InductionN-->Goal))))
+        */
+        test().believe("(((--,(i))&&(--,(j)))==>(x-->both_false))")
+                .believe("(--,(j))")
+                .mustBelieve(cycles, "(x-->both_false)", 1f, 0.73f);
+
+    }
+
 }

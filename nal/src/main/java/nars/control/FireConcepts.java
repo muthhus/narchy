@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.bag.BagFlow;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;
@@ -30,8 +31,9 @@ import java.util.function.Consumer;
 /** controls an active focus of concepts */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
-    public final AtomicBoolean clear = new AtomicBoolean(false);
     public final FloatParam activationRate = new FloatParam(1f);
+
+    public final AtomicBoolean clear = new AtomicBoolean(false);
 
     final MatrixPremiseBuilder premiser;
 
@@ -70,25 +72,29 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //        }
 //    }
 
-    public boolean premiseVector(NAR nar, Concept c, Consumer<DerivedTask> target) {
+    public void premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target) {
+
+        Concept c = pc.get();
 
         c.tasklinks().commit();
-
-        @Nullable BLink<Task> taskLink = c.tasklinks().sample();
-        if (taskLink == null)
-            return true;
-
         c.termlinks().commit();
 
-        int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+        int numTaskLinks = 1; //Util.lerp(pc.pri(), 2, 1);
+        for (int i = 0; i < numTaskLinks; i++) {
+            @Nullable BLink<Task> taskLink = c.tasklinks().sample();
+            if (taskLink == null)
+                return;
 
-        FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-        c.termlinks().sample(termlinksPerForThisTask, termLinks::add);
 
-        if (!termLinks.isEmpty())
-            premiser.newPremiseVector(c, taskLink, termlinksFiredPerFiredConcept,
-                    target, termLinks, nar);
-        return false;
+            int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+
+            FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+            c.termlinks().sample(termlinksPerForThisTask, termLinks::add);
+
+            if (!termLinks.isEmpty())
+                premiser.newPremiseVector(c, taskLink, termlinksFiredPerFiredConcept,
+                        target, termLinks, nar);
+        }
     }
 
     class PremiseMatrixBatch implements Consumer<NAR> {
@@ -104,7 +110,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Override
         public void accept(NAR nar) {
-            nar.focus().sample(batchSize, c -> {
+            source.sample(batchSize, c -> {
                 premiser.newPremiseMatrix(c.get(),
                         _tasklinks, _termlinks,
                         FireConcepts.this, //input them within the current thread here
@@ -132,7 +138,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Override public void fire() {
             source.sample(conceptsFiredPerCycle.intValue(), c -> {
-                premiseVector(nar, c.get(), nar::input);
+                premiseVector(nar, c, nar::input);
                 return true;
             });
         }
@@ -192,7 +198,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 ((ConceptBagFocus)nar.focus()).active,
                 pending,
                 nar.exe, (concept, target) -> {
-                    premiseVector(nar, concept.get(), target::put);
+                    premiseVector(nar, concept, target::put);
                     return true;
                 },
                 x->nar.input(in.apply(x)));

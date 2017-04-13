@@ -96,8 +96,13 @@ abstract public class substituteIfUnifies extends Functor {
 //        }
 
         Term term = a[0];
+
         Term x = a[1];
         Term y = a[2];
+        if (x.equals(y))
+            return term; //False; //no effect
+
+
 
         Term z = unify(term, x, y);
         return (z != null) ? z : False;
@@ -105,22 +110,25 @@ abstract public class substituteIfUnifies extends Functor {
 
     public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
 
-        if (forwardOnly()) {
-            if (!(term instanceof Compound))
-                return null;
-            int dt = ((Compound)term).dt();
-            if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
-                return null;
-        }
+//        if (forwardOnly()) {
+//            if (!(term instanceof Compound))
+//                return null;
+//            int dt = ((Compound)term).dt();
+//            if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
+//                return null;
+//        }
 
         @Nullable Op op = unifying();
-        boolean hasAnyOp = op == null || (x.hasAny(op) && term.hasAny(op));
+        boolean hasAnyOp =
+                (op == null && (x.vars() + x.varPattern() + y.vars() + y.varPattern() > 0))
+                ||
+                (op!=null && (x.hasAny(op) || term.hasAny(op)));
 
-        if (!hasAnyOp && mustSubstitute()) {
+        if (!hasAnyOp/* && mustSubstitute()*/) {
             return null; //FAILED
         }
 
-        boolean equals = equal(x, y, false /* different dt */, true /* same polarity */);
+        //boolean equals = equal(x, y, false /* different dt */, true /* same polarity */);
 //        if (!equals) {
 //            //try auto-negation:
 //            boolean xn = (x.op()==NEG);
@@ -147,17 +155,17 @@ abstract public class substituteIfUnifies extends Functor {
 //            }
 //        }
 
-        if (!equals && hasAnyOp) {
+        if (hasAnyOp) {
             Term newTerm = new SubUnify(parent, op).tryMatch(parent, term, x, y);
             return newTerm;
         } else {
-            return equals ? term : null;
+            return null;
         }
     }
 
-    protected boolean forwardOnly() {
-        return false;
-    }
+//    protected boolean forwardOnly() {
+//        return false;
+//    }
 
 
     public static class substituteIfUnifiesAny extends substituteIfUnifies {
@@ -244,29 +252,29 @@ abstract public class substituteIfUnifies extends Functor {
 //    }
 
 
-    /** specifies a forward ordering constraint, for example:
-     *      B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
-     *
-     *  if B unifies with A then A must be eternal, simultaneous, or future with respect to C
-     *
-     *  for now, this assumes the decomposed term is in the belief position
-     */
-    public static final class substituteIfUnifiesForward extends substituteIfUnifies {
-
-        public substituteIfUnifiesForward(Derivation parent) {
-            super("subIfUnifiesForward",parent);
-        }
-
-        @Override
-        protected boolean forwardOnly() {
-            return true;
-        }
-
-        @Override
-        protected @Nullable Op unifying() {
-            return null;
-        }
-    }
+//    /** specifies a forward ordering constraint, for example:
+//     *      B, (C && A), time(decomposeBelief) |- substituteIfUnifiesIndepForward(C,A,B), (Desire:Strong)
+//     *
+//     *  if B unifies with A then A must be eternal, simultaneous, or future with respect to C
+//     *
+//     *  for now, this assumes the decomposed term is in the belief position
+//     */
+//    public static final class substituteIfUnifiesForward extends substituteIfUnifies {
+//
+//        public substituteIfUnifiesForward(Derivation parent) {
+//            super("subIfUnifiesForward",parent);
+//        }
+//
+//        @Override
+//        protected boolean forwardOnly() {
+//            return true;
+//        }
+//
+//        @Override
+//        protected @Nullable Op unifying() {
+//            return null;
+//        }
+//    }
 
 //    public static final class substituteOnlyIfUnifiesIndep extends substituteIfUnifies {
 //

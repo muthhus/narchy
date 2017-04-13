@@ -241,8 +241,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         if (answer == null || answer.isDeleted()) {
             return null;
         } else {
-            novel = (answer instanceof AnswerTask) //includes: answers, revision, or dynamic
-                    && !(answer instanceof DynamicBeliefTask);
+            novel = (answer instanceof AnswerTask); //includes: answers, revision, or dynamic
+                    //&& !(answer instanceof DynamicBeliefTask);
         }
 
         //project if different occurrence

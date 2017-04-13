@@ -67,7 +67,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.ask("<blue --> likes>"); //cats like blue?
 
         //tester.mustBelieve(time, "<(cat,blue) --> likes>", 1.0f, 0.42f); //en("A base is something that has a reaction with an acid.");
-        tester.mustBelieve(time, "<blue --> likes>", 1.0f, 0.4f /* 0.45? */); //en("A base is something that has a reaction with an acid.");
+        tester.mustBelieve(time, "<blue --> likes>", 1.0f, 0.45f /* 0.45? */); //en("A base is something that has a reaction with an acid.");
 
     }
 

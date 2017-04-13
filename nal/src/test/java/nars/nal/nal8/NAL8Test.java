@@ -460,7 +460,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test()
             .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001}))). :|:")
-            .mustBelieve(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
+            .mustBelieve(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
             .mustBelieve(cycles, "(at(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5, 10)
         ;
     }
@@ -479,7 +479,7 @@ public class NAL8Test extends AbstractNALTest {
         //requires StructuralDeduction to AllowOverlap
         test()
                 .input("(a:b &&+5 (c:d &&+5 x:y)). :|:")
-                .mustBelieve(cycles, "a:b", 1.0f, 0.81f, 0)
+                .mustBelieve(cycles, "a:b", 1.0f, 0.73f, 0)
                 .mustBelieve(cycles, "c:d", 1.0f, 0.73f, 5)
                 .mustBelieve(cycles, "x:y", 1.0f, 0.73f, 10)
         ;
@@ -1238,14 +1238,14 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
+                .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
         test()
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 0f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, 3, 0, 10, ETERNAL);
+                .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL);
     }
 
     @Test public void conjDecoposeGoalAfterNegNeg() {

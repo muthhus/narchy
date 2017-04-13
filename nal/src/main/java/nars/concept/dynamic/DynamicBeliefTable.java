@@ -5,8 +5,10 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.Budget;
+import nars.budget.RawBLink;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -29,11 +31,15 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
-        if (input instanceof DynamicBeliefTask)
-            return input; //dont insert its own dynamic belief task, causing a feedback loop
-        else {
-            return super.add(input, concept, nar);
+        if (input instanceof DerivedTask) {
+            return input;
         }
+
+        if (input instanceof DynamicBeliefTask) {
+            return input; //dont insert its own dynamic belief task, causing a feedback loop
+        }
+
+        return super.add(input, concept, nar);
     }
 
     public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {

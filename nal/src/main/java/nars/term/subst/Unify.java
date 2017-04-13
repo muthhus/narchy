@@ -176,7 +176,7 @@ public abstract class Unify extends Termunator implements Subst {
      */
     public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
-        int s = now();
+        //int s = now();
         boolean result;
         try {
             if (unify(x, y)) {
@@ -209,7 +209,7 @@ public abstract class Unify extends Termunator implements Subst {
         }
 
         if (finish) {
-            revert(s); //else: allows the set constraints to continue
+            //revert(s); //else: allows the set constraints to continue
             this.termutes = null;
         }
 

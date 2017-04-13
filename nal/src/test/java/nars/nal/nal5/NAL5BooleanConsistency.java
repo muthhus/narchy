@@ -49,13 +49,15 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(512);
+                d.run(256);
 
                 System.out.println(i + " " + j);
 
                 for (String s : outcomes) {
                     System.out.println("\t" + s + "\t" + d.concept(s).belief(d.time(), d.dur()));
                 }
+
+                System.out.println();
 
                 //return;
             }
