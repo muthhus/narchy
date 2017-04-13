@@ -13,9 +13,8 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -25,22 +24,6 @@ import java.util.function.Predicate;
  */
 public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, BLink<X>> {
 
-//    @Deprecated @NotNull
-//    public static <K> BLink<K> newLink(@NotNull K i, @Nullable Budgeted exists) {
-//
-//        if (exists == null || exists.isDeleted()) {
-//            if (i instanceof Budgeted) {
-//                return new DependentBLink((Budgeted) i);
-//                //return new WeakBLink(i);
-//            } else {
-//                return new DefaultBLink(i);
-//            }
-//        } else {
-//            return new DefaultBLink(i, exists);
-//        }
-//
-//    }
-
     public final BudgetMerge mergeFunction;
 
 
@@ -49,6 +32,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
      */
     public float pressure, mass;
 
+    private final AtomicBoolean unsorted = new AtomicBoolean(false);
 
     public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<X, BLink<X>> map) {
         this(0, mergeFunction, map);
@@ -77,9 +61,17 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
         return false;
     }
 
+
     @Override
     public void pressurize(float f) {
         pressure += f;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<BLink<X>> iterator() {
+        ensureSorted();
+        return super.iterator();
     }
 
     /**
@@ -91,8 +83,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
         SortedArray<BLink<X>> items;
 
-        //List<BLink<V>> pendingRemoval;
-        List<BLink<X>> pendingRemoval;
+        List<BLink<X>> pendingRemoval = null;
         boolean result;
         synchronized (items = this.items) {
             int additional = (toAdd != null) ? 1 : 0;
@@ -101,15 +92,14 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
             int s = size();
 
             int nextSize = s + additional;
+
             if (nextSize > c) {
                 pendingRemoval = $.newArrayList(nextSize - c);
                 s = clean(toAdd, s, nextSize - c, pendingRemoval);
+                clean2(pendingRemoval);
                 if (s + additional > c) {
-                    clean2(pendingRemoval);
                     return false; //throw new RuntimeException("overflow");
                 }
-            } else {
-                pendingRemoval = null;
             }
 
 
@@ -131,6 +121,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
                 int ss = size();
                 if (ss < c) {
+                    ensureSorted();
                     items.add(toAdd, this);
                     result = true;
                     //items.addInternal(toAdd); //grows the list if necessary
@@ -150,9 +141,6 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
             }
 
         }
-
-        if (pendingRemoval != null)
-            clean2(pendingRemoval);
 
         return result;
 
@@ -197,28 +185,15 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
     private void clean2(List<BLink<X>> trash) {
         int toRemoveSize = trash.size();
-        if (toRemoveSize > 0) {
 
-            for (int i = 0; i < toRemoveSize; i++) {
-                BLink<X> w = trash.get(i);
+        for (int i = 0; i < toRemoveSize; i++) {
+            BLink<X> w = trash.get(i);
 
-                X k = w.get();
+            map.remove(key(w));
 
-
-                map.remove(k);
-
-//                    if (k2 != w && k2 != null) {
-//                        //throw new RuntimeException(
-//                        logger.error("bag inconsistency: " + w + " removed but " + k2 + " may still be in the items list");
-//                        //reinsert it because it must have been added in the mean-time:
-//                        map.putIfAbsent(k, k2);
-//                    }
-
-                //pressure -= w.priIfFiniteElseZero(); //release pressure
-                onRemoved(w);
-                w.delete();
-
-            }
+            //pressure -= w.priIfFiniteElseZero(); //release pressure
+            onRemoved(w);
+            w.delete();
 
         }
 
@@ -301,7 +276,8 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
 
     @Override
-    @NotNull public final X key(@NotNull BLink<X> l) {
+    @NotNull
+    public final X key(@NotNull BLink<X> l) {
         return l.get();
     }
 
@@ -361,21 +337,10 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
         }
 
         if (isNew[0]) {
-
-            //attempt new insert
-            boolean added;
-            synchronized (items) {
-
-                added = updateItems(v);
-
-                if (!added) {
-                    v.delete();
-                } else {
-                    sortAfterUpdate();
-                }
-            }
-
-            if (added) {
+            boolean added = updateItems(v); //attempt new insert
+            if (!added) {
+                v.delete();
+            } else {
                 onAdded(v);
                 return v;
             }
@@ -384,12 +349,9 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
             return null; //reject
 
         } else {
-            synchronized (items) {
-                sortAfterUpdate(); //TODO see if this works better here, being an adaptive sort: https://en.wikipedia.org/wiki/Smoothsort
-            }
+            unsorted.set(true);
             return v;
         }
-
 
     }
 
@@ -458,14 +420,15 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
                 boolean needsSort;
                 if (each != null) {
-                    needsSort = !updateBudget(each);
-                } else {
+                    updateBudget(each);
                     needsSort = true;
+                } else {
+                    needsSort = false;
                 }
 
 
                 if (needsSort) {
-                    sort();
+                    unsorted.set(true);
                 }
 
             }
@@ -476,14 +439,18 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     }
 
 
-    protected void sortAfterUpdate() {
-        sort();
-    }
+//    protected void sortAfterUpdate() {
+//        unsorted.set(true);
+//        sort();
+//    }
 
-    public void sort() {
+    protected void sort() {
         int s = size();
-        if (s > 0)
-            qsort(new int[sortSize(s) /* estimate */], items.array(), 0 /*dirtyStart - 1*/, (s - 1));
+        if (s > 1) {
+            synchronized (items) {
+                qsort(new int[sortSize(s) /* estimate */], items.array(), 0 /*dirtyStart - 1*/, (s - 1));
+            }
+        }
     }
 
     protected static int sortSize(int s) {
@@ -531,6 +498,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     }
 
 
+
     private int removeDeleted(@NotNull Collection<BLink<X>> removed, int minRemoved) {
 
         SortedArray<BLink<X>> items = this.items;
@@ -558,6 +526,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
             items.forEach(x -> {
                 map.remove(x.get());
                 onRemoved(x);
+                x.delete();
             });
             items.clear();
         }
@@ -589,6 +558,9 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
     @Override
     public void forEach(Consumer<? super BLink<X>> action) {
+
+        ensureSorted();
+
         Object[] x = items.array();
         if (x.length > 0) {
             for (BLink a : ((BLink[]) x)) {
@@ -601,6 +573,14 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
         }
     }
 
+//    public void sortPartial(float sortPercentage) {
+//        int s = size();
+//        int sortRange = (int) Math.ceil(s * sortPercentage);
+//        int start = sampleIndex();
+//        int end = Math.min(start + sortRange, s - 1);
+//
+//        qsort(new int[sortSize(sortRange)], items.array(), start, end);
+//    }
 
     /**
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
@@ -730,13 +710,25 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
 
     @Override
     public float priMax() {
-        BLink x = items.first();
+        BLink x;
+        synchronized (items) {
+            x = items.first();
+        }
         return x != null ? x.priSafe(-1) : 0f;
+    }
+
+    protected void ensureSorted() {
+        if (unsorted.compareAndSet(true, false)) {
+            sort();
+        }
     }
 
     @Override
     public float priMin() {
-        BLink x = items.last();
+        BLink x;
+        synchronized (items) {
+            x = items.last();
+        }
         return x != null ? x.priSafe(-1) : 0f;
     }
 

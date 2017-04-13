@@ -103,7 +103,7 @@ public abstract class Param  {
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 24;
+    public final static int UnificationStackMax = 32;
 
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;

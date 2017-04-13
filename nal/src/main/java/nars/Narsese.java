@@ -716,8 +716,7 @@ public class Narsese extends BaseParser<Object> {
         }
     }
 
-    public static boolean isValidAtomChar(char c) {
-        int x = c;
+    public static boolean isValidAtomChar(char x) {
 
         //TODO replace these with Symbols. constants
         switch (x) {
@@ -925,10 +924,9 @@ public class Narsese extends BaseParser<Object> {
 
     Rule sepArgSep() {
         return firstOf(
-                        ss(),
-                        seq(s(), optional(ARGUMENT_SEPARATOR), s())
+                        seq(s(), optional(ARGUMENT_SEPARATOR), s()),
+                        ss()
                 );
-
     }
 
 

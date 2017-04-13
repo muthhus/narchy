@@ -39,7 +39,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @NotNull
     @Override
-    public final Iterator<L> iterator() {
+    public Iterator<L> iterator() {
         return items.iterator();
     }
 

@@ -15,6 +15,7 @@ import nars.term.mutate.Choose2;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -358,6 +359,14 @@ abstract public class PatternCompound extends GenericCompound {
 
                 yFree.removeIf(alreadyInY::contains);
 
+                Iterator<Term> xx = xFree.iterator();
+                while (xx.hasNext()) {
+                    if (yFree.remove(xx.next())) {
+                        xx.remove(); //eliminated
+                    }
+                }
+
+
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 
                 //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
@@ -381,8 +390,9 @@ abstract public class PatternCompound extends GenericCompound {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
                 case 1:
                     Term theFreeX = xFree.iterator().next();
-                    return yFree.size() == 1 ? subst.putXY(theFreeX, yFree.iterator().next()) : subst.addTermutator(
-                            new Choose1(ellipsis, theFreeX, yFree));
+                    return yFree.size() == 1 ? subst.putXY(theFreeX, yFree.iterator().next()) :
+                            subst.addTermutator(
+                                new Choose1(ellipsis, theFreeX, yFree));
                 case 2:
                     return subst.addTermutator(
                             new Choose2(subst, ellipsis, xFree, yFree));

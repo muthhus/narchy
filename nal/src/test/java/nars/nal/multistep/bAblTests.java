@@ -66,7 +66,7 @@ public class bAblTests extends AbstractNALTest {
                 .inputAt(0, "isIn(bob,kitchen).") ////Bob went to the kitchen.
                 .inputAt(0, "isIn(football,?where)?") ////Where is the football?
                 .mustBelieve(2000, "isIn(football,playground)",
-                        1f, 0.66f, ETERNAL); ////A: playground
+                        1f, 0.73f, ETERNAL); ////A: playground
 
     }
 

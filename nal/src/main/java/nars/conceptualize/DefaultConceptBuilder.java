@@ -1,5 +1,6 @@
 package nars.conceptualize;
 
+import com.romix.scala.collection.concurrent.TrieMap;
 import jcog.bag.Bag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
@@ -364,10 +365,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            if (volume < 3) {
-                return new ConcurrentHashMap(8);
-            } else if (volume < 13){
-                return new SynchronizedHashMap(2, loadFactor);
+            //if (volume < 3) {
+            //    return new ConcurrentHashMap(8);
+            //} else
+            if (volume < 33) {
+                //return new SynchronizedHashMap(2, loadFactor);
+                return new TrieMap();
             } else {
                 return new SynchronizedUnifiedMap(2, loadFactor);
             }

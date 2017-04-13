@@ -50,7 +50,7 @@ public class CurveBag<V> extends ArrayBag<V>  {
 
 
     @Override
-    public void sort() {
+    protected void sort() {
         super.sort();
         sampler.commit(this);
     }
@@ -82,6 +82,7 @@ public class CurveBag<V> extends ArrayBag<V>  {
 
     /** simplified one item sample */
     @Nullable @Override public BLink<V> sample() {
+        ensureSorted();
         synchronized (items) {
             int s = size();
             while (s > 0) {
@@ -100,14 +101,6 @@ public class CurveBag<V> extends ArrayBag<V>  {
         return null;
     }
 
-    public void sortPartial(float sortPercentage) {
-        int s = size();
-        int sortRange = (int) Math.ceil(s * sortPercentage);
-        int start = sampleIndex();
-        int end = Math.min(start + sortRange, s - 1);
-
-        qsort(new int[sortSize(sortRange)], items.array(), start, end);
-    }
 
 
     /**
@@ -118,26 +111,29 @@ public class CurveBag<V> extends ArrayBag<V>  {
     @Override
     public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
 
+        ensureSorted();
+
         //sampleIterative(n, target);
         sampleMulti(n, target);
 
         return this;
     }
 
-    /** doesnt quite work yet; can get stuck in infinite loop  */
-    private void sampleIterative(int n, @NotNull Predicate<? super BLink<V>> target) {
-        for (int i = 0; i < n; i++) {
-
-            BLink<V> next;
-            do {
-                next = sample();
-            } while (next!=null && !target.test(next));
-
-        }
-    }
+//    /** doesnt quite work yet; can get stuck in infinite loop  */
+//    private void sampleIterative(int n, @NotNull Predicate<? super BLink<V>> target) {
+//        for (int i = 0; i < n; i++) {
+//
+//            BLink<V> next;
+//            do {
+//                next = sample();
+//            } while (next!=null && !target.test(next));
+//
+//        }
+//    }
 
     @NotNull
     private void sampleMulti(int n, @NotNull Predicate<? super BLink<V>> target) {
+        ensureSorted();
         synchronized (items) {
 
             int ss = size();

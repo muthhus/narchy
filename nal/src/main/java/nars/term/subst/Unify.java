@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.BiPredicate;
@@ -184,7 +185,10 @@ public abstract class Unify extends Termunator implements Subst {
                     result = true; //return to callee to continue in subsequent operation
                 } else {
                     @Nullable List<Termutator> t = termutes;
-                    if (termutes != null) {
+                    if (t != null) {
+
+                        //shuffle the ordering of the termutes themselves
+                        Collections.shuffle(t, random);
 
                         t.add(this); //call-back
                         mutate(this, t, -2);
