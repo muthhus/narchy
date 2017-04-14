@@ -2,7 +2,6 @@ package nars.time;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Timer;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 

@@ -4,7 +4,6 @@ import jcog.bag.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.concept.dynamic.DynamicBeliefTask;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;

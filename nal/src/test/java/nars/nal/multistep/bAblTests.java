@@ -57,16 +57,15 @@ public class bAblTests extends AbstractNALTest {
         //if something is picked, it means that the object which is picked is where the person is
 
         TestNAR t = test();
-
                 //.log()
              t  .believe("((pick($Person,$Object) &&+0 isIn($Person,$Place)) ==>+0 isIn($Object,$Place))")
                 .inputAt(0, "isIn(john,playground).") ////John is in the playground.
                 .inputAt(0, "isIn(bob,office).") ////Bob is in the office.
                 .inputAt(0, "pick(john,football).") ////John picked up the football.
                 .inputAt(0, "isIn(bob,kitchen).") ////Bob went to the kitchen.
-                .inputAt(0, "$0.99$ isIn(football,?where)?") ////Where is the football?
+                .inputAt(0, "$0.9$ isIn(football,?where)?") ////Where is the football?
                 .mustBelieve(6000, "isIn(football,playground)",
-                        1f, 0.73f, ETERNAL); ////A: playground
+                        1f, 0.66f, ETERNAL); ////A: playground
 
     }
 

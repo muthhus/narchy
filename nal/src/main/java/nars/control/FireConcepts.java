@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.bag.BagFlow;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;

@@ -13,11 +13,6 @@ public class Versioned<X> extends FasterList<X> {
     @NotNull
     private final Versioning context;
 
-//    public Versioned(@NotNull Versioning context, X[] array) {
-//        super(0, array);
-//        this.context = context;
-//    }
-
     public Versioned(@NotNull Versioning context, int initialCapacity) {
         super(initialCapacity);
         this.context = context;

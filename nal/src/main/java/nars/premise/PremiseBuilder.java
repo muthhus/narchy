@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
-import static nars.util.UtilityFunctions.aveAri;
 
 
 abstract public class PremiseBuilder {

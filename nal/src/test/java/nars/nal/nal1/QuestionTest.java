@@ -135,7 +135,7 @@ public class QuestionTest {
     @Test public void questionDrivesInference() {
 
         final int[] dims = {4, 3};
-        final int timelimit = 3000;
+        final int timelimit = 2000;
 
         TaskStatistics withTasks = new TaskStatistics();
         TaskStatistics withoutTasks = new TaskStatistics();

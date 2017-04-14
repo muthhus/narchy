@@ -5,8 +5,6 @@ import jcog.bag.PLink;
 import jcog.bag.impl.PLinkHijackBag;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.bag.impl.CurveBag;
-import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;

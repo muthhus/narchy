@@ -18,10 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
@@ -85,12 +82,12 @@ public abstract class Unify extends Termutator implements Subst {
 
         public boolean add(Term x, MatchConstraint m) {
 
-            Term y = xy.get(x);
-            if (y!=null) {
-                //check that constraint isnt violated by existing conditions:
-                if (m.invalid(x, y, Unify.this))
-                    return false;
-            }
+//            //check that constraint isnt violated by existing conditions:
+//            Term y = xy.get(x);
+//            if (y!=null) {
+//                if (m.invalid(x, y, Unify.this))
+//                    return false;
+//            }
 
             List<MatchConstraint> ccc = get(x);
             if (ccc == null)

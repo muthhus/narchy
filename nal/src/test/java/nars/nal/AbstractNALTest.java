@@ -71,12 +71,12 @@ public abstract class AbstractNALTest {
         List<Supplier<NAR>> l = $.newArrayList(2);
 
 
-            for (int c : new int[] {  4/*, 2, 4 */}) { ///concepts fired per cycle
+            for (int c : new int[] { 4/*, 2, 4 */}) { ///concepts fired per cycle
                 l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
                         Default d =
                             new Default(768, c, 2 );
                         d.nal(level);
-                        d.termVolumeMax.setValue(64);
+                        d.termVolumeMax.setValue(28);
                         return d;
                     }
                 ));

@@ -70,8 +70,8 @@ public class FunctorTest {
     public void testFunctor2() {
         //Param.DEBUG = true;
 
-        int TIME = 4048;
-        TestNAR t = new TestNAR(new Default(1024, 32, 2));
+        int TIME = 2048;
+        TestNAR t = new TestNAR(new Default(1024, 4, 2));
 
         //Param.DEBUG = true; t.log();
 

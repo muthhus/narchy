@@ -120,7 +120,7 @@ public class Derivation extends Unify {
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);
-        this.punct = new Versioned<>(versioning, 2);
+        this.punct = new Versioned<>(versioning, 1);
 
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
