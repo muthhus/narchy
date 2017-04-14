@@ -71,11 +71,11 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<<bird --> $x> ==> <robin --> $x>>"); //en("What can be said about bird can also be said about robin.");
         tester.believe("<<swimmer --> $y> ==> <robin --> $y>>", 0.70f, 0.90f); //en("What can be said about swimmer usually can also be said about robin.");
-        tester.mustBelieve(cycles*2, "<(&&,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 1.00f, 0.81f); //en("What can be said about bird and swimmer can also be said about robin.");
+        tester.mustBelieve(cycles*2, "<(&&,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 0.7f, 0.81f); //en("What can be said about bird and swimmer can also be said about robin.");
         //tester.mustBelieve(cycles, "<(||,<bird --> $1>,<swimmer --> $1>) ==> <robin --> $1>>", 0.70f, 0.81f); //en("What can be said about bird or swimmer can also be said about robin.");
-        tester.mustBelieve(cycles*2, "<<bird --> $1> ==> <swimmer --> $1>>", 1.00f, 0.36f); //en("I guess what can be said about bird can also be said about swimmer.");
-        tester.mustBelieve(cycles*2, "<<swimmer --> $1> ==> <bird --> $1>>", 0.70f, 0.45f); //en("I guess what can be said about swimmer can also be said about bird.");
-        tester.mustBelieve(cycles*2, "<<bird --> $1> <=> <swimmer --> $1>>", 0.70f, 0.45f); //en("I guess bird and swimmer share most properties.");
+        tester.mustBelieve(cycles*2, "<<bird --> $1> ==> <swimmer --> $1>>", 1f, 0.36F); //en("I guess what can be said about bird can also be said about swimmer.");
+        tester.mustBelieve(cycles*2, "<<swimmer --> $1> ==> <bird --> $1>>", 0.7f, 0.45f); //en("I guess what can be said about swimmer can also be said about bird.");
+        tester.mustBelieve(cycles*2, "<<bird --> $1> <=> <swimmer --> $1>>", 0.7f, 0.45f); //en("I guess bird and swimmer share most properties.");
 
     }
 
@@ -190,7 +190,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<{Tweety} --> [withWings]>"); //en("Tweety has wings.");
         tester.believe("<(&&,<$x --> [chirping]>,<$x --> [withWings]>) ==> <$x --> bird>>"); //en("If something can chirp and has wings, then it is a bird.");
-        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.81f); //en("If Tweety can chirp, then it is a bird.");
+        tester.mustBelieve(cycles, "<<{Tweety} --> [chirping]> ==> <{Tweety} --> bird>>", 1.00f, 0.73f); //en("If Tweety can chirp, then it is a bird.");
 
     }
 
@@ -332,7 +332,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<$x --> key> ==> <{lock1} --> (/,open,$x,_)>>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
-        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.45f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> <$2 --> (/,open,$1,_)>>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
         tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> open($1,$2)>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
     }
@@ -504,7 +504,7 @@ public class NAL6Test extends AbstractNALTest {
         .believe("<0 --> n>", 1.0f, 0.9f)
         .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
         .ask("<(/,next,(/,next,0,_),_) --> n>")
-        .mustBelieve(cycles, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.81f, 1.0f)
+        .mustBelieve(cycles, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
         .mustBelieve(cycles, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
@@ -540,8 +540,8 @@ public class NAL6Test extends AbstractNALTest {
                 .believe("num(0)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((0)))")
-                .mustBelieve(time, "num((0))", 1.0f, 1.0f, 0.81f, 1.0f)
-                .mustBelieve(time, "num(((0)))", 1.0f, 1.0f, 0.59f, 1.0f)
+                .mustBelieve(time, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
+                .mustBelieve(time, "num(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')

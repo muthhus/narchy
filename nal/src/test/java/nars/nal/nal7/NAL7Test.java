@@ -223,7 +223,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
-                .mustBelieve(time, "X:x.", 1.00f, 0.81f, 1)
+                .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
                 .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
                 .mustNotOutput(time, "(Y:y &&+2 Z:z)", BELIEF, 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
                 .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
@@ -901,7 +901,7 @@ public class NAL7Test extends AbstractNALTest {
         int x2 =       x1 + eventDT*2;
         int x3 =       x2 + eventDT*2;
         int deadline = x3 + (int) (eventDT * 1.5f);
-        int x4 =       x3 + eventDT*2;
+        int x4 =       x3 + eventDT*2+14;
 
 
         TestNAR t = test();
@@ -919,8 +919,8 @@ public class NAL7Test extends AbstractNALTest {
                         $.task($("(y)"), QUESTION, null).time(x3, x3 + eventDT).budgetSafe(1f, 0.9f).apply(t.nar)
                 )
 
-                .mustBelieve(deadline, "(x)", 1f, 0.59f, x4)
-                .mustBelieve(deadline, "(y)", 1f, 0.59f, x4+eventDT)
+                .mustBelieve(deadline, "(x)", 1f, 0.73f, x4)
+                .mustBelieve(deadline, "(y)", 1f, 0.73f, x4+eventDT)
         ;
     }
 
