@@ -72,13 +72,6 @@ abstract public class substituteIfUnifies extends Functor {
 //    }
 
 
-    /**
-     * whether an actual substitution is required to happen; when true and no substitution occurrs, then fails
-     */
-    protected boolean mustSubstitute() {
-        return false;
-    }
-
     @Nullable
     abstract protected Op unifying();
 
@@ -95,10 +88,11 @@ abstract public class substituteIfUnifies extends Functor {
 
         Term x = a[1];
         Term y = a[2];
+
+        if (y.equals(term))
+            return term;
         if (x.equals(y))
-            return term; //False; //no effect
-
-
+            return term;
 
         Term z = unify(term, x, y);
         return (z != null) ? z : False;
@@ -114,49 +108,22 @@ abstract public class substituteIfUnifies extends Functor {
 //                return null;
 //        }
 
+        if (x.equals(y))
+            return null; //no effect
+
         @Nullable Op op = unifying();
         boolean hasAnyOp =
-                (op == null && (x.vars() + x.varPattern() + y.vars() + y.varPattern() > 0))
+                (op==null && (x.vars() + x.varPattern() + y.vars() + y.varPattern()  > 0))
                 ||
-                (op!=null && (x.hasAny(op) || term.hasAny(op)));
+                (op!=null && (x.hasAny(op) || y.hasAny(op)));
 
         if (!hasAnyOp/* && mustSubstitute()*/) {
             return null; //FAILED
         }
 
-        //boolean equals = equal(x, y, false /* different dt */, true /* same polarity */);
-//        if (!equals) {
-//            //try auto-negation:
-//            boolean xn = (x.op()==NEG);
-//            boolean yn = (y.op()==NEG);
-//            Term px = (xn) ? x.unneg() : x; //positive X
-//            Term py = (yn) ? y.unneg() : y; //positive Y
-//            if (equalAtemporally(px, py)) {
-//                equals = true;
-//                if (xn ^ yn) {
-//                    if (yn/* && !xn*/) { //x isnt negated and y is, so
-//                        y = py;
-//                    } else { //if (xn && !yn) { //x is negated and y isn't, so
-//                        y = $.neg(y);
-//                    }
-//
-//                    term = $.neg(term);
-//
-//                    //now x and y have matching polarities
-//                } else if (xn/* && yn*/) {
-//                    //both negated
-//                } else {
-//                    //shouldnt hapen?
-//                }
-//            }
-//        }
 
-        if (hasAnyOp) {
-            Term newTerm = new SubUnify(parent, op).tryMatch(parent, term, x, y);
-            return newTerm;
-        } else {
-            return null;
-        }
+        return new SubUnify(parent, op).tryMatch(parent, term, x, y);
+
     }
 
 //    protected boolean forwardOnly() {
@@ -184,11 +151,6 @@ abstract public class substituteIfUnifies extends Functor {
             super("subIfUnifiesDep", parent);
         }
 
-        @Override
-        protected boolean mustSubstitute() {
-            return true;
-        }
-
 
         @NotNull
         @Override
@@ -196,25 +158,20 @@ abstract public class substituteIfUnifies extends Functor {
             return Op.VAR_DEP;
         }
     }
-    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
-
-
-        public substituteIfUnifiesIndep(Derivation parent) {
-            super("subIfUnifiesIndep", parent);
-        }
-
-        @Override
-        protected boolean mustSubstitute() {
-            return false;
-        }
-
-
-        @NotNull
-        @Override
-        public Op unifying() {
-            return Op.VAR_INDEP;
-        }
-    }
+//    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
+//
+//
+//        public substituteIfUnifiesIndep(Derivation parent) {
+//            super("subIfUnifiesIndep", parent);
+//        }
+//
+//
+//        @NotNull
+//        @Override
+//        public Op unifying() {
+//            return Op.VAR_INDEP;
+//        }
+//    }
 //    public static final class substituteOnlyIfUnifiesDep extends substituteIfUnifies {
 //
 //        public substituteOnlyIfUnifiesDep(PremiseEval parent) {

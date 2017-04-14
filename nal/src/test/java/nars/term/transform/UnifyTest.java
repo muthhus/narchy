@@ -32,10 +32,10 @@ public class UnifyTest {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 
-        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
+        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTTL) {
 
             @Override
-            public void onMatch() {
+            public boolean onMatch() {
 
                 assertTrue(matches);
 
@@ -48,6 +48,7 @@ public class UnifyTest {
                 assertEquals(
                         "(a-->b) (?1-->b) -?>",
                         a + " " + b + " -?>"  /*+ " remaining power"*/);
+                return false;
             }
         };
 

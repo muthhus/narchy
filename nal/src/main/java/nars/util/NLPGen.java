@@ -77,10 +77,10 @@ public class NLPGen {
 
                         final String[] result = {null};
 
-                        Unify u = new Unify(terminal.concepts, VAR_PATTERN, terminal.random, Param.UnificationStackMax) {
+                        Unify u = new Unify(terminal.concepts, VAR_PATTERN, terminal.random, Param.UnificationStackMax, Param.UnificationTTL) {
 
                             @Override
-                            public void onMatch() {
+                            public boolean onMatch() {
 
 
                                 final String[] r = {natural};
@@ -93,6 +93,7 @@ public class NLPGen {
                                 });
 
                                 result[0] = r[0];
+                                return false;
                             }
                         };
 

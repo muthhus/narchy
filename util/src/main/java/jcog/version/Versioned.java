@@ -62,6 +62,10 @@ public class Versioned<X> extends FasterList<X> {
     @Nullable
     public final Versioned<X> set(X nextValue) {
 
+        X current = get();
+        if (current!=null && current.equals(nextValue))
+            return this; //no change
+
         //if (current == null || !current.equals(nextValue)) {
         if (context.nextChange(this, nextValue))
             return this;

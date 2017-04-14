@@ -107,8 +107,8 @@ public class Derivation extends Unify {
 
     public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
                       DerivationBudgeting b,
-                      int stack) {
-        super(nar.concepts, VAR_PATTERN, nar.random, stack);
+                      int stack, int ttl) {
+        super(nar.concepts, VAR_PATTERN, nar.random, stack, ttl);
 
         this.budgeting = b;
 
@@ -217,23 +217,25 @@ public class Derivation extends Unify {
     /**
      * only one thread should be in here at a time
      */
-    public final void matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPredicate eachMatch) {
 
 
         this.forEachMatch = eachMatch;
 
         boolean finish = eachMatch!=null;
-        unify(x, y, !finish, finish);
+        boolean result = unify(x, y, !finish, finish);
 
         this.forEachMatch = null;
 
+        return result;
 
 
     }
 
-    @Override public final void onMatch() {
+    @Override public final boolean onMatch() {
         forEachMatch.test(this);
         //return  (--matchesRemain > 0) && ;
+        return true;
     }
 
 
@@ -263,9 +265,6 @@ public class Derivation extends Unify {
     }
 
 
-    public boolean replaceAllXY(@NotNull Unify m) {
-        return m.xy.forEachVersioned(this::replaceXY);
-    }
 
 
     @Nullable

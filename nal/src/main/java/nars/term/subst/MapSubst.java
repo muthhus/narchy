@@ -46,6 +46,10 @@ public class MapSubst implements Subst {
 //        xy.forEach(each);
 //    }
 
+    @Override
+    public boolean tryPut(@NotNull Unify copied) {
+        throw new UnsupportedOperationException("TODO");
+    }
 
     @NotNull
     @Override

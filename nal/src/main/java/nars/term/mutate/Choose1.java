@@ -59,7 +59,7 @@ public class Choose1 extends Termutator {
     }
 
     @Override
-    public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+    public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
 
         @NotNull Term[] yy = this.yy;
 
@@ -73,7 +73,7 @@ public class Choose1 extends Termutator {
         Term xEllipsis = this.xEllipsis;
         for (Term x = this.x; l >=0; l--) {
 
-            if (!f.versioning.nextChange()) return;
+            if (!f.versioning.tick()) break;
 
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {
@@ -86,6 +86,7 @@ public class Choose1 extends Termutator {
             f.revert(start);
         }
 
+        return true;
     }
 
 

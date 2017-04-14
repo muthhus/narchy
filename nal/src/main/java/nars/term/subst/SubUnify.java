@@ -22,7 +22,8 @@ public class SubUnify extends Unify {
 
 
     public SubUnify(TermIndex index, Op type, Random r) {
-        super(index, type, r, Param.SubUnificationStackMax);
+        super(index, type, r,
+                Param.SubUnificationStackMax, Param.SubUnificationTTL);
     }
 
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
@@ -34,30 +35,23 @@ public class SubUnify extends Unify {
      * terminates after the first match
      */
     @Override
-    public void onMatch() {
+    public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
         if (xterm != null) {
-            Subst s;
+            final Subst s;
             if (target != null) {
-                int start = target.now();
-                if (target.replaceAllXY(this)) {
-                    s = target;
-                } else {
-                    target.revert(start);
-                    s = null; //returns null after decrementing retries
+                if (!target.tryPut(this)) {
+                    return true; //try again
                 }
+                s = target;
             } else {
                 s = this;
             }
-            if (s == null) {
-                result = null;
-            } else {
-                result = transform(xterm, s);
-            }
+
+            result = transform(xterm, s);
         }
 
-        //return (result == null) && --retries > 0;
-
+        return (result == null); //
     }
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {

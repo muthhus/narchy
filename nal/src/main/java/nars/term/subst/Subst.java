@@ -1,6 +1,7 @@
 package nars.term.subst;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
@@ -23,6 +24,11 @@ public interface Subst  {
 //    }
 
     void clear();
+
+    /** copy in
+     * @return whether all puts were successful
+     * */
+    boolean tryPut(@NotNull Unify copied);
 
 //    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
 //

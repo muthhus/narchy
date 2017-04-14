@@ -715,9 +715,9 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     @Override
     public float priMax() {
         BLink x;
-        synchronized (items) {
+        //synchronized (items) {
             x = items.first();
-        }
+        //}
         return x != null ? x.priSafe(-1) : 0f;
     }
 
@@ -730,9 +730,9 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     @Override
     public float priMin() {
         BLink x;
-        synchronized (items) {
+        //synchronized (items) {
             x = items.last();
-        }
+        //}
         return x != null ? x.priSafe(-1) : 0f;
     }
 

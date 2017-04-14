@@ -70,8 +70,8 @@ public abstract class Unify extends Termutator implements Subst {
 
 
 
-    public final void mutate(List<Termutator> chain, int next) {
-        chain.get(++next).mutate(this, chain, next);
+    public final boolean mutate(List<Termutator> chain, int next) {
+        return chain.get(++next).mutate(this, chain, next);
     }
 
     public final class Constraints extends VersionMap<Term,List<MatchConstraint>> implements BiPredicate<Term, Term> {
@@ -117,8 +117,8 @@ public abstract class Unify extends Termutator implements Subst {
         }
     }
 
-    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax) {
-        this(index, type, random, new Versioning(stackMax));
+    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int ttl) {
+        this(index, type, random, new Versioning(stackMax, ttl));
     }
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
@@ -144,8 +144,10 @@ public abstract class Unify extends Termutator implements Subst {
 
     /**
      * called each time all variables are satisfied in a unique way
+     *
+     * @return whether to continue on any subsequent matches
      */
-    public abstract void onMatch();
+    public abstract boolean onMatch();
 
 
     @Override
@@ -178,7 +180,7 @@ public abstract class Unify extends Termutator implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
         //int s = now();
         boolean result;
@@ -195,10 +197,10 @@ public abstract class Unify extends Termutator implements Subst {
                         Collections.shuffle(t, random);
 
                         t.add(this); //call-back
-                        mutate(this, t, -2);
+                        result = mutate(this, t, -2);
 
                     } else {
-                        onMatch();
+                        result = onMatch();
                     }
                 }
 
@@ -217,14 +219,23 @@ public abstract class Unify extends Termutator implements Subst {
             this.termutes = null;
         }
 
+        return result;
 
     }
 
+
+    @Override public boolean tryPut(@NotNull Unify m) {
+        return m.xy.forEachVersioned(this::replaceXY);
+    }
+
     @Override
-    public final void mutate(Unify f, List<Termutator> n, int seq) {
-        if (seq==-2)
-            f.mutate(n, -1); //start combinatorial recurse
-        else
+    public final boolean mutate(Unify f, List<Termutator> n, int seq) {
+        if (!f.versioning.tick())
+            return false;
+
+        return (seq==-2) ?
+            f.mutate(n, -1) //start combinatorial recurse
+                :
             f.onMatch(); //end combinatorial recurse
     }
 

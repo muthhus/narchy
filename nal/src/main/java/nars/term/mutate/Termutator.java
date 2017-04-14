@@ -19,7 +19,7 @@ public abstract class Termutator  {
     }
 
     /** match all termutations recursing to the next after each successful one */
-    public abstract void mutate(Unify f, List<Termutator> chain, int current);
+    public abstract boolean mutate(Unify f, List<Termutator> chain, int current);
 
     public abstract int getEstimatedPermutations();
 

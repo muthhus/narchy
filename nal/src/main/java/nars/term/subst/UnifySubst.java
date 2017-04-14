@@ -29,7 +29,7 @@ public class UnifySubst extends Unify {
     int matches;
 
     public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int maxMatches) {
-        super(n.concepts, varType, n.random, Param.SubUnificationStackMax);
+        super(n.concepts, varType, n.random, Param.SubUnificationStackMax, Param.SubUnificationTTL);
 
         this.nar = n;
         this.maxMatches = maxMatches;
@@ -38,7 +38,7 @@ public class UnifySubst extends Unify {
     }
 
     @Override
-    public void unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
         this.a = x;
         this.matches = 0;
 
@@ -46,6 +46,7 @@ public class UnifySubst extends Unify {
             super.unify(x, y, start, finish);
         }
 
+        return start;
     }
 
 
@@ -54,7 +55,7 @@ public class UnifySubst extends Unify {
     }
 
 
-    @Override public void onMatch() {
+    @Override public boolean onMatch() {
 
         //TODO combine these two blocks to use the same sub-method
 
@@ -86,6 +87,7 @@ public class UnifySubst extends Unify {
 
 
         //return matches < maxMatches; //determines how many
+        return false;
     }
 
 

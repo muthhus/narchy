@@ -134,7 +134,7 @@ abstract public class DerivedTask extends ImmutableTask {
 
             } else {
 
-                feedbackToPremiseConcepts(nar);
+                //feedbackToPremiseConcepts(nar);
                 //feedbackToPremiseLinks(deltaConfidence, deltaSatisfaction, nar);
 
             }
@@ -144,48 +144,44 @@ abstract public class DerivedTask extends ImmutableTask {
             }
         }
 
-//        private void negativeFeedback(@NotNull NAR nar) {
-//            feedback(1f - priIfFiniteElseZero() /* HEURISTIC */, nar);
-//            //delete(); //delete will happen soon after this
+
+//        private void feedbackToPremiseConcepts(@NotNull NAR nar) {
+//            Concept thisConcept = concept(nar);
+//            if (thisConcept != null) {
+//                Premise p;
+//                if ((p = premise) != null)
+//                    feedbackToPremiseConcepts(thisConcept, nar, p.concept);
+//
+//                feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
+//                feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
+//            }
 //        }
-
-        private void feedbackToPremiseConcepts(@NotNull NAR nar) {
-            Concept thisConcept = concept(nar);
-            if (thisConcept != null) {
-                Premise p;
-                if ((p = premise) != null)
-                    feedbackToPremiseConcepts(thisConcept, nar, p.concept);
-
-                feedbackToPremiseConcepts(thisConcept, nar, getParentTask());
-                feedbackToPremiseConcepts(thisConcept, nar, getParentBelief());
-            }
-        }
-
-        private void feedbackToPremiseConcepts(@NotNull Concept thisConcept, @NotNull NAR nar, @Nullable Termed p) {
-            if (p == null)
-                return;
-
-            boolean tasklinked = Param.DERIVATION_TASKLINKED;
-            boolean termlinked = Param.DERIVATION_TERMLINKED;
-            if (tasklinked || termlinked) {
-                Concept parentConcept = nar.concept(p);
-                if (parentConcept != null) {
-
-                    //TODO use CrossLink or other Activation's here?
-
-                    if (tasklinked) {
-                        parentConcept.tasklinks().put(new DependentBLink(this));
-                    }
-
-                    if (termlinked && !thisConcept.equals(parentConcept)) {
-                        Budget b = budget();
-                        parentConcept.termlinks().put(new RawBLink(thisConcept.term(), b));
-                        thisConcept.termlinks().put(new RawBLink(parentConcept.term(), b));
-                    }
-
-                }
-            }
-        }
+//
+//        private void feedbackToPremiseConcepts(@NotNull Concept thisConcept, @NotNull NAR nar, @Nullable Termed p) {
+//            if (p == null)
+//                return;
+//
+//            boolean tasklinked = Param.DERIVATION_TASKLINKED;
+//            boolean termlinked = Param.DERIVATION_TERMLINKED;
+//            if (tasklinked || termlinked) {
+//                Concept parentConcept = nar.concept(p);
+//                if (parentConcept != null) {
+//
+//                    //TODO use CrossLink or other Activation's here?
+//
+//                    if (tasklinked) {
+//                        parentConcept.tasklinks().put(new DependentBLink(this));
+//                    }
+//
+//                    if (termlinked && !thisConcept.equals(parentConcept)) {
+//                        Budget b = budget();
+//                        parentConcept.termlinks().put(new RawBLink(thisConcept.term(), b));
+//                        thisConcept.termlinks().put(new RawBLink(parentConcept.term(), b));
+//                    }
+//
+//                }
+//            }
+//        }
 
 //        public void feedbackToPremiseLinks(float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 //

@@ -32,18 +32,19 @@ public class NAL5BooleanConsistency {
                 d.log();
 
                 String[] outcomes = {
-                        "(x --> both_false)",
-                        "(x --> i_not_j)",
-                        "(x --> j_not_i)",
-                        "(x --> both_true)"};
+                        "(x --> (0,0))",
+                        "(x --> (1,0))",
+                        "(x --> (0,1))",
+                        "(x --> (1,1))"};
+                String expected = "(x --> (" + i + "," + j + "))";
 
-                d.believe("(((i) && (j)) ==> " + outcomes[3] + ")");
-                d.believe("((--(i) && --(j)) ==> " + outcomes[0] + ")");
-                d.believe("(((i) && --(j)) ==> " + outcomes[1] + ")");
-                d.believe("((--(i) && (j)) ==> " + outcomes[2] + ")");
+                d.believe("(((x-->i) && (x-->j)) ==> " + outcomes[3] + ")");
+                d.believe("((--(x-->i) && --(x-->j)) ==> " + outcomes[0] + ")");
+                d.believe("(((x-->i) && --(x-->j)) ==> " + outcomes[1] + ")");
+                d.believe("((--(x-->i) && (x-->j)) ==> " + outcomes[2] + ")");
 
-                d.believe($.negIf($.$("(i)"), i==0));
-                d.believe($.negIf($.$("(j)"), j==0));
+                d.believe($.negIf($.$("(x-->i)"), i==0));
+                d.believe($.negIf($.$("(x-->j)"), j==0));
 
 //                for (String s : outcomes) {
 //                    d.ask(s);

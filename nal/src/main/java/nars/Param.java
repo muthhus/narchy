@@ -49,9 +49,9 @@ public abstract class Param  {
     //public static final boolean ARITHMETIC_INDUCTION = false;
 
 
-    /** whether derivation's concepts are cross-termlink'ed with the premise concept */
-    public static boolean DERIVATION_TERMLINKED;
-    public static boolean DERIVATION_TASKLINKED;
+//    /** whether derivation's concepts are cross-termlink'ed with the premise concept */
+//    public static boolean DERIVATION_TERMLINKED;
+//    public static boolean DERIVATION_TASKLINKED;
 
 
     //    //TODO use 'I' for SELf, it is 3 characters shorter
@@ -87,26 +87,17 @@ public abstract class Param  {
     public static final boolean DERIVER_PERMUTE_SWAPPED = true;
 
 
-    ///** conjunctions over this length will be ineligible for 2nd-layer termlink templates. it can be decomposed however, and decompositions of this size or less will be eligible. */
-    //public static final int MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES = 3;
-
-    ///* adjuts this between 0 and 1. 0=fully backward, 0.5=balanced, 1=fully forward */
-    //public static final float ACTIVATION_TERMLINK_BALANCE = 0.5f;
-
-
-//    /** used in linear interpolating link adjustments during feedback. set to zero to disable */
-//    public final FloatParam linkFeedbackRate = new FloatParam(0.0f);
-
-
-
     /**
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 32;
+    public final static int UnificationStackMax = 16;
 
+    /** 'time to live', unification operations until unification fails */
+    public final static int UnificationTTL = 512;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
+    public final static int SubUnificationTTL = UnificationTTL/2;
 
     /**
      * minimum difference necessary to indicate a significant modification in budget float number components

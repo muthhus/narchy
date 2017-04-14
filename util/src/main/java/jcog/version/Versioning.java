@@ -10,10 +10,6 @@ public class Versioning extends FasterList<Versioned> {
 
     private int ttl;
 
-    @Deprecated public Versioning(int capacity) {
-        this(capacity, capacity*8);
-    }
-
     public Versioning(int capacity, int ttl) {
         super(0, new Versioned[capacity]);
         this.ttl = ttl;
@@ -33,7 +29,7 @@ public class Versioning extends FasterList<Versioned> {
             if (v!=null) {
                 if (!v.add(x)) {
                     //if this returns false? shouldnt happen but if it did it would require that this.remove(v)
-                    removeLast();
+                    //removeLast();
                     return false;
                 }
             }
@@ -73,7 +69,7 @@ public class Versioning extends FasterList<Versioned> {
 
     @Override
     public final boolean add(@Nullable Versioned newItem) {
-        if (--ttl<=0)
+        if (!tick())
             return false;
 
         Versioned[] ii = this.items;
@@ -83,6 +79,10 @@ public class Versioning extends FasterList<Versioned> {
             ii[this.size++] = newItem;
             return true;
         }
+    }
+
+    public boolean tick() {
+        return --ttl > 0;
     }
 
 }

@@ -27,10 +27,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax) {
+    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTTL) {
         @Override
-        public void onMatch() {
+        public boolean onMatch() {
 
+            return false;
         }
     };
 
@@ -139,13 +140,14 @@ public class TermutatorTest {
 
         t.mutate(f, Lists.newArrayList( t, new Termutator("evaluate") {
 
-            @Override public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+            @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
                 if (s.add( f.xy.toString() )) {
                     actual[0]++;
                 } else {
                     duplicates[0]++;
                 }
 
+                return true;
             }
 
             @Override public int getEstimatedPermutations() {

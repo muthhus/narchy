@@ -1,6 +1,7 @@
 package nars.term.subst;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,6 +32,11 @@ public class MapSubst1 implements Subst {
 
     @Override
     public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean tryPut(@NotNull Unify copied) {
         throw new UnsupportedOperationException();
     }
 }

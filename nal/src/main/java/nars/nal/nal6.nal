@@ -90,12 +90,12 @@
 
 
     B, (A ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+        //B, (A ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
     B, ((--,%A) ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+        //B, ((--,%A) ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
     B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+        //B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
     //B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
         //B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
@@ -108,14 +108,13 @@
             //     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
     //answering
-    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
-
-    Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
+    Z, (X==>Y), task("?"), time(dtBeliefExact), neq(Y,Z) |- subIfUnifiesAny((X ==>+- Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    Z, (X==>Y), task("?"), time(dtBeliefExact), neq(X,Z) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    Z, (X<=>Y), task("?"), time(dtBeliefExact), neq(Y,Z) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
-    B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:Strong)
+    B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
         //B, (C && A), time(decomposeBeliefLate) |- subIfUnifiesAny((--,%C),A,B), (Goal:StrongN)
         //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 

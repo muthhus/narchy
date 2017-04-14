@@ -82,7 +82,7 @@ public class UnificationTest {
 
             final Term finalT = t1;
             Unify sub = new Unify($.terms, type,
-                    nar.random, Param.UnificationStackMax*8) {
+                    nar.random, Param.UnificationStackMax, Param.UnificationTTL) {
 
 //            @Override
 //            public void onPartial() {
@@ -91,7 +91,7 @@ public class UnificationTest {
 //            }
 
                 @Override
-                public void onMatch() {
+                public boolean onMatch() {
 
                     if (shouldSub) {
 
@@ -124,6 +124,7 @@ public class UnificationTest {
                         //assertFalse("match found but should not have", true);
                     }
 
+                    return false;
                 }
             };
             sub.unifyAll(t1, t2);

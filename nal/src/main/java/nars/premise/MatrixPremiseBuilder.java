@@ -47,7 +47,8 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
         return new Derivation(nar, p, each,
                 budgeting,
-                Param.UnificationStackMax
+                Param.UnificationStackMax,
+                Param.UnificationTTL
         );
     }
 

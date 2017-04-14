@@ -210,7 +210,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             int inputsPerCycle = derivationsInputPerCycle.intValue();
             pending.capacity(inputsPerCycle * 4);
             pending.commit();
-            this.flow.update(0.05f, 0.65f);
+            this.flow.update(0.05f, 0.5f);
 
 ////            AtomicReferenceArray<Task> all = pending.reset();
 ////            if (all!=null) {
