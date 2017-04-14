@@ -14,6 +14,7 @@ import java.util.List;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -85,7 +86,11 @@ public final class DynTruth implements Truthed {
             return null;
 
         //HACK try to reconstruct the term because it may be invalid
-        c = compoundOrNull(nar.concepts.the(c.op(), c.dt(), c.terms()));
+        int dt = c.dt();
+        if (c.op().temporal && dt == DTERNAL && start!=ETERNAL)
+            dt = 0; //actually it is measured at the current time so make it parallel
+
+        c = compoundOrNull(nar.concepts.the(c.op(), dt, c.terms()));
         if (c == null)
             return null;
 

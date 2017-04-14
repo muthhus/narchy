@@ -188,71 +188,71 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     protected float activateAtom(AtomConcept atom, float scale) {
 
-//        Bag<Task, BLink<Task>> tlinks = atom.tasklinks();
-//        int n = tlinks.size();
-//        if (n > 0) {
-//
-//            //initially start with a fair budget assuming each link receives a full share
-//            float subActivation = ((1f - parentRetention) * scale) / (n);
-//            final float[] change = {0};
-//            float parentActivation = (parentRetention * scale);
-//
-//            long inStart = in.start();
-//            long inEnd = in.end();
-//
-//            tlinks.commit((b) -> {
-//                float subSubActivation = subActivation;/// * b.qua();
-//
-//                if (subSubActivation >= minScale) {
-//                    Task bt = b.get();
-//                    if (inStart != ETERNAL) {
-//                        long bs = bt.start();
-//                        if (bs != ETERNAL) {
-//                            long be = bt.end();
-//                            long timeDistance = Math.max(0,
-//                                unionLength(inStart, inEnd, bs, be)
-//                                        - (inEnd - inStart) //task range
-//                                        - (be - bs)  //belief range
-//                                        - dur
-//                            ); //perceptual duration
-//
-//                            //float borrow = change[0] / n; //boost with up to 1/n of collected change
-//                            ///change[0] -= borrow;
-//                            //subSubActivation += borrow;
-//
+        Bag<Task, BLink<Task>> tlinks = atom.tasklinks();
+        int n = tlinks.size();
+        if (n > 0) {
+
+            //initially start with a fair budget assuming each link receives a full share
+            float subActivation = ((1f - parentRetention) * scale) / (n);
+            final float[] change = {0};
+            float parentActivation = (parentRetention * scale);
+
+            long inStart = in.start();
+            long inEnd = in.end();
+
+            tlinks.commit((b) -> {
+                float subSubActivation = subActivation;/// * b.qua();
+
+                if (inStart != ETERNAL) {
+                    if (subSubActivation >= minScale) {
+                        Task bt = b.get();
+                        long bs = bt.start();
+                        if (bs != ETERNAL) {
+                            long be = bt.end();
+                            long timeDistance = Math.max(0,
+                                unionLength(inStart, inEnd, bs, be)
+                                        - (inEnd - inStart) //task range
+                                        - (be - bs)  //belief range
+                                        - dur
+                            ); //perceptual duration
+
+                            //float borrow = change[0] / n; //boost with up to 1/n of collected change
+                            ///change[0] -= borrow;
+                            //subSubActivation += borrow;
+
 //                            //lower value (< 1) means activation is less temporally 'specific' than a higher value (> 1)
 //                            final float DECAY_RATE = 0.5f;
-//
-//                            //multiply by temporal relevancy
-//                            subSubActivation = subSubActivation * (
-//                                (1f-temporalSpecificity) + //min reduction
-//                                (temporalSpecificity) * TruthPolation.evidenceDecay(
-//                                    1f,
-//                                    (int) Math.ceil(dur / DECAY_RATE),
-//                                    timeDistance));
-//                        }
-//                    }
-//
-//                    if (subSubActivation >= minScale) {
-//                        subSubActivation -= b.priAddOverflow(subSubActivation, tlinks); //activate the link
-//                    } else {
-//                        subSubActivation = 0;
-//                    }
-//
-//                } else {
-//                    subSubActivation = 0;
-//                }
-//
-//                change[0] += (subActivation - subSubActivation);
-//            });
-//
-//            //recoup losses to the parent
-//            parentActivation += change[0];
-//            return parentActivation;
-//        }
-//        else {
-//            //termlinks?
-//        }
+
+                            //multiply by temporal relevancy
+                            subSubActivation = subSubActivation * (
+                                (1f-temporalSpecificity) + //min reduction
+                                (temporalSpecificity) * TruthPolation.evidenceDecay(
+                                    1f,
+                                    (int) Math.ceil(dur),
+                                    timeDistance));
+                        }
+                    }
+
+                    if (subSubActivation >= minScale) {
+                        subSubActivation -= b.priAddOverflow(subSubActivation, tlinks); //activate the link
+                    } else {
+                        subSubActivation = 0;
+                    }
+
+                } else {
+                    subSubActivation = 0;
+                }
+
+                change[0] += (subActivation - subSubActivation);
+            });
+
+            //recoup losses to the parent
+            parentActivation += change[0];
+            return parentActivation;
+        }
+        else {
+            //termlinks?
+        }
 
         return scale;
     }

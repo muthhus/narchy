@@ -245,7 +245,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             return
                     dmt != null ?
-                            new DynamicConcept(t, dmt, dmt, termbag, taskbag, nar) :
+                            new DynamicConcept(t, dmt, null, termbag, taskbag, nar) :
                             new TaskConcept(t, termbag, taskbag, nar)
                     ;
         });

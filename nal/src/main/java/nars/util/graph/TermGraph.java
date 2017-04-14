@@ -88,7 +88,7 @@ public abstract class TermGraph {
 
             tc.termlinks().forEachKey(m -> {
 
-                    if ((m.op() == IMPL) && (m.containsTerm(t))) {
+                    if (m.op() == IMPL && m.vars()==0 && ((Compound)m).containsTermRecursively(t)) {
                         Compound l = (Compound) m;
                         Term s = l.term(0);
 
@@ -125,7 +125,9 @@ public abstract class TermGraph {
             } else {
                 reverse = false;
             }
-            float conf = dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
+            float conf =
+                    t.conf(when, dur);
+                    //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
 
             float freq = t.freq();
             boolean neg;
@@ -139,8 +141,8 @@ public abstract class TermGraph {
             if (val < Param.BUDGET_EPSILON)
                 return;
 
-            Term S = reverse ? pred : subj;
-            Term P = reverse ? $.negIf(subj, neg) : $.negIf(pred, neg);
+            Term S = reverse ? $.negIf(pred, neg) : subj;
+            Term P = reverse ? subj : $.negIf(pred, neg);
             g.putEdgeValue(S, P, val + g.edgeValueOrDefault( S, P, 0f ) );
 
         }

@@ -5,6 +5,7 @@ import jcog.bag.PLink;
 import jcog.bag.RawPLink;
 import nars.Focus;
 import nars.NAR;
+import nars.Param;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +59,8 @@ public class ConceptBagFocus implements Focus {
 
     @Override
     public void activate(/*Concept*/ Concept concept, float priToAdd) {
-        active.put(new RawPLink(concept, priToAdd), currentActivationRate, null);
+        if (priToAdd >= Param.BUDGET_EPSILON)
+            active.put(new RawPLink(concept, priToAdd), currentActivationRate, null);
     }
 
 

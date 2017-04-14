@@ -522,23 +522,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @Nullable
-    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) {
+    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
         return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
 
     @Nullable
-    public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf) {
+    public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf) throws InvalidTaskException {
         return input(pri, goal, GOAL, when, freq, conf);
     }
 
     @Nullable
-    public Task goal(float pri, @NotNull Termed<Compound> goal, @NotNull Tense tense, float freq, float conf) {
-        return input(pri, goal, GOAL, time(tense), freq, conf);
-    }
-
-    @Nullable
-    public Task input(float pri, Termed<Compound> term, byte punc, long occurrenceTime, float freq, float conf) {
+    public Task input(float pri, Termed<Compound> term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
 
         if (term == null) {
             throw new NullPointerException("null task term");
@@ -1490,8 +1485,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @Override
     public void activate(Concept c, float priToAdd) {
-        if (priToAdd > Param.BUDGET_EPSILON)
-            focus.activate(c, priToAdd);
+        focus.activate(c, priToAdd);
     }
 
     @Override

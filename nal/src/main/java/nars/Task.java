@@ -93,7 +93,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
                 else
                     cw = 0;
 
-                if (eternalizable()) {
+                if (eternalizable(term())) {
                     float et = t.eternalizedEvi();
                     if (et > cw)
                         cw = et;
@@ -106,11 +106,11 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     }
 
-    static boolean eternalizable() {
+    static boolean eternalizable(Term term) {
 
         //return term.varIndep() > 0;
-        //return term.vars() > 0;
-        return false;
+        return term.vars() > 0;
+        //return false;
         //return true;
         //return op().temporal;
 

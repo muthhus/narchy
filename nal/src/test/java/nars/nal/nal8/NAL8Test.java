@@ -940,7 +940,7 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
                 .mustDesire(cycles, "(good)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0f, 1f, ETERNAL)
+                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.5f, 1f, ETERNAL)
                 .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
     }
@@ -1159,7 +1159,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "c(x)! :|:")
                 .inputAt(1,"a(x). :|:")
                 .input("((a($x) &&+4 b($x)) ==>-3 c($x)).")
-                .mustDesire(cycles*3, "b(x)", 1f, 0.61f, 3 /* early since c(x) is alrady active when this gets derived */);
+                .mustDesire(cycles*3, "b(x)", 1f, 0.66f, 4 /* early since c(x) is alrady active when this gets derived */);
     }
 
     @Test public void testConjDecomposeWithDepVar() {

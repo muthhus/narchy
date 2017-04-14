@@ -5,19 +5,24 @@ import com.google.common.collect.Lists;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import jcog.Texts;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
+import jcog.list.FasterList;
+import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
+import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.test.agent.Line1DSimplest;
+import nars.time.Tense;
 import nars.util.graph.TermGraph;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static nars.NAgentX.runRT;
+import static nars.Op.GOAL;
+import static nars.Op.NEG;
 
 /**
  * Created by me on 3/15/17.
@@ -25,7 +30,7 @@ import static nars.NAgentX.runRT;
 public class Line1D {
 
     public static void main(String[] args) {
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
 
         NAR nar = runRT((NAR n) -> {
@@ -40,9 +45,9 @@ public class Line1D {
 //                }
 //            });
 
-            n.termVolumeMax.setValue(20);
-            n.beliefConfidence(0.5f);
-            n.goalConfidence(0.5f);
+            n.termVolumeMax.setValue(24);
+            n.beliefConfidence(0.9f);
+            n.goalConfidence(0.9f);
 
 
             Line1DSimplest a = new Line1DSimplest(n);
@@ -50,6 +55,13 @@ public class Line1D {
             //n.log();
 
             implAccelerator(n, a);
+
+            n.onTask(x -> {
+                if (x.isGoal() && x instanceof DerivedTask) {
+                    // && x.term().equals(a.o)
+                    System.out.println(x.proof());
+                }
+            });
 
 
             //TEST CHEAT:
@@ -59,7 +71,7 @@ public class Line1D {
 
             n.onCycle(() -> {
                 a.i.setValue(
-                        0.5f * (Math.sin(n.time() / 80f) + 1f)
+                        0.5f * (Math.sin(n.time() / 20f) + 1f)
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
@@ -75,49 +87,100 @@ public class Line1D {
 
     public static void implAccelerator(NAR n, NAgent a) {
         TermGraph.ImplGraph tg = new TermGraph.ImplGraph();
-        n.onCycle(r -> {
-            MutableValueGraph<Term, Float> s = tg.snapshot(
-                    Iterables.concat(
-                            Iterables.transform(a.actions, ActionConcept::term),
-                            Lists.newArrayList(a.happy.term())
-                    ),
-                    n, n.time());
-            Set<EndpointPair<Term>> ee = s.edges();
+        a.onFrame(new Consumer<NAgent>() {
 
-            if (!ee.isEmpty()) {
+            MutableValueGraph<Term, Float> s = null;
 
-                List<EndpointPair<Term>> ff = $.newArrayList();
-                ff.addAll(ee);
-                ff.sort((aa, bb) -> { //TODO faster
-                    float av = s.edgeValue(aa.nodeU(), aa.nodeV());
-                    float bv = s.edgeValue(bb.nodeU(), bb.nodeV());
-                    int o = Float.compare(bv, av);
-                    if (o == 0) {
-                        return Integer.compare(aa.hashCode(), bb.hashCode());
-                    }
-                    return o;
-                });
+            float decay = 0.5f;
+            float min = 0.01f;
 
-                System.out.println(ee.size() + " total implication edges");
-                ff.subList(0, Math.min(ff.size(), 10)).forEach(e -> {
-                            Term subj = e.nodeU();
-                            Term pred = e.nodeV();
+            @Override
+            public void accept(NAgent r) {
+                if (s != null) {
 
-                            Concept csubj = n.concept(subj);
-                            if (csubj != null)
-                                n.activate(csubj, 0.1f);
-
-                            Concept cpred = n.concept(pred);
-                            if (cpred != null)
-                                n.activate(cpred, 0.1f);
-
-                            System.out.println(
-                                    Texts.n4(s.edgeValue(subj, pred)) + "\t(" + e.source() + "==>" + e.target() + ")"
-
-                            );
+                    List<EndpointPair<Term>> toRemove = new FasterList();
+                    Iterator<EndpointPair<Term>> ii = s.edges().iterator();
+                    while (ii.hasNext()) {
+                        EndpointPair<Term> e = ii.next();
+                        Term a = e.source();
+                        Term b = e.target();
+                        float next = this.s.edgeValue(a, b) * decay;
+                        if (next < min) {
+                            toRemove.add(e);
+                        } else {
+                            s.putEdgeValue(a, b, next);
                         }
+                    }
+                    toRemove.forEach(rr -> s.removeEdge(rr.source(), rr.target()));
+                }
+                s = tg.snapshot(s,
+                        Iterables.concat(
+                              Iterables.transform(a.actions, ActionConcept::term),
+                            Lists.newArrayList(a.happy.term())
+                        )
+                        , n, n.time());
 
-                );
+                Set<EndpointPair<Term>> ee = s.edges();
+
+                if (!ee.isEmpty()) {
+
+                    List<EndpointPair<Term>> ff = $.newArrayList();
+                    ff.addAll(ee);
+                    ff.sort((aa, bb) -> { //TODO faster
+                        float av = s.edgeValue(aa.source(), aa.target());
+                        float bv = s.edgeValue(bb.source(), bb.target());
+                        int o = Float.compare(bv, av);
+                        if (o == 0) {
+                            return Integer.compare(aa.hashCode(), bb.hashCode());
+                        }
+                        return o;
+                    });
+
+                    float confMin = n.confMin.floatValue();
+
+                    ///System.out.println(ee.size() + " total implication edges");
+
+                    ff
+                            //.subList(0, Math.min(ff.size(), 40))
+                            .forEach(e -> {
+                                Term subj = e.source();
+                                Term pred = e.target();
+
+//                                float activation = 0.5f;
+//
+//                                Concept csubj = n.concept(subj);
+//                                if (csubj != null)
+//                                    n.activate(csubj, activation);
+//
+//                                Concept cpred = n.concept(pred);
+//                                if (cpred != null)
+//                                    n.activate(cpred, activation);
+
+                                float v = Math.min(1f, s.edgeValue(subj, pred));
+
+                                float c = n.confDefault(GOAL) * v;
+                                if (c > confMin) {
+                                    if (pred.equals(a.happy)) {
+                                        Task x = n.goal(subj, Tense.Present, 1f, c);
+                                    } else if (pred.op() == NEG && pred.unneg().equals(a.happy)) {
+                                        Task x = n.goal(subj, Tense.Present, 0f, c);
+                                    }
+
+                                    if (subj.equals(a.happy)) {
+                                        Task x = n.goal(pred, Tense.Present, 1f, c);
+                                    } else if (subj.op() == NEG && subj.unneg().equals(a.happy)) {
+                                        Task x = n.goal(pred, Tense.Present, 0f, c);
+                                    }
+
+//                                    System.out.println(
+//                                            Texts.n4(v) + "\t(" + subj + "==>" + pred + ")"
+//
+//                                    );
+                                }
+                            }
+
+                    );
+                }
             }
         });
     }

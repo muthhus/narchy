@@ -94,7 +94,7 @@ public abstract class Param  {
     public final static int UnificationStackMax = 16;
 
     /** 'time to live', unification operations until unification fails */
-    public final static int UnificationTTL = 512;
+    public final static int UnificationTTL = 256;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;

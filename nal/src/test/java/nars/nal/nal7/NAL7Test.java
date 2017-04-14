@@ -1176,18 +1176,22 @@ public class NAL7Test extends AbstractNALTest {
 //                .mustBelieve(cycles, "(--(i) && --(j))", 1f, 0.81f);
 //
 //    }
-    @Test public void dontUnifyNegated() {
-        /*
-        shouldn't happen:
-
-            (((--,(x-->j))&&(x-->i))==>(x-->(1,0))). %1.0;.90% {0: 3}
-            (x-->i). %1.0;.90% {0: 5}
-               |- (x-->(1,0)). %1.0;.73% {148: 3;5} ((%1,(%2==>%3),time(decomposeBeliefLate)),(subIfUnifiesAny(%3,%2,%1),((Deduction-->Belief),(Induction-->Goal))))
-        */
-        test().believe("(((--,(x-->j))&&(x-->i))==>(x-->(1,0)))")
-                .believe("(x-->i)")
-                .mustBelieve(cycles, "(x-->(1,0))", 1f, 0.73f);
-
-    }
+//    @Test public void dontUnifyNegated() {
+//        /*
+//        shouldn't happen:
+//
+//            (((--,(x-->j))&&(x-->i))==>(x-->(1,0))). %1.0;.90% {0: 3}
+//            (x-->i). %1.0;.90% {0: 5}
+//               |- (x-->(1,0)). %1.0;.73% {148: 3;5} ((%1,(%2==>%3),time(decomposeBeliefLate)),(subIfUnifiesAny(%3,%2,%1),((Deduction-->Belief),(Induction-->Goal))))
+//        */
+//        test()
+//                .log()
+//                .believe("(((--,(x-->j))&&(x-->i))<=>(x-->(1,0)))")
+//                .believe("(x-->i)")
+//            //balanced:
+//                .mustBelieve(cycles, "(x-->(1,0))", 1f, 0.73f)
+//                .mustBelieve(cycles, "(x-->(1,0))", 0f, 0.73f);
+//
+//    }
 
 }

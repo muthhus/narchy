@@ -40,7 +40,7 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
     @Override
     public final boolean test(@NotNull Derivation m) {
         boolean result = true;
-        int start = m.now();
+       // int start = m.now();
         for (BoolPredicate x : termCache) {
             boolean b = x.test(m);
 //            if (m.now() > 0)
@@ -51,7 +51,7 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
             }
         }
 
-        m.revert(start);
+        //m.revert(start);
         return result;
     }
 

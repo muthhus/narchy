@@ -732,7 +732,7 @@ public class PremiseRule extends GenericCompound {
 //                            break;
                         case "conjoinEternal":
                             timeFunction = TimeFunctions.occForwardMerge;
-                            pres.add(events.afterOrEternal);
+                            //pres.add(events.afterOrEternal);
                             break;
 
 //                        case "dtAfter":

@@ -21,14 +21,14 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 40, 32, (v) -> t(v, alpha()))
+        senseCamera("fz", ()->fz.image, 32, 24, (v) -> t(v, alpha()))
                 .setResolution(0.02f);
 
-        actionTogglePWM($.inh($.the("fz"), $.the("fwd")),
+        actionToggle($.inh($.the("fz"), $.the("fwd")),
                 //(b)->{ fz.thrust = b; }
                 () -> fz.thrust = true, () -> fz.thrust = false
         );
-        actionTriStatePWM($.inh($.the("fz"), $.the("rot") ), (dh) -> {
+        actionTriState($.inh($.the("fz"), $.the("rot") ), (dh) -> {
             switch (dh) {
                 case +1: fz.left = false; fz.right = true; break;
                 case 0: fz.left = fz.right = false; break;
@@ -194,8 +194,8 @@ public class FZero extends NAgentX {
     public static void main(String[] args) throws Narsese.NarseseException {
         new FZero(NARBuilder.newMultiThreadNAR(
                 3,
-                new RealTime.CS(true)
-                    .durFPS(2f), true)
+                new RealTime.DSHalf(true)
+                    .durFPS(10f), true)
         ).runRT(30f);
     }
 }

@@ -120,7 +120,7 @@ public class TemporalInductionTest {
 
         //System.out.println(numConcepts + " " + numBeliefs);
 
-        d.run(100);
+        d.run(60);
 
         //# unique concepts unchanged:
         assertEquals(numConcepts, Iterables.size(d.conceptsActive()));

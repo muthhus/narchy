@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
                     }
                 };
 
-                d.log();
+                //d.log();
 
                 String[] outcomes = {
                         "(x --> (0,0))",
@@ -38,10 +38,10 @@ public class NAL5BooleanConsistency {
                         "(x --> (1,1))"};
                 String expected = "(x --> (" + i + "," + j + "))";
 
-                d.believe("(((x-->i) && (x-->j)) ==> " + outcomes[3] + ")");
-                d.believe("((--(x-->i) && --(x-->j)) ==> " + outcomes[0] + ")");
-                d.believe("(((x-->i) && --(x-->j)) ==> " + outcomes[1] + ")");
-                d.believe("((--(x-->i) && (x-->j)) ==> " + outcomes[2] + ")");
+                d.believe("(((x-->i) && (x-->j)) <=> " + outcomes[3] + ")");
+                d.believe("((--(x-->i) && --(x-->j)) <=> " + outcomes[0] + ")");
+                d.believe("(((x-->i) && --(x-->j)) <=> " + outcomes[1] + ")");
+                d.believe("((--(x-->i) && (x-->j)) <=> " + outcomes[2] + ")");
 
                 d.believe($.negIf($.$("(x-->i)"), i==0));
                 d.believe($.negIf($.$("(x-->j)"), j==0));

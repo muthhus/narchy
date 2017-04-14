@@ -30,9 +30,11 @@ public final class Fork extends GenericCompound implements BoolPredicate<Derivat
     public boolean test(@NotNull Derivation m) {
 
         int now = m.now();
-        for (BoolPredicate s : termCache) {
+        for (int i = 0, termCacheLength = termCache.length; i < termCacheLength; i++) {
+            BoolPredicate s = termCache[i];
             s.test(m);
-            m.revert(now);
+            if (i < termCacheLength-1) //elide final iteration's revert, ie. tail-call
+                m.revert(now);
         }
 
         return true;

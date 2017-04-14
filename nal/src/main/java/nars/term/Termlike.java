@@ -29,9 +29,10 @@ public interface Termlike {
      */
     int size();
 
-    /** if contained within; doesnt match this term (if it's a term);
+    /** (first-level only, non-recursive)
+     *  if contained within; doesnt match this term (if it's a term);
      *  false if term is atomic since it can contain nothing
-     *  (first-level only, non-recursive)
+     *
      */
     boolean containsTerm(Termlike t);
 

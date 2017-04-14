@@ -120,9 +120,9 @@ abstract public class NAgent implements NSense, NAct {
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 
-                (x) -> t(x, alpha())
+                //(x) -> t(x, alpha())
 
-                /*(x) -> {
+                (x) -> {
                     if (x > 0.5f + Param.TRUTH_EPSILON) {
                         return t(1f, alpha() * (x - 0.5f) * 2f);
                     } else if (x < 0.5f - Param.TRUTH_EPSILON) {
@@ -130,7 +130,7 @@ abstract public class NAgent implements NSense, NAct {
                     } else {
                         return t(0.5f, alpha());
                     }
-                }*/) {
+                }) {
             @Override
             public EternalTable newEternalTable(int eCap) {
                 return new EternalTable(1); //for storing the eternal happiness goal
@@ -206,7 +206,7 @@ abstract public class NAgent implements NSense, NAct {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
 
-        this.now = now;
+        this.now = nar.time();
 
 
         float r = rewardValue = act();
@@ -294,6 +294,8 @@ abstract public class NAgent implements NSense, NAct {
         if (initialized)
             return;
 
+        now = nar.time();
+
         initialized = true;
 
         //this.curiosityAttention = reinforcementAttention / actions.size();
@@ -307,9 +309,10 @@ abstract public class NAgent implements NSense, NAct {
         int dur = nar.dur();
 
         predictors.add(
-                goal(happiness, t(1f, nar.confDefault(BELIEF /*GOAL*/)),
-                        //ETERNAL
-                        now + dur
+                goal(happiness,
+                        t(1f, nar.confDefault(/*BELIEF*/ GOAL)),
+                        ETERNAL
+                        //now + dur/2
                 )
         );
 
@@ -347,10 +350,12 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     quest((Compound) (action.term()),
-                            now + dur)
+                            now)
                             //ETERNAL)
 
-                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    //,quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 //                    question(impl(action, 0, happiness), ETERNAL),
