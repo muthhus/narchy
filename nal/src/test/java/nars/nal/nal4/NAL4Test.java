@@ -28,7 +28,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL4Test extends AbstractNALTest {
 
 
-    public static final int CYCLES = 350;
+    public static final int CYCLES = 50;
 
     public NAL4Test(Supplier<NAR> b) { super(b);  }
 
@@ -320,7 +320,7 @@ public class NAL4Test extends AbstractNALTest {
         test()
                 .believe("f(x,z)",1.0f,0.9f)
                 .believe("f(y,z)",1.0f,0.9f)
-                .mustBelieve(CYCLES, "f:((x,z)&(y,z))", 1.0f, 0.81f);
+                .mustBelieve(CYCLES*16, "f:((x,z)&(y,z))", 1.0f, 0.81f);
     }
 
     @Test public void testNeqComConstraint() {

@@ -2,6 +2,7 @@ package nars.term.subst;
 
 import jcog.list.FasterList;
 import jcog.version.VersionMap;
+import jcog.version.Versioned;
 import jcog.version.Versioning;
 import nars.$;
 import nars.Op;
@@ -9,7 +10,6 @@ import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.TermIndex;
 import nars.term.Term;
-import nars.term.mutate.Termunator;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
@@ -20,7 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 
@@ -39,7 +41,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class Unify extends Termunator implements Subst {
+public abstract class Unify extends Termutator implements Subst {
 
     @NotNull
     public final Random random;
@@ -62,16 +64,13 @@ public abstract class Unify extends Termunator implements Subst {
     @NotNull
     public final Constraints constraints;
     @NotNull
-    public final VersionMap.Reassigner<Term, Term> reassignerXY;//, reassignerYX;
+    public final Reassigner<Term, Term> reassignerXY;//, reassignerYX;
 
     @NotNull
     public final VersionMap<Term, Term> xy;
     @NotNull
     public final VersionMap<Term, Term> yx;
 
-    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax) {
-        this(index, type, random, new Versioning(stackMax));
-    }
 
 
     public final void mutate(List<Termutator> chain, int next) {
@@ -121,8 +120,12 @@ public abstract class Unify extends Termunator implements Subst {
         }
     }
 
+    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax) {
+        this(index, type, random, new Versioning(stackMax));
+    }
+
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
-        super();
+        super(Unify.class);
 
         this.index = index;
 
@@ -131,13 +134,13 @@ public abstract class Unify extends Termunator implements Subst {
 
         this.versioning = versioning;
 
-        int constraintsLimit = 6;
+        int constraintsLimit = 16;
         constraints = new Constraints(versioning, constraintsLimit);
 
-        xy = new VersionMap(versioning, 16);
-        reassignerXY = new VersionMap.Reassigner(constraints, xy);
+        xy = new VersionMap(versioning, 32);
+        reassignerXY = new Reassigner(constraints, xy);
 
-        yx = new VersionMap(versioning, 8);
+        yx = new VersionMap(versioning, 16);
         //reassignerYX = new VersionMap.Reassigner<>(constraintPredicate, yx);
     }
 
@@ -153,6 +156,10 @@ public abstract class Unify extends Termunator implements Subst {
         versioning.clear();
     }
 
+    @Override
+    public int getEstimatedPermutations() {
+        throw new UnsupportedOperationException();
+    }
 
     @Nullable
     @Override
@@ -393,6 +400,42 @@ public abstract class Unify extends Termunator implements Subst {
     }
 
 
+    private static class Reassigner<X,Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
+
+        protected Y y;
+        protected final VersionMap<X,Y> map;
+        private final BiPredicate<X,Y> assigner;
+
+        Reassigner(@NotNull BiPredicate<X,Y> assigner, @NotNull final VersionMap<X,Y> map) {
+            this.map = map;
+            this.assigner = assigner;
+        }
+
+        @Override
+        public Versioned<Y> apply(X x, @Nullable Versioned<Y> vy) {
+            final Y y = this.y;
+
+            if (vy == null) {
+                return assigner.test(x, y) ?  map.newEntry(x).set(y) : null;
+            } else {
+                Y yy = vy.get();
+                if (yy == null) {
+                    if (!assigner.test(x, y) || (vy.set(y)==null))
+                        return null;
+                } else if (!Objects.equals(yy, y)) {
+                    return null; //conflict
+                }
+                return vy;
+            }
+        }
+
+        /** should not be used by multiple threads at once! */
+        public final boolean compute(@NotNull X x, @NotNull Y y) {
+            this.y = y;
+            return map.computeAssignable(x, this);
+        }
+
+    }
 }
 
 

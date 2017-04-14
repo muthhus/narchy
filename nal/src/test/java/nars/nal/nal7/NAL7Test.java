@@ -532,18 +532,17 @@ public class NAL7Test extends AbstractNALTest {
         TestNAR tester = test();
 
         tester.input("at(SELF,{t003}). :|:");
-        tester.inputAt(10, "on({t002},{t003}). :|:");
+        tester.inputAt(4, "on({t002},{t003}). :|:");
 
         tester.mustBelieve(cycles,
-                //"(<#1 --> (/,at,SELF,_)> &&+10 <#1 --> (/,on,{t002},_)>)",
-                "(at(SELF,{t003}) &&+10 on({t002},{t003}))",
+                "(at(SELF,{t003}) &&+4 on({t002},{t003}))",
                 1.0f, 0.81f,
-                0, 10);
+                0, 4);
         tester.mustBelieve(cycles,
-                "(at(SELF,#1) &&+10 on({t002},#1))",
+                "(at(SELF,#1) &&+4 on({t002},#1))",
                 1.0f, 0.81f,
-                0, 10);
-        tester.mustNotOutput(cycles, "(at(SELF,#1) &&-10 on({t002},#1))", BELIEF, ETERNAL);
+                0, 4);
+        tester.mustNotOutput(cycles, "(at(SELF,#1) &&-4 on({t002},#1))", BELIEF, ETERNAL);
 
     }
 

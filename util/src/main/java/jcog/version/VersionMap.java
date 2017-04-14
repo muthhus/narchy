@@ -5,10 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
 
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
@@ -21,11 +18,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     public VersionMap(Versioning context, int initialSize) {
         this(context,
-            new UnifiedMap(initialSize)
+            new HashMap(initialSize, 0.1f)
+            //new UnifiedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
-            //new HashMap(initialSize)
-            //new ConcurrentHashMap(initialSize)
-            //new ConcurrentHashMapUnsafe<>(initialSize)
         );
     }
 
@@ -34,23 +29,6 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         this.map = map;
     }
 
-    @Override
-    public final boolean containsKey(Object key) {
-        throw new UnsupportedOperationException(); //requires filtering
-        //return map.containsKey(key);
-    }
-
-    @NotNull
-    @Override
-    public Set<X> keySet() {
-        throw new UnsupportedOperationException(); //requires filtering
-        //return map.keySet();
-    }
-
-    //    @Override
-//    public final void forEach(BiConsumer<? super X, ? super Y> action) {
-//        map.forEach((BiConsumer<? super X, ? super Versioned<Y>>) action);
-//    }
 
     @Nullable
     @Override
@@ -90,10 +68,6 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return size()==0;
     }
 
-//    @Override
-//    public final void putAll(Map<? extends X, ? extends Y> m) {
-//        m.forEach(this::put);
-//    }
 
     /** avoid using this if possible because it involves transforming the entries from the internal map to the external form */
     @NotNull
@@ -104,18 +78,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return e;
     }
 
-    @Override
-    public void putAll(Map<? extends X, ? extends Y> m) {
-        throw new UnsupportedOperationException();
-//        if (m instanceof VersionMap) {
-//            VersionMap<X,Y> o = (VersionMap)m;
-//            o.map.forEach((k,v) -> put(k, v.get()));
-//        }
-//        else {
-//            //default
-//            super.putAll(m);
-//        }
-    }
+
 
     /**
      * records an assignment operation
@@ -131,19 +94,16 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     public final void putConstant(X key, Y value) {
-        map.put(key, new Versioned<>(value));
+        map.put(key, new Versioned(value));
     }
 
-
-
-
-    public final Versioned getOrCreateIfAbsent(X key) {
+    public final Versioned<Y> getOrCreateIfAbsent(X key) {
         return map.computeIfAbsent(key, this::newEntry);
     }
 
     @NotNull
     public final Versioned<Y> newEntry(X keyIgnoredk) {
-        return new Versioned(context, elementStackSize);
+        return new Versioned<>(context, elementStackSize);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);
     }
@@ -167,39 +127,6 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
 
-//    /** this implementation removes itself from the map when it is reverted to
-//     *  times prior to its appearance in the map */
-//    final class RemovingVersionedEntry extends Versioned<Y> {
-//
-//        private final X key;
-//
-//        public RemovingVersionedEntry(X key) {
-//            super(context);
-//            this.key = key;
-//        }
-//
-//        @Override
-//        boolean revertNext(int before) {
-//            boolean v = super.revertNext(before);
-//            if (size == 0)
-//                removeFromMap();
-//            return v;
-//        }
-//
-//
-//        private void removeFromMap() {
-//            VersionMap.this.remove(key);
-//        }
-//
-//
-//    }
-
-
-
-//    public boolean cache(X key) {
-//        return false;
-//    }
-
     @Override
     public final Y get(/*X*/Object key) {
         Versioned<Y> v = map.get(key);
@@ -222,42 +149,20 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return map.get(key);
     }
 
-    public static class Reassigner<X, Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
 
-        protected Y y;
-        protected final VersionMap map;
-        private final BiPredicate<X, Y> assigner;
 
-        public Reassigner(BiPredicate<X, Y> assigner, final VersionMap map) {
-            this.map = map;
-            this.assigner = assigner;
-        }
 
-        @Override
-        public Versioned<Y> apply(X x, @Nullable Versioned<Y> vy) {
-            final Y y = this.y;
-
-            if (vy == null) {
-                return assigner.test(x, y) ?  map.newEntry(x).set(y) : null;
-            } else {
-                Y yy = vy.get();
-                if (yy == null) {
-                    if (!assigner.test(x, y) || (vy.set(y)==null))
-                        return null;
-                } else if (!Objects.equals(yy, y)) {
-                    return null; //conflict
-                }
-                return vy;
-            }
-        }
-
-        /** should not be used by multiple threads at once! */
-        public final boolean compute(@NotNull X x, @NotNull Y y) {
-            this.y = y;
-            return map.computeAssignable(x, this);
-        }
-
+    @Override
+    public final boolean containsKey(Object key) {
+        throw new UnsupportedOperationException(); //requires filtering
+        //return map.containsKey(key);
     }
 
+    @NotNull
+    @Override
+    public Set<X> keySet() {
+        throw new UnsupportedOperationException(); //requires filtering
+        //return map.keySet();
+    }
 
 }
