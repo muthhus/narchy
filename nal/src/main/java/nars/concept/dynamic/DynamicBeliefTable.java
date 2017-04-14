@@ -31,13 +31,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Override
     public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input instanceof DerivedTask) {
-//            Task match = match(input.start(), nar.time(), nar.dur(), input, input.term(), false);
-//            if (match!=null) {
+            Task match = match(input.start(), nar.time(), nar.dur(), input, input.term(), false);
+            if (match!=null) {
 //                return match;
 //            } else {
                 //use the input
                 return input;
-//            }
+            }
         }
 
         if (input instanceof DynamicBeliefTask) {
