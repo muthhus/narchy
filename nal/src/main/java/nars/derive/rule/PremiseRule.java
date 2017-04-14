@@ -329,10 +329,10 @@ public class PremiseRule extends GenericCompound {
         //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
         //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
 
-        if (b == events.after) return events.class;
+        //if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
         if (b == events.beforeAfterOrEternal) return events.class;
-        if (b == events.nonEternal) return events.class;
+        //if (b == events.nonEternal) return events.class;
         if (b == events.beliefDTSimultaneous) return events.class;
 
         //if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
@@ -726,23 +726,23 @@ public class PremiseRule extends GenericCompound {
 //                            pres.add(events.bothTemporal);
 //                            break;
 
-                        case "conjoin":
-                            timeFunction = TimeFunctions.occForwardMerge;
-                            pres.add(events.nonEternal);
-                            break;
+//                        case "conjoin":
+//                            timeFunction = TimeFunctions.occForwardMerge;
+//                            pres.add(events.nonEternal);
+//                            break;
                         case "conjoinEternal":
                             timeFunction = TimeFunctions.occForwardMerge;
                             pres.add(events.afterOrEternal);
                             break;
 
-                        case "dtAfter":
-                            timeFunction = TimeFunctions.occForward;
-                            pres.add(events.nonEternal);
-                            break;
-                        case "dtAfterReverse":
-                            timeFunction = TimeFunctions.occReverse;
-                            pres.add(events.nonEternal);
-                            break;
+//                        case "dtAfter":
+//                            timeFunction = TimeFunctions.occForward;
+//                            pres.add(events.nonEternal);
+//                            break;
+//                        case "dtAfterReverse":
+//                            timeFunction = TimeFunctions.occReverse;
+//                            pres.add(events.nonEternal);
+//                            break;
 
                         case "raw":
                             beliefProjected = false;
@@ -1174,18 +1174,18 @@ public class PremiseRule extends GenericCompound {
 //        return neg;
 //    }
 
-    /**
-     * safe negation
-     */
-    @NotNull
-    private static Term neg(@NotNull Term x) {
-        if (x.op() == NEG) {
-            return ((Compound) x).term(0); //unwrap
-        } else {
-            //do this manually for premise rules since they will need to negate atoms which is not usually allowed
-            return new GenericCompound(NEG, TermVector.the(x));
-        }
-    }
+//    /**
+//     * safe negation
+//     */
+//    @NotNull
+//    private static Term neg(@NotNull Term x) {
+//        if (x.op() == NEG) {
+//            return ((Compound) x).term(0); //unwrap
+//        } else {
+//            //do this manually for premise rules since they will need to negate atoms which is not usually allowed
+//            return new GenericCompound(NEG, TermVector.the(x));
+//        }
+//    }
 
 
     @NotNull

@@ -225,15 +225,7 @@ public enum Op {
 
     }
 
-    @Deprecated public static boolean isOperation(@NotNull Termed _t) {
-        Term t = _t.term();
-        if (t.op() == Op.INH) { //Op.hasAll(t.structure(), Op.OperationBits) &&
-            Compound c = (Compound) t;
-            return c.isTerm(1, Op.ATOM) &&
-                   c.isTerm(0, Op.PROD);
-        }
-        return false;
-    }
+
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
         return ((existing | possiblyIncluded) == existing);
@@ -256,14 +248,14 @@ public enum Op {
 
 
 
-    @NotNull
-    public final String toString(@NotNull Compound c)  {
-        int t = c.dt();
-
-        return t == Tense.DTERNAL ?
-                str :
-                str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
-    }
+//    @NotNull
+//    public final String toString(@NotNull Compound c)  {
+//        int t = c.dt();
+//
+//        return t == Tense.DTERNAL ?
+//                str :
+//                str + ((t >= 0) ? "+" : "") + (Integer.toString(t));
+//    }
 
 
     /**
@@ -313,9 +305,9 @@ public enum Op {
         return in(SetsBits);
     }
 
-    public static int or(int bits, @NotNull Op o) {
-        return bits | o.bit;
-    }
+//    public static int or(int bits, @NotNull Op o) {
+//        return bits | o.bit;
+//    }
 
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
@@ -325,17 +317,17 @@ public enum Op {
 //        return hasAny(structure, o.bit);
 //    }
 
-    public final boolean isIntersect() {
-        return this == Op.SECTe || this == Op.SECTi;
-    }
-
-    public static int or(@NotNull int... i) {
-        int bits = 0;
-        for (int x : i) {
-            bits |= x;
-        }
-        return bits;
-    }
+//    public final boolean isIntersect() {
+//        return this == Op.SECTe || this == Op.SECTi;
+//    }
+//
+//    public static int or(@NotNull int... i) {
+//        int bits = 0;
+//        for (int x : i) {
+//            bits |= x;
+//        }
+//        return bits;
+//    }
 
     public static int or(@NotNull Op... o) {
         int bits = 0;

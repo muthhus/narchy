@@ -15,36 +15,36 @@ import static nars.time.Tense.ETERNAL;
  */
 abstract public class events extends AtomicPredicate<Derivation> {
 
-    /** task is before or simultaneous with belief which follows (T ... B) */
-    public static final events nonEternal = new events() {
+//    /** task is before or simultaneous with belief which follows (T ... B) */
+//    public static final events nonEternal = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "nonEternal";
+//        }
+//
+//        @Override
+//        public boolean test(@NotNull Derivation m) {
+//            return deltaOcc(m.task, m.belief) !=ETERNAL; /* && d!=DTERNAL which is negative */
+//        }
+//
+//    };
 
-        @Override
-        public String toString() {
-            return "nonEternal";
-        }
-
-        @Override
-        public boolean test(@NotNull Derivation m) {
-            return deltaOcc(m.task, m.belief) !=ETERNAL; /* && d!=DTERNAL which is negative */
-        }
-
-    };
-
-    /** task is before or simultaneous with belief which follows (T ... B) */
-    public static final events after = new events() {
-
-        @Override
-        public String toString() {
-            return "after";
-        }
-
-        @Override
-        public boolean test(@NotNull Derivation m) {
-            long d = deltaOcc(m.task, m.belief);
-            return d<=0 && d!=ETERNAL; /* && d!=DTERNAL which is negative */
-        }
-
-    };
+//    /** task is before or simultaneous with belief which follows (T ... B) */
+//    public static final events after = new events() {
+//
+//        @Override
+//        public String toString() {
+//            return "after";
+//        }
+//
+//        @Override
+//        public boolean test(@NotNull Derivation m) {
+//            long d = deltaOcc(m.task, m.belief);
+//            return d<=0 && d!=ETERNAL; /* && d!=DTERNAL which is negative */
+//        }
+//
+//    };
 //    /** true if both are non-eternal and task is after or simultaneous with belief  */
 //    @Nullable
 //    public static final events before = new events() {
@@ -152,21 +152,21 @@ abstract public class events extends AtomicPredicate<Derivation> {
 //        }
 //    };
 
-    public static long deltaOcc(@NotNull Task a, @Nullable Task b) {
-
-        if (b == null)
-            return ETERNAL;
-
-        long tOcc = a.start();
-        if (tOcc == ETERNAL)
-            return ETERNAL;
-
-        long bOcc = b.start();
-        if (bOcc == ETERNAL)
-            return ETERNAL;
-
-        return (tOcc - bOcc);
-    }
+//    public static long deltaOcc(@NotNull Task a, @Nullable Task b) {
+//
+//        if (b == null)
+//            return ETERNAL;
+//
+//        long tOcc = a.start();
+//        if (tOcc == ETERNAL)
+//            return ETERNAL;
+//
+//        long bOcc = b.start();
+//        if (bOcc == ETERNAL)
+//            return ETERNAL;
+//
+//        return (tOcc - bOcc);
+//    }
 
 //    /** both task and belief must be non-null and eternal */
 //    @Nullable

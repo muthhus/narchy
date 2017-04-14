@@ -291,6 +291,16 @@ public class TermTest {
     }
 
 
+    @Deprecated static boolean isOperation(@NotNull Termed _t) {
+        Term t = _t.term();
+        if (t.op() == Op.INH) { //Op.hasAll(t.structure(), Op.OperationBits) &&
+            Compound c = (Compound) t;
+            return c.isTerm(1, Op.ATOM) &&
+                    c.isTerm(0, Op.PROD);
+        }
+        return false;
+    }
+
     @Test
     public void testParseOperationInFunctionalForm() {
 
@@ -302,7 +312,7 @@ public class TermTest {
         try {
             Term x = n.term("wonder(a,b)").term();
             assertEquals(INH, x.op());
-            assertTrue(Op.isOperation(x));
+            assertTrue(isOperation(x));
             assertEquals("wonder(a,b)", x.toString());
 
         } catch (Narsese.NarseseException ex) {
