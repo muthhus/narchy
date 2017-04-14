@@ -24,12 +24,8 @@ import org.jetbrains.annotations.Nullable;
 public class RevisionTask extends AnswerTask  {
 
 
-    @Nullable
-    private TaskConcept concept;
-
-    public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end, TaskConcept target) {
+    public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end) {
         super(term, newBelief, oldBelief, conclusion, creationTime, start, end, 0.5f);
-        this.concept = target;
     }
 
 
@@ -46,18 +42,7 @@ public class RevisionTask extends AnswerTask  {
 //        this.concept = target;
 //    }
 
-    @Override
-    public @Nullable TaskConcept concept(@NotNull NAR n) {
-        if (concept==null)
-            return super.concept(n); //HACK
-        return concept;
-    }
 
-    @Override
-    public void unlink() {
-        super.unlink();
-        concept = null;
-    }
 
     //    @Override
 //    public boolean isDeleted() {
