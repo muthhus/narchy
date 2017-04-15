@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.Param;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;

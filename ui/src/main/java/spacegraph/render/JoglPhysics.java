@@ -330,7 +330,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
 
 
     @Override protected void render() {
-        window.swapBuffers();
+        //window.swapBuffers();
         clear();
         updateCamera();
         forEachSpatial(this::render);

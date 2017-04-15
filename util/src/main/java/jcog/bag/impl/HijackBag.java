@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -93,7 +94,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
 
-    @Contract(pure=true) private static int i(int c, int hash) {
+    @Contract(pure = true)
+    private static int i(int c, int hash) {
         return (int) (Integer.toUnsignedLong(hash) % c);
     }
 
@@ -257,7 +259,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                                 }
 
                             } else { //put
-                                pressurize( merge(ii, adding, scale) );
+                                pressurize(merge(ii, adding, scale));
 
                                 targetIndex = -1;
                                 added = ii;
@@ -328,7 +330,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 onAdded(added);
             } else if (add) {
                 //rejected: add but not added and not merged
-                pressurize(pri(adding) * scale );
+                pressurize(pri(adding) * scale);
             }
 
 
@@ -458,89 +460,124 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Nullable
     @Override
+    public HijackBag<K, V> sample(int n, @NotNull IntObjectToIntFunction<? super V> target) {
+        scan(n, target);
+        return this;
+    }
+
+    @Nullable
+    @Override
     public HijackBag<K, V> sample(int n, @NotNull Predicate<? super V> target) {
-        scan(n, false, target);
+        scan(n, (h, v) -> {
+            for (int i = 0; i < h; i++)
+                target.test(v);
+            return h;
+        });
         return this;
     }
 
     @Nullable
     @Override
     public int pop(int n, @NotNull Predicate<? super V> target) {
-        return scan(n, true, target);
+        return scan(n, (h, v) -> {
+            return (target.test(v) ? -1 : 0);
+        });
     }
 
-    /**
-     * @return how many items selected/removed
-     */
-    public int scan(int n, boolean remove, @NotNull Predicate<? super V> target) {
+
+    public int scan(int n, IntObjectToIntFunction<? super V> each) {
+
+        int s = size();
+        if (s == 0)
+            return 0;
+
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
             return 0;
 
-        /*if (isEmpty())
-            return null;*/
 
-        int jLimit = (int) Math.ceil(c / ((float)reprobes/2));
-
-        int i = random.nextInt(c), j = 0;
+        int i = random.nextInt(c);
 
 
-        float min = priMin;
-        float max = priMax;
-        float priRange = max - min;
+//        float min = priMin;
+//        float max = priMax;
+//        float priRange = max - min;
 
         //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
 
-        //randomly choose traversal direction
-        boolean di = random.nextBoolean();
+
+        //boolean di = random.nextBoolean(); //randomly choose traversal direction
+
         int selected = 0;
 
-        while ((n > 0) && (j < jLimit) /* prevent infinite looping */) {
+        int nulls = c - s; //approximate number of empty slots that would be expected
 
-            if (di) {
+        float scanRate = 1f;
+        float priToHits = ((n) / (s * scanRate));
+
+        int skipped = 0;
+
+        final int N = n;
+        while (n > 0) {
+
+            //if (di) {
                 if (++i == c) i = 0;
-            } else {
+            /*} else {
                 if (--i == -1) i = c - 1;
-            }
-
-            j++;
+            }*/
 
             V v = map.get(i);
             if (v == null) {
+                if (++skipped >= nulls)
+                    break;
                 continue;
             }
 
             float p = pri(v);
             if (p == p) {
 
-                float r = curve() * priRange + priMin; //randomized threshold
-
-                if (r < p + tolerance(((float) j) / jLimit)) { /*|| (r < p + tolerance(j, jLimit, n, batchSize, c))*/
-                    if (!remove || map.compareAndSet(i, v, null)) {
-                        if (target.test(v)) {
-                            if (remove) {
-                                size.decrementAndGet();
-                            }
-                            n--;
-                            selected++;
-                        } else {
-                            //try to reinsert in that slot
-                            if (!map.compareAndSet(i, null, v)) {
-                                //try to insert as if normally
-                                put(v);
-                            }
-                        }
-                    }
+                float fhits = (p * priToHits);
+                int hits;
+                if (fhits < 1f) {
+                    hits = ((float)n/N) /* gets more desperate to select something as n shrinks to zero */ * random.nextFloat() < fhits ? 1 : 0;
+                } else {
+                    hits = (int) Math.ceil(fhits);
                 }
 
-            } else {
+                if (hits > 0) {
+                    if (map.compareAndSet(i, v, null)) {
+                        int taken = each.intValueOf(hits, v);
+                        boolean popped = (taken < 0);
+                        if (popped) {
+                            taken = 1; //make positive
+                            size.decrementAndGet();  onRemoved(v);
+                        } else if (taken > 0) {
+                            //try to reinsert in that slot we removed it temporarily from
+                            if (!map.compareAndSet(i, null, v)) {
+                                //try to insert as if normally
+                                if (put(v) == null) {
+                                    //give up
+                                    size.decrementAndGet();  onRemoved(v);
+                                    continue;
+                                }
+                            }
+
+                        }
+
+                        n -= taken;
+                        selected += taken;
+                    }
+
+                }
+
+            } /*else {
                 //early deletion nullify
 //                    if (map.compareAndSet(m, v, null)) {
 //                        size.decrementAndGet();
 //                        onRemoved(v);
 //                    }
-            }
+            }*/
 
 
         }
@@ -602,9 +639,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Deprecated
     public Bag<K, V> commit() {
         //throw new UnsupportedOperationException();
-        float p = (float)this.pressure.getAndSet(0);
+        float p = (float) this.pressure.getAndSet(0);
         if (p > 0) {
-            return commit(Bag.forget(size(), p, mass, temperature(), priEpsilon(), this::forget));
+            return commit(Bag.forget(size(), capacity(), p, mass, temperature(), priEpsilon(), this::forget));
         }
         return this;
     }
@@ -627,7 +664,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
 
-        if (update!=null) {
+        if (update != null) {
             update(update);
         }
 

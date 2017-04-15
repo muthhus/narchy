@@ -6,6 +6,7 @@ import jcog.list.SynchronizedArrayList;
 import nars.Focus;
 import nars.concept.Concept;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -32,7 +33,7 @@ public class CompoundFocus implements Focus {
 
 
     @Override
-    public void sample(int max, Predicate<? super PLink<Concept>> c) {
+    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
         throw new UnsupportedOperationException("TODO");
     }
 

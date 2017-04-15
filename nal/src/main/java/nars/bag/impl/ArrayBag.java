@@ -10,6 +10,7 @@ import nars.attention.Forget;
 import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -289,11 +290,16 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
     @NotNull
     @Override
     public ArrayBag<X> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
-        if (!isEmpty())
-            forEachWhile(target, n);
+        forEachWhile(target, n);
         return this;
     }
 
+    @Override
+    public Bag<X, BLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super BLink<X>> target) {
+        //HACK
+        forEachWhile(x -> target.intValueOf(1, x) > 0, n);
+        return this;
+    }
 
     @Override
     public final BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflow) {
@@ -373,7 +379,7 @@ public class ArrayBag<X> extends SortedListTable<X, BLink<X>> implements Bag<X, 
         float p = this.pressure;
         if (p > 0) {
             this.pressure = 0;
-            return commit(Forget.forget(size(), p, mass, Forget::new));
+            return commit(Forget.forget(size(), capacity(), p, mass, Forget::new));
         }
         return this;
     }

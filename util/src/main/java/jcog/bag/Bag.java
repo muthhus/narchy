@@ -1,9 +1,11 @@
 package jcog.bag;
 
 import jcog.Util;
+import jcog.bag.impl.HijackBag;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,11 +35,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * @return the update function to apply to a bag
      */
     @Nullable
-    public static <X> Consumer<X> forget(int s, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
+    public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
-        float r = Util.unitize(((m + p) - (s * (1f - temperature))) / m);
+        float avgToBeRemoved = Util.unitize(((m + p) - (c * (1f - temperature))) / s);
+
         //float r = Util.unitize(p / (p + m) * temperature);
-        return r >= priEpsilon*s ? f.valueOf(r) : null;
+        return avgToBeRemoved >= priEpsilon ? f.valueOf(avgToBeRemoved) : null;
 
     }
 
@@ -112,9 +115,19 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * fills a collection with at-most N items, if an item passes the predicate.
      * returns how many items added
      */
-    @Nullable
-    Bag<K, V> sample(int n, @NotNull Predicate<? super V> target);
+    //@Deprecated
+    //Bag<K, V> sample(int n, @NotNull Predicate<? super V> target);
+    @Deprecated /* HACK */ default Bag<K,V> sample(int max, Predicate<? super V> c) {
+        sample(max, (h, v) -> {
+            if (!c.test(v)) return 0;
+            for (int i = 0; i < h - 1; i++)
+                c.test(v);
+            return h;
+        });
+        return this;
+    }
 
+    Bag<K, V> sample(int n, @NotNull IntObjectToIntFunction<? super V> target);
 
     /**
      * The number of items in the bag
@@ -533,10 +546,10 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
             return this;
         }
 
-        @NotNull
+
         @Override
-        public Bag sample(int n, @NotNull Predicate target) {
-            return this;
+        public Bag sample(int n, @NotNull IntObjectToIntFunction target) {
+            return null;
         }
 
         @Nullable

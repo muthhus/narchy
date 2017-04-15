@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class BudgetFairnessTest {
             }
 
             @Override
-            public void sample(int max, Predicate<? super PLink<Concept>> p) {
+            public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> p) {
                 c.sample(max, p);
             }
 

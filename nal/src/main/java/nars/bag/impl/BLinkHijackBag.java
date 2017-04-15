@@ -28,8 +28,8 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,BLink<K>> {
     }
 
     @Override
-    protected Consumer<BLink<K>> forget(float rate) {
-        return new Forget(rate);
+    protected Consumer<BLink<K>> forget(float avgToBeRemoved) {
+        return new Forget(avgToBeRemoved);
     }
 
     public static void flatForget(BudgetHijackBag<?,? extends Budgeted> b) {

@@ -10,18 +10,19 @@ import java.util.function.Consumer;
  */
 public class PForget<X extends Priority> implements Consumer<X> {
 
-    public final float gain;
+    public final float avgToBeRemoved;
 
-    public PForget(float rate) {
-        this.gain = 1f-rate;
+    public PForget(float avgToBeRemoved) {
+        this.avgToBeRemoved = avgToBeRemoved;
     }
 
     @Override
     public void accept(@NotNull X b) {
-        float p = b.priSafe(-1);
-        if (p > 0) {
-            b.priMult(gain);
-        }
+        b.priSub(avgToBeRemoved);
+//        float p = b.priSafe(-1);
+//        if (p > 0) {
+//            b.priMult(gain);
+//        }
     }
 
 }

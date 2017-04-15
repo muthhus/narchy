@@ -669,7 +669,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
 //                    new RealTime.DSHalf().durSeconds(0.2f));
 
-            float metaLearningRate = 0.75f;
+//            float metaLearningRate = 0.75f;
 //            m.confMin.setValue(0.01f);
 //            m.goalConfidence(metaLearningRate);
 //            m.termVolumeMax.setValue(24);
@@ -678,7 +678,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         );
         metaT.init();
-        metaT.trace = true;
+        //metaT.trace = true;
         a.onFrame((z)->metaT.cycle());
 
         //n.onCycle(metaT.nar::cycle);

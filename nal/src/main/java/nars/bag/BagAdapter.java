@@ -3,6 +3,7 @@ package nars.bag;
 import jcog.bag.Bag;
 import nars.budget.BLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -85,6 +86,12 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
     @Override
     public BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflowing) {
         return bag.put(b, scale, overflowing);
+    }
+
+    @Override
+    public Bag<X, BLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super BLink<X>> target) {
+        bag.sample(n, target);
+        return this;
     }
 
     @NotNull

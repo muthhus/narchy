@@ -1,6 +1,7 @@
 package jcog.bag;
 
 import jcog.meter.event.PeriodMeter;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 
 import java.util.concurrent.Executor;
 import java.util.function.BiPredicate;
@@ -18,11 +19,16 @@ public class BagFlow<X,Y> {
     private final Executor exe;
 
     final PeriodMeter /*inRate,*/ outRate, inRate;
-    private final BiPredicate<X, Bag<?,Y>> inToOut;
+
+    public interface TransferFn<X,Y> {
+        void transfer(X object, int hits, Bag<?,Y> target);
+    }
+
+    private final TransferFn<X,Y> inToOut;
     private final Consumer<Y> eachOut;
     private final float batchDivisor;
 
-    public BagFlow(Bag in, Bag out, Executor e, BiPredicate<X,Bag<?,Y> /* output bag to insert result */> inToOut, Consumer<Y> eachOut) {
+    public BagFlow(Bag in, Bag out, Executor e, TransferFn<X, Y> inToOut, Consumer<Y> eachOut) {
 
         this.exe = e;
 
@@ -75,36 +81,37 @@ public class BagFlow<X,Y> {
 //                    outRate + "-> n=" + toDrain +
 //                ") per batches of size=" + batchDivisor );
 
-        transfer(toTransfer);
+        if (toTransfer > 0)
+            transfer(toTransfer);
 
-        drain(toDrain);
+        if (toDrain > 0)
+            drain(toDrain);
 
     }
 
     protected void transfer(int remain) {
-        drain(remain, this.inRate, x -> inToOut.test(x, out), this.in, true, batchDivisor, exe);
+        drain(remain, this.inRate, (h,x) -> {
+            inToOut.transfer(x, h, out);
+            return h;
+        }, this.in, batchDivisor, exe);
     }
 
     protected void drain(int remain) {
-        drain(remain, this.outRate, x -> {
+        drain(remain, this.outRate, (h,x) -> {
             eachOut.accept(x);
-            return true;
-        }, this.out, false, batchDivisor, exe);
+            return -1;
+        }, this.out, batchDivisor, exe);
     }
 
 
-    private static <X,Y> void drain(int remain, PeriodMeter rate, Predicate<? super X> f, Bag<?, X> sampled, boolean sampleOrPop, float batchDivisor, Executor exe) {
+    private static <X,Y> void drain(int remain, PeriodMeter rate, IntObjectToIntFunction<? super X> f, Bag<?, X> sampled, float batchDivisor, Executor exe) {
         int batchSize = (int)Math.ceil(remain/batchDivisor);
         while (remain > 0) {
             int nextBatchSize = Math.min(remain, batchSize);
             exe.execute(() -> {
                 long start = nanoTime();
 
-                if (sampleOrPop) {
-                    sampled.sample(nextBatchSize, f);
-                } else {
-                    sampled.pop(nextBatchSize, f);
-                }
+                sampled.sample(nextBatchSize, f);
 
                 long end = nanoTime();
                 double dt = (end - start) / ((float)nextBatchSize);

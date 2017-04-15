@@ -7,7 +7,6 @@ package nars.premise;
 import nars.Task;
 import nars.budget.RawBudget;
 import nars.term.Term;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -3,6 +3,7 @@ package nars;
 import jcog.bag.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -39,8 +40,9 @@ public interface Focus extends Iterable<PLink<Concept>> {
         return conceptsActive().iterator();
     }
 
-    void sample(int max, Predicate<? super PLink<Concept>> c);
 
+
+    void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c);
 
     Focus NULL_FOCUS = new Focus() {
         @Override
@@ -49,7 +51,7 @@ public interface Focus extends Iterable<PLink<Concept>> {
         }
 
         @Override
-        public void sample(int max, Predicate<? super PLink<Concept>> c) {
+        public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
 
         }
 

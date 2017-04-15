@@ -41,6 +41,7 @@ import nars.util.Cycles;
 import nars.util.data.Mix;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
@@ -1679,7 +1680,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @Override
-    public void sample(int max, Predicate<? super PLink<Concept>> c) {
+    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
         focus.sample(max, c);
     }
 

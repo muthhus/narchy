@@ -1,5 +1,6 @@
 package nars.attention;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import nars.Param;
 import nars.budget.Budget;
@@ -15,30 +16,30 @@ import java.util.function.Consumer;
  */
 public class Forget<X extends Budget> implements Consumer<X> {
 
-    public final float r;
+    public final float avgToBeRemoved;
 
-    public final float maxEffectiveQuality;
+    //public final float gain;
 
-    public final float gain;
-
-    public Forget(float r) {
-        this(r, 1f ,1f);
-    }
-
-    public Forget(float r, float maxEffectiveQuality, float gain) {
-        this.r = r;
-        this.maxEffectiveQuality = maxEffectiveQuality;
-        this.gain = gain;
+    public Forget(float avgToBeRemoved) {
+//        this(avgToBeRemoved, 1f);
+//    }
+//
+//    public Forget(float avgToBeRemoved, float gain) {
+        this.avgToBeRemoved = avgToBeRemoved;
+        //this.gain = gain;
     }
 
     @Nullable
-    public static <X> Consumer<X> forget(int s, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-        return Bag.forget(s, p, m, 0.5f, Param.BUDGET_EPSILON, f);
+    public static <X> Consumer<X> forget(int s, int c, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
+        return Bag.forget(s, c, p, m, 0.5f, Param.BUDGET_EPSILON, f);
     }
 
     @Override
     public void accept(@NotNull X b) {
-        b.priMult(gain * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
+        float q = b.qua();
+        float toRemove = Util.lerp(q, avgToBeRemoved/2f, avgToBeRemoved*2f);
+        b.priSub(toRemove);
+        //b.priMult(gain * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
     }
 
 }

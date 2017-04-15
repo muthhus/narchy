@@ -50,8 +50,8 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
     }
 
     @Override
-    protected Consumer<Task> forget(float rate) {
-        return new Forget(rate);
+    protected Consumer<Task> forget(float avgToBeRemoved) {
+        return new Forget(avgToBeRemoved);
     }
 
 

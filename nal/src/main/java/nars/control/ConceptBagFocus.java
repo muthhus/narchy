@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
@@ -77,7 +78,7 @@ public class ConceptBagFocus implements Focus {
     }
 
     @Override
-    public void sample(int max, Predicate<? super PLink<Concept>> c) {
+    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
         active.sample(max, c);
     }
 

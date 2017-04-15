@@ -1,24 +1,16 @@
 package nars.derive;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Sets;
-import jcog.bloom.AwesomeBitSet;
 import nars.$;
-import nars.Op;
 import nars.derive.meta.PostCondition;
 import nars.derive.meta.op.AbstractPatternOp;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import nars.term.Term;
-import nars.term.container.TermContainer;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
 
 import java.util.*;
-
-import static nars.time.Tense.DTERNAL;
 
 /**
  * Created by me on 4/15/17.

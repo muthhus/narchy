@@ -36,30 +36,30 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 //        return this;
 //    }
 
-    public static void flatForget(HijackBag<?,? extends PLink> b) {
-        int s = b.size();
-        if (s > 0) {
-
-            double p = b.pressure.get() /* MULTIPLIER TO ANTICIPATE NEXT period */;
-            //float ideal = s * b.temperature();
-
-            if (p > EPSILON_DEFAULT) {
-                if (b.pressure.compareAndSet(p, 0)) {
-
-                    b.commit(null); //precommit to get accurate mass
-                    float mass = b.mass;
-
-                    float deduction = //(float) ((p + mass) - ideal);
-                            ((float) p / ((float) p + mass)) / s;
-                    if (deduction > EPSILON_DEFAULT) {
-                        b.commit(x -> x.priSub(deduction));
-                    }
-                }
-
-            }
-        }
-
-    }
+//    public static void flatForget(HijackBag<?,? extends PLink> b) {
+//        int s = b.size();
+//        if (s > 0) {
+//
+//            double p = b.pressure.get() /* MULTIPLIER TO ANTICIPATE NEXT period */;
+//            //float ideal = s * b.temperature();
+//
+//            if (p > EPSILON_DEFAULT) {
+//                if (b.pressure.compareAndSet(p, 0)) {
+//
+//                    b.commit(null); //precommit to get accurate mass
+//                    float mass = b.mass;
+//
+//                    float deduction = //(float) ((p + mass) - ideal);
+//                            ((float) p / ((float) p + mass)) / s;
+//                    if (deduction > EPSILON_DEFAULT) {
+//                        b.commit(x -> x.priSub(deduction));
+//                    }
+//                }
+//
+//            }
+//        }
+//
+//    }
 
 
     @Override
@@ -79,8 +79,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
 
     @Override
-    public PForget forget(float rate) {
-        float memoryForget = 1f;
-        return new PForget(rate * memoryForget);
+    public PForget forget(float avgToBeRemoved) {
+        return new PForget(avgToBeRemoved);
     }
 }

@@ -74,7 +74,7 @@ public abstract class AbstractNALTest {
             for (int c : new int[] { 4/*, 2, 4 */}) { ///concepts fired per cycle
                 l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
                         Default d =
-                            new Default(768, c, 2 );
+                            new Default(512, c, 3 );
                         d.nal(level);
                         d.termVolumeMax.setValue(28);
                         return d;

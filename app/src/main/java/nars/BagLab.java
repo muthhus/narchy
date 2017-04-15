@@ -27,7 +27,7 @@ public class BagLab  {
 
     public static final int BINS = 64;
 
-    int clearInterval = 16;
+    int clearInterval = 64;
     int iteration = 0;
 
 
@@ -41,7 +41,7 @@ public class BagLab  {
         super();
         this.bag = bag;
 
-        this.uniques = bag.capacity()*8;
+        this.uniques = bag.capacity()*2;
 
         int inputs = 10;
         inputSliders = $.newArrayList(inputs);
@@ -104,16 +104,23 @@ public class BagLab  {
 
 
         int bins = selectionHistogram.length;
-        float sampleBatches = 16;
-        int batchSize = 16;
+        float sampleBatches = 1;
+        int batchSize = 512;
 
         if (iteration++ % clearInterval == 0)
             Arrays.fill(selectionHistogram, 0);
 
-        List<BLink<Integer>> sampled = $.newArrayList();
+        //System.out.println(bag.size());
+
+        List<BLink<Integer>> sampled = $.newArrayList(1024);
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
-            bag.sample(batchSize, sampled::add );
+            bag.sample(batchSize, (h, v) -> {
+                System.out.println(h + " " + v);
+                for (int k = 0; k < h; k++)
+                    sampled.add(v);
+                return h;
+            });
 
             //BLink<Integer> sample = bag.sample();
             for (BLink<Integer> sample : sampled) {

@@ -1,6 +1,5 @@
 package nars.conceptualize;
 
-import com.romix.scala.collection.concurrent.TrieMap;
 import jcog.bag.Bag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;

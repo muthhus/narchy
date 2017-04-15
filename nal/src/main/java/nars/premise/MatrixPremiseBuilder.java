@@ -53,48 +53,48 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     }
 
 
-    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, @NotNull MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
-
-        @NotNull Bag<Task, BLink<Task>> tasklinkBag = c.tasklinks();
-        @NotNull Bag<Term, BLink<Term>> termlinkBag = c.termlinks();
-
-
-        tasklinkBag.commit();
-        termlinkBag.commit();
-
-        int tasklinksSampled = (int) Math.ceil(tasklinks);
-
-        FasterList<BLink<Task>> tasksBuffer = (FasterList) $.newArrayList(tasklinksSampled);
-        tasklinkBag.sample(tasklinksSampled, tasksBuffer::add);
-
-        int numTaskLinks = tasksBuffer.size();
-        if (numTaskLinks > 0) {
-
-            int termlinksSampled = (int) Math.ceil(termlinks.hi());
-
-            FasterList<BLink<Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
-            termlinkBag.sample(termlinksSampled, termsBuffer::add);
-
-            //if (!termsBuffer.isEmpty()) {
-
-            int countPerTasklink = 0;
-
-            //random starting position
-            int il = nar.random.nextInt(numTaskLinks);
-
-            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
-
-                BLink<Task> taskLink = tasksBuffer.get(il % numTaskLinks);
-
-                return newPremiseVector(c, taskLink, termlinks, target, termsBuffer, nar);
-            }
-        } else {
-            if (Param.DEBUG_EXTRA)
-                logger.warn("{} has zero tasklinks", c);
-        }
-
-        return 0;
-    }
+//    public int newPremiseMatrix(@NotNull Concept c, int tasklinks, @NotNull MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar) {
+//
+//        @NotNull Bag<Task, BLink<Task>> tasklinkBag = c.tasklinks();
+//        @NotNull Bag<Term, BLink<Term>> termlinkBag = c.termlinks();
+//
+//
+//        tasklinkBag.commit();
+//        termlinkBag.commit();
+//
+//        int tasklinksSampled = (int) Math.ceil(tasklinks);
+//
+//        FasterList<BLink<Task>> tasksBuffer = (FasterList) $.newArrayList(tasklinksSampled);
+//        tasklinkBag.sample(tasklinksSampled, tasksBuffer::add);
+//
+//        int numTaskLinks = tasksBuffer.size();
+//        if (numTaskLinks > 0) {
+//
+//            int termlinksSampled = (int) Math.ceil(termlinks.hi());
+//
+//            FasterList<BLink<Term>> termsBuffer = (FasterList) $.newArrayList(termlinksSampled);
+//            termlinkBag.sample(termlinksSampled, termsBuffer::add);
+//
+//            //if (!termsBuffer.isEmpty()) {
+//
+//            int countPerTasklink = 0;
+//
+//            //random starting position
+//            int il = nar.random.nextInt(numTaskLinks);
+//
+//            for (int i = 0; i < numTaskLinks && countPerTasklink < numTaskLinks; i++, il++) {
+//
+//                BLink<Task> taskLink = tasksBuffer.get(il % numTaskLinks);
+//
+//                return newPremiseVector(c, taskLink, termlinks, target, termsBuffer, nar);
+//            }
+//        } else {
+//            if (Param.DEBUG_EXTRA)
+//                logger.warn("{} has zero tasklinks", c);
+//        }
+//
+//        return 0;
+//    }
 
 
     /**

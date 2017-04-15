@@ -2,8 +2,6 @@ package nars;
 
 
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;

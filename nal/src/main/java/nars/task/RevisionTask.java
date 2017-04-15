@@ -5,12 +5,10 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.BLink;
 import nars.budget.BudgetFunctions;
-import nars.concept.TaskConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The result of belief/goal revision. Also responsible for balancing

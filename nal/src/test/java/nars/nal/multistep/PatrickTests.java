@@ -129,7 +129,7 @@ public class PatrickTests extends AbstractNALTest {
         );
         //tt.log();
 
-        tt.mustDesire(4500, "lighter(I, toothbrush)", 1f,
+        tt.mustDesire(1000, "lighter(I, toothbrush)", 1f,
                 0.17f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
