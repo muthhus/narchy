@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
-import jcog.Texts;
 import jcog.list.FasterList;
 import nars.*;
 import nars.concept.ActionConcept;
@@ -12,17 +11,18 @@ import nars.concept.Concept;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.test.agent.Line1DSimplest;
-import nars.time.Tense;
+import nars.truth.Truth;
+import nars.truth.TruthAccumulator;
 import nars.util.graph.TermGraph;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static nars.NAgentX.runRT;
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Created by me on 3/15/17.
@@ -30,7 +30,7 @@ import static nars.Op.NEG;
 public class Line1D {
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
 
         NAR nar = runRT((NAR n) -> {
@@ -45,7 +45,7 @@ public class Line1D {
 //                }
 //            });
 
-            n.termVolumeMax.setValue(24);
+            n.termVolumeMax.setValue(32);
             n.beliefConfidence(0.9f);
             n.goalConfidence(0.9f);
 
@@ -71,7 +71,7 @@ public class Line1D {
 
             n.onCycle(() -> {
                 a.i.setValue(
-                        0.5f * (Math.sin(n.time() / 20f) + 1f)
+                        0.5f * (Math.sin(n.time() / 200f) + 1f)
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
@@ -81,21 +81,23 @@ public class Line1D {
 
             return a;
 
-        }, 20, 3, -1);
+        }, 20, 1, -1);
 
     }
 
     public static void implAccelerator(NAR n, NAgent a) {
         TermGraph.ImplGraph tg = new TermGraph.ImplGraph();
-        a.onFrame(new Consumer<NAgent>() {
+        //a.onFrame(
+        a.nar.onCycle(
+                new Consumer() {
 
             MutableValueGraph<Term, Float> s = null;
 
-            float decay = 0.5f;
-            float min = 0.01f;
+            float momentum = 0.5f;
+            float min = 0.001f;
 
             @Override
-            public void accept(NAgent r) {
+            public void accept(Object r) {
                 if (s != null) {
 
                     List<EndpointPair<Term>> toRemove = new FasterList();
@@ -104,7 +106,7 @@ public class Line1D {
                         EndpointPair<Term> e = ii.next();
                         Term a = e.source();
                         Term b = e.target();
-                        float next = this.s.edgeValue(a, b) * decay;
+                        float next = this.s.edgeValue(a, b) * momentum;
                         if (next < min) {
                             toRemove.add(e);
                         } else {
@@ -118,71 +120,123 @@ public class Line1D {
                               Iterables.transform(a.actions, ActionConcept::term),
                             Lists.newArrayList(a.happy.term())
                         )
-                        , n, n.time());
+                        , n, n.time() + n.dur()/2);
 
                 Set<EndpointPair<Term>> ee = s.edges();
 
-                if (!ee.isEmpty()) {
+                if (ee.isEmpty()) {
+                    return;
+                }
 
-                    List<EndpointPair<Term>> ff = $.newArrayList();
-                    ff.addAll(ee);
-                    ff.sort((aa, bb) -> { //TODO faster
-                        float av = s.edgeValue(aa.source(), aa.target());
-                        float bv = s.edgeValue(bb.source(), bb.target());
-                        int o = Float.compare(bv, av);
-                        if (o == 0) {
-                            return Integer.compare(aa.hashCode(), bb.hashCode());
+                List<EndpointPair<Term>> ff = $.newArrayList(ee.size());
+                ff.addAll(ee);
+                ff.sort((aa, bb) -> { //TODO faster
+                    float av = s.edgeValue(aa.source(), aa.target());
+                    float bv = s.edgeValue(bb.source(), bb.target());
+                    int o = Float.compare(bv, av);
+                    if (o == 0) {
+                        return Integer.compare(aa.hashCode(), bb.hashCode());
+                    }
+                    return o;
+                });
+
+                float confMin = n.confMin.floatValue();
+                long now = n.time();
+                int dur = n.dur();
+
+                System.out.println(ee.size() + " total implication edges");
+
+                //int maxInputs = 40;
+                Map<Term,TruthAccumulator> adjusts = new HashMap();
+
+                //.subList(0, Math.min(ff.size(), maxInputs))
+                for (EndpointPair<Term> e : ff) {
+
+
+                    Term subj = e.source();
+                    Term pred = e.target();
+
+
+                    Term tt = null;
+                    final float freq;
+                    float c = w2c(s.edgeValue(subj, pred));
+                    Set<Term> recurse = null;
+                    if (c > confMin) {
+
+                        if (pred.equals(a.happy)) {
+                            tt = subj;
+                            freq = 1f;
+                            recurse = s.predecessors(subj);
+                        } else if (pred.op() == NEG && pred.unneg().equals(a.happy)) {
+                            tt = subj;
+                            freq = 0f;
+                            recurse = s.predecessors(subj);
+//                        } else if (subj.equals(a.happy)) {
+//                            tt = pred;
+//                            freq = 1f;
+//                            //recurse = s.successors(pred);
+//                        } else if (subj.op() == NEG && subj.unneg().equals(a.happy)) {
+//                            tt = pred;
+//                            freq = 0f;
+//                            //recurse = s.successors(pred);
+                        } else {
+                            freq = Float.NaN;
                         }
-                        return o;
-                    });
 
-                    float confMin = n.confMin.floatValue();
+                        if (tt != null) {
 
-                    ///System.out.println(ee.size() + " total implication edges");
+                            float activation = w2c(s.edgeValue(subj, pred));
+                            if (activation >= Param.BUDGET_EPSILON) {
+                                Concept csubj = n.concept(subj);
+                                if (csubj != null)
+                                    n.activate(csubj, activation);
 
-                    ff
-                            //.subList(0, Math.min(ff.size(), 40))
-                            .forEach(e -> {
-                                Term subj = e.source();
-                                Term pred = e.target();
+                                Concept cpred = n.concept(pred);
+                                if (cpred != null)
+                                    n.activate(cpred, activation);
+                            }
 
-//                                float activation = 0.5f;
-//
-//                                Concept csubj = n.concept(subj);
-//                                if (csubj != null)
-//                                    n.activate(csubj, activation);
-//
-//                                Concept cpred = n.concept(pred);
-//                                if (cpred != null)
-//                                    n.activate(cpred, activation);
+                            add(adjusts, tt, freq, c);
 
-                                float v = Math.min(1f, s.edgeValue(subj, pred));
+                            if (recurse!=null) {
 
-                                float c = n.confDefault(GOAL) * v;
-                                if (c > confMin) {
-                                    if (pred.equals(a.happy)) {
-                                        Task x = n.goal(subj, Tense.Present, 1f, c);
-                                    } else if (pred.op() == NEG && pred.unneg().equals(a.happy)) {
-                                        Task x = n.goal(subj, Tense.Present, 0f, c);
+                                recurse.forEach(rrr -> {
+                                    float c2 = w2c(s.edgeValue(rrr, subj));
+                                    float cc = c * c2;
+                                    if (cc > confMin) {
+                                        //System.out.println(e + " " + rrr + " " );
+                                        add(adjusts, rrr, freq, cc);
                                     }
 
-                                    if (subj.equals(a.happy)) {
-                                        Task x = n.goal(pred, Tense.Present, 1f, c);
-                                    } else if (subj.op() == NEG && subj.unneg().equals(a.happy)) {
-                                        Task x = n.goal(pred, Tense.Present, 0f, c);
-                                    }
-
+                                });
+                            }
+                        }
 //                                    System.out.println(
 //                                            Texts.n4(v) + "\t(" + subj + "==>" + pred + ")"
 //
 //                                    );
-                                }
-                            }
-
-                    );
+                    }
                 }
+
+                adjusts.forEach((tt,a)->{
+                    @Nullable Truth uu = a.commitSum();
+                    float c = uu.conf();
+                    if (uu!=null && c > confMin) {
+                        Task x = n.goal(n.priorityDefault(GOAL), tt, now + dur / 2, uu.freq(), c);
+                        System.out.println("\t" + x);
+                    }
+                });
             }
-        });
+
+                    public void add(Map<Term, TruthAccumulator> adjusts, Term tt, float freq, float c) {
+                        adjusts.compute(tt, (ttt, p) -> {
+                            if (p==null)
+                                p = new TruthAccumulator();
+                            p.add($.t(freq, c));
+                            return p;
+                        });
+                    }
+                });
     }
 
 

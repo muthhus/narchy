@@ -38,8 +38,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     public final FloatParam timePerFall = new FloatParam(2f, 1f, 32f);
 
-    public static final int tetris_width = 6;
-    public static final int tetris_height = 12;
+    public static final int tetris_width = 8;
+    public static final int tetris_height = 16;
 
     //private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;

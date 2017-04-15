@@ -43,7 +43,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     @Override
     public @Nullable Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar) {
 
-        Premise p = new Premise(c, task, beliefTerm, belief, pri, qua);
+        Premise p = new Premise(task, beliefTerm, belief, pri, qua);
 
         return new Derivation(nar, p, each,
                 budgeting,

@@ -34,6 +34,7 @@ import static java.util.stream.Collectors.toList;
 public class PremiseRuleSet {
 
     public final List<PremiseRule> rules;
+    private final boolean permuteBackwards, permuteForwards;
 
 
 //    static final BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
@@ -93,7 +94,7 @@ public class PremiseRuleSet {
 //    }
 
     @NotNull
-    public static PremiseRuleSet rules(String... name) {
+    public static PremiseRuleSet rules(boolean permute, String... name) {
 
         PatternTermIndex p = new PatternTermIndex(1024);
         PremiseRuleSet rs = new PremiseRuleSet(
@@ -111,7 +112,7 @@ public class PremiseRuleSet {
 
                         }
                 )
-            , p
+            , p, permute
         );
 
         logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
@@ -130,21 +131,29 @@ public class PremiseRuleSet {
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    public PremiseRuleSet(boolean normalize, @NotNull PremiseRule... rules) {
+    public PremiseRuleSet(@NotNull PremiseRule... rules) {
+        this(rules, false);
+    }
+    public PremiseRuleSet(@NotNull PremiseRule[] rules, boolean permute) {
         this.patterns = new PatternTermIndex();
         this.rules = $.newArrayList(rules.length);
         for (PremiseRule p : rules) {
-            this.rules.add(normalize ? p.normalizeRule(patterns) : p);
+            try {
+                this.rules.add(normalize(p, patterns));
+            } catch (Exception e) {
+                logger.error(" {}", e);
+            }
         }
+        this.permuteBackwards = this.permuteForwards = permute;
     }
 
     final int[] errors = {0};
 
 
-    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns) {
-        this.rules = permute(parsed, patterns).distinct().collect(toList());
-
+    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
         this.patterns = patterns;
+        this.permuteBackwards = this.permuteForwards = permute;
+        this.rules = permute(parsed, patterns).distinct().collect(toList());
     }
 
 
@@ -252,6 +261,11 @@ public class PremiseRuleSet {
     }
 
     @NotNull
+    public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
+        return parse(src, new PatternTermIndex());
+    }
+
+    @NotNull
     public static PremiseRule parse(@NotNull String src, @NotNull PatternTermIndex index) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
@@ -276,7 +290,7 @@ public class PremiseRuleSet {
     }
 
     @NotNull
-    static Stream<PremiseRule> permute(@NotNull Stream<Pair<Compound, String>> rawRules, @NotNull PatternTermIndex index) {
+    Stream<PremiseRule> permute(@NotNull Stream<Pair<Compound, String>> rawRules, @NotNull PatternTermIndex index) {
         return rawRules.map(rawAndSrc -> {
 
             String src = rawAndSrc.getTwo();
@@ -294,20 +308,20 @@ public class PremiseRuleSet {
     }
 
     @NotNull
-    public static Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
+    public Set<PremiseRule> permute(@NotNull PremiseRule preNorm) {
         Set<PremiseRule> ur;
         permute(preNorm, "", new PatternTermIndex(), ur = $.newHashSet(1));
         return ur;
     }
 
-    public static void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur) {
+    public void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur) {
         posNegPermute(preNormRule, src, ur, index,
                 (PremiseRule r) -> permuteSwap(r, src, index, ur,
                         (PremiseRule s) -> permuteBackward(src, index, ur, r)));
     }
 
-    static void permuteBackward(String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
-        if (Param.DERIVER_PERMUTE_BACKWARD && r.allowBackward) {
+    void permuteBackward(String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
+        if (permuteBackwards && r.allowBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
                 PremiseRule b = add(q, src + ':' + reason, ur, index);
@@ -334,11 +348,11 @@ public class PremiseRuleSet {
     }
 
 
-    public static void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull Consumer<PremiseRule> then) {
+    public void permuteSwap(@NotNull PremiseRule r, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull Consumer<PremiseRule> then) {
 
         then.accept(r);
 
-        if (Param.DERIVER_PERMUTE_SWAPPED && r.allowForward && permuteSwap(r)) {
+        if (permuteForwards && r.allowForward && permuteSwap(r)) {
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));

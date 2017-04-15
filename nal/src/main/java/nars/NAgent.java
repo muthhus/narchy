@@ -116,7 +116,7 @@ abstract public class NAgent implements NSense, NAct {
         this.now = nar.time();
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : $.inh(id, $.the("happy")),
+                id == null ? p("happy") : $.inh( $.the("happy"), id),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 

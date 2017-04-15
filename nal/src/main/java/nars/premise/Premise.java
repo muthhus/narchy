@@ -31,16 +31,16 @@ public class Premise extends RawBudget  {
     @Nullable
     public final Task belief;
 
-    @NotNull
-    public final Termed concept;
+    /*@NotNull
+    public final Termed concept;*/
 
-    protected Premise(@NotNull Termed concept, @NotNull Task taskLink,
+    public Premise(@NotNull Task taskLink,
                    @NotNull Term termLink,
                    @Nullable Task belief, float pri, float qua) {
 
         super(pri, qua);
 
-        this.concept = concept;
+        //this.concept = concept;
 
         this.task = taskLink;
 

@@ -16,16 +16,27 @@
  */
 package nars.kif;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
+import nars.budget.RawBLink;
+import nars.derive.DefaultDeriver;
+import nars.derive.TrieDeriver;
+import nars.derive.rule.PremiseRule;
+import nars.derive.rule.PremiseRuleSet;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.premise.Derivation;
+import nars.premise.PreferSimpleAndConfident;
+import nars.premise.Premise;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
+import nars.term.subst.MapSubst;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.tuple.Tuples;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
@@ -51,12 +62,12 @@ public class KIFInput implements Runnable {
     private final Iterator<Formula> formulaIterator;
     private final NAR nar;
 
-    private PrintStream output;
+    private final PrintStream output;
 
-    private boolean includeSubclass = true;
-    private boolean includeInstance = true;
-    private boolean includeRelatedInternalConcept = true;
-    private boolean includeDisjoint = true;
+    private final boolean includeSubclass = true;
+    private final boolean includeInstance = true;
+    private final boolean includeRelatedInternalConcept = true;
+    private final boolean includeDisjoint = true;
     private final boolean includeDoc = false;
 
     public KIFInput(NAR nar, String kifPath) throws Exception {
@@ -103,12 +114,13 @@ public class KIFInput implements Runnable {
 
 //        long[] stamp = { new Random().nextLong() };
         for (Compound x : beliefs) {
-            output.println(x + ".");
-            /*try {
-                nar.input("$0.01$ " + x + ".");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
+            //output.println(x + ".");
+
+//            try {
+//                nar.input("$0.01$ " + x + ".");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
 
         //nar.believe(y);
@@ -181,7 +193,7 @@ public class KIFInput implements Runnable {
                         System.err.println("instance expects 2 arguments");
                     } else {
                         try {
-                            y = $.$("(" + args.get(0) + " --> [" + args.get(1) + "])");
+                            y = compoundOrNull(Narsese.the().term("(" + args.get(0) + " --> [" + args.get(1) + "])", nar.concepts, false));
                         } catch (Narsese.NarseseException e) {
                             e.printStackTrace();
                         }
@@ -201,6 +213,10 @@ public class KIFInput implements Runnable {
                         }
                     }
                 }
+                break;
+
+            case "equal":
+                y = $.func("equal", args.get(0), args.get(1));
                 break;
             case "disjointRelation":
             case "disjoint":
@@ -224,6 +240,11 @@ public class KIFInput implements Runnable {
 //                        nar.input("(" + args.get(0) + " --> " + args.get(1) + ").");
 //                    }
 //                    break;
+//            case "forall":
+//                y = args.get(1)
+            case "exists":
+                y = compoundOrNull(args.get(1)); //skip over the first parameter, since depvar is inherently existential
+                break;
             case "=>":
                 y = impl(args.get(0), args.get(1), true);
                 break;
@@ -329,30 +350,117 @@ public class KIFInput implements Runnable {
         return Integer.toString(Math.abs(serial.incrementAndGet()), 36);
     }
 
+    public final Set<Twin<Term>> impl = new HashSet();
+
     public Compound impl(Term conditionTerm, Term actionTerm, boolean implOrEquiv) {
+        MutableSet<Term> conditionVars = new UnifiedSet();
+        ((Compound)conditionTerm).termsToSetRecurse(Op.VariableBits, conditionVars, true);
+        MutableSet<Term> actionVars = new UnifiedSet();
+        ((Compound)actionTerm).termsToSetRecurse(Op.VariableBits, actionVars, true);
+
+        MutableSet<Term> common = conditionVars.intersect(actionVars);
+        Map<Term,Term> remap = new HashMap();
+        common.forEach(t -> {
+            remap.put( t, $.v(
+                    //Op.VAR_INDEP,
+                    //Op.VAR_QUERY,
+                    Op.VAR_PATTERN,
+                    "" +
+                            "_" + t.toString().substring(1)));
+        });
+
+        conditionTerm = nar.concepts.transform(conditionTerm, new MapSubst(remap));
+        if (conditionTerm == null)
+            return null;
+
+        actionTerm = nar.concepts.transform(actionTerm, new MapSubst(remap));
+        if (actionTerm == null)
+            return null;
+
         try {
+            impl.add(Tuples.twin(conditionTerm, actionTerm));
+            if (!implOrEquiv) {
+                impl.add(Tuples.twin(actionTerm, conditionTerm)); //reverse
+            }
+
             return
                     implOrEquiv ?
                             $.impl(conditionTerm, actionTerm) :
                             (Compound) $.equi(conditionTerm, actionTerm)
                     ;
         } catch (Exception ignore) {
-
+            ignore.printStackTrace();
         }
         return null;
     }
 
 
     public static void main(String[] args) throws Exception {
-        NAR d = new Default();
+        Param.DEBUG = true;
 
+
+
+
+
+
+        Default e = new Default();
+
+        NAR d = new Terminal();
         KIFInput k = new KIFInput(d, "/home/me/sumo/Merge.kif");
         k.run();
 
-//        d.clear();
-//        d.log();
-//        d.input("[Phrase]:\"this is\".");
-//        d.run(500);
+        //(($_#AGENT,#OBJECT)-->needs)==>($_#AGENT,#OBJECT)-->wants)).
+        //String rules = "((%AGENT,%OBJECT)-->needs), %X |- ((%AGENT,%OBJECT)-->wants), (Belief:Identity)\n";
+
+
+        TrieDeriver miniDeriver =
+                //new TrieDeriver(PremiseRuleSet.rules(false, "nal6.nal"));
+                new TrieDeriver(new PremiseRuleSet(
+                        k.impl.parallelStream().map(tt -> {
+                            try {
+                                return PremiseRuleSet.parse(tt.getOne() + ", () |- " + tt.getTwo() + ", (Belief:Identity)\n");
+                            } catch (Exception e1) {
+                                //e1.printStackTrace();
+                                return null;
+                            }
+                        }).filter(Objects::nonNull).toArray(PremiseRule[]::new)
+                ) );
+
+
+        miniDeriver.print(System.out);
+
+        //d.clear();
+        e.log();
+
+        PreferSimpleAndConfident budgeting = new PreferSimpleAndConfident();
+
+        e.onTask(t -> {
+           if (t.isInput()) {
+               //d.forEachTask(b -> {
+                   miniDeriver.accept(new Derivation(
+                           e,
+                           new Premise( t, Terms.ZeroProduct, null, 1f, 0.5f),
+                           //e::input,
+                           x -> {
+                               System.out.println(x);
+                               e.input(x);
+                           },
+                           budgeting,
+                           Param.UnificationStackMax, Param.UnificationTTL*1000
+                   ));
+               //});
+           }
+        });
+        e.input("[Physical]:X.");
+        e.input("[Atom]:Y.");
+        e.input("[Electron]:E.");
+        e.input("[Proton]:P.");
+        e.input("contains(X,Y).");
+        e.input("([Integer]:1 && [Integer]:3).");
+        e.input("starts(A,B).");
+        e.input("[GovernmentFn]:A.");
+        e.input("[WealthFn]:B.");
+        e.run(500);
 //        d.conceptsActive().forEach(System.out::println);
         //d.concept("[Phrase]").print();
 

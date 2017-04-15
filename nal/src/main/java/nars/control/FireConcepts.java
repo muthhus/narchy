@@ -85,7 +85,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 return;
 
 
-            int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(taskLink.priSafe(0));
+            int termlinksPerForThisTask = termlinksFiredPerFiredConcept.lerp(
+                    pc.pri()
+                    //taskLink.priSafe(0)
+            );
 
             FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
             c.termlinks().sample(termlinksPerForThisTask, termLinks::add);

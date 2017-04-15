@@ -219,6 +219,7 @@ public class NAL2Test extends AbstractNALTest {
     public void backwardInference()  {
         TestNAR tester = test();
 
+        tester.log();
         //<bird --> swimmer>. <{?x} --> swimmer>?
         tester.believe("<bird --> swimmer>");//Bird is a type of swimmer. ");
         tester.ask("<{?x} --> swimmer>");//What is a swimmer?");

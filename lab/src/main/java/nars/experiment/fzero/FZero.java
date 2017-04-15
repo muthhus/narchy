@@ -1,12 +1,14 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
+import jcog.math.FloatNormalized;
 import nars.*;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;
+import static nars.experiment.Line1D.implAccelerator;
 
 /**
  * Created by me on 3/21/17.
@@ -36,12 +38,13 @@ public class FZero extends NAgentX {
             }
         });
 
-        senseNumberDifference($.inh($.the("fz"), $.the("joy")), happy);
-        senseNumberDifference($.inh($.the("fz"), $.the("angVel")), ()->(float)fz.playerAngle).resolution(0.02f);
-        senseNumberDifference($.inh($.the("fz"), $.the("accel")), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
-        //senseNumberTri("rot", new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
+        senseNumberDifference($.inh($.the("joy"), id), happy);
+        senseNumberDifference($.inh($.the("angVel"), id), ()->(float)fz.playerAngle).resolution(0.02f);
+        senseNumberDifference($.inh($.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
+        senseNumberBi($.inh($.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
-        //implAccelerator(nar, this);
+        //nar.mix.stream("Derive").setValue(1);
+        implAccelerator(nar, this);
 
 
 //        try {

@@ -813,4 +813,12 @@ public class TermReductionsTest {
         //  instead should have been: (busyVol&&busyPri)
 
     }
+
+    @Test public void reduceComplex() throws Narsese.NarseseException {
+        String s = "(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&((x-->tetris)&&((rotate-->tetris)&&(x-->tetris))))))))";
+        System.out.println(s);
+        Term t = $(s);
+        System.out.println(t);
+        assertEquals("(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&(x-->tetris))))))", t.toString());
+    }
 }

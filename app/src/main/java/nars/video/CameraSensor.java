@@ -91,8 +91,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         for (int i = 0; i < m; i++) {
             Term xy;
             char levelPrefix =
-                //(char)('a' + (m-1 - i)); //each level given a different scale prefix
-                'p';
+                (char)('a' + (m-1 - i)); //each level given a different scale prefix
+                //'p';
 
             if (i >= sx && i >=sy) {
                 xy = $.the(levelPrefix + x[ix++].toString() + y[iy++].toString());

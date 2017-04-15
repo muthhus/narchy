@@ -401,7 +401,7 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     private Term transform(Op op, int dt, @NotNull Compound src, @NotNull CompoundTransform t) {
 
-        int modifications = 0;
+        //int modifications = 0;
 
         boolean filterTrueAndFalse = disallowTrueOrFalse(op);
 
@@ -416,8 +416,9 @@ public abstract class TermIndex extends TermBuilder {
             if (y == null)
                 return null;
 
-            if ( y instanceof Compound )
+            if ( y instanceof Compound ) {
                 y = transform((Compound) y, t); //recurse
+            }
 
             if (y == null)
                 return null;
@@ -432,7 +433,7 @@ public abstract class TermIndex extends TermBuilder {
 
                 //if (x != y) { //must be refernce equality test for some variable normalization cases
                 //if (!x.equals(y)) { //must be refernce equality test for some variable normalization cases
-                modifications++;
+                //modifications++;
                 //}
             }
 
@@ -441,8 +442,8 @@ public abstract class TermIndex extends TermBuilder {
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
-        return (modifications > 0 || op!=src.op() || dt!=src.dt()) ?
-                the(target) : src;
+        return //(modifications > 0 || op!=src.op() || dt!=src.dt()) ?
+                the(target);// : src;
     }
 
     static boolean disallowTrueOrFalse(Op superOp) {

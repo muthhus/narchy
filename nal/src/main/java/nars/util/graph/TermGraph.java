@@ -64,7 +64,7 @@ public abstract class TermGraph {
             Set<Term> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
-            int maxSize = 128;
+            int maxSize = 1024;
             do {
                 Iterator<Term> ii = next.iterator();
                 while (ii.hasNext()) {
@@ -88,15 +88,17 @@ public abstract class TermGraph {
 
             tc.termlinks().forEachKey(m -> {
 
-                    if (m.op() == IMPL && m.vars()==0 && ((Compound)m).containsTermRecursively(t)) {
+                    if (m.op() == IMPL /* && m.vars()==0 */
+                        //&& ((Compound)m).containsTermRecursively(t)) {
+                        ) {
                         Compound l = (Compound) m;
                         Term s = l.term(0);
 
                         Term p = l.term(1);
 
                         //if (!g.nodes().contains(s) || !done.contains(p)) {
-                            boolean se = s.equalsOrContains(t);
-                            boolean pe = p.equalsOrContains(t);
+                            boolean se = s.equals(t) || ((Compound)s).containsTermRecursively(t);
+                            boolean pe = p.equals(t) || ((Compound)p).containsTermRecursively(t);
                             if (se || pe) {
                                 next.add(s);
                                 next.add(p);
@@ -125,13 +127,13 @@ public abstract class TermGraph {
             } else {
                 reverse = false;
             }
-            float conf =
-                    t.conf(when, dur);
+            float evi =
+                    t.evi(when, dur);
                     //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
 
             float freq = t.freq();
             boolean neg;
-            float val = (TruthFunctions.expectation(freq, conf) - 0.5f) * 2f;
+            float val = (TruthFunctions.expectation(freq, evi) - 0.5f) * 2f;
             if (val < 0f) {
                 val = -val;
                 neg = true;

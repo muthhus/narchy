@@ -275,6 +275,7 @@ public class PremiseRule extends GenericCompound {
 
         put(TaskPunctuation.class, rank--);
 
+        put(Solve.class, rank--);
         put(SubTermsStructure.class, rank--);
 
         put(MatchTaskBelief.AddConstraint.class, rank--);
@@ -294,7 +295,6 @@ public class PremiseRule extends GenericCompound {
 
 
 
-        put(Solve.class, rank--);
 
 //        put(SubTermOp.class, 10);
 //        put(TaskPunctuation.class, 9);

@@ -29,7 +29,7 @@ public interface Deriver extends Consumer<Derivation> {
 
     @NotNull
     static Deriver get(String... path) {
-        return new TrieDeriver(PremiseRuleSet.rules(path));
+        return new TrieDeriver(PremiseRuleSet.rules(true, path));
     }
 
     //    @NotNull
