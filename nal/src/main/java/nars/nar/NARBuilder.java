@@ -13,6 +13,7 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.mental.Compressor;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
@@ -143,45 +144,45 @@ public interface NARBuilder {
 //                };
 //            }
 
-//            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
-//            final Compressor compressor = new Compressor(this, "_",
-//                    4, 20,
-//                    0.25f, 64, 16);
-//
-//            @Override
-//            public Task pre(@NotNull Task t) {
-//                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
-//                    return compressor.encode(t);
-//                } else {
-//                    //@NotNull Task encoded = compressor.encode(t);
-////                    if (!encoded.equals(t))
-////                        process(t); //input both forms
-//                    //return encoded;
-//
-//                    return t; //dont affect input
-//                }
-//            }
-//
-//            @NotNull
-//            @Override
-//            public Term pre(@NotNull Term t) {
-//                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
-//                    return compressor.encode(t);
-//                else
-//                    return t;
-//            }
-//
-//            @NotNull
-//            @Override
-//            public Task post(@NotNull Task t) {
-//                return compressor.decode(t);
-//            }
-//
-//            @Override
-//            @NotNull
-//            public Term post(@NotNull Term t) {
-//                return compressor.decode(t);
-//            }
+            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
+            final Compressor compressor = new Compressor(this, "_",
+                    4, 20,
+                    0.25f, 64, 16);
+
+            @Override
+            public Task pre(@NotNull Task t) {
+                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
+                    return compressor.encode(t);
+                } else {
+                    //@NotNull Task encoded = compressor.encode(t);
+//                    if (!encoded.equals(t))
+//                        process(t); //input both forms
+                    //return encoded;
+
+                    return t; //dont affect input
+                }
+            }
+
+            @NotNull
+            @Override
+            public Term pre(@NotNull Term t) {
+                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
+                    return compressor.encode(t);
+                else
+                    return t;
+            }
+
+            @NotNull
+            @Override
+            public Task post(@NotNull Task t) {
+                return compressor.decode(t);
+            }
+
+            @Override
+            @NotNull
+            public Term post(@NotNull Term t) {
+                return compressor.decode(t);
+            }
 
 
         };

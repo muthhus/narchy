@@ -9,7 +9,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.TruthFunctions;
@@ -19,7 +18,6 @@ import java.util.Set;
 
 import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 public abstract class TermGraph {
 
@@ -46,6 +44,7 @@ public abstract class TermGraph {
         }
 
         ;
+
         public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }
@@ -79,7 +78,7 @@ public abstract class TermGraph {
             return g;
         }
 
-        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done,  Set<Term> next, Term t) {
+        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Term> next, Term t) {
 
 
             Concept tc = nar.concept(t);
@@ -88,25 +87,24 @@ public abstract class TermGraph {
 
             tc.termlinks().forEachKey(m -> {
 
-                    if (m.op() == IMPL /* && m.vars()==0 */
-                        //&& ((Compound)m).containsTermRecursively(t)) {
-                        ) {
-                        Compound l = (Compound) m;
-                        Term s = l.term(0);
+                        if (m.op() == IMPL /* && m.vars()==0 */
+                            //&& ((Compound)m).containsTermRecursively(t)) {
+                                ) {
+                            Compound l = (Compound) m;
+                            Term s = l.term(0);
 
-                        Term p = l.term(1);
+                            Term p = l.term(1);
 
-                        //if (!g.nodes().contains(s) || !done.contains(p)) {
-                            boolean se = s.equals(t) || ((Compound)s).containsTermRecursively(t);
-                            boolean pe = p.equals(t) || ((Compound)p).containsTermRecursively(t);
-                            if (se || pe) {
+                            //if (!g.nodes().contains(s) || !done.contains(p)) {
+                            if ((s.equals(t) || s.containsTermRecursively(t)) ||
+                                    (p.equals(t) || p.containsTermRecursively(t))) {
                                 next.add(s);
                                 next.add(p);
                                 impl(g, nar, when, l, s, p);
                             }
-                        //}
+                            //}
+                        }
                     }
-                }
             );
         }
 
@@ -122,14 +120,15 @@ public abstract class TermGraph {
 
             int dt = t.dt();
             boolean reverse;
-            if (dt!=DTERNAL && (dt < 0)) {
-                dt = -dt; reverse = true;
+            if (dt != DTERNAL && (dt < 0)) {
+                dt = -dt;
+                reverse = true;
             } else {
                 reverse = false;
             }
             float evi =
                     t.evi(when, dur);
-                    //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
+            //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
 
             float freq = t.freq();
             boolean neg;
@@ -145,7 +144,7 @@ public abstract class TermGraph {
 
             Term S = reverse ? $.negIf(pred, neg) : subj;
             Term P = reverse ? subj : $.negIf(pred, neg);
-            g.putEdgeValue(S, P, val + g.edgeValueOrDefault( S, P, 0f ) );
+            g.putEdgeValue(S, P, val + g.edgeValueOrDefault(S, P, 0f));
 
         }
 

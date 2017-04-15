@@ -2,6 +2,7 @@ package nars.conceptualize;
 
 import com.romix.scala.collection.concurrent.TrieMap;
 import jcog.bag.Bag;
+import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
 import nars.$;
 import nars.NAR;
@@ -31,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import static nars.Op.DIFFe;
@@ -363,12 +365,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            //if (volume < 3) {
-            //    return new ConcurrentHashMap(8);
-            //} else
-            if (volume < 33) {
-                //return new SynchronizedHashMap(2, loadFactor);
-                return new TrieMap();
+            if (volume < 5) {
+                return new ConcurrentHashMap(8);
+            } else if (volume < 33) {
+                return new SynchronizedHashMap(2, loadFactor);
+                //return new TrieMap();
             } else {
                 return new SynchronizedUnifiedMap(2, loadFactor);
             }

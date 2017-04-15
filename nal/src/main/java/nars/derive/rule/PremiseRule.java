@@ -40,7 +40,6 @@ import java.util.function.Function;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
-import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.meta.TaskBeliefSubterms.withinNonCommutive;
 import static nars.term.Terms.*;
@@ -220,7 +219,7 @@ public class PremiseRule extends GenericCompound {
         //SUFFIX (order already determined for matching)
         {
 
-            addAll(l, match.procedure);
+            addAll(l, match.post);
 
             l.add(truth.conclude); //will be linked to and invoked by match callbacks
 
@@ -918,16 +917,8 @@ public class PremiseRule extends GenericCompound {
                 constraints);
 
 
-        if (taskPunc == 0) {
-            //default: add explicit no-questions rule
-            pres.add(TaskPunctuation.NotQuestion);
-        } else if (taskPunc == ' ') {
-            //any task type
-            taskPunc = 0;
-        }
 
-        //store to arrays
-        this.PRE = pres.toArray(new BoolPredicate[pres.size()]);
+
 
         List<PostCondition> postConditions = newArrayList();
 
@@ -941,6 +932,19 @@ public class PremiseRule extends GenericCompound {
 
             postConditions.add(PostCondition.make(this, t, sorted(modifiers)));
         }
+
+        if (taskPunc == 0) {
+            //default: add explicit no-questions rule
+            // TODO restrict this further somehow
+            pres.add(TaskPunctuation.NotQuestion);
+        } else if (taskPunc == ' ') {
+            //any task type
+            taskPunc = 0;
+        }
+
+        //store to arrays
+        this.PRE = pres.toArray(new BoolPredicate[pres.size()]);
+
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
             throw new RuntimeException("postcondition duplicates:\n\t" + postConditions);

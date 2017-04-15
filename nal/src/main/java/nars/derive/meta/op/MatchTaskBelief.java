@@ -38,7 +38,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
 
     @NotNull
-    public final Term[] procedure;
+    public final Term[] post;
     @NotNull
     public final Term[] pre;
 
@@ -61,7 +61,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         compile(taskPattern, beliefPattern, pre, code, index, constraints);
 
         this.pre = pre.toArray(new BoolPredicate[pre.size()]);
-        this.procedure = code.toArray(new BoolPredicate[code.size()]);
+        this.post = code.toArray(new BoolPredicate[code.size()]);
 
 
         //Term beliefPattern = pattern.term(1);
@@ -104,45 +104,45 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
                                 @NotNull List<BoolPredicate> pre, @NotNull List<BoolPredicate> code,
                                 @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
 
-        BoolPredicate preGuard = null;
+        //BoolPredicate preGuard = null;
 
         //check for any self similarity
-        if (task.equals(belief)) {
-            //add precondition constraint that task and belief must be equal.
-            // assuming this succeeds, only need to test the task half
-            preGuard = new TaskBeliefEqualCondition();
-            belief = null;
-        }
-
-        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
-                && null==Ellipsis.firstEllipsis((Compound)task)
-                && null==Ellipsis.firstEllipsis((Compound)belief)
-                ) {
-            byte[] beliefInTask = ((Compound)task).isSubterm(belief);
-            if (beliefInTask != null) {
-                //add precondition for this constraint that is checked between the premise's terms
-                //assuming this succeeds, only need to test the task half
-                preGuard = new ComponentCondition(0, beliefInTask, 1);
-                belief = null;
-            }
-        }
-
-        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
-                && null==Ellipsis.firstEllipsis((Compound)belief)
-                && null==Ellipsis.firstEllipsis((Compound)task)
-         ) {
-            byte[] taskInBelief = ((Compound)belief).isSubterm(task);
-            if (taskInBelief != null) {
-                //add precondition for this constraint that is checked between the premise's terms
-                //assuming this succeeds, only need to test the belief half
-                preGuard = new ComponentCondition(1, taskInBelief, 0);
-                task = null;
-            }
-        }
-
-        //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
-        if (preGuard!=null)
-            pre.add(preGuard);
+//        if (task.equals(belief)) {
+//            //add precondition constraint that task and belief must be equal.
+//            // assuming this succeeds, only need to test the task half
+//            preGuard = new TaskBeliefEqualCondition();
+//            belief = null;
+//        }
+//
+//        else if (task instanceof Compound && belief instanceof Compound && !task.isCommutative()
+//                && null==Ellipsis.firstEllipsis((Compound)task)
+//                && null==Ellipsis.firstEllipsis((Compound)belief)
+//                ) {
+//            byte[] beliefInTask = ((Compound)task).isSubterm(belief);
+//            if (beliefInTask != null) {
+//                //add precondition for this constraint that is checked between the premise's terms
+//                //assuming this succeeds, only need to test the task half
+//                preGuard = new ComponentCondition(0, beliefInTask, 1);
+//                belief = null;
+//            }
+//        }
+//
+//        else if (belief instanceof Compound && task instanceof Compound && !belief.isCommutative()
+//                && null==Ellipsis.firstEllipsis((Compound)belief)
+//                && null==Ellipsis.firstEllipsis((Compound)task)
+//         ) {
+//            byte[] taskInBelief = ((Compound)belief).isSubterm(task);
+//            if (taskInBelief != null) {
+//                //add precondition for this constraint that is checked between the premise's terms
+//                //assuming this succeeds, only need to test the belief half
+//                preGuard = new ComponentCondition(1, taskInBelief, 0);
+//                task = null;
+//            }
+//        }
+//
+//        //put this one after the guards added in the compileTaskBelief like checking for op, subterm vector etc which will be less expensive
+//        if (preGuard!=null)
+//            pre.add(preGuard);
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
         compileTaskBelief(pre, code, task, belief, index, constraints);

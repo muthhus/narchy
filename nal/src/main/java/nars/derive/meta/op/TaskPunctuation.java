@@ -52,7 +52,7 @@ final public class TaskPunctuation extends AtomicPredicate<Derivation> {
         }
     };
 
-//    /** only belief, not goal or question */
+    //    /** only belief, not goal or question */
 //    public static final AtomicBoolCondition NotGoal = new AtomicBoolCondition()  {
 //        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.GOAL);
@@ -60,17 +60,17 @@ final public class TaskPunctuation extends AtomicPredicate<Derivation> {
 //        @Override public String toString() { return "task:\".\""; }
 //    };
     public static final AtomicPredicate<Derivation> NotQuestion = new AtomicPredicate<>() {
-    @Override
-    public boolean test(@NotNull Derivation o) {
-        byte p = o.taskPunct;
-        return (p != Op.QUESTION && p != Op.QUEST);
-    }
+        @Override
+        public boolean test(@NotNull Derivation o) {
+            byte p = o.taskPunct;
+            return (p != Op.QUESTION && p != Op.QUEST);
+        }
 
-    @Override
-    public String toString() {
-        return "task:\".!\"";
-    }
-};
+        @Override
+        public String toString() {
+            return "task:\".!\"";
+        }
+    };
 //    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
 //        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.BELIEF);
@@ -79,13 +79,12 @@ final public class TaskPunctuation extends AtomicPredicate<Derivation> {
 //    };
 
 
-
     TaskPunctuation(char p) {
         this(p, "task:\"" + p + '\"');
     }
 
     TaskPunctuation(char p, String id) {
-        this.punc = (byte)p;
+        this.punc = (byte) p;
         this.id = id;
     }
 

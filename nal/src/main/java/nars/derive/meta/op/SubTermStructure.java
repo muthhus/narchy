@@ -28,7 +28,7 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
             throw new RuntimeException("no filter effected");
         }
         id = "SubTermStruct" + subterm + ':' +
-                Integer.toString(bits, 16);
+                Integer.toBinaryString(bits);
     }
 
 

@@ -24,7 +24,7 @@ public final class SubTermsStructure extends AtomicPredicate<Derivation> {
         this.bits = SubTermStructure.filter(matchingType, bits);
 
         id = "SubTermsStruct:" +
-                Integer.toString(bits, 16);
+                Integer.toBinaryString(bits);
     }
 
 
