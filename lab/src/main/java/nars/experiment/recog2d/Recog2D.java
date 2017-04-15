@@ -58,11 +58,11 @@ public class Recog2D extends NAgentX {
 
 
     int image;
-    final int maxImages = 4;
+    final int maxImages = 7;
     static int durFPS = 10;
-    int imagePeriod = 16;
+    int imagePeriod = 164;
     static int fps = 10;
-    float goalInfluence = 1f; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
+    float goalInfluence = 0.5f; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;

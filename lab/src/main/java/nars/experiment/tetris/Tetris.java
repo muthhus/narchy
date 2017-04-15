@@ -664,22 +664,24 @@ public class Tetris extends NAgentX implements Bitmap2D {
         Tetris a = new MyTetris(n);
         a.trace = true;
         NAgentX.chart(a);
-
-            Default m = new Default(512, 16, 2, n.random,
-                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
-                    new RealTime.DSHalf().durSeconds(0.2f));
+//
+//            Default m = new Default(512, 16, 2, n.random,
+//                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
+//                    new RealTime.DSHalf().durSeconds(0.2f));
 
             float metaLearningRate = 0.75f;
-            m.confMin.setValue(0.01f);
-            m.goalConfidence(metaLearningRate);
-            m.termVolumeMax.setValue(24);
+//            m.confMin.setValue(0.01f);
+//            m.goalConfidence(metaLearningRate);
+//            m.termVolumeMax.setValue(24);
         MetaAgent metaT = new MetaAgent(a
-                ,m
+                //,m
 
         );
         metaT.init();
         metaT.trace = true;
-        n.onCycle(metaT.nar::cycle);
+        a.onFrame((z)->metaT.cycle());
+
+        //n.onCycle(metaT.nar::cycle);
 
         try {
             InterNAR i = new InterNAR(n, 8, 10421);

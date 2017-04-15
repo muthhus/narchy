@@ -108,8 +108,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     static boolean eternalizable(Term term) {
 
-        //return term.varIndep() > 0;
-        return term.vars() > 0;
+        return term.varIndep() > 0;
+        //return term.vars() > 0;
         //return false;
         //return true;
         //return op().temporal;

@@ -97,9 +97,8 @@ public class TrieDeriver2  implements Deriver {
             else
                 return i;
         });
-        s.forEach(x -> {
-            System.out.println(x);
-        });
+
+        s.forEach(System.out::println);
 
 
     }

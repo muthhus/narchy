@@ -202,7 +202,7 @@ abstract public class NAgent implements NSense, NAct {
 
     int actionFrame = 0;
 
-    private void cycle() {
+    public void cycle() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
 
@@ -613,4 +613,6 @@ abstract public class NAgent implements NSense, NAct {
     public On onFrame(Consumer<NAgent> each) {
         return eventFrame.on(each);
     }
+
+
 }

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 200;
+    final int cycles = 100;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -165,7 +165,7 @@ public class NAL8Test extends AbstractNALTest {
     public void condition_goal_deductionWithVariableEliminationOpposite()  {
 
         test()
-                .log()
+                //.log()
                 .input("goto({t003}). :|:")
                 .input("(goto(#1) &&+5 at(SELF,#1))!")
                 .mustDesire(2 * cycles, "at(SELF,{t003})", 1.0f, 0.81f, 5)
@@ -410,7 +410,7 @@ public class NAL8Test extends AbstractNALTest {
                 .input( "(at:$1 ==>+5 goto:$1).")
 
                 .mustDesire(cycles, "goto:t003", 1.0f, 0.45f, 6)
-                .mustNotOutput(cycles, "goto:t003", Op.GOAL,  1);
+                .mustNotOutput(cycles, "goto:t003", GOAL, 0f, 1f, 0.1f, 1f, 1L );
 
     }
 
@@ -1285,7 +1285,7 @@ public class NAL8Test extends AbstractNALTest {
 
     @Ignore @Test public void questImplDt() {
         test()
-                .log()
+                //.log()
                 .inputAt(0, "((a),(b)).") //to create termlinks
                 .inputAt(0, "(a). :|:")
                 .inputAt(4, "(b)@ :|:")

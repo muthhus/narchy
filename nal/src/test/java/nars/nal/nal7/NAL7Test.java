@@ -90,7 +90,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void temporal_analogy() {
         test()
-            .log()
+            //.log()
             .believe("( open($x, door) ==>+5 enter($x, room) )", 0.95f, 0.9f)
             .believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
             .mustBelieve(cycles*2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.81f)
@@ -158,7 +158,7 @@ public class NAL7Test extends AbstractNALTest {
         //y.z
         //  zx
         test()
-                .log()
+                //.log()
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
                 .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
@@ -1102,10 +1102,10 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(1, "((a) &&+5 (c)). :|:")
                 .inputAt(3, "(b). :|:")
-                .mustBelieve(cycles,
+                .mustBelieve(cycles*2,
                         "(((a) &&+2 (b)) &&+3 (c))",
                         1f, 0.81f, 1, 6)
-                .mustNotOutput(cycles,
+                .mustNotOutput(cycles*2,
                         "((b) &&+3 ((a) &&+5 (c)))", BELIEF, ETERNAL, 1);
     }
     @Test public void testInductionIntervalMerge2() {
