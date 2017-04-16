@@ -44,7 +44,7 @@ public class FZero extends NAgentX {
         senseNumberBi($.inh($.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
         //nar.mix.stream("Derive").setValue(1);
-        implAccelerator(nar, this);
+        //implAccelerator(nar, this);
 
 
 //        try {
