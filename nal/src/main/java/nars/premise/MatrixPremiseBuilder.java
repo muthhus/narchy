@@ -2,7 +2,6 @@ package nars.premise;
 
 import jcog.bag.PLink;
 import jcog.bag.Priority;
-import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
 import nars.NAR;
 import nars.Param;
@@ -95,77 +94,6 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 //    }
 
 
-    /**
-     * derives matrix of: concept => (tasklink x termlink) => premises
-     */
-    public int newPremiseVector(@NotNull Concept c, PLink<Task> taskLink, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<PLink<Term>> termLinks, @NotNull NAR nar) {
-
-        int count = 0;
-
-
-        int termsBufferSize = termLinks.size();
-        if (termsBufferSize > 0) {
-
-            //current termlink counter, as it cycles through what has been sampled, give it a random starting position
-            int jl = nar.random.nextInt(termsBufferSize);
-
-
-            long now = nar.time();
-
-
-            int termlinksPerForThisTask = termlinks.lerp(taskLink.priSafe(0));
-
-            //if (Param.PREMISE_LOG)
-            //logger.info("try: { concept:\"{}\",\ttask:\"{}\",\tbeliefTerm:\"{}\" }", c, task, beliefTerm);
-
-            //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
-            //            return null;
-
-            Priority taskLinkCopy = taskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
-            if (taskLinkCopy == null) //deleted
-                return 0;
-
-
-            Task task = (taskLink.get());
-
-            long when;
-            long start = task.start();
-
-            if (start == ETERNAL) {
-
-                when = //task.isGoal() ? now : ETERNAL;
-                    ETERNAL;
-
-            } else {
-                //USE TASK's OCCURENCE find closest end-point to now
-                long end = task.end();
-                if ((now >= start) && (now <= end)) {
-                    when = now; //inner
-                } else {
-                    if (Math.abs(now - start) <= Math.abs(now - end)) {
-                        when = start;
-                    } else {
-                        when = end;
-                    }
-                }
-            }
-
-            for (int j = 0; j < termsBufferSize && count < termlinksPerForThisTask; j++, jl++) {
-
-
-                Derivation d = premise(c, task, taskLinkCopy, when, termLinks.get(jl % termsBufferSize).get(), now, nar, -1f, target);
-                if (d != null) {
-                    deriver.accept(d);
-                    count++;
-                }
-
-            }
-        } else {
-            if (Param.DEBUG_EXTRA)
-                logger.warn("{} has zero termlinks", c);
-        }
-        return count;
-    }
 
 
 

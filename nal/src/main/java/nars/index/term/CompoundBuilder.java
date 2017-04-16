@@ -21,7 +21,14 @@ public class CompoundBuilder extends FasterList<Term> {
 
         this.op = op;
         this.dt = dt;
-        this.hash = hashCombine(op.hashCode(), dt);
+
+        int hash = hashCombine(op.hashCode(), dt);
+
+        //include the hash as if the values were added iteratively such as in add()
+        for (Term x : u)
+            hash = hashCombine(hash, x.hashCode());
+
+        this.hash = hash;
     }
 
 
@@ -31,6 +38,8 @@ public class CompoundBuilder extends FasterList<Term> {
         this.op = op;
         this.dt = dt;
         this.hash = hashCombine(op.hashCode(), dt);
+
+        //hash will be modified for each added subterm
     }
 
 
@@ -42,6 +51,11 @@ public class CompoundBuilder extends FasterList<Term> {
         super.add(x);
         hash = hashCombine(hash, x.hashCode());
         return true;
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

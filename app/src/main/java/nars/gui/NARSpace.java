@@ -103,6 +103,11 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
         //System.out.println(space.dyn.summary() + " " +  prev.size() + " prev " + next.size() + " next");
 
         this.active = next;
+
+        prev.forEach(x -> {
+            if (!x.preactive)
+                x.order = -1;
+        });
     }
 
     /** override to filter items */

@@ -33,7 +33,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Truth truth(long when, long now, int dur) {
 
-        Truth tt = temporal.truth(when, now, dur, eternal);
+        Truth tt = temporal.truth(when, dur, eternal);
 
         return (tt != null) ? tt : eternal.truth();
 

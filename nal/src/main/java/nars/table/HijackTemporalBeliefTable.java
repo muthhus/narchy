@@ -1,6 +1,5 @@
 package nars.table;
 
-import jcog.bag.Priority;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
@@ -190,50 +189,50 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        return delta[0];
     }
 
-    /**
-     * apply feedback for a newly inserted task
-     */
-    protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
-        float f = inserted.freq();
-        float c = inserted.conf();
-        long is = inserted.start();
-        long ie = inserted.end();
-
-        float penaltySum = 0;
-
-        for (int i = 0, lSize = l.size(); i < lSize; i++) {
-            Task x = l.get(i);
-            if (x == inserted) continue;
-
-
-            float df = abs(f - x.freq());
-
-            if (df > Param.BUDGET_EPSILON) {
-
-                long xs = x.start();
-                long xe = x.end();
-                long overlapLength = Interval.intersectLength(is, ie, xs, xe);
-                if (overlapLength >= 0) {
-
-                    float penalty = df * ((1f + overlapLength) / (1f + (xe - xs)));
-                    if (penalty > Param.BUDGET_EPSILON) {
-                        Priority b = x.budget();
-                        float pBefore = b.priSafe(0), pAfter;
-                        if (pBefore > 0) {
-                            b.priMult(1f - penalty);
-                            pAfter = b.pri();
-                            penaltySum += pAfter - pBefore;
-                        }
-                    }
-
-                }
-
-            }
-        }
-
-        if (penaltySum > 0)
-            inserted.budget().priAdd(penaltySum); //absorb removed priority from sibling tasks
-    }
+//    /**
+//     * apply feedback for a newly inserted task
+//     */
+//    protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
+//        float f = inserted.freq();
+//        float c = inserted.conf();
+//        long is = inserted.start();
+//        long ie = inserted.end();
+//
+//        float penaltySum = 0;
+//
+//        for (int i = 0, lSize = l.size(); i < lSize; i++) {
+//            Task x = l.get(i);
+//            if (x == inserted) continue;
+//
+//
+//            float df = abs(f - x.freq());
+//
+//            if (df > Param.BUDGET_EPSILON) {
+//
+//                long xs = x.start();
+//                long xe = x.end();
+//                long overlapLength = Interval.intersectLength(is, ie, xs, xe);
+//                if (overlapLength >= 0) {
+//
+//                    float penalty = df * ((1f + overlapLength) / (1f + (xe - xs)));
+//                    if (penalty > Param.BUDGET_EPSILON) {
+//                        Priority b = x.budget();
+//                        float pBefore = b.priSafe(0), pAfter;
+//                        if (pBefore > 0) {
+//                            b.priMult(1f - penalty);
+//                            pAfter = b.pri();
+//                            penaltySum += pAfter - pBefore;
+//                        }
+//                    }
+//
+//                }
+//
+//            }
+//        }
+//
+//        if (penaltySum > 0)
+//            inserted.budget().priAdd(penaltySum); //absorb removed priority from sibling tasks
+//    }
 
 
 //    /** HACK use of volatiles here is a hack. it may rarely cause the bag to experience flashbacks. proper locking can solve this */
@@ -515,11 +514,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         return c != null ? c : a;
     }
 
-    @Nullable
     @Override
-    public Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
+    public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
 
-        return TruthPolation.truth(eternal != null ? eternal.match() : null, when, dur, this);
+        return TruthPolation.truth(
+                eternal != null ? eternal.match() : null,
+                when, dur, this);
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;
     }

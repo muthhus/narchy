@@ -193,4 +193,8 @@ public class Maze extends CompoundSpatial {
         }
 
 
+    @Override
+    public float radius() {
+        return 1;
+    }
 }

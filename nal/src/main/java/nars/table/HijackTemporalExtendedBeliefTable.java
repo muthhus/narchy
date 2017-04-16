@@ -51,18 +51,19 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     }
 
     @Override
-    public @Nullable Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
-        Truth t = super.truth(when, now, dur, eternal);
+    public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
+        Truth t = super.truth(when, dur, eternal);
         Task h = matchHistory(when);
         if (h != null) {
-            float conf = h.conf(when, dur);
-            if (t == null || conf > t.conf())
-                return $.t(h.freq(), conf);
+            float hConf = h.conf(when, dur);
+            if (t == null || hConf > t.conf())
+                return $.t(h.freq(), hConf);
         }
         return t;
     }
 
-    public Task matchHistory(long when) {
+    //TODO use a better method:
+    Task matchHistory(long when) {
         Double dwhen = when + 0.5;
 
         Task c, f;
@@ -98,18 +99,18 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
         if (!save(x))
             return;
 
+        /** time + insignificant hash difference HACK */
+        double k = (x.mid() - 0.25) + (0.5 * (Math.abs(x.hashCode() / ((double) (Integer.MAX_VALUE)))));
+
         synchronized (history) {
             int toRemove = history.size() + 1 - historicCapacity;
-            if (toRemove > 0) {
-                for (int i = 0; i < toRemove; i++) {
-                    Task t = history.pollFirstEntry().getValue();
-                    t.delete();
-                }
+            for (int i = 0; i < toRemove; i++) {
+                Task t = history.pollFirstEntry().getValue();
+                t.delete();
             }
 
-            history.put(
-                x.mid() - 0.25 + ( 0.5 * (Math.abs(x.hashCode()/((double)(Integer.MAX_VALUE)))))  /** hash -> insignifcant differnece, HACK */
-                , x);
+
+            history.put( k , x);
         }
     }
 

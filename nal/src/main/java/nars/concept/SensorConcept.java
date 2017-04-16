@@ -37,10 +37,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    public static final int historicCapMultiplier = 4;
-
-    //private boolean latchLastValue = true;
-
     public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
         this($.$(term), n, signal, truth);
     }
@@ -65,8 +61,10 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
+        return
+            //new MyListTemporalBeliefTable
+            new HijackTemporalBeliefTable(
+                    tCap * 2, nar.random);
     }
 
     //    /** originating from this sensor, or a future prediction */
@@ -177,12 +175,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             super(tCap, historicCap, random);
         }
 
-        @Override
-        protected Task ressurect(Task t) {
-            if (t.isDeleted())
-                t.budget().setPriority(0);
-            return t;
-        }
 
         @Override
         protected boolean save(Task t) {
@@ -190,10 +182,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             //return t instanceof SignalTask;
         }
 
-        @Override
-        protected void feedback(MutableList<Task> l,  @NotNull Task inserted) {
-            //ignore feedback here
-        }
+
     }
 
 

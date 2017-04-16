@@ -5,17 +5,16 @@ package spacegraph;
  */
 public interface Active {
 
-    void reactivate(boolean b);
+    void preActivate(boolean b);
 
     default void activate() {
-        reactivate(true);
+        preActivate(true);
     }
     default void deactivate() {
-        reactivate(false);
+        preActivate(false);
     }
 
     boolean active();
-    boolean preactive();
 
     void hide();
 

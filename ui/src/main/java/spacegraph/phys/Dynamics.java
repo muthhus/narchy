@@ -259,8 +259,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
                     }
 
 
-                } else {
-                    System.err.println("ignoring non-dynamic: " + c);
                 }
             });
 

@@ -81,16 +81,12 @@ public abstract class Spatial<X> implements Active {
 
     @Override
     public boolean active() {
-        return preactive && order > -1;
+        return order >= 0;
     }
 
-    @Override
-    public final boolean preactive() {
-        return preactive;
-    }
 
     @Override
-    public void reactivate(boolean b) {
+    public void preActivate(boolean b) {
 
         this.preactive = b;
 
@@ -118,8 +114,9 @@ public abstract class Spatial<X> implements Active {
     }
 
     public boolean hidden() {
-        return !(order > -1 || preactive);
+        return (order < 0 || !preactive);
     }
+
     //abstract public Iterable<Collidable> bodies();
     abstract public void forEachBody(Consumer<Collidable> c);
 
@@ -145,8 +142,6 @@ public abstract class Spatial<X> implements Active {
     }
 
 
-    public float radius() {
-        return 0;
-    }
+    abstract public float radius();
 
 }

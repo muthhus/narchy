@@ -144,10 +144,10 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
 
-    public @Nullable Spatial getIfActive(X t) {
-        Spatial v = atoms.getIfPresent(t);
-        return v != null && v.preactive() ? v : null;
-    }
+//    public @Nullable Spatial getIfActive(X t) {
+//        Spatial v = atoms.getIfPresent(t);
+//        return v != null && v.preactive() ? v : null;
+//    }
 
 
     public SpaceGraph setGravity(v3 v) {

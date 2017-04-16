@@ -46,12 +46,19 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             }
 
             @Override
+            public void onAdded(PLink<Concept> conceptPLink) {
+
+            }
+
+            @Override
             public void onRemoved(@NotNull PLink<Concept> value) {
                 ConceptWidget cw = widgetGet(value.get());
                 if (cw!=null) {
-                    //cw.hide();
-                    cw.delete();
+                    cw.hide();
                 }
+//                    cw.deactivate();
+//                    //cw.delete();
+//                }
             }
         };
     }
@@ -59,20 +66,10 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
 
-
-
-        //long now = nar.time();
-
-        bag.forEach((PLink<Concept> b) ->{
-
-            Concept concept = b.get();
-
-            displayNext.add(
-                widgetGetOrCreate(concept)
-                //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
-            );
-
-        });
+        bag.forEachKey((Concept concept) ->
+            displayNext.add( widgetGetOrCreate(concept) )
+            //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
+        );
 
         //System.out.println(nar.time() + " " + displayNext.size() );
 
@@ -87,12 +84,11 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             if (p == null) {
                 ConceptWidget c = materializer().apply(concept);
                 c.concept = concept;
-                c.activate();
-                return c;
-            } else {
-                ((Spatial)p).activate();
-                return p;
+                p = c;
             }
+
+            ((Spatial)p).activate();
+            return p;
         });
     }
 
@@ -102,11 +98,11 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     @Override
     protected void update() {
-        super.update();
-
-
         this.now = nar.time();
         this.dur = nar.dur();
+
+        super.update();
+
         active.forEach(c -> c.commit(this));
     }
 

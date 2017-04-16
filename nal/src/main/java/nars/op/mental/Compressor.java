@@ -155,10 +155,11 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                     @Override
                     public void onRemoved(@NotNull Object value) {
                         ((Abbr)value).stop();
+                        ((Abbr)value).delete();
                     }
                     @Override
                     protected boolean replace(Object incoming, Object existing) {
-                        return hijackGreedy(((Abbr)incoming).pri(), ((Abbr)existing).pri());
+                        return hijackGreedy(((Abbr)incoming).priSafe(-1), ((Abbr)existing).priSafe(-1));
                     }
 
                 };

@@ -21,7 +21,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     /** finds the strongest match to the specified parameters. Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
     @Nullable Task match(long when, long now, int dur, @Nullable Task against);
 
-    @Nullable Truth truth(long when, long now, int dur, EternalTable eternal);
+    Truth truth(long when, int dur, EternalTable eternal);
 
     @Nullable Task add(@NotNull Task input, Concept concept, @NotNull NAR nar);
 
@@ -67,7 +67,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable Truth truth(long when, long now, int dur, EternalTable eternal) {
+        public Truth truth(long when, int dur, EternalTable eternal) {
             return null;
         }
 

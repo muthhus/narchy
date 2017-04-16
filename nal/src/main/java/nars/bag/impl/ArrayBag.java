@@ -1,9 +1,6 @@
 package nars.bag.impl;
 
-import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.Prioritized;
-import jcog.bag.RawPLink;
+import jcog.bag.*;
 import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
@@ -380,7 +377,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         float p = this.pressure;
         if (p > 0) {
             this.pressure = 0;
-            return commit(Forget.forget(size(), capacity(), p, mass, Forget::new));
+            return commit(Forget.forget(size(), capacity(), p, mass, PForget::new));
         }
         return this;
     }

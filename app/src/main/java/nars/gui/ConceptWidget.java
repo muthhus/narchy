@@ -60,7 +60,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-                new PLinkHijackBag(numEdges, 4, nar.random);
+                new PLinkHijackBag(numEdges, 2, nar.random);
         //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
@@ -95,9 +95,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     @Override
     public void delete() {
+        concept = null;
         super.delete();
         edges.clear();
-        concept = null;
     }
 
 
@@ -121,23 +121,22 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
         if (c != null) {
 
+            edges.commit(x -> {
+                TermEdge xx = x.get();
 
-            edges.forEach(x -> {
-                if (null == space.space.getIfActive(x.get().term())) {
-                    //the target of this edge has disappeared
+                if (!xx.target.active()) {
                     x.delete();
                 } else {
-                    x.get().clear();
+                    xx.clear();
                 }
-            });
 
-            edges.commit();
+            });
 
             //phase 1: collect
             c.tasklinks().forEach(this);
             c.termlinks().forEach(this);
 
-            edges.forEach(ff -> ff.get().update(ff));
+            edges.forEachKey(TermEdge::update);
 
             conceptVis.apply(this, key);
 
@@ -290,7 +289,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             return hash;
         }
 
-        public void update(PLink<TermEdge> ff) {
+        public void update() {
 
             float priSum = (termlinkPri + tasklinkPri);
 
@@ -318,7 +317,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
                 //this.a = 0.1f + 0.5f * pri;
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
-                        0.1f + 0.9f * ff.pri(); //0.9f;
+                        //0.1f + 0.9f * ff.pri(); //0.9f;
+                        0.9f;
 
                 this.attraction = 1f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {

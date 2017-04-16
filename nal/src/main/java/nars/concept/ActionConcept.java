@@ -18,8 +18,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.concept.SensorConcept.historicCapMultiplier;
-
 
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
 
@@ -67,10 +65,14 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         goalIntegrated.add( goal( now, dur ));
     }
 
+
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        //TODO only for Beliefs; Goals can remain normal
-        return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
+        //return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
+
+        return
+                new HijackTemporalBeliefTable(
+                        tCap * 2, nar.random);
     }
 
     @Override
@@ -112,12 +114,6 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         }
 
 
-        @Override
-        protected Task ressurect(Task t) {
-            if (t.isDeleted())
-                t.budget().setPriority(0);
-            return t;
-        }
 
         @Override
         protected boolean save(Task t) {
@@ -127,9 +123,5 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
                 return true; //accept all goals
         }
 
-        @Override
-        protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
-            //ignore feedback here
-        }
     }
 }

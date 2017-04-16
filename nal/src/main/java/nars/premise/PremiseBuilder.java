@@ -1,5 +1,6 @@
 package nars.premise;
 
+import jcog.bag.PLink;
 import jcog.bag.Priority;
 import nars.$;
 import nars.NAR;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.ETERNAL;
 
 
 abstract public class PremiseBuilder {
@@ -42,11 +44,15 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Derivation premise(@NotNull Concept concept, Task task, Priority taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
+    public Derivation premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
 
+        Term beliefTerm = termLink.get();
         Task belief = null;
 
         int dur = nar.dur();
+
+        Task task = taskLink.get();
+        long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
 
         if (beliefTerm instanceof Compound) {
 
@@ -81,7 +87,7 @@ abstract public class PremiseBuilder {
                             //transfer budget from question to answer
                             //float qBefore = taskBudget.priSafe(0);
                             //float aBefore = answered.priSafe(0);
-                            BudgetFunctions.transferPri(taskLinkCopy, answered.budget(),
+                            BudgetFunctions.transferPri(taskLink, answered.budget(),
                                     (float) answered.conf()
                                     //(1f - taskBudget.qua())
                                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
@@ -166,7 +172,7 @@ abstract public class PremiseBuilder {
             return null; //task deleted
 
         float pri =
-                Math.max(taskPri, beliefPriority !=null ? beliefPriority.pri() : 0);
+                Math.max(taskPri, beliefPriority !=null ? beliefPriority.priSafe(0) : 0);
                 //belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
 
         if (pri < priMin)

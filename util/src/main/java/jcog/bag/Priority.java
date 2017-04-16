@@ -13,8 +13,6 @@ import static jcog.Util.lerp;
  */
 public interface Priority extends Prioritized {
 
-
-
     static String toString(@NotNull Priority b) {
         return toStringBuilder(null, Texts.n4(b.pri())).toString();
     }

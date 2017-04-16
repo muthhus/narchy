@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import jcog.bag.PForget;
 import jcog.bag.PLink;
 import nars.Param;
 import nars.attention.Forget;
@@ -28,12 +29,11 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,PLink<K>> {
 
     @Override
     protected Consumer<PLink<K>> forget(float avgToBeRemoved) {
-        return new Forget(avgToBeRemoved);
+        return new PForget(avgToBeRemoved);
     }
 
     @Override
     public void onRemoved(@NotNull PLink<K> v) {
-        v.delete();
     }
 
     @Override

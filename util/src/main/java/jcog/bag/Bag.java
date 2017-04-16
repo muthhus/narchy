@@ -197,7 +197,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     }
 
-    default void onAdded(V v) {
+    default void onAdded(@NotNull V v) {
 
     }
 
@@ -207,16 +207,13 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     float pri(@NotNull V key);
 
     default boolean active(@NotNull V key) {
-        return priSafeOrNeg1(key) >= 0;
+        return priSafe(key, -1) >= 0;
     }
 
     default float priSafeOrZero(@NotNull V key) {
         return priSafe(key, 0);
     }
 
-    default float priSafeOrNeg1(@NotNull V key) {
-        return priSafe(key, -1);
-    }
 
     default float priSafe(@NotNull V key, float valueIfMissing) {
         float p = pri(key);

@@ -335,13 +335,13 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
                     new ArrayBag<>(BudgetMerge.maxBlend,
                             new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
-            float confEffective = answer.conf(mid(), nar.dur());
+            float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
 
             if (!answers.contains(answer)) {
 
                 answers.commit();
 
-                PLink<Task> insertion = answers.put(new RawPLink<>(answer, 1f));
+                PLink<Task> insertion = answers.put(new RawPLink<>(answer, confEffective * 1f));
 
                 if (insertion != null) {
                     Command.log(nar, this.toString() + "  " + answer.toString());
@@ -350,6 +350,27 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
         }
 
         return answer;
+    }
+
+    default long nearestStartOrEnd(long when) {
+        long s = start();
+        if (s == ETERNAL)
+            return ETERNAL;
+        long e = end();
+
+        if (when >= s && when <= e) {
+            return when; //internal
+        } else if (Math.abs(when-s) <= Math.abs(when-e)) {
+            return s; //closer or beyond the start
+        } else {
+            return e; //closer or beyond the end
+        }
+    }
+
+    /** time difference to neareset 'temporal tangent' */
+    default long nearestStartOrEndTime(long when) {
+        long n = nearestStartOrEnd(when);
+        return Math.abs(when - n);
     }
 
 

@@ -96,7 +96,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Contract(pure = true)
     private static int i(int c, int hash) {
-        return (int) (Integer.toUnsignedLong(hash) % c);
+        //return (int) (Integer.toUnsignedLong(hash) % c);
+        return Math.abs(hash) % c;
     }
 
     public static boolean hijackGreedy(float newPri, float weakestPri) {
@@ -141,7 +142,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         if (capacity.getAndSet(newCapacity) != newCapacity) {
 
-            List<V> removed = new FasterList<>();
 
             final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
@@ -154,6 +154,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                     return next;
                 } else return x;
             })) {
+                List<V> removed = new FasterList<>();
+
                 //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
                 forEachActive(this, prev[0], (b) -> {
                     size.decrementAndGet(); //decrement size in any case. it will be re-incremented if the value was accepted during the following put
@@ -161,9 +163,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         removed.add(b);
                     }
                 });
+
+                removed.forEach(this::onRemoved);
             }
 
-            removed.forEach(this::onRemoved);
 
             return true;
         }
@@ -214,7 +217,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int targetIndex = -1;
         V target = null;
 
-        boolean dir = random.nextBoolean(); //choose random initial direction
+        //boolean dir = random.nextBoolean(); //choose random initial direction
 
         int hash = x.hashCode();
         int iStart = i(c, hash);
@@ -223,15 +226,15 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         try {
 
-            for (int retry = 0; retry < reprobes; retry++, dir = !dir) {
+            for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/) {
 
                 float targetPri = Float.POSITIVE_INFINITY;
-                int i = dir ? iStart : (iStart + reprobes) - 1;
+                int i = iStart; //dir ? iStart : (iStart + reprobes) - 1;
 
                 for (int probe = 0; probe < reprobes; probe++) {
 
-                    if (i >= c) i -= c;
-                    else if (i < 0) i += c;
+//                    if (i >= c) i -= c;
+//                    else if (i < 0) i += c;
 
                     V ii = map.get(i);
 
@@ -280,7 +283,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
                     }
 
-                    i = dir ? (i + 1) : (i - 1);
+                    //i = dir ? (i + 1) : (i - 1);
+                    i++; if (i == c) i = 0;
+
                 }
 
                 //add at target index
@@ -513,8 +518,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int nulls = c - s; //approximate number of empty slots that would be expected
 
-        float scanRate = 0.75f;
-        float priToHits = ((n) / (s * scanRate));
+        float priToHits = Math.max(1, ((n) / ((float)(s))));
 
         int skipped = 0;
 
@@ -522,7 +526,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         while (n > 0 && skipped < nulls) {
 
             //if (di) {
-                if (++i == c) i = 0;
+            if (++i == c) i = 0;
             /*} else {
                 if (--i == -1) i = c - 1;
             }*/
@@ -676,19 +680,21 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int count = 0;
 
         AtomicReferenceArray<V> a = map.get();
-        for (int i = 0; i < a.length(); i++) {
+        int len = a.length();
+        for (int i = 0; i < len; i++) {
             V f = a.get(i);
-            if (f != null) {
-                float p = priSafe(f, -1);
-                if (p >= 0) {
-                    count++;
-                    if (p > max) max = p;
-                    if (p < min) min = p;
-                    mass += p;
-                } else {
-                    if (a.compareAndSet(i, f, null)) {
-                        onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
-                    }
+            if (f == null)
+                continue;
+
+            float p = priSafe(f, -1);
+            if (p >= 0) {
+                count++;
+                if (p > max) max = p;
+                if (p < min) min = p;
+                mass += p;
+            } else {
+                if (a.compareAndSet(i, f, null)) {
+                    size.decrementAndGet(); onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
                 }
             }
         }

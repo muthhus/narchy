@@ -40,9 +40,10 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     final float temporalSpecificity = 0.1f;
 
-    /** 0.5 = forward/backward termlinking is balanced.
-     *  > 0.5 = more towards the forward link (ie, origin -> subterms)
-     *  < 0.5 = more towards the backward link (ie, subterms -> origin)
+    /**
+     * 0.5 = forward/backward termlinking is balanced.
+     * > 0.5 = more towards the forward link (ie, origin -> subterms)
+     * < 0.5 = more towards the backward link (ie, subterms -> origin)
      */
     private static final float TERMLINK_BALANCE = 0.5f;
 
@@ -198,57 +199,49 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             long inStart = in.start();
             long inEnd = in.end();
 
-            tlinks.commit((b) -> {
-                float subSubActivation = subActivation;/// * b.qua();
+            if (subActivation > minScale) {
+                tlinks.commit((b) -> {
+                    float subSubActivation = subActivation;/// * b.qua();
 
-                if (inStart != ETERNAL) {
-                    if (subSubActivation >= minScale) {
+                    if (inStart != ETERNAL) {
                         Task bt = b.get();
                         long bs = bt.start();
                         if (bs != ETERNAL) {
+                            //Temporal vs. temporal: reduce subActivation by temporal distance
+
                             long be = bt.end();
                             long timeDistance = Math.max(0,
-                                unionLength(inStart, inEnd, bs, be)
-                                        - (inEnd - inStart) //task range
-                                        - (be - bs)  //belief range
-                                        - dur
+                                    unionLength(inStart, inEnd, bs, be)
+                                            - (inEnd - inStart) //task range
+                                            - (be - bs)  //belief range
+                                            - dur
                             ); //perceptual duration
-
-                            //float borrow = change[0] / n; //boost with up to 1/n of collected change
-                            ///change[0] -= borrow;
-                            //subSubActivation += borrow;
-
-//                            //lower value (< 1) means activation is less temporally 'specific' than a higher value (> 1)
-//                            final float DECAY_RATE = 0.5f;
 
                             //multiply by temporal relevancy
                             subSubActivation = subSubActivation * (
-                                (1f-temporalSpecificity) + //min reduction
-                                (temporalSpecificity) * TruthPolation.evidenceDecay(
-                                    1f,
-                                    (int) Math.ceil(dur),
-                                    timeDistance));
+                                    (1f - temporalSpecificity) + //min reduction
+                                            (temporalSpecificity) * TruthPolation.evidenceDecay(
+                                                    1f,
+                                                    (int) Math.ceil(dur),
+                                                    timeDistance));
+
                         }
                     }
 
                     if (subSubActivation >= minScale) {
                         subSubActivation -= b.priAddOverflow(subSubActivation, tlinks); //activate the link
-                    } else {
-                        subSubActivation = 0;
                     }
 
-                } else {
-                    subSubActivation = 0;
-                }
+                    //change[0] += (subActivation - subSubActivation);
+                });
 
-                //change[0] += (subActivation - subSubActivation);
-            });
+                //recoup losses to the parent
+                //parentActivation += change[0];
+                return parentActivation;
 
-            //recoup losses to the parent
-            //parentActivation += change[0];
-            return parentActivation;
-        }
-        else {
+            }
+
+        } else {
             //termlinks?
         }
 
@@ -283,7 +276,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         if (tgt != origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
             //if (!originTerm.equals(tgtTerm)) {
-                termlink((Concept) tgt, originTerm, tlReverse);
+            termlink((Concept) tgt, originTerm, tlReverse);
             //}
         }
 

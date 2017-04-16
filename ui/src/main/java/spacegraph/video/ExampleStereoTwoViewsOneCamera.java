@@ -970,6 +970,11 @@ public class ExampleStereoTwoViewsOneCamera {
 //            }
         }
 
+        @Override
+        public float radius() {
+            return 1;
+        }
+
 //        private void projectScene() {
 //
 //

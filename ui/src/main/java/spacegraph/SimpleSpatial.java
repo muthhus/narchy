@@ -263,8 +263,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public void update(Dynamics world) {
         if (body == null) {
             this.body = create(world);
+        } else {
+            reactivate(); //necessary?
         }
-        reactivate(); //necessary?
     }
 
 

@@ -1,5 +1,6 @@
 package nars.bag.impl;
 
+import jcog.bag.PForget;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Forget;
@@ -26,17 +27,6 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
         super.forEach(max, action);
     }
 
-//    @NotNull
-//    @Override
-//    public HijackBag<Task, Task> commit() {
-//        //BLinkHijackBag.flatForget(this);
-//        //return this;
-//    }
-
-    @Override
-    public void onRemoved(@NotNull Task value) {
-        value.delete();
-    }
 
     @Override
     public float pri(@NotNull Task key) {
@@ -51,7 +41,7 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     @Override
     protected Consumer<Task> forget(float avgToBeRemoved) {
-        return new Forget(avgToBeRemoved);
+        return new PForget<>(avgToBeRemoved);
     }
 
 

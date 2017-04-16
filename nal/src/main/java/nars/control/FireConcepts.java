@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.bag.Bag;
 import jcog.bag.BagFlow;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;
@@ -15,6 +16,7 @@ import nars.Task;
 import nars.bag.impl.TaskHijackBag;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
+import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
@@ -24,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import static nars.time.Tense.ETERNAL;
 
 
 /** controls an active focus of concepts */
@@ -70,33 +74,46 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //        }
 //    }
 
-    public void premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numTaskLinks) {
+    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numPremises) {
 
         Concept c = pc.get();
 
         c.tasklinks().commit();
-        c.termlinks().commit();
+        Bag<Term, PLink<Term>> termLinks = c.termlinks();
+        termLinks.commit();
 
-        for (int i = 0; i < numTaskLinks; i++) {
+        long now = nar.time();
+        int count = 0;
+
+        for (int i = 0; i < numPremises; i++) {
             final @Nullable PLink<Task> taskLink = c.tasklinks().sample();
             if (taskLink == null)
-                return;
+                continue;
+
+            PLink<Term> termLink = termLinks.sample();
+            if (termLink==null)
+                continue;
+
+            Derivation d = premiser.premise(c, taskLink, termLink, now, nar, -1f, target);
+            if (d != null) {
+                premiser.deriver.accept(d);
+                count++;
+            }
 
 
-            int termlinksPerForThisTask = termlinksFiredPerFiredConcept
-                    .hi();
+//            int termlinksPerForThisTask = termlinksFiredPerFiredConcept
+//                    .hi();
                     //.lerp( pc.pri()  );
 
-            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
-                termLinks.add(v);
-                return 1;
-            });
+//            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+//            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
+//                termLinks.add(v);
+//                return 1;
+//            });
 
-            if (!termLinks.isEmpty())
-                premiser.newPremiseVector(c, taskLink, termlinksFiredPerFiredConcept,
-                        target, termLinks, nar);
+
         }
+        return count;
     }
 
 
@@ -116,8 +133,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Override public void fire() {
             source.sample(conceptsFiredPerCycle.intValue(), (h,c) -> {
-                premiseVector(nar, c, nar::input, h);
-                return h;
+                return premiseVector(nar, c, nar::input, h);
             });
         }
 
