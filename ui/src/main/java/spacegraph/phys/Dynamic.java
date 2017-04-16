@@ -29,6 +29,7 @@ import spacegraph.math.Quat4f;
 import spacegraph.math.v3;
 import spacegraph.phys.collision.CollidableType;
 import spacegraph.phys.collision.CollisionFlags;
+import spacegraph.phys.collision.broad.Broadphasing;
 import spacegraph.phys.constraint.TypedConstraint;
 import spacegraph.phys.math.MatrixUtil;
 import spacegraph.phys.math.Transform;
@@ -103,9 +104,6 @@ public class Dynamic<X> extends Collidable<X> {
 	public int contactSolverType;
 	public int frictionSolverType;
 	
-	private static int uniqueId;
-	public int debugBodyId;
-
 
 	public Dynamic(float mass, Transform t, CollisionShape collisionShape) {
 		this(mass, t, collisionShape, v());
@@ -170,18 +168,43 @@ public class Dynamic<X> extends Collidable<X> {
 		restitution = 0f;
 
 		setCollisionShape(collisionShape);
-		debugBodyId = uniqueId++;
 
 		setMass(mass, localInertia);
 		setDamping(0,0);
 		updateInertiaTensor();
 	}
 	
-	public void destroy() {
+	public void destroy(Collisions world) {
 		// No constraints should point to this rigidbody
 		// Remove constraints from the dynamics world before you delete the related rigidbodies. 
 		assert (constraintRefs.isEmpty());
-		userObjectPointer = null;
+		forceActivationState(Collidable.DISABLE_SIMULATION);
+		data = null;
+
+		Broadphasing bp = broadphase();
+		if (bp != null) {
+			//
+			// only clear the cached algorithms
+			//
+
+			world.broadphase.getOverlappingPairCache().cleanProxyFromPairs(bp, world.intersecter);
+			world.broadphase.destroyProxy(bp, world.intersecter);
+			broadphase(null);
+		} /*else {
+        	//System.err.println(collidable + " missing broadphase");
+			throw new RuntimeException(collidable + " missing broadphase");
+		}*/
+
+//		if (broadphaseHandle!=null) {
+//			//broadphaseHandle.data = null;
+//			broadphaseHandle = null;
+//		}
+
+//		if (collisionShape!=null) {
+//			collisionShape.setUserPointer(null);
+//			collisionShape = null;
+//		}
+
 	}
 
 

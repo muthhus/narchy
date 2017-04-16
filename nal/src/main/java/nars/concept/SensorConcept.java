@@ -15,7 +15,6 @@ import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

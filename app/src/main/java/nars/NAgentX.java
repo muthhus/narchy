@@ -190,7 +190,7 @@ abstract public class NAgentX extends NAgent {
 
                                     int iteration = 0;
                                     On on = nar.onCycle((r) -> {
-                                        Bag.priHistogram(nar.conceptsActive(), d);
+                                        Bag.priHistogram(nar.concepts(), d);
                                     });
 
                                     @Override
@@ -204,7 +204,7 @@ abstract public class NAgentX extends NAgent {
                     ),
                     new WindowButton( "conceptTreeMap", () -> {
 
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 128, 1f/nar.dur()), 64, nar);
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 128, 1f/nar.dur()), 64, nar);
 
                         return tc;
                     }),
@@ -222,7 +222,7 @@ abstract public class NAgentX extends NAgent {
 
             //Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
 
-            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.conceptsActive(), 32, 0.05f), 32, a.nar);
+            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 32, 0.05f), 32, a.nar);
 
 
             window(

@@ -8,7 +8,6 @@ import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import spacegraph.input.FPSLook;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
@@ -67,7 +66,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 Caffeine.newBuilder()
                         //.softValues().build();
                         .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
-                            v.delete();
+                            v.delete(dyn);
                         })
                         .maximumSize(cacheCapacity)
                         //.weakValues()

@@ -71,7 +71,7 @@ public class ConceptBagFocus implements Focus {
 
 
     @Override
-    public Iterable<PLink<Concept>> conceptsActive() {
+    public Iterable<PLink<Concept>> concepts() {
         return active;
     }
 

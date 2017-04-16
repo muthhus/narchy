@@ -98,7 +98,7 @@ public class Vis {
 
     public static Surface budgetHistogram(NAR nar, int bins) {
         if (nar instanceof Default) {
-            return budgetHistogram((Iterable)nar.focus().conceptsActive(), bins);
+            return budgetHistogram((Iterable)nar.focus().concepts(), bins);
         } else { //if (nar instance)
             //return budgetHistogram(((Default2)nar).active, bins);
             return grid(); //TODO

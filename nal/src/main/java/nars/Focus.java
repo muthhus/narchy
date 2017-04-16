@@ -31,12 +31,12 @@ public interface Focus extends Iterable<PLink<Concept>> {
         return (p == p) ? p : valueIfInactive;
     }
 
-    Iterable<PLink<Concept>> conceptsActive();
+    Iterable<PLink<Concept>> concepts();
 
     @NotNull
     @Override
     default Iterator<PLink<Concept>> iterator() {
-        return conceptsActive().iterator();
+        return concepts().iterator();
     }
 
 
@@ -60,7 +60,7 @@ public interface Focus extends Iterable<PLink<Concept>> {
         }
 
         @Override
-        public Iterable<PLink<Concept>> conceptsActive() {
+        public Iterable<PLink<Concept>> concepts() {
             return Collections.emptyList();
         }
     };

@@ -74,7 +74,7 @@ public class Signal {
 
 
         SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
-        s.budget(pri.asFloat() * deltaFactor(previous, t), nar);
+        s.setPriority(pri.asFloat() * deltaFactor(previous, t));
 
         //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
         //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);

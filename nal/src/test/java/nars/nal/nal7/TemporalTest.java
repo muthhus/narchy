@@ -375,7 +375,7 @@ public class TemporalTest {
         d.believe("(((#1-->[happy])&&(#1-->[sad])),(((0-->v),(0-->h))-->[pill]))");
         d.run(1);
 
-        assertTrue(3 <= size(d.conceptsActive()));
+        assertTrue(3 <= size(d.concepts()));
     }
 
     @Test
@@ -387,7 +387,7 @@ public class TemporalTest {
         d.run(1);
 
 
-        assertTrue(5 <= size(d.conceptsActive()));
+        assertTrue(5 <= size(d.concepts()));
         //Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
 
 

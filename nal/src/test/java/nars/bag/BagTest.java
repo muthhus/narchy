@@ -107,7 +107,7 @@ public class BagTest {
         assertEquals("x", ii.next().get());
 
 
-        assertEquals("[y=$0.2000;0.5000$, x=$0.1000;0.5000$]", a.listCopy().toString());
+        assertEquals("[y=0.2, x=0.1]", a.listCopy().toString());
 
         a.put(new RawPLink("x", 0.2f));
         a.commit();

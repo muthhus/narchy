@@ -56,8 +56,8 @@ public class BudgetFairnessTest {
             }
 
             @Override
-            public Iterable<PLink<Concept>> conceptsActive() {
-                return c.conceptsActive();
+            public Iterable<PLink<Concept>> concepts() {
+                return c.concepts();
             }
         });
 

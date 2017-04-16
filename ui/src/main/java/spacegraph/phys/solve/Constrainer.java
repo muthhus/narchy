@@ -40,7 +40,7 @@ public abstract class Constrainer {
 	
 	//protected final BulletStack stack = BulletStack.get();
 
-	public void prepareSolve (int numBodies, int numManifolds) {}
+
 
 	/**
 	 * Solve a group of constraints.

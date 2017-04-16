@@ -13,18 +13,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
- *  a bag which wraps another bag, accepts its value as input but at a throttled rate
- *  resulting in containing effectively the integrated / moving average values of the input bag
- *  TODO make a PLink version of ArrayBag since quality is not used here
+ * a bag which wraps another bag, accepts its value as input but at a throttled rate
+ * resulting in containing effectively the integrated / moving average values of the input bag
+ * TODO make a PLink version of ArrayBag since quality is not used here
  */
 public class Bagregate<X> extends ArrayBag<X> {
 
-    private final Iterable<X> src;
+    private final Iterable<PLink<X>> src;
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
-    public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
-        super(capacity, BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity));
+    public Bagregate(@NotNull Iterable<PLink<X>> src, int capacity, float scale) {
+        super(capacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
@@ -36,35 +36,33 @@ public class Bagregate<X> extends ArrayBag<X> {
         if (!busy.compareAndSet(false, true))
             return;
 
-        try {
+        //try {
 
-            commit();
+        commit();
 
-            float scale = this.scale.floatValue();
+        float scale = this.scale.floatValue();
 
-            src.forEach(x -> {
+        src.forEach(p -> {
 
-                float pri;
-                if (x instanceof PLink) { //HACK
-                    PLink p = (PLink) x;
-                    x = (X) p.get();
-                    pri = p.pri();
-                } else {
-                    pri = 1f;
-                }
 
-                if (x != null && include(x)) {
-                    put(new RawPLink(x, pri), scale, null);
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            X x = p.get();
+            float pri = p.pri();
+
+
+            if (x != null && include(x)) {
+                put(new RawPLink(x, pri), scale, null);
+            }
+        });
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         busy.set(false);
     }
 
-    /** can be overridden to filter entry */
+    /**
+     * can be overridden to filter entry
+     */
     protected boolean include(X x) {
         return true;
     }

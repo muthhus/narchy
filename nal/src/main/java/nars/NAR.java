@@ -546,7 +546,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         }
 
         Task y = new ImmutableTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
-        y.budget(pri, this);
+        y.setPriority(pri);
 
         input(y);
 
@@ -1344,7 +1344,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        conceptsActive().forEach(n -> recip.accept(n.get()));
+        concepts().forEach(n -> recip.accept(n.get()));
         return this;
     }
 
@@ -1450,10 +1450,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return focus.pri(termed);
     }
 
-    public Iterable<PLink<Concept>> conceptsActive() {
-        return focus.conceptsActive();
+    public Iterable<PLink<Concept>> concepts() {
+        return focus().concepts();
     }
-
 
     @NotNull
     public On onTask(@NotNull Consumer<Task> o) {

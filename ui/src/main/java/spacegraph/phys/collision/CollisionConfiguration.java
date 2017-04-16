@@ -39,6 +39,6 @@ public abstract class CollisionConfiguration {
 	virtual btStackAlloc*	getStackAllocator() = 0;
 	 */
 	
-	public abstract CollisionAlgorithmCreateFunc getCollisionAlgorithmCreateFunc(BroadphaseNativeType proxyType0, BroadphaseNativeType proxyType1);
+	public abstract CollisionAlgorithmCreateFunc collider(BroadphaseNativeType proxyType0, BroadphaseNativeType proxyType1);
 	
 }

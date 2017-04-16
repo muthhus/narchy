@@ -16,6 +16,7 @@ import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
+import spacegraph.phys.Dynamics;
 import spacegraph.phys.collision.ClosestRay;
 import spacegraph.render.Draw;
 import spacegraph.render.JoglPhysics;
@@ -94,9 +95,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
     }
 
     @Override
-    public void delete() {
+    public void delete(Dynamics dyn) {
         concept = null;
-        super.delete();
+        super.delete(dyn);
         edges.clear();
     }
 
@@ -142,7 +143,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
         } else {
             edges.clear();
-            delete();
+            delete(space.space.dyn);
         }
 
 //            float lastConceptForget = instance.getLastForgetTime();
@@ -234,7 +235,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             Concept c = space.nar.concept(tt);
             if (c != null) {
                 ConceptWidget at = space.widgetGet(c);
-                if (at != null && !at.hidden()) {
+                if (at != null && at.active()) {
                     TermEdge ate = new TermEdge(at);
                     ate.add(tgt, !(ttt instanceof Task));
                     edges.put(new RawPLink(ate, pri));

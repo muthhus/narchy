@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
+import static spacegraph.phys.Collidable.ISLAND_SLEEPING;
 import static spacegraph.phys.Dynamic.ifDynamic;
 
 /**
@@ -296,11 +297,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
     public void debugDrawWorld(IDebugDraw debugDrawer) {
 
         if (debugDrawer != null && (debugDrawer.getDebugMode() & DebugDrawModes.DRAW_CONTACT_POINTS) != 0) {
-            int numManifolds = intersecter.getNumManifolds();
+            int numManifolds = intersecter.manifoldCount();
             v3 color = new v3();
             color.set(0f, 0f, 0f);
             for (int i = 0; i < numManifolds; i++) {
-                PersistentManifold contactManifold = intersecter.getManifoldByIndexInternal(i);
+                PersistentManifold contactManifold = intersecter.manifold(i);
                 //btCollisionObject* obA = static_cast<btCollisionObject*>(contactManifold->getBody0());
                 //btCollisionObject* obB = static_cast<btCollisionObject*>(contactManifold->getBody1());
 
@@ -451,14 +452,19 @@ public abstract class Dynamics<X> extends Collisions<X> {
                         if (body.isStaticOrKinematicObject()) {
                             body.setActivationState(Collidable.ISLAND_SLEEPING);
                         } else {
-                            if (body.getActivationState() == Collidable.ACTIVE_TAG) {
-                                body.setActivationState(Collidable.WANTS_DEACTIVATION);
+                            switch (body.getActivationState()) {
+                                case Collidable.ACTIVE_TAG:
+                                    body.setActivationState(Collidable.WANTS_DEACTIVATION);
+                                    break;
+                                case ISLAND_SLEEPING:
+                                    tmp.zero();
+                                    //body.setAngularVelocity(tmp);
+                                    body.angularVelocity.zero();
+                                    //body.setLinearVelocity(tmp);
+                                    body.linearVelocity.zero();
+                                    break;
                             }
-                            if (body.getActivationState() == Collidable.ISLAND_SLEEPING) {
-                                tmp.set(0f, 0f, 0f);
-                                body.setAngularVelocity(tmp);
-                                body.setLinearVelocity(tmp);
-                            }
+
                         }
                     } else {
                         if (body.getActivationState() != Collidable.DISABLE_DEACTIVATION) {
@@ -581,20 +587,20 @@ public abstract class Dynamics<X> extends Collisions<X> {
         try {
             // sorted version of all btTypedConstraint, based on islandId
 
-            sortedConstraints.clear();
-            constraints.forEach((TypedConstraint c) -> sortedConstraints.add(c) );
+            if (!constraints.isEmpty()) {
+                sortedConstraints.clear();
+                constraints.forEach((TypedConstraint c) -> sortedConstraints.add(c));
 
-            //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
-            MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
+                //Collections.sort(sortedConstraints, sortConstraintOnIslandPredicate);
+                MiscUtil.quickSort(sortedConstraints, sortConstraintOnIslandPredicate);
+            }
 
             int num = sortedConstraints.size();
             solverCallback.init(solverInfo,
                     constrainer,
-                    num != 0 ? sortedConstraints : null,
+                    sortedConstraints,
                     num,
                     /*,m_stackAlloc*/ intersecter);
-
-            constrainer.prepareSolve(getNumCollisionObjects(), this.intersecter.getNumManifolds());
 
             // solve all the constraints for this island
             islands.buildAndProcessIslands(intersecter, collidable, solverCallback);
@@ -609,7 +615,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         BulletStats.pushProfile("calculateSimulationIslands");
         try {
 
-            islands.updateActivationState(this, intersecter);
+            islands.updateActivationState(this);
 
             forEachConstraint((TypedConstraint constraint) -> {
                 Dynamic colObj0 = constraint.getRigidBodyA();

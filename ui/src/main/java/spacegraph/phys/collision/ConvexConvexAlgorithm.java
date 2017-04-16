@@ -61,10 +61,8 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 
 	@Override
 	public void destroy() {
-		if (ownManifold) {
-			if (manifoldPtr != null) {
-				intersecter.releaseManifold(manifoldPtr);
-			}
+		if (ownManifold && manifoldPtr != null) {
+			intersecter.releaseManifold(manifoldPtr);
 			manifoldPtr = null;
 		}
 	}
@@ -256,10 +254,6 @@ public class ConvexConvexAlgorithm extends CollisionAlgorithm {
 			return algo;
 		}
 
-		@Override
-		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
-
-		}
-	}
+    }
 	
 }

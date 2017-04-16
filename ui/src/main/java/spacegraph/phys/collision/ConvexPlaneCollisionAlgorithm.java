@@ -160,10 +160,6 @@ public class ConvexPlaneCollisionAlgorithm extends CollisionAlgorithm {
 			return algo;
 		}
 
-		@Override
-		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
-
-		}
-	}
+    }
 	
 }

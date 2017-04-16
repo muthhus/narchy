@@ -34,7 +34,7 @@ public class UnionFind2 {
 
     // Optimization: could use short ints instead of ints (halving memory, would limit the number of rigid bodies to 64k, sounds reasonable).
 
-    private int[][] elements = new int[0][2];
+    protected int[][] elements = new int[0][2];
     int numElements;
 
     /**
@@ -63,7 +63,7 @@ public class UnionFind2 {
     }
 
     public void reset(int N) {
-        if (elements.length < N) {
+        if (elements == null || elements.length < N) {
             elements = new int[N][2];
         }
 
@@ -94,7 +94,7 @@ public class UnionFind2 {
     }
 
     public final int[] get(int index) {
-        valid(index);
+        //valid(index);
         return elements[index];
         //return array[index];
     }
@@ -172,7 +172,7 @@ public class UnionFind2 {
 
     static boolean valid(int x, int numElements) {
 
-        return !(x < 0 || (x >= numElements));
+        return x >= 0 && (x < numElements);
             ///throw new RuntimeException("overflow");
     }
 

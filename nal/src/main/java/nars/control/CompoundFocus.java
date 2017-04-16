@@ -47,16 +47,16 @@ public class CompoundFocus implements Focus {
     }
 
     @Override
-    public Iterable<PLink<Concept>> conceptsActive() {
+    public Iterable<PLink<Concept>> concepts() {
         int s = sub.size();
         switch (s) {
             case 0:
                 return Collections.emptyList();
             case 1:
-                return sub.get(0).conceptsActive(); //avoids the concatenated iterator default case
+                return sub.get(0).concepts(); //avoids the concatenated iterator default case
             default:
                 return () -> {
-                    return Iterators.concat(Iterators.transform(sub.iterator(), c -> c.conceptsActive().iterator()));
+                    return Iterators.concat(Iterators.transform(sub.iterator(), c -> c.concepts().iterator()));
                 };
         }
     }

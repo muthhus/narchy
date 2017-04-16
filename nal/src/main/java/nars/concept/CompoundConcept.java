@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.Param.TRUTH_EPSILON;
-import static nars.budget.BudgetMerge.plusBlend;
+import static nars.budget.BudgetMerge.maxBlend;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Termlike {
@@ -121,7 +121,7 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, plusBlend), b.newBag(sharedMap, plusBlend), nar);
+        this(term, b.newBag(sharedMap, maxBlend), b.newBag(sharedMap, maxBlend), nar);
     }
 
     @Override

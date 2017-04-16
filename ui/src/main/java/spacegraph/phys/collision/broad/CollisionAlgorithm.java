@@ -24,7 +24,6 @@
 package spacegraph.phys.collision.broad;
 
 import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.CollisionAlgorithmCreateFunc;
 import spacegraph.phys.collision.ManifoldResult;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.util.OArrayList;
@@ -38,10 +37,7 @@ import spacegraph.phys.util.OArrayList;
 public abstract class CollisionAlgorithm {
 
 	//protected final BulletStack stack = BulletStack.get();
-	
-	// JAVA NOTE: added
-	private CollisionAlgorithmCreateFunc createFunc;
-	
+
 	protected Intersecter intersecter;
 
 	public void init() {
@@ -59,12 +55,5 @@ public abstract class CollisionAlgorithm {
 	
 	public abstract void getAllContactManifolds(OArrayList<PersistentManifold> manifoldArray);
 	
-	public final void internalSetCreateFunc(CollisionAlgorithmCreateFunc func) {
-		createFunc = func;
-	}
 
-	public final CollisionAlgorithmCreateFunc internalGetCreateFunc() {
-		return createFunc;
-	}
-	
 }

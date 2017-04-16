@@ -23,9 +23,7 @@ public class LambdaQuestionTask extends ImmutableTask {
 
     /** wrap an existing question task */
     public LambdaQuestionTask(Task q, int history, NAR nar, BiConsumer<? super LambdaQuestionTask,Task> eachAnswer ) {
-        super(q.term(), q.punc(), null, q.creation(), q.start(), q.end(), new long[] { nar.time.nextStamp() } );
-        this.answers = newBag(history);
-        this.eachAnswer = eachAnswer;
+        this(q.term(), q.punc(), q.mid() /*, q.end()*/, history, nar, eachAnswer );
     }
 
     public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull Consumer<Task> eachAnswer) {
@@ -36,6 +34,8 @@ public class LambdaQuestionTask extends ImmutableTask {
 
     public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<? super LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null, nar.time(), occ, occ, new long[] { nar.time.nextStamp() } );
+
+        budget(nar);
 
         this.answers = newBag(history);
         this.eachAnswer = eachAnswer;

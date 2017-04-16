@@ -28,7 +28,6 @@ import spacegraph.phys.collision.broad.*;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 import spacegraph.phys.util.OArrayList;
 
-import java.util.Collection;
 import java.util.Collections;
 
 /**
@@ -41,7 +40,7 @@ public class DefaultIntersecter extends Intersecter {
 
 	private static final int MAX_BROADPHASE_COLLISION_TYPES = BroadphaseNativeType.MAX_BROADPHASE_COLLISION_TYPES.ordinal();
 	//private int count;
-	private final OArrayList<PersistentManifold> manifoldsPtr = new OArrayList<>();
+	private final OArrayList<PersistentManifold> manifolds = new OArrayList<>();
 	//private final boolean useIslands = true;
 	private boolean staticWarningReported;
 	//private ManifoldResult defaultManifoldResult;
@@ -54,8 +53,8 @@ public class DefaultIntersecter extends Intersecter {
 
 	private final CollisionAlgorithmConstructionInfo tmpCI = new CollisionAlgorithmConstructionInfo();
 
-	public DefaultIntersecter(CollisionConfiguration collisionConfiguration) {
-		this.collisionConfiguration = collisionConfiguration;
+	public DefaultIntersecter(CollisionConfiguration config) {
+		this.collisionConfiguration = config;
 
 		setNearCallback(new DefaultNearCallback());
 
@@ -63,12 +62,15 @@ public class DefaultIntersecter extends Intersecter {
 		//m_persistentManifoldPoolAllocator = collisionConfiguration->getPersistentManifoldPool();
 
 		for (int i = 0; i < MAX_BROADPHASE_COLLISION_TYPES; i++) {
+			BroadphaseNativeType ti = BroadphaseNativeType.forValue(i);
+			CollisionAlgorithmCreateFunc[] ddi = this.doubleDispatch[i];
+
 			for (int j = 0; j < MAX_BROADPHASE_COLLISION_TYPES; j++) {
-				doubleDispatch[i][j] = collisionConfiguration.getCollisionAlgorithmCreateFunc(
-					BroadphaseNativeType.forValue(i),
+				ddi[j] = config.collider(
+					ti,
 					BroadphaseNativeType.forValue(j)
 				);
-				assert (doubleDispatch[i][j] != null);
+				assert (ddi[j] != null);
 			}
 		}
 	}
@@ -98,20 +100,12 @@ public class DefaultIntersecter extends Intersecter {
 		CollisionAlgorithmConstructionInfo ci = tmpCI;
 		ci.intersecter1 = this;
 		ci.manifold = sharedManifold;
-		CollisionAlgorithmCreateFunc createFunc = doubleDispatch[body0.shape().getShapeType().ordinal()][body1.shape().getShapeType().ordinal()];
-		CollisionAlgorithm algo = createFunc.createCollisionAlgorithm(ci, body0, body1);
-		algo.internalSetCreateFunc(createFunc);
-
-		return algo;
+		CollisionAlgorithmCreateFunc createFunc =
+				doubleDispatch[body0.shape().getShapeType().ordinal()][body1.shape().getShapeType().ordinal()];
+		return createFunc.createCollisionAlgorithm(ci, body0, body1);
 	}
 
-	@Override
-	public void freeCollisionAlgorithm(CollisionAlgorithm algo) {
-		CollisionAlgorithmCreateFunc createFunc = algo.internalGetCreateFunc();
-		algo.internalSetCreateFunc(null);
-		createFunc.releaseCollisionAlgorithm(algo);
-		algo.destroy();
-	}
+
 
 	@Override
 	public PersistentManifold getNewManifold(Object b0, Object b1) {
@@ -141,8 +135,8 @@ public class DefaultIntersecter extends Intersecter {
 		PersistentManifold manifold = new PersistentManifold();
 		manifold.init(body0,body1,0);
 
-		manifold.index1a = manifoldsPtr.size();
-		manifoldsPtr.add(manifold);
+		manifold.index1a = manifolds.size();
+		manifolds.add(manifold);
 
 		return manifold;
 	}
@@ -156,11 +150,11 @@ public class DefaultIntersecter extends Intersecter {
 
 		// TODO: optimize
 		int findIndex = manifold.index1a;
-		assert (findIndex < manifoldsPtr.size());
-		Collections.swap(manifoldsPtr, findIndex, manifoldsPtr.size()-1);
+		assert (findIndex < manifolds.size());
+		Collections.swap(manifolds, findIndex, manifolds.size()-1);
         //return array[index];
-        manifoldsPtr.get(findIndex).index1a = findIndex;
-		manifoldsPtr.removeFast(manifoldsPtr.size()-1);
+        manifolds.get(findIndex).index1a = findIndex;
+		manifolds.removeFast(manifolds.size()-1);
 
 	}
 
@@ -197,10 +191,8 @@ public class DefaultIntersecter extends Intersecter {
 	@Override
 	public boolean needsResponse(Collidable body0, Collidable body1) {
 		//here you can do filtering
-		boolean hasResponse = (body0.hasContactResponse() && body1.hasContactResponse());
 		//no response between two static/kinematic bodies:
-		hasResponse = hasResponse && ((!body0.isStaticOrKinematicObject()) || (!body1.isStaticOrKinematicObject()));
-		return hasResponse;
+		return (body0.hasContactResponse() && body1.hasContactResponse()) && ((!body0.isStaticOrKinematicObject()) || (!body1.isStaticOrKinematicObject()));
 	}
 
 	private static class CollisionPairCallback extends OverlapCallback {
@@ -232,19 +224,14 @@ public class DefaultIntersecter extends Intersecter {
 	}
 
 	@Override
-	public int getNumManifolds() {
-		return manifoldsPtr.size();
+	public int manifoldCount() {
+		return manifolds.size();
 	}
 
 	@Override
-	public PersistentManifold getManifoldByIndexInternal(int index) {
-        return manifoldsPtr.get(index);
+	public PersistentManifold manifold(int index) {
+        return manifolds.get(index);
         //return array[index];
     }
 
-	@Override
-	public Collection<PersistentManifold> getInternalManifoldPointer() {
-		return manifoldsPtr;
-	}
-	
 }

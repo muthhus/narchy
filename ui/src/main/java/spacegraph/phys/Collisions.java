@@ -167,21 +167,6 @@ public abstract class Collisions<X> {
 //		removing(collidable);
 //	}
 
-	/** must be called before removing from objects list */
-	protected final void removing(Collidable collidable) {
-		Broadphasing bp = collidable.broadphase();
-		if (bp != null) {
-            //
-            // only clear the cached algorithms
-            //
-			broadphase.getOverlappingPairCache().cleanProxyFromPairs(bp, intersecter);
-			broadphase.destroyProxy(bp, intersecter);
-            collidable.broadphase(null);
-        } /*else {
-        	//System.err.println(collidable + " missing broadphase");
-			throw new RuntimeException(collidable + " missing broadphase");
-		}*/
-	}
 
 
 	
@@ -251,9 +236,6 @@ public abstract class Collisions<X> {
 	}
 
 
-	public int getNumCollisionObjects() {
-		return collidables().size();
-	}
 
 	final static ConvexShape pointShape = (ConvexShape) new SphereShape(0f).setMargin(0);
 

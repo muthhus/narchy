@@ -118,7 +118,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
-        for (int c = map.length(), j = -1; ++j < c; ) {
+        for (int c = map.length(), j = 0; j < c; j++) {
             Y v = map.get(j);
             if (v != null && accept.test(v)) {
                 e.accept(v);
@@ -532,50 +532,49 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             }*/
 
             V v = map.get(i);
-            if (v == null) {
-                skipped++;
-                continue;
-            }
+            if (v != null) {
+                float p = pri(v);
+                if (p == p) {
 
-            float p = pri(v);
-            if (p == p) {
-
-                float fhits = (p * priToHits);
-                int hits;
-                if (fhits < 1f) {
-                    hits = ((float)n/N) /* gets more desperate to select something as n shrinks to zero */ * random.nextFloat() < fhits ? 1 : 0;
-                } else {
-                    hits = (int) Math.ceil(fhits);
-                }
-
-                if (hits > 0) {
-                    if (map.compareAndSet(i, v, null)) {
-                        int taken = each.intValueOf(hits, v);
-                        boolean popped = (taken < 0);
-                        if (popped) {
-                            taken = 1; //make positive
-                            size.decrementAndGet();  onRemoved(v);
-                        } else if (taken > 0) {
-                            //try to reinsert in that slot we removed it temporarily from
-                            if (!map.compareAndSet(i, null, v)) {
-                                //try to insert as if normally
-                                if (put(v) == null) {
-                                    //give up
-                                    size.decrementAndGet();  onRemoved(v);
-                                    continue;
-                                }
-                            }
-
-                        }
-
-                        n -= taken;
-                        selected += taken;
+                    float fhits = (p * priToHits);
+                    int hits = (int) Math.floor(fhits);
+                    float remainder = fhits - hits;
+                    if (remainder > 0) {
+                        if (remainder >= random.nextFloat()) //use the change to select +1 probabalistically
+                            hits++;
                     }
 
-                } else {
-                    skipped++;
-                }
+                    if (hits > 0) {
+                        if (map.compareAndSet(i, v, null)) {
+                            int taken = each.intValueOf(hits, v);
+                            boolean popped = (taken < 0);
+                            if (popped) {
+                                taken = 1; //make positive
+                                size.decrementAndGet();
+                                onRemoved(v);
+                            } else if (taken > 0) {
+                                //try to reinsert in that slot we removed it temporarily from
+                                if (!map.compareAndSet(i, null, v)) {
+                                    //try to insert as if normally
+                                    if (put(v) == null) {
+                                        //give up
+                                        skipped++;
+                                        size.decrementAndGet();
+                                        onRemoved(v);
+                                        continue;
+                                    }
+                                }
 
+                            }
+
+                            n -= taken;
+                            selected += taken;
+                        }
+
+                    } else {
+                        skipped++;
+                    }
+                }
             } else {
                 skipped++;
                 //early deletion nullify
@@ -612,13 +611,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         forEachActive(this, e);
     }
 
-    /**
-     * yields the next threshold value to sample against
-     */
-    public float curve() {
-        float c = random.nextFloat();
-        return 1f - (c * c);
-    }
+//    /**
+//     * yields the next threshold value to sample against
+//     */
+//    public float curve() {
+//        float c = random.nextFloat();
+//        return 1f - (c * c);
+//    }
 
     @Override
     public Spliterator<V> spliterator() {

@@ -26,8 +26,6 @@ package spacegraph.phys.collision.broad;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.collision.narrow.PersistentManifold;
 
-import java.util.Collection;
-
 /**
  * Dispatcher abstract class can be used in combination with broadphase to dispatch
  * calculations for overlapping pairs. For example for pairwise collision detection,
@@ -56,14 +54,14 @@ public abstract class Intersecter {
 
 	public abstract void dispatchAllCollisionPairs(OverlappingPairCache pairCache, DispatcherInfo dispatchInfo, Intersecter intersecter);
 
-	public abstract int getNumManifolds();
+	public abstract int manifoldCount();
 
-	public abstract PersistentManifold getManifoldByIndexInternal(int index);
-
-	public abstract Collection<PersistentManifold> getInternalManifoldPointer();
+	public abstract PersistentManifold manifold(int index);
 
 	//public abstract Object allocateCollisionAlgorithm(int size);
 
-	public abstract void freeCollisionAlgorithm(CollisionAlgorithm algo);
+	public final void freeCollisionAlgorithm(CollisionAlgorithm algo) {
+		algo.destroy();
+	}
 	
 }

@@ -267,7 +267,6 @@ public class DbvtBroadphase extends Broadphase {
 		// clean up:
 		//SPC(m_profiling.m_cleanup);
 		FasterList<BroadphasePair> pairs = paircache.getOverlappingPairArray();
-		if (!pairs.isEmpty()) {
 			for (int i=0, ni=pairs.size(); i<ni; i++) {
 				//return array[index];
 				BroadphasePair p = pairs.get(i);
@@ -284,7 +283,7 @@ public class DbvtBroadphase extends Broadphase {
 					ni--;
 					i--;
 				}
-			}
+
 		}
 		pid++;
 
@@ -330,7 +329,7 @@ public class DbvtBroadphase extends Broadphase {
 			bounds.set(sets[1].root.volume);
 		}
 		else {
-			DbvtAabbMm.fromCR(new v3(0f, 0f, 0f), 0f, bounds);
+			DbvtAabbMm.fromCR(new v3(), 0f, bounds);
 		}
 		aabbMin.set(bounds.mins());
 		aabbMax.set(bounds.maxs());

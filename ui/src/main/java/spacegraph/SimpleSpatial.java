@@ -50,17 +50,18 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     }
 
     @Override
-    public void delete() {
+    public void delete(Dynamics dyn) {
 //        if (shape!=null) {
 //            shape.setUserPointer(null);
 //            shape = null;
 //        }
+
+        super.delete(dyn);
+
         if (body!=null) {
-            body.destroy();
+            body.destroy(dyn);
             body = null;
         }
-
-        super.delete();
 
     }
 
@@ -93,7 +94,6 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
         v3 center = transform();
         move(Util.lerp(rate, x, center.x), center.y, center.z);
     }
-
 
     public void moveY(float y, float rate) {
         v3 center = transform();

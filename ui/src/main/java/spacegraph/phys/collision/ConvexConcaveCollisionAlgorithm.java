@@ -228,10 +228,7 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			return algo;
 		}
 
-		@Override
-		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
-		}
-	}
+    }
 
 	public static class SwappedCreateFunc extends CollisionAlgorithmCreateFunc {
 
@@ -242,9 +239,6 @@ public class ConvexConcaveCollisionAlgorithm extends CollisionAlgorithm {
 			return algo;
 		}
 
-		@Override
-		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
-		}
-	}
+    }
 	
 }

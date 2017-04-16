@@ -82,7 +82,7 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
                 nextPri = Math.max(ePri, iPri*iScale);
                 break;
             case AVG:
-                nextPri = lerp(0.5f, iPri, ePri);
+                nextPri = lerp(iScale, (iPri+ePri)/2f, ePri);
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;

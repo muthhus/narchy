@@ -38,322 +38,329 @@ import java.util.List;
 
 /**
  * SimulationIslandManager creates and handles simulation islands, using {@link UnionFind}.
- * 
+ *
  * @author jezek2
  */
 public class Islands {
 
-	//public final UnionFind find = new UnionFind();
-	public final UnionFind2 find = new UnionFind2();
+    //public final UnionFind find = new UnionFind();
+    public final UnionFind2 find = new UnionFind2();
 
-	private final FasterList<PersistentManifold> islandmanifold = new FasterList<>();
-	private final FasterList<Collidable> islandBodies = new FasterList<>();
+    private final FasterList<PersistentManifold> islandmanifold = new FasterList<>();
+    private final FasterList<Collidable> islandBodies = new FasterList<>();
 
-	public void initUnionFind(int n) {
-		find.reset(n);
-	}
+    public void findUnions(Collisions colWorld) {
+        FasterList<BroadphasePair> pairPtr = colWorld.pairs().getOverlappingPairArray();
+        int n = pairPtr.size();
 
-	public void findUnions(Intersecter intersecter, Collisions colWorld) {
-		FasterList<BroadphasePair> pairPtr = colWorld.pairs().getOverlappingPairArray();
-		for (int i=0; i<pairPtr.size(); i++) {
-			//return array[index];
-			BroadphasePair collisionPair = pairPtr.get(i);
+//        if (n > 0) {
+//            System.out.println(pairPtr.size() + " pairPtr in");
+//        }
 
-			Collidable colObj0 = collisionPair.pProxy0.data;
-			if (colObj0 == null)
-				continue;
-			Collidable colObj1 = collisionPair.pProxy1.data;
-			if (colObj1 == null)
-				continue;
+        for (int i = 0; i < n; i++) {
+            //return array[index];
+            BroadphasePair collisionPair = pairPtr.get(i);
 
-			if (( ((colObj0).mergesSimulationIslands())) &&
-					( ((colObj1).mergesSimulationIslands()))) {
-
-				find.unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
-			}
-		}
-	}
-
-	public final void updateActivationState(Collisions<?> colWorld, Intersecter intersecter) {
-		int num = colWorld.getNumCollisionObjects();
-
-		initUnionFind(num);
-
-		final int[] i = {0};
-		colWorld.collidables().forEach((collidable)->{
-			collidable.setIslandTag(i[0]++);
-			collidable.setCompanionId(-1);
-			collidable.setHitFraction(1f);
-		});
-
-		findUnions(intersecter, colWorld);
-	}
-
-	public final void storeIslandActivationState(Collisions<?> world) {
-		// put the islandId ('find' value) into m_tag
-		int i = 0;
-		for (Collidable collidable : world.collidables()) {
-			storeIslandActivationState(i++, collidable);
-		}
+            Collidable colObj0 = collisionPair.pProxy0.data;
+            if (colObj0!=null && ((colObj0).mergesSimulationIslands())) {
+                Collidable colObj1 = collisionPair.pProxy1.data;
+                if (colObj1 != null && ((colObj1).mergesSimulationIslands())) {
+                    find.unite((colObj0).getIslandTag(), (colObj1).getIslandTag());
+                }
+            }
+        }
     }
 
-	final boolean storeIslandActivationState(int i, Collidable c) {
-		if (!c.isStaticOrKinematicObject()) {
-			c.setIslandTag(find.find(i));
-			c.setCompanionId(-1);
-		} else {
-			c.setIslandTag(-1);
-			c.setCompanionId(-2);
-		}
-		return true;
-	}
+    public final void updateActivationState(Collisions<?> colWorld) {
+        List<Collidable> cc = colWorld.collidables();
+        int num = cc.size();
 
-	private static int getIslandId(PersistentManifold lhs) {
-		int islandId;
-		Collidable rcolObj0 = (Collidable) lhs.getBody0();
-		Collidable rcolObj1 = (Collidable) lhs.getBody1();
-		islandId = rcolObj0.getIslandTag() >= 0? rcolObj0.getIslandTag() : rcolObj1.getIslandTag();
-		return islandId;
-	}
+        find.reset(num);
 
-	public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
+        final int[] i = {0};
+        cc.forEach((collidable) -> {
+            collidable.setIslandTag(i[0]++);
+            collidable.setCompanionId(-1);
+            collidable.setHitFraction(1f);
+        });
 
-		//System.out.println("build islands");
 
-		BulletStats.pushProfile("islandUnionFindAndQuickSort");
-		try {
-			islandmanifold.clear();
+        findUnions(colWorld);
+    }
 
-			// we are going to sort the unionfind array, and store the element id in the size
-			// afterwards, we clean unionfind, to make sure no-one uses it anymore
+    public final void storeIslandActivationState(Collisions<?> world) {
+        // put the islandId ('find' value) into m_tag
+        int i = 0;
+        List<Collidable> collidables = world.collidables();
+        for (int i1 = 0, collidablesSize = collidables.size(); i1 < collidablesSize; i1++) {
+            storeIslandActivationState(i++, collidables.get(i1));
+        }
+    }
+
+    final boolean storeIslandActivationState(int i, Collidable c) {
+        if (!c.isStaticOrKinematicObject()) {
+            c.setIslandTag(find.find(i));
+            c.setCompanionId(-1);
+        } else {
+            c.setIslandTag(-1);
+            c.setCompanionId(-2);
+        }
+        return true;
+    }
+
+    private static int getIslandId(PersistentManifold lhs) {
+        int islandId;
+        Collidable rcolObj0 = (Collidable) lhs.getBody0();
+        Collidable rcolObj1 = (Collidable) lhs.getBody1();
+        int t0 = rcolObj0.getIslandTag();
+        islandId = t0 >= 0 ? t0 : rcolObj1.getIslandTag();
+        return islandId;
+    }
+
+    public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
+
+        //System.out.println("build islands");
+
+        BulletStats.pushProfile("islandUnionFindAndQuickSort");
+        try {
+            islandmanifold.clear();
+
+            // we are going to sort the unionfind array, and store the element id in the size
+            // afterwards, we clean unionfind, to make sure no-one uses it anymore
 
             find.sortIslands();
             int numElem = find.size();
 
-			int endIslandIndex = 1;
-			int startIslandIndex;
+            int endIslandIndex = 1;
+            int startIslandIndex;
 
-			// update the sleeping state for bodies, if all are sleeping
-			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
+            // update the sleeping state for bodies, if all are sleeping
+            for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
                 int islandId = find.getId(startIslandIndex);
                 for (endIslandIndex = startIslandIndex + 1; (endIslandIndex < numElem) && (find.getId(endIslandIndex) == islandId); endIslandIndex++) {
-				}
+                }
 
-				//int numSleeping = 0;
+                //int numSleeping = 0;
 
-				boolean allSleeping = true;
+                boolean allSleeping = true;
 
-				int idx;
-				for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
+                int idx;
+                for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
                     int i = find.getSz(idx);
 
-					//return array[index];
-					Collidable colObj0 = collidables.get(i);
-					if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
-						islandError(colObj0);
-						continue;
-					}
+                    //return array[index];
+                    final Collidable colObj0 = collidables.get(i);
+                    final int tag0 = colObj0.getIslandTag();
 
-					assert ((colObj0.getIslandTag() == islandId) || (colObj0.getIslandTag() == -1));
-					if (colObj0.getIslandTag() == islandId) {
-						if (colObj0.getActivationState() == Collidable.ACTIVE_TAG) {
-							allSleeping = false;
-						}
-						if (colObj0.getActivationState() == Collidable.DISABLE_DEACTIVATION) {
-							allSleeping = false;
-						}
-					}
-				}
+                    if ((tag0 != islandId) && (tag0 != -1)) {
+                        islandError(colObj0);
+                        continue;
+                    }
+
+                    assert ((tag0 == islandId) || (tag0 == -1));
+                    if (tag0 == islandId) {
+                        if (colObj0.getActivationState() == Collidable.ACTIVE_TAG) {
+                            allSleeping = false;
+                        }
+                        if (colObj0.getActivationState() == Collidable.DISABLE_DEACTIVATION) {
+                            allSleeping = false;
+                        }
+                    }
+                }
 
 
-				if (allSleeping) {
-					//int idx;
-					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
+                if (allSleeping) {
+                    //int idx;
+                    for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
                         int i = find.getSz(idx);
-						//return array[index];
-						Collidable colObj0 = collidables.get(i);
-						if ((colObj0.getIslandTag() != islandId) && (colObj0.getIslandTag() != -1)) {
-							islandError(colObj0);
-							continue;
-						}
+                        //return array[index];
+                        final Collidable colObj0 = collidables.get(i);
+                        int tag0 = colObj0.getIslandTag();
+                        if ((tag0 != islandId) && (tag0 != -1)) {
+                            islandError(colObj0);
+                            continue;
+                        }
 
-						assert ((colObj0.getIslandTag() == islandId) || (colObj0.getIslandTag() == -1));
+                        assert ((tag0 == islandId) || (tag0 == -1));
 
-						if (colObj0.getIslandTag() == islandId) {
-							colObj0.setActivationState(Collidable.ISLAND_SLEEPING);
-						}
-					}
-				}
-				else {
+                        if (tag0 == islandId) {
+                            colObj0.setActivationState(Collidable.ISLAND_SLEEPING);
+                        }
+                    }
+                } else {
 
-					//int idx;
-					for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
+                    //int idx;
+                    for (idx = startIslandIndex; idx < endIslandIndex; idx++) {
                         int i = find.getSz(idx);
 
-						//return array[index];
-						Collidable colObj0 = collidables.get(i);
-						int tag = colObj0.getIslandTag();
-						if ((tag != islandId) && (tag != -1)) {
-							islandError(colObj0);
-							continue;
-						}
+                        //return array[index];
+                        Collidable colObj0 = collidables.get(i);
+                        int tag0 = colObj0.getIslandTag();
+                        if ((tag0 != islandId) && (tag0 != -1)) {
+                            islandError(colObj0);
+                            continue;
+                        }
 
-						assert ((tag == islandId) || (tag == -1));
+                        assert ((tag0 == islandId) || (tag0 == -1));
 
-						if (tag == islandId) {
-							if (colObj0.getActivationState() == Collidable.ISLAND_SLEEPING) {
-								colObj0.setActivationState(Collidable.WANTS_DEACTIVATION);
-							}
-						}
-					}
-				}
-			}
+                        if (tag0 == islandId) {
+                            if (colObj0.getActivationState() == Collidable.ISLAND_SLEEPING) {
+                                colObj0.setActivationState(Collidable.WANTS_DEACTIVATION);
+                            }
+                        }
+                    }
+                }
+            }
 
 
-			int i;
-			int maxNumManifolds = intersecter.getNumManifolds();
+            int i;
+            int maxNumManifolds = intersecter.manifoldCount();
 
-			//#define SPLIT_ISLANDS 1
-			//#ifdef SPLIT_ISLANDS
-			//#endif //SPLIT_ISLANDS
+            //#define SPLIT_ISLANDS 1
+            //#ifdef SPLIT_ISLANDS
+            //#endif //SPLIT_ISLANDS
 
-			for (i = 0; i < maxNumManifolds; i++) {
-				PersistentManifold manifold = intersecter.getManifoldByIndexInternal(i);
+            for (i = 0; i < maxNumManifolds; i++) {
+                PersistentManifold manifold = intersecter.manifold(i);
 
-				Collidable colObj0 = (Collidable) manifold.getBody0();
-				Collidable colObj1 = (Collidable) manifold.getBody1();
+                Collidable colObj0 = (Collidable) manifold.getBody0();
+                if (colObj0!=null) {
+                    Collidable colObj1 = (Collidable) manifold.getBody1();
+                    if (colObj1!=null) {
 
-				// todo: check sleeping conditions!
-				if (((colObj0 != null) && colObj0.getActivationState() != Collidable.ISLAND_SLEEPING) ||
-						((colObj1 != null) && colObj1.getActivationState() != Collidable.ISLAND_SLEEPING)) {
+                        // todo: check sleeping conditions!
+                        int s0 = colObj0.getActivationState();
+                        int s1 = colObj1.getActivationState();
+                        if ((s0 != Collidable.ISLAND_SLEEPING) || (s1 != Collidable.ISLAND_SLEEPING)) {
 
-					// kinematic objects don't merge islands, but wake up all connected objects
-					if (colObj0.isKinematicObject() && colObj0.getActivationState() != Collidable.ISLAND_SLEEPING) {
-						colObj1.activate();
-					}
-					if (colObj1.isKinematicObject() && colObj1.getActivationState() != Collidable.ISLAND_SLEEPING) {
-						colObj0.activate();
-					}
-					//#ifdef SPLIT_ISLANDS
-					//filtering for response
-					if (intersecter.needsResponse(colObj0, colObj1)) {
-						islandmanifold.add(manifold);
-					}
-					//#endif //SPLIT_ISLANDS
-				}
-			}
-		}
-		finally {
-			BulletStats.popProfile();
-		}
-	}
+                            // kinematic objects don't merge islands, but wake up all connected objects
+                            if (s0 != Collidable.ISLAND_SLEEPING && colObj0.isKinematicObject()) {
+                                colObj1.activate(true);
+                            }
+                            if (s1 != Collidable.ISLAND_SLEEPING && colObj1.isKinematicObject()) {
+                                colObj0.activate(true);
+                            }
 
-	public void islandError(Collidable colObj0) {
-		//System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
-	}
+                            //#ifdef SPLIT_ISLANDS
+                            //filtering for response
+                            if (intersecter.needsResponse(colObj0, colObj1)) {
+                                islandmanifold.add(manifold);
+                            }
+                            //#endif //SPLIT_ISLANDS
+                        }
+                    }
+                }
+            }
+        } finally {
+            BulletStats.popProfile();
+        }
+    }
 
-	public <X> void buildAndProcessIslands(Intersecter intersecter, List<Collidable> collidables, IslandCallback callback) {
-		buildIslands(intersecter, collidables);
+    public void islandError(Collidable colObj0) {
+        System.err.println("error in island management: " + colObj0 + " " + colObj0.data());
+    }
 
-		int endIslandIndex = 1;
-		int startIslandIndex;
+    public <X> void buildAndProcessIslands(Intersecter intersecter, List<Collidable> collidables, IslandCallback callback) {
+        buildIslands(intersecter, collidables);
+
+        int endIslandIndex = 1;
+        int startIslandIndex;
         int numElem = find.size();
 
-		BulletStats.pushProfile("processIslands");
-		try {
-			//#ifndef SPLIT_ISLANDS
-			//btPersistentManifold** manifold = dispatcher->getInternalManifoldPointer();
-			//
-			//callback->ProcessIsland(&collisionObjects[0],collisionObjects.size(),manifold,maxNumManifolds, -1);
-			//#else
-			// Sort manifolds, based on islands
-			// Sort the vector using predicate and std::sort
-			//std::sort(islandmanifold.begin(), islandmanifold.end(), btPersistentManifoldSortPredicate);
+        BulletStats.pushProfile("processIslands");
+        try {
+            //#ifndef SPLIT_ISLANDS
+            //btPersistentManifold** manifold = dispatcher->getInternalManifoldPointer();
+            //
+            //callback->ProcessIsland(&collisionObjects[0],collisionObjects.size(),manifold,maxNumManifolds, -1);
+            //#else
+            // Sort manifolds, based on islands
+            // Sort the vector using predicate and std::sort
+            //std::sort(islandmanifold.begin(), islandmanifold.end(), btPersistentManifoldSortPredicate);
 
-			int numManifolds = islandmanifold.size();
+            int numManifolds = islandmanifold.size();
 
-			// we should do radix sort, it it much faster (O(n) instead of O (n log2(n))
-			//islandmanifold.heapSort(btPersistentManifoldSortPredicate());
+            // we should do radix sort, it it much faster (O(n) instead of O (n log2(n))
+            //islandmanifold.heapSort(btPersistentManifoldSortPredicate());
 
-			// JAVA NOTE: memory optimized sorting with caching of temporary array
-			//Collections.sort(islandmanifold, persistentManifoldComparator);
-			MiscUtil.quickSort(islandmanifold, persistentManifoldComparator);
+            // JAVA NOTE: memory optimized sorting with caching of temporary array
+            //Collections.sort(islandmanifold, persistentManifoldComparator);
+            MiscUtil.quickSort(islandmanifold, persistentManifoldComparator);
 
-			// now process all active islands (sets of manifolds for now)
+            // now process all active islands (sets of manifolds for now)
 
-			int startManifoldIndex = 0;
-			int endManifoldIndex = 1;
+            int startManifoldIndex = 0;
+            int endManifoldIndex = 1;
 
-			//int islandId;
+            //int islandId;
 
-			//printf("Start Islands\n");
+            //printf("Start Islands\n");
 
-			// traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
-			for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
+            // traverse the simulation islands, and call the solver, unless all objects are sleeping/deactivated
+            for (startIslandIndex = 0; startIslandIndex < numElem; startIslandIndex = endIslandIndex) {
                 int islandId = find.getId(startIslandIndex);
-				boolean islandSleeping = false;
+                boolean islandSleeping = false;
 
-				for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.getId(endIslandIndex) == islandId)); endIslandIndex++) {
-					int i = find.getSz(endIslandIndex);
-					//return array[index];
-					Collidable colObj0 = collidables.get(i);
-					islandBodies.add(colObj0);
-					if (!colObj0.isActive()) {
-						islandSleeping = true;
-					}
-				}
-
-
-				// find the accompanying contact manifold for this islandId
-				int numIslandManifolds = 0;
-				//ObjectArrayList<PersistentManifold> startManifold = null;
-				int startManifold_idx = -1;
-
-				if (startManifoldIndex < numManifolds) {
-					//return array[index];
-					int curIslandId = getIslandId(islandmanifold.get(startManifoldIndex));
-					if (curIslandId == islandId) {
-						//startManifold = &m_islandmanifold[startManifoldIndex];
-						//startManifold = islandmanifold.subList(startManifoldIndex, islandmanifold.size());
-						startManifold_idx = startManifoldIndex;
-
-						//return array[index];
-						for (endManifoldIndex = startManifoldIndex + 1; (endManifoldIndex < numManifolds) && (islandId == getIslandId(islandmanifold.get(endManifoldIndex))); endManifoldIndex++) {
-
-						}
-						// Process the actual simulation, only if not sleeping/deactivated
-						numIslandManifolds = endManifoldIndex - startManifoldIndex;
-					}
-
-				}
+                for (endIslandIndex = startIslandIndex; (endIslandIndex < numElem) && ((find.getId(endIslandIndex) == islandId)); endIslandIndex++) {
+                    int i = find.getSz(endIslandIndex);
+                    //return array[index];
+                    Collidable colObj0 = collidables.get(i);
+                    islandBodies.add(colObj0);
+                    if (!colObj0.isActive()) {
+                        islandSleeping = true;
+                    }
+                }
 
 
-				if (!islandSleeping) {
-					callback.processIsland(islandBodies, islandmanifold, startManifold_idx, numIslandManifolds, islandId);
-					//printf("Island callback of size:%d bodies, %d manifolds\n",islandBodies.size(),numIslandManifolds);
-				}
+                // find the accompanying contact manifold for this islandId
+                int numIslandManifolds = 0;
+                //ObjectArrayList<PersistentManifold> startManifold = null;
+                int startManifold_idx = -1;
 
-				if (numIslandManifolds != 0) {
-					startManifoldIndex = endManifoldIndex;
-				}
+                if (startManifoldIndex < numManifolds) {
+                    //return array[index];
+                    int curIslandId = getIslandId(islandmanifold.get(startManifoldIndex));
+                    if (curIslandId == islandId) {
+                        //startManifold = &m_islandmanifold[startManifoldIndex];
+                        //startManifold = islandmanifold.subList(startManifoldIndex, islandmanifold.size());
+                        startManifold_idx = startManifoldIndex;
 
-				islandBodies.clear();
-			}
+                        //return array[index];
+                        for (endManifoldIndex = startManifoldIndex + 1; (endManifoldIndex < numManifolds) && (islandId == getIslandId(islandmanifold.get(endManifoldIndex))); endManifoldIndex++) {
+
+                        }
+                        // Process the actual simulation, only if not sleeping/deactivated
+                        numIslandManifolds = endManifoldIndex - startManifoldIndex;
+                    }
+
+                }
 
 
-			//#endif //SPLIT_ISLANDS
-		}
-		finally {
-			BulletStats.popProfile();
-		}
-	}
+                if (!islandSleeping) {
+                    callback.processIsland(islandBodies, islandmanifold, startManifold_idx, numIslandManifolds, islandId);
+                    //printf("Island callback of size:%d bodies, %d manifolds\n",islandBodies.size(),numIslandManifolds);
+                }
 
-	////////////////////////////////////////////////////////////////////////////
-	
-	public static abstract class IslandCallback {
-		public abstract void processIsland(Collection<Collidable> bodies, FasterList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
-	}
-	
-	private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs)? -1 : +1;
-	
+                if (numIslandManifolds != 0) {
+                    startManifoldIndex = endManifoldIndex;
+                }
+
+                islandBodies.clear();
+            }
+
+
+            //#endif //SPLIT_ISLANDS
+        } finally {
+            BulletStats.popProfile();
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    public static abstract class IslandCallback {
+        public abstract void processIsland(Collection<Collidable> bodies, FasterList<PersistentManifold> manifolds, int manifolds_offset, int numManifolds, int islandId);
+    }
+
+    private static final Comparator<PersistentManifold> persistentManifoldComparator = (lhs, rhs) -> getIslandId(lhs) < getIslandId(rhs) ? -1 : +1;
+
 }

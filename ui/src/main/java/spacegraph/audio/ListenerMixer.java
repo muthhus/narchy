@@ -1,11 +1,8 @@
 package spacegraph.audio;
 
 
-import jcog.list.SynchronizedArrayList;
-
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 

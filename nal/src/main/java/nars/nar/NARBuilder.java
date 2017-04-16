@@ -56,12 +56,12 @@ public interface NARBuilder {
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
-                new DefaultConceptState("sleep", 16, 16, 3, 32, 32),
-                new DefaultConceptState("awake", 16, 16, 4, 48, 48)
+                new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
+                new DefaultConceptState("awake", 16, 16, 4, 32, 24)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-                Bag<Term, PLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.plusBlend, rng);
+                Bag<Term, PLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
                 Bag<Task, PLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
                 return f.apply(termlink, tasklink);
             }
@@ -74,12 +74,12 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 256 * 1024;
+        int maxConcepts = 512 * 1024;
 
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                1, 5, rng,
+                1, 3, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -186,11 +186,11 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(256);
+        nar.deriver.conceptsFiredPerCycle.setValue(512);
         nar.deriver.conceptsFiredPerBatch.setValue(64);
-        nar.deriver.derivationsInputPerCycle.setValue(64);
+        nar.deriver.derivationsInputPerCycle.setValue(128);
 
-        nar.termVolumeMax.setValue(72);
+        nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);

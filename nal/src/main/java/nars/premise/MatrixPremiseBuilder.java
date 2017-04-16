@@ -1,12 +1,8 @@
 package nars.premise;
 
-import jcog.bag.PLink;
-import jcog.bag.Priority;
-import jcog.list.FasterList;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.Concept;
 import nars.derive.Deriver;
 import nars.task.DerivedTask;
 import nars.term.Term;
@@ -17,8 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * constructs premises from a virtual matrix of tasks (row x column)

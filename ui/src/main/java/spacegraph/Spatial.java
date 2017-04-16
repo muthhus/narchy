@@ -126,7 +126,8 @@ public abstract class Spatial<X> implements Active {
 
     public abstract void renderRelative(GL2 gl, Collidable body);
 
-    public void delete() {
+    public void delete(Dynamics dyn) {
+
         hide();
     }
 

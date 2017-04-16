@@ -3,7 +3,6 @@ package nars.bag.impl;
 import jcog.bag.PForget;
 import nars.NAR;
 import nars.Task;
-import nars.attention.Forget;
 import nars.budget.BudgetMerge;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;

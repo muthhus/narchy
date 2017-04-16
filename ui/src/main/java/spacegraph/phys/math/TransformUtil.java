@@ -138,12 +138,12 @@ public class TransformUtil {
 		//axis[3] = btScalar(0.);
 
 		// check for axis length
-		float len = axis.lengthSquared();
-		if (len < BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON) {
+		float lenSq = axis.lengthSquared();
+		if (lenSq < BulletGlobals.FLT_EPSILON * BulletGlobals.FLT_EPSILON) {
 			axis.set(1f, 0f, 0f);
 		}
 		else {
-			axis.scale(1f / (float) Math.sqrt(len));
+			axis.scale(1f / (float) Math.sqrt(lenSq));
 		}
 	}
 	

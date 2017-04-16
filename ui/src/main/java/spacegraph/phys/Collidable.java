@@ -70,13 +70,13 @@ public class Collidable<X> {
 	protected int collisionFlags;
 	protected int islandTag1;
 	protected int companionId;
-	protected int activationState1;
+	protected int state;
 	protected float deactivationTime;
 	protected float friction;
 	protected float restitution;
 
 	///users can point to their objects, m_userPointer is not used by Bullet, see setUserPointer/getUserPointer
-	protected X userObjectPointer;
+	protected X data;
 
 	// internalType is reserved to distinguish Bullet's CollisionObject, RigidBody, SoftBody etc.
 	// do not assign your own internalType unless you write a new dynamics object class.
@@ -102,7 +102,7 @@ public class Collidable<X> {
 		this.collisionFlags = CollisionFlags.STATIC_OBJECT;
 		this.islandTag1 = -1;
 		this.companionId = -1;
-		this.activationState1 = 1;
+		this.state = 1;
 		this.friction = 0.5f;
 		this.hitFraction = 1f;
 		this.worldTransform = t;
@@ -159,12 +159,12 @@ public class Collidable<X> {
 	}
 
 	public final int getActivationState() {
-		return activationState1;
+		return state;
 	}
 
 	public void setActivationState(int newState) {
-		if ((activationState1 != DISABLE_DEACTIVATION) && (activationState1 != DISABLE_SIMULATION)) {
-			this.activationState1 = newState;
+		if ((state != DISABLE_DEACTIVATION) && (state != DISABLE_SIMULATION)) {
+			this.state = newState;
 		}
 	}
 
@@ -177,7 +177,7 @@ public class Collidable<X> {
 	}
 
 	public void forceActivationState(int newState) {
-		this.activationState1 = newState;
+		this.state = newState;
 	}
 
 	public void activate() {
@@ -192,7 +192,7 @@ public class Collidable<X> {
 	}
 
 	public final boolean isActive() {
-		int s = this.activationState1;
+		int s = this.state;
 		return ((s != ISLAND_SLEEPING) && (s != DISABLE_SIMULATION));
 	}
 
@@ -320,11 +320,11 @@ public class Collidable<X> {
 	}
 
 	public X data() {
-		return userObjectPointer;
+		return data;
 	}
 
-	public void setData(X userObjectPointer) {
-		this.userObjectPointer = userObjectPointer;
+	public void setData(X x) {
+		this.data = x;
 	}
 
 	public boolean checkCollideWith(Collidable co) {

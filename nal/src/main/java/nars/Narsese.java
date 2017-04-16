@@ -136,41 +136,6 @@ public class Narsese extends BaseParser<Object> {
         return parsers.get();
     }
 
-    @NotNull
-    public static Task makeTask(@NotNull NAR nar, @Nullable Float b, @NotNull Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
-
-//        if (p == null)
-//            throw new RuntimeException("character is null");
-//
-//        if ((t == null) && ((p == JUDGMENT) || (p == GOAL)))
-//            t = new DefaultTruth(p);
-//
-//        if ((blen > 0) && (Float.isFinite(b[0])))
-//            blen = 0;
-//
-
-        if (t == null) {
-            t = nar.truthDefault(p);
-        }
-
-        TaskBuilder ttt =
-                new TaskBuilder(content, p, t)
-                        .time(
-                                nar.time(), //creation time
-                                Tense.getRelativeOccurrence(
-                                        tense,
-                                        nar
-                                ));
-
-        if (b == null)  /* do not set, Memory will apply defaults */
-            ttt.budgetSafe(nar.priorityDefault(p));
-        else
-            ttt.budgetSafe(b);
-
-
-        return ttt.log(NARSESE_TASK_TAG).apply(nar);
-    }
-
     public static float quality(NAR nar, byte p, @Nullable Truth t) {
         return t != null ? BudgetFunctions.truthToQuality(t) : nar.qualityDefault(p);
     }
@@ -1270,7 +1235,38 @@ public class Narsese extends BaseParser<Object> {
             if (t != null && !Float.isFinite(t.conf()))
                 t = t.withConf(m.confDefault(punct));
 
-            return makeTask(m, (Float) x[0], (Compound) content, punct, t, (Tense) x[4]);
+            @Nullable Truth t1 = t;
+
+//        if (p == null)
+//            throw new RuntimeException("character is null");
+//
+//        if ((t == null) && ((p == JUDGMENT) || (p == GOAL)))
+//            t = new DefaultTruth(p);
+//
+//        if ((blen > 0) && (Float.isFinite(b[0])))
+//            blen = 0;
+//
+
+            if (t1 == null) {
+                t1 = m.truthDefault(punct);
+            }
+
+            TaskBuilder ttt =
+                    new TaskBuilder((Compound) content, punct, t1)
+                            .time(
+                                    m.time(), //creation time
+                                    Tense.getRelativeOccurrence(
+                                            (Tense) x[4],
+                                            m
+                                    ));
+
+            if ((Float) x[0] == null)  /* do not set, Memory will apply defaults */
+                ttt.budgetSafe(m.priorityDefault(punct));
+            else
+                ttt.budgetSafe((Float) x[0]);
+
+
+            return ttt.log(NARSESE_TASK_TAG).apply(m);
         }
     }
 

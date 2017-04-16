@@ -758,17 +758,11 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
 
     /** auto budget by truth (if belief/goal, or punctuation if question/quest) */
     default Task budget(NAR nar) {
-        budget(nar.priorityDefault(punc()), nar);
+        setPriority(nar.priorityDefault(punc()));
         return this;
     }
 
-    /** auto budget by truth (if belief/goal, or punctuation if question/quest), with a specific non-default priority */
-    default Task budget(float p, NAR nar) {
-        budget().setPriority(p);
-        return this;
-    }
-
-//    default Task eternalized() {
+    //    default Task eternalized() {
 //        if (isEternal()) {
 //            return this;
 //        } else {

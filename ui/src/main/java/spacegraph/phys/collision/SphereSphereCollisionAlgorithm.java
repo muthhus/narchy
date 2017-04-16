@@ -30,7 +30,6 @@ import spacegraph.phys.collision.broad.CollisionAlgorithm;
 import spacegraph.phys.collision.broad.CollisionAlgorithmConstructionInfo;
 import spacegraph.phys.collision.broad.DispatcherInfo;
 import spacegraph.phys.collision.narrow.PersistentManifold;
-import spacegraph.phys.math.Transform;
 import spacegraph.phys.shape.SphereShape;
 import spacegraph.phys.util.OArrayList;
 
@@ -54,17 +53,12 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 		}
 	}
 
-	@Override
-	public void init(CollisionAlgorithmConstructionInfo ci) {
-		super.init(ci);
-	}
+
 
 	@Override
 	public void destroy() {
-		if (ownManifold) {
-			if (manifoldPtr != null) {
-				intersecter.releaseManifold(manifoldPtr);
-			}
+		if (ownManifold && manifoldPtr != null) {
+			intersecter.releaseManifold(manifoldPtr);
 			manifoldPtr = null;
 		}
 	}
@@ -75,18 +69,16 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 			return;
 		}
 
-		Transform tmpTrans1 = new Transform();
-		Transform tmpTrans2 = new Transform();
-
 		resultOut.setPersistentManifold(manifoldPtr);
+
+
+		v3 diff = new v3();
+		diff.sub(col0.worldTransform, col1.worldTransform);
+
+		float lenSq = diff.lengthSquared();
 
 		SphereShape sphere0 = (SphereShape) col0.shape();
 		SphereShape sphere1 = (SphereShape) col1.shape();
-
-		v3 diff = new v3();
-		diff.sub(col0.getWorldTransform(tmpTrans1), col1.getWorldTransform(tmpTrans2));
-
-		float len = diff.length();
 		float radius0 = sphere0.getRadius();
 		float radius1 = sphere1.getRadius();
 
@@ -95,17 +87,21 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 		//#endif
 
 		// if distance positive, don't generate a new contact
-		if (len > (radius0 + radius1)) {
+		float r01 = radius0 + radius1;
+		if (lenSq > r01*r01) {
 			//#ifndef CLEAR_MANIFOLD
 			resultOut.refreshContactPoints();
 			//#endif //CLEAR_MANIFOLD
 			return;
 		}
-		// distance (negative means penetration)
-		float dist = len - (radius0 + radius1);
 
-		v3 normalOnSurfaceB = new v3();
-		normalOnSurfaceB.set(1f, 0f, 0f);
+
+		v3 normalOnSurfaceB = new v3(1, 0, 0);
+
+		float len = (float) Math.sqrt(lenSq);
+		// distance (negative means penetration)
+		float dist = len - r01;
+
 		if (len > BulletGlobals.FLT_EPSILON) {
 			normalOnSurfaceB.scale(1f / len, diff);
 		}
@@ -115,12 +111,12 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 		// point on A (worldspace)
 		v3 pos0 = new v3();
 		tmp.scale(radius0, normalOnSurfaceB);
-		pos0.sub(col0.getWorldTransform(tmpTrans1), tmp);
+		pos0.sub(col0.worldTransform, tmp);
 
 		// point on B (worldspace)
 		v3 pos1 = new v3();
 		tmp.scale(radius1, normalOnSurfaceB);
-		pos1.add(col1.getWorldTransform(tmpTrans2), tmp);
+		pos1.add(col1.worldTransform, tmp);
 
 		// report a contact. internally this will be kept persistent, and contact reduction is done
 		resultOut.addContactPoint(normalOnSurfaceB, pos1, dist);
@@ -152,10 +148,6 @@ public class SphereSphereCollisionAlgorithm extends CollisionAlgorithm {
 			return algo;
 		}
 
-		@Override
-		public void releaseCollisionAlgorithm(CollisionAlgorithm algo) {
-
-		}
 	}
 
 }

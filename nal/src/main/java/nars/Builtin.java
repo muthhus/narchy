@@ -165,7 +165,7 @@ public class Builtin {
 
 
         nar.on("top", (Command) (op, args, n) -> {
-            Iterable<PLink<Concept>> ii = n.conceptsActive();
+            Iterable<PLink<Concept>> ii = n.concepts();
 
             int MAX_RESULT_LENGTH = 250;
             StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);

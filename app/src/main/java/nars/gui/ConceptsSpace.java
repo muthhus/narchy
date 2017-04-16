@@ -1,6 +1,5 @@
 package nars.gui;
 
-import com.google.common.collect.Iterables;
 import jcog.bag.PLink;
 import nars.NAR;
 import nars.Narsese;
@@ -8,18 +7,15 @@ import nars.Param;
 import nars.bag.Bagregate;
 import nars.concept.Concept;
 import nars.nar.Default;
-import nars.nar.NARBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
+import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Collection;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static nars.gui.Vis.MyForceDirected;
 import static nars.gui.Vis.reflect;
@@ -28,7 +24,7 @@ import static spacegraph.layout.Grid.col;
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
-    public static final float UPDATE_RATE = 0.1f;
+    public static final float UPDATE_RATE = 0.5f;
     public final NAR nar;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
@@ -39,7 +35,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         super(nar);
         this.nar = nar;
         this.maxEdgesPerNode = maxEdgesPerNode;
-        bag = new Bagregate<Concept>(Iterables.transform(nar.conceptsActive(), Supplier::get), maxNodes, UPDATE_RATE) {
+        bag = new Bagregate<Concept>(nar.concepts(), maxNodes, UPDATE_RATE) {
             @Override
             protected boolean include(Concept x) {
                 return ConceptsSpace.this.include(x.term());
@@ -52,16 +48,15 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
             @Override
             public void onRemoved(@NotNull PLink<Concept> value) {
-                ConceptWidget cw = widgetGet(value.get());
-                if (cw!=null) {
-                    cw.hide();
-                }
+                widgetRemove(value.get());
 //                    cw.deactivate();
 //                    //cw.delete();
 //                }
             }
         };
     }
+
+
 
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
@@ -75,21 +70,31 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     }
 
-    public ConceptWidget widgetGet(Concept concept) {
+    ConceptWidget widgetRemove(Concept concept) {
+        ConceptWidget cw = concept.remove(this);
+        if (cw!=null) {
+            cw.delete(space.dyn);
+        }
+        return cw;
+    }
+
+    ConceptWidget widgetGet(Concept concept) {
         return concept.get(this);
     }
 
-    public ConceptWidget widgetGetOrCreate(Concept concept) {
-        return concept.meta(this, (k,p) -> {
+    ConceptWidget widgetGetOrCreate(Concept concept) {
+        @NotNull ConceptWidget cw = concept.meta(this, (k, p) -> {
             if (p == null) {
                 ConceptWidget c = materializer().apply(concept);
                 c.concept = concept;
                 p = c;
             }
-
-            ((Spatial)p).activate();
             return p;
         });
+
+        cw.activate();
+
+        return cw;
     }
 
     private Function<Termed, ConceptWidget> materializer() {
@@ -111,8 +116,8 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Param.DEBUG = false;
 
-        //Default n = new Default(64, 3, 1, 3);
-        Default n = NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(true).durSeconds(0.2f));
+        Default n = new Default(256, 1, 1);
+        //Default n = NARBuilder.newMultiThreadNAR(1, new RealTime.DSHalf(true).durSeconds(0.05f));
         //n.nal(1);
 //        n.termVolumeMax.setValue(7f);
 //        n.DEFAULT_BELIEF_PRIORITY = 0.9f;
@@ -125,8 +130,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        n.inputAt(3, "c:b.");
 
         //new DeductiveChainTest(n, 8,  2048, inh);
+        n.mix.stream("Derive").setValue(0.005f); //quiet derivation
 
-        n.loop(1f);
+        n.loop(2f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
@@ -144,7 +150,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 32, 8) {
+        NARSpace cs = new ConceptsSpace(n, 128, 8) {
 //            @Override
 //            protected boolean include(Term term) {
 //
@@ -168,7 +174,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //                            }
 //                        }
 
-                        //new Flatten()
+                        new Flatten()
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);

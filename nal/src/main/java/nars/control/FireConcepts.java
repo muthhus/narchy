@@ -8,7 +8,6 @@ import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.event.On;
-import jcog.list.FasterList;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;
@@ -26,8 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import static nars.time.Tense.ETERNAL;
 
 
 /** controls an active focus of concepts */
@@ -168,9 +165,11 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
             this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
-
-
-                //                @Override
+                @Override
+                public float temperature() {
+                    return 0.1f; //forget slowly
+                }
+//                @Override
 //                public float pri(@NotNull Task key) {
 //                    //return (1f + key.priSafe(0)) * (1f + key.qua());
 //                    //return (1f + key.priSafe(0)) * (1f + key.qua());
