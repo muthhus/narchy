@@ -26,12 +26,11 @@ import static jcog.Util.clamp;
  * <p>
  * TODO make a CurveSampling interface with at least 2 implementations: Random and LinearScanning. it will use this instead of the 'boolean random' constructor argument
  */
-public class CurveBag<V> extends ArrayBag<V>  {
+public class CurveBag<V> extends ArrayBag<V> {
 
 
     @NotNull
     final CurveSampler sampler;
-
 
 
     public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
@@ -46,7 +45,6 @@ public class CurveBag<V> extends ArrayBag<V>  {
 //    public BLink<V> pop() {
 //        return peekNext(true);
 //    }
-
 
 
     @Override
@@ -80,17 +78,23 @@ public class CurveBag<V> extends ArrayBag<V>  {
 //    }
 
 
-    /** simplified one item sample */
-    @Nullable @Override public BLink<V> sample() {
+    /**
+     * simplified one item sample
+     */
+    @Nullable
+    @Override
+    public BLink<V> sample() {
         ensureSorted();
-        synchronized (items) {
-            int s = size();
-            while (s > 0) {
+        int s = size();
+        while (s > 0) {
+            synchronized (items) {
+
                 int i = sampleIndex(s);
                 BLink<V> b = get(i);
                 if (b.isDeleted()) {
                     items.removeFast(i);
                     map.remove(b.get());
+
                     s--;
                     //then try again
                 } else {
@@ -98,9 +102,9 @@ public class CurveBag<V> extends ArrayBag<V>  {
                 }
             }
         }
+
         return null;
     }
-
 
 
     /**
@@ -168,7 +172,7 @@ public class CurveBag<V> extends ArrayBag<V>  {
                 //scan upwrads and downwrads alternating until all items iterated
                 int dones = 0;
 
-                for (int upwards = begin - 1, downwards = end + 1; (n > 0) && (dones!=3); ) {
+                for (int upwards = begin - 1, downwards = end + 1; (n > 0) && (dones != 3); ) {
                     //scan upwards for any remaining
                     if (upwards >= 0) {
                         if (trySample(target, l[upwards--])) {
@@ -433,7 +437,6 @@ public class CurveBag<V> extends ArrayBag<V>  {
     private final int sampleIndex(int s) {
         return s <= 1 ? 0 : index(sampler.sample(s), s);
     }
-
 
 
 //    /** provides a next index to sample from */

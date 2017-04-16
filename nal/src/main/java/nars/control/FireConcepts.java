@@ -76,6 +76,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         Concept c = pc.get();
 
         c.tasklinks().commit();
+        c.termlinks().commit();
 
         for (int i = 0; i < numTaskLinks; i++) {
             @Nullable BLink<Task> taskLink = c.tasklinks().sample();
@@ -88,7 +89,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     //.lerp( pc.pri()  );
 
             FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-            c.termlinks().commit().sample(termlinksPerForThisTask, (h,v) -> {
+            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
                 termLinks.add(v);
                 return 1;
             });

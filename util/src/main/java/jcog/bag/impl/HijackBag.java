@@ -513,13 +513,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int nulls = c - s; //approximate number of empty slots that would be expected
 
-        float scanRate = 1f;
+        float scanRate = 0.75f;
         float priToHits = ((n) / (s * scanRate));
 
         int skipped = 0;
 
         final int N = n;
-        while (n > 0) {
+        while (n > 0 && skipped < nulls) {
 
             //if (di) {
                 if (++i == c) i = 0;
@@ -529,8 +529,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
             V v = map.get(i);
             if (v == null) {
-                if (++skipped >= nulls)
-                    break;
+                skipped++;
                 continue;
             }
 
@@ -569,15 +568,18 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         selected += taken;
                     }
 
+                } else {
+                    skipped++;
                 }
 
-            } /*else {
+            } else {
+                skipped++;
                 //early deletion nullify
 //                    if (map.compareAndSet(m, v, null)) {
 //                        size.decrementAndGet();
 //                        onRemoved(v);
 //                    }
-            }*/
+            }
 
 
         }
