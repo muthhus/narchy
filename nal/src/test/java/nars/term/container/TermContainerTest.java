@@ -20,14 +20,14 @@ public class TermContainerTest {
         assertFalse(TermContainer.commonSubtermOrContainment($("x"), $("y")));
         assertTrue(TermContainer.commonSubtermOrContainment($("(x,y,z)"), $("y")));
         assertFalse(TermContainer.commonSubtermOrContainment($("(x,y,z)"), $("w")));
-        assertFalse(TermContainer.commonSubterms($("(a,b,c)"), $("(x,y,z)")));
-        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("(x,y,z)")));
+        assertFalse(TermContainer.commonSubterms($("(a,b,c)"), $("(x,y,z)"), false));
+        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("(x,y,z)"), false));
     }
 
     @Test
     public void testCommonSubtermsRecursion() throws Narsese.NarseseException {
-        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}")));
-        assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}")));
+        assertTrue(TermContainer.commonSubterms($("(x,y)"), $("{a,x}"), false));
+        assertFalse(TermContainer.commonSubterms($("(x,y)"), $("{a,b}"), false));
 
         assertFalse(TermContainer.commonSubterms($("(#x,y)"), $("{a,#x}"), true));
         assertTrue(TermContainer.commonSubterms($("(#x,a)"), $("{a,$y}"), true));

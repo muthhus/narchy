@@ -116,11 +116,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return yy instanceof Variable ? false : xx.contains(yy);
 //    };
 
-    @NotNull
-    static boolean commonSubterms(@NotNull Compound a, @NotNull Compound b) {
-        return commonSubterms(a, b, false);
-    }
-
     /**
      * recursively
      */
@@ -134,7 +129,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (commonStructure == 0)
             return false;
 
-        Set<Term> scratch = new HashSet(a.size());
+        Set<Term> scratch = new HashSet(/*a.size() + b.size()*/);
         a.termsToSetRecurse(commonStructure, scratch, true);
         return b.termsToSetRecurse(commonStructure, scratch, false);
     }
@@ -176,7 +171,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = term(i);
-                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).subterms().containsTermRecursively(b)))) {
+                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursively(b)))) {
                     return true;
                 }
             }
@@ -184,18 +179,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
-    default boolean containsTermAtemporally(@NotNull Term b) {
-        b = b.unneg();
-        if (!impossibleSubTerm(b)) {
-            int s = size();
-            for (int i = 0; i < s; i++) {
-                if (Terms.equalAtemporally(term(i),b)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    default boolean containsTermAtemporally(@NotNull Term b) {
+//        b = b.unneg();
+//        if (!impossibleSubTerm(b)) {
+//            int s = size();
+//            for (int i = 0; i < s; i++) {
+//                if (Terms.equalAtemporally(term(i),b)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
 //    default boolean containsTermRecursivelyAtemporally(@NotNull Term b) {
 //        b = b.unneg();
@@ -241,7 +236,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         boolean aCompound = a instanceof Compound;
         boolean bCompound = b instanceof Compound;
         if (aCompound && bCompound) {
-            return commonSubterms((Compound) a, ((Compound) b));
+            return commonSubterms((Compound) a, ((Compound) b), false);
         } else {
             if (aCompound && !bCompound) {
                 return ((Compound) a).containsTerm(b);

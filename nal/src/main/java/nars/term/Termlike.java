@@ -63,8 +63,7 @@ public interface Termlike {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return  this==target ||
-                (!hasAll(target.structure())) ||
+        return  (!hasAll(target.structure())) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 
@@ -148,7 +147,4 @@ public interface Termlike {
                 hasAny(t == null ? Op.VariableBits : t.bit);
     }
 
-    default boolean equalsOrContains(Term t) {
-        return equals(t) || containsTerm(t);
-    }
 }

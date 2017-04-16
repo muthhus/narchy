@@ -307,7 +307,7 @@ public class PremiseRule extends GenericCompound {
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
 
 
-        if ((b == neq) || (b == neqCom) || (b == neqRCom))
+        if (b == neq)// || (b == neqCom) || (b == neqRCom))
             return TermNotEquals.class;
 
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
@@ -573,22 +573,22 @@ public class PremiseRule extends GenericCompound {
                 case "neqAndCom":
                     //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
-                    constraints.put(Y, new CommonSubtermConstraint(X));
                     constraints.put(X, new CommonSubtermConstraint(Y));
+                    constraints.put(Y, new CommonSubtermConstraint(X));
                     break;
 
                 case "neqCom":
                     //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
-                    constraints.put(Y, new NoCommonSubtermConstraint(X, false));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, false));
+                    constraints.put(Y, new NoCommonSubtermConstraint(X, false));
 
                     break;
                 case "neqRCom":
                     //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
-                    constraints.put(Y, new NoCommonSubtermConstraint(X, true));
                     constraints.put(X, new NoCommonSubtermConstraint(Y, true));
+                    constraints.put(Y, new NoCommonSubtermConstraint(X, true));
                     break;
 
                 case "notSet":
@@ -1040,15 +1040,15 @@ public class PremiseRule extends GenericCompound {
         the_equals(p)
     };
 
-    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqCom = (p) -> new BoolPredicate[]{
-        the_equals(p),
-        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, false, true))
-    };
-
-    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqRCom = (p) -> new BoolPredicate[]{
-        the_equals(p),
-        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, true, true))
-    };
+//    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqCom = (p) -> new BoolPredicate[]{
+//        the_equals(p),
+//        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, false, true))
+//    };
+//
+//    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqRCom = (p) -> new BoolPredicate[]{
+//        the_equals(p),
+//        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, true, true))
+//    };
 
 
 

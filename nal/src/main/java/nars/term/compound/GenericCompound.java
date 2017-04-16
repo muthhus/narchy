@@ -162,11 +162,11 @@ public class GenericCompound implements Compound {
 
         //return subterms.equals(cthat.subterms()) &&
         return
-                (op == cthat.op()) &&
-                (dt == cthat.dt()) &&
                 subterms.equivalent(cthat.subterms())
-                ;
-
+                &&
+                (op == cthat.op())
+                &&
+                (dt == cthat.dt());
 
         //subterm sharing:
 //        if (as != cs) {
