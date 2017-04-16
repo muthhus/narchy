@@ -300,8 +300,8 @@ public class Recog2D extends NAgentX {
         Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
                 3,
                 new RealTime.DSHalf(true).durFPS(durFPS)));
-        a.runRT(fps);
         NAgentX.chart(a);
+        a.runRT(30);
     }
 
     public static class Training {
