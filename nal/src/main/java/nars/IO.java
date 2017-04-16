@@ -4,7 +4,6 @@ package nars;
 import jcog.bag.Prioritized;
 import jcog.data.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
-import nars.budget.Budgeted;
 import nars.index.term.TermIndex;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
@@ -73,13 +72,12 @@ public class IO {
         long[] evi = readEvidence(in);
 
         float pri = in.readFloat();
-        float qua = in.readFloat();
 
         long cre = in.readLong();
 
 
         ImmutableTask mm = new ImmutableTask(term, punc, truth, cre, start, end, evi);
-        mm.setBudget(pri, qua);
+        mm.setPriority(pri);
         return mm;
     }
 
@@ -164,9 +162,8 @@ public class IO {
         out.writeFloat(t.priSafe(0));
     }
 
-    public static void writeBudget(@NotNull DataOutput out, @NotNull Budgeted t) throws IOException {
+    public static void writeBudget(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
         writePriority(out, t);
-        out.writeFloat(t.qua());
     }
 
     public static void writeEvidence(@NotNull DataOutput out, @NotNull long[] evi) throws IOException {

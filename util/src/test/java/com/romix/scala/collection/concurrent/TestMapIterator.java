@@ -1,13 +1,9 @@
 package com.romix.scala.collection.concurrent;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-
 import org.junit.Test;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class TestMapIterator {
     @Test

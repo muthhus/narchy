@@ -1,29 +1,67 @@
 package jcog.bag;
 
-import jcog.Util;
+import jcog.Texts;
+import org.apache.commons.lang3.mutable.MutableFloat;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.lerp;
-import static jcog.Util.unitize;
 
 /**
  * Created by me on 2/17/17.
  */
 public interface Priority extends Prioritized {
 
+
+
+    static String toString(@NotNull Priority b) {
+        return toStringBuilder(null, Texts.n4(b.pri())).toString();
+    }
+
+    @NotNull
+    static StringBuilder toStringBuilder(@Nullable StringBuilder sb, @NotNull String priorityString) {
+        int c = 1 + priorityString.length();
+        if (sb == null)
+            sb = new StringBuilder(c);
+        else {
+            sb.ensureCapacity(c);
+        }
+
+        sb.append('$')
+                .append(priorityString);
+                //.append(Op.BUDGET_VALUE_MARK);
+
+        return  sb;
+    }
+
+    @NotNull
+    static Ansi.Color budgetSummaryColor(@NotNull Prioritized tv) {
+        int s = (int)Math.floor(tv.priSafe(0) *5);
+        switch (s) {
+            default: return Ansi.Color.DEFAULT;
+
+            case 1: return Ansi.Color.MAGENTA;
+            case 2: return Ansi.Color.GREEN;
+            case 3: return Ansi.Color.YELLOW;
+            case 4: return Ansi.Color.RED;
+
+        }
+    }
+
     default void priAdd(float toAdd) {
         setPriority(priSafe(0) + toAdd);
     }
+    default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
 
-    default void priAvg(float pOther, float rate) {
-        float cu = priSafe(0);
-        setPriority(Util.lerp(rate, (cu + pOther)/2f, cu));
-    }
+//    default void priAvg(float pOther, float rate) {
+//        float cu = priSafe(0);
+//        setPriority(Util.lerp(rate, (cu + pOther)/2f, cu));
+//    }
 
-    default float priAddOverflow(float toAdd) {
-        return priAddOverflow(toAdd, null);
-    }
+//    default float priAddOverflow(float toAdd) {
+//        return priAddOverflow(toAdd, null);
+//    }
 
     default float priAddOverflow(float toAdd, @Nullable Bag pressurized) {
         float before = priSafe(0);
@@ -43,7 +81,6 @@ public interface Priority extends Prioritized {
 
         return change;
     }
-    default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
 
     static float validPriority(float p) {
         if (p!=p /* fast NaN test */)
@@ -86,18 +123,75 @@ public interface Priority extends Prioritized {
         return this;
     }
 
-    /** returns the delta */
-    default float priLerpMult(float factor, float speed) {
+//    /** returns the delta */
+//    default float priLerpMult(float factor, float speed) {
+//
+////        if (Util.equals(factor, 1f, Param.BUDGET_EPSILON))
+////            return 0; //no change
+//
+//        float p = pri();
+//        float target = unitize(p * factor);
+//        float delta = target - p;
+//        setPriority(lerp(speed, target, p));
+//        return delta;
+//
+//    }
 
-//        if (Util.equals(factor, 1f, Param.BUDGET_EPSILON))
-//            return 0; //no change
+    default void absorb(@Nullable MutableFloat overflow) {
+        if (overflow!=null) {
+            float taken = Math.min(overflow.floatValue(), 1f - priSafe(0));
+            if (taken > PLink.EPSILON_DEFAULT) {
+                overflow.subtract(taken);
+                priAdd(taken);
+            }
+        }
+    }
 
-        float p = pri();
-        float target = unitize(p * factor);
-        float delta = target - p;
-        setPriority(lerp(speed, target, p));
-        return delta;
+    /** returns null if already deleted */
+    @Nullable Priority clone();
 
+
+
+    /**
+     * copies a budget into this; if source is null, it deletes the budget
+     */
+    @NotNull
+    default Priority copyFrom(@Nullable Prioritized srcCopy) {
+        if (srcCopy == null) {
+            delete();
+        } else {
+            float p = srcCopy.priSafe(-1);
+            if (p < 0) {
+                delete();
+            } else {
+                setPriority(p);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Briefly display the BudgetValue
+     *
+     * @return String representation of the value with 2-digit accuracy
+     */
+    @NotNull
+    default Appendable toBudgetStringExternal()  {
+        return toBudgetStringExternal(null);
+    }
+
+    default @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb)  {
+        return Priority.toStringBuilder(sb, Texts.n2(pri()));
+    }
+
+    @NotNull
+    default String toBudgetString() {
+        return toBudgetStringExternal().toString();
+    }
+
+    @NotNull default String getBudgetString() {
+        return toString(this);
     }
 
 //    void orPriority(float v);

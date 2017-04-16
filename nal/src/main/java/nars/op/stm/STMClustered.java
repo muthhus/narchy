@@ -2,6 +2,7 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import jcog.bag.Prioritized;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
@@ -9,7 +10,6 @@ import jcog.learn.gng.Node;
 import nars.NAR;
 import nars.Task;
 import nars.bag.impl.BLinkHijackBag;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.DependentBLink;
 import nars.truth.Truth;
@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 public abstract class STMClustered extends STM {
 
 
-    public final ThreadLocal<@Nullable Bag<Task, BLink<Task>>> input;
+    public final ThreadLocal<@Nullable Bag<Task, PLink<Task>>> input;
 
     final short clusters;
     public final int dims;
@@ -229,23 +229,9 @@ public abstract class STMClustered extends STM {
         }
 
         @Override
-        public DependentBLink<Task> cloneScaled(BudgetMerge merge, float scale) {
-            TLink adding2 = new TLink(id);
-            adding2.setBudget(0, qua()); //use the incoming quality.  budget will be merged
-            merge.apply(adding2, this, scale);
-            return adding2;
-        }
-
-        @Override
-        public TLink cloneZero(float q) {
-            return new TLink(id, 0, q);
-        }
-
-        @Override
         public @Nullable Truth truth() {
             return get().truth();
         }
-
 
         @NotNull
         @Override
@@ -329,7 +315,7 @@ public abstract class STMClustered extends STM {
 
 
             @Override
-            public void onRemoved(@NotNull BLink<Task> value) {
+            public void onRemoved(@NotNull PLink<Task> value) {
                 super.onRemoved(value);
                 drop((TLink) value);
             }

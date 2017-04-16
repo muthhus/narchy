@@ -1,9 +1,8 @@
 package nars.attention;
 
-import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.Priority;
 import nars.Param;
-import nars.budget.Budget;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
  * decreases priority at a specified rate which is diminished in proportion to a budget's quality
  * so that high quality results in slower priority loss
  */
-public class Forget<X extends Budget> implements Consumer<X> {
+public class Forget<X extends Priority> implements Consumer<X> {
 
     public final float avgToBeRemoved;
 
@@ -36,9 +35,7 @@ public class Forget<X extends Budget> implements Consumer<X> {
 
     @Override
     public void accept(@NotNull X b) {
-        float q = b.qua();
-        float toRemove = Util.lerp(q, avgToBeRemoved/2f, avgToBeRemoved*2f);
-        b.priSub(toRemove);
+        b.priSub(avgToBeRemoved);
         //b.priMult(gain * (1f - (r * (1f - b.qua() * maxEffectiveQuality))));
     }
 

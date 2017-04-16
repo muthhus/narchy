@@ -3,11 +3,11 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
+import jcog.bag.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.bag.impl.ArrayBag;
 import nars.bag.leak.LeakOut;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -77,7 +77,7 @@ public class IRCNLP extends IRC {
             while (true) {
                 if (!out.isEmpty()) {
                     try {
-                        BLink<String> next = out.pop();
+                        PLink<String> next = out.pop();
                         String s = next.get();
                         send(channels, s).run();
                         prevOut.commit();
@@ -162,7 +162,7 @@ public class IRCNLP extends IRC {
         }
 
         @Override
-        protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+        protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
             if (trace || t.isCommand())
                 super.in(t, each);
         }
@@ -367,7 +367,7 @@ public class IRCNLP extends IRC {
 
             if (!bot.prevOut.contains(msg)) {
                 bot.out.commit();
-                bot.out.put(new RawBLink<String>(msg, 1f, 0.5f));
+                bot.out.put(new RawBLink<String>(msg, 1f));
             }
         });
 

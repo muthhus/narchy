@@ -8,9 +8,9 @@ import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import jcog.Texts;
 import jcog.Util;
+import jcog.bag.Priority;
 import jcog.list.FasterList;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.budget.Budget;
 import nars.budget.RawBudget;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPredicate;
@@ -803,8 +803,8 @@ public enum $ {
         return (f!=f || c!=c || c < minConf) ? null : new DefaultTruth(f, c);
     }
 
-    public static Budget b(float p, float q) {
-        return new RawBudget(p, q);
+    public static Priority b(float p) {
+        return new RawBudget(p);
     }
 
     /** negates each entry in the array */
@@ -1025,7 +1025,7 @@ public enum $ {
     public static TaskBuilder command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         TaskBuilder t = new TaskBuilder(op, COMMAND, null);
-        t.setBudget(1f, 1f);
+        t.setPriority(1f);
         return t;
     }
 

@@ -20,6 +20,7 @@
  */
 package nars.budget;
 
+import jcog.bag.Priority;
 import nars.Task;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
@@ -225,7 +226,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
     /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
-    public static void transferPri(@Nullable Budget from, @Nullable Budget to, float s) {
+    public static void transferPri(@Nullable Priority from, @Nullable Priority to, float s) {
 
         float priToSend = from.priSafe(0) * s;
         if (priToSend > 0) {
@@ -244,10 +245,10 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Budget fund(@NotNull Iterable<Task> tt, float paymentProportion, boolean copyOrTransfer) {
-        RawBudget u = new RawBudget(0f, Float.NaN);
+    public static Priority fund(@NotNull Iterable<Task> tt, float paymentProportion, boolean copyOrTransfer) {
+        RawBudget u = new RawBudget(0f);
         for (Task t : tt) {
-            Budget tbudget = t.budget();
+            Priority tbudget = t.budget();
             if (copyOrTransfer) {
                 //COPY
                 plusBlend.merge(u, tbudget, paymentProportion);
@@ -275,7 +276,7 @@ public final class BudgetFunctions extends UtilityFunctions {
      * if either input budget is null or deleted (non-exists), the burden will shift
      * to the other budget (if exists). if neither exists, no effect results.
      */
-    public static void balancePri(@Nullable Budget a, @Nullable Budget b, float resultPri, float aStrength) {
+    public static void balancePri(@Nullable Priority a, @Nullable Priority b, float resultPri, float aStrength) {
 
         boolean aExist = a!=null && !a.isDeleted();
         boolean bExist = b!=null && !b.isDeleted();

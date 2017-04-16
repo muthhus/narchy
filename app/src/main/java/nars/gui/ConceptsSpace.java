@@ -1,11 +1,11 @@
 package nars.gui;
 
 import com.google.common.collect.Iterables;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.bag.Bagregate;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -15,7 +15,6 @@ import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.Spatial;
-import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Collection;
@@ -47,7 +46,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             }
 
             @Override
-            public void onRemoved(@NotNull BLink<Concept> value) {
+            public void onRemoved(@NotNull PLink<Concept> value) {
                 ConceptWidget cw = widgetGet(value.get());
                 if (cw!=null) {
                     //cw.hide();
@@ -64,7 +63,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //long now = nar.time();
 
-        bag.forEach((BLink<Concept> b) ->{
+        bag.forEach((PLink<Concept> b) ->{
 
             Concept concept = b.get();
 

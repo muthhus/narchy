@@ -1,13 +1,13 @@
 package nars.op.mental;
 
+import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import jcog.bag.impl.PLinkHijackBag;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.Leak;
-import nars.budget.BLink;
-import nars.budget.RawBLink;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -36,7 +36,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends Leak<Task, BLink<Task>> {
+public class Inperience extends Leak<Task, PLink<Task>> {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -153,16 +153,15 @@ public class Inperience extends Leak<Task, BLink<Task>> {
     }
 
     @Override
-    protected void in(Task task, @NotNull Consumer<BLink<Task>> each) {
+    protected void in(Task task, @NotNull Consumer<PLink<Task>> each) {
 
-        Compound tt = task.term();
 
         if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
             return;
 
         boolean full = bag.isFull();
 
-        boolean belief;
+
         if (task.isBeliefOrGoal()) {
             //check for sufficient truth polarization
             if (full && task.conf() <= confMin.floatValue())
@@ -173,13 +172,14 @@ public class Inperience extends Leak<Task, BLink<Task>> {
             if (!(f <= fm) && !(f >= (1f - fm))  )
                 return;
 
-            belief = true;
+            //belief = true;
         } else {
-            belief = false;
+            //belief = false;
         }
 
-        if (!task.isDeleted())
-            each.accept(new RawBLink<>(task, task, (belief ? beliefFactor : questionFactor) / tt.volume()));
+        float p = task.priSafe(-1);
+        if (p >= 0)
+            each.accept(new RawPLink<>(task, p));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -211,7 +211,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
     }
 
     @Override
-    protected float onOut(@NotNull BLink<Task> b) {
+    protected float onOut(@NotNull PLink<Task> b) {
 
         Task task = b.get();
 
@@ -237,7 +237,7 @@ public class Inperience extends Leak<Task, BLink<Task>> {
                         task.stamp()
                 );
                 e.log("Inperience");
-                e.setBudget( task.priSafe(0) * priFactor, task.qua() );
+                e.setPriority( task.priSafe(0) * priFactor );
 
                 logger.info(" {}", e);
                 nar.input(e);

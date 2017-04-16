@@ -1,5 +1,8 @@
 package nars.op.mental;
 
+import jcog.bag.PLink;
+import jcog.bag.Priority;
+import jcog.bag.RawPLink;
 import jcog.data.MutableIntRange;
 import nars.$;
 import nars.NAR;
@@ -7,10 +10,7 @@ import nars.Op;
 import nars.Task;
 import nars.bag.impl.CurveBag;
 import nars.bag.leak.Leak;
-import nars.budget.BLink;
-import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -46,7 +46,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compound>> {
+public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, PLink<Compound>> {
 
 
     /**
@@ -91,17 +91,17 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
     @Nullable
     @Override
-    protected void in(@NotNull Task task, @NotNull Consumer<BLink<Compound>> each) {
+    protected void in(@NotNull Task task, @NotNull Consumer<PLink<Compound>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
 
-        Budget b = task.budget().clone();
+        Priority b = task.budget().clone();
         if (b != null)
             input(b, each, task.term(), 1f);
     }
 
-    private void input(@NotNull Budget b, @NotNull Consumer<BLink<Compound>> each, @NotNull Compound t, float scale) {
+    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -113,7 +113,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                         !(abbreviable instanceof PermanentConcept) &&
                                 abbreviable.get(Abbreviation.class) == null) {
 
-                    each.accept(new RawBLink<Compound>(t, b));
+                    each.accept(new RawPLink<>(t, b.priSafe(0)));
                 }
             }
         } else {
@@ -129,7 +129,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
 
 
     @Override
-    protected float onOut(BLink<Compound> b) {
+    protected float onOut(PLink<Compound> b) {
 
         abbreviate(b.get(), b);
         return 1f;
@@ -181,7 +181,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
     //private boolean createRelation = false;
 
 
-    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Priority b) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);
@@ -214,7 +214,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, BLink<Compo
                             new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
                     );
                     abbreviationTask.log("Abbreviate");
-                    abbreviationTask.setBudget(b);
+                    abbreviationTask.budget().copyFrom(b);
 
                     nar.input(abbreviationTask);
                     logger.info("{}", abbreviationTask);

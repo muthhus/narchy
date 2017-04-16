@@ -1,9 +1,8 @@
 package nars.task;
 
+import jcog.bag.Priority;
 import jcog.data.array.LongArrays;
 import nars.*;
-import nars.budget.Budget;
-import nars.budget.BudgetFunctions;
 import nars.budget.RawBudget;
 import nars.concept.Concept;
 import nars.task.util.InvalidTaskException;
@@ -98,7 +97,6 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
         super();
         priority = p; //direct set
-        quality = q; //direct set
 
         this.punc = (byte) punctuation;
 
@@ -201,16 +199,9 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
-        float q = qua();
-        if (q != q) {
-
+        float pp = priSafe(-1);
+        if (pp < 0) {
             setPriority(n.priorityDefault(punc));
-
-            if (isBeliefOrGoal()) {
-                setQua(BudgetFunctions.truthToQuality(truth()));
-            } else if (!isCommand()) {
-                setQua(n.qualityDefault(punc));
-            }
         }
 
 
@@ -232,7 +223,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 
         ImmutableTask i = new ImmutableTask(term, punc, truth, creation, start, end, evidence);
-        i.setBudget(this);
+        i.copyFrom(this);
         return i;
     }
 
@@ -531,8 +522,8 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 
     @NotNull
-    public final TaskBuilder budget(@NotNull Budget bb) {
-        setBudget(bb);
+    public final TaskBuilder budget(@NotNull Priority bb) {
+        copyFrom(bb);
         return this;
     }
 
@@ -545,8 +536,8 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
 
-    public TaskBuilder budgetSafe(float p, float q) {
-        super.budgetSafe(p, q);
+    public TaskBuilder budgetSafe(float p) {
+        super.budgetSafe(p);
         return this;
     }
 }

@@ -1,8 +1,8 @@
 package com.romix.scala.collection.concurrent;
 
-import java.util.concurrent.ConcurrentMap;
-
 import org.junit.Test;
+
+import java.util.concurrent.ConcurrentMap;
 
 public class TestConcurrentMapReplace {
     private static final int COUNT = 50*1000;

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.Predicate;
 
 /**
  * Created by me on 12/27/16.

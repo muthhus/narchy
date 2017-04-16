@@ -1,6 +1,6 @@
 package nars.premise;
 
-import nars.budget.Budget;
+import jcog.bag.Priority;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +12,6 @@ import org.jetbrains.annotations.Nullable;
 public interface DerivationBudgeting {
 
     /** return null to cancel a derivation */
-    @Nullable Budget budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc);
+    @Nullable Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc);
 
 }

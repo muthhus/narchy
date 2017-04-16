@@ -3,11 +3,9 @@ package nars.bag.experimental;
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
-import jcog.bag.Prioritized;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.PLinkHijackBag;
 import jcog.random.XorShift128PlusRandom;
-import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;
 

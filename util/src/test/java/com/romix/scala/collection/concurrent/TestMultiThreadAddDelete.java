@@ -1,11 +1,11 @@
 package com.romix.scala.collection.concurrent;
 
+import org.junit.Test;
+
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 
 public class TestMultiThreadAddDelete {
     private static final int RETRIES = 1;

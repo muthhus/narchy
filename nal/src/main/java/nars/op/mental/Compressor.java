@@ -1,11 +1,11 @@
 package nars.op.mental;
 
+import jcog.bag.PLink;
+import jcog.bag.Priority;
 import jcog.bag.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.PLinkHijackBag;
 import nars.*;
-import nars.budget.BLink;
-import nars.budget.Budget;
 import nars.concept.PermanentConcept;
 import nars.nar.Default;
 import nars.term.Compound;
@@ -166,7 +166,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
 
     @Override
-    protected float onOut(BLink<Compound> b) {
+    protected float onOut(PLink<Compound> b) {
         Compound x = b.get();
 //        if (code.getIfPresent(x)!=null)
 //            return 0; //already in
@@ -184,7 +184,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
     }
 
     @Override
-    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Budget b) {
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Priority b) {
 
 
         Op ao = abbreviated.op();

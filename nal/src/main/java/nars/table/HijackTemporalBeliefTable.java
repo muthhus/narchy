@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.bag.Priority;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
@@ -7,7 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.impl.TaskHijackBag;
-import nars.budget.Budget;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.task.Revision;
@@ -15,6 +15,7 @@ import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -30,7 +31,6 @@ import static jcog.math.Interval.intersectLength;
  * stores the items unsorted; revection manages their ranking and removal
  */
 public class HijackTemporalBeliefTable extends TaskHijackBag implements TemporalBeliefTable {
-
 
 
     public HijackTemporalBeliefTable(int initialCapacity, Random random) {
@@ -120,8 +120,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Override
     public float pri(@NotNull Task t) {
         //return (1f + t.priSafe(0)) * (1f + t.conf());
-        return (t.priSafe(0)) * (1f + t.conf());
-        //return t.priSafe(0);
+        float p = t.priSafe(-1);
+        if (p >= 0)
+            return UtilityFunctions.or((1f + p), (1f + t.conf()));
+        else
+            return 0;
     }
 
     @Nullable
@@ -192,7 +195,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
      */
     protected void feedback(MutableList<Task> l, @NotNull Task inserted) {
         float f = inserted.freq();
-        float q = inserted.qua();
         float c = inserted.conf();
         long is = inserted.start();
         long ie = inserted.end();
@@ -203,32 +205,29 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             Task x = l.get(i);
             if (x == inserted) continue;
 
-            float dq = q - x.qua();
-            if (dq > Param.BUDGET_EPSILON) {
 
-                float df = abs(f - x.freq());
-                float dqf = dq * df;
+            float df = abs(f - x.freq());
 
-                if (dqf > Param.BUDGET_EPSILON) {
+            if (df > Param.BUDGET_EPSILON) {
 
-                    long xs = x.start();
-                    long xe = x.end();
-                    long overlapLength = Interval.intersectLength(is, ie, xs, xe);
-                    if (overlapLength >= 0) {
+                long xs = x.start();
+                long xe = x.end();
+                long overlapLength = Interval.intersectLength(is, ie, xs, xe);
+                if (overlapLength >= 0) {
 
-                        float penalty = dqf * ((1f + overlapLength) / (1f + (xe - xs)));
-                        if (penalty > Param.BUDGET_EPSILON) {
-                            Budget b = x.budget();
-                            float pBefore = b.priSafe(0), pAfter;
-                            if (pBefore > 0) {
-                                b.mul(1f - penalty, 1f - penalty);
-                                pAfter = b.pri();
-                                penaltySum += pAfter - pBefore;
-                            }
+                    float penalty = df * ((1f + overlapLength) / (1f + (xe - xs)));
+                    if (penalty > Param.BUDGET_EPSILON) {
+                        Priority b = x.budget();
+                        float pBefore = b.priSafe(0), pAfter;
+                        if (pBefore > 0) {
+                            b.priMult(1f - penalty);
+                            pAfter = b.pri();
+                            penaltySum += pAfter - pBefore;
                         }
-
                     }
+
                 }
+
             }
         }
 
@@ -267,8 +266,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        //return (((float)range()) / size()) * 2f;
 //        return 1f;
 //    }
-
-
 
 
 //    @Override
@@ -342,7 +339,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         return r;
     }
 
-    @Nullable static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
+    @Nullable
+    static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
         return l.maxBy(Float.NEGATIVE_INFINITY, rankMatchMerge(toMergeWith, now, dur));
     }
 
@@ -381,12 +379,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
                 return Float.NEGATIVE_INFINITY; //dont allow merge if no overlap
 
             return (1f - abs(x.freq() - yf)) *
-                   (1f / (1f + abs(yRange  - (xe - xs)))) *
-                   (1f + Math.min(abs(xe-now), abs(xs-now))/yDist) *
-                   (1f + overlap / (1 + yRange)) *
-                   (1f - Stamp.overlapFraction(yStamp, x.stamp())/2f)
-                   //(1f + (1f - x.conf()))
-            ;
+                    (1f / (1f + abs(yRange - (xe - xs)))) *
+                    (1f + Math.min(abs(xe - now), abs(xs - now)) / yDist) *
+                    (1f + overlap / (1 + yRange)) *
+                    (1f - Stamp.overlapFraction(yStamp, x.stamp()) / 2f)
+                    //(1f + (1f - x.conf()))
+                    ;
         };
 
     }
@@ -459,11 +457,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     /**
      * t is the target time of the new merged task
      */
-    @Nullable private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
+    @Nullable
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
 
 
-        Interval ai = new Interval( a.start() , a.end() );
-        Interval bi = new Interval( b.start() , b.end() );
+        Interval ai = new Interval(a.start(), a.end());
+        Interval bi = new Interval(b.start(), b.end());
 
         Interval timeOverlap = ai.intersection(bi);
 
@@ -482,16 +481,16 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
             //discount related to loss of stamp when its capacity to contain the two incoming is reached
             float stampCapacityDiscount =
-                    Math.min(1f, ((float)Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
+                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
 
             float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
 
 
             Interval union = ai.union(bi);
-            float timeDiscount = rangeEquality + (1f-rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
+            float timeDiscount = rangeEquality + (1f - rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
 
             Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
-            if (t!=null) {
+            if (t != null) {
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
                 return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);

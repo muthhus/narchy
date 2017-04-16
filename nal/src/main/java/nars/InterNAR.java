@@ -1,9 +1,9 @@
 package nars;
 
 import jcog.Util;
+import jcog.bag.PLink;
 import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
-import nars.budget.BLink;
 import nars.task.LambdaQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +59,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
             }
 
             @Override
-            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+            protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
                 if (t.isCommand())
                     return;
 
@@ -70,7 +70,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     }
 
     private static byte ttl(Task x) {
-        return (byte)Util.lerp((1f + x.pri()) * (1f + x.qua()), 5, 2);
+        return (byte)Util.lerp((1f + x.pri()) /* * (1f + x.qua())*/, 5, 2);
     }
 
     @Override

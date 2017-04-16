@@ -2,9 +2,9 @@ package nars.concept;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BLink;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
@@ -29,10 +29,10 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @NotNull
-    private final Bag<Task,BLink<Task>> taskLinks;
+    private final Bag<Task,PLink<Task>> taskLinks;
 
     @NotNull
-    private final Bag<Term,BLink<Term>> termLinks;
+    private final Bag<Term,PLink<Term>> termLinks;
 
     @NotNull
     private final Compound term;
@@ -51,7 +51,7 @@ public class CompoundConcept implements Concept, Termlike {
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Term,BLink<Term>> termLinks, @NotNull Bag<Task,BLink<Task>> taskLinks, @NotNull NAR nar) {
+    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Term,PLink<Term>> termLinks, @NotNull Bag<Task,PLink<Task>> taskLinks, @NotNull NAR nar) {
 
         this.term = term;
         this.termLinks = termLinks;
@@ -101,13 +101,13 @@ public class CompoundConcept implements Concept, Termlike {
     }
 
     @Override
-    public @NotNull Bag<Task,BLink<Task>> tasklinks() {
+    public @NotNull Bag<Task,PLink<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term,BLink<Term>> termlinks() {
+    public Bag<Term,PLink<Term>> termlinks() {
         return termLinks;
     }
 

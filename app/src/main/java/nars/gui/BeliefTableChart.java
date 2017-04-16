@@ -325,7 +325,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     }
 
     private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
-        wave.forEach((freq, conf, s, e, qua) -> {
+        wave.forEach((freq, conf, s, e) -> {
 
             boolean eternal = (s != s);
             float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
@@ -379,7 +379,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         gl.glLineWidth(2.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
-        wave.forEach((freq, conf, start, end, qua) -> {
+        wave.forEach((freq, conf, start, end) -> {
 
             boolean eternal = (start != start);
             float x;

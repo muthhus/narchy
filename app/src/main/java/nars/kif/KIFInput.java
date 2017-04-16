@@ -17,8 +17,6 @@
 package nars.kif;
 
 import nars.*;
-import nars.budget.RawBLink;
-import nars.derive.DefaultDeriver;
 import nars.derive.TrieDeriver;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -27,7 +25,6 @@ import nars.nar.Terminal;
 import nars.premise.Derivation;
 import nars.premise.PreferSimpleAndConfident;
 import nars.premise.Premise;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -38,7 +35,6 @@ import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -439,7 +435,7 @@ public class KIFInput implements Runnable {
                //d.forEachTask(b -> {
                    miniDeriver.accept(new Derivation(
                            e,
-                           new Premise( t, Terms.ZeroProduct, null, 1f, 0.5f),
+                           new Premise( t, Terms.ZeroProduct, null, 1f),
                            //e::input,
                            x -> {
                                System.out.println(x);

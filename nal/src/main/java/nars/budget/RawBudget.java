@@ -1,13 +1,12 @@
 package nars.budget;
 
 
+import jcog.bag.Prioritized;
+import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static jcog.bag.Priority.validPriority;
-import static nars.budget.Budget.validQuality;
 
 /**
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
@@ -21,37 +20,28 @@ public class RawBudget implements Budget {
     protected float priority;
 
 
-    /**
-     * The overall (context-independent) evaluation
-     */
-    protected float quality;
-
-    private static final Logger logger = LoggerFactory.getLogger(RawBudget.class);
-
     public RawBudget() {
     }
 
-    public RawBudget(@NotNull Budgeted b, float scale) {
-        this(b.pri()*scale, b.qua());
-    }
-    public RawBudget(@NotNull Budgeted b) {
-        this(b.pri(), b.qua());
+    public RawBudget(@NotNull Prioritized b, float scale) {
+        this(b.pri()*scale);
     }
 
-    public RawBudget(float p, float q) {
+    public RawBudget(@NotNull Prioritized b) {
+        this(b.pri());
+    }
+
+    public RawBudget(float p) {
         this.priority = validPriority(p);
-        if (q==q)
-            this.quality = validQuality(q);
-        else
-            this.quality = Float.NaN;
+
     }
 
 
     @Nullable
     @Override
-    public Budget clone() {
+    public Priority clone() {
         float p = priority;
-        return p != p /* deleted? */ ? null : new RawBudget(p, qua());
+        return p != p /* deleted? */ ? null : new RawBudget(p);
     }
 
     /**
@@ -66,15 +56,6 @@ public class RawBudget implements Budget {
 
 
 
-    /**
-     * Get quality value
-     *
-     * @return The current quality
-     */
-    @Override
-    public final float qua() {
-        return quality;
-    }
 
 
     @Override
@@ -114,13 +95,6 @@ public class RawBudget implements Budget {
     }
 
 
-    @NotNull
-    @Override
-    public final Budget setBudget(float p, float q) {
-        this.priority = validPriority(p);
-        this.quality = validQuality(q);
-        return this;
-    }
 
     @Override
     public final void setPriority(float p) {
@@ -129,29 +103,18 @@ public class RawBudget implements Budget {
 
 
 
-    /**
-     * Change quality value
-     * allows storing NaN, used as a flag to indicate an unknown value
-     *
-     * @param q The new quality
-     */
-    @Override
-    public final void setQua(float q) {
-        this.quality = validQuality(q);
-    }
 
 
     /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
     @NotNull
-    public final RawBudget budgetSafe(@NotNull Budget b) {
-        budgetSafe(b.priSafe(0), b.qua());
+    public final RawBudget budgetSafe(@NotNull Priority b) {
+        budgetSafe(b.priSafe(0));
         return this;
     }
 
     /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public RawBudget budgetSafe(float p, float q) {
+    @NotNull public RawBudget budgetSafe(float p) {
         priority = p;
-        quality = q;
         return this;
     }
 

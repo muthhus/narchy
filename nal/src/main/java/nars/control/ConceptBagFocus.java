@@ -11,8 +11,6 @@ import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
-
 /**
  * The default deterministic memory cycle implementation that is currently used as a standard
  * for development and testing.

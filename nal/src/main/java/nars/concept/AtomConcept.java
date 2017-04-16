@@ -1,10 +1,10 @@
 package nars.concept;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.budget.BLink;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
@@ -20,8 +20,8 @@ import java.util.Map;
 
 public class AtomConcept extends AtomicStringConstant implements Concept {
 
-    private final Bag<Term,BLink<Term>> termLinks;
-    private final Bag<Task,BLink<Task>> taskLinks;
+    private final Bag<Term,PLink<Term>> termLinks;
+    private final Bag<Task,PLink<Task>> taskLinks;
 
     @Nullable private transient ConceptState state;
 
@@ -31,11 +31,11 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     @Nullable
     private Map meta;
 
-    public AtomConcept(@NotNull Atomic atom, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
+    public AtomConcept(@NotNull Atomic atom, Bag<Term,PLink<Term>> termLinks, Bag<Task,PLink<Task>> taskLinks) {
         this(atom.toString(), atom.op(), termLinks, taskLinks);
     }
 
-    protected AtomConcept(@NotNull String term, @NotNull Op op, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
+    protected AtomConcept(@NotNull String term, @NotNull Op op, Bag<Term,PLink<Term>> termLinks, Bag<Task,PLink<Task>> taskLinks) {
         super(term);
 
         this.op = op;
@@ -75,13 +75,13 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
 
     @Override
-    public @NotNull Bag<Task,BLink<Task>> tasklinks() {
+    public @NotNull Bag<Task,PLink<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term,BLink<Term>> termlinks() {
+    public Bag<Term,PLink<Term>> termlinks() {
         return termLinks;
     }
 

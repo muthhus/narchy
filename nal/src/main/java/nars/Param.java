@@ -167,11 +167,6 @@ public abstract class Param  {
     @NotNull
     public final FloatParam confMin = new FloatParam(0.01f, TRUTH_EPSILON, 1f);
 
-    /**
-     * budget quality threshold necessary to form tasks
-     */
-    public final FloatParam quaMin = new FloatParam(0, 0, 1f);
-
 
     /**
      * controls the speed (0..+1.0) of budget propagating from compound

@@ -1,8 +1,8 @@
 package com.romix.scala.collection.concurrent;
 
-import java.util.Map;
-
 import org.junit.Test;
+
+import java.util.Map;
 
 public class TestCNodeFlagCollision {
     @Test

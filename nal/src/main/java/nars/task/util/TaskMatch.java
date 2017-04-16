@@ -1,11 +1,11 @@
 package nars.task.util;
 
+import jcog.bag.Priority;
 import jcog.event.On;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.budget.Budget;
 import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
 import nars.term.Compound;
@@ -29,7 +29,7 @@ abstract public class TaskMatch extends AtomicPredicate<Task> implements Consume
     private BoolPredicate<Truth> truth = null;
     private BoolPredicate<Byte> punctuation = null;
     private BoolPredicate<LongLongPair> time = null;
-    private BoolPredicate<Budget> budget = null;
+    private BoolPredicate<Priority> budget = null;
 
 
 

@@ -39,7 +39,6 @@ public class Derivation extends Unify {
 
     // cached for fast access during derivation:
     public final float truthResolution;
-    public final float quaMin;
     public final float premiseEvidence;
     public final float confMin;
 
@@ -115,8 +114,6 @@ public class Derivation extends Unify {
         this.nar = nar;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-        this.quaMin = nar.quaMin.floatValue();
-
 
         //occDelta = new Versioned(this);
         //tDelta = new Versioned(this);

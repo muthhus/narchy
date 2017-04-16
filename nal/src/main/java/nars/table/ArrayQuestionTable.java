@@ -88,7 +88,7 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
                 l.sortThis(this);
 
                 if (sizeStart >= capacity()) {
-                    if (l.get(sizeStart - 1).qua() > tp) {
+                    if (l.get(sizeStart - 1).priSafe(-1) > tp) {
                         result[0] = null;
                         return;
                     } else {
@@ -102,11 +102,11 @@ public class ArrayQuestionTable extends MultiRWFasterList<Task> implements Quest
                 }
             }
 
-            //insert in sorted order by qua
+            //insert in sorted order by pri
             int i = 0;
             int sizeInsert = l.size();
             for (; i < sizeInsert - 1; i++) {
-                if (l.get(i).qua() < tp)
+                if (l.get(i).priSafe(-1) < tp)
                     break;
             }
             l.add(i, question);

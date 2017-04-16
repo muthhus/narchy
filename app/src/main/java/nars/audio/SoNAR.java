@@ -13,7 +13,6 @@ import spacegraph.audio.Sound;
 import spacegraph.audio.SoundProducer;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
-import spacegraph.audio.sample.SamplePlayer;
 import spacegraph.audio.sample.SonarSample;
 
 import javax.sound.sampled.LineUnavailableException;

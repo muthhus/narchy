@@ -124,9 +124,8 @@ public class NarseseTest {
 
     @Test
     public void testBudget() throws Narsese.NarseseException {
-        Task t = task("$0.70;0.50$ <a <=> b>. %0.00;0.93");
+        Task t = task("$0.70$ <a <=> b>. %0.00;0.93");
         assertEquals(0.7f, t.pri(), 0.01f);
-        assertEquals(0.5f, t.qua(), 0.01f);
 
         Task u = task("$0.9$ <a <=> b>. %0.00;0.93");
         assertEquals(0.9f, u.pri(), 0.01f);

@@ -13,8 +13,6 @@ import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFuncti
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import java.util.function.Predicate;
-
 /**
  * Created by me on 1/12/17.
  */

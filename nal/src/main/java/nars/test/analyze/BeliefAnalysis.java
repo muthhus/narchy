@@ -1,10 +1,10 @@
 package nars.test.analyze;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
@@ -117,7 +117,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@NotNull
-    public Bag<Task,BLink<Task>> tasklinks() {
+    public Bag<Task,PLink<Task>> tasklinks() {
 		return concept().tasklinks();
 	}
 

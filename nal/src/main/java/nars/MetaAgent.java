@@ -45,7 +45,7 @@ public class MetaAgent extends NAgent {
         }, -0.02f /* non-zero deadzone */, 0.5f);
 
 
-        actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
+        //actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 
 //        int dur = nar.dur();
 //        actionLerp($.p("dur"), (d) -> agentNAR.time.dur(d),

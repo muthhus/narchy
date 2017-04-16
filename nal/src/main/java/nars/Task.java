@@ -1,9 +1,13 @@
 package nars;
 
 import jcog.Texts;
+import jcog.bag.PLink;
+import jcog.bag.Priority;
 import jcog.map.SynchronizedHashMap;
 import nars.bag.impl.ArrayBag;
-import nars.budget.*;
+import nars.budget.BudgetMerge;
+import nars.budget.Budgeted;
+import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
@@ -42,7 +46,7 @@ import static nars.truth.TruthFunctions.w2c;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked {
+public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>, Priority {
 
 
     byte punc();
@@ -147,18 +151,14 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
 
-    static void proof(@NotNull Task task, int indent, @NotNull Appendable sb) {
+    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 
-        try {
             for (int i = 0; i < indent; i++)
                 sb.append("  ");
             task.appendTo(sb, null, true);
             sb.append("\n  ");
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
 
         Task pt = task.getParentTask();
@@ -276,7 +276,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     @Nullable
     default Appendable appendTo(Appendable sb) throws IOException {
-        return appendTo(sb, null);
+        sb.append(appendTo(null, null));
+        return sb;
     }
 
     @Nullable
@@ -340,7 +341,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
                 answers.commit();
 
-                BLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f, confEffective));
+                PLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f));
 
                 if (insertion != null) {
                     Command.log(nar, this.toString() + "  " + answer.toString());
@@ -401,15 +402,11 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     @NotNull
     default Appendable toString(/**@Nullable*/NAR memory) {
-        try {
             return appendTo(null, memory);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
-    default @Nullable Appendable appendTo(@Nullable Appendable sb, /**@Nullable*/NAR memory) throws IOException {
-        if (sb == null) sb = new StringBuilder();
+    default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory)  {
         return appendTo(sb, memory, false);
     }
 
@@ -423,20 +420,17 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     @Deprecated
     default String toStringWithoutBudget(NAR memory) {
         StringBuilder b = new StringBuilder();
-        try {
             appendTo(b, memory, true, false,
                     false, //budget
                     false//log
             );
             return b.toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     @Nullable
     @Deprecated
-    default Appendable appendTo(Appendable buffer, /**@Nullable*/NAR memory, boolean showStamp) throws IOException {
+    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp)  {
         boolean notCommand = punc() != Op.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -445,7 +439,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
     }
 
     @Nullable
-    default Appendable appendTo(@Nullable Appendable buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) throws IOException {
+    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog)  {
 
         String contentName;
         if (term) {
@@ -473,7 +467,8 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
         int stringLength = contentName.length() + tenseString.length() + 1 + 1;
 
-        if (truth() != null)
+        Truth tt = truth();
+        if (tt != null)
             stringLength += 11;
 
         if (showStamp)
@@ -499,8 +494,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         if (buffer == null)
             buffer = new StringBuilder(stringLength);
         else {
-            if (buffer instanceof StringBuilder)
-                ((StringBuilder) buffer).ensureCapacity(stringLength);
+            buffer.ensureCapacity(stringLength);
         }
 
 
@@ -513,9 +507,9 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
         if (tenseString.length() > 0)
             buffer.append(' ').append(tenseString);
 
-        if (truth() != null) {
+        if (tt != null) {
             buffer.append(' ');
-            truth().appendString(buffer, 2);
+            tt.appendString(buffer, 2);
         }
 
         if (showStamp) {
@@ -661,12 +655,12 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     @Nullable
     static ImmutableTask clone(@NotNull Task x, long created, long start, long end) {
-        Budget b = x.budget().clone(); //snapshot its budget
+        Priority b = x.budget().clone(); //snapshot its budget
         if (b.isDeleted())
             return null;
 
         ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
-        y.setBudget(b);
+        y.copyFrom(b);
         y.meta = x.meta();
         return y;
     }
@@ -679,7 +673,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 //                return null;
 //        }
 
-        Budget b = x.budget().clone(); //snapshot its budget
+        Priority b = x.budget().clone(); //snapshot its budget
         if (b.isDeleted())
             return null;
 
@@ -691,7 +685,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
             return null;
 
         ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.stamp());
-        y.setBudget(b);
+        y.copyFrom(b);
         y.meta = x.meta();
         return y;
 
@@ -749,19 +743,7 @@ public interface Task extends Budgeted, Truthed, Stamp, Termed<Compound>, Tasked
 
     /** auto budget by truth (if belief/goal, or punctuation if question/quest), with a specific non-default priority */
     default Task budget(float p, NAR nar) {
-        float q;
-
-        Truth tt = truth();
-        if (tt != null) {
-            q = BudgetFunctions.truthToQuality(tt);
-        } else {
-            if (nar != null) {
-                q = nar.qualityDefault(punc());
-            } else
-                throw new RuntimeException("missing truth");
-        }
-
-        budget().setBudget(p, q);
+        budget().setPriority(p);
         return this;
     }
 

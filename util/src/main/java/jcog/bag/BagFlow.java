@@ -4,9 +4,7 @@ import jcog.meter.event.PeriodMeter;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 
 import java.util.concurrent.Executor;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static java.lang.System.nanoTime;
 

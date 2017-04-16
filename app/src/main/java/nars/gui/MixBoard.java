@@ -35,7 +35,6 @@ public class MixBoard extends Grid implements Consumer<NAR> {
         mix.streams.forEach((k, v) -> {
             priInPlot.add(k + " in", v.priMeterIn::sum);
             priOutPlot.add(k + " out", v.priMeterOut::sum);
-            quaPlot.add(k + "quaMean", v.quaMeter::mean, 0, 1f);
             sliders.add(
                 new FloatSlider(v) {
                     @Override public String labelText() {

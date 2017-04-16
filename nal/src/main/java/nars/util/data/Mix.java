@@ -1,8 +1,8 @@
 package nars.util.data;
 
+import jcog.bag.Priority;
 import jcog.data.FloatParam;
 import jcog.meter.event.PeriodMeter;
-import nars.budget.Budget;
 import nars.budget.Budgeted;
 
 import java.util.Map;
@@ -22,7 +22,6 @@ public class Mix<K, P extends Budgeted>  {
     public static class MixStream<K,P extends Budgeted> extends FloatParam implements Consumer<P>, Function<P,P> {
 
         public final PeriodMeter priMeterIn, priMeterOut;
-        public final PeriodMeter quaMeter;
         public final K source;
 
         MixStream(K source, int window) {
@@ -30,7 +29,6 @@ public class Mix<K, P extends Budgeted>  {
             this.source = source;
             priMeterIn = new PeriodMeter("priIn", window);
             priMeterOut = new PeriodMeter("priOut", window);
-            quaMeter = new PeriodMeter( "qua", window);
         }
 
         public Stream<P> apply(Stream<P> x) {
@@ -56,16 +54,15 @@ public class Mix<K, P extends Budgeted>  {
 
             float g = floatValue();
 
-            Budget budget = xx.budget();
-            float p = budget.priSafe(0);
+            Priority priority = xx.budget();
+            float p = priority.priSafe(0);
             priMeterIn.hit(p);
             priMeterOut.hit(p * g);
-            quaMeter.hit(budget.qua());
 
             if (p <= 0 || g <= 0) {
 
             } else {
-                budget.priMult(g);
+                priority.priMult(g);
             }
 
         }

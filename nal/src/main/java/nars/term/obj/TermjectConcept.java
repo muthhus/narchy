@@ -1,10 +1,10 @@
 package nars.term.obj;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
@@ -32,11 +32,11 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
 
     @NotNull
     private final Termject<X> termject;
-    private final Bag<Term,BLink<Term>> termLinks;
-    private final Bag<Task,BLink<Task>> taskLinks;
+    private final Bag<Term,PLink<Term>> termLinks;
+    private final Bag<Task,PLink<Task>> taskLinks;
     private ConceptState policy;
 
-    public TermjectConcept(@NotNull Termject<X> t, Bag<Term,BLink<Term>> termLinks, Bag<Task,BLink<Task>> taskLinks) {
+    public TermjectConcept(@NotNull Termject<X> t, Bag<Term,PLink<Term>> termLinks, Bag<Task,PLink<Task>> taskLinks) {
         this.termject = t;
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
@@ -176,12 +176,12 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
 
 
     @Override
-    public @NotNull Bag<Task,BLink<Task>> tasklinks() {
+    public @NotNull Bag<Task,PLink<Task>> tasklinks() {
         return taskLinks;
     }
 
     @Override
-    public @NotNull Bag<Term,BLink<Term>> termlinks() {
+    public @NotNull Bag<Term,PLink<Term>> termlinks() {
         return termLinks;
     }
 

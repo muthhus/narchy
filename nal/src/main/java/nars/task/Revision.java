@@ -143,7 +143,7 @@ public class Revision {
                 evidence
         );
 
-        t.budget(a, b, aProp);
+        t.budget(a, b);
 
         return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }

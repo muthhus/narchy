@@ -1,26 +1,8 @@
 package nars.nal;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
-import nars.$;
-import nars.Op;
 import nars.derive.DefaultDeriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.PostCondition;
-import nars.term.Term;
-import nars.term.container.ArrayTermVector;
-import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
-import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static nars.time.Tense.DTERNAL;
 
 /**
  * Created by me on 12/12/15.

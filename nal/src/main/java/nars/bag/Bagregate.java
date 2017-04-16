@@ -3,7 +3,6 @@ package nars.bag;
 import jcog.bag.PLink;
 import jcog.data.FloatParam;
 import nars.bag.impl.ArrayBag;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.budget.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -55,7 +54,7 @@ public class Bagregate<X> extends ArrayBag<X> {
                 }
 
                 if (x != null && include(x)) {
-                    put(new RawBLink(x, pri, 0.5f), scale, null);
+                    put(new RawBLink(x, pri), scale, null);
                 }
             });
         } catch (Exception e) {
@@ -71,12 +70,12 @@ public class Bagregate<X> extends ArrayBag<X> {
     }
 
     @Override
-    public void forEach(Consumer<? super BLink<X>> action) {
+    public void forEach(Consumer<? super PLink<X>> action) {
         forEach(size(), action);
     }
 
     @Override
-    public void forEach(int max, Consumer<? super BLink<X>> action) {
+    public void forEach(int max, Consumer<? super PLink<X>> action) {
         update();
         super.forEach(max, action);
     }

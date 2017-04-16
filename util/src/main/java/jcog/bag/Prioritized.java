@@ -1,6 +1,7 @@
 package jcog.bag;
 
 
+import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,12 +9,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Prioritized {
 
+    /**
+     * a value in range 0..1.0 inclusive.
+     * if the value is NaN, then it means this has been deleted
+     */
     float pri();
 
-    default float priSafe(float valueIfInactive) {
+    default float priSafe(float valueIfDeleted) {
         float p = pri();
-        return p == p ? p : valueIfInactive;
+        return p == p ? p : valueIfDeleted;
     }
+
 
     /** the result of this should be that pri() is not finite (ex: NaN)
      * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
@@ -30,6 +36,10 @@ public interface Prioritized {
         for (Prioritized i : c)
             totalPriority += i.priSafe(0);
         return totalPriority;
+    }
+
+    default boolean equalsBudget(@NotNull Prioritized t, float epsilon) {
+        return Util.equals(priSafe(-1), t.priSafe(-1), epsilon);
     }
 
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {

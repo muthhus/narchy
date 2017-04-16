@@ -1,10 +1,10 @@
 package nars.attention;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.BLink;
 import nars.budget.RawBLink;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
@@ -36,7 +36,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     transient final int dur; //cache
     transient final float inPri; //cached priority value of input at input
-    transient final float inQua; //cached quality value of input at input
     transient final Term originTerm;
 
     final float temporalSpecificity = 0.1f;
@@ -70,7 +69,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         this.parentRetention = nar.momentum.floatValue();
 
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
-        this.inQua = in.qua();
         this.dur = nar.dur();
 
         Term originTerm = origin.term();
@@ -188,7 +186,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     protected float activateAtom(AtomConcept atom, float scale) {
 
-        Bag<Task, BLink<Task>> tlinks = atom.tasklinks();
+        Bag<Task, PLink<Task>> tlinks = atom.tasklinks();
         int n = tlinks.size();
         if (n > 0) {
 
@@ -293,13 +291,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     void tasklink(Concept target, float scale) {
         target.tasklinks().put(
-                new RawBLink(in, inPri, inQua),
+                new RawBLink(in, inPri),
                 //new DependentBLink(src),
                 scale, null);
     }
 
     void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(new RawBLink(to, inPri, inQua), scale, linkOverflow);
+        from.termlinks().put(new RawBLink(to, inPri), scale, linkOverflow);
     }
 
 

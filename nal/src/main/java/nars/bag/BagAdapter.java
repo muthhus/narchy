@@ -1,7 +1,7 @@
 package nars.bag;
 
 import jcog.bag.Bag;
-import nars.budget.BLink;
+import jcog.bag.PLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -14,31 +14,31 @@ import java.util.function.Predicate;
 /**
  * proxies to a delegate bag
  */
-public class BagAdapter<X> implements Bag<X,BLink<X>> {
+public class BagAdapter<X> implements Bag<X,PLink<X>> {
 
-    @NotNull Bag<X,BLink<X>> bag;
+    @NotNull Bag<X,PLink<X>> bag;
 
-    public BagAdapter(Bag<X,BLink<X>> delegate) {
+    public BagAdapter(Bag<X,PLink<X>> delegate) {
         set(delegate);
     }
 
     @Override
-    public float pri(@NotNull BLink<X> key) {
+    public float pri(@NotNull PLink<X> key) {
         return key.pri();
     }
 
     @NotNull
     @Override
-    public X key(BLink<X> value) {
+    public X key(PLink<X> value) {
         return value.get();
     }
 
-    public void set(Bag<X,BLink<X>> delegate) {
+    public void set(Bag<X,PLink<X>> delegate) {
         bag = delegate;
     }
 
     @Override
-    public @Nullable BLink<X> get(@NotNull Object key) {
+    public @Nullable PLink<X> get(@NotNull Object key) {
         return bag.get(key);
     }
 
@@ -48,12 +48,12 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super BLink<X>> each, int n) {
+    public void forEachWhile(@NotNull Predicate<? super PLink<X>> each, int n) {
         bag.forEachWhile(each, n);
     }
 
     @Override
-    public void forEach(Consumer<? super BLink<X>> action) {
+    public void forEach(Consumer<? super PLink<X>> action) {
         bag.forEach(action);
     }
 
@@ -63,12 +63,12 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super BLink<X>> action) {
+    public void forEachWhile(@NotNull Predicate<? super PLink<X>> action) {
         bag.forEachWhile(action);
     }
 
     @Override
-    public void forEach(int max, @NotNull Consumer<? super BLink<X>> action) {
+    public void forEach(int max, @NotNull Consumer<? super PLink<X>> action) {
         throw new UnsupportedOperationException(); //typing issue, TODO
     }
 
@@ -79,24 +79,24 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     @Nullable
     @Override
-    public BLink<X> remove(@NotNull X x) {
+    public PLink<X> remove(@NotNull X x) {
         return bag.remove(x);
     }
 
     @Override
-    public BLink<X> put(@NotNull BLink<X> b, float scale, @Nullable MutableFloat overflowing) {
+    public PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflowing) {
         return bag.put(b, scale, overflowing);
     }
 
     @Override
-    public Bag<X, BLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super BLink<X>> target) {
+    public Bag<X, PLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super PLink<X>> target) {
         bag.sample(n, target);
         return this;
     }
 
     @NotNull
     @Override
-    public Bag<X,BLink<X>> sample(int n, @NotNull Predicate<? super BLink<X>> target) {
+    public Bag<X,PLink<X>> sample(int n, @NotNull Predicate<? super PLink<X>> target) {
         bag.sample(n, target);
         return this;
     }
@@ -108,7 +108,7 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     @NotNull
     @Override
-    public Iterator<BLink<X>> iterator() {
+    public Iterator<PLink<X>> iterator() {
         return bag.iterator();
     }
 
@@ -140,7 +140,7 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
     @NotNull
     @Override
-    public Bag<X,BLink<X>> commit(Consumer<BLink<X>> update) {
+    public Bag<X,PLink<X>> commit(Consumer<PLink<X>> update) {
         bag.commit(update);
         return this;
     }
@@ -148,17 +148,17 @@ public class BagAdapter<X> implements Bag<X,BLink<X>> {
 
 
     @Override
-    public void onAdded(BLink<X> v) {
+    public void onAdded(PLink<X> v) {
         bag.onAdded(v);
     }
 
     @Override
-    public void onRemoved(@NotNull BLink<X> v) {
+    public void onRemoved(@NotNull PLink<X> v) {
         bag.onRemoved(v);
     }
 
     @Override
-    public Bag<X,BLink<X>> commit() {
+    public Bag<X,PLink<X>> commit() {
         bag.commit();
         return this;
     }

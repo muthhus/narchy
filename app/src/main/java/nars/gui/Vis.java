@@ -9,7 +9,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
@@ -337,7 +336,7 @@ public class Vis {
         new LeakOut(nar, 4, 0.25f) {
 
             @Override
-            protected void in(@NotNull Task t, Consumer<BLink<Task>> each) {
+            protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
                 if (t.pri() >= priMin.floatValue()) {
                     super.in(t, each);
                 }

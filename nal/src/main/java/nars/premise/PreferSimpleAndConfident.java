@@ -1,10 +1,10 @@
 package nars.premise;
 
 import jcog.Util;
+import jcog.bag.Priority;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.Task;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -59,24 +59,18 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 
 
     @Nullable @Override
-    public Budget budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
+    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
 
         float p = d.premise.pri();
-        float q = d.premise.qua();
-
-        final float quaMin = d.quaMin;
 
         if (truth!=null) { //belief and goal:
-            q *= BudgetFunctions.truthToQuality(truth);
+            p *= BudgetFunctions.truthToQuality(truth);
                     //confidencePreservationFactor(truth, d);
-            if (q < quaMin) return null;
         } else {
-            q *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-            if (q < quaMin) return null;
+            p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
         }
 
         p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
-        if (q < quaMin) return null;
 
 
         p *= puncFactor(punc).floatValue();
@@ -84,9 +78,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         FloatParam off = opFactor(conclusion);
         p *= off.floatValue();
 
-        p *= q; //further discount priority in similar way as quality
-
-        return $.b(p, q);
+        return $.b(p);
     }
 
 //    static float polarizationFactor(@Nullable Truth truth) {

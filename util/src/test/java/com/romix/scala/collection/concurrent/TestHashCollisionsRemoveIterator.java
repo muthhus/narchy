@@ -1,12 +1,12 @@
 package com.romix.scala.collection.concurrent;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.junit.Test;
 
 public class TestHashCollisionsRemoveIterator {
     @Test

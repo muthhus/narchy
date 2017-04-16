@@ -1,9 +1,10 @@
 package nars.task;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BLink;
+import nars.budget.BudgetException;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -101,7 +102,7 @@ public class RevisionTask extends AnswerTask  {
                     newBeliefContribution);
 
             //Balance Tasklinks
-            Bag<Task,BLink<Task>> tasklinks = concept(nar).tasklinks();
+            Bag<Task,PLink<Task>> tasklinks = concept(nar).tasklinks();
             BudgetFunctions.balancePri(
                     tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
                     resultPri,

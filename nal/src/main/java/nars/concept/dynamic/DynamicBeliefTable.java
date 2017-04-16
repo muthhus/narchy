@@ -1,10 +1,10 @@
 package nars.concept.dynamic;
 
 import jcog.Util;
+import jcog.bag.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.budget.Budget;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.task.DerivedTask;
@@ -75,7 +75,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //    }
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Budget b) {
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b) {
 
 
 

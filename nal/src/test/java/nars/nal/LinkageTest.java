@@ -1,10 +1,10 @@
 package nars.nal;
 
 import com.google.common.collect.Lists;
+import jcog.bag.PLink;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
@@ -76,7 +76,7 @@ public class LinkageTest extends AbstractNALTest {
 
     public boolean isPassed2(String premise1, @Nullable Concept ret2, boolean passed2) {
         if(ret2!=null){// && ret2.getTermLinks()!=null) {
-            for (BLink<Term> entry : ret2.termlinks()) {
+            for (PLink<Term> entry : ret2.termlinks()) {
                 Term w = entry.get().term();
                 if (w.toString().equals(premise1)) {
                     passed2 = true;
@@ -179,7 +179,7 @@ public class LinkageTest extends AbstractNALTest {
 
         Term p2Term = premise2.term();
 
-        for (BLink<Term> entry : ret.termlinks()) {
+        for (PLink<Term> entry : ret.termlinks()) {
             Term w = entry.get();
 
             //test 1st level link
@@ -190,7 +190,7 @@ public class LinkageTest extends AbstractNALTest {
             //test 2nd level link
             Concept ww = nar.concept(w);
             if (ww != null) {
-                for (BLink<Term> entry2 : ww.termlinks()) {
+                for (PLink<Term> entry2 : ww.termlinks()) {
                     if (entry2.get().equals(p2Term)) {
                         return true;
                     }
@@ -224,7 +224,7 @@ public class LinkageTest extends AbstractNALTest {
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
         if(ret != null) {
-            for (BLink<Term> entry : ret.termlinks()) {
+            for (PLink<Term> entry : ret.termlinks()) {
                 Term et1 = entry.get().term();
                 if(et1.toString().equals(premise2)) {
                     passed = true;
@@ -234,7 +234,7 @@ public class LinkageTest extends AbstractNALTest {
                 if (!(et1 instanceof Variable)) {
                     Concept Wc = tester.nar.concept(et1);
                     if (Wc != null) {
-                        for (BLink<Term> entry2 : Wc.termlinks()) {
+                        for (PLink<Term> entry2 : Wc.termlinks()) {
                             Term et2 = entry2.get().term();
                             if (et2.toString().equals(premise2)) {
                                 passed = true;
@@ -242,7 +242,7 @@ public class LinkageTest extends AbstractNALTest {
                             }
                             Concept Wc2 = tester.nar.concept(et2);
                             if (Wc2 != null) {
-                                for (BLink<Term> entry3 : Wc2.termlinks()) {
+                                for (PLink<Term> entry3 : Wc2.termlinks()) {
                                     Term et3 = entry3.get().term();
                                     if (et3.toString().equals(premise2)) {
                                         passed = true;

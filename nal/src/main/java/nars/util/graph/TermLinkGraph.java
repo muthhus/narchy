@@ -1,9 +1,9 @@
 package nars.util.graph;
 
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.$;
 import nars.NAR;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -118,7 +118,7 @@ public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
 
         Term cterm = c.term();
 
-        Bag<Term,BLink<Term>> tl = c.termlinks();
+        Bag<Term,PLink<Term>> tl = c.termlinks();
 
         tl.forEach(t -> {
             Termed target = t.get();

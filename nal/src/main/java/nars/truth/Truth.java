@@ -28,7 +28,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Comparator;
 
 import static jcog.Util.*;
@@ -158,7 +157,7 @@ public interface Truth extends Truthed {
 
 
     @NotNull
-    default Appendable appendString(@NotNull Appendable sb) throws IOException {
+    default StringBuilder appendString(@NotNull StringBuilder sb) {
         return appendString(sb, 2);
     }
 
@@ -168,10 +167,9 @@ public interface Truth extends Truthed {
      * accruate to 1%
      */
     @NotNull
-    default Appendable appendString(@NotNull Appendable sb, int decimals) throws IOException {
+    default StringBuilder appendString(@NotNull StringBuilder sb, int decimals)  {
 
-        if (sb instanceof StringBuilder)
-            ((StringBuilder)sb).ensureCapacity(3 + 2 * (2 + decimals) );
+        sb.ensureCapacity(3 + 2 * (2 + decimals) );
 
         return sb
             .append(Op.TRUTH_VALUE_MARK)

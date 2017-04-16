@@ -13,7 +13,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.impl.TaskHijackBag;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import nars.concept.Concept;
 import nars.premise.MatrixPremiseBuilder;
@@ -79,7 +78,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         c.termlinks().commit();
 
         for (int i = 0; i < numTaskLinks; i++) {
-            @Nullable BLink<Task> taskLink = c.tasklinks().sample();
+            @Nullable PLink<Task> taskLink = c.tasklinks().sample();
             if (taskLink == null)
                 return;
 
@@ -88,7 +87,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     .hi();
                     //.lerp( pc.pri()  );
 
-            FasterList<BLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
             c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
                 termLinks.add(v);
                 return 1;

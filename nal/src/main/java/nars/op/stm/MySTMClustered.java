@@ -231,7 +231,7 @@ public class MySTMClustered extends STMClustered {
 //                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
 //                        float priAvg = ((float)(priTotal / uu.size()));
 //
-                        m.setBudget(BudgetFunctions.fund(uu, (1f / uu.size()), false));
+                        m.budget().copyFrom(BudgetFunctions.fund(uu, (1f / uu.size()), false));
                         //m.log("STMCluster CoOccurr");
 
                         return m;

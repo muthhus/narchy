@@ -81,7 +81,9 @@ public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTab
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        BLinkHijackBag.flatForget(this );
+        commit();
+
+        //BLinkHijackBag.flatForget(this );
 
         //new Forget( Util.unitize(1f/capacity() + forgetRate) )
 

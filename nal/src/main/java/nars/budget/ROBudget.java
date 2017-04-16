@@ -1,17 +1,17 @@
 package nars.budget;
 
+import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * reverse osmosis read-only budget
  */
-public final class ROBudget implements Budget {
+public final class ROBudget implements Priority {
 
-    private final float pri, qua;
+    private final float pri;
 
-    public ROBudget(float pri, float qua) {
+    public ROBudget(float pri) {
         this.pri = pri;
-        this.qua = qua;
     }
 
     @Override
@@ -30,32 +30,18 @@ public final class ROBudget implements Budget {
     }
 
 
-    @Override
-    public void setQua(float q) {
-        throw new UnsupportedOperationException();
-    }
-
     @NotNull
     @Override
-    public Budget clone() {
+    public Priority clone() {
         return new RawBudget(this);
     }
 
-    @NotNull
-    @Override
-    public Budget setBudget(float p, float q) {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public final float pri() {
         return pri;
     }
 
-    @Override
-    public final float qua() {
-        return qua;
-    }
 
     /**
      * Fully display the BudgetValue

@@ -1,7 +1,6 @@
 package jcog.bag;
 
 import jcog.Util;
-import jcog.bag.impl.HijackBag;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;

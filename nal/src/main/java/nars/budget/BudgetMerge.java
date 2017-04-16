@@ -1,6 +1,9 @@
 package nars.budget;
 
 import jcog.Util;
+import jcog.bag.PLink;
+import jcog.bag.Prioritized;
+import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +17,7 @@ import static nars.util.UtilityFunctions.or;
  * Budget merge function, with input scale factor
  */
 @FunctionalInterface
-public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
+public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
 
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
@@ -23,22 +26,22 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      *
      * @return any resultng overflow priority which was not absorbed by the target, >=0
      * */
-    float merge(Budget existing, Budgeted incoming, float incomingScale);
+    float merge(Priority existing, Prioritized incoming, float incomingScale);
 
 
     @Nullable
     @Override
-    default Budget apply(@NotNull Budget existing, @NotNull Budget incoming) {
+    default Priority apply(@NotNull Priority existing, @NotNull Priority incoming) {
         return apply(existing, incoming, 1f);
     }
 
     @Nullable
-    default Budget apply(@NotNull Budget target, @NotNull Budgeted incoming, float scale) {
+    default Priority apply(@NotNull Priority target, @NotNull Prioritized incoming, float scale) {
         merge(target, incoming, scale);
         return target;
     }
 
-    default float merge(BLink prev, BLink next) {
+    default float merge(PLink prev, PLink next) {
         return merge(prev, next, 1f);
     }
 
@@ -57,34 +60,14 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      *
      //TODO will this work for a possible negative pri value case?
      * */
-    static float blend(@NotNull Budget exi, @NotNull Budgeted inc, float iScale, @NotNull PriMerge priMerge) {
+    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, float iScale, @NotNull PriMerge priMerge) {
 
         float ePri = exi.priSafe(0);
         //boolean hasTP = tPri > 0;
         float iPri = inc.priSafe(0);
         //boolean hasSP = sPri > 0 && sScale >= BUDGET_EPSILON;
 
-        /*
-        if (!hasSP) {
-            if (hasTP) {
-                return 0; //nothing to do; zero incoming doesnt budge the target budget
-            }
-        } else {
-            if (!hasTP) {
-                tgt.setBudget(sPri * sScale, src.qua()); //target has no influence, it becomes set entirely by incoming
-                return 0;
-            }
-        }
-        */
-        float iQua = inc.qua();
-        float eQua = exi.qua();
-        float iInfluence;
-        if (eQua!=eQua) {
-            eQua = 0;
-            iInfluence = 1f; //fully influenced by incoming
-        } else {
-            iInfluence = iScale/2f;// * (iQua / (eQua + iQua));
-        }
+
 
 
         float nextPri;
@@ -99,7 +82,7 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
                 nextPri = Math.max(ePri, iPri*iScale);
                 break;
             case AVG:
-                nextPri = lerp(iInfluence, iPri, ePri);
+                nextPri = lerp(0.5f, iPri, ePri);
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;
@@ -117,9 +100,8 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
             overflow = 0;
         }
 
-        float newQua = lerp(iInfluence, iQua, eQua);
 
-        exi.setBudget( nextPri, newQua );
+        exi.setPriority( nextPri );
 
         return overflow;
     }
@@ -237,9 +219,8 @@ public interface BudgetMerge extends BiFunction<Budget, Budget, Budget> {
      *  WARNING untested
      * */
     BudgetMerge maxHard = (tgt, src, srcScaleIgnored) -> {
-        tgt.setBudget(
-            Util.max(src.priSafe(0), tgt.priSafe(0)),
-                Util.max(src.qua(), tgt.qua()));
+        tgt.setPriority(
+            Util.max(src.priSafe(0), tgt.priSafe(0)));
         return 0;
     };
 

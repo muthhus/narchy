@@ -1,11 +1,10 @@
 package nars.premise;
 
-import jcog.Util;
+import jcog.bag.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -43,7 +42,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Derivation premise(@NotNull Concept concept, Task task, Budget taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
+    public Derivation premise(@NotNull Concept concept, Task task, Priority taskLinkCopy, long when, Term beliefTerm, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
 
         Task belief = null;
 
@@ -83,7 +82,7 @@ abstract public class PremiseBuilder {
                             //float qBefore = taskBudget.priSafe(0);
                             //float aBefore = answered.priSafe(0);
                             BudgetFunctions.transferPri(taskLinkCopy, answered.budget(),
-                                    (float) Math.sqrt(answered.conf() * answered.qua())
+                                    (float) answered.conf()
                                     //(1f - taskBudget.qua())
                                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                             );
@@ -143,24 +142,17 @@ abstract public class PremiseBuilder {
         }
 
 
-        Budget beliefBudget;
+        Priority beliefPriority;
         if (belief != null) {
-            beliefBudget = belief.budget().clone();
-            if (beliefBudget == null)
+            beliefPriority = belief.budget().clone();
+            if (beliefPriority == null)
                 belief = null;
         } else {
-            beliefBudget = null;
+            beliefPriority = null;
         }
 
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
-
-        float tq = task.qua();
-
-        float bq = (beliefBudget != null) ? beliefBudget.qua() : Float.NaN;
-        float qua = belief == null ? tq : Math.max(tq, bq);
-        if (qua < nar.quaMin.floatValue())
-            return null;
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
@@ -174,8 +166,8 @@ abstract public class PremiseBuilder {
             return null; //task deleted
 
         float pri =
-                //Math.max(taskPri, beliefBudget!=null ? beliefBudget.pri() : 0);
-                belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
+                Math.max(taskPri, beliefPriority !=null ? beliefPriority.pri() : 0);
+                //belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
 
         if (pri < priMin)
             return null;
@@ -185,10 +177,10 @@ abstract public class PremiseBuilder {
 
         nar.concepts.commit(concept);
 
-        return newPremise(concept, task, beliefTerm, belief, pri, qua, target, nar);
+        return newPremise(concept, task, beliefTerm, belief, pri, target, nar);
     }
 
-    @Nullable abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
+    abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
 
     @Nullable
     private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {

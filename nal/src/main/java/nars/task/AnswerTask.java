@@ -1,6 +1,5 @@
 package nars.task;
 
-import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.term.Compound;
@@ -9,8 +8,6 @@ import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static jcog.Util.lerp;
 
 /**
  * Created by me on 7/3/16.
@@ -59,21 +56,11 @@ public class AnswerTask extends ImmutableTask {
 
     @Nullable
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        float ae = a.evi();
-        return budget(a, b, ae / (ae + b.evi()));
-    }
-
-    @Nullable
-    public final AnswerTask budget(@NotNull Task a, @NotNull Task b, float aMix) {
-        budgetSafe(
-            Util.unitize(
-                a.priSafe(0) +
-                   b.priSafe(0)
-            ),
-            lerp(aMix, a.qua(), b.qua())
-        );
+        budgetSafe(a.priSafe(0) +
+                b.priSafe(0));
         return this;
     }
+
 
     @Override
     public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {

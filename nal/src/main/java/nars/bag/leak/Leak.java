@@ -5,7 +5,7 @@ import jcog.bag.PLink;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import nars.budget.Budget;
+import nars.budget.BudgetException;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,7 +48,7 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
     public void accept(Task task) {
         try {
             in(task, bag::put);
-        } catch (Budget.BudgetException e) {
+        } catch (BudgetException e) {
             //was deleted before the link could be made
         }
     }

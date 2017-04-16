@@ -1,5 +1,7 @@
 package com.romix.scala.collection.concurrent;
 
+import org.junit.Test;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,8 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
-import org.junit.Test;
 
 public class TestMultiThreadMapIterator {
     private static final int NTHREADS = 7;

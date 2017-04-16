@@ -1,11 +1,11 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
+import jcog.bag.Priority;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.budget.Budget;
 import nars.derive.rule.PremiseRule;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
@@ -123,11 +123,11 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
             Truth truth = ct.truth;
             byte punc = ct.punc;
 
-            Budget budget = m.budgeting.budget(m, cr, truth, punc);
-            if (budget == null)
+            Priority priority = m.budgeting.budget(m, cr, truth, punc);
+            if (priority == null)
                 return true;
 
-            derive(m, cr, truth, budget, punc, ct.evidence); //continue to stage 2
+            derive(m, cr, truth, priority, punc, ct.evidence); //continue to stage 2
 
 
         } catch (@NotNull InvalidTermException | InvalidTaskException e) {
@@ -142,7 +142,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
     /**
      * 2nd-stage
      */
-    final void derive(@NotNull Derivation m, @NotNull final Compound _content, Truth truth, Budget budget, byte punc, long[] evidence) {
+    final void derive(@NotNull Derivation m, @NotNull final Compound _content, Truth truth, Priority priority, byte punc, long[] evidence) {
 
         Compound content = _content;
 
@@ -253,7 +253,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
         }
 
 
-        DerivedTask d = derive(content, budget, nar.time(), occ, m, truth, punc, evidence, nar);
+        DerivedTask d = derive(content, priority, nar.time(), occ, m, truth, punc, evidence, nar);
 
         if (d != null)
             m.target.accept(d);
@@ -264,7 +264,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Compound cc, @NotNull Budget budget, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence, NAR nar) {
+    public final DerivedTask derive(@NotNull Compound cc, @NotNull Priority priority, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence, NAR nar) {
 
         long start, end;
         if (occ != null) {
@@ -281,7 +281,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
 
 
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-        d.setBudget(budget); // copied in, not shared
+        d.copyFrom(priority); // copied in, not shared
         //.anticipate(derivedTemporal && d.anticipate)
 
         if (Param.DEBUG)

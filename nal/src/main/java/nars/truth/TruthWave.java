@@ -19,7 +19,7 @@ import java.util.Arrays;
  * */
 public class TruthWave {
 
-    private static final int ENTRY_SIZE = 5;
+    private static final int ENTRY_SIZE = 4;
 
     /** start and stop interval (in cycles) */
     long start;
@@ -67,7 +67,7 @@ public class TruthWave {
             int ss = size[0];
             if (ss < s) { //HACK in case the table size changed since allocating above
                 int j = (size[0]++) * ENTRY_SIZE;
-                load(t, j, x.start(), x.end(), x, x.qua());
+                load(t, j, x.start(), x.end(), x);
             }
         });
         this.size = size[0];
@@ -91,14 +91,13 @@ public class TruthWave {
         this.current = b.truth(now, dur);
     }
 
-    public static void load(float[] array, int index, long start, long end, @Nullable Truthed truth, float qua) {
+    public static void load(float[] array, int index, long start, long end, @Nullable Truthed truth) {
         if (truth == null)
             return;
         array[index++] = start == Tense.ETERNAL ? Float.NaN : start;
         array[index++] = end == Tense.ETERNAL ? Float.NaN : end;
         array[index++] = truth.freq();
         array[index++] = truth.conf();
-        array[index++] = qua;
     }
 
     public void ensureSize(int s) {
@@ -131,7 +130,7 @@ public class TruthWave {
             int lt = Math.round(t);
             Truth x = table.truth(lt, dur);
             if (x!=null) {
-                load(data, (j++) * ENTRY_SIZE, lt, lt, x, 0.5f);
+                load(data, (j++) * ENTRY_SIZE, lt, lt, x);
             }
             t+= dt;
         }
@@ -153,7 +152,7 @@ public class TruthWave {
 
 
     @FunctionalInterface public interface TruthWaveVisitor {
-        void onTruth(float f, float c, float start, float end, float qua);
+        void onTruth(float f, float c, float start, float end);
     }
 
     public final void forEach(@NotNull TruthWaveVisitor v) {
@@ -165,8 +164,7 @@ public class TruthWave {
             float e = t[j++];
             float f = t[j++];
             float c = t[j++];
-            float q = t[j++];
-            v.onTruth(f, c, s, e, q);
+            v.onTruth(f, c, s, e);
         }
     }
 

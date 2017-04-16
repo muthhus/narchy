@@ -7,7 +7,6 @@ import jcog.bag.impl.PLinkHijackBag;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
@@ -29,7 +28,7 @@ import static nars.util.UtilityFunctions.or;
 import static spacegraph.math.v3.v;
 
 
-public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? extends Termed>> {
+public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? extends Termed>> {
 
     public final PLinkHijackBag<TermEdge> edges;
 
@@ -225,7 +224,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
     }
 
     @Override
-    public void accept(BLink<? extends Termed> tgt) {
+    public void accept(PLink<? extends Termed> tgt) {
         float pri = tgt.priSafe(-1);
         if (pri < 0)
             return;
@@ -266,7 +265,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<BLink<? exte
             termlinkPri = tasklinkPri = 0;
         }
 
-        public void add(BLink b, boolean termOrTask) {
+        public void add(PLink b, boolean termOrTask) {
             float p = b.priSafe(0);
             if (termOrTask) {
                 termlinkPri += p;

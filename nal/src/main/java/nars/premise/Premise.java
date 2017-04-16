@@ -35,9 +35,9 @@ public class Premise extends RawBudget  {
 
     public Premise(@NotNull Task taskLink,
                    @NotNull Term termLink,
-                   @Nullable Task belief, float pri, float qua) {
+                   @Nullable Task belief, float pri) {
 
-        super(pri, qua);
+        super(pri);
 
         //this.concept = concept;
 

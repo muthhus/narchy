@@ -1,12 +1,9 @@
 package nars.audio;
 
-import jcog.Util;
-import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -14,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Tense;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
@@ -22,8 +18,6 @@ import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.audio.MIDI.MidiInReceiver.channelKey;
 

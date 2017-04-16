@@ -1,10 +1,9 @@
 package nars.task;
 
+import jcog.bag.Priority;
 import jcog.data.byt.ByteSeq;
 import nars.NAR;
 import nars.Task;
-import nars.budget.Budget;
-import nars.budget.Budgeted;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -28,6 +27,16 @@ public class SerializedTask extends ByteSeq.WindowByteSeq implements Task {
     }
 
     @Override
+    public void setPriority(float p) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public @Nullable Priority clone() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean delete() {
         return false;
     }
@@ -39,19 +48,11 @@ public class SerializedTask extends ByteSeq.WindowByteSeq implements Task {
     }
 
     @Override
-    public @NotNull Budget budget() {
+    public @NotNull Priority budget() {
         return null;
     }
 
-    @Override
-    public float qua() {
-        return 0;
-    }
 
-    @Override
-    public Budget setBudget(@Nullable Budgeted srcCopy) {
-        return null;
-    }
 
     @Override
     public byte punc() {

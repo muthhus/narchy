@@ -24,7 +24,6 @@ public class TaskStatistics {
     final Frequency freq = new Frequency();
     final Frequency conf = new Frequency();
     final Frequency pri = new Frequency();
-    final Frequency qua = new Frequency();
 
     public TaskStatistics add(NAR nar) {
         nar.forEachTask(this::add);
@@ -59,7 +58,6 @@ public class TaskStatistics {
             conf.addValue(Util.round(t.conf(), 0.1f));
         }
         pri.addValue(Util.round(t.pri(), 0.1f));
-        qua.addValue(Util.round(t.qua(), 0.1f));
 
     }
 
@@ -76,7 +74,6 @@ public class TaskStatistics {
         out.println("\nfreq:\n" + freq);
         out.println("\nconf:\n" + conf);
         out.println("\npri:\n" + pri);
-        out.println("\nqua:\n" + qua);
 
     }
 

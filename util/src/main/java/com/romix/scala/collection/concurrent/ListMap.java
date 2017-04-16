@@ -1,9 +1,9 @@
 package com.romix.scala.collection.concurrent;
 
+import com.romix.scala.Option;
+
 import java.util.Iterator;
 import java.util.Map.Entry;
-
-import com.romix.scala.Option;
 
 /**
  * Mimic immutable ListMap in Scala

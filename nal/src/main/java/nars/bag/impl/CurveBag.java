@@ -1,7 +1,7 @@
 package nars.bag.impl;
 
+import jcog.bag.PLink;
 import nars.Param;
-import nars.budget.BLink;
 import nars.budget.BudgetMerge;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
@@ -33,7 +33,7 @@ public class CurveBag<V> extends ArrayBag<V> {
     final CurveSampler sampler;
 
 
-    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, @NotNull Map<V, BLink<V>> map) {
+    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, @NotNull Map<V, PLink<V>> map) {
         super(mergeFunction, map);
         capacity(initialCapacity);
         this.sampler = c;
@@ -83,14 +83,14 @@ public class CurveBag<V> extends ArrayBag<V> {
      */
     @Nullable
     @Override
-    public BLink<V> sample() {
+    public PLink<V> sample() {
         ensureSorted();
         int s = size();
         while (s > 0) {
             synchronized (items) {
 
                 int i = sampleIndex(s);
-                BLink<V> b = get(i);
+                PLink<V> b = get(i);
                 if (b.isDeleted()) {
                     items.removeFast(i);
                     map.remove(b.get());
@@ -113,7 +113,7 @@ public class CurveBag<V> extends ArrayBag<V> {
      */
     @NotNull
     @Override
-    public CurveBag<V> sample(int n, @NotNull Predicate<? super BLink<V>> target) {
+    public CurveBag<V> sample(int n, @NotNull Predicate<? super PLink<V>> target) {
 
         ensureSorted();
 
@@ -136,7 +136,7 @@ public class CurveBag<V> extends ArrayBag<V> {
 //    }
 
     @NotNull
-    private void sampleMulti(int n, @NotNull Predicate<? super BLink<V>> target) {
+    private void sampleMulti(int n, @NotNull Predicate<? super PLink<V>> target) {
         ensureSorted();
         synchronized (items) {
 
@@ -160,7 +160,7 @@ public class CurveBag<V> extends ArrayBag<V> {
                 end = begin + n;
             }
 
-            BLink<V>[] l = items.array();
+            PLink<V>[] l = items.array();
 
             for (int i = begin; i < end; i++) {
                 //scan the designated subarray
@@ -201,7 +201,7 @@ public class CurveBag<V> extends ArrayBag<V> {
         //System.out.println("(of " + ss + ") select " + n + ": " + begin + ".." + end + " = " + target);
     }
 
-    public static boolean trySample(@NotNull Predicate target, BLink b) {
+    public static boolean trySample(@NotNull Predicate target, PLink b) {
         return (!b.isDeleted() && target.test(b));
     }
 

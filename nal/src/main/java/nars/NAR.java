@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
+import jcog.bag.Priority;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -12,8 +13,7 @@ import jcog.event.Topic;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
-import nars.budget.BLink;
-import nars.budget.Budget;
+import nars.budget.BudgetException;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -617,17 +617,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             return null;
         }
 
-        float q = input.qua();
-        if (q != q) { //default budget if qua == NaN
-            input.budget(this);
-        }
+        float inputPri = input.priSafe(-1);
+        if (inputPri < 0)
+            return null; //deleted
 
-        float inputPri = input.priSafe(0);
         emotion.busy(inputPri, input.volume());
 
-
         if (input.isCommand() /* || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))*/) { //eternal, present (within duration radius), or future
-
 
             Task transformed = execute(input);
             if (transformed == null)
@@ -666,7 +662,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
             }
 
-        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | Budget.BudgetException e) {
+        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | BudgetException e) {
 
             emotion.eror(input.volume());
 
@@ -920,7 +916,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
                 input(x.apply(this));
 
-            } catch (@NotNull InvalidTaskException | InvalidTermException | Budget.BudgetException e) {
+            } catch (@NotNull InvalidTaskException | InvalidTermException | BudgetException e) {
 
                 if (x instanceof TaskBuilder) {
 
@@ -942,7 +938,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
-        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, BLink<Term>> termLinks, Bag<Task, BLink<Task>> taskLinks) {
+        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, PLink<Term>> termLinks, Bag<Task, PLink<Task>> taskLinks) {
             super(atom, termLinks, taskLinks);
         }
     }
@@ -1076,11 +1072,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         } else if (v instanceof Task) {
             Task tv = ((Task) v);
             v = ansi()
-                    .a(tv.qua() > 0.5f ?
+                    .a(tv.originality() >= 0.33f ?
                             Ansi.Attribute.INTENSITY_BOLD :
                             Ansi.Attribute.INTENSITY_FAINT)
                     .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
-                    .fg(Budget.budgetSummaryColor(tv))
+                    .fg(Priority.budgetSummaryColor(tv))
                     .a(
                             tv.toString(this, true)
                     )
@@ -1088,9 +1084,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
                     .toString();
         }
 
-        out.append(v.toString());
-
-        out.append('\n');
+        out.append(v.toString()).append('\n');
     }
 
     /**

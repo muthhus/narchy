@@ -1,7 +1,7 @@
 package nars.concept.dynamic;
 
+import jcog.bag.Priority;
 import nars.*;
-import nars.budget.Budget;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Stamp;
@@ -39,7 +39,7 @@ public final class DynTruth implements Truthed {
     }
 
     @Nullable
-    public Budget budget() {
+    public Priority budget() {
         //RawBudget b = new RawBudget();
         int s = e.size();
         assert (s > 0);
@@ -75,10 +75,10 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, @Nullable Budget b, NAR nar) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, @Nullable Priority b, NAR nar) {
 
-        Budget budget = b != null ? b : budget();
-        if (budget == null || budget.isDeleted())
+        Priority priority = b != null ? b : budget();
+        if (priority == null || priority.isDeleted())
             return null;
 
         Truth tr = truth();
@@ -111,7 +111,7 @@ public final class DynTruth implements Truthed {
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, start + dur, evidence());
-        dyn.setBudget( budget );
+        dyn.copyFrom(priority);
         if (Param.DEBUG)
             dyn.log("Dynamic");
 

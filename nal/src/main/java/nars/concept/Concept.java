@@ -22,9 +22,9 @@ package nars.concept;
 
 import com.google.common.collect.Iterators;
 import jcog.bag.Bag;
+import jcog.bag.PLink;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BLink;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -49,9 +49,9 @@ import static nars.Op.*;
 
 public interface Concept extends Termed {
 
-    @NotNull Bag<Task,BLink<Task>> tasklinks();
+    @NotNull Bag<Task,PLink<Task>> tasklinks();
 
-    @NotNull Bag<Term,BLink<Term>> termlinks();
+    @NotNull Bag<Term,PLink<Term>> termlinks();
 
     @Nullable Map<Object, Object> meta();
 
@@ -366,10 +366,10 @@ public interface Concept extends Termed {
                 }
             };
 
-            Consumer<BLink> printBagItem = b -> {
+            Consumer<PLink> printBagItem = b -> {
                 try {
                     out.append(indent);
-                    out.append(String.valueOf(b.get())).append(" ").append(b.toBudgetString());
+                    out.append(String.valueOf(b.get())).append(' ').append(b.toBudgetString());
                     out.append(" ");
                 } catch (IOException e) {
                     e.printStackTrace();

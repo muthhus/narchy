@@ -14,7 +14,6 @@ import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,6 @@ public class ImmutableTask extends RawBudget implements Task {
             throw new InvalidTaskException(term, "query variable in belief or goal");
 
         this.priority = 0;
-        this.quality = Float.NaN;
 
         this.term = term;
         this.truth = truth;
@@ -181,11 +179,7 @@ public class ImmutableTask extends RawBudget implements Task {
     @Override
     @Deprecated
     public String toString() {
-        try {
-            return appendTo(null, null).toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return appendTo(null, null).toString();
     }
 
 

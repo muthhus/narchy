@@ -5,10 +5,8 @@ import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 
-
-public class DefaultTruth implements Truth  {
+public class DefaultTruth implements Truth {
 
     public final float freq, conf;
 
@@ -44,7 +42,8 @@ public class DefaultTruth implements Truth  {
 
 
     @Nullable
-    @Override public final Truth withConf(float newConf) {
+    @Override
+    public final Truth withConf(float newConf) {
         return new DefaultTruth(freq, newConf);
     }
 
@@ -54,11 +53,8 @@ public class DefaultTruth implements Truth  {
         //return DELIMITER + frequency.toString() + SEPARATOR + confidence.toString() + DELIMITER;
 
         //1 + 6 + 1 + 6 + 1
-        try {
-            return appendString(new StringBuilder(7)).toString();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return appendString(new StringBuilder(7)).toString();
+
     }
 
     @Override
@@ -66,8 +62,9 @@ public class DefaultTruth implements Truth  {
 
         //if (that instanceof DefaultTruth) {
 
-            //return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
-        /*} else */if (that instanceof Truth) {
+        //return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
+        /*} else */
+        if (that instanceof Truth) {
             //Truth t = (Truth)that;
             //return freq == t.freq() && conf == t.conf();
             return hashCode() == that.hashCode();

@@ -5,7 +5,6 @@ import jcog.bag.PLink;
 import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;
-import nars.budget.BLink;
 import nars.concept.Concept;
 import nars.term.Term;
 import spacegraph.web.PeriodicWebsocketService;
@@ -127,7 +126,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 
         IO.writeUTF8WithPreLen(c.toString(), out);
 
-        Bag<Term,BLink<Term>> b = c.termlinks();
+        Bag<Term,PLink<Term>> b = c.termlinks();
         b.forEach(termlinks, t -> {
             try {
                 IO.writeBudget(out, t);

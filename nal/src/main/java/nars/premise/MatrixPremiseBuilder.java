@@ -1,14 +1,12 @@
 package nars.premise;
 
-import jcog.bag.Bag;
+import jcog.bag.PLink;
+import jcog.bag.Priority;
 import jcog.data.MutableIntRange;
 import jcog.list.FasterList;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.BLink;
-import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.derive.Deriver;
 import nars.task.DerivedTask;
@@ -41,9 +39,9 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
 
 
     @Override
-    public @Nullable Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, float qua, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar) {
+    public Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, @NotNull Consumer<DerivedTask> each, @NotNull NAR nar) {
 
-        Premise p = new Premise(task, beliefTerm, belief, pri, qua);
+        Premise p = new Premise(task, beliefTerm, belief, pri);
 
         return new Derivation(nar, p, each,
                 budgeting,
@@ -100,7 +98,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
     /**
      * derives matrix of: concept => (tasklink x termlink) => premises
      */
-    public int newPremiseVector(@NotNull Concept c, BLink<Task> taskLink, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<BLink<Term>> termLinks, @NotNull NAR nar) {
+    public int newPremiseVector(@NotNull Concept c, PLink<Task> taskLink, MutableIntRange termlinks, @NotNull Consumer<DerivedTask> target, FasterList<PLink<Term>> termLinks, @NotNull NAR nar) {
 
         int count = 0;
 
@@ -123,7 +121,7 @@ public class MatrixPremiseBuilder extends PremiseBuilder {
             //        if (Terms.equalSubTermsInRespectToImageAndProduct(task.term(), term))
             //            return null;
 
-            Budget taskLinkCopy = taskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
+            Priority taskLinkCopy = taskLink.clone(); /* copy, in case the tasklink becomes deleted during this method */
             if (taskLinkCopy == null) //deleted
                 return 0;
 
