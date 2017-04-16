@@ -137,7 +137,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     @NotNull
-    public static Task makeTask(@NotNull NAR nar, @Nullable float[] b, @NotNull Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
+    public static Task makeTask(@NotNull NAR nar, @Nullable Float b, @NotNull Compound content, byte p, @Nullable Truth t, Tense tense) throws NarseseException {
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -145,7 +145,6 @@ public class Narsese extends BaseParser<Object> {
 //        if ((t == null) && ((p == JUDGMENT) || (p == GOAL)))
 //            t = new DefaultTruth(p);
 //
-        int blen = b != null ? b.length : 0;
 //        if ((blen > 0) && (Float.isFinite(b[0])))
 //            blen = 0;
 //
@@ -163,16 +162,11 @@ public class Narsese extends BaseParser<Object> {
                                         nar
                                 ));
 
-        switch (blen) {
-            case 0:     /* do not set, Memory will apply defaults */
-                ttt.budgetSafe(nar.priorityDefault(p));
-                break;
-            case 1:
-                ttt.budgetSafe(b[0]);
-                break;
-            default:
-                throw new NarseseException("budget parse error");
-        }
+        if (b == null)  /* do not set, Memory will apply defaults */
+            ttt.budgetSafe(nar.priorityDefault(p));
+        else
+            ttt.budgetSafe(b);
+
 
         return ttt.log(NARSESE_TASK_TAG).apply(nar);
     }
@@ -323,7 +317,7 @@ public class Narsese extends BaseParser<Object> {
 
     public Rule Task() {
 
-        Var<float[]> budget = new Var();
+        Var<Float> budget = new Var();
         Var<Character> punc = new Var(Op.COMMAND);
         Var<Term> term = new Var();
         Var<Truth> truth = new Var();
@@ -352,39 +346,39 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    public Rule Budget(Var<float[]> budget) {
+    public Rule Budget(Var<Float> budget) {
         return sequence(
                 BUDGET_VALUE_MARK,
 
                 ShortFloat(),
 
-                firstOf(
-                        BudgetPriorityDurabilityQuality(budget),
-                        BudgetPriorityDurability(budget),
-                        BudgetPriority(budget)
-                ),
+//                firstOf(
+//                        BudgetPriorityDurabilityQuality(budget),
+//                        BudgetPriorityDurability(budget),
+                        BudgetPriority(budget),
+//                ),
 
                 optional(BUDGET_VALUE_MARK)
         );
     }
 
-    boolean BudgetPriority(Var<float[]> budget) {
-        return budget.set(new float[]{(float) pop()});
+    boolean BudgetPriority(Var<Float> budget) {
+        return budget.set((Float)(pop()));
     }
 
-    public Rule BudgetPriorityDurability(Var<float[]> budget) {
-        return sequence(
-                VALUE_SEPARATOR, ShortFloat(),
-                budget.set(new float[]{(float) pop(), (float) pop()}) //intermediate representation
-        );
-    }
+//    public Rule BudgetPriorityDurability(Var<float[]> budget) {
+//        return sequence(
+//                VALUE_SEPARATOR, ShortFloat(),
+//                budget.set(new float[]{(float) pop(), (float) pop()}) //intermediate representation
+//        );
+//    }
 
-    public Rule BudgetPriorityDurabilityQuality(Var<float[]> budget) {
-        return sequence(
-                VALUE_SEPARATOR, ShortFloat(), VALUE_SEPARATOR, ShortFloat(),
-                budget.set(new float[]{(float) pop(), (float) pop(), (float) pop()}) //intermediate representation
-        );
-    }
+//    public Rule BudgetPriorityDurabilityQuality(Var<float[]> budget) {
+//        return sequence(
+//                VALUE_SEPARATOR, ShortFloat(), VALUE_SEPARATOR, ShortFloat(),
+//                budget.set(new float[]{(float) pop(), (float) pop(), (float) pop()}) //intermediate representation
+//        );
+//    }
 
     public Rule Tense(Var<Tense> tense) {
         return firstOf(
@@ -1276,7 +1270,7 @@ public class Narsese extends BaseParser<Object> {
             if (t != null && !Float.isFinite(t.conf()))
                 t = t.withConf(m.confDefault(punct));
 
-            return makeTask(m, (float[]) x[0], (Compound) content, punct, t, (Tense) x[4]);
+            return makeTask(m, (Float) x[0], (Compound) content, punct, t, (Tense) x[4]);
         }
     }
 

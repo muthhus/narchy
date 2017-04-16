@@ -4,12 +4,12 @@ package nars.web;
 import com.google.common.base.Joiner;
 import jcog.Util;
 import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.bag.impl.ArrayBag;
 import nars.bag.leak.LeakOut;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
@@ -367,7 +367,7 @@ public class IRCNLP extends IRC {
 
             if (!bot.prevOut.contains(msg)) {
                 bot.out.commit();
-                bot.out.put(new RawBLink<String>(msg, 1f));
+                bot.out.put(new RawPLink<String>(msg, 1f));
             }
         });
 

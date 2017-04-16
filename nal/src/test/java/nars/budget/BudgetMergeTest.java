@@ -49,7 +49,7 @@ public class BudgetMergeTest {
         //z,a - averaging with zero results in half of the incoming
         testMerge(z(), a, 1.0f, AVG, 0.5f * a.pri());
         //z,a(scale=0.5)
-        testMerge(z(), a, 0.5f, AVG, 0.25f * a.pri());
+        testMerge(z(), a, 0.5f, AVG, 0.5f * a.pri());
         //a,z - should be identical to z,a being that AVG is commutive:
         testMerge(a, z(), 1.0f, AVG, 0.5f * a.pri());
 

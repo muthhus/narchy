@@ -12,7 +12,7 @@ import static jcog.bag.Priority.validPriority;
  * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
  * because this includes timestamp.
  */
-public class RawBudget implements Budget {
+public class RawBudget implements Priority, Budget {
 
     /**
      * The relative share of time resource to be allocated

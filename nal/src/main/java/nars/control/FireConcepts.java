@@ -78,7 +78,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         c.termlinks().commit();
 
         for (int i = 0; i < numTaskLinks; i++) {
-            @Nullable PLink<Task> taskLink = c.tasklinks().sample();
+            final @Nullable PLink<Task> taskLink = c.tasklinks().sample();
             if (taskLink == null)
                 return;
 

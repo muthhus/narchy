@@ -3,6 +3,7 @@ package nars.bag;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
+import jcog.bag.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.Param;
 import nars.bag.impl.ArrayBag;
@@ -10,7 +11,6 @@ import nars.bag.impl.BLinkHijackBag;
 import nars.bag.impl.CurveBag;
 import nars.budget.Budget;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.budget.RawBudget;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -63,7 +63,7 @@ public class BagTest {
         }
 
         //insert an item with zero budget
-        c.put(new RawBLink("x", 0));
+        c.put(new RawPLink("x", 0));
         c.commit();
 
         assertEquals(1, c.size());
@@ -80,8 +80,8 @@ public class BagTest {
         ArrayBag<String> a = new ArrayBag<String>(4, plusBlend, new HashMap<>(4));
         assertEquals(0, a.size());
 
-        a.put(new RawBLink("x", 0.1f));
-        a.put(new RawBLink("x", 0.1f));
+        a.put(new RawPLink("x", 0.1f));
+        a.put(new RawPLink("x", 0.1f));
         a.commit();
         assertEquals(1, a.size());
 
@@ -97,8 +97,8 @@ public class BagTest {
     public void testSort() {
         ArrayBag<String> a = new ArrayBag(4, plusBlend, new HashMap<>(4));
 
-        a.put(new RawBLink("x",0.1f));
-        a.put(new RawBLink("y",0.2f));
+        a.put(new RawPLink("x",0.1f));
+        a.put(new RawPLink("y",0.2f));
 
         a.commit();
 
@@ -109,7 +109,7 @@ public class BagTest {
 
         assertEquals("[y=$0.2000;0.5000$, x=$0.1000;0.5000$]", a.listCopy().toString());
 
-        a.put(new RawBLink("x", 0.2f));
+        a.put(new RawPLink("x", 0.2f));
         a.commit();
 
         //x should now be ahead
@@ -126,14 +126,14 @@ public class BagTest {
     public void testCapacity() {
         ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
 
-        a.put(new RawBLink("x", 0.1f));
-        a.put(new RawBLink("y", 0.2f));
+        a.put(new RawPLink("x", 0.1f));
+        a.put(new RawPLink("y", 0.2f));
         a.commit();        a.print();
         assertEquals(2, a.size());
 
         assertEquals( 0.1f , a.priMin(), 0.2f /* to allow for any forgetting that was applied */);
 
-        a.put(new RawBLink("z", 0.05f));
+        a.put(new RawPLink("z", 0.05f));
         a.commit();        a.print();
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));
@@ -148,7 +148,7 @@ public class BagTest {
 
     public static void testRemoveByKey(Bag<String,PLink<String>> a) {
 
-        a.put(new RawBLink("x", 0.1f));
+        a.put(new RawPLink("x", 0.1f));
         a.commit();
         assertEquals(1, a.size());
 
@@ -176,8 +176,8 @@ public class BagTest {
     }
 
     public static void testScalePut(Bag<String,PLink<String>> a) {
-        a.put(new RawBLink("x",0.1f));
-        a.put(new RawBLink("x",0.15f), 0.5f, null);
+        a.put(new RawPLink("x",0.1f));
+        a.put(new RawPLink("x",0.15f), 0.5f, null);
         assertNotNull(a.get("x"));
         a.commit();
 
@@ -188,9 +188,9 @@ public class BagTest {
 
     public static void testScalePut2(Bag<String,PLink<String>> a) {
 
-        a.put(new RawBLink("y",0.1f));
-        a.put(new RawBLink("y",0.1f), 0.5f, null);
-        a.put(new RawBLink("y",0.1f), 0.25f, null);
+        a.put(new RawPLink("y",0.1f));
+        a.put(new RawPLink("y",0.1f), 0.5f, null);
+        a.put(new RawPLink("y",0.1f), 0.25f, null);
         //a.commit();
 
         assertEquals(0.175, a.get("y").pri(), 0.001f);
@@ -284,7 +284,7 @@ public class BagTest {
 
         //fill with uniform randomness
         for (int i = 0; i < n; i++) {
-            a.put(new RawBLink("x" + i, (float) random.getAsDouble()));
+            a.put(new RawPLink("x" + i, (float) random.getAsDouble()));
         }
 
         a.commit();
@@ -320,7 +320,7 @@ public class BagTest {
 
 
         for (int i = 0; i < n; i++) {
-            a.put(new RawBLink("x" + i, level));
+            a.put(new RawPLink("x" + i, level));
         }
 
         a.commit(); //commit necessary to set sampler's dynamic range
@@ -344,7 +344,7 @@ public class BagTest {
     public static void populate(Bag<String,PLink<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
         float dPri = maxPri - minPri;
         for (int i = 0; i < count; i++) {
-            b.put(new RawBLink(
+            b.put(new RawPLink(
                     "x" + rng.nextInt(dimensionality),
                     rng.nextFloat() * dPri + minPri)
             );

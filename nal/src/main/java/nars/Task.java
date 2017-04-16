@@ -3,11 +3,11 @@ package nars;
 import jcog.Texts;
 import jcog.bag.PLink;
 import jcog.bag.Priority;
+import jcog.bag.RawPLink;
 import jcog.map.SynchronizedHashMap;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
 import nars.budget.Budgeted;
-import nars.budget.RawBLink;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
@@ -341,7 +341,7 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
 
                 answers.commit();
 
-                PLink<Task> insertion = answers.put(new RawBLink<>(answer, 1f));
+                PLink<Task> insertion = answers.put(new RawPLink<>(answer, 1f));
 
                 if (insertion != null) {
                     Command.log(nar, this.toString() + "  " + answer.toString());

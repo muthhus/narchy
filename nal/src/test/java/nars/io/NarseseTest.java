@@ -69,7 +69,7 @@ public class NarseseTest {
 
     @Test
     public void testParseCompleteEternalTask() throws Narsese.NarseseException {
-        Task t = task("$0.99;0.95$ <a --> b>! %0.93;0.95%");
+        Task t = task("$0.99 <a --> b>! %0.93;0.95%");
 
         assertNotNull(t);
         assertEquals('!', t.punc());
@@ -124,10 +124,10 @@ public class NarseseTest {
 
     @Test
     public void testBudget() throws Narsese.NarseseException {
-        Task t = task("$0.70$ <a <=> b>. %0.00;0.93");
+        Task t = task("$0.70 <a <=> b>. %0.00;0.93");
         assertEquals(0.7f, t.pri(), 0.01f);
 
-        Task u = task("$0.9$ <a <=> b>. %0.00;0.93");
+        Task u = task("$0.9 <a <=> b>. %0.00;0.93");
         assertEquals(0.9f, u.pri(), 0.01f);
     }
 
@@ -367,12 +367,12 @@ public class NarseseTest {
     @Test public void testQueryVariableTask() throws Narsese.NarseseException {
         String term = "hear(Time,(the,?x))";
         assertEquals("hear(Time,(the,?x))", term( term ).toString());
-        assertEquals("$.50;.50$ hear(Time,(the,?1))?", task(term + "?").toString());
+        assertEquals("$.50 hear(Time,(the,?1))?", task(term + "?").toString());
     }
     @Test public void testQueryVariableTaskQuotes() throws Narsese.NarseseException {
         String term = "hear(\"Time\",(\"the\",?x))";
         assertEquals("hear(\"Time\",(\"the\",?x))", term( term ).toString());
-        assertEquals("$.50;.50$ hear(\"Time\",(\"the\",?1))?", task(term + "?").toString());
+        assertEquals("$.50 hear(\"Time\",(\"the\",?1))?", task(term + "?").toString());
     }
 
     @Test
@@ -454,7 +454,7 @@ public class NarseseTest {
 
     @Test
     public void testCompleteTask() throws Narsese.NarseseException {
-        taskParses("$0.80;0.95$ <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
+        taskParses("$0.80 <<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>. %1.00;0.90%");
     }
 
     @Test public void testNonNegativeIntegerAtoms() throws Narsese.NarseseException {

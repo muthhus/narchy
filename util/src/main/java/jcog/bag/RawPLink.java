@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RawPLink<X> implements PLink<X> {
 
-    private final X id;
+    protected final X id;
     float pri;
 
     public RawPLink(X x, float p) {

@@ -3,10 +3,10 @@ package nars;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
 import spacegraph.SpaceGraph;
@@ -96,7 +96,7 @@ public class BagLab  {
             if (Math.random() < inputSliders.get(i).value()) {
                 float p = (i + (float)Math.random()) / (n - 1);
                 float q = (float)Math.random(); //random quality
-                bag.put(new RawBLink<>((int) Math.floor(Math.random() * uniques), p));
+                bag.put(new RawPLink<>((int) Math.floor(Math.random() * uniques), p));
             }
         }
 

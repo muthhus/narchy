@@ -6,6 +6,7 @@ package nars.nar;
 
 
 import com.google.common.collect.Iterables;
+import jcog.bag.PLink;
 import nars.Narsese;
 import nars.concept.Concept;
 import org.junit.Test;
@@ -39,7 +40,10 @@ public class AttentionTest {
         Set<Concept> uniqueconcepts = new HashSet();
         
         for (int i = 0; i < numConcepts; i++) {
-            Concept s = n.focus.active.sample().get();
+            PLink<Concept> ps = n.focus.active.sample();
+            if (ps == null)
+                break;
+            Concept s = ps.get();
             uniqueconcepts.add(s);
         }
 

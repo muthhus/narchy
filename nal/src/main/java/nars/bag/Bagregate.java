@@ -1,10 +1,10 @@
 package nars.bag;
 
 import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import jcog.data.FloatParam;
 import nars.bag.impl.ArrayBag;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ public class Bagregate<X> extends ArrayBag<X> {
                 }
 
                 if (x != null && include(x)) {
-                    put(new RawBLink(x, pri), scale, null);
+                    put(new RawPLink(x, pri), scale, null);
                 }
             });
         } catch (Exception e) {

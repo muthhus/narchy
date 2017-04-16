@@ -276,7 +276,7 @@ public class NAL3Test extends AbstractNALTest {
     @Test public void testArity1_Decomposition_IntersectExt2() {
         //(M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         test()
-                ////.log()
+                .log()
                 .believe("(a-->b)")
                 .believe("(a-->(&,b,c))")
                 .mustBelieve(cycles, "(a-->c)", 1f, 0.81f, ETERNAL);

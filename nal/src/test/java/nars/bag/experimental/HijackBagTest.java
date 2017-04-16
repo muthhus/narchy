@@ -3,10 +3,10 @@ package nars.bag.experimental;
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import nars.bag.BagTest;
 import nars.bag.impl.BLinkHijackBag;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ public class HijackBagTest {
 
         Bag<String,PLink<String>> a = new BLinkHijackBag<String>(n, 4, maxBlend, rng());
         for (int i = 0; i < n; i++) {
-            a.put(new RawBLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
+            a.put(new RawPLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
         }
 
         a.commit();

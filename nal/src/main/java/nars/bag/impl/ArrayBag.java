@@ -3,13 +3,13 @@ package nars.bag.impl;
 import jcog.bag.Bag;
 import jcog.bag.PLink;
 import jcog.bag.Prioritized;
+import jcog.bag.RawPLink;
 import jcog.data.sorted.SortedArray;
 import jcog.table.SortedListTable;
 import nars.$;
 import nars.Param;
 import nars.attention.Forget;
 import nars.budget.BudgetMerge;
-import nars.budget.RawBLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -320,7 +320,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 o = mergeFunction.merge(existing, b, scale);
             } else {
                 //new
-                PLink<X> n = new RawBLink(b, 0);
+                PLink<X> n = new RawPLink<>(b.get(), 0);
                 float oo = mergeFunction.merge(n, b, scale);
                 float np = n.pri();
 

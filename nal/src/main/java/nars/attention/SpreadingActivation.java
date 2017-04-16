@@ -2,10 +2,10 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import jcog.bag.PLink;
+import jcog.bag.RawPLink;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.RawBLink;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
@@ -192,7 +192,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
             //initially start with a fair budget assuming each link receives a full share
             float subActivation = ((1f - parentRetention) * scale) / (n);
-            final float[] change = {0};
+            //final float[] change = {0};
             float parentActivation = (parentRetention * scale);
 
             long inStart = in.start();
@@ -241,11 +241,11 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                     subSubActivation = 0;
                 }
 
-                change[0] += (subActivation - subSubActivation);
+                //change[0] += (subActivation - subSubActivation);
             });
 
             //recoup losses to the parent
-            parentActivation += change[0];
+            //parentActivation += change[0];
             return parentActivation;
         }
         else {
@@ -291,13 +291,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     void tasklink(Concept target, float scale) {
         target.tasklinks().put(
-                new RawBLink(in, inPri),
+                new RawPLink(in, inPri),
                 //new DependentBLink(src),
                 scale, null);
     }
 
     void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(new RawBLink(to, inPri), scale, linkOverflow);
+        from.termlinks().put(new RawPLink(to, inPri), scale, linkOverflow);
     }
 
 

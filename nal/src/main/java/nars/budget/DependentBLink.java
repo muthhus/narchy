@@ -1,5 +1,6 @@
 package nars.budget;
 
+import jcog.bag.RawPLink;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * Adds an additional condition that deletes the link if the referenced
  * Budgeted is deleted.
  */
-public class DependentBLink<X extends Budgeted> extends RawBLink<X> {
+public class DependentBLink<X extends Budgeted> extends RawPLink<X> {
 
     public DependentBLink(@NotNull X id) {
         super(id, id.priSafe(0));
