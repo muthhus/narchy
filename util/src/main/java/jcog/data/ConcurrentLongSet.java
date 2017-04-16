@@ -8,7 +8,7 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  */
 
-package jcog.bag.impl;
+package jcog.data;
 
 import com.lmax.disruptor.util.Util;
 import org.eclipse.collections.api.block.function.Function;

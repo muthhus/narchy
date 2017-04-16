@@ -1,9 +1,9 @@
 package nars.util.data;
 
-import jcog.bag.Priority;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import jcog.data.FloatParam;
 import jcog.meter.event.PeriodMeter;
-import nars.budget.Budgeted;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,10 +16,10 @@ import java.util.stream.Stream;
  * @K source identifier
  * @P type of mixable content
  */
-public class Mix<K, P extends Budgeted>  {
+public class Mix<K, P extends Prioritized>  {
 
 
-    public static class MixStream<K,P extends Budgeted> extends FloatParam implements Consumer<P>, Function<P,P> {
+    public static class MixStream<K,P extends Prioritized> extends FloatParam implements Consumer<P>, Function<P,P> {
 
         public final PeriodMeter priMeterIn, priMeterOut;
         public final K source;
@@ -54,7 +54,7 @@ public class Mix<K, P extends Budgeted>  {
 
             float g = floatValue();
 
-            Priority priority = xx.budget();
+            Priority priority = xx.priority();
             float p = priority.priSafe(0);
             priMeterIn.hit(p);
             priMeterOut.hit(p * g);

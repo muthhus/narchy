@@ -1,7 +1,7 @@
 package nars.premise;
 
 import jcog.Util;
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.Task;

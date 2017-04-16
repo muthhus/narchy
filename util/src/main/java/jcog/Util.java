@@ -1574,4 +1574,25 @@ public enum Util { ;
     public static boolean calledBySomethingContaining(String s) {
         return Joiner.on(' ').join(Thread.currentThread().getStackTrace()).contains(s);
     }
+
+    /**
+     * A function where the output is disjunctively determined by the inputs
+     * @param arr The inputs, each in [0, 1]
+     * @return The output that is no smaller than each input
+     */
+//    public static float or(@NotNull float... arr) {
+//        float product = 1;
+//        for (float f : arr) {
+//            product *= (1 - f);
+//        }
+//        return 1.0f - product;
+//    }
+
+    public static float or(float a, float b) {
+        return 1.0f - ((1.0f - a) * (1.0f - b));
+    }
+
+    public static float or(float a, float b, float c) {
+        return 1.0f -((1.0f - a) * (1.0f - b) * (1.0f - c));
+    }
 }

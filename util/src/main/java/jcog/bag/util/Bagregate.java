@@ -1,10 +1,10 @@
-package nars.bag;
+package jcog.bag.util;
 
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.bag.impl.ArrayBag;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import jcog.data.FloatParam;
-import nars.bag.impl.ArrayBag;
-import nars.budget.BudgetMerge;
+import jcog.pri.PriMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public class Bagregate<X> extends ArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<PLink<X>> src, int capacity, float scale) {
-        super(capacity, BudgetMerge.avgBlend, new ConcurrentHashMap<>(capacity));
+        super(capacity, PriMerge.avgBlend, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);

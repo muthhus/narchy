@@ -1,16 +1,16 @@
 package nars.op.mental;
 
-import jcog.bag.PLink;
-import jcog.bag.Priority;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.Priority;
+import jcog.pri.RawPLink;
 import jcog.data.MutableIntRange;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.impl.CurveBag;
-import nars.bag.leak.Leak;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.CurveBag;
+import jcog.pri.PriMerge;
+import nars.bag.leak.TaskLeak;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -37,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static nars.Op.BELIEF;
-import static nars.bag.impl.CurveBag.power4BagCurve;
+import static jcog.bag.impl.CurveBag.power4BagCurve;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 
@@ -46,7 +46,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, PLink<Compound>> {
+public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<Compound>> {
 
 
     /**
@@ -77,7 +77,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, PLink<Compo
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
                 new CurveBag.NormalizedSampler(power4BagCurve, n.random),
-                BudgetMerge.plusBlend, new ConcurrentHashMap()), selectionRate, n);
+                PriMerge.plusBlend, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -96,7 +96,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, PLink<Compo
         if (task instanceof AbbreviationTask)
             return;
 
-        Priority b = task.budget().clone();
+        Priority b = task.priority().clone();
         if (b != null)
             input(b, each, task.term(), 1f);
     }
@@ -214,7 +214,7 @@ public class Abbreviation/*<S extends Term>*/ extends Leak<Compound, PLink<Compo
                             new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
                     );
                     abbreviationTask.log("Abbreviate");
-                    abbreviationTask.budget().copyFrom(b);
+                    abbreviationTask.priority().copyFrom(b);
 
                     nar.input(abbreviationTask);
                     logger.info("{}", abbreviationTask);

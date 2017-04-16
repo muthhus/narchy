@@ -2,15 +2,15 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.Prioritized;
+import jcog.pri.PLink;
+import jcog.pri.Prioritized;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.Node;
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.BLinkHijackBag;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.PriMerge;
 import nars.budget.DependentBLink;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -302,7 +302,8 @@ public abstract class STMClustered extends STM {
         this.punc = punc;
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
-        this.input = ThreadLocal.withInitial(() -> new BLinkHijackBag<Task>(capacity.intValue(), 4, BudgetMerge.maxBlend, nar.random) {
+        this.input = ThreadLocal.withInitial(() ->
+                new DefaultHijackBag<Task>(capacity.intValue(), 2, PriMerge.avgBlend, nar.random) {
 
 //            @NotNull
 //            @Override

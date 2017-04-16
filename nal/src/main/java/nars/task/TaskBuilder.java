@@ -1,9 +1,9 @@
 package nars.task;
 
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import jcog.data.array.LongArrays;
 import nars.*;
-import nars.budget.RawBudget;
+import jcog.pri.Pri;
 import nars.concept.Concept;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -36,7 +36,7 @@ import static nars.time.Tense.*;
  * <p>
  * once input, input tasks will have unique serial numbers anyway
  */
-public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<NAR, Task> {
+public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, Task> {
 
     @NotNull
     private Compound term;
@@ -522,7 +522,7 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
 
 
     @NotNull
-    public final TaskBuilder budget(@NotNull Priority bb) {
+    public final TaskBuilder pri(@NotNull Priority bb) {
         copyFrom(bb);
         return this;
     }
@@ -536,8 +536,8 @@ public class TaskBuilder extends RawBudget implements Termed, Truthed, Function<
     }
 
 
-    public TaskBuilder budgetSafe(float p) {
-        super.budgetSafe(p);
+    public TaskBuilder pri(float p) {
+        setPriority(p);
         return this;
     }
 }

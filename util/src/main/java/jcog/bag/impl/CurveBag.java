@@ -1,8 +1,7 @@
-package nars.bag.impl;
+package jcog.bag.impl;
 
-import jcog.bag.PLink;
-import nars.Param;
-import nars.budget.BudgetMerge;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +32,7 @@ public class CurveBag<V> extends ArrayBag<V> {
     final CurveSampler sampler;
 
 
-    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull BudgetMerge mergeFunction, @NotNull Map<V, PLink<V>> map) {
+    public CurveBag(int initialCapacity, @NotNull CurveSampler c, @NotNull PriMerge mergeFunction, @NotNull Map<V, PLink<V>> map) {
         super(mergeFunction, map);
         capacity(initialCapacity);
         this.sampler = c;
@@ -480,7 +479,7 @@ public class CurveBag<V> extends ArrayBag<V> {
      */
     public static final class NormalizedSampler extends CurveSampler {
 
-        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(Param.BUDGET_EPSILON) /* heuristic */;
+        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(PLink.EPSILON_DEFAULT) /* heuristic */;
         private float range;
 
         public NormalizedSampler(CurveBag.BagCurve curve, Random random) {

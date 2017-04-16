@@ -2,7 +2,7 @@ package nars.nal.nal7;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;

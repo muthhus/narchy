@@ -1,7 +1,7 @@
 package nars.derive.meta;
 
 import com.google.common.base.Joiner;
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import nars.NAR;
 import nars.Op;
 import nars.Param;

@@ -1,9 +1,10 @@
-package nars.bag.impl;
+package nars.bag;
 
-import jcog.bag.PForget;
+import jcog.pri.PForget;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BudgetMerge;
+import jcog.pri.PriMerge;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,10 +15,10 @@ import java.util.function.Consumer;
 /**
  * Created by me on 2/17/17.
  */
-public class TaskHijackBag extends BudgetHijackBag<Task,Task> implements TaskTable {
+public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskTable {
 
 
-    public TaskHijackBag(int reprobes, BudgetMerge merge, Random random) {
+    public TaskHijackBag(int reprobes, PriMerge merge, Random random) {
         super(random, merge, reprobes);
     }
 

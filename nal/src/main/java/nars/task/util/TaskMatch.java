@@ -1,6 +1,6 @@
 package nars.task.util;
 
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import jcog.event.On;
 import nars.$;
 import nars.NAR;

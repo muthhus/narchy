@@ -1,6 +1,6 @@
 package nars.index.term.map;
 
-import jcog.bag.impl.HijackMemoize;
+import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.random.XorShift128PlusRandom;
 import nars.Op;
 import nars.concept.PermanentConcept;

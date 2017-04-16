@@ -3,6 +3,7 @@ package jcog.bag.impl;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.data.ConcurrentLongSet;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
@@ -43,7 +44,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      * ID of this bag, for use in constructing keys for the global treadmill
      */
-    private final int id;
+    //private final int id;
 
 
     /**
@@ -90,7 +91,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public HijackBag(int reprobes, Random random) {
         this.random = random;
         this.reprobes = reprobes;
-        this.id = Treadmill.newTarget();
+        //this.id = Treadmill.newTarget();
         this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
 
@@ -516,14 +517,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int selected = 0;
 
-        int nulls = c - s; //approximate number of empty slots that would be expected
+        //int nulls = c - s; //approximate number of empty slots that would be expected
 
         float priToHits = Math.max(1, ((n) / ((float)(s))));
 
         int skipped = 0;
 
-        final int N = n;
-        while (n > 0 && skipped < nulls) {
+        //final int N = n;
+        while (n > 0 && skipped < c) {
 
             //if (di) {
             if (++i == c) i = 0;
@@ -549,19 +550,28 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             int taken = each.intValueOf(hits, v);
                             boolean popped = (taken < 0);
                             if (popped) {
-                                taken = 1; //make positive
                                 size.decrementAndGet();
                                 onRemoved(v);
+                                if (--s <= 0) {
+                                    break;
+                                } else {
+                                    skipped++;
+                                    taken = -taken; //make positive
+                                }
                             } else if (taken > 0) {
                                 //try to reinsert in that slot we removed it temporarily from
                                 if (!map.compareAndSet(i, null, v)) {
-                                    //try to insert as if normally
-                                    if (put(v) == null) {
-                                        //give up
-                                        skipped++;
+
+                                    if (put(v) == null) { //try to insert as if normally
+                                        //but if it didnt happen, give up, admit that it lost it
                                         size.decrementAndGet();
                                         onRemoved(v);
-                                        continue;
+                                        if (--s <= 0)
+                                            break;
+                                        else {
+                                            skipped++;
+                                            continue;
+                                        }
                                     }
                                 }
 

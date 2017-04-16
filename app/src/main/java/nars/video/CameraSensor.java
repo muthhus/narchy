@@ -35,7 +35,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     final int numPixels;
 
-
     public CameraSensor(Term root, P src, NAgent agent) {
         this(root, src, agent, (v) -> $.t(v, agent.nar.confDefault(BELIEF)));
     }
@@ -54,7 +53,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         pixels = encode((x, y) ->
                         $.inh(
                                 //$.inh(
-                                root,
+
 
                                 //$.secte
                                     radix > 1 ?
@@ -62,8 +61,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                                         $.p( zipCoords(coord(x, width), coord(y, height)) ) :
                                         //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                         //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                        $.p( $.the(x), $.the(y) )
+                                        $.p( $.the(x), $.the(y) ),
 
+                                root
 
 
                         )
@@ -165,14 +165,15 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     @Override
     public void accept(NAgent a) {
 
-        src.update(1);
         frameStamp();
+
+        src.update(1);
 
         NAR nar = a.nar;
 
-        in.input(pixels.stream()./*filter(PixelConcept::update).*/map(c -> c.apply(nar))
-                .filter(Objects::nonNull), y -> nar.input((Stream)y));
-
+        in.input(pixels.stream()/*filter(PixelConcept::update).*/
+                .map(c -> c.apply(nar)),
+                y -> nar.input((Stream)y));
     }
 
 
@@ -187,12 +188,12 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public class PixelConcept extends SensorConcept {
 
-        private final int x, y;
+        //private final int x, y;
 
         public PixelConcept(Compound cell, FloatToObjectFunction<Truth> brightnessToTruth, int x, int y) {
             super(cell, nar, null, brightnessToTruth);
-            this.x = x;
-            this.y = y;
+            //this.x = x;
+            //this.y = y;
             setSignal(()->src.brightness(x, y));
         }
 

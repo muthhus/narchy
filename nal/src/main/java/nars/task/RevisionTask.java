@@ -1,10 +1,9 @@
 package nars.task;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BudgetException;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -20,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * This is in case the revision task for some reason does not become processed,
  * then this budget will not be moved.
  */
-public class RevisionTask extends AnswerTask  {
+public class RevisionTask extends AnswerTask {
 
 
     public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end) {
@@ -42,7 +41,6 @@ public class RevisionTask extends AnswerTask  {
 //    }
 
 
-
     //    @Override
 //    public boolean isDeleted() {
 //        if (super.isDeleted()) {
@@ -59,27 +57,28 @@ public class RevisionTask extends AnswerTask  {
 //
 
 
-
-    /** According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links */
+    /**
+     * According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links
+     */
     @Override
     public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
 
         //TODO reimplement again
 
         float resultPri = pri();
-        if (resultPri!=resultPri) {
+        if (resultPri != resultPri) {
             unlink();
             return;
         }
 
         Task parentNewBelief = getParentTask();
-        if (parentNewBelief==null) {
+        if (parentNewBelief == null) {
             unlink();
             return; //HACK
         }
 
         Task parentOldBelief = getParentBelief();
-        if (parentOldBelief==null) {
+        if (parentOldBelief == null) {
             unlink();
             return; //HACK
         }
@@ -94,23 +93,20 @@ public class RevisionTask extends AnswerTask  {
             newBeliefContribution = 0.5f;
         }
 
-        try {
-            //Balance Tasks
-            BudgetFunctions.balancePri(
-                    parentNewBelief.budget(), parentOldBelief.budget(),
-                    resultPri,
-                    newBeliefContribution);
 
-            //Balance Tasklinks
-            Bag<Task,PLink<Task>> tasklinks = concept(nar).tasklinks();
-            BudgetFunctions.balancePri(
-                    tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
-                    resultPri,
-                    newBeliefContribution);
+        //Balance Tasks
+        BudgetFunctions.balancePri(
+                parentNewBelief.priority(), parentOldBelief.priority(),
+                resultPri,
+                newBeliefContribution);
 
-        } catch (BudgetException ignored) {
-            //HACK
-        }
+        //Balance Tasklinks
+        Bag<Task, PLink<Task>> tasklinks = concept(nar).tasklinks();
+        BudgetFunctions.balancePri(
+                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+                resultPri,
+                newBeliefContribution);
+
 
         unlink();
     }

@@ -1,18 +1,19 @@
 package nars.nar;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.bag.impl.BLinkHijackBag;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.PriMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
@@ -61,15 +62,15 @@ public interface NARBuilder {
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-                Bag<Term, PLink<Term>> termlink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
-                Bag<Task, PLink<Task>> tasklink = new BLinkHijackBag<>(reprobes, BudgetMerge.maxBlend, rng);
+                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(reprobes, PriMerge.avgBlend, rng);
+                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(reprobes, PriMerge.avgBlend, rng);
                 return f.apply(termlink, tasklink);
             }
 
             @NotNull
             @Deprecated @Override
-            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, BudgetMerge blend) {
-                return new BLinkHijackBag<>(reprobes, blend, rng);
+            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+                return new DefaultHijackBag<>(reprobes, blend, rng);
             }
         };
 
@@ -217,7 +218,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        //new Inperience(nar, 0.25f, 4);
+        new Inperience(nar, 0.25f, 4);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Util;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
 import nars.task.LambdaQuestionTask;

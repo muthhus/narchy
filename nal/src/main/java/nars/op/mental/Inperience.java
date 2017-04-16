@@ -1,13 +1,13 @@
 package nars.op.mental;
 
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
-import jcog.bag.impl.PLinkHijackBag;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.bag.leak.Leak;
+import nars.bag.leak.TaskLeak;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -36,7 +36,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends Leak<Task, PLink<Task>> {
+public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 

@@ -1,6 +1,5 @@
-package nars.budget;
+package jcog.pri;
 
-import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,6 +18,8 @@ public final class ROBudget implements Priority {
         return false;
     }
 
+
+
     @Override
     public boolean delete() {
         throw new UnsupportedOperationException();
@@ -33,7 +34,7 @@ public final class ROBudget implements Priority {
     @NotNull
     @Override
     public Priority clone() {
-        return new RawBudget(this);
+        return new Pri(this);
     }
 
 

@@ -1,6 +1,6 @@
 package nars;
 
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;

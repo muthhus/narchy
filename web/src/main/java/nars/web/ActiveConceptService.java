@@ -1,7 +1,7 @@
 package nars.web;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.data.MutableInteger;
 import nars.IO;
 import nars.NAR;

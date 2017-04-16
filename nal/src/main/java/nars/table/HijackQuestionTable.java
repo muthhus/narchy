@@ -1,8 +1,8 @@
 package nars.table;
 
 import nars.NAR;
-import nars.bag.impl.TaskHijackBag;
-import nars.budget.BudgetMerge;
+import nars.bag.TaskHijackBag;
+import jcog.pri.PriMerge;
 
 import java.util.Random;
 
@@ -12,7 +12,7 @@ import java.util.Random;
 public class HijackQuestionTable extends TaskHijackBag implements QuestionTable {
 
 
-    public HijackQuestionTable(int cap, int reprobes, BudgetMerge merge, Random random) {
+    public HijackQuestionTable(int cap, int reprobes, PriMerge merge, Random random) {
         super(reprobes, merge, random);
 
         capacity(cap);

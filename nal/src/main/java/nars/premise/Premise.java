@@ -5,7 +5,7 @@
 package nars.premise;
 
 import nars.Task;
-import nars.budget.RawBudget;
+import jcog.pri.Pri;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends RawBudget  {
+public class Premise extends Pri {
 
     //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
 

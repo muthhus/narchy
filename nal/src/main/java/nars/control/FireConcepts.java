@@ -1,8 +1,8 @@
 package nars.control;
 
 import jcog.bag.Bag;
-import jcog.bag.BagFlow;
-import jcog.bag.PLink;
+import jcog.bag.control.BagFlow;
+import jcog.pri.PLink;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -12,8 +12,8 @@ import nars.Focus;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.bag.impl.TaskHijackBag;
-import nars.budget.BudgetMerge;
+import nars.bag.TaskHijackBag;
+import jcog.pri.PriMerge;
 import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
@@ -164,7 +164,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             super(focus, premiseBuilder, nar);
 
 
-            this.pending = new TaskHijackBag(3, BudgetMerge.maxBlend, nar.random) {
+            this.pending = new TaskHijackBag(3, PriMerge.avgBlend, nar.random) {
                 @Override
                 public float temperature() {
                     return 0.1f; //forget slowly

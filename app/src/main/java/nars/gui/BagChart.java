@@ -1,7 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;

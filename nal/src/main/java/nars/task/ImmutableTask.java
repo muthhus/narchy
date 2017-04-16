@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.budget.RawBudget;
+import jcog.pri.Pri;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -25,7 +25,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 2/24/17.
  */
-public class ImmutableTask extends RawBudget implements Task {
+public class ImmutableTask extends Pri implements Task {
 
     public final Compound term;
     public final Truth truth;
@@ -218,7 +218,7 @@ public class ImmutableTask extends RawBudget implements Task {
 
 
         ImmutableTask t = new ImmutableTask(term, punc, $.t(freq(), newConf), creation, newStart, newStart, stamp);
-        t.budgetSafe(this);
+        t.setPriority(this);
         //t.meta
         //t.log("Projected")
         return t;
@@ -226,7 +226,7 @@ public class ImmutableTask extends RawBudget implements Task {
 
     public Task clone(Compound x) {
         ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start(), end(), stamp);
-        t.budgetSafe(this);
+        t.setPriority(this);
         return t;
     }
 

@@ -1261,9 +1261,9 @@ public class Narsese extends BaseParser<Object> {
                                     ));
 
             if ((Float) x[0] == null)  /* do not set, Memory will apply defaults */
-                ttt.budgetSafe(m.priorityDefault(punct));
+                ttt.setPriority(m.priorityDefault(punct));
             else
-                ttt.budgetSafe((Float) x[0]);
+                ttt.setPriority((Float) x[0]);
 
 
             return ttt.log(NARSESE_TASK_TAG).apply(m);

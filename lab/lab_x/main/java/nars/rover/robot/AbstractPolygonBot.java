@@ -2,7 +2,6 @@ package nars.rover.robot;
 
 import nars.NAR;
 import nars.Symbols;
-import nars.budget.Budget;
 import nars.concept.Concept;
 import nars.nal.nal7.Tense;
 import nars.rl.gng.NeuralGasNet;

@@ -1,6 +1,6 @@
 package nars.table;
 
-import jcog.bag.Prioritized;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
@@ -260,7 +260,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                     answer,
                     question,
                     aProj, now, when, when, 0.5f);
-            a.budgetSafe(answer.budget());
+            a.setPriority(answer.priority());
 
 //            if (Param.DEBUG)
 //                a.log("Answer Projected");

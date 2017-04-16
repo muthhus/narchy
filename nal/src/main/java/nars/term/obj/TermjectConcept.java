@@ -1,7 +1,7 @@
 package nars.term.obj;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Op;
 import nars.Task;

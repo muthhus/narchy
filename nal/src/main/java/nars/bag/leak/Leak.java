@@ -1,101 +1,122 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.event.On;
-import nars.NAR;
-import nars.Task;
-import nars.budget.BudgetException;
-import org.apache.commons.lang3.mutable.MutableFloat;
+import jcog.data.FloatParam;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.time.Tense.ETERNAL;
 
 /**
- * interface for controlled draining of a bag
+ * drains items from a Bag at
  */
-public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consumer<Task> {
+public class Leak<X, Y> {
 
     //private static final Logger logger = LoggerFactory.getLogger(MutaTaskBag.class);
-    @NotNull
-    public final MutableFloat rate;
-    @NotNull
-    public final Bag<X,V> bag;
-    private final On onTask, onReset, onCycle;
-    private long last;
 
-    public Leak(@NotNull Bag<X,V> bag, float rate, @NotNull NAR n) {
-         this(bag, new MutableFloat(rate), n);
+    @NotNull
+    public final Bag<X, Y> bag;
+
+
+    /**
+     * asynchronously controlled implementation of Leak which
+     * decides demand according to time elapsed (stored as some 'long' value)
+     * since a previous call, and a given rate parameter.
+     * if the rate * elapsed dt will not exceed the provided maxCost
+     * value, which can be POSITIVE_INFINITY (by default).
+     *
+     * draining the input bag
+     */
+    public static abstract class DtLeak<X, Y> extends Leak<X, Y> {
+
+
+        @NotNull
+        public final FloatParam rate /* items per dt */;
+        @NotNull
+        public final FloatParam maxCost;
+
+        protected long lastLeak = ETERNAL;
+
+        public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate) {
+            this(bag, rate, new FloatParam(Float.POSITIVE_INFINITY));
+        }
+
+        /**
+         * rate = max successful leaks per duration
+         *
+         * @param bag
+         * @param rate
+         * @param maxCost
+         */
+        public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam maxCost) {
+            super(bag);
+            this.rate = rate;
+            this.maxCost = maxCost;
+        }
+
+        private final AtomicBoolean busy = new AtomicBoolean(false);
+
+        public void commit(long now) {
+
+            if (!busy.compareAndSet(false, true))
+                return;
+
+            try {
+                bag.commit();
+
+                if (bag.size() >= minSizeForLeak()) {
+
+                    long last = this.lastLeak;
+                    if (last == ETERNAL) {
+                        this.lastLeak = last = now;
+                    }
+                    long dt = now - last;
+                    if (dt > 0) {
+
+                        float hits = Math.min(rate.floatValue() * dt, maxCost.floatValue());
+
+                        final int[] totalCost = {0};
+                        bag.sample((int) Math.ceil(hits), (h, v) -> {
+                            float costf = onOut(v);
+                            int cost = (int) Math.ceil(costf);
+                            totalCost[0] += cost;
+                            return -cost;
+                        });
+
+                        if (totalCost[0] > 0) {
+                            this.lastLeak = now; //only set time if some cost was spent
+                        }
+                    }
+                }
+            } finally {
+                busy.set(false);
+            }
+        }
+
+
+        /**
+         * returns a cost value, in relation to the bag sampling parameters, which is subtracted
+         * from the rate each iteration. this can allow proportional consumption of
+         * a finitely allocated resource.
+         */
+        abstract protected float onOut(@NotNull Y b);
+
     }
-
 
     /**
      * rate = max successful leaks per duration
      */
-    public Leak(@NotNull Bag<X,V> bag, @NotNull MutableFloat rate, @NotNull NAR n) {
+    public Leak(@NotNull Bag<X, Y> bag) {
         this.bag = bag;
-        this.rate = rate;
-        onTask = n.onTask(this);
-
-        //TODO make Weak
-        onReset = n.onReset((nn)->bag.clear());
-        onCycle = n.onCycle(this::next);
     }
 
-    @Override
-    public void accept(Task task) {
-        try {
-            in(task, bag::put);
-        } catch (BudgetException e) {
-            //was deleted before the link could be made
-        }
-    }
-
-    /** transduce an input to a series of created BLink's to be inserted */
-    abstract protected void in(@NotNull Task task, Consumer<V> each);
-
-    /** returns a cost value, in relation to the 'rate' parameter, which is subtracted
-     * from the rate each iteration. this can allow proportional consumption of
-     * a finitely allocated resource.
+    /**
+     * minimum bag size allowed before leak
      */
-    abstract protected float onOut(@NotNull V b);
-
-    /** next iteration, each frame */
-    protected void next(@NotNull NAR nar) {
-
-        bag.commit();
-
-        long last = this.last;
-        long now = nar.time();
-        int dur = nar.dur();
-        if (now - last < dur)
-            return; //too soon
-
-        //for each full integer = 1 instanceof a 100% prob selection
-        // each fraction of an integer = some probability of a next one occurring
-        for (float r = rate.floatValue();
-             (r > 0) &&
-             bag.size() >= minSizeForLeak() &&
-             ((r >= 1) || ((r < 1f) && (nar.random.nextFloat() < r)));
-             ) {
-            @Nullable V t = bag.pop();
-            if (t!=null) {
-                float cost = onOut(t);
-                r -= cost;
-            }
-        }
-
-        this.last = now;
-
-    }
-
-    /** minimum bag size allowed before leak */
     public int minSizeForLeak() {
         return 1;
     }
-
 
     public void setCapacity(int capacity) {
         bag.setCapacity(capacity);
@@ -103,11 +124,5 @@ public abstract class Leak</* TODO: A, */X, V extends PLink<X>> implements Consu
 
     public void clear() {
         bag.clear();
-    }
-
-    public void stop() {
-        onTask.off();
-        onReset.off();
-        onCycle.off();
     }
 }

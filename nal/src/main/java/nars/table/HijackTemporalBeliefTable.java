@@ -1,20 +1,20 @@
 package nars.table;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.bag.impl.TaskHijackBag;
-import nars.budget.BudgetMerge;
+import nars.bag.TaskHijackBag;
+import jcog.pri.PriMerge;
 import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -33,7 +33,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     public HijackTemporalBeliefTable(int initialCapacity, Random random) {
-        super(4 /* reprobes */, BudgetMerge.maxBlend, random);
+        super(4 /* reprobes */, PriMerge.maxBlend, random);
         setCapacity(initialCapacity);
     }
 
@@ -121,7 +121,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         //return (1f + t.priSafe(0)) * (1f + t.conf());
         float p = t.priSafe(-1);
         if (p >= 0)
-            return UtilityFunctions.or((1f + p), (1f + t.conf()));
+            return Util.or((1f + p), (1f + t.conf()));
         else
             return 0;
     }

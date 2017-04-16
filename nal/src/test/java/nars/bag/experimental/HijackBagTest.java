@@ -2,11 +2,11 @@ package nars.bag.experimental;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.bag.BagTest;
-import nars.bag.impl.BLinkHijackBag;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.PriMerge;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.junit.Test;
 
@@ -14,8 +14,8 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import static nars.bag.BagTest.*;
-import static nars.budget.BudgetMerge.maxBlend;
-import static nars.budget.BudgetMerge.plusBlend;
+import static jcog.pri.PriMerge.maxBlend;
+import static jcog.pri.PriMerge.plusBlend;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -25,32 +25,32 @@ import static org.junit.Assert.assertTrue;
 public class HijackBagTest {
 
     @Test public void testSamplingFlatHijack() {
-        testSamplingFlat(new BLinkHijackBag<String>(64, 4, maxBlend, rng()), 0.076f);
+        testSamplingFlat(new DefaultHijackBag<String>(64, 4, maxBlend, rng()), 0.076f);
     }
 
     @Test public void testRemoveByKey() {
-        BagTest.testRemoveByKey(new BLinkHijackBag(2, 3, plusBlend, rng()));
+        BagTest.testRemoveByKey(new DefaultHijackBag(2, 3, plusBlend, rng()));
     }
 
 
     @Test
     public void testScalePutHija() {
-        BagTest.testScalePut(new BLinkHijackBag(2, 1, maxBlend, rng()));
-        BagTest.testScalePut(new BLinkHijackBag(2, 2, maxBlend, rng()));
-        BagTest.testScalePut2(new BLinkHijackBag(2, 1, plusBlend, rng()));
-        BagTest.testScalePut2(new BLinkHijackBag(2, 2, plusBlend, rng()));
+        BagTest.testScalePut(new DefaultHijackBag(2, 1, maxBlend, rng()));
+        BagTest.testScalePut(new DefaultHijackBag(2, 2, maxBlend, rng()));
+        BagTest.testScalePut2(new DefaultHijackBag(2, 1, plusBlend, rng()));
+        BagTest.testScalePut2(new DefaultHijackBag(2, 2, plusBlend, rng()));
     }
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new BLinkHijackBag(1, 1, maxBlend, rng()));
+        testBasicInsertionRemoval(new DefaultHijackBag(1, 1, maxBlend, rng()));
     }
 
     @Test public void testHijackFlatBagRemainsRandomInNormalizedSampler() {
 
         int n = 64;
 
-        Bag<String,PLink<String>> a = new BLinkHijackBag<String>(n, 4, maxBlend, rng());
+        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(n, 4, maxBlend, rng());
         for (int i = 0; i < n; i++) {
             a.put(new RawPLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
         }
@@ -89,7 +89,7 @@ public class HijackBagTest {
     @Test
     public void testHijackResize() {
         Random rng = rng();
-        BLinkHijackBag b = new BLinkHijackBag(0, 7, BudgetMerge.maxBlend, rng);
+        DefaultHijackBag b = new DefaultHijackBag(0, 7, PriMerge.maxBlend, rng);
         BagTest.populate(b, rng, 10, 20, 0f, 1f, 0.5f);
         assertEquals(b.reprobes /*0*/, b.size());
 

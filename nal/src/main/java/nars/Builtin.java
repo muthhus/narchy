@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Texts;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;

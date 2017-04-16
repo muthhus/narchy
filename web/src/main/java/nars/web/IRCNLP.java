@@ -3,13 +3,13 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.bag.impl.ArrayBag;
+import jcog.bag.impl.ArrayBag;
 import nars.bag.leak.LeakOut;
-import nars.budget.BudgetMerge;
+import jcog.pri.PriMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
@@ -64,8 +64,8 @@ public class IRCNLP extends IRC {
 
     boolean trace;
 
-    final ArrayBag<String> out = new ArrayBag<String>(16, BudgetMerge.maxBlend, new ConcurrentHashMap());
-    final ArrayBag<String> prevOut = new ArrayBag<String>(512, BudgetMerge.maxBlend, new ConcurrentHashMap());
+    final ArrayBag<String> out = new ArrayBag<String>(16, PriMerge.maxBlend, new ConcurrentHashMap());
+    final ArrayBag<String> prevOut = new ArrayBag<String>(512, PriMerge.maxBlend, new ConcurrentHashMap());
 
     public IRCNLP(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);

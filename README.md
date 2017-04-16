@@ -27,7 +27,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
            <compound> ::=
                         | "(--," <term> ")"                  // negation
-                        | --<term>                           // negation shorthand
+                        | "--" <term>                           // negation shorthand
 
                         | "(" <term> {","<term>} ")"         // product (ie. un-ordered vector or list, length >= 0)
                         | "{" <term> {","<term>} "}"         // extensional set (ordered, all unique, length >= 1)
@@ -40,15 +40,17 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
                         | "("<term> "==>" <term>")"          // implication
                         | "("<term> "==>"<dt> <term>")"      // implication sequence
+                        | "("<term> "=|>" <term>")"          // implication parallel (commutive, dt=0)
 
                         | "("<term> "<=>" <term>")"          // equivalence (commutive)
                         | "("<term> "<=>"<dt> <term>")"      // equivalence sequence (commutive, but preserves relative time direction)
+                        | "("<term> "<|>" <term>")"          // equivalence parallel (commutive, dt=0)
 
                         | "(&&," <term> {","<term>} ")"      // conjunction eternal (commutive)
                         |   "("<term> "&&" <term>")"           // conjunction eternal (commutive, shorthand for size=2)
-                        |   "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only, preserving time direction)
+                        |   "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only, preserving time direction)                        
+                        |   "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y)
                         |   "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions, with integer intervals embedded TODO
-                        |   "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y) TODO
 
                         | "(||," <term> {","<term>} ")"      // disjunction, internally converts to negated conjunction of negations, also: (x || y)
 
@@ -69,8 +71,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 
                  <dt> ::= [+|-]<number>                      //delta-time amount (frames); positive = future, negative = past, +0 = simultaneous
                         | [+|-]<number>["min"|"hr"|"day"...] //delta-time amount (other time metrics) TODO
-
-                        <dt> is 32-bit integer
+                  //note: <dt> is stored as 32-bit signed integer
 
 ```
 
@@ -99,12 +100,11 @@ Note:
 
 **Budget**
 ```
-<budget> ::= "$"<priority>[";"<quality>]"$"  // priority in [0,1], quality in (0,1)
+<budget> ::= "$"<priority>  // priority in [0,1]
 ```
- - Priority [0..1.0] - determines applied attention relative to other items
-    - if unspecified, a default priority will be assigned to inputs
- - Quality [0..1.0] - indicates a level of accumulated utility, higher value preserves priority longer through time during forget
-    - if unspecified, a default quality will be assigned to inputs
+ - Priority [0..1.0]
+    - quantified demand for attention, relative to other items in a collection. 
+    - if unspecified, a default priority will be assigned to input Tasks based on punctuation and/or truth
 
 **Variables**
  - $X independent variable

@@ -1,17 +1,12 @@
 package nars.bag;
 
-import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.Prioritized;
-import jcog.bag.RawPLink;
+import jcog.bag.*;
+import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
 import nars.Param;
-import nars.bag.impl.ArrayBag;
-import nars.bag.impl.BLinkHijackBag;
-import nars.bag.impl.CurveBag;
-import nars.budget.Budget;
-import nars.budget.BudgetMerge;
-import nars.budget.RawBudget;
+import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.CurveBag;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -26,8 +21,8 @@ import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static nars.budget.BudgetMerge.maxBlend;
-import static nars.budget.BudgetMerge.plusBlend;
+import static jcog.pri.PriMerge.maxBlend;
+import static jcog.pri.PriMerge.plusBlend;
 import static org.junit.Assert.*;
 
 /**
@@ -57,7 +52,7 @@ public class BagTest {
 
 
         assertEquals(1, c.capacity());
-        if (!(c instanceof BLinkHijackBag)) {
+        if (!(c instanceof DefaultHijackBag)) {
             assertEquals(0, c.size());
             assertTrue(c.isEmpty());
         }
@@ -71,7 +66,7 @@ public class BagTest {
 
         assertEquals(0, c.priMin(), 0.001f);
 
-        assertTrue(Budget.Zero.equalsBudget(c.get("x"), 0.01f));
+        assertTrue(Priority.Zero.equalsBudget(c.get("x"), 0.01f));
 
     }
 
@@ -87,7 +82,7 @@ public class BagTest {
 
 
         PLink<String> agx = a.get("x");
-        RawBudget expect = new RawBudget(0.2f);
+        Pri expect = new Pri(0.2f);
         assertTrue(agx + "==?==" + expect, expect.equalsBudget(
                 agx, 0.01f));
 
@@ -333,7 +328,7 @@ public class BagTest {
     static final CurveBag.CurveSampler defaultSampler = new CurveBag.NormalizedSampler(CurveBag.power6BagCurve, rng);
 
     @NotNull
-    public CurveBag<String> curveBag(int n, BudgetMerge mergeFunction) {
+    public CurveBag<String> curveBag(int n, PriMerge mergeFunction) {
         return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
     }
 

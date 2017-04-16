@@ -2,8 +2,8 @@ package nars.task;
 
 import nars.NAR;
 import nars.Task;
-import nars.bag.impl.ArrayBag;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.ArrayBag;
+import jcog.pri.PriMerge;
 import nars.budget.DependentBLink;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public class LambdaQuestionTask extends ImmutableTask {
     }
 
     protected ArrayBag<Task> newBag(int history) {
-        return new ArrayBag<>(history, BudgetMerge.maxHard, new ConcurrentHashMap<>(history));
+        return new ArrayBag<>(history, PriMerge.maxHard, new ConcurrentHashMap<>(history));
     }
 
     @Override

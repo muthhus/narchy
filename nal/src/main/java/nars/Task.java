@@ -1,13 +1,9 @@
 package nars;
 
 import jcog.Texts;
-import jcog.bag.PLink;
-import jcog.bag.Priority;
-import jcog.bag.RawPLink;
+import jcog.pri.*;
 import jcog.map.SynchronizedHashMap;
-import nars.bag.impl.ArrayBag;
-import nars.budget.BudgetMerge;
-import nars.budget.Budgeted;
+import jcog.bag.impl.ArrayBag;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
@@ -46,7 +42,7 @@ import static nars.truth.TruthFunctions.w2c;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>, Priority {
+public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority, Prioritized {
 
 
     byte punc();
@@ -332,7 +328,7 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (Param.ANSWER_REPORTING && isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                    new ArrayBag<>(BudgetMerge.maxBlend,
+                    new ArrayBag<>(PriMerge.avgBlend,
                             new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
@@ -520,7 +516,7 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
 
 
         if (showBudget) {
-            budget().toBudgetStringExternal(buffer).append(' ');
+            priority().toBudgetStringExternal(buffer).append(' ');
         }
 
         buffer.append(contentName).append((char)punc());
@@ -676,7 +672,7 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
 
     @Nullable
     static ImmutableTask clone(@NotNull Task x, long created, long start, long end) {
-        Priority b = x.budget().clone(); //snapshot its budget
+        Priority b = x.priority().clone(); //snapshot its budget
         if (b.isDeleted())
             return null;
 
@@ -694,7 +690,7 @@ public interface Task extends Budgeted, Tasked, Truthed, Stamp, Termed<Compound>
 //                return null;
 //        }
 
-        Priority b = x.budget().clone(); //snapshot its budget
+        Priority b = x.priority().clone(); //snapshot its budget
         if (b.isDeleted())
             return null;
 

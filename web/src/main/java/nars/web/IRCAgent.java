@@ -1,6 +1,6 @@
 package nars.web;
 
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;

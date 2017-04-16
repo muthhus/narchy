@@ -8,14 +8,14 @@ import static java.lang.Math.min;
 /**
  * Captures a awt/swing component to a bitmap and scales it down, returning an image pixel by pixel
  */
-public class SwingCamera extends ImageCamera {
+public class SwingBitmap2D extends BufferedImageBitmap2D {
 
     private final Component component;
 
     public Rectangle selection;
 
 
-    public SwingCamera(Component component) {
+    public SwingBitmap2D(Component component) {
         this.component = component;
         input(0, 0, component.getWidth(), component.getHeight());
         update(1);

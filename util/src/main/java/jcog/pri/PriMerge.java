@@ -1,23 +1,19 @@
-package nars.budget;
+package jcog.pri;
 
 import jcog.Util;
-import jcog.bag.PLink;
-import jcog.bag.Prioritized;
-import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
 import static jcog.Util.lerp;
-import static nars.budget.BudgetMerge.PriMerge.*;
-import static nars.util.UtilityFunctions.or;
+import static jcog.pri.PriMerge.PriMergeOp.*;
 
 /**
  * Budget merge function, with input scale factor
  */
 @FunctionalInterface
-public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
+public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
 
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
@@ -31,7 +27,7 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
 
     @Nullable
     @Override
-    default Priority apply(@NotNull Priority existing, @NotNull Priority incoming) {
+    default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming) {
         return apply(existing, incoming, 1f);
     }
 
@@ -41,11 +37,11 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
         return target;
     }
 
-    default float merge(PLink prev, PLink next) {
+    default float merge(Priority prev, Prioritized next) {
         return merge(prev, next, 1f);
     }
 
-    enum PriMerge {
+    enum PriMergeOp {
         PLUS,
         AVG,
         OR,
@@ -60,15 +56,10 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
      *
      //TODO will this work for a possible negative pri value case?
      * */
-    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, float iScale, @NotNull PriMerge priMerge) {
+    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, float iScale, @NotNull PriMerge.PriMergeOp priMerge) {
 
         float ePri = exi.priSafe(0);
-        //boolean hasTP = tPri > 0;
         float iPri = inc.priSafe(0);
-        //boolean hasSP = sPri > 0 && sScale >= BUDGET_EPSILON;
-
-
-
 
         float nextPri;
         switch (priMerge) {
@@ -76,7 +67,7 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
                 nextPri = ePri + iPri*iScale;
                 break;
             case OR:
-                nextPri = or(ePri,iPri*iScale);
+                nextPri = Util.or(ePri,iPri*iScale);
                 break;
             case MAX:
                 nextPri = Math.max(ePri, iPri*iScale);
@@ -135,26 +126,26 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
 //                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
 //    }
 
-    BudgetMerge errorMerge = (x, y, z) -> {
+    PriMerge errorMerge = (x, y, z) -> {
         throw new UnsupportedOperationException();
     };
 
-    BudgetMerge nullMerge = (x, y, z) -> {
+    PriMerge nullMerge = (x, y, z) -> {
         //nothing
         return 0f;
     };
 
     /** sum priority, LERP other components in proportion to the priorities */
-    BudgetMerge plusBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
+    PriMerge plusBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    BudgetMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
+    PriMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
 
 //    /** or priority, LERP other components in proportion to the priorities */
-    BudgetMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+    PriMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
 
     //    /** or priority, LERP other components in proportion to the priorities */
-    BudgetMerge maxBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
+    PriMerge maxBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
 //
 //
 //    /** AND priority, LERP other components in proportion to the priorities */
@@ -218,7 +209,7 @@ public interface BudgetMerge extends BiFunction<Priority, Priority, Priority> {
     /** add priority, interpolate durability and quality according to the relative change in priority
      *  WARNING untested
      * */
-    BudgetMerge maxHard = (tgt, src, srcScaleIgnored) -> {
+    PriMerge maxHard = (tgt, src, srcScaleIgnored) -> {
         tgt.setPriority(
             Util.max(src.priSafe(0), tgt.priSafe(0)));
         return 0;

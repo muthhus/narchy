@@ -1,15 +1,15 @@
 package nars.conceptualize;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.bag.impl.CurveBag;
-import nars.budget.BudgetMerge;
+import jcog.bag.impl.CurveBag;
+import jcog.pri.PriMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -34,9 +34,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
+import static jcog.pri.PriMerge.avgBlend;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
-import static nars.budget.BudgetMerge.maxBlend;
+import static jcog.pri.PriMerge.maxBlend;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -65,7 +66,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //    }
 
     @NotNull
-    @Deprecated public <X> Bag<X,PLink<X>> newBag(@NotNull Map m, BudgetMerge blend) {
+    @Deprecated public <X> Bag<X,PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
         return new CurveBag<>(8, defaultCurveSampler, blend, m);
     }
 
@@ -86,8 +87,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public <X> X withBags(Term t, BiFunction<Bag<Term,PLink<Term>>,Bag<Task,PLink<Task>>,X> f) {
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term,PLink<Term>> termbag = newBag(sharedMap, maxBlend);
-        @NotNull Bag<Task,PLink<Task>> taskbag = newBag(sharedMap, maxBlend);
+        @NotNull Bag<Term,PLink<Term>> termbag = newBag(sharedMap, avgBlend);
+        @NotNull Bag<Task,PLink<Task>> taskbag = newBag(sharedMap, avgBlend);
 
 
 //        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);

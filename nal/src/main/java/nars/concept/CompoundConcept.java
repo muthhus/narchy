@@ -2,7 +2,7 @@ package nars.concept;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -21,8 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static jcog.pri.PriMerge.avgBlend;
 import static nars.Param.TRUTH_EPSILON;
-import static nars.budget.BudgetMerge.maxBlend;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Termlike {
@@ -121,7 +121,7 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, maxBlend), b.newBag(sharedMap, maxBlend), nar);
+        this(term, b.newBag(sharedMap, avgBlend), b.newBag(sharedMap, avgBlend), nar);
     }
 
     @Override

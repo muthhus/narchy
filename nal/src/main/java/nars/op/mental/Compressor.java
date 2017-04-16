@@ -1,10 +1,10 @@
 package nars.op.mental;
 
-import jcog.bag.PLink;
-import jcog.bag.Priority;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.Priority;
+import jcog.pri.RawPLink;
 import jcog.bag.impl.HijackBag;
-import jcog.bag.impl.PLinkHijackBag;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import nars.*;
 import nars.concept.PermanentConcept;
 import nars.nar.Default;

@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Util;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import nars.term.atom.Atom;

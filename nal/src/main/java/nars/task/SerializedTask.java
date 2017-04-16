@@ -1,6 +1,6 @@
 package nars.task;
 
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import jcog.data.byt.ByteSeq;
 import nars.NAR;
 import nars.Task;
@@ -48,7 +48,7 @@ public class SerializedTask extends ByteSeq.WindowByteSeq implements Task {
     }
 
     @Override
-    public @NotNull Priority budget() {
+    public @NotNull Priority priority() {
         return null;
     }
 

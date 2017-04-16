@@ -45,7 +45,7 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
 
     protected Task ressurect(Task t) {
         if (t.isDeleted())
-            t.budget().setPriority(0);
+            t.priority().setPriority(0);
 
         return t;
     }

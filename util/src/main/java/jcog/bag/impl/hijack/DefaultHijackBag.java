@@ -1,10 +1,9 @@
-package nars.bag.impl;
+package jcog.bag.impl.hijack;
 
-import jcog.bag.PForget;
-import jcog.bag.PLink;
-import nars.Param;
-import nars.budget.BudgetMerge;
-import org.jetbrains.annotations.NotNull;
+import jcog.bag.impl.HijackBag;
+import jcog.pri.PForget;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 
 import java.util.Random;
 import java.util.function.Consumer;
@@ -14,16 +13,16 @@ import java.util.function.Consumer;
  * <p>
  * it uses a AtomicReferenceArray<> to hold the data but Unsafe CAS operations might perform better (i couldnt get them to work like NBHM does).  this is necessary when an index is chosen for replacement that it makes certain it was replacing the element it thought it was (that it hadnt been inter-hijacked by another thread etc).  on an insert i issue a ticket to the thread and store this in a small ConcurrentHashMap<X,Integer>.  this spins in a busy putIfAbsent loop until it can claim the ticket for the object being inserted. this is to prevent the case where two threads try to insert the same object and end-up puttnig two copies in adjacent hash indices.  this should be rare so the putIfAbsent should usually work on the first try.  when it exits the update critical section it removes the key,value ticket freeing it for another thread.  any onAdded and onRemoved subclass event handling happen outside of this critical section, and all cases seem to be covered.
  */
-public class BLinkHijackBag<K> extends BudgetHijackBag<K,PLink<K>> {
+public class DefaultHijackBag<K> extends PriorityHijackBag<K,PLink<K>> {
 
-    public BLinkHijackBag(int capacity, int reprobes, BudgetMerge merge, Random random) {
+    public DefaultHijackBag(int capacity, int reprobes, PriMerge merge, Random random) {
         this(reprobes, merge, random);
         setCapacity(capacity);
     }
 
-    public BLinkHijackBag(int reprobes, BudgetMerge merge, Random random) {
+    public DefaultHijackBag(int reprobes, PriMerge merge, Random random) {
         super(random, merge, reprobes);
-        this.map.set(EMPTY_ARRAY);
+        this.map.set(HijackBag.EMPTY_ARRAY);
     }
 
     @Override
@@ -31,14 +30,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,PLink<K>> {
         return new PForget(avgToBeRemoved);
     }
 
-    @Override
-    public void onRemoved(@NotNull PLink<K> v) {
-    }
 
-    @Override
-    public float pri(@NotNull PLink<K> key) {
-        return key.pri();
-    }
 
     @Override
     public K key(PLink<K> value) {
@@ -47,7 +39,7 @@ public class BLinkHijackBag<K> extends BudgetHijackBag<K,PLink<K>> {
 
     @Override
     protected float priEpsilon() {
-        return Param.BUDGET_EPSILON;
+        return PLink.EPSILON_DEFAULT;
     }
 
 

@@ -1,18 +1,15 @@
-package nars.budget;
+package jcog.pri;
 
 
-import jcog.bag.Prioritized;
-import jcog.bag.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.bag.Priority.validPriority;
+import static jcog.pri.Priority.validPriority;
 
 /**
- * Contains only the 3 p,d,q as floats.  For general purpose usage, you probably want to use UnitBudget
- * because this includes timestamp.
+ * default mutable prioritized implementation
  */
-public class RawBudget implements Priority, Budget {
+public class Pri implements Priority {
 
     /**
      * The relative share of time resource to be allocated
@@ -20,28 +17,28 @@ public class RawBudget implements Priority, Budget {
     protected float priority;
 
 
-    public RawBudget() {
+    public Pri() {
     }
 
-    public RawBudget(@NotNull Prioritized b, float scale) {
+    public Pri(@NotNull Prioritized b, float scale) {
         this(b.pri()*scale);
     }
 
-    public RawBudget(@NotNull Prioritized b) {
+    public Pri(@NotNull Prioritized b) {
         this(b.pri());
     }
 
-    public RawBudget(float p) {
+    public Pri(float p) {
         this.priority = validPriority(p);
-
     }
+
 
 
     @Nullable
     @Override
     public Priority clone() {
         float p = priority;
-        return p != p /* deleted? */ ? null : new RawBudget(p);
+        return p != p /* deleted? */ ? null : new Pri(p);
     }
 
     /**
@@ -105,15 +102,8 @@ public class RawBudget implements Priority, Budget {
 
 
 
-    /** sets the budget even if 'b' has been deleted; priority will be zero in that case */
-    @NotNull
-    public final RawBudget budgetSafe(@NotNull Priority b) {
-        budgetSafe(b.priSafe(0));
-        return this;
-    }
-
     /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public RawBudget budgetSafe(float p) {
+    @NotNull public Pri pri(float p) {
         priority = p;
         return this;
     }

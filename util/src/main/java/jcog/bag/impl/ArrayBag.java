@@ -1,12 +1,10 @@
-package nars.bag.impl;
+package jcog.bag.impl;
 
 import jcog.bag.*;
 import jcog.data.sorted.SortedArray;
+import jcog.list.FasterList;
+import jcog.pri.*;
 import jcog.table.SortedListTable;
-import nars.$;
-import nars.Param;
-import nars.attention.Forget;
-import nars.budget.BudgetMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +25,7 @@ import java.util.function.Predicate;
  */
 public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, PLink<X>> {
 
-    public final BudgetMerge mergeFunction;
+    public final PriMerge mergeFunction;
 
 
     /**
@@ -37,11 +35,11 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     private final AtomicBoolean unsorted = new AtomicBoolean(false);
 
-    public ArrayBag(BudgetMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
+    public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
         this(0, mergeFunction, map);
     }
 
-    public ArrayBag(@Deprecated int cap, BudgetMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
+    public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
         super(PLink[]::new, map);
 
         this.mergeFunction = mergeFunction;
@@ -97,7 +95,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             int nextSize = s + additional;
 
             if (nextSize > c) {
-                pendingRemoval = $.newArrayList(nextSize - c);
+                pendingRemoval = new FasterList(nextSize - c);
                 s = clean(toAdd, s, nextSize - c, pendingRemoval);
                 clean2(pendingRemoval);
                 if (s + additional > c) {
@@ -377,7 +375,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         float p = this.pressure;
         if (p > 0) {
             this.pressure = 0;
-            return commit(Forget.forget(size(), capacity(), p, mass, PForget::new));
+            return commit(PForget.forget(size(), capacity(), p, mass, PForget::new));
         }
         return this;
     }
@@ -493,7 +491,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 each.accept(b);
             }
 
-            if (pBelow - p >= Param.BUDGET_EPSILON) {
+            if (pBelow - p >= PLink.EPSILON_DEFAULT) {
                 sorted = false;
             }
 

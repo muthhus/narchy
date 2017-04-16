@@ -1,19 +1,19 @@
 package nars.op.stm;
 
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
-import jcog.bag.impl.PLinkHijackBag;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
-import nars.bag.leak.Leak;
+import nars.bag.leak.TaskLeak;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
 import static nars.attention.Crosslink.crossLink;
-import static nars.util.UtilityFunctions.or;
+import static jcog.Util.or;
 
 /**
  * Short-term Memory Belief Event Induction.
@@ -22,7 +22,7 @@ import static nars.util.UtilityFunctions.or;
  *
  * Concurrent Bag
  */
-public class STMTemporalLinkage2 extends Leak<Task,PLink<Task>> {
+public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
 
 
     @NotNull private final On onReset;

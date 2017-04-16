@@ -1,7 +1,7 @@
 package nars;
 
 
-import jcog.bag.Prioritized;
+import jcog.pri.Prioritized;
 import jcog.data.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
 import nars.index.term.TermIndex;

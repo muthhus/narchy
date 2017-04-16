@@ -1,6 +1,7 @@
-package jcog.bag;
+package jcog.pri;
 
 import jcog.Texts;
+import jcog.bag.Bag;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,15 @@ import static jcog.Util.lerp;
  * Created by me on 2/17/17.
  */
 public interface Priority extends Prioritized {
+
+    /**common instance for a 'Deleted budget'.*/
+    Priority Deleted = new ROBudget(Float.NaN);
+    /** common instance for a 'full budget'.*/
+    Priority One = new ROBudget(1f);
+    /** common instance for a 'half budget'.*/
+    Priority Half = new ROBudget(0.5f);
+    /** common instance for a 'zero budget'.*/
+    Priority Zero = new ROBudget(0);
 
     static String toString(@NotNull Priority b) {
         return toStringBuilder(null, Texts.n4(b.pri())).toString();
@@ -51,6 +61,11 @@ public interface Priority extends Prioritized {
         setPriority(priSafe(0) + toAdd);
     }
     default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
+
+    @Override @NotNull
+    default Priority priority() {
+        return this;
+    }
 
 //    default void priAvg(float pOther, float rate) {
 //        float cu = priSafe(0);
@@ -97,6 +112,10 @@ public interface Priority extends Prioritized {
      * @return whether the operation had any effect
      */
     void setPriority(float p);
+
+    default void setPriority(@NotNull Prioritized p) {
+        setPriority(p.pri());
+    }
 
     //    default Budget mult(float priFactor, int durFactor, float quaFactor) {
     //        if (priFactor!=1) priMult(priFactor);

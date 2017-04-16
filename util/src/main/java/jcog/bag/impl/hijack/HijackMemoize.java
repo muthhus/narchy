@@ -1,7 +1,8 @@
-package jcog.bag.impl;
+package jcog.bag.impl.hijack;
 
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.bag.impl.HijackBag;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -11,9 +12,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * Created by me on 3/29/17.
- */
 public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements Function<K,V> {
 
     final static float INITIAL_PRI = 0.5f;

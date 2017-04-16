@@ -1,4 +1,4 @@
-package jcog.bag;
+package jcog.pri;
 
 
 import jcog.Util;
@@ -13,7 +13,9 @@ public interface Prioritized {
      * a value in range 0..1.0 inclusive.
      * if the value is NaN, then it means this has been deleted
      */
-    float pri();
+    default float pri() {
+        return priority().pri();
+    }
 
     default float priSafe(float valueIfDeleted) {
         float p = pri();
@@ -30,6 +32,8 @@ public interface Prioritized {
         return p!=p; //fast NaN check
     }
 
+    @NotNull
+    Priority priority();
 
     static float priSum(@NotNull Iterable<? extends Prioritized> c) {
         float totalPriority = 0;

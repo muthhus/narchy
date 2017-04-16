@@ -1,6 +1,11 @@
 package nars.video;
 
 
+import jcog.data.FloatParam;
+import jcog.random.XorShift128PlusRandom;
+
+import java.util.Random;
+
 public interface Bitmap2D {
 
     /** explicit refresh update the image */
@@ -15,6 +20,9 @@ public interface Bitmap2D {
     /** returns a value 0..1.0 indicating the monochrome brightness (white level) at the specified pixel */
     float brightness(int xx, int yy);
 
+    static float rgbToMono(int r, int g, int b) {
+        return (r+g+b)/256f/3f;
+    }
 
 
     @FunctionalInterface interface EachPixelRGB {
@@ -63,9 +71,6 @@ public interface Bitmap2D {
 //        });
 //    }
 
-    static float rgbToMono(int r, int g, int b) {
-        return (r+g+b)/256f/3f;
-    }
 
     static float decodeRed(int p) {
         return ((p & 0x00ff0000) >> 16)/256f;
@@ -86,6 +91,5 @@ public interface Bitmap2D {
 //        }
 //        return v;
 //    }
-
 
 }

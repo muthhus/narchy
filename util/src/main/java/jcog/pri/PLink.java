@@ -1,4 +1,4 @@
-package jcog.bag;
+package jcog.pri;
 
 /**
  * Created by me on 2/11/17.

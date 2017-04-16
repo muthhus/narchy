@@ -3,7 +3,7 @@ package nars;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.event.On;
-import nars.bag.Bagregate;
+import jcog.bag.util.Bagregate;
 import nars.concept.Concept;
 import nars.gui.BagChart;
 import nars.gui.HistogramChart;
@@ -260,15 +260,15 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCamera(id, new Scale(new SwingCamera(w), pw, ph), pixelTruth);
+        return senseCamera(id, new Scale(new SwingBitmap2D(w), pw, ph), pixelTruth);
     }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
-        return senseCameraRetina(id, new SwingCamera(w), pw, ph, (v) -> t(v, alpha()));
+        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph, (v) -> t(v, alpha()));
     }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCameraRetina(id, new SwingCamera(w), pw, ph, pixelTruth);
+        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph, pixelTruth);
     }
 
     protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {

@@ -8,20 +8,10 @@ import static nars.video.Bitmap2D.*;
 /**
  * exposes a buffered image as a camera video source
  */
-public class ImageCamera implements Bitmap2D, Supplier<BufferedImage> {
+public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> {
 
     Supplier<BufferedImage> source;
     public BufferedImage out;
-
-
-    public ImageCamera() {
-
-    }
-//
-//    public ImageCamera(Supplier<BufferedImage> i) {
-//        this.source = i;
-//        update();
-//    }
 
     @Override
     public int width() {

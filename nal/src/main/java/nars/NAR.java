@@ -3,9 +3,9 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.Prioritized;
-import jcog.bag.Priority;
+import jcog.pri.PLink;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -13,7 +13,6 @@ import jcog.event.Topic;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
-import nars.budget.BudgetException;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -662,7 +661,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
             }
 
-        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException | BudgetException e) {
+        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
 
             emotion.eror(input.volume());
 
@@ -916,7 +915,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
                 input(x.apply(this));
 
-            } catch (@NotNull InvalidTaskException | InvalidTermException | BudgetException e) {
+            } catch (InvalidTaskException | InvalidTermException e) {
 
                 if (x instanceof TaskBuilder) {
 
@@ -925,7 +924,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
                     emotion.eror(tb.volume());
 
                     if (tb.isInput() || Param.DEBUG_EXTRA)
-                        logger.warn("input: {}", e.toString());
+                        logger.warn("input: {}", e);
 
                 }
 

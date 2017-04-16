@@ -1,7 +1,7 @@
 package nars.control;
 
 import com.google.common.collect.Iterators;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.list.SynchronizedArrayList;
 import nars.Focus;
 import nars.concept.Concept;

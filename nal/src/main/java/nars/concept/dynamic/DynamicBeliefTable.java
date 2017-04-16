@@ -1,7 +1,7 @@
 package nars.concept.dynamic;
 
 import jcog.Util;
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Task;

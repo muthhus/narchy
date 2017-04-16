@@ -1,7 +1,7 @@
 package nars.util.graph;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.$;
 import nars.NAR;
 import nars.concept.Concept;

@@ -1,8 +1,8 @@
 package nars.control;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;

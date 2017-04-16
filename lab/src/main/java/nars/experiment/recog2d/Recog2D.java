@@ -9,10 +9,12 @@ import nars.*;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
+import nars.term.Compound;
 import nars.term.Termed;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.truth.Truth;
+import nars.video.Blink;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
@@ -105,19 +107,23 @@ public class Recog2D extends NAgentX {
 //                () -> canvas, w, h, v -> $.t(v, nar.confDefault(BELIEF)));
 
         //still
-        CameraSensor sp = senseCamera($.p(id, $.the("zoom")),
-                new Scale(() -> canvas, w, h), v -> $.t(v, alpha()));
+        CameraSensor sp = senseCamera(
+                id
+                //$.p(id,
+                //$.the("zoom")
+                //)
+                ,
+                new Blink(new Scale(() -> canvas, w, h), 0.8f), v -> $.t(v, alpha()));
 
         //nar.log();
 
-        outs = new Outputs(ii -> $.inh($.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> (Compound)$.inst($.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
                     sp.src instanceof PixelBag ?  Iterables.concat(sensors, ((PixelBag)sp.src).actions) : sensors
                 ),
                 outs, nar);
-        //epsilonProbability = 0; //disable curiosity
 
         //new Thread(() -> {
             SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
@@ -289,7 +295,7 @@ public class Recog2D extends NAgentX {
         //LineMetrics lineMetrics = fontMetrics.getLineMetrics(s, g);
         Rectangle2D sb = fontMetrics.getStringBounds(s, g);
 
-        System.out.println(s + " : " + sb);
+        //System.out.println(s + " : " + sb);
 
         //g.rotate(nar.random.nextFloat() * dTheta, w/2, h/2);
 

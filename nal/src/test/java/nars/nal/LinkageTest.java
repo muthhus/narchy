@@ -1,7 +1,7 @@
 package nars.nal;
 
 import com.google.common.collect.Lists;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;

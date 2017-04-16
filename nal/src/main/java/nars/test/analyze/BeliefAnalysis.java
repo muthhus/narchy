@@ -1,7 +1,7 @@
 package nars.test.analyze;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;

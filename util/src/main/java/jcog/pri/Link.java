@@ -1,4 +1,4 @@
-package jcog.bag;
+package jcog.pri;
 
 import java.util.function.Supplier;
 

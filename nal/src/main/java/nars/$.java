@@ -8,10 +8,10 @@ import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import jcog.Texts;
 import jcog.Util;
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import jcog.list.FasterList;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.budget.RawBudget;
+import jcog.pri.Pri;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPredicate;
 import nars.index.term.TermIndex;
@@ -804,7 +804,7 @@ public enum $ {
     }
 
     public static Priority b(float p) {
-        return new RawBudget(p);
+        return new Pri(p);
     }
 
     /** negates each entry in the array */

@@ -56,7 +56,7 @@ public class AnswerTask extends ImmutableTask {
 
     @Nullable
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        budgetSafe(a.priSafe(0) +
+        pri(a.priSafe(0) +
                 b.priSafe(0));
         return this;
     }

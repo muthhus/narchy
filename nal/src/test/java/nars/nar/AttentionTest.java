@@ -6,7 +6,7 @@ package nars.nar;
 
 
 import com.google.common.collect.Iterables;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import nars.Narsese;
 import nars.concept.Concept;
 import org.junit.Test;

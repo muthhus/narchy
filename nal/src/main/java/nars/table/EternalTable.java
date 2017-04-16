@@ -3,7 +3,7 @@ package nars.table;
 import jcog.data.sorted.SortedArray;
 import nars.NAR;
 import nars.Task;
-import nars.budget.BudgetMerge;
+import jcog.pri.PriMerge;
 import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -188,7 +188,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             if (x.equals(input)) {
                 if (x != input)
-                    BudgetMerge.maxBlend.apply(x.budget(), input.budget());
+                    PriMerge.maxBlend.apply(x, input.priority());
                 return x;
             }
 

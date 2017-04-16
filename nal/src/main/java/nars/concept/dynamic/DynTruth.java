@@ -1,6 +1,6 @@
 package nars.concept.dynamic;
 
-import jcog.bag.Priority;
+import jcog.pri.Priority;
 import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
@@ -52,7 +52,7 @@ public final class DynTruth implements Truthed {
             //            return b;
             return BudgetFunctions.fund(e, f, true);
         } else {
-            return e.get(0).budget().clone();
+            return e.get(0).priority().clone();
         }
     }
 

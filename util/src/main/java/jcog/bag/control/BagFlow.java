@@ -1,5 +1,6 @@
-package jcog.bag;
+package jcog.bag.control;
 
+import jcog.bag.Bag;
 import jcog.meter.event.PeriodMeter;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 

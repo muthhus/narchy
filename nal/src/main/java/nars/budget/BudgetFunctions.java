@@ -20,14 +20,15 @@
  */
 package nars.budget;
 
-import jcog.bag.Priority;
+import jcog.pri.Pri;
+import jcog.pri.Priority;
 import nars.Task;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.budget.BudgetMerge.plusBlend;
+import static jcog.pri.PriMerge.plusBlend;
 
 /**
  * Budget functions for resources allocation
@@ -246,9 +247,9 @@ public final class BudgetFunctions extends UtilityFunctions {
     /** TODO guarantee balanced input and output */
     @NotNull
     public static Priority fund(@NotNull Iterable<Task> tt, float paymentProportion, boolean copyOrTransfer) {
-        RawBudget u = new RawBudget(0f);
+        Pri u = new Pri(0f);
         for (Task t : tt) {
-            Priority tbudget = t.budget();
+            Priority tbudget = t.priority();
             if (copyOrTransfer) {
                 //COPY
                 plusBlend.merge(u, tbudget, paymentProportion);

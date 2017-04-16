@@ -1,7 +1,7 @@
 package nars.premise;
 
-import jcog.bag.PLink;
-import jcog.bag.Priority;
+import jcog.pri.PLink;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -87,7 +87,7 @@ abstract public class PremiseBuilder {
                             //transfer budget from question to answer
                             //float qBefore = taskBudget.priSafe(0);
                             //float aBefore = answered.priSafe(0);
-                            BudgetFunctions.transferPri(taskLink, answered.budget(),
+                            BudgetFunctions.transferPri(taskLink, answered.priority(),
                                     (float) answered.conf()
                                     //(1f - taskBudget.qua())
                                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
@@ -150,7 +150,7 @@ abstract public class PremiseBuilder {
 
         Priority beliefPriority;
         if (belief != null) {
-            beliefPriority = belief.budget().clone();
+            beliefPriority = belief.priority().clone();
             if (beliefPriority == null)
                 belief = null;
         } else {

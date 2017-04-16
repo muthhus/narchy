@@ -1,6 +1,8 @@
 package nars.budget;
 
-import jcog.bag.Priority;
+import jcog.pri.Pri;
+import jcog.pri.PriMerge;
+import jcog.pri.Priority;
 import nars.$;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -10,17 +12,17 @@ import static junit.framework.TestCase.assertEquals;
 /**
  * Created by me on 2/2/16.
  */
-public class BudgetMergeTest {
+public class PriMergeTest {
 
     final static float tol = 0.01f;
 
-    static final RawBudget a = new RawBudget(1);
-    static final RawBudget b = new RawBudget(0.5f);
-    static final RawBudget c = new RawBudget(0.25f);
+    static final Pri a = new Pri(1);
+    static final Pri b = new Pri(0.5f);
+    static final Pri c = new Pri(0.25f);
 
     @Test
     public void testPlusDQBlend() {
-        BudgetMerge m = BudgetMerge.plusBlend;
+        PriMerge m = PriMerge.plusBlend;
 
         testMerge(z(), a, m, 1f, 1f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(z(), a, 0.5f, m, 0.5f); //scale of half should affect priority only
@@ -44,7 +46,7 @@ public class BudgetMergeTest {
 
     @Test
     public void testAvg() {
-        BudgetMerge AVG = BudgetMerge.avgBlend;
+        PriMerge AVG = PriMerge.avgBlend;
 
         //z,a - averaging with zero results in half of the incoming
         testMerge(z(), a, 1.0f, AVG, 0.5f * a.pri());
@@ -68,8 +70,8 @@ public class BudgetMergeTest {
     }
 
     @NotNull
-    private RawBudget z() {
-        return new RawBudget(0);
+    private Pri z() {
+        return new Pri(0);
     }
 
 //    @NotNull
@@ -87,10 +89,10 @@ public class BudgetMergeTest {
 //        RawBudget y = new RawBudget(inPri, inQua);
 //        return testMerge(x, y, scale, m, ouPri, ouQua);
 //    }
-    private static Priority testMerge(Priority x, Priority y, float scale, @NotNull BudgetMerge m, float ouPri) {
+    private static Priority testMerge(Priority x, Priority y, float scale, @NotNull PriMerge m, float ouPri) {
         return testMerge(x, y, m, scale, ouPri, -1f);
     }
-    private static Priority testMerge(Priority x, Priority y, @NotNull BudgetMerge m, float scale, float ouPri, float expectedOverflow) {
+    private static Priority testMerge(Priority x, Priority y, @NotNull PriMerge m, float scale, float ouPri, float expectedOverflow) {
         x = x.clone();
 
         Priority x0 = x.clone();

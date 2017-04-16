@@ -1,8 +1,8 @@
 package nars.attention;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
-import jcog.bag.RawPLink;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

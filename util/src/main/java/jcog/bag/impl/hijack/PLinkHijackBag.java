@@ -1,13 +1,14 @@
-package jcog.bag.impl;
+package jcog.bag.impl.hijack;
 
-import jcog.bag.PForget;
-import jcog.bag.PLink;
+import jcog.bag.impl.HijackBag;
+import jcog.pri.PForget;
+import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-import static jcog.bag.PLink.EPSILON_DEFAULT;
+import static jcog.pri.PLink.EPSILON_DEFAULT;
 
 /**
  * Created by me on 2/17/17.

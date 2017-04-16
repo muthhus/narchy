@@ -2,7 +2,7 @@ package nars.gui;
 
 import com.google.common.collect.Lists;
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import nars.NAR;

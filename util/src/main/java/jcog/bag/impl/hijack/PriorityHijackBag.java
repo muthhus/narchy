@@ -1,22 +1,23 @@
-package nars.bag.impl;
+package jcog.bag.impl.hijack;
 
-import jcog.bag.Priority;
+import jcog.pri.Pri;
+import jcog.pri.Priority;
 import jcog.bag.impl.HijackBag;
-import nars.budget.BudgetMerge;
-import nars.budget.RawBudget;
+import jcog.pri.PriMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 2/17/17.
  */
-abstract public class BudgetHijackBag<K,V extends Priority> extends HijackBag<K, V> {
+abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<K, V> {
 
-    protected final BudgetMerge merge;
+    protected final PriMerge merge;
 
-    public BudgetHijackBag(Random random, BudgetMerge merge, int reprobes) {
+    public PriorityHijackBag(Random random, PriMerge merge, int reprobes) {
         super(reprobes, random);
         this.merge = merge;
     }
@@ -28,7 +29,7 @@ abstract public class BudgetHijackBag<K,V extends Priority> extends HijackBag<K,
         Priority applied;
         if (existing == null) {
             existing = incoming;
-            applied = new RawBudget(0 );
+            applied = new Pri(0 );
             scale = 1f - scale; //?? does this actually work
         } else {
             applied = incoming;
@@ -41,6 +42,15 @@ abstract public class BudgetHijackBag<K,V extends Priority> extends HijackBag<K,
         return pressure;
     }
 
+    @Override
+    protected Consumer<V> forget(float rate) {
+        return null;
+    }
 
+
+    @Override
+    public float pri(@NotNull V key) {
+        return key.pri();
+    }
 
 }

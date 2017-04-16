@@ -1,8 +1,8 @@
 package nars.attention;
 
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Param;
-import nars.budget.Budgeted;
 import nars.concept.Concept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 12/16/16.
  */
-abstract public class Activation<B extends Budgeted> {
+abstract public class Activation<B extends Prioritized> {
 
     @NotNull
     public final Concept origin;

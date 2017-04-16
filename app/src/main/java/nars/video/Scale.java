@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * Pan/Zoom filter for a BuferredImage source
  */
-public class Scale extends ImageCamera {
+public class Scale extends BufferedImageBitmap2D {
 
     private final Supplier<BufferedImage> src;
 

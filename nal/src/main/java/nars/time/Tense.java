@@ -6,7 +6,7 @@ import nars.table.BeliefTable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.util.UtilityFunctions.or;
+import static jcog.Util.or;
 
 
 /** tense modes, and various Temporal utility functions and constants */

@@ -1,7 +1,7 @@
-package nars.bag;
+package jcog.bag.util;
 
 import jcog.bag.Bag;
-import jcog.bag.PLink;
+import jcog.pri.PLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +14,11 @@ import java.util.function.Predicate;
 /**
  * proxies to a delegate bag
  */
-public class BagAdapter<X> implements Bag<X,PLink<X>> {
+public class ProxyBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull Bag<X,PLink<X>> bag;
 
-    public BagAdapter(Bag<X,PLink<X>> delegate) {
+    public ProxyBag(Bag<X,PLink<X>> delegate) {
         set(delegate);
     }
 
