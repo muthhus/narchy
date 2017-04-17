@@ -1,9 +1,9 @@
 package nars.util.data;
 
-import jcog.pri.Prioritized;
-import jcog.pri.Priority;
 import jcog.data.FloatParam;
 import jcog.meter.event.PeriodMeter;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

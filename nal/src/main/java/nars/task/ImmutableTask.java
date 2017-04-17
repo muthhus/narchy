@@ -1,11 +1,11 @@
 package nars.task;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import jcog.pri.Pri;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.truth.Truth;

@@ -1,9 +1,9 @@
 package nars.op.stm;
 
-import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.event.On;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
@@ -12,8 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static nars.attention.Crosslink.crossLink;
 import static jcog.Util.or;
+import static nars.attention.Crosslink.crossLink;
 
 /**
  * Short-term Memory Belief Event Induction.

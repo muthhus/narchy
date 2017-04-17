@@ -6,7 +6,6 @@ import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.Focus;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;

@@ -4,12 +4,12 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
 import jcog.bag.Bag;
-import jcog.pri.RawPLink;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
-import jcog.data.byt.DynByteSeq;
+import jcog.byt.DynByteSeq;
 import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
@@ -25,6 +25,13 @@ import java.util.function.Consumer;
 
 /**
  * UDP peer
+ *
+ * see:
+ *   Gnutella
+ *   WASTE
+ *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/p2p/P2pMessageCodes.java
+ *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/shh/WhisperImpl.java
+ *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/MessageQueue.java
  */
 public class UDPeer extends UDP {
 
@@ -34,20 +41,21 @@ public class UDPeer extends UDP {
 
     private static final Logger logger = LoggerFactory.getLogger(UDPeer.class);
 
+    //TODO create a Command enum with interface for all stages of message handling
     public static final byte PING = (byte) 'P';
     public static final byte PONG = (byte) 'p';
     public static final byte WHO = (byte) 'w';
-    public static final byte SAY = (byte) 's';
+    public static final byte TELL = (byte) 's';
 
     private static final byte DEFAULT_PING_TTL = 2;
 
+    //TODO use a 128+ bit identifier. ethereumj uses 512bits
     public final int id = ThreadLocalRandom.current().nextInt();
 
-    //protected final InetSocketAddress me;
-    //private final byte[] meBytes;
 
     /**
      * max # of active links
+     * TODO make this IntParam mutable
      */
     final static int PEERS_CAPACITY = 16;
 
@@ -470,7 +478,7 @@ public class UDPeer extends UDP {
     }
 
     public int say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return say(new Msg(SAY, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
+        return say(new Msg(TELL, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
     }
 
     /**
@@ -532,7 +540,7 @@ public class UDPeer extends UDP {
             case WHO:
                 m.dataAddresses(this::ping);
                 break;
-            case SAY:
+            case TELL:
                 //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
                 receive(m);
                 break;
@@ -575,8 +583,7 @@ public class UDPeer extends UDP {
 
     public @Nullable UDProfile recvPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
 
-        long sent = m.dataLong(); //TODO should be Long
-        long latency = now - (sent);
+        long latency = pingTime(m, now); //TODO should be Long
         if (connected != null) {
             connected.onPing(latency);
         } else {
@@ -584,6 +591,11 @@ public class UDPeer extends UDP {
                 connected = them.put(new UDProfile(-1, (InetSocketAddress) p.getSocketAddress(), latency));
         }
         return connected;
+    }
+
+    private long pingTime(Msg m, long now) {
+        long sent = m.dataLong(); //TODO dont store the sent time in the message where it can be spoofed. instead store a pending ping table that a pong will lookup by the iniating ping's message hash
+        return now - sent;
     }
 
     /**

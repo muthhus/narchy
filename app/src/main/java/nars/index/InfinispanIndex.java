@@ -1,6 +1,6 @@
 //package nars.index;
 //
-//import jcog.data.byt.RawByteSeq;
+//import RawByteSeq;
 //import XorShift128PlusRandom;
 //import nars.$;
 //import nars.IO;

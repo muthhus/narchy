@@ -3,13 +3,13 @@ package nars;
 
 import com.google.common.collect.Sets;
 import jcog.bag.Bag;
-import jcog.pri.PLink;
-import jcog.pri.Prioritized;
-import jcog.pri.Priority;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.pri.PLink;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
 import nars.attention.Activation;
 import nars.attention.SpreadingActivation;

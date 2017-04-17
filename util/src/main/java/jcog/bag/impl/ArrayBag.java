@@ -1,6 +1,6 @@
 package jcog.bag.impl;
 
-import jcog.bag.*;
+import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
 import jcog.pri.*;

@@ -1,8 +1,8 @@
 package nars.table;
 
+import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.bag.TaskHijackBag;
-import jcog.pri.PriMerge;
 
 import java.util.Random;
 

@@ -14,8 +14,8 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-import static nars.attention.Crosslink.crossLink;
 import static jcog.Util.or;
+import static nars.attention.Crosslink.crossLink;
 
 /**
  * Short-term Memory Belief Event Induction.

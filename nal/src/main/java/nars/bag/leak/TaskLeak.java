@@ -7,11 +7,8 @@ import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import static nars.time.Tense.ETERNAL;
 
 
 /**

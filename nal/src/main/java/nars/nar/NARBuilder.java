@@ -1,14 +1,14 @@
 package nars.nar;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.pri.PriMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.TermIndex;

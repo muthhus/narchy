@@ -1,9 +1,9 @@
 package nars;
 
 
-import jcog.pri.Prioritized;
-import jcog.data.byt.DynByteSeq;
+import jcog.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
+import jcog.pri.Prioritized;
 import nars.index.term.TermIndex;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
@@ -37,6 +37,8 @@ import static nars.time.Tense.XTERNAL;
 
 /**
  * Created by me on 5/29/16.
+ * @see:
+ *      RLP classes: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/RLP.java
  */
 public class IO {
 

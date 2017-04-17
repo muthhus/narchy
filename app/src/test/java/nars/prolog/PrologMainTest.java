@@ -1,11 +1,11 @@
-package nars.prolog;
-
-
-/**
- * Created by me on 1/29/16.
- */
-public class PrologMainTest {
-
+//package nars.prolog;
+//
+//
+///**
+// * Created by me on 1/29/16.
+// */
+//public class PrologMainTest {
+//
 //    @Test
 //    public void testAsk() {
 //        AXR p = new AXR();
@@ -105,4 +105,4 @@ public class PrologMainTest {
 ////        //assertEquals(null, p.ask("small.").pprint());
 ////
 ////    }
-}
+//}

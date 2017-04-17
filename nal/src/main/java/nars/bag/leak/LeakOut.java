@@ -1,11 +1,11 @@
 package nars.bag.leak;
 
+import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
-import jcog.bag.impl.ArrayBag;
-import jcog.pri.PriMerge;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;

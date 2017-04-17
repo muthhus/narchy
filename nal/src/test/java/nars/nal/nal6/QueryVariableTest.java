@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
 import nars.term.Compound;
-import nars.term.Termed;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

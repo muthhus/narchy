@@ -1,6 +1,6 @@
 package nars.index.task;
 
-import jcog.data.byt.ByteSeq;
+import jcog.byt.ByteSeq;
 import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.Task;
 import nars.index.term.tree.TermKey;

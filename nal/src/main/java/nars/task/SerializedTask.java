@@ -1,7 +1,7 @@
 package nars.task;
 
+import jcog.byt.WindowByteSeq;
 import jcog.pri.Priority;
-import jcog.data.byt.ByteSeq;
 import nars.NAR;
 import nars.Task;
 import nars.term.Compound;
@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * TODO
  */
-public class SerializedTask extends ByteSeq.WindowByteSeq implements Task {
+public class SerializedTask extends WindowByteSeq implements Task {
 
     public SerializedTask(byte[] b) {
         super(b, 0, b.length);

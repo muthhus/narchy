@@ -1,15 +1,15 @@
 package nars.conceptualize;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.bag.impl.CurveBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import jcog.bag.impl.CurveBag;
-import jcog.pri.PriMerge;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -37,7 +37,6 @@ import java.util.function.BiFunction;
 import static jcog.pri.PriMerge.avgBlend;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
-import static jcog.pri.PriMerge.maxBlend;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 

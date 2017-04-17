@@ -1,8 +1,8 @@
 package nars;
 
 import jcog.Util;
-import jcog.pri.PLink;
 import jcog.net.UDPeer;
+import jcog.pri.PLink;
 import nars.bag.leak.LeakOut;
 import nars.task.LambdaQuestionTask;
 import org.jetbrains.annotations.NotNull;
@@ -116,7 +116,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
             if (answer!=null) {
                 @Nullable byte[] a = IO.taskToBytes(answer);
                 if (a != null) {
-                    Msg aa = new Msg(SAY, ttl(answer), id, null, a);
+                    Msg aa = new Msg(TELL, ttl(answer), id, null, a);
                     if (!seen(aa, 1f))
                         send(aa, q.origin());
                 }

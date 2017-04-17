@@ -1,10 +1,10 @@
 package jcog.bag.util;
 
 import jcog.bag.impl.ArrayBag;
-import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import jcog.data.FloatParam;
+import jcog.pri.PLink;
 import jcog.pri.PriMerge;
+import jcog.pri.RawPLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 

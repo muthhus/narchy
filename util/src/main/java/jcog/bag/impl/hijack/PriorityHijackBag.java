@@ -1,9 +1,9 @@
 package jcog.bag.impl.hijack;
 
-import jcog.pri.Pri;
-import jcog.pri.Priority;
 import jcog.bag.impl.HijackBag;
+import jcog.pri.Pri;
 import jcog.pri.PriMerge;
+import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

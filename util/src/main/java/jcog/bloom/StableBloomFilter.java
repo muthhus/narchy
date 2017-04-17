@@ -1,13 +1,13 @@
 package jcog.bloom;
 
-import jcog.bloom.hashing.HashProvider;
+import jcog.bloom.hash.HashProvider;
 
 import java.util.Random;
 
 /**
  * Created by jeff on 14/05/16.
  */
-public class StableBloomFilter<E> implements CountingBloomFilter<E> {
+public class StableBloomFilter<E> implements CountingLeakySet<E> {
 
     private final HashProvider<E> hashProvider;
     private final byte[] cells;

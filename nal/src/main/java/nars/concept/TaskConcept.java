@@ -1,10 +1,10 @@
 package nars.concept;
 
 import jcog.bag.Bag;
+import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
-import jcog.pri.PriMerge;
 import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptBagFocus;
 import nars.table.*;

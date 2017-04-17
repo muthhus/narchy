@@ -1,9 +1,9 @@
 package nars.task;
 
-import nars.NAR;
-import nars.Task;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PriMerge;
+import nars.NAR;
+import nars.Task;
 import nars.budget.DependentBLink;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;

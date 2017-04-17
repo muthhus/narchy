@@ -1,9 +1,9 @@
 package nars.task;
 
-import jcog.pri.Priority;
 import jcog.data.array.LongArrays;
-import nars.*;
 import jcog.pri.Pri;
+import jcog.pri.Priority;
+import nars.*;
 import nars.concept.Concept;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;

@@ -2,7 +2,7 @@ package nars.web;
 
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
-import jcog.data.byt.DynByteSeq;
+import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.NAR;
 import nars.Narsese;

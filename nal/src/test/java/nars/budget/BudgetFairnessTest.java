@@ -1,7 +1,7 @@
 package nars.budget;
 
-import jcog.pri.PLink;
 import jcog.math.MultiStatistics;
+import jcog.pri.PLink;
 import nars.Focus;
 import nars.Narsese;
 import nars.Op;

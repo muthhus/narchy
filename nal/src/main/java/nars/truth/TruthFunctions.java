@@ -29,9 +29,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static jcog.Util.clamp;
+import static jcog.Util.or;
 import static nars.$.t;
 import static nars.util.UtilityFunctions.and;
-import static jcog.Util.or;
 
 /**
  * All truth-value (and desire-value) functions used in logic rules

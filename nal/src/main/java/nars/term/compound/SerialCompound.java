@@ -1,7 +1,7 @@
 package nars.term.compound;
 
 import com.google.common.primitives.Ints;
-import jcog.data.byt.DynByteSeq;
+import jcog.byt.DynByteSeq;
 import nars.$;
 import nars.IO;
 import nars.Op;

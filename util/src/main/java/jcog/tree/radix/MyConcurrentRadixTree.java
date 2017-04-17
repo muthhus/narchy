@@ -1,7 +1,7 @@
 package jcog.tree.radix;
 
-import jcog.data.byt.ByteSeq;
-import jcog.data.byt.RawByteSeq;
+import jcog.byt.ArrayByteSeq;
+import jcog.byt.ByteSeq;
 import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.tuple.Pair;
@@ -204,7 +204,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
     }
 
-    static class ByteArrayNodeLeafVoidValue extends RawByteSeq implements Node {
+    static class ByteArrayNodeLeafVoidValue extends ArrayByteSeq implements Node {
         //public final byte[] incomingEdgeCharArray;
 
         public ByteArrayNodeLeafVoidValue(ByteSeq edgeCharSequence) {
@@ -266,7 +266,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
 
         @NotNull @Override
         public ByteSeq getIncomingEdge() {
-            return new RawByteSeq(this.incomingEdgeCharArray);
+            return new ArrayByteSeq(this.incomingEdgeCharArray);
         }
 
         @Override
@@ -892,7 +892,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
         byte[] c = new byte[aLen + bLen];
         a.toArray(c, 0);
         b.toArray(c, aLen);
-        return new RawByteSeq(c);
+        return new ArrayByteSeq(c);
     }
 
 

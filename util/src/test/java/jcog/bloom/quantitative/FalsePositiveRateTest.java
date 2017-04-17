@@ -1,6 +1,6 @@
 package jcog.bloom.quantitative;
 
-import jcog.bloom.BloomFilter;
+import jcog.bloom.LeakySet;
 import jcog.bloom.BloomFilterBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
@@ -15,7 +15,7 @@ public class FalsePositiveRateTest {
 
     @Test
     public void whenContinuouslyAddingElements_falsePositivesIncrease() {
-        BloomFilter<String> filter = BloomFilterBuilder.get()
+        LeakySet<String> filter = BloomFilterBuilder.get()
                 .withSize(10000)
                 .buildFilter();
         final int batchSize = 1000;

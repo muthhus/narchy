@@ -3,9 +3,12 @@ package jcog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.CharBuffer;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -603,4 +606,59 @@ public enum Texts {
 //        return b.put(c);        
 //    }
 
+    /**
+     * Return formatted Date String: yyyy.MM.dd HH:mm:ss
+     * Based on Unix's time() input in seconds
+     *
+     * @param timestamp seconds since start of Unix-time
+     * @return String formatted as - yyyy.MM.dd HH:mm:ss
+       from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+    public static String longToDateTime(long timestamp) {
+        Date date = new Date(timestamp * 1000);
+        DateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+        return formatter.format(date);
+    }
+
+    /**
+     * string repr of an amount of milliseconds
+     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+    public static String stringifyMS(long msec) {
+        if (msec < 1000) return msec + "ms";
+        if (msec < 3000) return String.format("%.2f", msec / 1000d);
+        if (msec < 60 * 1000) return (msec / 1000) + "s";
+        long sec = msec / 1000;
+        if (sec < 5 * 60) return (sec / 60) +  "m" + (sec % 60) + "s";
+        long min = sec / 60;
+        if (min < 60) return min + "m";
+        long hour = min / 60;
+        if (min < 24 * 60) return hour + "h" + (min % 60) + "m";
+        long day = hour / 24;
+        return day + "d" + (day % 24) + "h";
+    }
+
+    /** from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+    public static String stringifyByteCount(long size) {
+        if (size < 2 * (1L << 10)) return size + "b";
+        if (size < 2 * (1L << 20)) return String.format("%dKb", size / (1L << 10));
+        if (size < 2 * (1L << 30)) return String.format("%dMb", size / (1L << 20));
+        return String.format("%dGb", size / (1L << 30));
+    }
+    /** from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+    public static String repeat(String s, int n) {
+
+        if (s.length() == 1) {
+            char c = s.charAt(0);
+            if (c < 0xff) { //ASCII, 8bit
+                byte[] bb = new byte[n];
+                Arrays.fill(bb, (byte)c);
+                return new String(bb);
+            }
+        }
+
+        StringBuilder ret = new StringBuilder();
+        for (int i = 0; i < n; i++) ret.append(s);
+        return ret.toString();
+    }
+
 }
+

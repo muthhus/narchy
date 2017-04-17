@@ -1,9 +1,9 @@
 package nars;
 
 import jcog.Texts;
-import jcog.pri.*;
-import jcog.map.SynchronizedHashMap;
 import jcog.bag.impl.ArrayBag;
+import jcog.map.SynchronizedHashMap;
+import jcog.pri.*;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;

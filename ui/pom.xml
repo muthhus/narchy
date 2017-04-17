@@ -42,13 +42,10 @@
             <scope>test</scope>
         </dependency>
 
-
-
         <dependency>
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>3.0.0.M1</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.googlecode.lanterna/lanterna -->

@@ -1,9 +1,9 @@
 package nars.index.term;
 
 import jcog.Util;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;

@@ -15,6 +15,8 @@
  */
 package jcog.bloom;
 
+import jcog.bit.AwesomeBitSet;
+
 import java.util.ArrayList;
 import java.util.List;
 

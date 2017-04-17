@@ -1,10 +1,10 @@
 package jcog.bloom;
 
-import jcog.bloom.hashing.DefaultHashProvider;
-import jcog.bloom.hashing.HashProvider;
+import jcog.bloom.hash.DefaultHashProvider;
+import jcog.bloom.hash.HashProvider;
 
 /**
- * {@link BloomFilterBuilder}s are the entry point to build different types of {@link BloomFilter}s.
+ * {@link BloomFilterBuilder}s are the entry point to build different types of {@link LeakySet}s.
  *
  * References:
  * [1] Phillip Bradford and Michael Katehakis. 2007. A probabilistic study on combinatorial expanders and hashing. DOI=http://dx.doi.org/10.1137/S009753970444630X
@@ -48,7 +48,7 @@ public class BloomFilterBuilder<E> {
     }
 
     /**
-     * Set the unlearning rate to make the {@link BloomFilter} stable. The unlearning rate represents
+     * Set the unlearning rate to make the {@link LeakySet} stable. The unlearning rate represents
      * a percentage of filter cells that will be "unlearned" with each write operation.
      * @param unlearningRate Must be between 0.0 and 1.0.
      * @return {@link BloomFilterBuilder} For chaining.
@@ -70,25 +70,25 @@ public class BloomFilterBuilder<E> {
 
     /**
      * Build the instance.
-     * @return Standard {@link BloomFilter}.
+     * @return Standard {@link LeakySet}.
      */
-    public BloomFilter<E> buildFilter() {
+    public LeakySet<E> buildFilter() {
         return new StableBloomFilter<>(size, numberOfHashes, 0, hashProvider);
     }
 
     /**
      * Build the instance.
-     * @return {@link CountingBloomFilter}.
+     * @return {@link CountingLeakySet}.
      */
-    public CountingBloomFilter<E> buildCountingFilter() {
+    public CountingLeakySet<E> buildCountingFilter() {
         return new StableBloomFilter<>(size, numberOfHashes, 0, hashProvider);
     }
 
     /**
      * Build the instance.
-     * @return A stable {@link BloomFilter}.
+     * @return A stable {@link LeakySet}.
      */
-    public CountingBloomFilter<E> buildStableFilter() {
+    public CountingLeakySet<E> buildStableFilter() {
         return new StableBloomFilter<>(size, numberOfHashes, unlearningRate, hashProvider);
     }
 

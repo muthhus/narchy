@@ -87,28 +87,24 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>15.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections-api</artifactId>
             <version>8.1.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
             <version>8.1.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
             <version>1.14</version>
-            <scope>compile</scope>
         </dependency>
 
 
@@ -127,14 +123,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>21.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.5</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
@@ -154,7 +148,7 @@
             <!--<groupId>org.codehaus.janino</groupId>-->
             <!--<artifactId>janino</artifactId>-->
             <!--<version>3.0.6</version>-->
-            <!--<scope>compile</scope>-->
+            <!---->
         <!--</dependency>-->
 
 
@@ -163,7 +157,6 @@
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
             <version>6.0_ALPHA</version>
-            <scope>compile</scope>
         </dependency>
 
 
@@ -171,21 +164,20 @@
         <!--<groupId>me.qmx.jitescript</groupId>-->
         <!--<artifactId>jitescript</artifactId>-->
         <!--<version>0.4.1</version>-->
-        <!--<scope>compile</scope>-->
+        <!---->
         <!--</dependency>-->
 
 
         <dependency>
             <groupId>net.bytebuddy</groupId>
             <artifactId>byte-buddy</artifactId>
-            <version>1.6.12</version>
-            <scope>compile</scope>
+            <version>1.6.13</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
-            <scope>compile</scope>
+            
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -196,7 +188,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
-            <scope>compile</scope>
+            
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
@@ -210,7 +202,7 @@
         <!--<groupId>de.ruedigermoeller</groupId>-->
         <!--<artifactId>fst</artifactId>-->
         <!--<version>2.48</version>-->
-        <!--<scope>compile</scope>-->
+        <!---->
         <!--<exclusions>-->
         <!--<exclusion><artifactId>javassist</artifactId><groupId>org.javassist</groupId></exclusion>-->
         <!--<exclusion><artifactId>objenesis</artifactId><groupId>org.objenesis</groupId></exclusion>-->
@@ -234,14 +226,14 @@
             <!--<groupId>com.googlecode.concurrent-trees</groupId>-->
             <!--<artifactId>concurrent-trees</artifactId>-->
             <!--<version>2.6.0</version>-->
-            <!--<scope>compile</scope>-->
+            <!---->
         <!--</dependency>-->
 
         <!--<dependency>-->
             <!--<groupId>ognl</groupId>-->
             <!--<artifactId>ognl</artifactId>-->
             <!--<version>3.1.12</version>-->
-            <!--<scope>compile</scope>-->
+            <!---->
             <!--<exclusions>-->
                 <!--<exclusion>-->
                     <!--<artifactId>javassist</artifactId>-->
@@ -264,7 +256,7 @@
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
             <version>2.5.1</version>
-            <scope>compile</scope>
+            
         </dependency>
 
         <dependency>
@@ -328,7 +320,7 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>2.4.0</version>
-            <scope>compile</scope>
+            
         </dependency>
 
 

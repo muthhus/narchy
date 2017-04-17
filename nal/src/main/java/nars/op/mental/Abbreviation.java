@@ -1,15 +1,15 @@
 package nars.op.mental;
 
+import jcog.bag.impl.CurveBag;
+import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
-import jcog.data.MutableIntRange;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import jcog.bag.impl.CurveBag;
-import jcog.pri.PriMerge;
 import nars.bag.leak.TaskLeak;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -36,8 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static nars.Op.BELIEF;
 import static jcog.bag.impl.CurveBag.power4BagCurve;
+import static nars.Op.BELIEF;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 

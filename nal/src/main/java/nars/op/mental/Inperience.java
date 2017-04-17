@@ -1,9 +1,9 @@
 package nars.op.mental;
 
-import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.data.FloatParam;
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.$;
 import nars.NAR;
 import nars.Task;

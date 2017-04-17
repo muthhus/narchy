@@ -1,7 +1,7 @@
 package nars.task.util;
 
-import jcog.pri.Priority;
 import jcog.event.On;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;

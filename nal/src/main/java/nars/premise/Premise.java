@@ -4,8 +4,8 @@
  */
 package nars.premise;
 
-import nars.Task;
 import jcog.pri.Pri;
+import nars.Task;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -1,8 +1,8 @@
 package nars.control;
 
 import com.google.common.collect.Iterators;
-import jcog.pri.PLink;
 import jcog.list.SynchronizedArrayList;
+import jcog.pri.PLink;
 import nars.Focus;
 import nars.concept.Concept;
 import nars.term.Termed;

@@ -2,7 +2,7 @@ package nars.index.term.tree;
 
 import io.airlift.compress.lz4.Lz4Compressor;
 import io.airlift.compress.lz4.Lz4RawCompressor;
-import jcog.data.byt.DynByteSeq;
+import jcog.byt.HashCachedDynByteSeq;
 import nars.IO;
 import nars.Op;
 import nars.Task;
@@ -22,7 +22,7 @@ import static nars.IO.writeEvidence;
 /**
  * TODO lazily compute
  */
-public class TermKey extends DynByteSeq {
+public class TermKey extends HashCachedDynByteSeq {
 
     private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     //final static Lz4Decompressor decompressor = new Lz4Decompressor();
@@ -51,13 +51,14 @@ public class TermKey extends DynByteSeq {
             }
 
             //this.writeByte(0); //null terminator, signifying end-of-term
+            y.compact();
             return y;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public TermKey(int len) {
+    protected TermKey(int len) {
         super(len);
     }
 
@@ -70,7 +71,6 @@ public class TermKey extends DynByteSeq {
             byte punc = task.punc();
             this.writeByte(punc);
 
-
             writeLong(task.start());
 
             if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
@@ -81,6 +81,8 @@ public class TermKey extends DynByteSeq {
 
             if (COMPRESS)
                 compress();
+
+            compact();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -129,7 +131,7 @@ public class TermKey extends DynByteSeq {
         throw new UnsupportedOperationException();
     }
 
-    public static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term, boolean includeTemporal) throws IOException {
+    static void writeTermSeq(@NotNull DataOutput out, @NotNull Term term, boolean includeTemporal) throws IOException {
 
 
         if (term instanceof Atomic) {
@@ -147,16 +149,16 @@ public class TermKey extends DynByteSeq {
         }
     }
 
-    public static void writeStringBytes(@NotNull DataOutput out, @NotNull Object o) throws IOException {
+    static void writeStringBytes(@NotNull DataOutput out, @NotNull Object o) throws IOException {
         out.write(bytes(o.toString()));
     }
 
-    public static void writeStringBytes(@NotNull DataOutput out, String s) throws IOException {
+    static void writeStringBytes(@NotNull DataOutput out, String s) throws IOException {
         out.write(bytes(s));
     }
 
 
-    public static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c, boolean includeTemporal) throws IOException {
+    static void writeCompoundSeq(@NotNull DataOutput out, @NotNull Compound c, boolean includeTemporal) throws IOException {
 
         out.writeByte('(');
         writeTermContainerSeq(out, c.subterms(), includeTemporal);
