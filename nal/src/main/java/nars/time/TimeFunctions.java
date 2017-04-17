@@ -162,7 +162,7 @@ public interface TimeFunctions {
      * should be used in combination with a "premise Event" precondition
      */
     TimeFunctions occForward = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1, false);
-    TimeFunctions occForwardMerge = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1, true);
+    //TimeFunctions occForwardMerge = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, +1, true);
     TimeFunctions occReverse = (derived, p, d, occReturn, confScale) -> occBeliefMinTask(derived, p, occReturn, -1, false);
 
 
@@ -182,7 +182,7 @@ public interface TimeFunctions {
 
             occReturn[0] = union.a;
 
-            if (merge && derived.op() == CONJ) {
+            if (/*merge && */derived.op() == CONJ) {
                 assert(polarity==1);
 
                 occReturn[1] = union.b;

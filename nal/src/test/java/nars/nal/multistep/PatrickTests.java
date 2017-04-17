@@ -259,7 +259,7 @@ public class PatrickTests extends AbstractNALTest {
         //(&|,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>,<example1 --> name>)?\n" +
 
         //for (int i = 0; i < 2; i++) {
-        n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_4"), $("P:p_4_3"), $("name:example1")));
+        n.question($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_4"), $("P:p_4_3"), $("name:example1")));
         //}
 
         //Answer (&|,<example1 --> name>,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>). :-1: %0.80;0.16%
@@ -310,7 +310,7 @@ public class PatrickTests extends AbstractNALTest {
         //(&|,<p_2_3 --> pixel>,<p_3_2 --> pixel>,<p_3_3 --> pixel>,<p_3_4 --> pixel>,<p_4_3 --> pixel>,<example2 --> name>)?
 
         //for (int i = 0; i < 8; i++) {
-        n.ask($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_3"), $("P:p_3_4"), $("P:p_4_3"), $("name:example2")));
+        n.question($.parallel($("P:p_2_3"), $("P:p_3_2"), $("P:p_3_3"), $("P:p_3_4"), $("P:p_4_3"), $("name:example2")));
         n.run(6000);
         //}
 

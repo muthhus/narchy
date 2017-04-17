@@ -224,6 +224,11 @@ public class NarseseExtendedTest {
     }
 
 
+    @Test public void testQuoteEscaping() throws Narsese.NarseseException {
+        assertEquals("it said: \"wtf\"",
+                $.quote("it said: \"wtf\"").toString());
+    }
+
     @Test public void testTripleQuote() throws Narsese.NarseseException {
         assertEquals( "(\"\"\"triplequoted\"\"\")", term("(\"\"\"triplequoted\"\"\")").toString() );
         assertEquals( "(\"\"\"triple\"quoted\"\"\")", term("(\"\"\"triple\"quoted\"\"\")").toString() );

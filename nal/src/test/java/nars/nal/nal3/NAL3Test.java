@@ -152,7 +152,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement()  {
+    public void composition_on_both_sides_of_a_statement() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(&,bird,swimmer) --> (&,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
@@ -161,7 +161,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement_2()  {
+    public void composition_on_both_sides_of_a_statement_2() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(|,bird,swimmer) --> (|,animal,swimmer)>"); //.en("Is a swimming bird a type of swimming animal?");
@@ -172,7 +172,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2()  {
+    public void composition_on_both_sides_of_a_statement2() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(-,swimmer,animal) --> (-,swimmer,bird)>"); //.en("Is a nonanimal swimmer a type of a nonbird swimmer?");
@@ -181,7 +181,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2_2()  {
+    public void composition_on_both_sides_of_a_statement2_2() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",0.9f,0.9f); //.en("Bird is a type of animal.");
         tester.ask("<(~,swimmer,animal) --> (~,swimmer,bird)>"); //.en("Is a nonanimal swimmer a type of a nonbird swimmer?");
@@ -190,7 +190,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-     public void compound_composition_one_premise()  {
+     public void compound_composition_one_premise() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<swan --> (|,bird,swimmer)>"); //.en("Is a swan a type of bird or swimmer?");
@@ -199,7 +199,7 @@ public class NAL3Test extends AbstractNALTest {
     }
 
     @Test
-     public void compound_composition_one_premise2()  {
+     public void compound_composition_one_premise2() throws Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f); //.en("Swan is a type of bird.");
         tester.ask("<(&,swan,swimmer) --> bird>"); //.en("Is swimming swan a type of bird?");

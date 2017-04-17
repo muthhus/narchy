@@ -19,16 +19,13 @@ public abstract class CommonalityConstraint implements MatchConstraint {
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
-        if (y instanceof Variable)
-            return false;
 
         Term bb = f.xy(b);
 
-        if (bb == null || bb instanceof Variable)
-            return false;
+        if (bb == null) return false;
 
-        if (bb.equals(y))
-            return true;
+        if (bb.equals(y)) return true;
+        if (bb instanceof Variable) return false; //only if bb!=y
 
         boolean bCompound = bb instanceof Compound;
         if (!(y instanceof Compound)) {

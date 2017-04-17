@@ -146,7 +146,7 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void conversion()  {
+    public void conversion() throws nars.Narsese.NarseseException {
 
         TestNAR test = test();
         test.believe("<bird --> swimmer>")
@@ -158,14 +158,14 @@ public class NAL1Test extends AbstractNALTest {
 
 
     @Test
-    public void backwardInference()  {
+    public void backwardInference() throws nars.Narsese.NarseseException {
 
         test()
-
+                .log()
                 .believe("<bird --> swimmer>", 1.0f, 0.8f) //Bird is a type of swimmer
                 .ask(    "<?1 --> swimmer>") //What is a type of swimmer?
-                .mustOutput(125, "<?1 --> bird>?") //.en("What is a type of bird?");
-                .mustOutput(125, "<bird --> ?1>?") //.en("What is the type of bird?");
+                .mustOutput(255, "<?1 --> bird>?") //.en("What is a type of bird?");
+                .mustOutput(255, "<bird --> ?1>?") //.en("What is the type of bird?");
         ;
     }
 

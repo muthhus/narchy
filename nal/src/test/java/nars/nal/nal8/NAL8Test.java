@@ -339,9 +339,9 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void testExecutionResultConstant() {
         test()
-            
+            //.log()
             .input("<z --> (/,exe,x,_)>! :|:")
-            .mustDesire(64, "exe(x, z)", 1.0f, 0.9f, 0);
+            .mustDesire(128, "exe(x, z)", 1.0f, 0.9f, 0);
     }
 
     @Test public void testExecutionResult()  {
@@ -940,9 +940,9 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
                 .mustDesire(cycles, "(good)", 1.0f, 0.81f)
-                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.5f, 1f, ETERNAL)
+                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.7f, 0.5f, 1f, ETERNAL)
                 .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
+                .mustNotOutput(cycles, "(bad)", GOAL, 0.3f, 1f, 0f, 1f, ETERNAL);
     }
 
     @Test

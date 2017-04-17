@@ -319,13 +319,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public Termed term(@NotNull String t) throws NarseseException {
-        Termed x = concepts.parse(t);
-        if (x == null) {
-            //if a NarseseException was not already thrown, this indicates that it parsed but the index failed to provide its output
-            throw new NarseseException("Unindexed: " + t);
-        }
-        return x;
+    public <T extends Term> T term(@NotNull String t) throws NarseseException {
+        return concepts.term(t);
     }
 
     @Override
@@ -355,16 +350,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     @NotNull
     public void ask(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
-        ask(term(termString));
+        question(term(termString));
     }
 
     /**
      * ask question
      */
-    @NotNull
-    public void ask(@NotNull Termed<Compound> c) {
-        //TODO remove '?' if it is attached at end
-        ask(c, (char) QUESTION);
+    public Task question(@NotNull Compound c) {
+        return que(c, QUESTION);
+    }
+
+    public Task quest(@NotNull Compound c) {
+        return que(c, QUEST);
     }
 
 //    /**
@@ -388,59 +385,59 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @Nullable
     public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException {
-        return goal((Termed) $(goalTermString), tense, freq, conf);
+        return goal($(goalTermString), tense, freq, conf);
     }
 
     /**
      * desire goal
      */
     @Nullable
-    public Task goal(@NotNull Termed<Compound> goalTerm, @NotNull Tense tense, float freq, float conf) {
+    public Task goal(@NotNull Compound goalTerm, @NotNull Tense tense, float freq, float conf) {
         return goal(
                 priorityDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq, float conf) {
+    public NAR believe(@NotNull Compound term, @NotNull Tense tense, float freq, float conf) {
         return believe(term, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, @NotNull long when, float freq, float conf) {
+    public NAR believe(@NotNull Compound term, @NotNull long when, float freq, float conf) {
         believe(priorityDefault(BELIEF), term, when, freq, conf);
         return this;
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
+    public NAR believe(@NotNull Compound term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, long when, float freq) {
+    public NAR believe(@NotNull Compound term, long when, float freq) {
         return believe(term, when, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term, @NotNull Tense tense, float freq) {
+    public Task goal(@NotNull Compound term, @NotNull Tense tense, float freq) {
         return goal(term, tense, freq, confDefault(GOAL));
     }
 
 
     @Nullable
-    public Task believe(float priority, @NotNull Termed term, @NotNull Tense tense, float freq, float conf) {
+    public Task believe(float priority, @NotNull Compound term, @NotNull Tense tense, float freq, float conf) {
         return believe(priority, term, time(tense), freq, conf);
     }
 
 
     @NotNull
-    public NAR believe(@NotNull Termed term, float freq, float conf) {
+    public NAR believe(@NotNull Compound term, float freq, float conf) {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
     @NotNull
-    public Task goal(@NotNull Termed term, float freq, float conf) {
+    public Task goal(@NotNull Compound term, float freq, float conf) {
         return goal(term, Tense.Eternal, freq, conf);
     }
 
@@ -460,13 +457,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @NotNull
     public NAR believe(@NotNull String termString, float freq, float conf) throws NarseseException {
-        return believe((Termed) term(termString), freq, conf);
+        return believe(term(termString), freq, conf);
     }
 
     @NotNull
     public Task goal(@NotNull String termString) {
         try {
-            return goal((Termed) term(termString), true);
+            return goal(term(termString), true);
         } catch (NarseseException e) {
             throw new RuntimeException(e);
         }
@@ -492,48 +489,48 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term) {
+    public NAR believe(@NotNull Compound term) {
         return believe(term, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse) {
+    public NAR believe(@NotNull Compound term, boolean trueOrFalse) {
         return believe(term, trueOrFalse, confDefault(BELIEF));
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term) {
+    public Task goal(@NotNull Compound term) {
         return goal(term, true);
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse) {
+    public Task goal(@NotNull Compound term, boolean trueOrFalse) {
         return goal(term, trueOrFalse, confDefault(BELIEF));
     }
 
     @NotNull
-    public NAR believe(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) {
+    public NAR believe(@NotNull Compound term, boolean trueOrFalse, float conf) {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
     @NotNull
-    public Task goal(@NotNull Termed<Compound> term, boolean trueOrFalse, float conf) {
+    public Task goal(@NotNull Compound term, boolean trueOrFalse, float conf) {
         return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
     @Nullable
-    public Task believe(float pri, @NotNull Termed<Compound> term, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+    public Task believe(float pri, @NotNull Compound term, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
         return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
 
     @Nullable
-    public Task goal(float pri, @NotNull Termed<Compound> goal, long when, float freq, float conf) throws InvalidTaskException {
+    public Task goal(float pri, @NotNull Compound goal, long when, float freq, float conf) throws InvalidTaskException {
         return input(pri, goal, GOAL, when, freq, conf);
     }
 
     @Nullable
-    public Task input(float pri, Termed<Compound> term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+    public Task input(float pri, Compound term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
 
         if (term == null) {
             throw new NullPointerException("null task term");
@@ -552,25 +549,24 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return y;
     }
 
-    @NotNull
-    public void ask(@NotNull Termed<Compound> term, char questionOrQuest) {
-        ask(term, questionOrQuest, ETERNAL);
+    /** ¿qué?  que-stion or que-st */
+    public Task que(@NotNull Compound term, byte questionOrQuest) {
+        return que(term, questionOrQuest, ETERNAL);
     }
 
-    public Task ask(@NotNull Termed<Compound> term, char questionOrQuest, long when) {
+    /** ¿qué?  que-stion or que-st */
+    public Task que(@NotNull Compound term, byte punc, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
-        if ((questionOrQuest != QUESTION) && (questionOrQuest != QUEST))
-            throw new RuntimeException("invalid punctuation");
+        assert((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
-        Task t = new ImmutableTask((Compound) term, (byte) questionOrQuest, null,
-                time(), when, when, new long[]{time.nextStamp()}).budget(this);
-
-        input(t);
-
-        return t;
-
+        return inputAndGet(
+            new ImmutableTask(term, punc, null,
+                time(), when, when,
+                new long[]{time.nextStamp()}
+            ).budget(this)
+        );
     }
 
     /**
@@ -1458,7 +1454,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return eventTaskProcess.on(o);
     }
 
-    public @NotNull NAR believe(@NotNull Termed<Compound> c, @NotNull Tense tense) {
+    public @NotNull NAR believe(@NotNull Compound c, @NotNull Tense tense) {
         return believe(c, tense, 1f);
     }
 

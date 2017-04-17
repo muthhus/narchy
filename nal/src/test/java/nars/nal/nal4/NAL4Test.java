@@ -147,7 +147,7 @@ public class NAL4Test extends AbstractNALTest {
         tester.mustBelieve(CYCLES, "<(bird,plant) --> (animal,plant)>", 1.0f, 0.81f); //en("The relation between bird and plant is a type of relation between animal and plant.");
     }
     @Test
-    public void composition_on_both_sides_of_a_statement_question_simultaneous()  {
+    public void composition_on_both_sides_of_a_statement_question_simultaneous() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird --> animal>",1.0f,0.9f); //en("Bird is a type of animal.");
         tester.ask("<(bird,plant) --> ?x>"); //en("What is the relation between a bird and a plant?");
@@ -193,7 +193,7 @@ public class NAL4Test extends AbstractNALTest {
 //    }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2()  {
+    public void composition_on_both_sides_of_a_statement2() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<neutralization --> reaction>",1.0f,0.9f); //en("Neutralization is a type of reaction.");
         tester.ask("<(\\,neutralization,acid,_) --> ?x>"); //en("What can be neutralized by acid?");
@@ -203,7 +203,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement2_2()  {
+    public void composition_on_both_sides_of_a_statement2_2() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<neutralization --> reaction>",1.0f,0.9f); //en("Neutralization is a type of reaction.");
         tester.ask("((\\,neutralization,acid,_) --> (\\,reaction,acid,_))");
@@ -212,35 +212,35 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void composition_on_both_sides_of_a_statement3()  {
+    public void composition_on_both_sides_of_a_statement3() throws nars.Narsese.NarseseException {
         test()
             .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
             .ask("<(/,neutralization,_,base) --> ?x>") //en("What is something that can neutralize a base?");
             .mustBelieve(CYCLES, "<(/,neutralization,_,base) --> (/,neutralization,_,soda)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
     @Test
-    public void composition_on_both_sides_of_a_statement3b()  {
+    public void composition_on_both_sides_of_a_statement3b() throws nars.Narsese.NarseseException {
         test()
                 .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
                 .ask("<(/,neutralization,liquid,_,base) --> ?x>") //en("What is something that can neutralize a base?");
                 .mustBelieve(CYCLES, "<(/,neutralization,liquid,_,base) --> (/,neutralization,liquid,_,soda)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
     @Test
-    public void composition_on_both_sides_of_a_statement3c()  {
+    public void composition_on_both_sides_of_a_statement3c() throws nars.Narsese.NarseseException {
         test()
                 .believe("<soda --> base>",1.0f,0.9f) //en("Soda is a type of base.");
                 .ask("<(/,neutralization,liquid,base,_) --> ?x>") //en("What is something that can neutralize a base?");
                 .mustBelieve(CYCLES, "<(/,neutralization,liquid,base,_) --> (/,neutralization,liquid,soda,_)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
 
-    @Test public void testCompositionFromProductInh() {
+    @Test public void testCompositionFromProductInh() throws nars.Narsese.NarseseException {
         //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         test()
                 .believe("(soda --> acid)",1.0f,0.9f)
                 .ask("((drink,soda) --> ?death)")
                 .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);
     }
-    @Test public void testCompositionFromProductSim() {
+    @Test public void testCompositionFromProductSim() throws nars.Narsese.NarseseException {
         test()
                 .believe("(soda <-> deadly)",1.0f,0.9f)
                 .ask("((soda,food) <-> #x)")

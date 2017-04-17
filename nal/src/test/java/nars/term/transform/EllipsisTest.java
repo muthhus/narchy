@@ -241,7 +241,7 @@ public class EllipsisTest {
         @Override
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
             PatternTermIndex pi = new PatternTermIndex();
-            Compound pattern = (Compound) pi.parse(prefix + "%1, " + ellipsisTerm + suffix).term();
+            Compound pattern = (Compound) pi.term(prefix + "%1, " + ellipsisTerm + suffix).term();
             return pattern;
         }
 
@@ -251,7 +251,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() throws Narsese.NarseseException {
             final PatternTermIndex pi = new PatternTermIndex();
-            return (Compound) pi.normalize(pi.parse("<%1 --> (" + ellipsisTerm +  ")>")).term();
+            return (Compound) pi.normalize(pi.term("<%1 --> (" + ellipsisTerm +  ")>")).term();
         }
 
     }
@@ -498,14 +498,14 @@ public class EllipsisTest {
             if (o.statement) continue;
 
             if (o!=DIFFe && o!=DIFFi) {
-                assertEquals(o + " with normal term", a, $.compound(o, a));
+                assertEquals(o + " with normal term", a, $.the(o, a));
             } else {
-                assertEquals(False, $.compound(o, a));
+                assertEquals(False, $.the(o, a));
             }
 
             assertEquals(o + " with ellipsis not reduced",
                     o.statement ? VAR_PATTERN : o,
-                    $.compound(o,b).op());
+                    $.the(o,b).op());
         }
     }
 

@@ -16,13 +16,15 @@
      (&&,X,A..+), B, task("!"), time(decomposeTaskSubset) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
         (&&,(--,%X),A..+), B,  task("!"), time(decomposeTaskSubset) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
 
-     X, (&&,X,A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
-        X, (&&,(--,%X),A..+), time(decomposeBelief), task("?@") |- (&&,A..+), ()
-     B, (A==>B), time(decomposeBelief), task("?@") |- A, ()
+     X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
+        X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()
+     B, (A==>B),                task("?@"), time(decomposeBelief) |- A, ()
+     A, (A==>B),                task("?@"), time(decomposeBelief) |- B, ()
+     A, ((--,%A)==>B),          task("?@"), time(decomposeBelief) |- B, ()
 
      //quest to 'how' question
-     B, X, neq(B,X), task("@"), time(dtAfterOrEternal), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
-     B, X, neq(B,X), task("@"), time(dtAfterOrEternal), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
+     B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
+     B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
 
      (&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
         (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
@@ -79,7 +81,7 @@
 //If S can stand for P, P can to a certain low degree also represent the class S
 //If after S usually P happens, then it might be a good guess that usually before P happens, S happens.
 
-    (P --> S), (S --> P),                                                 task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
+    (P --> S), (S --> P),                               task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
     (P ==> S), (S ==> P), time(dtBeliefReverse),        task("?") |- (P ==>+- S), (Belief:Conversion, Punctuation:Belief)
     (P ==> S), ((--,%S) ==> P), time(dtBeliefReverse),  task("?") |- (--,(P ==>+- S)), (Belief:Conversion, Punctuation:Belief)
     (P ==> S), (S ==> P), time(dtBeliefReverse),        task("?") |- ((--,%P) ==>+- S), (Belief:ConversionPN, Punctuation:Belief)
@@ -89,10 +91,8 @@
 
 //Similarity to Inheritance
 
-    (S --> P), (S <-> P),                       task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
-    (S ==> P), (S <=> P), time(dtBeliefExact),  task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
-
-
+    (S --> P), (S <-> P),                   task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
+    (S ==> P), (S <=> P), time(dtCombine),  task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
 
 //NAL2:
 
@@ -132,8 +132,6 @@
 
 //disjunction
    (&&,(--,%B),A..+), B, task("?") |- (--,(&&,(--,%B),A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-
 
 
 

@@ -3,6 +3,7 @@ package nars.nal.nal6;
 import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
+import nars.term.Compound;
 import nars.term.Termed;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public class QueryVariableTest {
 
         Default nar = new Default();
         //nar.log();
-        Termed beliefTerm = nar.term(beliefString);
+        Compound beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.ask(question, Tense.ETERNAL, (q,a)-> {
             if (a.term().equals(beliefTerm)) {

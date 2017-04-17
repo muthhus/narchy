@@ -38,7 +38,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     transient final float inPri; //cached priority value of input at input
     transient final Term originTerm;
 
-    final float temporalSpecificity = 0.1f;
+    private static final float temporalSpecificity = 0.25f;
 
     /**
      * 0.5 = forward/backward termlinking is balanced.

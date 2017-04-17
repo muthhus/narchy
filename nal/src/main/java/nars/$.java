@@ -6,6 +6,8 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import jcog.Texts;
 import jcog.Util;
 import jcog.pri.Priority;
@@ -76,7 +78,7 @@ public enum $ {
 
     @NotNull
     public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
-        return terms.parse(term);
+        return terms.term(term);
     }
 
 //    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
@@ -98,6 +100,8 @@ public enum $ {
 
     final static Atom emptyQuote = (Atom) $.the("\"\"");
 
+    final static Escaper quoteEscaper = Escapers.builder().addEscape('\"', "\\\"").build();
+
     @NotNull public static Atom quote(@NotNull Object text) {
         String s = text.toString();
 
@@ -107,19 +111,20 @@ public enum $ {
             return emptyQuote;
 
         if (s.charAt(0)=='\"' && s.charAt(length -1)=='\"') {
-            //already quoted
+            if (length == 1) {
+                s = "\"\\\"\"";
+            } else {
+                //already quoted the empty string
+            }
         } else {
-            s = ("\"" + s + '"');
+            s = ("\"" + quoteEscaper.escape(s) + '"');
         }
 
         return new Atom(s);
     }
 
 
-    /** warning: this will modify the StringBuilder parameter in generating the quote, to avoid duplicating the instance */
-    @NotNull public static Atom quote(StringBuilder getsModified) {
-        return (Atom)$.the(getsModified.insert(0, '"').append('"'));
-    }
+
 
     @NotNull
     public static Term[] the(@NotNull String... id) {
@@ -150,24 +155,24 @@ public enum $ {
      *  returns a Term if the two inputs are equal to each other
      */
     @Nullable
-    public static Compound inh(Term subj, Term pred) {
+    public static <T extends Term> T inh(Term subj, Term pred) {
 
 //        if ((predicate instanceof Operator) && if (subject instanceof Product))
 //            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
 //        else
-        return compoundOrNull(compound(INH, subj, pred));
+        return (T) the(INH, subj, pred);
     }
 
 
     @Nullable
-    public static Compound inh(@NotNull String subj, @NotNull String pred) throws Narsese.NarseseException {
-        return inh((Term)$(subj), (Term)$(pred));
+    public static <T extends Term> T inh(@NotNull String subj, @NotNull String pred) throws Narsese.NarseseException {
+        return (T) inh((Term)$(subj), (Term)$(pred));
     }
 
 
     @Nullable
-    public static Term sim(@NotNull Term subj, @NotNull Term pred) {
-        return compound(SIM, subj, pred);
+    public static <T extends Term> T sim(@NotNull Term subj, @NotNull Term pred) {
+        return (T) the(SIM, subj, pred);
     }
 
 
@@ -184,7 +189,7 @@ public enum $ {
     /** function ((a,b)==>c) aka: c(a,b) */
     @NotNull
     public static Compound func(@NotNull Atomic opTerm, @Nullable Term... arg) {
-        return (Compound) compound(
+        return (Compound) the(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
@@ -192,7 +197,7 @@ public enum $ {
     }
 
     @NotNull public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
-        return (Compound) compound(
+        return (Compound) the(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
@@ -201,22 +206,22 @@ public enum $ {
 
 
     @NotNull
-    public static Compound impl(@NotNull Term a, @NotNull Term b) {
-        return (Compound) compound(IMPL, a, b);
+    public static <T extends Term> T impl(@NotNull Term a, @NotNull Term b) {
+        return (T) the(IMPL, a, b);
     }
 
     @NotNull
-    public static Compound impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (Compound)compound(IMPL, dt, a, b);
+    public static <T extends Term> T impl(@NotNull Term a, int dt, @NotNull Term b) {
+        return (T) the(IMPL, dt, a, b);
     }
 
     @NotNull
-    public static Term neg(@NotNull Term x) {
-        return terms.neg(x);
+    public static <T extends Term> T neg(@NotNull Term x) {
+        return (T) terms.neg(x);
     }
 
-    @NotNull public static Term negIf(@NotNull Term x, boolean negate) {
-        return negate ? neg(x) : x;
+    @NotNull public static <T extends Term> T negIf(@NotNull Term x, boolean negate) {
+        return (T) (negate ? neg(x) : x);
     }
 
     @NotNull
@@ -226,7 +231,7 @@ public enum $ {
 
     @NotNull
     public static Compound p(@NotNull Term... t) {
-        return (t.length == 0) ? Terms.ZeroProduct : (Compound) compound(PROD, t);
+        return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PROD, t);
     }
     @NotNull
     public static Compound p(@NotNull TermContainer t) {
@@ -308,16 +313,16 @@ public enum $ {
      * @return A compound generated or null
      */
     @Nullable
-    public static Term inst(@NotNull Term subj, Term pred) {
-        return terms.inst(subj, pred);
+    public static <T extends Term> T inst(@NotNull Term subj, Term pred) {
+        return (T) terms.inst(subj, pred);
     }
     @Nullable
-    public static Term instprop(@NotNull Term subject, @NotNull Term predicate) {
-        return terms.instprop(subject, predicate);
+    public static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
+        return (T) terms.instprop(subject, predicate);
     }
     @Nullable
-    public static Compound prop(Term subject, Term predicate) {
-        return (Compound) terms.prop(subject, predicate);
+    public static <T extends Term> T prop(Term subject, Term predicate) {
+        return (T) terms.prop(subject, predicate);
     }
 
 //    public static Term term(final Op op, final Term... args) {
@@ -341,7 +346,7 @@ public enum $ {
 
     @NotNull
     public static TaskBuilder task(@NotNull String term, byte punct, float freq, float conf) throws Narsese.NarseseException {
-        return task((Compound)$.$(term), punct, freq, conf);
+        return task($.$(term), punct, freq, conf);
     }
 
     @NotNull
@@ -355,7 +360,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) compound(SETe, (Collection)t);
+        return (Compound) the(SETe, (Collection)t);
     }
 
     /** construct set_ext of key,value pairs from a Map */
@@ -414,7 +419,7 @@ public enum $ {
 
     @NotNull
     public static Compound sete(Term... t) {
-        return (Compound) compound(SETe, t);
+        return (Compound) the(SETe, t);
 
     }
 
@@ -426,7 +431,7 @@ public enum $ {
 
     @NotNull
     public static Compound seti(Term... t) {
-        return (Compound) compound(SETi, t);
+        return (Compound) the(SETi, t);
     }
 
 //    /**
@@ -454,8 +459,9 @@ public enum $ {
 
     @Nullable
     public static Term conj(Term... a) {
-        return compound(CONJ, a);
+        return the(CONJ, a);
     }
+
     @Nullable
     public static Term conj(@NotNull Collection<Term> collection, @NotNull Term... append) {
         if (append.length == 0)
@@ -467,7 +473,7 @@ public enum $ {
         for (Term t : append) {
             ca[i++] = t;
         }
-        return compound(CONJ, ca);
+        return the(CONJ, ca);
     }
 
 
@@ -475,12 +481,12 @@ public enum $ {
 
     /** parallel conjunction &| aka &&+0 */
     @Nullable
-    public static Term parallel(Term... s) {
-        return compound(CONJ, 0, s);
+    public static <T extends Term> T parallel(Term... s) {
+        return (T) the(CONJ, 0, s);
     }
     @Nullable
     public static Term parallel(@NotNull Collection<Term> s) {
-        return compound(CONJ, 0, s);
+        return the(CONJ, 0, s);
     }
 
     @Nullable
@@ -556,66 +562,66 @@ public enum $ {
 
     @Nullable
     public static Term equi(Term subject, Term pred) {
-        return compound(EQUI, subject, pred);
+        return the(EQUI, subject, pred);
     }
     @Nullable
     public static Term equi(Term subject, int dt, Term pred) {
-        return compound(EQUI, dt, subject, pred);
+        return the(EQUI, dt, subject, pred);
     }
 
     @Nullable
     public static Term diffi(Term a, Term b) {
-        return compound(DIFFi, a, b);
+        return the(DIFFi, a, b);
     }
 
     @Nullable
     public static Term diffe(Term a, Term b) {
-        return compound(DIFFe, a, b);
+        return the(DIFFe, a, b);
     }
 
     @Nullable
     public static Term imge(Term... x) {
-        return compound(IMGe, x);
+        return the(IMGe, x);
     }
     @Nullable
     public static Term imgi(Term... x) {
-        return compound(IMGi, x);
+        return the(IMGi, x);
     }
 
     @Nullable
     public static Term secte(Term... x) {
-        return compound(SECTe, x);
+        return the(SECTe, x);
     }
 
 
 
     @Nullable
-    public static Term secti(Term... x) { return compound(SECTi, x); }
+    public static Term secti(Term... x) { return the(SECTi, x); }
 
 
 
 
     @NotNull
-    public static Term compound(@NotNull Op op, Term... subterms) {
-        return compound(op, DTERNAL, subterms);
+    public static Term the(@NotNull Op op, Term... subterms) {
+        return the(op, DTERNAL, subterms);
     }
 
     @NotNull
-    public static Term compound(@NotNull Op op, int dt, @NotNull Term... subterms) {
+    public static Term the(@NotNull Op op, int dt, @NotNull Term... subterms) {
         return terms.the(op, dt, subterms);
     }
 
     @Nullable
-    public static Term compound(@NotNull Op op, @NotNull Collection<Term> subterms) {
-        return compound(op, DTERNAL, subterms);
+    public static Term the(@NotNull Op op, @NotNull Collection<Term> subterms) {
+        return the(op, DTERNAL, subterms);
     }
 //    @Nullable
 //    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
 //        return terms.the(op, dt, subterms);
 //    }
     @Nullable
-    public static Term compound(@NotNull Op op, int dt, @NotNull Collection<Term> subterms) {
-        return compound(op, dt, subterms.toArray(new Term[subterms.size()]));
+    public static Term the(@NotNull Op op, int dt, @NotNull Collection<Term> subterms) {
+        return the(op, dt, subterms.toArray(new Term[subterms.size()]));
     }
 
 
@@ -779,7 +785,7 @@ public enum $ {
     @Nullable
     public static Term imageMask(int relation, boolean ext, @NotNull Term[] elements) {
         Term[] elementsMasked = ArrayUtils.remove(elements, relation);
-        return compound(ext ? IMGe : IMGi, relation, elementsMasked);
+        return the(ext ? IMGe : IMGi, relation, elementsMasked);
     }
 
     @Nullable
@@ -865,7 +871,7 @@ public enum $ {
 
     /** conjunction sequence (2-ary) */
     @Nullable public static Compound seq(Term x, int dt, Term y) {
-        return compoundOrNull(compound(CONJ, dt, x, y)); //must be a vector, not set
+        return compoundOrNull(the(CONJ, dt, x, y)); //must be a vector, not set
     }
 
 

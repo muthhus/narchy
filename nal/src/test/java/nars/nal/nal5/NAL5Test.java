@@ -256,7 +256,7 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void compound_composition_one_premises(){
+    public void compound_composition_one_premises() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<robin --> [flying]>"); //.en("Robin can fly.");
         tester.ask("(||,<robin --> [flying]>,<robin --> swimmer>)"); //.en("Can robin fly or swim?");
@@ -304,7 +304,7 @@ public class NAL5Test extends AbstractNALTest {
 
     @Ignore
     @Test
-    public void negation2(){
+    public void negation2() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<robin --> [flying]>",0.9f,0.9f); //.en("Robin can fly.");
         tester.ask("(--,<robin --> [flying]>)"); //.en("Can robin fly or not?");
@@ -314,7 +314,7 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void contraposition1(){
+    public void contraposition1() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
 
         /*
@@ -412,7 +412,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<R --> [f]>,<R --> [w]>) ==> <R --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<R --> [f]>,<R --> b>) ==> <R --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",1.00f,0.35f);
+        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",1.00f,0.36f);
         tester.mustBelieve(cycles*2,"<<R --> [w]> ==> <R --> b>>",0.90f,0.45f);
     }
 

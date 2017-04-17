@@ -52,7 +52,7 @@ public class DeductiveChainTest  {
         for (Compound belief : beliefs) {
             n.nar.believe(belief);
         }
-        n.nar.ask( q );
+        n.nar.question( q );
 
         n.mustBelieve(timeLimit, q.toString(), 1f, 1f, 0.01f, 1f);
 

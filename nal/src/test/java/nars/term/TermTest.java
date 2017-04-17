@@ -48,13 +48,13 @@ public class TermTest {
 
 
     @Nullable
-    public static Term imageInt(Term... x) {
-        return $.compound(IMGi, x);
+    public static Compound imageInt(Term... x) {
+        return (Compound) $.the(IMGi, x);
     }
 
     @Nullable
-    public static Term imageExt(Term... x) {
-        return $.compound(IMGe, x);
+    public static Compound imageExt(Term... x) {
+        return (Compound) $.the(IMGe, x);
     }
 
 
@@ -645,7 +645,7 @@ public class TermTest {
             assertNotNull(x);
 
             Terminal t = new Terminal(8);
-            t.believe(x);
+            t.believe((Compound)x);
 
             assertTrue(x + " should not have been allowed as a task content", false);
 

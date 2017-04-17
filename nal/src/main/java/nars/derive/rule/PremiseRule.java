@@ -166,35 +166,6 @@ public class PremiseRule extends GenericCompound {
 //        return true;
 //    }
 
-    protected final void ensureValid() {
-
-//        if (getConclusionTermPattern().containsTemporal()) {
-//            if ((!getTaskTermPattern().containsTemporal())
-//                    &&
-//                    (!getBeliefTermPattern().containsTemporal())) {
-//                //if conclusion is temporal term but the premise has none:
-//
-//                String s = toString();
-//                if ((!s.contains("after")) && (!s.contains("concurrent") && (!s.contains("measure")))) {
-//                    //System.err.println
-//                  throw new RuntimeException
-//                            ("Possibly invalid temporal rule from atemporal premise: " + this);
-//
-//                }
-//            }
-//        }
-//
-
-        if (POST.length == 0)
-            throw new RuntimeException(this + " has no postconditions");
-//        if (!getTask().hasVarPattern())
-//            throw new RuntimeException("rule's task term pattern has no pattern variable");
-//        if (!getBelief().hasVarPattern())
-//            throw new RuntimeException("rule's task belief pattern has no pattern variable");
-//        if (!getConclusionTermPattern().hasVarPattern())
-//            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
-    }
-
 
     /**
      * compiles the conditions which are necessary to activate this rule
@@ -330,7 +301,7 @@ public class PremiseRule extends GenericCompound {
 
         //if (b == events.after) return events.class;
         if (b == events.afterOrEternal) return events.class;
-        if (b == events.beforeAfterOrEternal) return events.class;
+        if (b == events.eventsOrEternals) return events.class;
         //if (b == events.nonEternal) return events.class;
         if (b == events.beliefDTSimultaneous) return events.class;
 
@@ -729,10 +700,7 @@ public class PremiseRule extends GenericCompound {
 //                            timeFunction = TimeFunctions.occForwardMerge;
 //                            pres.add(events.nonEternal);
 //                            break;
-                        case "conjoinEternal":
-                            timeFunction = TimeFunctions.occForwardMerge;
-                            //pres.add(events.afterOrEternal);
-                            break;
+
 
 //                        case "dtAfter":
 //                            timeFunction = TimeFunctions.occForward;
@@ -759,7 +727,7 @@ public class PremiseRule extends GenericCompound {
 
                         case "dtCombine":
                             timeFunction = TimeFunctions.dtCombine;
-                            pres.add(events.beforeAfterOrEternal);
+                            pres.add(events.eventsOrEternals);
                             break;
                         case "dtCombinePre":
                             timeFunction = TimeFunctions.dtCombinePre;
@@ -768,14 +736,22 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = TimeFunctions.dtCombinePost;
                             break;
 
-                        //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
-                        case "dtAfterOrEternal":
+                        case "dtEvents":
                             timeFunction = TimeFunctions.occForward;
-                            pres.add(events.beforeAfterOrEternal);
+                            pres.add(events.bothEvents);
                             break;
-                        case "dtAfterOrEternalReverse":
+                        case "dtEventsReverse":
                             timeFunction = TimeFunctions.occReverse;
-                            pres.add(events.beforeAfterOrEternal);
+                            pres.add(events.bothEvents);
+                            break;
+                        //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
+                        case "dtEventsOrEternals":
+                            timeFunction = TimeFunctions.occForward;
+                            pres.add(events.eventsOrEternals);
+                            break;
+                        case "dtEventsOrEternalsReverse":
+                            timeFunction = TimeFunctions.occReverse;
+                            pres.add(events.eventsOrEternals);
                             break;
 
                         case "dtTminB":
@@ -906,19 +882,12 @@ public class PremiseRule extends GenericCompound {
                     throw new RuntimeException("unhandled postcondition: " + predicateNameStr + " in " + this);
 
             }
-
-
         }
-
 
         this.match = new MatchTaskBelief(
                 getTask(), getBelief(), //HACK
                 index,
                 constraints);
-
-
-
-
 
         List<PostCondition> postConditions = newArrayList();
 
@@ -926,7 +895,6 @@ public class PremiseRule extends GenericCompound {
             Term t = postcons[i++];
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
-
 
             Term[] modifiers = ((Compound) postcons[i++]).terms();
 
@@ -936,7 +904,7 @@ public class PremiseRule extends GenericCompound {
         if (taskPunc == 0) {
             //default: add explicit no-questions rule
             // TODO restrict this further somehow
-            pres.add(TaskPunctuation.NotQuestion);
+            //pres.add(TaskPunctuation.NotQuestion);
         } else if (taskPunc == ' ') {
             //any task type
             taskPunc = 0;
@@ -964,7 +932,31 @@ public class PremiseRule extends GenericCompound {
                 ));
 
 
-        ensureValid();
+        //        if (getConclusionTermPattern().containsTemporal()) {
+//            if ((!getTaskTermPattern().containsTemporal())
+//                    &&
+//                    (!getBeliefTermPattern().containsTemporal())) {
+//                //if conclusion is temporal term but the premise has none:
+//
+//                String s = toString();
+//                if ((!s.contains("after")) && (!s.contains("concurrent") && (!s.contains("measure")))) {
+//                    //System.err.println
+//                  throw new RuntimeException
+//                            ("Possibly invalid temporal rule from atemporal premise: " + this);
+//
+//                }
+//            }
+//        }
+//
+
+        if (POST.length == 0)
+            throw new RuntimeException(this + " has no postconditions");
+//        if (!getTask().hasVarPattern())
+//            throw new RuntimeException("rule's task term pattern has no pattern variable");
+//        if (!getBelief().hasVarPattern())
+//            throw new RuntimeException("rule's task belief pattern has no pattern variable");
+//        if (!getConclusionTermPattern().hasVarPattern())
+//            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
 
         return this;
     }

@@ -509,8 +509,8 @@ public abstract class TermIndex extends TermBuilder {
         return Narsese.the().term(termToParse, this, false);
     }
 
-    @Nullable
-    public <T extends Termed> T parse(@NotNull String termToParse) throws Narsese.NarseseException {
+    @NotNull
+    public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) (Narsese.the().term(termToParse, this, true));
     }
 

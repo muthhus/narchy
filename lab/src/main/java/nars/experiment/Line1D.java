@@ -9,6 +9,7 @@ import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.task.DerivedTask;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.test.agent.Line1DSimplest;
 import nars.truth.Truth;
@@ -222,7 +223,7 @@ public class Line1D {
                     @Nullable Truth uu = a.commitSum();
                     float c = uu.conf();
                     if (uu!=null && c > confMin) {
-                        Task x = n.goal(n.priorityDefault(GOAL), tt, now + dur / 2, uu.freq(), c);
+                        Task x = n.goal(n.priorityDefault(GOAL), (Compound)tt, now + dur / 2, uu.freq(), c);
                         System.out.println("\t" + x);
                     }
                 });

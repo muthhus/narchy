@@ -6,6 +6,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.learn.MLP;
 import nars.*;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
@@ -132,7 +133,7 @@ public class Recog2D extends NAgentX {
 
     public Surface conceptTraining(Outputs tv, NAR nar) {
 
-        LinkedHashMap<Concept, Outputs.Neuron> out = tv.out;
+        LinkedHashMap<CompoundConcept, Outputs.Neuron> out = tv.out;
 
         Plot2D p;
 
@@ -373,7 +374,8 @@ public class Recog2D extends NAgentX {
                     float c = nar.confDefault(BELIEF) * (1f - errSum);
                     if (c > 0) {
                         nar.believe(
-                                outs.outVector[j], Tense.Present, y, c);
+                                outs.outVector[j].term(),
+                                Tense.Present, y, c);
                     }
 
                 }

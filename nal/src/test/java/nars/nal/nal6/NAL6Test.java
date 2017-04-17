@@ -498,7 +498,7 @@ public class NAL6Test extends AbstractNALTest {
     }
 
 
-    @Test public void recursionSmall2()  {
+    @Test public void recursionSmall2() throws nars.Narsese.NarseseException {
 
         test()
         .believe("<0 --> n>", 1.0f, 0.9f)
@@ -511,7 +511,7 @@ public class NAL6Test extends AbstractNALTest {
     }
 
     @Test
-    public void recursionSmall()  {
+    public void recursionSmall() throws nars.Narsese.NarseseException {
 
         //<patham9> this is the only rule which is needed in this example
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
@@ -529,7 +529,7 @@ public class NAL6Test extends AbstractNALTest {
         ;
     }
     @Test
-    public void recursionSmall1()  {
+    public void recursionSmall1() throws nars.Narsese.NarseseException {
 
         //<patham9> this is the only rule which is needed in this example
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))

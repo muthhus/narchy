@@ -9,6 +9,7 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import java.util.List;
 
 import static java.lang.System.out;
+import static nars.Op.QUESTION;
 
 /**
  * https://github.com/encog/encog-java-examples/blob/master/src/main/java/org/encog/examples/neural/predict/sunspot/PredictSunspotElman.java
@@ -178,7 +179,7 @@ public class Predict_NARS_Core {
             }*/
 
             //n.ask(n.term("(?X)"), '?', n.time() + thinkInterval);
-            n.ask(n.term("(?X)"), '?', n.time() + thinkInterval / 2);
+            n.que(n.term("(?X)"), QUESTION, n.time() + thinkInterval / 2);
             //n.ask(n.term("(?X)"), '?', n.time() + thinkInterval / 4);
 
         }

@@ -41,7 +41,7 @@ public class DeductiveMeshTest {
         if (dims.length!=2)
             throw new UnsupportedOperationException("2-D only implemented");
 
-        Set<Term> edges = new HashSet();
+        Set<Compound> edges = new HashSet();
 
         coords = $.newArrayList();
         for (int x = 0; x < dims[0]; x++) {
@@ -63,7 +63,7 @@ public class DeductiveMeshTest {
 
         edges.forEach(n.nar::believe);
 
-        Compound term = q = (Compound) link(0, 0, dims[0] - 1, dims[1] - 1);
+        Compound term = q = link(0, 0, dims[0] - 1, dims[1] - 1);
         ask(n, term);
 
         if (timeLimit>0)
@@ -78,7 +78,7 @@ public class DeductiveMeshTest {
     }
 
     @Nullable
-    private Term link(int x1, int y1, int x2, int y2) {
+    private Compound link(int x1, int y1, int x2, int y2) {
         //return $.prop($.p(a, b), $.the("X"));
         return $.sim( $.p($.the(x1), $.the(y1)), $.p($.the(x2), $.the(y2)) );
     }

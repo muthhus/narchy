@@ -2,6 +2,7 @@ package nars.experiment.recog2d;
 
 import nars.NAR;
 import nars.NAgent;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -86,8 +87,8 @@ public class Outputs {
     }
 
 
-    final LinkedHashMap<Concept,Neuron> out;
-    Concept[] outVector;
+    final LinkedHashMap<CompoundConcept,Neuron> out;
+    CompoundConcept[] outVector;
 
     final int states;
 
@@ -136,7 +137,7 @@ public class Outputs {
 //                            //.timing(0, 1) //synchronous feed
 
         ).peek(c -> out.put(c, new Neuron()))
-                .toArray(Concept[]::new);
+                .toArray(CompoundConcept[]::new);
 
 
 

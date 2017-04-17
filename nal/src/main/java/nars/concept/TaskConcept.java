@@ -6,6 +6,7 @@ import nars.Task;
 import nars.attention.Activation;
 import jcog.pri.PriMerge;
 import nars.conceptualize.state.ConceptState;
+import nars.control.ConceptBagFocus;
 import nars.table.*;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -266,11 +267,17 @@ public class TaskConcept extends CompoundConcept {
         if (inserted == null)
             return null;
 
-        Activation a = nar.activateTask(inserted, this, 1);
+        //HACK
+        float activation =
+                (nar.focus() instanceof ConceptBagFocus) ? ((ConceptBagFocus) (nar.focus())).activationRate.floatValue() : 1
+                //1
+        ;
+        Activation a = nar.activateTask(inserted, this, activation);
         if (input != inserted) {
             return null; //dont process further aside from this re-activation
+        } else {
+            return a;
         }
-        return a;
 
     }
 

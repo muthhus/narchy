@@ -61,7 +61,7 @@ public abstract class AbstractNALTest {
     }
     @After
     public void end() {
-        tester.test();
+        tester.run();
     }
 
     @NotNull

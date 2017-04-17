@@ -28,7 +28,7 @@ public class bAblTests extends AbstractNALTest {
     }
 
     @Ignore @Test
-    public void test1() {
+    public void test1() throws nars.Narsese.NarseseException {
 
         test()
                 .believe("in({john},{playground})") //john is in the playground.
@@ -64,13 +64,13 @@ public class bAblTests extends AbstractNALTest {
                 .inputAt(0, "pick(john,football).") ////John picked up the football.
                 .inputAt(0, "isIn(bob,kitchen).") ////Bob went to the kitchen.
                 .inputAt(0, "isIn(football,?where)?") ////Where is the football?
-                .mustBelieve(2000, "isIn(football,playground)",
+                .mustBelieve(4000, "isIn(football,playground)",
                         1f, 0.73f, ETERNAL); ////A: playground
 
     }
 
     /** TODO find a better problem representation, this one isnt good */
-    @Ignore @Test public void test19() {
+    @Ignore @Test public void test19() throws nars.Narsese.NarseseException {
 
         //(19) Path Finding
         TestNAR t = test();

@@ -53,7 +53,7 @@ public class FunctorTest {
     }
 
     /** tests correct TRUE fall-through behavior, also backward question triggered execution */
-    @Test public void testFunctor1() {
+    @Test public void testFunctor1() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
         TestNAR t = new TestNAR(new Default());
@@ -67,7 +67,7 @@ public class FunctorTest {
     }
 
     @Test
-    public void testFunctor2() {
+    public void testFunctor2() throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
         int TIME = 2048;

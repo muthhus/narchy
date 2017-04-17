@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.bag.Bag;
+import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.Focus;
@@ -19,10 +20,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ConceptBagFocus implements Focus {
 
-    /**
-     * distinct from the NAR's
-     */
-    protected float currentActivationRate = 1f;
+    public final FloatParam activationRate = new FloatParam(1f);
 
     /**
      * concepts active in this cycle
@@ -41,27 +39,12 @@ public class ConceptBagFocus implements Focus {
         this.active = conceptBag;
     }
 
-    public void setActivationRate(float currentActivationRate) {
-        this.currentActivationRate = currentActivationRate;
-    }
-
-    //    /** called when a concept is displaced from the concept bag */
-//    protected void sleep(@NotNull Concept c) {
-//        NAR n = this.nar;
-//
-//        n.setState(c, conceptBuilder.sleep());
-//
-//        n.emotion.alert(1f / active.size());
-//    }
-
 
 
     @Override
     public void activate(/*Concept*/ Concept concept, float priToAdd) {
-        if (priToAdd >= Param.BUDGET_EPSILON)
-            active.put(new RawPLink(concept, priToAdd), currentActivationRate, null);
+        active.put(new RawPLink(concept, priToAdd));
     }
-
 
     @Override
     public float pri(@NotNull Termed concept) {
@@ -72,6 +55,7 @@ public class ConceptBagFocus implements Focus {
 
     @Override
     public Iterable<PLink<Concept>> concepts() {
+        active.commit();
         return active;
     }
 

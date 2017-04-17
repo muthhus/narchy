@@ -57,7 +57,7 @@ public class UnificationTest {
 
                 //special handling
                 final PatternTermIndex pi = new PatternTermIndex();
-                t1 = pi.get(pi.parse(s1), true).term();
+                t1 = pi.get(pi.term(s1), true).term();
 
             } else {
                 nar.ask(s1);

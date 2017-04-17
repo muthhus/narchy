@@ -237,10 +237,13 @@ public class Derivation extends Unify {
 
 
     private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
-        if (!task.isEternal() || task.dt() != DTERNAL)
+        if (!task.isEternal() || (task.op().temporal && task.dt() != DTERNAL))
             return true;
 
-        return belief != null && (!belief.isEternal() || belief.dt() != DTERNAL);
+        return (belief != null) &&
+                        (!belief.isEternal()
+                            ||
+                        (belief.op().temporal && (belief.dt() != DTERNAL)));
     }
 
 

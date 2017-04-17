@@ -224,6 +224,24 @@ public class QuestionTest {
 
     }
 
+    @Test
+    public void testDeriveQuestionOrdinary() throws Narsese.NarseseException, Narsese.NarseseException {
+        new TestNAR(new Default())
+                //.log()
+                .ask("((S | P) --> M)")
+                .believe("(S --> M)")
+                .mustQuestion(512, "(P --> M)").run();
+    }
+    @Test
+    public void testDeriveQuestOrdinary() throws Narsese.NarseseException {
+        new TestNAR(new Default(1024, 2, 3))
+                .log()
+                .quest("((S | P) --> M)")
+                .believe("(S --> M)")
+                .mustQuest(256, "(P --> M)").run();
+    }
+
+
 //    @Test public void testSaneBudgeting() {
 //        Param.DEBUG = true;
 //        String c = "((parent($X,$Y) && parent($Y,$Z)) ==> grandparent($X,$Z))";

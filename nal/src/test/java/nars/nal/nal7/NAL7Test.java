@@ -22,7 +22,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 520;
+    final int cycles = 2520;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -1058,6 +1058,7 @@ public class NAL7Test extends AbstractNALTest {
         // b +10 x
         //   -> b +30 e
         test()
+            .log()
             .believe("((b-->x) ==>+10 (c-->x))")
             .believe("((e-->x) ==>-20 (c-->x))")
             .mustBelieve(cycles, "(x:e ==>-30 x:b)", 1f, 0.45f)

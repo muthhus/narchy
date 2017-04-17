@@ -105,7 +105,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void inheritanceToSimilarity3()  {
+    public void inheritanceToSimilarity3() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<swan --> bird>",0.9f,0.9f);//Swan is a type of bird.");
         tester.ask("<bird <-> swan>");//Is bird similar to swan?");
@@ -114,7 +114,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void inheritanceToSimilarity4()  {
+    public void inheritanceToSimilarity4() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bird <-> swan>",0.9f,0.9f);//a bird is similar to a swan.");
         tester.ask("<swan --> bird>");//Is swan a type of bird?");
@@ -185,7 +185,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation()  {
+    public void structureTransformation() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<Birdie <-> Tweety>", 0.9f, 0.9f);//Birdie is similar to Tweety.");
         tester.ask("<{Birdie} <-> {Tweety}>");//Is Birdie similar to Tweety?");
@@ -194,7 +194,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation2()  {
+    public void structureTransformation2() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
         tester.believe("<bright <-> smart>", 0.9f, 0.9f);//Bright is similar to smart.");
         tester.ask("<[bright] --> [smart]>");//Is bright thing a type of smart thing?");
@@ -203,7 +203,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void structureTransformation3()  {
+    public void structureTransformation3() throws nars.Narsese.NarseseException {
         /*
         <bright <-> smart>. %0.9;0.9%
         <{bright} --> {smart}>?
@@ -216,7 +216,7 @@ public class NAL2Test extends AbstractNALTest {
     }
 
     @Test
-    public void backwardInference()  {
+    public void backwardInference() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
 
         tester.log();

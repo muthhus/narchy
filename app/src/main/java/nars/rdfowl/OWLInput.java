@@ -2,6 +2,7 @@ package nars.rdfowl;
 
 import nars.$;
 import nars.NAR;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 
@@ -396,7 +397,7 @@ public class OWLInput  {
 
     public static final Atomic owlClass = $.the("class");
 
-    public static Term isAClass(Term clas) {
+    public static Compound isAClass(Term clas) {
         return $.inst(clas, owlClass);
     }
 

@@ -188,13 +188,27 @@ abstract public class events extends AtomicPredicate<Derivation> {
 
 
 
-
     @Nullable
-    public static final events beforeAfterOrEternal = new events() {
+    public static final events bothEvents = new events() {
 
         @Override
         public String toString() {
-            return "beforeAfterOrEternal";
+            return "bothEvents";
+        }
+
+        @Override
+        public boolean test(@NotNull Derivation m) {
+            Task b = m.belief;
+            return b != null && !b.isEternal() && !m.task.isEternal();
+        }
+    };
+
+    @Nullable
+    public static final events eventsOrEternals = new events() {
+
+        @Override
+        public String toString() {
+            return "eventsOrEternals";
         }
 
         @Override
@@ -202,11 +216,7 @@ abstract public class events extends AtomicPredicate<Derivation> {
             Task b = m.belief;
             if (b==null)
                 return false;
-            if (m.task.isEternal() && m.belief.isEternal()) {
-                return m.task.term().compareTo(b.term()) < 0; //lexical filter
-            } else {
-                return true;
-            }
+            return m.task.isEternal() == b.isEternal();
         }
     };
 

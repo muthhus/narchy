@@ -45,12 +45,12 @@ public class NAL4MultistepTest extends AbstractNALTest {
         //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
         tester.mustBelieve(time, "likes(cat,[blue])",
                 1f,
-                0.4F);
+                0.36F);
 
     }
 
     @Test
-    public void nal4_everyday_reasoning_easiest() throws Narsese.NarseseException {
+    public void nal4_everyday_reasoning_easiest() throws Narsese.NarseseException, Narsese.NarseseException {
         int time = 150;
 
         //Global.DEBUG = true;
@@ -72,7 +72,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
     }
 
     @Test @Ignore
-    public void nal4_everyday_reasoning_easier() throws Narsese.NarseseException {
+    public void nal4_everyday_reasoning_easier() throws Narsese.NarseseException, Narsese.NarseseException {
         int time = 2550;
 
         //Global.DEBUG = true;

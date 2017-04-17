@@ -172,7 +172,7 @@ public class Revision {
                         x[i] = intermpolate(ca.term(i), cb.term(i), aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
                     }
 
-                    return $.compound(
+                    return $.the(
                             ca.op(), /* although parallel could be maintained if this happens by choosing dt between a and b */
                             ca.dt(), //incase 'a' is an image
                             x
@@ -216,7 +216,7 @@ public class Revision {
         }
 
 
-        return $.compound(a.op(), dt,
+        return $.the(a.op(), dt,
                 intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
                 intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
 

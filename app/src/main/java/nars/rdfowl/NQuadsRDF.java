@@ -420,9 +420,8 @@ public abstract class NQuadsRDF {
             //disjoint classes have no common instances:
             // (--, (&&, {#x} --> subject, {#x} --> object ) ).
             Term x = varDep(1);
-            belief = neg(conj(inh(x, subject), inh(x,object)));
-        }
-        else {
+            belief = neg(conj(new Term[] { inh(x, subject), inh(x,object) } ));
+        } else {
             if (subject!=null && object!=null && predicate!=null) {
                 belief =
                     //inst

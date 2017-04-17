@@ -16,8 +16,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
+import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -485,6 +484,20 @@ public class TestNAR {
     }
 
     @NotNull
+    public TestNAR mustQuestion(long withinCycles, @NotNull String qt) {
+        return mustOutput(withinCycles, qt, QUESTION);
+    }
+
+    @NotNull
+    public TestNAR mustQuest(long withinCycles, @NotNull String qt) {
+        return mustOutput(withinCycles, qt, QUEST);
+    }
+
+    private TestNAR mustOutput(long withinCycles, @NotNull String qt, byte question) {
+        return mustOutput(withinCycles, qt, question, Float.NaN, Float.NaN);
+    }
+
+    @NotNull
     public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
@@ -508,17 +521,12 @@ public class TestNAR {
 //        return this;
 //    }
 
-    @NotNull
-    public TestNAR ask(@NotNull String termString) {
-        //Override believe to input beliefs that have occurrenceTime set on input
-        // "lazy timing" appropriate for test cases that can have delays
-        try {
-            nar.ask(termString);
-        } catch (Narsese.NarseseException e) {
-            throw new RuntimeException(e);
-        }
-
-        //explainable(t);
+    public TestNAR ask(@NotNull String termString) throws Narsese.NarseseException {
+        nar.ask(termString);
+        return this;
+    }
+    public TestNAR quest(@NotNull String termString) throws Narsese.NarseseException {
+        nar.quest($.$(termString));
         return this;
     }
 
@@ -589,7 +597,7 @@ public class TestNAR {
 //    }
 
     @NotNull
-    public TestNAR test() {
+    public TestNAR run() {
         return run(true);
     }
 

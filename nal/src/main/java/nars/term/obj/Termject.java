@@ -291,11 +291,11 @@ public interface Termject<X> extends Term {
         //n.believe($.sim(new IntTerm(4), $.the("x")), 1f, 0.9f);
         n.believe($.sim(new IntInterval(0, 5), $.the("small")), 1f, 0.9f);
         n.believe($.sim(new IntInterval(5, 10), $.the("large")), 1f, 0.9f);
-        n.ask($.inh($.varDep(1), $.the("large")));
-        n.ask($.inh($.varDep(1), $.the("small")));
-        n.ask($.inh(new IntTerm(1), $.the("small")));
-        n.ask($.inh(new IntTerm(1), $.the("large")));
-        n.ask($.sim(new IntInterval(0, 15), $.the("x")));
+        n.question($.inh($.varDep(1), $.the("large")));
+        n.question($.inh($.varDep(1), $.the("small")));
+        n.question($.inh(new IntTerm(1), $.the("small")));
+        n.question($.inh(new IntTerm(1), $.the("large")));
+        n.question($.sim(new IntInterval(0, 15), $.the("x")));
         n.run(1000);
     }
 }

@@ -30,7 +30,6 @@ import java.util.function.Consumer;
 /** controls an active focus of concepts */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
-    public final FloatParam activationRate = new FloatParam(1f);
 
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
@@ -236,11 +235,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     public void run() {
         ConceptBagFocus f = (ConceptBagFocus) this.source;
 
-        f.setActivationRate( activationRate.floatValue() );
-
         //while clear is enabled, keep active clear
         if (clear.get()) {
             f.active.clear();
+            clear.set(false);
         } else {
             f.active.commit();
         }
