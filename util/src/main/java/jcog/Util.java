@@ -1419,12 +1419,14 @@ public enum Util { ;
 
     }
 
-    public static void sleep(long periodMS) {
+    public static boolean sleep(long periodMS) {
         try {
             Thread.sleep(periodMS);
+            return true;
         } catch (InterruptedException e) {
             //TODO
-            e.printStackTrace();
+            //e.printStackTrace();
+            return false;
         }
     }
 

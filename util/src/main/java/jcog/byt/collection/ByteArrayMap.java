@@ -20,6 +20,7 @@ package jcog.byt.collection;
 import jcog.byt.RawByteSeq;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Anton Nashatyrev on 06.10.2016.
@@ -28,7 +29,7 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
     private final Map<RawByteSeq, V> delegate;
 
     public ByteArrayMap() {
-        this(new HashMap<RawByteSeq, V>());
+        this(new ConcurrentHashMap<RawByteSeq, V>());
     }
 
     public ByteArrayMap(Map<RawByteSeq, V> delegate) {
