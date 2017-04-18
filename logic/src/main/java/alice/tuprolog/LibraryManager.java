@@ -66,7 +66,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized Library loadLibrary(String className)
+	public synchronized Library load(String className)
 			throws InvalidLibraryException
 	{
 		Library lib = null;
@@ -110,7 +110,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized Library loadLibrary(String className, String[] paths)
+	public synchronized Library load(String className, String[] paths)
 			throws InvalidLibraryException
 	{
 		Library lib = null;
@@ -270,7 +270,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized void loadLibrary(Library lib)
+	public synchronized void load(Library lib)
 			throws InvalidLibraryException
 	{
 		String name = lib.getName();

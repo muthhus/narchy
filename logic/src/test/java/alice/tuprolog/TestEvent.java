@@ -18,7 +18,7 @@ class MyListener extends PrologEventAdapter {
     }
     
     @Override
-    public void newQueryResultAvailable(QueryEvent ev){
+    public void accept(QueryEvent ev){
         System.out.println("NEW QUERY RESULT AVAILABLE: \nquery\n "+
                 ev.getSolveInfo().getQuery().toString()+"\nresult\n"+
                 ev.getSolveInfo());
@@ -52,9 +52,9 @@ public class TestEvent {
         engine.addQueryListener(l);
         engine.addLibraryListener(l);
 
-        engine.loadLibrary("alice.tuprolog.lib.BasicLibrary");
-        engine.loadLibrary("alice.tuprolog.lib.OOLibrary");
-        engine.loadLibrary("alice.tuprolog.lib.IOLibrary");
+        engine.addLibrary("alice.tuprolog.lib.BasicLibrary");
+        engine.addLibrary("alice.tuprolog.lib.OOLibrary");
+        engine.addLibrary("alice.tuprolog.lib.IOLibrary");
         
         Theory th = new Theory(
                 	"a(1).\n"+
@@ -68,7 +68,7 @@ public class TestEvent {
             sinfo = engine.solveNext();
         }
         
-        engine.unloadLibrary("alice.tuprolog.lib.IOLibrary");
+        engine.removeLibrary("alice.tuprolog.lib.IOLibrary");
         
         th = new Theory(
             	"a(3).\n"+

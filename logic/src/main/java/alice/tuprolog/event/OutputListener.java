@@ -26,6 +26,6 @@ import java.util.EventListener;
  *
  *
  */
-public interface OutputListener extends EventListener {
+@FunctionalInterface public interface OutputListener extends EventListener {
     void onOutput(OutputEvent e);
 }

@@ -18,6 +18,7 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+import jcog.list.FasterList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,9 +54,13 @@ public class StateRuleSelection extends State {
             /* from normal evaluation */
             fromBacktracking = false;
             //List varsList = new LinkedList();
-            List<Var> varsList = new ArrayList<>();
+
+            List<Var> varsList = new FasterList<>();
             e.currentContext.trailingVars = new OneWayList<>(varsList, e.currentContext.trailingVars);
-            clauseStore = ClauseStore.build(goal, varsList, c.find(goal));
+
+            List<ClauseInfo> g = c.find(goal);
+            clauseStore = g!=null ? ClauseStore.build(goal, varsList, g) : null;
+
             if (clauseStore == null){
                 e.nextState = c.BACKTRACK;
                 return;

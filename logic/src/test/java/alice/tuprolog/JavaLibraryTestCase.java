@@ -28,7 +28,7 @@ public class JavaLibraryTestCase extends TestCase {
 	}
 
 	public void testAnonymousObjectRegistration() throws InvalidTheoryException, InvalidObjectIdException {	
-		OOLibrary lib = (OOLibrary) engine.getLibrary("alice.tuprolog.lib.OOLibrary");
+		OOLibrary lib = (OOLibrary) engine.library("alice.tuprolog.lib.OOLibrary");
 		String theory = "demo(X) :- X <- update. \n";
 		engine.setTheory(new Theory(theory));
 		TestCounter counter = new TestCounter();
@@ -44,7 +44,7 @@ public class JavaLibraryTestCase extends TestCase {
 
 	public void testDynamicObjectsRetrival() throws PrologException {
 		Prolog engine = new Prolog();
-		OOLibrary lib = (OOLibrary) engine.getLibrary("alice.tuprolog.lib.OOLibrary");
+		OOLibrary lib = (OOLibrary) engine.library("alice.tuprolog.lib.OOLibrary");
 		String theory = "demo(C) :- \n" +
 				"java_object('alice.tuprolog.TestCounter', [], C), \n" +
 				"C <- update, \n" +
@@ -277,7 +277,7 @@ public class JavaLibraryTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Res).");
 		assertEquals(true, info.isSuccess());
-		OOLibrary lib = (OOLibrary) engine.getLibrary("alice.tuprolog.lib.OOLibrary");
+		OOLibrary lib = (OOLibrary) engine.library("alice.tuprolog.lib.OOLibrary");
 		Struct id = (Struct) info.getTerm("Res");
 		Object obj = lib.getRegisteredObject(id);
 		assertNull(obj);

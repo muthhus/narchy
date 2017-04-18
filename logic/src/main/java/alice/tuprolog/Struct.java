@@ -181,7 +181,7 @@ public class Struct extends Term {
     private Struct(String name_,int arity_) {
         if (name_ == null)
             throw new InvalidTermException("The functor of a Struct cannot be null");
-        if (name_.length() == 0 && arity_ > 0)
+        if (name_.isEmpty() && arity_ > 0)
             throw new InvalidTermException("The functor of a non-atom Struct cannot be an empty string");
         name = name_;
         arity = arity_;
@@ -192,11 +192,7 @@ public class Struct extends Term {
         resolved = false;
     }
     
-    /** @deprecated Use Struct#getPredicateIndicator instead. */
-    String getHashKey() {
-        return getPredicateIndicator();
-    }
-    
+
     /**
 	 * @return
 	 */
@@ -726,6 +722,7 @@ public class Struct extends Term {
     public PrimitiveInfo getPrimitive() {
         return primitive;
     }
+
     
     /**
      * Check if this term is a primitive struct

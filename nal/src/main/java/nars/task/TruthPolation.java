@@ -13,6 +13,9 @@ import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
+ * see:
+ *  https://en.wikipedia.org/wiki/Category:Intertemporal_economics
+ *  https://en.wikipedia.org/wiki/Discounted_utility
  */
 public enum TruthPolation  {
     ;

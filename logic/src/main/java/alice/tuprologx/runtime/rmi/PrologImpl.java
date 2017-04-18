@@ -74,12 +74,12 @@ public class PrologImpl extends UnicastRemoteObject
 
     @Override
     public void loadLibrary(String className) throws InvalidLibraryException, RemoteException {
-        imp.loadLibrary(className);
+        imp.addLibrary(className);
     }
 
     @Override
     public void unloadLibrary(String className) throws InvalidLibraryException, RemoteException {
-        imp.unloadLibrary(className);
+        imp.removeLibrary(className);
     }
 
 }

@@ -216,7 +216,7 @@ public final class BuiltIn extends Library {
 				 throw PrologError.type_error(engineManager, 1, "atom", arg0);
 		 }
 		 try {
-			 libraryManager.loadLibrary(((Struct) arg0).name());
+			 libraryManager.load(((Struct) arg0).name());
 			 return true;
 		 } catch (Exception ex) {
 			 throw PrologError.existence_error(engineManager, 1, "class", arg0,
@@ -245,7 +245,7 @@ public final class BuiltIn extends Library {
 			 String[] paths = getStringArrayFromStruct((Struct) arg1);
 			 if(paths == null || paths.length == 0)
 				 throw PrologError.existence_error(engineManager, 2, "paths", arg1, new Struct("Invalid paths' list."));
-			 libraryManager.loadLibrary(((Struct) arg0).name(), paths);
+			 libraryManager.load(((Struct) arg0).name(), paths);
 			 return true;
 			
 		 } catch (Exception ex) {
@@ -601,7 +601,7 @@ public final class BuiltIn extends Library {
 	 public void $load_library_1(Term lib) throws InvalidLibraryException {
 		 lib = lib.getTerm();
 		 if (lib.isAtom())
-			 libraryManager.loadLibrary(((Struct) lib).name());
+			 libraryManager.load(((Struct) lib).name());
 	 }
 
 	 public void include_1(Term theory) throws

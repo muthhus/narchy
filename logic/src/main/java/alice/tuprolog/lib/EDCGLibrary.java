@@ -32,8 +32,6 @@ import alice.tuprolog.Var;
  */
 public class EDCGLibrary extends Library {
 	private static final long serialVersionUID = 1L;
-    public EDCGLibrary() {
-    }
 
     @Override
     public String getTheory() {

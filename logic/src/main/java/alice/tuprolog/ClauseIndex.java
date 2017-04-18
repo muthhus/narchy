@@ -1,5 +1,7 @@
 package alice.tuprolog;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 
@@ -9,7 +11,7 @@ public interface ClauseIndex extends  /*Map<String,FamilyClausesList>,*/ Iterabl
     FamilyClausesList remove(String key);
 
     void add(String key, ClauseInfo d, boolean first);
-    List<ClauseInfo> getPredicates(Term headt);
+    @Nullable List<ClauseInfo> getPredicates(Struct headt);
 
     void clear();
 }

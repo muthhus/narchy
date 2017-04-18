@@ -1,7 +1,10 @@
 package alice.tuprolog;
 
 
+import jcog.list.FasterList;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * <code>FamilyClausesList</code> is a common <code>LinkedList</code>
@@ -14,7 +17,9 @@ import java.util.*;
  * 
  * @see LinkedList
  */
-public class FamilyClausesList extends LinkedList<ClauseInfo> {
+public class FamilyClausesList extends
+		//ConcurrentLinkedDeque<ClauseInfo> {
+		FasterList<ClauseInfo> {
 	private static final long serialVersionUID = 1L;
 	private final FamilyClausesIndex<Number> numCompClausesIndex;
 	private final FamilyClausesIndex<String> constantCompClausesIndex;
@@ -22,6 +27,11 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	private final LinkedList<ClauseInfo> listCompClausesList;
 
 	//private LinkedList<ClauseInfo> clausesList;
+
+	public FamilyClausesList(Collection<ClauseInfo> copy) {
+		this();
+		copy.forEach(this::addLast);
+	}
 
 	public FamilyClausesList(){
 		super();
@@ -38,9 +48,10 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	 *
 	 * @param ci    The clause to be added (with related informations)
 	 */
-	@Override
+	//@Override
 	public void addFirst(ClauseInfo ci){
-		super.addFirst(ci);
+		//super.addFirst(ci);
+		super.add(0, ci);
 
 		// Add first in type related storage
 		register(ci, true);
@@ -51,20 +62,19 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	 *
 	 * @param ci    The clause to be added (with related informations)
 	 */
-	@Override
+	//@Override
 	public void addLast(ClauseInfo ci){
-		super.addLast(ci);
+		//super.addLast(ci);
+		super.add(ci);
 
 		// Add last in type related storage
 		register(ci, false);
 	}
 
 	@Override
-	public boolean add(ClauseInfo o) {
-		addLast(o);
-		return true;
+	public boolean add(ClauseInfo newItem) {
+		throw new UnsupportedOperationException();
 	}
-
 
 	public final boolean add(ClauseInfo o, boolean first) {
 		if (first)
@@ -98,40 +108,47 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
-	@Override
+	//@Override
 	public ClauseInfo removeFirst() {
-		ClauseInfo ci = getFirst();
-		if (remove(ci)){
-			return ci;
-		}
-
-		return null;
+		return remove(0);
+//		ClauseInfo ci = getFirst();
+//		if (remove(ci)){
+//			return ci;
+//		}
+//
+//		return null;
 	}
 
 	@Override
 	public ClauseInfo removeLast() {
-		ClauseInfo ci = getLast();
-		if (remove(ci)){
-			return ci;
-		}
+		int s = size();
+		if (s == 0)
+			return null;
+		else
+			return remove(s -1);
 
-		return null;
+//		ClauseInfo ci = getLast();
+//		if (remove(ci)){
+//			return ci;
+//		}
+//
+//		return null;
 	}
 
-	@Override
+
+	//@Override
 	public ClauseInfo remove(){
 		return removeFirst();
 	}
 
 	@Override
 	public ClauseInfo remove(int index){
-		ClauseInfo ci = super.get(index);
+		ClauseInfo ci = super.remove(index);
+		//ClauseInfo ci = super.get(index);
+		if (ci!=null)
+			unregister(ci);
 
-		if(remove(ci)){
-			return ci;
-		}
-
-		return null;
+		return ci;
 	}
 
 	@Override
@@ -147,9 +164,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 	@Override
 	public void clear(){
-		while(size() > 0){
-			removeFirst();
-		}
+		while (removeLast()!=null) { 		}
 	}
 
 	/**
@@ -246,7 +261,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	}
 
 	// Updates indexes, storing informations about the last added clause
-	private void register(ClauseInfo ci, boolean first){
+	void register(ClauseInfo ci, boolean first){
 		// See FamilyClausesList.get(Term): same concept
 		Term clause = ci.getHead();
 		if(clause instanceof Struct){
@@ -288,7 +303,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	}
 
 	// Updates indexes, deleting informations about the last removed clause
-	public void unregister(ClauseInfo ci) {
+	void unregister(ClauseInfo ci) {
 		Term clause = ci.getHead();
 		if(clause != null){
 			Struct g = (Struct) clause.getTerm();
@@ -323,7 +338,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 	private class ListItr implements ListIterator<ClauseInfo> {
 
 		private final ListIterator<ClauseInfo> it;
-		private final LinkedList<ClauseInfo> l;
+		private final List<ClauseInfo> l;
 		private int currentIndex;
 
 		public ListItr(FamilyClausesList list, int index){
@@ -370,7 +385,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 		@Override
 		public void remove() {
 			// Alessandro Montanari - alessandro.montanar5@studio.unibo.it
-			ClauseInfo ci = l.get(currentIndex);
+			ClauseInfo ci = l.get(currentIndex--);
 
 			it.remove();
 
@@ -385,8 +400,7 @@ public class FamilyClausesList extends LinkedList<ClauseInfo> {
 
 		@Override
 		public void add(ClauseInfo o) {
-			l.addLast(o);
-
+			l.add(o);
 		}
 
 //		public ListIterator<ClauseInfo> getIt(){

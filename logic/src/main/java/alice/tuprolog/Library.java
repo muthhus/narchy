@@ -139,14 +139,13 @@ public abstract class Library implements Serializable, IPrimitives {
             return null;
         Term val = term.getTerm();
         if (val instanceof Struct) {
-            Struct t = (Struct) val;
-            if (term != t)
-                if (!t.isPrimitive())
-                    engine.identifyFunctor(t);
-            if (t.isPrimitive()) {
+            final Struct t = (Struct) val;
+            boolean primitive = t.isPrimitive();
+            if (!primitive && term != t) {
+                engine.identifyFunctor(t);
+            } else if (primitive) {
                 PrimitiveInfo bt = t.getPrimitive();
-                // check for library functors
-                if (bt.isFunctor())
+                if (bt.isFunctor()) // check for library functors
                     return bt.evalAsFunctor(t);
             }
         } else if (val instanceof Number) {

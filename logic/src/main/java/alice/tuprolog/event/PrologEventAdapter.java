@@ -51,7 +51,7 @@ public abstract class PrologEventAdapter implements TheoryListener, QueryListene
      * @see alice.tuprolog.PrologEventListener#newQueryResultAvailable(alice.tuprolog.QueryEvent)
      */
     @Override
-    public void newQueryResultAvailable(QueryEvent e) {
+    public void accept(QueryEvent e) {
     }
 
 }

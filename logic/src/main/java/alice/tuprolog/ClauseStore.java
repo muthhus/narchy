@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ClauseStore {
 //     *
 //     * @param familyClauses
 //     */
-    public static ClauseStore build(Term goal, List<Var> vars, List<ClauseInfo> familyClauses) {
+    public static ClauseStore build(Term goal, List<Var> vars, @NotNull List<ClauseInfo> familyClauses) {
         ClauseStore clauseStore = new ClauseStore(goal, vars);
         clauseStore.clauses = OneWayList.transform2(familyClauses);
         if (clauseStore.clauses == null || !clauseStore.existCompatibleClause())

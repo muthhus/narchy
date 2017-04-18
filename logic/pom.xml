@@ -71,4 +71,18 @@
 
     </dependencies>
 
+    <build>
+        <!--<resources>-->
+
+        <!--</resources>-->
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.pl</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+    </build>
 </project>

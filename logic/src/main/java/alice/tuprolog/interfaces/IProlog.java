@@ -56,7 +56,7 @@ public interface IProlog {
 	 * @return the reference to the library loaded, null if the library is
 	 *         not found
 	 */
-	Library getLibrary(String name);
+	Library library(String name);
 	
 	/**
 	 * Loads a library.
@@ -68,7 +68,7 @@ public interface IProlog {
 	 * @return the reference to the Library just loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
-	Library loadLibrary(String className) throws Exception;
+	Library addLibrary(String className) throws Exception;
 	
 	/**
 	 * Unloads a previously loaded library
@@ -76,7 +76,7 @@ public interface IProlog {
 	 * @param name of the library to be unloaded
 	 * @throws InvalidLibraryException if name is not a valid loaded library
 	 */
-	void unloadLibrary(String name) throws Exception;
+	void removeLibrary(String name) throws Exception;
 	
 	/**
 	 * Solves a query

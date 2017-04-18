@@ -90,7 +90,7 @@ public class PrologImpl implements java.io.Serializable {
     public void loadLibrary(ObjectInputStream in,ObjectOutputStream out) throws Exception{
         try {
             String st=(String)in.readObject();
-            core.loadLibrary(st);
+            core.addLibrary(st);
             out.writeObject(Boolean.TRUE);
         } catch (InvalidLibraryException ex){
             out.writeObject(Boolean.FALSE);
@@ -100,7 +100,7 @@ public class PrologImpl implements java.io.Serializable {
     public void unloadLibrary(ObjectInputStream in,ObjectOutputStream out) throws Exception {
         try {
             String st=(String)in.readObject();
-            core.unloadLibrary(st);
+            core.removeLibrary(st);
             out.writeObject(Boolean.TRUE);
         } catch (InvalidLibraryException ex){
             out.writeObject(Boolean.FALSE);

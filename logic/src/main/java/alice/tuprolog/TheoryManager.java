@@ -18,6 +18,7 @@
 package alice.tuprolog;
 
 import alice.util.Tools;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -106,25 +107,16 @@ public class TheoryManager {
 		Struct clause = toClause(cl);
 		Struct struct = ((Struct) clause.term(0));
 		List<ClauseInfo> family = dynamicDBase.get(struct.getPredicateIndicator());
-		ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
+		final ExecutionContext ctx = engine.getEngineManager().getCurrentContext();
 		
 		/*creo un nuovo clause database x memorizzare la teoria all'atto della retract 
 		 * questo lo faccio solo al primo giro della stessa retract 
 		 * (e riconosco questo in base all'id del contesto)
 		 * sara' la retract da questo db a restituire il risultato
 		 */
-		FamilyClausesList familyQuery;
-	    if(!retractDBase.containsKey("ctxId "+ctx.getId())){
-	    	familyQuery=new FamilyClausesList();
-	    	for (int i = 0; i < family.size(); i++) {
-	 	       familyQuery.add(family.get(i));
-	 	    }
-	    	//familyQuery.addAll(family);
-	    	retractDBase.put("ctxId "+ctx.getId(), familyQuery);
-	    }
-	   else {
-		   familyQuery=retractDBase.get("ctxId "+ctx.getId());
-	   }
+		FamilyClausesList familyQuery = retractDBase.computeIfAbsent("ctxId "+ctx.getId(), (c) -> {
+			return new FamilyClausesList(family);
+		});
 		
 	    if (familyQuery == null)
 			return null;
@@ -178,13 +170,20 @@ public class TheoryManager {
 	 * Reviewed by Paolo Contessi: modified according to new ClauseDatabase
 	 * implementation
 	 */
+	@NotNull
 	public /*synchronized*/ List<ClauseInfo> find(Term headt) {
+
 		if (headt instanceof Struct) {
 			//String key = ((Struct) headt).getPredicateIndicator();
-			List<ClauseInfo> list = dynamicDBase.getPredicates(headt);
-			if (list.isEmpty())
-				list = staticDBase.getPredicates(headt);
-			return list;
+			Struct s = (Struct) headt;
+			List<ClauseInfo> list = dynamicDBase.getPredicates(s);
+			if (list==null) {
+				list = staticDBase.getPredicates(s);
+				if (list != null)
+					return list;
+			} else {
+				return list;
+			}
 		}
 
 		if (headt instanceof Var){
@@ -197,7 +196,7 @@ public class TheoryManager {
 			//            return l;
 			throw new RuntimeException();
 		}
-		return Collections.EMPTY_LIST; //new LinkedList<>();
+		return Collections.emptyList(); //new LinkedList<>();
 	}
 
 	/**

@@ -7,16 +7,16 @@ public class PrologTestCase extends TestCase {
 	public void testEngineInitialization() {
 		Prolog engine = new Prolog();
 		assertEquals(4, engine.getCurrentLibraries().length);
-		assertNotNull(engine.getLibrary("alice.tuprolog.lib.BasicLibrary"));
-		assertNotNull(engine.getLibrary("alice.tuprolog.lib.ISOLibrary"));
-		assertNotNull(engine.getLibrary("alice.tuprolog.lib.IOLibrary"));
-		assertNotNull(engine.getLibrary("alice.tuprolog.lib.OOLibrary"));
+		assertNotNull(engine.library("alice.tuprolog.lib.BasicLibrary"));
+		assertNotNull(engine.library("alice.tuprolog.lib.ISOLibrary"));
+		assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
+		assertNotNull(engine.library("alice.tuprolog.lib.OOLibrary"));
 	}
 	
 	public void testLoadLibraryAsString() throws InvalidLibraryException {
 		Prolog engine = new Prolog();
-		engine.loadLibrary("alice.tuprolog.StringLibrary");
-		assertNotNull(engine.getLibrary("alice.tuprolog.StringLibrary"));
+		engine.addLibrary("alice.tuprolog.StringLibrary");
+		assertNotNull(engine.library("alice.tuprolog.StringLibrary"));
 	}
 
 //	@Ignore
@@ -32,16 +32,16 @@ public class PrologTestCase extends TestCase {
 	
 	public void testGetLibraryWithName() throws InvalidLibraryException {
 		Prolog engine = new Prolog(new String[] {"alice.tuprolog.TestLibrary"});
-		assertNotNull(engine.getLibrary("TestLibraryName"));
+		assertNotNull(engine.library("TestLibraryName"));
 	}
 	
 	public void testUnloadLibraryAfterLoadingTheory() throws Exception {
 		Prolog engine = new Prolog();
-		assertNotNull(engine.getLibrary("alice.tuprolog.lib.IOLibrary"));
+		assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
 		Theory t = new Theory("a(1).\na(2).\n");
 		engine.setTheory(t);
-		engine.unloadLibrary("alice.tuprolog.lib.IOLibrary");
-		assertNull(engine.getLibrary("alice.tuprolog.lib.IOLibrary"));
+		engine.removeLibrary("alice.tuprolog.lib.IOLibrary");
+		assertNull(engine.library("alice.tuprolog.lib.IOLibrary"));
 	}
 	
 	public void testAddTheory() throws InvalidTheoryException {
@@ -70,13 +70,13 @@ public class PrologTestCase extends TestCase {
 	
 	public void testLibraryListener() throws InvalidLibraryException {
 		Prolog engine = new Prolog(new String[]{});
-		engine.loadLibrary("alice.tuprolog.lib.BasicLibrary");
-		engine.loadLibrary("alice.tuprolog.lib.IOLibrary");
+		engine.addLibrary("alice.tuprolog.lib.BasicLibrary");
+		engine.addLibrary("alice.tuprolog.lib.IOLibrary");
 		TestPrologEventAdapter a = new TestPrologEventAdapter();
 		engine.addLibraryListener(a);
-		engine.loadLibrary("alice.tuprolog.lib.JavaLibrary");
+		engine.addLibrary("alice.tuprolog.lib.JavaLibrary");
 		assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
-		engine.unloadLibrary("alice.tuprolog.lib.JavaLibrary");
+		engine.removeLibrary("alice.tuprolog.lib.JavaLibrary");
 		assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
 	}
 	

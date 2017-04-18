@@ -29,12 +29,18 @@ import alice.tuprolog.Solution;
 public class QueryEvent extends PrologEvent {
 
    private final Solution info;
-   private static final long serialVersionUID = 1L;
     public QueryEvent(Prolog source, Solution info){
         super(source);
         this.info=info;
     }
-    
+
+    @Override
+    public String toString() {
+        return "QueryEvent(" +
+                info.getQuery() + "," + info +
+                ')';
+    }
+
     /**
      * Gets information about the query result.
      * 
@@ -43,4 +49,6 @@ public class QueryEvent extends PrologEvent {
     public Solution getSolveInfo(){
         return info;
     }
+
+
 }

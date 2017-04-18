@@ -18,12 +18,13 @@
 package alice.tuprolog.event;
 
 import java.util.EventListener;
+import java.util.function.Consumer;
 
 /**
  * Listener for query events
  *
  * @since 1.3
  */
-public interface QueryListener extends EventListener {
-    void newQueryResultAvailable(QueryEvent e);
+public interface QueryListener extends EventListener, Consumer<QueryEvent> {
+    void accept(QueryEvent e);
 }

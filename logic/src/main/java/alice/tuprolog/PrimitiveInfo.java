@@ -115,7 +115,7 @@ public class PrimitiveInfo {
      * evaluates the primitive as a predicate
      * @throws Exception if invocation primitive failure
      */
-    public synchronized boolean evalAsPredicate(Struct g) throws Throwable {
+    public boolean evalAsPredicate(Struct g) throws Throwable {
         for (int i=0; i<primitive_args.length; i++) {
             primitive_args[i] = g.term(i);
         }
@@ -124,7 +124,8 @@ public class PrimitiveInfo {
             return (Boolean) method.invoke(source, primitive_args);
         } catch (InvocationTargetException e) {
             // throw new Exception(e.getCause());
-            throw e.getCause();
+            throw /*new JavaException*/
+                    (e.getCause());
         }
     }
     

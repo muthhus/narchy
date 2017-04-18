@@ -156,16 +156,16 @@ public class ParserTestCase extends TestCase {
 		assertEquals(result, p.nextTerm(false));
 	}
 	
-	// This is an error both in 2.0.1 and in 2.1... don't know why, though.
-//	public void testDCGActionWithOperators() throws Exception {
-//        String input = "{A =.. B, hotel, 2}";
-//        Struct result = new Struct("{}",
-//                            new Struct(",", new Struct("=..", new Var("A"), new Var("B")),
-//                                new Struct(",", new Struct("hotel"), new Int(2))));
-//        result.resolveTerm();
-//        Parser p = new Parser(input);
-//        assertEquals(result, p.nextTerm(false));
-//	}
+	 //This is an error both in 2.0.1 and in 2.1... don't know why, though.
+	public void testDCGActionWithOperators() throws Exception {
+        String input = "{A =.. B, hotel, 2}";
+        Struct result = new Struct("{}",
+                            new Struct(",", new Struct("=..", new Var("A"), new Var("B")),
+                                new Struct(",", new Struct("hotel"), new Int(2))));
+        result.resolveTerm();
+        Parser p = new Parser(input);
+        assertEquals(result, p.nextTerm(false));
+	}
 	
 	public void testMissingDCGActionElement() {
 		String s = "{1, 2, , 4}";

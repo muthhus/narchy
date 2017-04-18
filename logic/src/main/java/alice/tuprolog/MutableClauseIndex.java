@@ -17,10 +17,15 @@
  */
 package alice.tuprolog;
 
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 /**
  * Customized HashMap for storing clauses in the TheoryManager
@@ -30,14 +35,13 @@ import java.util.List;
  * Reviewed by Paolo Contessi
  */
 
-public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> implements ClauseIndex {
+public final class MutableClauseIndex extends ConcurrentHashMap<String,FamilyClausesList> implements ClauseIndex {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public void add(String key, ClauseInfo d, boolean first) {
-		FamilyClausesList family = computeIfAbsent(key, (k)->new FamilyClausesList());
-		family.add(d, first);
+		computeIfAbsent(key, (k)->new FamilyClausesList()).add(d, first);
 	}
 
 //	public void addLast(String key, ClauseInfo d) {
@@ -70,10 +74,10 @@ public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> 
 	 * @return  The list of matching-compatible predicates
 	 */
 	@Override
-	public List<ClauseInfo> getPredicates(Term headt) {
-		FamilyClausesList family = get(((Struct) headt).getPredicateIndicator());
+	public List<ClauseInfo> getPredicates(Struct headt) {
+		FamilyClausesList family = get(headt.getPredicateIndicator());
 		//new ReadOnlyLinkedList<>();
-		return family == null ? Collections.EMPTY_LIST : family.get(headt);
+		return family == null ? null : family.get(headt);
 	}
 
 //	/**
@@ -95,14 +99,18 @@ public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> 
 		return new CompleteIterator(this);
 	}
 
+//	public void forEachClause(Consumer<ClauseInfo> ci) {
+//		values().forEach(x -> x.forEach(ci::accept));
+//	}
+
 	private static class CompleteIterator implements Iterator<ClauseInfo> {
 		Iterator<FamilyClausesList> values;
 		Iterator<ClauseInfo> workingList;
 		//private boolean busy = false;
 
 		public CompleteIterator(MutableClauseIndex clauseDatabase) {
-
-			values = clauseDatabase.values().iterator();
+			//copy so that this can be done concurrently
+			values = Lists.newArrayList(clauseDatabase.values()).iterator();
 		}
 
 		@Override
@@ -119,7 +127,7 @@ public final class MutableClauseIndex extends HashMap<String,FamilyClausesList> 
 		}
 
 		@Override
-		public synchronized ClauseInfo next() {
+		public ClauseInfo next() {
 			return workingList.hasNext() ? workingList.next() : null;
 		}
 

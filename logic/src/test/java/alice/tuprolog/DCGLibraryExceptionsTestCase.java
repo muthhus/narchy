@@ -13,7 +13,7 @@ public class DCGLibraryExceptionsTestCase extends TestCase {
 	// verifico che phrase(X, []) lancia un errore di instanziazione
 	public void test_phrase_2_1() throws Exception {
 		Prolog engine = new Prolog();
-		engine.loadLibrary("alice.tuprolog.lib.DCGLibrary");
+		engine.addLibrary("alice.tuprolog.lib.DCGLibrary");
 		String goal = "catch(phrase(X, []), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());
@@ -27,7 +27,7 @@ public class DCGLibraryExceptionsTestCase extends TestCase {
 	// verifico che phrase(X, [], []) lancia un errore di instanziazione
 	public void test_phrase_3_1() throws Exception {
 		Prolog engine = new Prolog();
-		engine.loadLibrary("alice.tuprolog.lib.DCGLibrary");
+		engine.addLibrary("alice.tuprolog.lib.DCGLibrary");
 		String goal = "catch(phrase(X, [], []), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
 		assertTrue(info.isSuccess());

@@ -16,7 +16,7 @@ public class TestPrologEventAdapter extends PrologEventAdapter {
     }
     
     @Override
-    public void newQueryResultAvailable(QueryEvent ev) {
+    public void accept(QueryEvent ev) {
     	firstMessage = ev.getSolveInfo().getQuery().toString();
     	secondMessage = ev.getSolveInfo().toString();
     }

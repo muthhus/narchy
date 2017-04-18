@@ -1903,10 +1903,10 @@ public class ISOIOLibrary extends Library{
         
         Library library=null;
         
-        library = engine.getLibrary("alice.tuprolog.lib.IOLibrary");
+        library = engine.library("alice.tuprolog.lib.IOLibrary");
         if(library == null){
             try {
-                library = engine.loadLibrary("alice.tuprolog.lib.IOLibrary");
+                library = engine.addLibrary("alice.tuprolog.lib.IOLibrary");
             } catch (InvalidLibraryException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

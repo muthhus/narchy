@@ -135,7 +135,7 @@ public class BasicLibrary extends Library {
             }
             Theory t = new Theory(theory.name());
             TheoryLibrary thlib = new TheoryLibrary(libN.name(), t);
-            getEngine().loadLibrary(thlib);
+            getEngine().addLibrary(thlib);
             return true;
         } catch (Exception ex) {
             return false;

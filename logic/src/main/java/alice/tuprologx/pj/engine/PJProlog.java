@@ -28,9 +28,9 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
     public PJProlog() {
         engine = new alice.tuprolog.Prolog();        
         try {
-            engine.unloadLibrary("alice.tuprolog.lib.OOLibrary");
-            engine.loadLibrary("alice.tuprologx.pj.lib.PJLibraryNew");
-            engine.loadLibrary("alice.tuprolog.lib.DCGLibrary");
+            engine.removeLibrary("alice.tuprolog.lib.OOLibrary");
+            engine.addLibrary("alice.tuprologx.pj.lib.PJLibraryNew");
+            engine.addLibrary("alice.tuprolog.lib.DCGLibrary");
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -123,12 +123,12 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
     }
     
      public alice.tuprolog.Struct registerJavaObject(Object o) {
-        return ((alice.tuprolog.lib.OOLibrary)engine.getLibrary("alice.tuprologx.pj.lib.PJLibraryNew")).register(o);
+        return ((alice.tuprolog.lib.OOLibrary)engine.library("alice.tuprologx.pj.lib.PJLibraryNew")).register(o);
      }
      
      public Object getJavaObject(alice.tuprolog.Struct t) { 
         try {
-            return ((alice.tuprolog.lib.OOLibrary)engine.getLibrary("alice.tuprologx.pj.lib.PJLibraryNew")).getRegisteredObject(t);
+            return ((alice.tuprolog.lib.OOLibrary)engine.library("alice.tuprologx.pj.lib.PJLibraryNew")).getRegisteredObject(t);
         }
         catch (Exception e) {
             return null;
@@ -137,7 +137,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
      
      public void loadLibrary(alice.tuprolog.Library library) {
          try {
-            engine.loadLibrary(library);
+            engine.addLibrary(library);
          }
          catch (Exception e) {
              throw new UnsupportedOperationException(e);
@@ -146,7 +146,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
 
      public alice.tuprologx.pj.lib.PJLibraryNew getPJLibrary() {
          try {
-            return (alice.tuprologx.pj.lib.PJLibraryNew)engine.getLibrary("alice.tuprologx.pj.lib.PJLibraryNew");
+            return (alice.tuprologx.pj.lib.PJLibraryNew)engine.library("alice.tuprologx.pj.lib.PJLibraryNew");
          }
          catch (Exception e) {
              return null;

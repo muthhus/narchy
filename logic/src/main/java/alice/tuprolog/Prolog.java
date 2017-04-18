@@ -19,6 +19,7 @@ package alice.tuprolog;
 
 import alice.tuprolog.event.*;
 import alice.tuprolog.interfaces.IProlog;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,25 +98,25 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	public Prolog(ClauseIndex dynamics) {
 		this(false, dynamics);
 		try {
-			loadLibrary("alice.tuprolog.lib.BasicLibrary");
+			addLibrary("alice.tuprolog.lib.BasicLibrary");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		try {
-			loadLibrary("alice.tuprolog.lib.ISOLibrary");
+			addLibrary("alice.tuprolog.lib.ISOLibrary");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		try {
-			loadLibrary("alice.tuprolog.lib.IOLibrary");
+			addLibrary("alice.tuprolog.lib.IOLibrary");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		try {
 			if (System.getProperty("java.vm.name").equals("IKVM.NET"))
-				loadLibrary("OOLibrary.OOLibrary, OOLibrary");
+				addLibrary("OOLibrary.OOLibrary, OOLibrary");
 			else
-				loadLibrary("alice.tuprolog.lib.OOLibrary");
+				addLibrary("alice.tuprolog.lib.OOLibrary");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -132,7 +133,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		this(false, new MutableClauseIndex());
 		if (libs != null) {
 			for (int i = 0; i < libs.length; i++) {
-				loadLibrary(libs[i]);
+				addLibrary(libs[i]);
 			}
 		}
 	}
@@ -332,8 +333,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
 	@Override
-	public Library loadLibrary(String className) throws InvalidLibraryException {	//no syn
-		return libraryManager.loadLibrary(className);
+	public Library addLibrary(String className) throws InvalidLibraryException {	//no syn
+		return libraryManager.load(className);
 	}
 
 	/**
@@ -347,8 +348,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @return the reference to the Library just loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
-	public Library loadLibrary(String className, String[] paths) throws InvalidLibraryException {	//no syn
-		return libraryManager.loadLibrary(className, paths);
+	public Library addLibrary(String className, String[] paths) throws InvalidLibraryException {	//no syn
+		return libraryManager.load(className, paths);
 	}
 
 
@@ -361,8 +362,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param lib the (Java class) name of the library to be loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
-	public void loadLibrary(Library lib) throws InvalidLibraryException {	//no syn
-		libraryManager.loadLibrary(lib);
+	public void addLibrary(Library lib) throws InvalidLibraryException {	//no syn
+		libraryManager.load(lib);
 	}
 
 
@@ -384,7 +385,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @throws InvalidLibraryException if name is not a valid loaded library
 	 */
 	@Override
-	public void unloadLibrary(String name) throws InvalidLibraryException {		//no syn
+	public void removeLibrary(String name) throws InvalidLibraryException {		//no syn
 		libraryManager.unloadLibrary(name);
 	}
 
@@ -397,7 +398,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *         not found
 	 */
 	@Override
-	public Library getLibrary(String name) {	//no syn
+	public Library library(String name) {	//no syn
 		return libraryManager.getLibrary(name);
 	}
 
@@ -434,9 +435,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @return the result of the demonstration
 	 * @see Solution
 	 **/
-	public Solution solve(Term g) {
-		//System.out.println("ENGINE SOLVE #0: "+g);
-		if (g == null) return null;
+	public Solution solve(@NotNull Term g) {
 
 		Solution sinfo = engineManager.solve(g);
 
@@ -473,12 +472,14 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	@Override
 	public Solution solve(String st) throws MalformedGoalException {
 		try {
-			Parser p = new Parser(opManager, st);
-			Term t = p.nextTerm(true);
-			return solve(t);
+			return solve(term(st));
 		} catch (InvalidTermException ex) {
 			throw new MalformedGoalException();
 		}
+	}
+
+	public Term term(String toParse) throws InvalidTermException {
+		return new Parser(opManager, toParse).nextTerm(true);
 	}
 
 	/**
@@ -638,13 +639,15 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		//System.out.println("spy: "+i+"  "+s+"  "+g);
 		if (spy) {
 			ExecutionContext ctx = e.currentContext;
-			int i=0;
-			String g = "-";
-			if (ctx.fatherCtx != null){
-				i = ctx.depth-1;
-				g = ctx.fatherCtx.currentGoal.toString();
+			if (ctx!=null) {
+				int i = 0;
+				String g = "-";
+				if (ctx.fatherCtx != null) {
+					i = ctx.depth - 1;
+					g = ctx.fatherCtx.currentGoal.toString();
+				}
+				notifySpy(new SpyEvent(this, e, "spy: " + i + "  " + s + "  " + g));
 			}
-			notifySpy(new SpyEvent(this, e, "spy: " + i + "  " + s + "  " + g));
 		}
 	}
 
@@ -947,8 +950,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param e the event
 	 */
 	protected void notifyOutput(OutputEvent e) {
-		for(OutputListener ol:outputListeners){
-			ol.onOutput(e);
+		for (int i = 0, outputListenersSize = outputListeners.size(); i < outputListenersSize; i++) {
+			outputListeners.get(i).onOutput(e);
 		}
 	}
 
@@ -958,8 +961,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param e the event
 	 */
 	private void notifySpy(SpyEvent e) {
-		for (SpyListener sl : spyListeners) {
-			sl.onSpy(e);
+		for (int i = 0, spyListenersSize = spyListeners.size(); i < spyListenersSize; i++) {
+			spyListeners.get(i).onSpy(e);
 		}
 	}
 
@@ -971,8 +974,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 */
 	protected void notifyException(ExceptionEvent e) {
 		//
-		for(ExceptionListener el:exceptionListeners){
-			el.onException(e);
+		for (int i = 0, exceptionListenersSize = exceptionListeners.size(); i < exceptionListenersSize; i++) {
+			exceptionListeners.get(i).onException(e);
 		}
 		logger.error("{} {}", e.getSource(), e.getMsg());
 	}
@@ -1022,8 +1025,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		if (!queryListeners.isEmpty()) {
 			QueryEvent e = new QueryEvent(source, info);
 			for (int i = 0, queryListenersSize = queryListeners.size(); i < queryListenersSize; i++) {
-				QueryListener ql = queryListeners.get(i);
-				ql.newQueryResultAvailable(e);
+				queryListeners.get(i).accept(e);
 			}
 		}// else {
 		//throw new RuntimeException("no query listeners attached");

@@ -150,7 +150,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
         forwarded, and the Object won't be registered.
          */
         
-        OOLibrary ooLib = (OOLibrary) prolog.getLibrary("alice.tuprolog.lib.OOLibrary");
+        OOLibrary ooLib = (OOLibrary) prolog.library("alice.tuprolog.lib.OOLibrary");
         
         if(ooLib != null) {
             for(Map.Entry<String, Object> keyPair: bindings.entrySet()) {
@@ -261,7 +261,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
      * @param sc the ScriptContext to use for the next evaluation
      */
     private void setupStandardIO(ScriptContext sc) {
-        IOLibrary ioLib = (IOLibrary) prolog.getLibrary("alice.tuprolog.lib.IOLibrary");
+        IOLibrary ioLib = (IOLibrary) prolog.library("alice.tuprolog.lib.IOLibrary");
         
         if(ioLib != null) {
         	ioLib.setStandardInput(new InputStreamAdapter(sc.getReader()));
