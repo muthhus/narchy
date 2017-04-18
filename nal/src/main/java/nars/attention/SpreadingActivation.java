@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
@@ -141,7 +140,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             tasklink(ckk, v);
 
             float qv = v * inPri;
-            if (qv >= Param.BUDGET_EPSILON)
+            if (qv >= PLink.EPSILON_DEFAULT)
                 nar.activate(ckk, qv);
 
         } else {

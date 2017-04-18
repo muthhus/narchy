@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
@@ -7,6 +8,7 @@ import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +20,16 @@ public class Signal {
 
     public FloatSupplier pri;
 
-    boolean inputIfSame;
+    /** budget boost factor applied when the signal value has not changed since
+     * last cycle */
+    final static float residualBudgetFactor = 0.5f;
+
+    /** quantizes the output truth, ie. truth epsilon,
+     *  (does not process the value of the input signal)
+     * */
+    public final FloatSupplier resolution;
+
+//    boolean inputIfSame;
 //    int maxTimeBetweenUpdates;
 //    int minTimeBetweenUpdates;
 
@@ -28,9 +39,10 @@ public class Signal {
     @Nullable
     public SignalTask current;
 
-    public Signal(byte punc) {
+    public Signal(byte punc, FloatSupplier resolution) {
         pri(1);
         this.punc = punc;
+        this.resolution = resolution;
     }
 
 
@@ -50,9 +62,12 @@ public class Signal {
 
 
         if (current!=null) {
-            if (current.truth.equals(nextTruth, nar.truthResolution.floatValue())) {
-                current.budget(nar); //rebudget
-                return current;
+            if (current.truth.equals(nextTruth, resolution.asFloat())) {
+                if (residualBudgetFactor > 0) {
+                    current.budget(residualBudgetFactor, nar); //rebudget
+                    return current;
+                }
+                return null;
             }
         }
 
@@ -61,7 +76,7 @@ public class Signal {
                 now, now,
                 this.current, stamp, nar);
         if (t == null) {
-            this.current = null;
+            this.current = null; //signal dropped
             return null;
         } else {
             t.budget(nar);

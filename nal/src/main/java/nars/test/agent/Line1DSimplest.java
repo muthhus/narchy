@@ -86,7 +86,7 @@ public class Line1DSimplest extends NAgent {
 //
 //        });
 
-        in.resolution(resolution);
+        ;
 
 
     }

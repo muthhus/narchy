@@ -1,5 +1,6 @@
 package nars.concept;
 
+import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
@@ -31,6 +32,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     @NotNull
     public final ScalarSignal sensor;
+    private final FloatParam resolution;
     private FloatSupplier signal;
     protected float currentValue = Float.NaN;
 
@@ -43,7 +45,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.sensor = new ScalarSignal(n, term, this, truth) {
+        this.resolution = new FloatParam(n.truthResolution.floatValue());
+        this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
             @Override
             protected long nextStamp(@NotNull NAR nar) {
                 return SensorConcept.this.nextStamp(nar);
@@ -61,9 +64,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         return
-            //new MyListTemporalBeliefTable
-            new HijackTemporalBeliefTable(
-                    tCap * 2, nar.random);
+            new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random);
+            //new HijackTemporalBeliefTable(tCap * 2, nar.random);
     }
 
     //    /** originating from this sensor, or a future prediction */
@@ -117,12 +119,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public float floatValueOf(Term anObject /* ? */) {
         return this.currentValue = signal.asFloat();
-    }
-
-    @NotNull
-    public SensorConcept resolution(float v) {
-        sensor.resolution(v);
-        return this;
     }
 
     @Override @NotNull public final void pri(FloatSupplier v) {

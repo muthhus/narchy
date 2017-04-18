@@ -123,6 +123,11 @@ public class TermutatorTest {
                 new CommutivePermutations($("{%A,%B,%C}"),
                         $("{x,y,z}")), 6);
     }
+    @Test public void testComm3Conj() throws Narsese.NarseseException {
+        assertTermutatorProducesUniqueResults(
+                new CommutivePermutations($("(&&,%A,%B,%C)"),
+                        $("(&&,x,y,z)")), 6);
+    }
     @Test public void testComm4() throws Narsese.NarseseException {
         assertTermutatorProducesUniqueResults(
                 new CommutivePermutations($("{%A,%B,%C,%D}"),

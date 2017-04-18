@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
+import static nars.Op.False;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -390,6 +391,10 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         events.add(PrimitiveTuples.pair(this, dt));
     }
 
+
+    @NotNull public static Term falseIfNull(@Nullable Term maybeNull) {
+        return (maybeNull==null) ? False : maybeNull;
+    }
 
 }
 

@@ -130,9 +130,10 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        n.inputAt(3, "c:b.");
 
         //new DeductiveChainTest(n, 8,  2048, inh);
-        n.mix.stream("Derive").setValue(0.005f); //quiet derivation
+        //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
+        n.focus.activationRate.setValue(0.1f);
 
-        n.loop(2f);
+        n.loop(16f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
@@ -150,7 +151,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 128, 8) {
+        NARSpace cs = new ConceptsSpace(n, 128, 1) {
 //            @Override
 //            protected boolean include(Term term) {
 //

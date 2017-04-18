@@ -32,7 +32,7 @@ public class SideCraft extends NAgentX {
                 e.printStackTrace();
                 return null;
             }
-        }, 30, 5, -1);
+        }, 30);
     }
 
     public SideCraft(NAR nar) throws Narsese.NarseseException {

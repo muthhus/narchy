@@ -79,9 +79,9 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
 
             case QUEST:
             case QUESTION:
-                //a truth function so check cyclicity
-                if (m.cyclic)
-                    return false;
+//                //a truth function so check cyclicity
+//                if (m.cyclic)
+//                    return false;
 
                 if (punct==QUESTION && (m.task.isGoal() || m.task.isQuest()))
                     punct = QUEST;

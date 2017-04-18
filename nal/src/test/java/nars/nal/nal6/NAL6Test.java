@@ -512,10 +512,10 @@ public class NAL6Test extends AbstractNALTest {
     @Test public void testDecomposeImplPred() {
         test()
             .log()
-            .believe("( z(a,$b) ==> (&&, (x-->a), (x-->$b), (x --> c) ) )")
-            .mustBelieve(8, "( z(a,$b) ==> (x-->a) )", 1f, 0.81f)
-            .mustBelieve(8, "( z(a,$b) ==> (x-->$b) )", 1f, 0.81f)
-            .mustBelieve(8, "( z(a,$b) ==> (x-->c) )", 1f, 0.81f)
+            .believe("( (a,#b) ==> (&&, (x,#b), y, z ) )")
+            .mustBelieve(cycles, "( (a,#b) ==> (x,#b) )", 1f, 0.73f)
+            .mustBelieve(cycles, "( (a,#b) ==> y )", 1f, 0.73f)
+            .mustBelieve(cycles, "( (a,#b) ==> z )", 1f, 0.73f)
         ;
     }
 

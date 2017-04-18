@@ -1,8 +1,8 @@
 package nars.attention;
 
+import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ abstract public class Activation<B extends Prioritized> {
     public Activation(@NotNull B in, float scale, @NotNull Concept origin, NAR nar) {
         this.nar = nar;
         this.in = in;
-        this.minScale = Param.BUDGET_EPSILON / (scale * in.pri());
+        this.minScale = PLink.EPSILON_DEFAULT / (scale * in.pri());
         this.origin = origin;
 
     }

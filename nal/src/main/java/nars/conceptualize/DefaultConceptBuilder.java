@@ -35,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import static jcog.pri.PriMerge.max;
+import static jcog.pri.PriMerge.plus;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
 
@@ -45,12 +46,12 @@ import static nars.Op.PROD;
  */
 public class DefaultConceptBuilder implements ConceptBuilder {
 
-    public static final PriMerge DEFAULT_BLEND = max;
+    public static final PriMerge DEFAULT_BLEND = plus;
 
     public DefaultConceptBuilder() {
         this(
-            new DefaultConceptState("sleep", 12, 12, 6, 24, 12),
-            new DefaultConceptState("awake", 14, 14, 6, 32, 18)
+            new DefaultConceptState("sleep", 12, 12, 3, 24, 12),
+            new DefaultConceptState("awake", 14, 14, 4, 32, 18)
         );
     }
 

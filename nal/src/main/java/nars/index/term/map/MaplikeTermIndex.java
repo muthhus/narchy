@@ -24,12 +24,12 @@ import java.util.function.Function;
 public abstract class MaplikeTermIndex extends TermIndex {
 
     final Function<CompoundBuilder,Term> build = new HijackMemoize<>(
-            64384, 2, new XorShift128PlusRandom(1),
+            64384, 3, new XorShift128PlusRandom(1),
             (C) -> super.the(C.op, C.dt, C.toArray(new Term[C.size()]))
     );
 
     final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-            16384, 2, new XorShift128PlusRandom(1),
+            16384, 3, new XorShift128PlusRandom(1),
             super::normalize
     );
 

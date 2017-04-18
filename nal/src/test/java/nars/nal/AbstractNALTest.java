@@ -49,11 +49,7 @@ public abstract class AbstractNALTest {
         return nar.get();
     }
 
-    public static Iterable<Supplier<NAR>> terminal() {
-        return Lists.newArrayList(
-            new Supplier[] {supply("Terminal", ()->new Terminal(128))}
-        );
-    }
+
 
     @Before
     public void start() {
@@ -71,12 +67,12 @@ public abstract class AbstractNALTest {
         List<Supplier<NAR>> l = $.newArrayList(2);
 
 
-            for (int c : new int[] { 6/*, 2, 4 */}) { ///concepts fired per cycle
+            for (int c : new int[] { 16/*, 2, 4 */}) { ///concepts fired per cycle
                 l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
                         Default d =
                             new Default(768, c, 3 );
                         d.nal(level);
-                        d.termVolumeMax.setValue(28);
+                        d.termVolumeMax.setValue(32);
                         return d;
                     }
                 ));

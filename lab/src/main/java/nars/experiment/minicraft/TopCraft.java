@@ -45,7 +45,7 @@ public class TopCraft extends NAgentX {
                 e.printStackTrace();
                 return null;
             }
-        }, 25, 10, -1);
+        }, 25);
     }
 
     public TopCraft(NAR nar) throws Narsese.NarseseException {

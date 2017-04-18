@@ -36,7 +36,7 @@ public abstract class Param  {
     public static boolean ANSWER_REPORTING = true;
 
     /** default initial value for ConceptBagControl */
-    public static int TASKS_INPUT_PER_CYCLE = 32;
+    public static int TASKS_INPUT_PER_CYCLE_MAX = 256;
 
 
     /**
@@ -75,36 +75,19 @@ public abstract class Param  {
     public static final int STAMP_CAPACITY = 12;
 
 
-    /**
-     * permute certain rules backward to questions (experimental, generates a lot of questions)
-     */
-    public static final boolean DERIVER_PERMUTE_BACKWARD = true;
-
-
-    /**
-     * swap task and belief in eligible rules ("forward" permutation)
-     */
-    public static final boolean DERIVER_PERMUTE_SWAPPED = true;
 
 
     /**
      * maximum changes logged in deriver's stack.
      * bigger number means deeper unification depth for bigger compounds and more permutations
      */
-    public final static int UnificationStackMax = 16;
+    public final static int UnificationStackMax = 64;
 
-    /** 'time to live', unification operations until unification fails */
-    public final static int UnificationTTL = 256;
+    /** 'time to live', unification steps until unification is stopped */
+    public final static int UnificationTTL = 2048;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;
-
-    /**
-     * minimum difference necessary to indicate a significant modification in budget float number components
-     */
-    public static final float BUDGET_EPSILON = PLink.EPSILON_DEFAULT;
-
-
 
     public static int DEFAULT_NAL_LEVEL = 8;
 
@@ -133,7 +116,7 @@ public abstract class Param  {
 
 
     /** internal granularity which truth components are rounded to */
-    public static final float TRUTH_EPSILON = 0.001f;
+    public static final float TRUTH_EPSILON = 0.01f;
 
     public static final float DEFAULT_SENSOR_RESOLUTION = 0.01f;
 

@@ -43,6 +43,9 @@ public class Premise extends Pri {
 
         this.task = taskLink;
 
+        if (belief!=null && belief.equals(task))
+            belief = null;
+
         //use the belief's term and not the termlink because it is more specific if:
         // a) it contains temporal information that can be used in temporalization
         // b) a variable in the termlink was matched

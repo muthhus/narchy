@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -29,10 +30,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
     private final Compound term;
-    /**
-     * resolution of the output freq value
-     */
-    float resolution = Param.DEFAULT_SENSOR_RESOLUTION;
+
 
 
     private final FloatFunction<Term> value;
@@ -47,8 +45,8 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction) {
-        super(BELIEF);
+    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatParam resolution) {
+        super(BELIEF, resolution);
 
         this.term = t;
         this.value = value;
@@ -121,11 +119,6 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         return current;
     }
 
-    @NotNull
-    public ScalarSignal resolution(float r) {
-        this.resolution = r;
-        return this;
-    }
 
 
 

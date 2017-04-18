@@ -4,6 +4,7 @@ import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
@@ -138,7 +139,7 @@ public abstract class ConsoleAgent extends NAgentX {
             @Override
             protected float act() {
                 //copy
-                return  (Util.sqr(similarity(R.chars, W.chars) ) );
+                return  similarity(R.chars, W.chars );
             }
         };
 
@@ -180,8 +181,8 @@ public abstract class ConsoleAgent extends NAgentX {
             for (int x = 0; x< w; x++) {
                 for (int y = 0; y < h; y++) {
                     chars[x][y] = ' ';
-                    terms[x][y] = $.inh($.p($.the(x), $.the(y)), id);
-                    beliefs[x][y] = new Signal(BELIEF);
+                    terms[x][y] = $.p(id, $.the(x), $.the(y));
+                    beliefs[x][y] = new Signal(BELIEF, ()->0.25f);
                     believe((char)0, x, y);
                 }
             }

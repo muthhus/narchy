@@ -3,6 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.pri.PLink;
 import nars.concept.Concept;
+import nars.index.TermBuilder;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.data.*;
@@ -13,15 +14,13 @@ import nars.term.atom.Atom;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 
 import java.util.Arrays;
 
 import static nars.$.quote;
-import static nars.Op.INT;
-import static nars.Op.PROD;
-import static nars.Op.False;
-import static nars.Op.True;
+import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 
 /**
@@ -58,6 +57,8 @@ public class Builtin {
 
             Functor.f2Int("add", (x, y) -> x + y),
             Functor.f2Int("sub", (x, y) -> x - y),
+
+
 
             Functor.f1("quote", x -> x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
 
@@ -116,7 +117,27 @@ public class Builtin {
     public static void load(NAR nar) {
         //TODO these should be command-only operators, not functors
 
+        /** remove an element at random and try re-creating
+         * the compound. wont work in all situations.
+         * TODO move the type restriction to another functor to wrap this
+         */
+        nar.on(Functor.f1("dropAnyConj", (Compound c) -> {
+            if (c.op()!=CONJ || !TermBuilder.commutive(c.dt()))
+                return False;
 
+            //if (c.op().statement) return False;
+            int size = c.size();
+            if (size < 2) return False;
+
+            Term[] x = c.terms();
+            if (size == 2) {
+                int n = nar.random.nextInt(size);
+                return Term.falseIfNull(compoundOrNull(x[n]));
+            } else {
+                Term[] y = ArrayUtils.remove(x, nar.random.nextInt( size ));
+                return Term.falseIfNull(nar.concepts.the(c.op(), c.dt(), y));
+            }
+        }));
 
         nar.on("assertEquals", (Command) (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';

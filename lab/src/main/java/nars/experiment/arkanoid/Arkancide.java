@@ -51,7 +51,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 40, 2, -1);
+        }, 40);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -105,8 +105,10 @@ public class Arkancide extends NAgentX {
         if (numeric) {
             //nar.termVolumeMax.set(12);
             senseNumber( "x(paddle)", new FloatPolarNormalized(()->noid.paddle.x, noid.getWidth()/2));//.resolution(resX);
-            SensorConcept xb = senseNumber("x(ball)", new FloatPolarNormalized(() -> (noid.ball.x/noid.getWidth() - 0.5f)*2f, 1)).resolution(4 * resX);
-            SensorConcept yb = senseNumber( "y(ball)", new FloatPolarNormalized(()-> (noid.ball.y/noid.getHeight() - 0.5f)*2f, 1)).resolution(4 * resY);
+            SensorConcept sensorConcept1 = senseNumber("x(ball)", new FloatPolarNormalized(() -> (noid.ball.x/noid.getWidth() - 0.5f)*2f, 1));
+            SensorConcept xb = sensorConcept1;
+            SensorConcept sensorConcept = senseNumber( "y(ball)", new FloatPolarNormalized(()-> (noid.ball.y/noid.getHeight() - 0.5f)*2f, 1));
+            SensorConcept yb = sensorConcept;
             senseNumber("vx(ball)", new FloatPolarNormalized(()->noid.ball.velocityX));
             senseNumber("vy(ball)", new FloatPolarNormalized(()->noid.ball.velocityY));
 

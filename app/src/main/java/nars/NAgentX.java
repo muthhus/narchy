@@ -85,16 +85,13 @@ abstract public class NAgentX extends NAgent {
 //
 //    }
 
-    public static NAR runRT(Function<NAR, NAgent> init, float fps) {
-        return runRT(init, fps, 1, -1);
-    }
 
-    public static NAR runRT(Function<NAR, NAgent> init, float fps, float durFrames, int endTime) {
+    public static NAR runRT(Function<NAR, NAgent> init, float fps) {
 
         Time clock = new RealTime.
-                //DSHalf(true)
-                CS(true)
-                .durSeconds(durFrames / fps);
+                DSHalf(true)
+                //CS(true)
+                .durSeconds(0.5f / fps);
         Default nar =
                 //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
                 NARBuilder.newMultiThreadNAR(-1, clock, true);

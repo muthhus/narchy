@@ -44,7 +44,7 @@ public interface NARBuilder {
         Random rng = new XorShift128PlusRandom(1);
 
         if (threads == -1)
-            threads = Runtime.getRuntime().availableProcessors()-1;
+            threads = (int) Math.ceil(Runtime.getRuntime().availableProcessors()/2);
 
         Executioner exe =
                 //new SynchronousExecutor();
@@ -53,7 +53,7 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 4;
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
@@ -80,7 +80,7 @@ public interface NARBuilder {
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                1, 3, rng,
+                1, 4, rng,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -218,7 +218,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.25f, 4);
+        new Inperience(nar, 0.05f, 4);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

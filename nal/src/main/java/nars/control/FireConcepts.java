@@ -14,7 +14,6 @@ import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.Concept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
@@ -228,7 +227,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         this.conceptsFiredPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(1);
-        this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE);
+        this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
 
 
         this.on = nar.onCycle(this);

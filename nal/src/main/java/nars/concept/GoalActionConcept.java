@@ -24,9 +24,9 @@ public class GoalActionConcept extends ActionConcept {
     public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
         super(term, n);
 
-        this.feedback = new Signal(BELIEF);
-
         resolution = n.truthResolution;
+        this.feedback = new Signal(BELIEF, resolution);
+
         this.motor = motor;
         this.goals = newBeliefTable(nar, false); //pre-create
 

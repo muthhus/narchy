@@ -122,6 +122,7 @@ public final class TruthFunctions  {
 
         float f = and(a.freq(), bF);
 
+
         float c = and(f, a.conf(), bC);
 
         return c >= minConf ? t(f, c) : null;

@@ -132,10 +132,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
                 PixelConcept sss = new PixelConcept(cell, brightnessToTruth, x, y);
-                sss.resolution(
-                    //distToResolution(cdist)
-                    resolution
-                );
 
                 l.add(sss);
 
@@ -154,7 +150,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor setResolution(float resolution) {
         this.resolution = resolution;
-        pixels.forEach(p -> p.resolution(resolution));
+        pixels.forEach(p -> {
+        });
         return this;
     }
 

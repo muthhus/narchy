@@ -64,7 +64,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
         float p = d.premise.pri();
 
         if (truth!=null) { //belief and goal:
-            p *= BudgetFunctions.truthToQuality(truth);
+            p *= 0.5f + 0.5f * BudgetFunctions.truthToQuality(truth);
                     //confidencePreservationFactor(truth, d);
         } else {
             p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);

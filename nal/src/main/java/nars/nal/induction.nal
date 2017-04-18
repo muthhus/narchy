@@ -18,13 +18,13 @@
 
     A, B, time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                     |- (A &&+- B), (Belief:Intersection)
     A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro((A &&+- B)), (Belief:Intersection)
-        A, B, time(raw), time(dtEvents),neqRCom(A,B),notImplEqui(A), notImplEqui(B)                 |- (A &&+- (--,%B)), (Belief:IntersectionPN)
-        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
+        //A, B, time(raw), time(dtEvents),neqRCom(A,B),notImplEqui(A), notImplEqui(B)                 |- (A &&+- (--,%B)), (Belief:IntersectionPN)
+        //A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
+        //A, B, time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                              |- ((--,%A) &&+- B), (Belief:IntersectionN)
+        //A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
 
-    A, B, time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                              |- ((--,%A) &&+- B), (Belief:IntersectionN)
-    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
-        A, B, time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                          |- ((--,%A) &&+- (--,%B)), (Belief:IntersectionNN)
-        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) &&+- (--,%B))), (Belief:IntersectionNN)
+    A, B, time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                          |- (--,((--,%A) &&+- (--,%B))), (Belief:Union)
+    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- (--,varIntro(((--,%A) &&+- (--,%B)))), (Belief:Union)
 
 
 

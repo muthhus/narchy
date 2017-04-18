@@ -80,7 +80,7 @@ public class XorShift128PlusRandom extends Random {
 	
 	@Override
 	public int nextInt( int n ) {
-		return (int)nextLong( n );
+		return Math.abs((int)nextLong())%n;
 	}
 		
 	/** Returns a pseudorandom uniformly distributed {@code long} value

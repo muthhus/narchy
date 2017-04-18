@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import jcog.list.FasterList;
+import jcog.pri.PLink;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -82,7 +83,7 @@ public class Line1D {
 
             return a;
 
-        }, 20, 1, -1);
+        }, 20);
 
     }
 
@@ -187,7 +188,7 @@ public class Line1D {
                         if (tt != null) {
 
                             float activation = w2c(s.edgeValue(subj, pred));
-                            if (activation >= Param.BUDGET_EPSILON) {
+                            if (activation >= PLink.EPSILON_DEFAULT) {
                                 Concept csubj = n.concept(subj);
                                 if (csubj != null)
                                     n.activate(csubj, activation);

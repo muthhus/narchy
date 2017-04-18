@@ -3,6 +3,8 @@ package nars.experiment.fzero;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
+import nars.concept.SensorConcept;
+import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
@@ -39,8 +41,8 @@ public class FZero extends NAgentX {
         });
 
         senseNumberDifference($.inh(Atomic.the("joy"), id), happy);
-        senseNumberDifference($.inh(Atomic.the("angVel"), id), ()->(float)fz.playerAngle).resolution(0.02f);
-        senseNumberDifference($.inh(Atomic.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
+        SensorConcept sensorConcept1 = senseNumberDifference($.inh(Atomic.the("angVel"), id), ()->(float)fz.playerAngle);
+        SensorConcept sensorConcept = senseNumberDifference($.inh(Atomic.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]);
         senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
         //nar.mix.stream("Derive").setValue(1);
@@ -159,7 +161,6 @@ public class FZero extends NAgentX {
 //        actionToggle($.inh($.the("left"), $.the("fz")), (b)->{ fz.left = b; });
 //        actionToggle($.inh($.the("right"), $.the("fz")), (b)->{ fz.right = b; });
 
-        NAgentX.chart(this);
     }
 
     protected boolean polarized(@NotNull Task task) {
@@ -195,10 +196,17 @@ public class FZero extends NAgentX {
     }
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        new FZero(NARBuilder.newMultiThreadNAR(
-                3,
+        Default n = NARBuilder.newMultiThreadNAR(
+                2,
                 new RealTime.DSHalf(true)
-                    .durFPS(10f), true)
-        ).runRT(30f);
+                        .durFPS(10f), true);
+
+        n.truthResolution.setValue(0.2f);
+
+        FZero a = new FZero(n);
+        a.runRT(10f);
+
+        NAgentX.chart(a);
+
     }
 }

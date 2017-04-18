@@ -285,12 +285,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     default TaskConcept concept(@NotNull NAR n) {
         Concept c = n.concept(term(), true);
         if (!(c instanceof TaskConcept)) {
-            if (Param.DEBUG)
-                //throw new RuntimeException
-                System.err.println
+            //if (Param.DEBUG_EXTRA)
+                throw new RuntimeException
+                //System.err.println
                         ("should conceptualize to TaskConcept: " + c);
             //else
-            return null;
+            //return null;
         }
         return (TaskConcept) c;
     }
@@ -754,7 +754,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     /** auto budget by truth (if belief/goal, or punctuation if question/quest) */
     default Task budget(NAR nar) {
-        setPriority(nar.priorityDefault(punc()));
+        return budget(1f, nar);
+    }
+
+    default Task budget(float factor, NAR nar) {
+        setPriority(factor * nar.priorityDefault(punc()));
         return this;
     }
 

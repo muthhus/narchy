@@ -141,9 +141,9 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     }
 
     @NotNull
-    public FuzzyScalarConcepts resolution(float r) {
+    public FuzzyScalarConcepts resolution() {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
-            sensors.get(i).resolution(r);
+            sensors.get(i);
         }
         return this;
     }

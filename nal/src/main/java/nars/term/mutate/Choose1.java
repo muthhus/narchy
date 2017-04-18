@@ -64,7 +64,7 @@ public class Choose1 extends Termutator {
         @NotNull Term[] yy = this.yy;
 
         int l = yy.length-1;
-        int shuffle = f.random.nextInt(l); //randomize starting offset
+        int shuffle = f.random.nextInt(yy.length); //randomize starting offset
 
         int start = f.now();
 

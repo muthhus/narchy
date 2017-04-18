@@ -67,11 +67,11 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        //return new MyListTemporalBeliefTable(tCap * 2, tCap * historicCapMultiplier, nar.random);
+        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random);
 
-        return
-                new HijackTemporalBeliefTable(
-                        tCap * 2, nar.random);
+//        return
+//                new HijackTemporalBeliefTable(
+//                        tCap * 2, nar.random);
     }
 
     @Override

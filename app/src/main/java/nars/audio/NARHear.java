@@ -50,7 +50,8 @@ public class NARHear extends NAgent {
             e.printStackTrace();
         }
 
-        freqInputs.forEach(s -> s.resolution(0.05f));
+        freqInputs.forEach(s -> {
+        });
 
         Autoencoder ae = new Autoencoder(au.data.length, 16, new XorShift128PlusRandom(1));
         nar.onCycle(f->{
