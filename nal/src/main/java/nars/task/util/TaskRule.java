@@ -112,7 +112,7 @@ public class TaskRule extends TaskMatch {
         y = Task.content(y, nar);
         if (y==null) return;
 
-        y = compoundOrNull(nar.concepts.normalize(y));
+        y = nar.concepts.normalize(y);
         if (y==null) return;
 
         if (!Task.taskContentValid(y, X.punc(), nar, true))

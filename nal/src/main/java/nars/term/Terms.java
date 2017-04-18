@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.data.sorted.SortedList;
 import nars.$;
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
@@ -417,6 +418,13 @@ public enum Terms { ;
     @Nullable
     public static Compound compoundOrNull(@Nullable Term t) {
         return compoundOr(t, null);
+    }
+    @Nullable
+    public static Compound normalizedOrNull(@Nullable Term t, TermIndex i) {
+        Compound ct = compoundOrNull(t);
+        if (t == null)
+            return null;
+        return compoundOrNull(i.normalize(ct));
     }
 
     /**

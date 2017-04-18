@@ -127,14 +127,16 @@ public interface Compound extends Term, IPair, TermContainer {
         return unneg().op();
     }
 
+
     @NotNull
     @Override
-    default Term unneg() {
+    default public Term unneg() {
         if (op() == NEG) {
-            return term(0);
-//            if (Param.DEBUG && t.op() == NEG)
-//                throw new RuntimeException("double negation detected: " + t);
-//            return t;
+            Term x = term(0);
+            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
+                ((Compound) x).setNormalized();
+            }
+            return x;
         }
         return this;
     }

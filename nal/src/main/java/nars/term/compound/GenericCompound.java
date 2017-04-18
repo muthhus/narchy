@@ -108,18 +108,7 @@ public class GenericCompound implements Compound {
         return dt;
     }
 
-    @NotNull
-    @Override
-    public final Term unneg() {
-        if (op() == NEG) {
-            Term x = term(0);
-            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound) x).setNormalized();
-            }
-            return x;
-        }
-        return this;
-    }
+
 
     /**
      * do not call this manually, it will be set by VariableNormalization only

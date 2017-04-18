@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 
 import static nars.Op.VAR_QUERY;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -181,16 +182,16 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean strict = !(this instanceof PatternTermIndex); //f instanceof Derivation;
 
-        Compound crc = (Compound) src;
-        TermContainer subs = crc.subterms();
+        Compound curr = (Compound) src;
+        TermContainer subs = curr.subterms();
 
         int len = subs.size();
 
 
         boolean changed = false;
-        Op cop = crc.op();
+        Op cop = curr.op();
 
-        CompoundBuilder sub = new CompoundBuilder(cop, crc.dt(), len);
+        CompoundBuilder next = new CompoundBuilder(cop, curr.dt(), len);
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(cop);
@@ -206,11 +207,11 @@ public abstract class TermIndex extends TermBuilder {
 
             if (u instanceof EllipsisMatch) {
 
-                ((EllipsisMatch) u).expand(op, sub);
-                subAt = sub.size();
+                ((EllipsisMatch) u).expand(op, next);
+                subAt = next.size();
 
                 for (; volAt < subAt; volAt++) {
-                    Term st = sub.get(volAt);
+                    Term st = next.get(volAt);
                     if (filterTrueFalse && isTrueOrFalse(st)) return null;
                     volSum += st.volume();
                     if (volSum >= volLimit) {
@@ -241,7 +242,7 @@ public abstract class TermIndex extends TermBuilder {
                     return null;
                 } //HARD VOLUME LIMIT REACHED
 
-                sub.add(u);
+                next.add(u);
 
                 subAt++;
 
@@ -252,20 +253,14 @@ public abstract class TermIndex extends TermBuilder {
 
         Term transformed;
 
-//        if (!changed || (ss == len && crc.equalTerms(sub)))
-//            transformed = crc;
-//        else {
-        transformed = the(sub);
-        //}
 
-//        //cache the result
-//        if (transformed!=null) //TODO store false for 'null' result
-//            f.cache(src, transformed);
-
-        return transformed;
+        if (changed)
+            return the(next);
+        else
+            return curr;
     }
 
-    protected Term the(CompoundBuilder t) {
+    protected final Term the(CompoundBuilder t) {
         return the(t.op, t.dt, t.toArray(new Term[t.size()]));
     }
 
@@ -338,7 +333,8 @@ public abstract class TermIndex extends TermBuilder {
 //            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
 //    }
 
-    @Nullable public Compound normalize(@NotNull Compound x) {
+    @Nullable
+    public Compound normalize(@NotNull Compound x) {
 
         Term y;
 
@@ -401,7 +397,7 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean filterTrueAndFalse = disallowTrueOrFalse(op);
 
-        int s = src.size();
+        int s = src.size(), modifications = 0;
         CompoundBuilder target = new CompoundBuilder(op, dt, s);
         for (int i = 0; i < s; i++) {
 
@@ -412,7 +408,7 @@ public abstract class TermIndex extends TermBuilder {
             if (y == null)
                 return null;
 
-            if ( y instanceof Compound ) {
+            if (y instanceof Compound) {
                 y = transform((Compound) y, t); //recurse
             }
 
@@ -429,8 +425,8 @@ public abstract class TermIndex extends TermBuilder {
 
                 //if (x != y) { //must be refernce equality test for some variable normalization cases
                 //if (!x.equals(y)) { //must be refernce equality test for some variable normalization cases
-                //modifications++;
-                //}
+                modifications++;
+
             }
 
             target.add(y);
@@ -438,8 +434,10 @@ public abstract class TermIndex extends TermBuilder {
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
-        return //(modifications > 0 || op!=src.op() || dt!=src.dt()) ?
-                the(target);// : src;
+        if (modifications > 0 || op != src.op() || dt != src.dt())
+            return the(target);
+        else
+            return src;
     }
 
     static boolean disallowTrueOrFalse(Op superOp) {
@@ -535,13 +533,13 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term conceptualizable(@NotNull Term term) {
-        Term termPre = null;
-        while (term instanceof Compound && termPre != term) {
+//        Term termPre = null;
+//        while (term instanceof Compound && termPre != term) {
 //            //shouldnt need to check for this here
 //            if (isTrueOrFalse(term))
 //                throw new UnsupportedOperationException();
 
-            termPre = term;
+//            termPre = term;
 
             switch (term.op()) {
                 case VAR_DEP:
@@ -558,16 +556,20 @@ public abstract class TermIndex extends TermBuilder {
 
                     if (term instanceof Compound) {
                         term = normalize((Compound) term);
+                        if (term == null)
+                            return null;
                     }
 
                     if (term instanceof Compound) {
                         term = atemporalize((Compound) term);
+                        if (term == null)
+                            return null;
                     }
 
-                    break;
+
 
             }
-        }
+
 
         if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
             return null;
@@ -715,13 +717,9 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Compound eval(Compound x) {
-
-        //eval before normalizing
-        Compound z = compoundOrNull(x.eval(this));
-        if (z == null)
-            return null;
-
-        return normalize(z);
+        return normalizedOrNull(
+                x.eval(this),
+                this);
     }
 
     /**
@@ -735,7 +733,7 @@ public abstract class TermIndex extends TermBuilder {
         if (!(y instanceof Compound)) {
             return null;
         } else {
-            return compoundOrNull(normalize((Compound) y));
+            return normalize((Compound) y);
         }
 
     }
@@ -766,4 +764,5 @@ public abstract class TermIndex extends TermBuilder {
             return $.varDep((((Variable) subterm).id()));
         }
         return subterm;
-    };}
+    };
+}

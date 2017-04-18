@@ -86,7 +86,7 @@ public abstract class TermBuilder {
      * main entry point for compound construction - creates an immutable result
      */
     @NotNull
-    public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
+    public final Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
 
 
         int arity = u.length;
@@ -489,18 +489,13 @@ public abstract class TermBuilder {
         if (t instanceof Compound) {
             // (--,(--,P)) = P
             if (t.op() == NEG)
-                return ((Compound) t).term(0);//unneg();
+                return t.unneg();
         } else if (t instanceof AtomicSingleton) {
             if (isFalse(t)) return True;
             if (isTrue(t)) return False;
         }
 
-        Term y = finalize(NEG, t);
-        if (t.isNormalized() && y instanceof Compound) {
-            ((Compound) y).setNormalized();
-        }
-        return y;
-
+        return finalize(NEG, t);
         //return newCompound(Op.NEG, DTERNAL, new TermVector1(t)); //<- faster than through finalize()?
     }
 

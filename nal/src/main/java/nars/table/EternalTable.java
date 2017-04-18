@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -228,19 +229,18 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             }
         }
 
-        if (oldBelief == null) {
+        if (oldBelief == null)
             return null;
-        }
-
 
         final float newBeliefWeight = input.evi();
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
-        Compound t = compoundOrNull(Revision.intermpolate(
+        Compound t = normalizedOrNull(Revision.intermpolate(
                 input.term(), oldBelief.term(),
                 aProp,
                 nar.random,
                 true
-        ));
+        ), nar.concepts);
+
         if (t == null)
             return null;
 

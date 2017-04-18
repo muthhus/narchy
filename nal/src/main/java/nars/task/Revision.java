@@ -21,6 +21,7 @@ import java.util.Random;
 import static jcog.Util.lerp;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -119,7 +120,7 @@ public class Revision {
         Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) start, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Compound cc = compoundOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose) );
+        Compound cc = normalizedOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms );
         if (cc == null)
             return null;
         if (cc.op()==NEG) {
@@ -129,13 +130,12 @@ public class Revision {
             newTruth = newTruth.negated();
         }
 
+
         //get a stamp collecting all evidence from the table, since it all contributes to the result
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
         //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
 
         long[] evidence = Stamp.zip(a.stamp(), b.stamp(), aProp);
-
-
 
         RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,

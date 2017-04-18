@@ -174,7 +174,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Nullable
     static boolean taskContentValid(@NotNull Compound t, byte punc, @Nullable NAR nar, boolean safe) {
         if (!t.isNormalized())
-            return fail(t, "Task Term is null or not a normalized Compound", safe);
+            return fail(t, "Task Term not a normalized Compound", safe);
 
         if (nar!=null) {
             int maxVol = nar.termVolumeMax.intValue();

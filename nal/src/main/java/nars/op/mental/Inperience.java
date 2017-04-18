@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static nars.term.Terms.normalizedOrNull;
 import static nars.term.atom.Atomic.the;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
@@ -214,7 +215,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
         Task task = b.get();
 
         try {
-            Compound r = Task.content(reify(task, nar.self()), nar);
+            Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.concepts);
             if (r != null) {
 
                 long now = nar.time();

@@ -98,7 +98,6 @@
         //B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
     B, (A <=> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
-        B, (A <=> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyNN, Goal:DeductionNN)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)

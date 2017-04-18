@@ -23,6 +23,7 @@ import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
@@ -1321,7 +1322,11 @@ public class Narsese extends BaseParser<Object> {
             if (normalize && y instanceof Compound) {
                 return index.normalize((Compound) y);
             } else {
-                return index.get(y, true).term(); //y;
+                Termed existing = index.get(y, false);
+                if (existing == null)
+                    return y;
+                else
+                    return existing.term();
             }
         } finally {
             T = $.terms;
