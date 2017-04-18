@@ -113,146 +113,156 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             if (!Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true)) {
 
-                return new CompoundConcept(t, termbag, taskbag, nar);
+                return newStatic(t, termbag, taskbag);
+
+            } else {
+
+                return newDynamic(t, termbag, taskbag);
             }
-
-            DynamicTruthModel dmt = null;
-
-            switch (t.op()) {
-
-                case INH:
-                    //                if (Op.isOperation(t))
-                    //                    return new OperationConcept(t, termbag, taskbag, nar);
-
-
-                    Term subj = t.term(0);
-                    Term pred = t.term(1);
-
-
-                    Op so = subj.op();
-                    Op po = pred.op();
-
-                    if (dmt == null && (po.atomic || po.image || po == PROD)) {
-                        if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
-                            //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
-                            //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
-                            //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-                            Compound csubj = (Compound) subj;
-                            if (validUnwrappableSubterms(csubj.subterms())) {
-                                int s = csubj.size();
-                                Term[] x = new Term[s];
-                                boolean valid = true;
-                                for (int i = 0; i < s; i++) {
-                                    if ((x[i] = $.inh(csubj.term(i), pred)) == null) {
-                                        valid = false;
-                                        break;
-                                    }
-                                }
-
-                                if (valid) {
-                                    switch (so) {
-                                        case SECTi:
-                                            dmt = new DynamicTruthModel.Intersection(x);
-                                            break;
-                                        case SECTe:
-                                            dmt = new DynamicTruthModel.Union(x);
-                                            break;
-                                        case DIFFi:
-                                            dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                            break;
-                                    }
-                                }
-                            }
-                        } else if (po.image) {
-                            Compound img = (Compound) pred;
-                            Term[] ee = new Term[img.size()];
-
-                            int relation = img.dt();
-                            int s = ee.length;
-                            for (int j = 1, i = 0; i < s; ) {
-                                if (j == relation)
-                                    ee[i++] = subj;
-                                if (i < s)
-                                    ee[i++] = img.term(j++);
-                            }
-                            Compound b = $.inh($.p(ee), img.term(0));
-                            if (b != null)
-                                dmt = new DynamicTruthModel.Identity(t, b);
-                        }
-
-                    }
-
-                    if (dmt == null && (so.atomic || so.image || so == PROD)) {
-                        if ((po == Op.SECTi) || (po == Op.SECTe) || (po == DIFFe)) {
-                            //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
-                            //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
-                            //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
-                            Compound cpred = (Compound) pred;
-                            if (validUnwrappableSubterms(cpred.subterms())) {
-                                int s = cpred.size();
-                                Term[] x = new Term[s];
-                                boolean valid = true;
-                                for (int i = 0; i < s; i++) {
-                                    if ((x[i] = $.inh(subj, cpred.term(i))) == null) {
-                                        valid = false;
-                                        break;
-                                    }
-                                }
-
-                                if (valid) {
-                                    switch (po) {
-                                        case SECTi:
-                                            dmt = new DynamicTruthModel.Union(x);
-                                            break;
-                                        case SECTe:
-                                            dmt = new DynamicTruthModel.Intersection(x);
-                                            break;
-                                        case DIFFe:
-                                            dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                            break;
-                                    }
-                                }
-                            }
-                        } else if (so.image) {
-                            Compound img = (Compound) subj;
-                            Term[] ee = new Term[img.size()];
-
-                            int relation = img.dt();
-                            int s = ee.length;
-                            for (int j = 1, i = 0; i < s; ) {
-                                if (j == relation)
-                                    ee[i++] = pred;
-                                if (i < s)
-                                    ee[i++] = img.term(j++);
-                            }
-                            Compound b = $.inh(img.term(0), $.p(ee));
-                            if (b != null)
-                                dmt = new DynamicTruthModel.Identity(t, b);
-                        }
-
-                    }
-
-                    break;
-
-                case CONJ:
-                    //allow variables onlyif they are not themselves direct subterms of this
-                    if (validUnwrappableSubterms(t.subterms())) {
-                        dmt = DynamicTruthModel.Intersection;
-                    }
-                    break;
-
-                case NEG:
-                    throw new RuntimeException("negation terms must not be conceptualized");
-
-            }
-
-
-            return
-                    dmt != null ?
-                            new DynamicConcept(t, dmt, null, termbag, taskbag, nar) :
-                            new TaskConcept(t, termbag, taskbag, nar)
-                    ;
         });
+    }
+
+    private CompoundConcept newStatic(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+        return new CompoundConcept(t, termbag, taskbag, nar);
+    }
+
+    private CompoundConcept newDynamic(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+        DynamicTruthModel dmt = null;
+
+        switch (t.op()) {
+
+            case INH:
+                //                if (Op.isOperation(t))
+                //                    return new OperationConcept(t, termbag, taskbag, nar);
+
+
+                Term subj = t.term(0);
+                Term pred = t.term(1);
+
+
+                Op so = subj.op();
+                Op po = pred.op();
+
+                if (dmt == null && (po.atomic || po.image || po == PROD)) {
+                    if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
+                        //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
+                        Compound csubj = (Compound) subj;
+                        if (validUnwrappableSubterms(csubj.subterms())) {
+                            int s = csubj.size();
+                            Term[] x = new Term[s];
+                            boolean valid = true;
+                            for (int i = 0; i < s; i++) {
+                                if ((x[i] = $.inh(csubj.term(i), pred)) == null) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
+
+                            if (valid) {
+                                switch (so) {
+                                    case SECTi:
+                                        dmt = new DynamicTruthModel.Intersection(x);
+                                        break;
+                                    case SECTe:
+                                        dmt = new DynamicTruthModel.Union(x);
+                                        break;
+                                    case DIFFi:
+                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                        break;
+                                }
+                            }
+                        }
+                    } else if (po.image) {
+                        Compound img = (Compound) pred;
+                        Term[] ee = new Term[img.size()];
+
+                        int relation = img.dt();
+                        int s = ee.length;
+                        for (int j = 1, i = 0; i < s; ) {
+                            if (j == relation)
+                                ee[i++] = subj;
+                            if (i < s)
+                                ee[i++] = img.term(j++);
+                        }
+                        Compound b = $.inh($.p(ee), img.term(0));
+                        if (b != null)
+                            dmt = new DynamicTruthModel.Identity(t, b);
+                    }
+
+                }
+
+                if (dmt == null && (so.atomic || so.image || so == PROD)) {
+                    if ((po == Op.SECTi) || (po == Op.SECTe) || (po == DIFFe)) {
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
+                        //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P - S)), (Belief:Difference)
+                        Compound cpred = (Compound) pred;
+                        if (validUnwrappableSubterms(cpred.subterms())) {
+                            int s = cpred.size();
+                            Term[] x = new Term[s];
+                            boolean valid = true;
+                            for (int i = 0; i < s; i++) {
+                                if ((x[i] = $.inh(subj, cpred.term(i))) == null) {
+                                    valid = false;
+                                    break;
+                                }
+                            }
+
+                            if (valid) {
+                                switch (po) {
+                                    case SECTi:
+                                        dmt = new DynamicTruthModel.Union(x);
+                                        break;
+                                    case SECTe:
+                                        dmt = new DynamicTruthModel.Intersection(x);
+                                        break;
+                                    case DIFFe:
+                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                        break;
+                                }
+                            }
+                        }
+                    } else if (so.image) {
+                        Compound img = (Compound) subj;
+                        Term[] ee = new Term[img.size()];
+
+                        int relation = img.dt();
+                        int s = ee.length;
+                        for (int j = 1, i = 0; i < s; ) {
+                            if (j == relation)
+                                ee[i++] = pred;
+                            if (i < s)
+                                ee[i++] = img.term(j++);
+                        }
+                        Compound b = $.inh(img.term(0), $.p(ee));
+                        if (b != null)
+                            dmt = new DynamicTruthModel.Identity(t, b);
+                    }
+
+                }
+
+                break;
+
+            case CONJ:
+                //allow variables onlyif they are not themselves direct subterms of this
+                if (validUnwrappableSubterms(t.subterms())) {
+                    dmt = DynamicTruthModel.Intersection;
+                }
+                break;
+
+            case NEG:
+                throw new RuntimeException("negation terms must not be conceptualized");
+
+        }
+
+
+        return
+                dmt != null ?
+                        new DynamicConcept(t, dmt, null, termbag, taskbag, nar) :
+                        new TaskConcept(t, termbag, taskbag, nar)
+                ;
     }
 
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {

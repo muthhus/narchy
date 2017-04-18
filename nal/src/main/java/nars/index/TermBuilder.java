@@ -22,6 +22,7 @@ import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.pred;
 import static nars.term.Terms.subj;
 import static nars.time.Tense.DTERNAL;
@@ -171,7 +172,7 @@ public abstract class TermBuilder {
                 return statement(op, dt, u[0], u[1]);
 
             case PROD:
-                return (arity != 0) ? finalize(op, dt, u) : Terms.ZeroProduct;
+                return (arity != 0) ? compound(op, dt, u) : Terms.ZeroProduct;
 
         }
 
@@ -324,16 +325,8 @@ public abstract class TermBuilder {
         return TermVector.the(s);
     }
 
-    public Compound newCompound(@NotNull Op op, int dt, Term[] args) {
-        /*switch (args.length) {
-            case 1:
-                return new UnitCompound1(op, args[0]);
-            default:*/
-        return newCompound(op, dt, intern(args));
-        //}
-    }
-
-    static public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
+    /** directly constructs a new instance, applied at the end. */
+    protected Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
 
@@ -383,12 +376,12 @@ public abstract class TermBuilder {
         if (sort) {
             args = Terms.sorted(args);
         }
-        return finalize(op, dt, args);
+        return compound(op, dt, args);
     }
 
     @NotNull
     private Term finalize(@NotNull Op op, int dt, @NotNull Set<Term> args) {
-        return finalize(op, dt, Terms.sorted(args));
+        return compound(op, dt, Terms.sorted(args));
     }
 
     @NotNull
@@ -412,40 +405,43 @@ public abstract class TermBuilder {
 
     @NotNull
     private Term finalize(@NotNull Op op, @NotNull Term... args) {
-        return finalize(op, DTERNAL, args);
+        return compound(op, DTERNAL, args);
     }
 
     /**
-     * terms must be sorted, if they need to be, before calling.
+     * NOTE: terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    private Term finalize(@NotNull Op op, int dt, @NotNull Term... args) {
+    private Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
 
-        //if (Param.DEBUG ) {
-        //check for any imdex terms that may have not been removed
         int s = args.length;
-        if (s == 0) {
-            throw new RuntimeException("should not have zero args here");
-        }
+        assert(s!=0);
 
+
+//        if (s < op.minSize) {
+//            throw new RuntimeException("invalid size " + s + " for " + op);
+//        }
+//        //assert(s >= op.minSize);
 
         for (int i = 0; i < s; i++) {
             Term x = args[i];
 
-            x = /*eval*/(productNormalize(x));
+            x = productNormalize(x);
 
             if (isTrueOrFalse(x))
                 return False; //may have become False through eval()
 
+            if ((i == 0) && (s == 1) && (op.minSize > 1) && !(x instanceof Ellipsislike)) {
+                //special case: allow for ellipsis to occupy one item even if minArity>1
+                return x;
+            }
+
             args[i] = x;
         }
 
-//        if (Param.ARITHMETIC_INDUCTION)
-//            args = ArithmeticInduction.compress(op, dt, args);
-
 
         if (s == 1 && op.minSize > 1) {
-            //special case: allow for ellipsis to occupy one item even if minArity>1
+
             Term a0 = args[0];
             if (!(a0 instanceof Ellipsislike)) {
                 //return null;
@@ -454,7 +450,8 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, args);
+        return newCompound(op, dt, intern(args));
+        //}
     }
 
 
@@ -495,7 +492,7 @@ public abstract class TermBuilder {
             if (isTrue(x)) return False;
         }
 
-        Term y = newCompound(NEG, DTERNAL, new Term[] { x });
+        Term y = compound(NEG, DTERNAL, new Term[] { x });
         if (y instanceof Compound && x.isNormalized()) {
             ((Compound)y).setNormalized(); //share normalization state
         }
@@ -626,7 +623,7 @@ public abstract class TermBuilder {
         int n = s.size();
         switch (n) {
             case 0:
-                return False;
+                return False; //empty condition
             case 1:
                 return s.iterator().next();
             default:
@@ -790,7 +787,7 @@ public abstract class TermBuilder {
 
                         if (dt == XTERNAL) {
                             //create as-is
-                            return finalize(op, dt, subject, predicate);
+                            return compound(op, dt, subject, predicate);
                         }
 
                         if ((dt != 0 && dt != DTERNAL)) {
@@ -944,7 +941,7 @@ public abstract class TermBuilder {
 
                 }
 
-                return finalize(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
+                return compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
 
             }
         }
@@ -1128,4 +1125,103 @@ public abstract class TermBuilder {
 
         //return null;
     }
+
+    @NotNull
+    public Compound atemporalize(@NotNull Compound c) {
+
+        if (!c.hasTemporal())
+            return c;
+
+        TermContainer st = c.subterms();
+        Term[] oldSubs = st.terms();
+        Term[] newSubs = oldSubs;
+
+        Op o = c.op();
+        int pdt = c.dt();
+        if (st.hasAny(Op.TemporalBits)) {
+
+            boolean subsChanged = false;
+            int cs = oldSubs.length;
+            Term[] maybeNewSubs = new Term[cs];
+            for (int i = 0; i < cs; i++) {
+
+                Term x = oldSubs[i], y;
+                if (x instanceof Compound) {
+                    subsChanged |= (x != (y = atemporalize((Compound) x)));
+                } else {
+                    y = x;
+                }
+
+                maybeNewSubs[i] = y;
+
+            }
+
+            if (subsChanged)
+                newSubs = maybeNewSubs;
+
+
+        }
+
+        //resolve XTERNAL temporals to lexical order
+        if (pdt == XTERNAL /*&& cs == 2*/) {
+            boolean swap = false;
+
+            if (newSubs[0].compareTo(newSubs[1]) > 0) {
+                swap = true;
+            }
+
+
+            if (swap) {
+                Term x = newSubs[0];
+                newSubs[0] = newSubs[1];
+                newSubs[1] = x;
+            }
+        }
+
+
+        boolean dtChanged = (pdt != DTERNAL && o.temporal);
+        boolean subsChanged = (newSubs != oldSubs);
+
+        if (subsChanged || dtChanged) {
+
+            if (subsChanged && o.temporal && newSubs.length == 1) {
+                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+
+                if (pdt != DTERNAL)
+                    pdt = XTERNAL;
+
+                Term s = newSubs[0];
+                newSubs = new Term[]{s, s};
+            } else {
+                if (o.temporal)
+                    pdt = DTERNAL;
+            }
+//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
+//                System.out.println("?");
+//            }
+
+            Compound xx = compoundOrNull(
+                    compound(o,
+                            pdt,
+                            subsChanged ? newSubs : oldSubs)
+            );
+            if (xx == null)
+                throw new InvalidTermException("unable to atemporalize", c);
+
+            //if (c.isNormalized())
+                //xx.setNormalized();
+
+            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
+            //if (exxist!=null)
+            //return exxist.term();
+
+
+            //x = i.the(xx).term();
+            return xx;
+        } else {
+            return c;
+        }
+    }
+
+
 }

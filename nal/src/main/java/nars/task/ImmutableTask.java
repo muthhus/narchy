@@ -41,10 +41,10 @@ public class ImmutableTask extends Pri implements Task {
 
 
         if (term.op() == NEG) {
-            Compound term2 = compoundOrNull(term.unneg());
-            if (term2 == null)
+            term = compoundOrNull(term.unneg());
+            if (term == null)
                 throw new InvalidTaskException(term, "became non-compound on un-negation");
-            term = term2;
+
             if (truth != null)
                 truth = truth.negated();
         }

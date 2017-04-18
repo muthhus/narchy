@@ -58,7 +58,7 @@ public class IO {
         if (preterm == null)
             throw new IOException("invalid task term");
 
-        Compound term = t.normalize(preterm);
+        final Compound term = t.normalize(preterm);
         if (term == null)
             throw new IOException("un-normalizable task term");
 

@@ -16,7 +16,6 @@ import nars.term.subst.MapSubst1;
 import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
@@ -28,8 +27,6 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.Op.VAR_QUERY;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -336,41 +333,45 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public Compound normalize(@NotNull Compound x) {
 
+        if (x.isNormalized())
+            return x; //TODO try not to let this happen
+
         Term y;
 
-        try {
-            int vars = x.vars();
-            int pVars = x.varPattern();
-            int totalVars = vars + pVars;
+        int vars = x.vars();
+        int pVars = x.varPattern();
+        int totalVars = vars + pVars;
 
-            if (totalVars > 0) {
-                y = transform(x,
-                        (vars == 1 && pVars == 0) ?
-                                VariableNormalization.singleVariableNormalization //special case for efficiency
-                                :
-                                new VariableNormalization(totalVars /* estimate */)
-                );
+        Compound result;
+        if (totalVars > 0) {
+            y = transform(x,
+                    ((vars == 1) && (pVars == 0)) ?
+                            VariableNormalization.singleVariableNormalization //special case for efficiency
+                            :
+                            new VariableNormalization(totalVars /* estimate */)
+            );
+
+            if (y instanceof Compound) {
+                if (y != x) {
+                    Compound cy = (Compound) y;
+                    result = cy;
+                } else {
+                    result = x;
+                }
             } else {
-                y = x;
+                result = null;
             }
 
-
-        } catch (InvalidTermException e) {
-
-            if (Param.DEBUG_EXTRA)
-                logger.warn("normalize {} : {}", x, e);
-
-            return InvalidCompound;
-        }
-
-        if (y instanceof Compound) {
-            Compound cy = (Compound) y;
-            cy.setNormalized();
-            return cy;
         } else {
-            return null;
+            result = x;
         }
+
+        if (result!=null)
+            result.setNormalized();
+
+        return result;
     }
+
 
     @Nullable
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
@@ -531,51 +532,6 @@ public abstract class TermIndex extends TermBuilder {
         return cc;
     }
 
-    @Nullable
-    public Term conceptualizable(@NotNull Term term) {
-//        Term termPre = null;
-//        while (term instanceof Compound && termPre != term) {
-//            //shouldnt need to check for this here
-//            if (isTrueOrFalse(term))
-//                throw new UnsupportedOperationException();
-
-//            termPre = term;
-
-            switch (term.op()) {
-                case VAR_DEP:
-                case VAR_INDEP:
-                case VAR_QUERY:
-                case VAR_PATTERN:
-                    //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
-                    return null;
-
-                case NEG:
-                    term = term.unneg(); //fallthru
-
-                default:
-
-                    if (term instanceof Compound) {
-                        term = normalize((Compound) term);
-                        if (term == null)
-                            return null;
-                    }
-
-                    if (term instanceof Compound) {
-                        term = atemporalize((Compound) term);
-                        if (term == null)
-                            return null;
-                    }
-
-
-
-            }
-
-
-        if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
-            return null;
-
-        return term;
-    }
 
 
     @Nullable
@@ -599,108 +555,6 @@ public abstract class TermIndex extends TermBuilder {
     @NotNull
     public Term atemporalize(@NotNull Term t) {
         return t instanceof Compound ? atemporalize((Compound) t) : t;
-    }
-
-    @NotNull
-    public Compound atemporalize(@NotNull Compound c) {
-
-        if (!c.hasTemporal())
-            return c;
-
-        TermContainer psubs = c.subterms();
-        Term[] newSubs;
-
-        Op o = c.op();
-        int pdt = c.dt();
-        if (psubs.hasAny(Op.TemporalBits)) {
-            boolean subsChanged = false;
-            int cs = psubs.size();
-            Term[] ss = new Term[cs];
-            for (int i = 0; i < cs; i++) {
-
-                Term x = psubs.term(i), y;
-                if (x instanceof Compound) {
-                    subsChanged |= (x != (y = atemporalize((Compound) x)));
-                } else {
-                    y = x;
-                }
-
-                ss[i] = y;
-
-            }
-
-
-            newSubs = subsChanged ? ss : null;
-
-
-        } else {
-            newSubs = null;
-        }
-
-        //resolve XTERNAL temporals to lexical order
-        if (pdt == XTERNAL /*&& cs == 2*/) {
-            boolean swap = false;
-            if (newSubs == null) {
-                if (psubs.term(0).compareTo(psubs.term(1)) > 0) {
-                    newSubs = psubs.terms();
-                    swap = true;
-                }
-            } else {
-                if (newSubs[0].compareTo(newSubs[1]) > 0) {
-                    swap = true;
-                }
-            }
-
-            if (swap) {
-                Term x = newSubs[0];
-                newSubs[0] = newSubs[1];
-                newSubs[1] = x;
-            }
-        }
-
-
-        boolean dtChanged = (pdt != DTERNAL && o.temporal);
-        boolean subsChanged = (newSubs != null);
-
-        if (subsChanged || dtChanged) {
-
-            if (subsChanged && o.temporal && newSubs.length == 1) {
-                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-
-                if (pdt != DTERNAL)
-                    pdt = XTERNAL;
-
-                Term s = newSubs[0];
-                newSubs = new Term[]{s, s};
-            } else {
-                if (o.temporal)
-                    pdt = DTERNAL;
-            }
-//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
-//                System.out.println("?");
-//            }
-
-            Compound xx = compoundOrNull(
-                    newCompound(o,
-                            pdt,
-                            subsChanged ? intern(newSubs) : psubs)
-            );
-            if (xx == null)
-                throw new InvalidTermException("unable to atemporalize", c);
-
-            if (c.isNormalized())
-                xx.setNormalized();
-
-            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
-            //if (exxist!=null)
-            //return exxist.term();
-
-
-            //x = i.the(xx).term();
-            return xx;
-        } else {
-            return c;
-        }
     }
 
 
@@ -753,16 +607,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @Nullable
     public Term queryToDepVar(@NotNull Compound term) {
-        return transform(term, queryToDepVar);
+        return transform(term, CompoundTransform.queryToDepVar);
     }
 
-    /**
-     * change all query variables to dep vars
-     */
-    final static CompoundTransform queryToDepVar = (parent, subterm) -> {
-        if (subterm.op() == VAR_QUERY) {
-            return $.varDep((((Variable) subterm).id()));
-        }
-        return subterm;
-    };
 }

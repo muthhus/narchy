@@ -43,7 +43,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.$.newArrayList;
 import static nars.Op.*;
+import static nars.term.Term.falseIfNull;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -96,7 +98,6 @@ public class Narsese extends BaseParser<Object> {
 
     //These should be set to something like RecoveringParseRunner for performance
     private final ParseRunner inputParser = new MyParseRunner(Input());
-    private final ParseRunner singleTaskParser = new MyParseRunner(Task());
     private final ParseRunner singleTermParser = new MyParseRunner(Term());
     //private final ParseRunner singleTaskRuleParser = new ListeningParseRunner3(TaskRule());
 
@@ -1138,15 +1139,16 @@ public class Narsese extends BaseParser<Object> {
     /**
      * returns number of tasks created
      */
-    public static int tasks(String input, Collection<Task> c, NAR m) throws NarseseException {
-        int[] i = new int[1];
-        tasks(input, t -> {
-            c.add(t);
-            i[0]++;
-        }, m);
-        return i[0];
+    public static void tasks(String input, Collection<Task> c, NAR m) throws NarseseException {
+        tasks(input, c::add, m);
     }
 
+    public static List<Task> tasks(String input, NAR m) throws NarseseException {
+        List<Task> result = newArrayList(1);
+        tasks(input, result, m);
+
+        return result;
+    }
 
     /**
      * gets a stream of raw immutable task-generating objects
@@ -1157,6 +1159,8 @@ public class Narsese extends BaseParser<Object> {
         @NotNull Narsese p = the();
         p.T = m.concepts;
         try {
+
+            int parsedTasks = 0;
 
             ParsingResult r = p.inputParser.run(input);
 
@@ -1173,11 +1177,16 @@ public class Narsese extends BaseParser<Object> {
                 } else {
                     throw new NarseseException("Parse error: " + input);
                 }
+
                 Task t = decodeTask(m, y);
                 if (t != null) {
                     c.accept(t);
+                    parsedTasks++;
                 }
             }
+
+            if (parsedTasks == 0)
+                throw new NarseseException("nothing parsed: " + input);
 
         } finally {
             p.T = $.terms;
@@ -1201,20 +1210,10 @@ public class Narsese extends BaseParser<Object> {
      */
     @NotNull
     public Task task(String input, NAR n) throws NarseseException {
-        ParsingResult r;
-        T = n.concepts;
-        try {
-            r = singleTaskParser.run(input);
-            if (r == null)
-                throw new NarseseException(input);
-
-            return decodeTask(n, (Object[]) r.getValueStack().peek());
-
-        } catch (Throwable ge) {
-            throw new NarseseException(input, ge.getCause());
-        } finally {
-            T = $.terms;
-        }
+        List<Task> tt = tasks(input, n);
+        if (tt.size() != 1)
+            throw new NarseseException(tt.size() + " tasks parsed in single-task parse: " + input);
+        return tt.get(0);
     }
 
     /**
@@ -1225,9 +1224,11 @@ public class Narsese extends BaseParser<Object> {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
         }
+
         Term contentRaw = (Term) x[1];
         if (!(contentRaw instanceof Compound))
             throw new NarseseException("Invalid task term");
+
         Term content = /*m.normalize*/((Compound) contentRaw);
         /*if (!(content instanceof Compound)) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
@@ -1320,7 +1321,7 @@ public class Narsese extends BaseParser<Object> {
         try {
             Term y = term(s);
             if (normalize && y instanceof Compound) {
-                return index.normalize((Compound) y);
+                return falseIfNull(index.normalize((Compound) y));
             } else {
                 Termed existing = index.get(y, false);
                 if (existing == null)

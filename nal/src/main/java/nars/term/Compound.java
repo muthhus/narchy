@@ -861,10 +861,10 @@ public interface Compound extends Term, IPair, TermContainer {
                         if (dy == null || dy == this) {
                             return this; //functor returning null return value means keep the original input term
                         } else {
-                            if (dy.equals(this)) {
-                                System.err.println("redundant instance detected: " + subject + " " + dy );
-                                return this;
-                            }
+//                            if (dy.equals(this)) {
+//                                System.err.println("redundant instance detected: " + subject + " " + dy );
+//                                return this;
+//                            }
                             return dy.eval(index); //recurse
                         }
 

@@ -14,6 +14,7 @@ import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.transform.CompoundTransform;
 import nars.term.util.InvalidTermException;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -631,12 +632,16 @@ public interface TimeFunctions {
     static Term resolve(@NotNull Derivation p, @NotNull Term x) {
         Term y;
         try {
-            y = p.resolve(p.index.productNormalize(x));
+            y = p.resolve(x instanceof Compound  ?
+                    p.index.transform((Compound)x, CompoundTransform.Identity)
+                    : x);
         } catch (InvalidTermException e) {
             //failed, just return the input
-            y = null;
+            y = x;
         }
-        return y!=null ? y : x;
+
+        return y;
+
     }
 
     @Nullable

@@ -19,6 +19,7 @@ import nars.concept.PermanentConcept;
 import nars.concept.TaskConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
+import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
 import nars.task.ImmutableTask;
@@ -299,15 +300,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public List<Task> tasks(@NotNull String parse) throws NarseseException {
-        List<Task> result = newArrayList(1);
-        List<NarseseException> exc = newArrayList(0);
-        Narsese.the().tasks(parse, result, this);
-
-        if (!exc.isEmpty())
-            exc.forEach(e -> logger.error("parse error: {}", e));
-
-        return result;
+    public List<Task> tasks(@NotNull String text) throws NarseseException {
+        return Narsese.the().tasks(text, this);
     }
 
 
@@ -1322,11 +1316,57 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return concept(tt.term(), createIfMissing);
     }
 
+        @Nullable
+    private Term conceptualizable(@NotNull Term term) {
+//        Term termPre = null;
+//        while (term instanceof Compound && termPre != term) {
+//            //shouldnt need to check for this here
+//            if (isTrueOrFalse(term))
+//                throw new UnsupportedOperationException();
+
+//            termPre = term;
+
+        switch (term.op()) {
+            case VAR_DEP:
+            case VAR_INDEP:
+            case VAR_QUERY:
+            case VAR_PATTERN:
+                //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
+                return null;
+
+            case NEG:
+                term = term.unneg(); //fallthru
+
+            default:
+
+                if (term instanceof Compound) {
+                    term = concepts.normalize((Compound) term);
+                    if (term == null)
+                        return null;
+                }
+
+                if (term instanceof Compound) {
+                    term = concepts.atemporalize((Compound) term);
+                    if (term == null)
+                        return null;
+
+
+                }
+        }
+
+        if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
+            return null;
+
+
+
+        return term;
+    }
+
     public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
 
         //t = post(t);
 
-        t = concepts.conceptualizable(t);
+        t = conceptualizable(t);
         if (t == null)
             return null;
 
