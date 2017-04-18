@@ -37,12 +37,7 @@ public class ImmutableTask extends Pri implements Task {
     public Map meta = null;
 
 
-    public static ImmutableTask Eternal(Compound term, byte punc, Truth truth, long creation, long[] stamp) {
-        return new ImmutableTask(term, punc, truth, creation, ETERNAL, ETERNAL, stamp);
-    }
-
-
-    public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
+    public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
 
         if (term.op() == NEG) {
@@ -54,11 +49,13 @@ public class ImmutableTask extends Pri implements Task {
                 truth = truth.negated();
         }
 
-        if (truth == null && ((punc == BELIEF) || (punc == GOAL)))
-            throw new InvalidTaskException(term, "null truth");
+        if ((punc == BELIEF) || (punc == GOAL)) {
+            if (truth == null)
+                throw new InvalidTaskException(term, "null truth");
 
-        if (term.varQuery() > 0 && (punc == BELIEF || punc == GOAL))
-            throw new InvalidTaskException(term, "query variable in belief or goal");
+        }
+
+        Task.taskContentValid(term, punc, null, false);
 
         this.priority = 0;
 

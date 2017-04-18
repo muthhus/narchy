@@ -390,24 +390,24 @@ public enum Util { ;
 
     public static int hashCombine(int a, int b, int c) {
 
-        //return hashCombine(hashCombine(a, b), c); //TODO decide if this is efficient and hashes well
+        return hashCombine(hashCombine(a, b), c); //TODO decide if this is efficient and hashes well
 
         //https://gist.github.com/badboy/6267743
-        a=a-b;  a=a-c;  a=a^(c >>> 13);
-        b=b-c;  b=b-a;  b=b^(a << 8);
-        c=c-a;  c=c-b;  c=c^(b >>> 13);
-        a=a-b;  a=a-c;  a=a^(c >>> 12);
-        b=b-c;  b=b-a;  b=b^(a << 16);
-        c=c-a;  c=c-b;  c=c^(b >>> 5);
-        a=a-b;  a=a-c;  a=a^(c >>> 3);
-        b=b-c;  b=b-a;  b=b^(a << 10);
-        c=c-a;  c=c-b;  c=c^(b >>> 15);
-        return c;
+//        a=a-b;  a=a-c;  a=a^(c >>> 13);
+//        b=b-c;  b=b-a;  b=b^(a << 8);
+//        c=c-a;  c=c-b;  c=c^(b >>> 13);
+//        a=a-b;  a=a-c;  a=a^(c >>> 12);
+//        b=b-c;  b=b-a;  b=b^(a << 16);
+//        c=c-a;  c=c-b;  c=c^(b >>> 5);
+//        a=a-b;  a=a-c;  a=a^(c >>> 3);
+//        b=b-c;  b=b-a;  b=b^(a << 10);
+//        c=c-a;  c=c-b;  c=c^(b >>> 15);
+//        return c;
     }
 
     public static int hashCombine(Object[] t) {
         if (t.length == 0)
-            return 1;
+            return 0;
         int x = t[0].hashCode();
         for (int i = 1; i < t.length; i++) {
             x = hashCombine(x, t[i].hashCode());

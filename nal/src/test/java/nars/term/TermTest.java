@@ -655,11 +655,12 @@ public class TermTest {
             //correct if happens here
         }
     }
+
+    static final Terminal t = new Terminal(8);
+
     public static void assertValidTermValidConceptInvalidTaskContent(String o) {
         try {
 
-
-            Terminal t = new Terminal(8);
             t.believe(o);
 
             assertTrue(o + " should not have been allowed as a task content", false);
@@ -859,6 +860,16 @@ public class TermTest {
     }
 
 
+    public static void assertInvalid(@NotNull String o) {
+        assertInvalid(() -> {
+                try {
+                    Term x = $(o);
+                    return x;
+                } catch (Narsese.NarseseException e) {
+                    return False;
+                }
+        });
+    }
     public static void assertInvalid(@NotNull Supplier<Term> o) {
         try {
             Term recv = o.get();

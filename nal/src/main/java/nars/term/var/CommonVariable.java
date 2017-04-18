@@ -24,13 +24,14 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //            //System.out.println(v1 + " " + v2);
 //        }
 
+        int a = A.id();
+        int b = B.id();
+
         boolean aCommon = (A instanceof CommonVariable);
         boolean bCommon = (B instanceof CommonVariable);
         if (aCommon || bCommon) {
 
             if (aCommon && B instanceof AbstractVariable) {
-                int a = A.id();
-                int b = B.id();
 
                 //check to see if b is included in a
                 int a1 = multiVariable(a, true);
@@ -39,9 +40,6 @@ public final class CommonVariable extends GenericNormalizedVariable {
                     return A;
 
             } else if (bCommon && A instanceof AbstractVariable) {
-
-                int a = A.id();
-                int b = B.id();
 
                 //check to see if a is included in b
                 int b1 = multiVariable(b, true);
@@ -65,9 +63,6 @@ public final class CommonVariable extends GenericNormalizedVariable {
             );
             //throw new RuntimeException("variable oob");
         }
-
-        int a = A.id();
-        int b = B.id();
 
         if (a == b) {
             throw new RuntimeException("variables equal");

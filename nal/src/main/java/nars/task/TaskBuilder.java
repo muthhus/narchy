@@ -223,7 +223,19 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
 
 
         ImmutableTask i = new ImmutableTask(term, punc, truth, creation, start, end, evidence);
-        i.copyFrom(this);
+        i.setPriority(this);
+        //        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
         return i;
     }
 
@@ -523,7 +535,19 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
 
     @NotNull
     public final TaskBuilder pri(@NotNull Priority bb) {
-        copyFrom(bb);
+        setPriority(bb);
+        //        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
         return this;
     }
 

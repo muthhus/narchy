@@ -32,6 +32,7 @@ import java.util.Objects;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -173,16 +174,20 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Nullable
     static boolean taskContentValid(@NotNull Compound t, byte punc, @Nullable NAR nar, boolean safe) {
         if (!t.isNormalized())
-            return test(t, "Task Term is null or not a normalized Compound", safe);
+            return fail(t, "Task Term is null or not a normalized Compound", safe);
 
         if (nar!=null) {
             int maxVol = nar.termVolumeMax.intValue();
             if (t.volume() > maxVol)
-                return test(t, "Term exceeds maximum volume", safe);
+                return fail(t, "Term exceeds maximum volume", safe);
 
             int nalLevel = nar.level();
             if (!t.levelValid(nalLevel))
-                return test(t, "Term exceeds maximum NAL level", safe);
+                return fail(t, "Term exceeds maximum NAL level", safe);
+        }
+
+        if (t.op().temporal && t.dt()==XTERNAL) {
+            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
         }
 
         //if (Param.DEBUG) {
@@ -191,10 +196,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         //}
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
-            return test(t, "Belief or goal with query variable", safe);
+            return fail(t, "Belief or goal with query variable", safe);
         }
 
+
         return taskStatementValid(t, punc, safe);
+    }
+
+    @Nullable static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
+        return taskStatementValid(t, (byte)0, safe); //ignore the punctuation-specific conditions
     }
 
     /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
@@ -208,21 +218,21 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             case 0:
                 break;  //OK
             case 1:
-                return test(t, "singular independent variable must be balanced elsewhere", safe);
+                return fail(t, "singular independent variable must be balanced elsewhere", safe);
             default:
                 if (!t.hasAny(Op.StatementBits))
-                    return test(t, "Independent variables require statements super-terms", safe);
+                    return fail(t, "Independent variables require statements super-terms", safe);
                 else if (op.statement && t.hasVarIndep()) {
                     Term subj = t.term(0);
                     if (subj.op()==VAR_INDEP)
-                        return test(t, "Statement Task's subject is VAR_INDEP", safe);
+                        return fail(t, "Statement Task's subject is VAR_INDEP", safe);
                     if (subj.varIndep() == 0)
-                        return test(t, "Statement Task's subject has no VAR_INDEP", safe);
+                        return fail(t, "Statement Task's subject has no VAR_INDEP", safe);
                     Term pred = t.term(1);
                     if (pred.op()==VAR_INDEP)
-                        return test(t, "Statement Task's predicate is VAR_INDEP", safe);
+                        return fail(t, "Statement Task's predicate is VAR_INDEP", safe);
                     if (pred.varIndep() == 0)
-                        return test(t, "Statement Task's predicate has no VAR_INDEP", safe);
+                        return fail(t, "Statement Task's predicate has no VAR_INDEP", safe);
                 }
 
                 //TODO more thorough test for invalid independent-variable containing compounds
@@ -233,13 +243,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
 
         if ((punc == Op.GOAL || punc == Op.QUEST) && (op == Op.IMPL || op == Op.EQUI))
-            return test(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
+            return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
         return true;
     }
 
     @Nullable
-    static boolean test(@Nullable Term t, String reason, boolean safe) {
+    static boolean fail(@Nullable Term t, String reason, boolean safe) {
         if (safe)
             return false;
         else
@@ -285,12 +295,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     default TaskConcept concept(@NotNull NAR n) {
         Concept c = n.concept(term(), true);
         if (!(c instanceof TaskConcept)) {
-            //if (Param.DEBUG_EXTRA)
+            if (Param.DEBUG_EXTRA)
                 throw new RuntimeException
                 //System.err.println
                         ("should conceptualize to TaskConcept: " + c);
             //else
-            //return null;
+            return null;
         }
         return (TaskConcept) c;
     }
@@ -677,7 +687,19 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return null;
 
         ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
-        y.copyFrom(b);
+        y.setPriority(b);
+        //        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
         y.meta = x.meta();
         return y;
     }
@@ -702,7 +724,19 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return null;
 
         ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.stamp());
-        y.copyFrom(b);
+        y.setPriority(b);
+        //        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
         y.meta = x.meta();
         return y;
 

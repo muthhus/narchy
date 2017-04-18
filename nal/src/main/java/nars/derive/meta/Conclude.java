@@ -245,15 +245,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
                 return;
         }
 
-
-        if (!Task.taskContentValid(content, punc, nar, !Param.DEBUG)) {
-            //throw new InvalidTaskException(crr, "Invalid content");
-            //Task.taskContentValid(crr, punc, nar, !Param.DEBUG);
-            return;
-        }
-
-
-        DerivedTask d = derive(content, priority, nar.time(), occ, m, truth, punc, evidence, nar);
+        DerivedTask d = derive(content, priority, nar.time(), occ, m, truth, punc, evidence);
 
         if (d != null)
             m.target.accept(d);
@@ -264,7 +256,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
      * part 2
      */
     @Nullable
-    public final DerivedTask derive(@NotNull Compound cc, @NotNull Priority priority, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence, NAR nar) {
+    public final DerivedTask derive(@NotNull Compound cc, @NotNull Priority priority, long now, long[] occ, @NotNull Derivation p, Truth truth, byte punc, long[] evidence) {
 
         long start, end;
         if (occ != null) {
@@ -281,7 +273,19 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
 
 
         //new RuleFeedbackDerivedTask(c, truth, punc, evidence, p, rule);
-        d.copyFrom(priority); // copied in, not shared
+        d.setPriority(priority);
+        //        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
         //.anticipate(derivedTemporal && d.anticipate)
 
         if (Param.DEBUG)

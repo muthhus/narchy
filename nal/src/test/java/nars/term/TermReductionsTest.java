@@ -17,6 +17,7 @@ import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.Op.False;
 import static nars.Op.True;
+import static nars.term.TermTest.assertInvalid;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
@@ -117,8 +118,8 @@ public class TermReductionsTest {
     public void testInvalidEquivalences() throws Narsese.NarseseException {
         assertEquals("(P<=>Q)", equi(p, q).toString());
 
-        TermTest.assertInvalid(() -> equi(impl(p, q), r));
-        TermTest.assertInvalid(() -> equi(equi(p, q), r));
+        assertInvalid(() -> equi(impl(p, q), r));
+        assertInvalid(() -> equi(equi(p, q), r));
         assertInvalidTerms("<<a <=> b> <=> c>");
     }
 
@@ -227,7 +228,7 @@ public class TermReductionsTest {
 
     @Test
     public void testConjunctionNormal() throws Narsese.NarseseException {
-        Term x = $.$("(&&, <#1 --> lock>, <#1 --> (/, open, #2, _)>, <#2 --> key>)");
+        Term x = $("(&&, <#1 --> lock>, <#1 --> (/, open, #2, _)>, <#2 --> key>)");
         assertEquals(3, x.size());
         assertEquals(CONJ, x.op());
     }
@@ -596,10 +597,28 @@ public class TermReductionsTest {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==> (a))"));
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==>+0 (a))"));
     }
+
     @Test
     public void testCoNegatedEqui() throws Narsese.NarseseException {
-        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=> (a))"));
-        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+0 (a))"));
+        assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
+        assertInvalid(("((--,(a)) <=> (a))"));
+        assertInvalid(("((--,(a)) <=>+0 (a))"));
+        assertValid($("((--,(a)) <=>+1 (a))"));
+
+        //due to the unpaired $3
+        assertInvalid("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz))))");
+    }
+
+    @Test
+    public void testEquivCommonSubterms() throws Narsese.NarseseException {
+        //factor out the common sub-term
+        assertEquals(
+                "((--,isIn($1,xyz))<=>(x:y))",
+                $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
+
+        //negated common subterm is invalid
+        assertInvalid(
+                "(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(x:y)))");
     }
 
     @Test public void testCoNegatedImplOK() throws Narsese.NarseseException {

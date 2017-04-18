@@ -214,7 +214,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
         Task task = b.get();
 
         try {
-            Compound r = reify(task, nar.self());
+            Compound r = Task.content(reify(task, nar.self()), nar);
             if (r != null) {
 
                 long now = nar.time();

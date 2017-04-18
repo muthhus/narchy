@@ -261,35 +261,12 @@ public class TestNAR {
         }
     }
 
-//    public TestNAR onAnswer(String solution, AtomicBoolean solved /* for detecting outside of this */) throws InvalidInputException {
-//
-//        solved.set(false);
-//
-//        final Task expectedSolution = nar.task(solution);
-//
-//        nar.memory.eventAnswer.on(qa -> {
-//             if (!solved.get() && qa.getTwo().equals(expectedSolution)) {
-//                 solved.set(true);
-//             }
-//        });
-//
-//        return this;
-//
-//    }
-
-//    public TestNAR mustOutput(Topic<Tasked> c, long cycleStart, long cycleEnd, String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, int ocRelative) throws InvalidInputException {
-//        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ocRelative );
-//    }
 
     @NotNull
     public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) {
         return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ETERNAL, ETERNAL);
     }
 
-//    @NotNull
-//    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, @NotNull Tense t)  {
-//        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, nar.time(t));
-//    }
 
     @NotNull
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end) {
@@ -345,26 +322,11 @@ public class TestNAR {
     }
 
 
-//    /** padding to add to specified time limitations to allow correct answers;
-//     *  default=0 having no effect  */
-//    public static int getTemporalTolerance() {
-//        return temporalTolerance;
-//    }
-
-//    public void setTemporalTolerance(int temporalTolerance) {
-//        this.temporalTolerance = temporalTolerance;
-//    }
 
     @Nullable
     public Object getResult() {
         return result;
     }
-
-//    public TestNAR mustInput(long withinCycles, String task) {
-//        return mustEmit(
-//                new Topic[] { nar.memory.eventInput },
-//                withinCycles, task);
-//    }
 
 
     public final long time() {
@@ -405,14 +367,6 @@ public class TestNAR {
         return mustOutput(now, now + withinCycles, term, BELIEF, freqMin, freqMax, confMin, confMax, tense);
     }
 
-    //    public TestNAR mustBelievePast(long withinCycles, String term, float freqMin, float freqMax, float confMin, float confMax, int maxPastWindow) throws InvalidInputException {
-//        long now = time();
-//        return mustOutput(now, now + withinCycles, term, BELIEF, freqMin, freqMax, confMin, confMax);
-//    }
-//    public ExplainableTask mustBelieve(long cycleStart, long cycleStop, String term, float freq, float confidence) throws InvalidInputException {
-//        long now = time();
-//        return mustOutput(now + cycleStart, now + cycleStop, term, BELIEF, freq, freq, confidence, confidence);
-//    }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t) {
         long ttt = nar.time();
@@ -435,8 +389,9 @@ public class TestNAR {
             throw new UnsupportedOperationException();
 
         try {
+            long time = nar.time();
             return mustEmit(outputEvents,
-                    nar.time(), nar.time() + withinCycles,
+                    time, time + withinCycles,
                     sentenceTerm, punc, freqMin, freqMax, confMin,
                     confMax, occ, occ, false);
         } catch (Narsese.NarseseException e) {
@@ -445,17 +400,7 @@ public class TestNAR {
 
     }
 
-//    @NotNull
-//    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, @NotNull Tense t)  {
-//        return mustAnswer(withinCycles, term, freq, confidence, nar.time(t));
-//    }
 
-    //    @NotNull
-//    public TestNAR mustAnswer(long withinCycles, @NotNull String term, float freq, float confidence, long when)  {
-//        long ttt = nar.time();
-//        return mustEmit(new Topic[] { answerReceiver },
-//                ttt, ttt + withinCycles, term, BELIEF, freq, freq, confidence, confidence, when);
-//    }
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence, long occTimeAbsolute) {
         long t = nar.time();
@@ -510,17 +455,6 @@ public class TestNAR {
     }
 
 
-//    @NotNull
-//    public TestNAR mustExecute(long start, long end, @NotNull String term) {
-//        return mustExecute(start, end, term, 0, 1.0f);
-//    }
-//
-//    @NotNull
-//    public TestNAR mustExecute(long start, long end, @NotNull String term, float minExpect, float maxExpect) {
-//        requires.add(new ExecutionCondition(nar, start, end, term, minExpect, maxExpect));
-//        return this;
-//    }
-
     public TestNAR ask(@NotNull String termString) throws Narsese.NarseseException {
         nar.ask(termString);
         return this;
@@ -534,17 +468,19 @@ public class TestNAR {
     public TestNAR askAt(int i, String term) {
         try {
             nar.inputAt(i, term + "?");
-        } catch (Narsese.NarseseException e) {
-            assertTrue(e.toString(), false);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
         return this;
     }
 
 
-    @NotNull
-    public TestNAR believe(@NotNull String... termString) {
-        for (String s : termString) {
-            nar.believe(s);
+    /** TODO make this throw NarseseException */
+    @NotNull public TestNAR believe(@NotNull String termString) {
+        try {
+            nar.believe(termString);
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
         return this;
     }
@@ -553,7 +489,7 @@ public class TestNAR {
     public TestNAR believe(@NotNull String termString, float freq, float conf) {
         try {
             nar.believe(termString, freq, conf);
-        } catch (Narsese.NarseseException e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
         return this;

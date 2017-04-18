@@ -2,10 +2,7 @@ package nars.op.mental;
 
 import jcog.bag.impl.CurveBag;
 import jcog.data.MutableIntRange;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.Priority;
-import jcog.pri.RawPLink;
+import jcog.pri.*;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -215,7 +212,20 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
                             new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
                     );
                     abbreviationTask.log("Abbreviate");
-                    abbreviationTask.priority().copyFrom(b);
+                    abbreviationTask.priority().setPriority(b);
+                    abbreviationTask.priority();
+//        if (srcCopy == null) {
+//            delete();
+//        } else {
+//            float p = srcCopy.priSafe(-1);
+//            if (p < 0) {
+//                delete();
+//            } else {
+//                setPriority(p);
+//            }
+//        }
+//
+//        return this;
 
                     nar.input(abbreviationTask);
                     logger.info("{}", abbreviationTask);

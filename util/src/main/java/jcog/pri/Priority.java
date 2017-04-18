@@ -168,26 +168,6 @@ public interface Priority extends Prioritized {
     @Nullable Priority clone();
 
 
-
-    /**
-     * copies a budget into this; if source is null, it deletes the budget
-     */
-    @NotNull
-    default Priority copyFrom(@Nullable Prioritized srcCopy) {
-        if (srcCopy == null) {
-            delete();
-        } else {
-            float p = srcCopy.priSafe(-1);
-            if (p < 0) {
-                delete();
-            } else {
-                setPriority(p);
-            }
-        }
-
-        return this;
-    }
-
     /**
      * Briefly display the BudgetValue
      *

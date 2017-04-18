@@ -268,12 +268,8 @@ public class TaskConcept extends CompoundConcept {
         if (inserted == null)
             return null;
 
-        //HACK
-        float activation =
-                (nar.focus() instanceof ConceptBagFocus) ? ((ConceptBagFocus) (nar.focus())).activationRate.floatValue() : 1
-                //1
-        ;
-        Activation a = nar.activateTask(inserted, this, activation);
+
+        Activation a = nar.activateTask(inserted, this, 1f);
         if (input != inserted) {
             return null; //dont process further aside from this re-activation
         } else {

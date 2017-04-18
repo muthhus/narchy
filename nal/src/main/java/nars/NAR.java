@@ -470,17 +470,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString) {
+    public NAR believe(@NotNull String termString) throws NarseseException {
         return believe(termString, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString, boolean isTrue) {
-        try {
-            return believe(term(termString), isTrue);
-        } catch (NarseseException e) {
-            throw new RuntimeException(e);
-        }
+    public NAR believe(@NotNull String termString, boolean isTrue) throws NarseseException {
+        return believe(term(termString), isTrue);
     }
 
     @NotNull

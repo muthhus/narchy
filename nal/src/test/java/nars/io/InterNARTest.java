@@ -93,7 +93,11 @@ public class InterNARTest {
 
         testAB((a, b) -> {
 
-            b.believe("(X --> y)");
+            try {
+                b.believe("(X --> y)");
+            } catch (Narsese.NarseseException e) {
+                assertTrue(false);
+            }
 
             a.onTask(tt -> {
                 //System.out.println(b + ": " + tt);
@@ -127,8 +131,12 @@ public class InterNARTest {
         testAB((a, b) -> {
 
 
-            b.believe("(a --> b)");
-            b.believe("(c --> d)");
+            try {
+                b.believe("(a --> b)");
+                b.believe("(c --> d)");
+            } catch (Narsese.NarseseException e) {
+                assertTrue(false);
+            }
 
             b.onTask(tt -> {
                 //System.out.println(b + ": " + tt);
