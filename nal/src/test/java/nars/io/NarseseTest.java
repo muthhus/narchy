@@ -620,9 +620,7 @@ public class NarseseTest {
                 } else {
                     assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception
                 }
-            } catch (Narsese.NarseseException e) {
-                assertTrue(true);
-            } catch (InvalidTermException f) {
+            } catch (Narsese.NarseseException | InvalidTermException e) {
                 assertTrue(true);
             }
         }

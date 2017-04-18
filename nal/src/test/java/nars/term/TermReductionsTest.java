@@ -5,6 +5,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.Task;
 import nars.nar.Terminal;
+import nars.task.util.InvalidTaskException;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -498,7 +499,7 @@ public class TermReductionsTest {
         try {
             t.inputAndGet("at($1,$2,$3)");
             assertTrue(false);
-        } catch (Narsese.NarseseException e) {
+        } catch (InvalidTaskException e) {
             assertTrue(true);
         }
     }

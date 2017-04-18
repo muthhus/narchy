@@ -468,10 +468,6 @@ public class Narsese extends BaseParser<Object> {
 
                         seq(meta, Ellipsis()),
 
-                        Variable(),
-
-                        NumberAtom(),
-
 
                         seq(SETe.str,
 
@@ -539,8 +535,11 @@ public class Narsese extends BaseParser<Object> {
                                 //Negation.make(popTerm(null, true)))),
                                 T.neg( /*$.$(*/ (Term) pop()))),
 
+                        NumberAtom(),
 
-                        Atom()
+                        Atom(),
+
+                        Variable()
 
                 ),
 

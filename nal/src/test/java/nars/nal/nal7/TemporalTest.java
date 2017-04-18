@@ -243,6 +243,7 @@ public class TemporalTest {
 
         Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
+        assertNotNull(a);
         assertTrue(a == a0);
 
 

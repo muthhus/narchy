@@ -1340,18 +1340,18 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             default:
 
                 if (term instanceof Compound) {
+                    term = concepts.atemporalize((Compound) term);
+                    if (term == null)
+                        return null;
+                }
+
+
+                if (term instanceof Compound) {
                     term = concepts.normalize((Compound) term);
                     if (term == null)
                         return null;
                 }
 
-                if (term instanceof Compound) {
-                    term = concepts.atemporalize((Compound) term);
-                    if (term == null)
-                        return null;
-
-
-                }
         }
 
         if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))

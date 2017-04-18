@@ -24,7 +24,7 @@
 
     // the second neqRCom() is to handle the backwards cases until a proper variable transform is implemented for those auto-generated rules
 
-    (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backwards)
+    (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backwards, Permute:Swap)
         //(A --> B), (B --> C), neqRCom(A,C), neqAndCom(A,C)   |- varIntro((A --> C)), (Belief:Deduction, Goal:Strong)
     (A --> B), (A --> C), neqRCom(B,C)   |- (C --> B), (Belief:Abduction, Goal:Weak)
     (A --> C), (B --> C), neqRCom(A,B)   |- (A --> B), (Belief:Induction, Goal:Weak)
