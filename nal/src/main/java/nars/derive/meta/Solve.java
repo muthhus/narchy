@@ -53,7 +53,7 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
                 if (!single && m.belief == null)  //double premise, but belief is null
                     return false;
 
-                if (!f.allowOverlap() && m.overlap(single))
+                if (!f.allowOverlap() && (single ? m.cyclic : m.overlap))
                     return false;
 
                 //truth function is single premise so set belief truth to be null to prevent any negations below:
@@ -79,11 +79,12 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
 
             case QUEST:
             case QUESTION:
-//                //a truth function so check cyclicity
-//                if (m.cyclic)
-//                    return false;
+                //a truth function so check cyclicity
+                if (m.cyclic || m.overlap)
+                    return false;
 
-                if (punct==QUESTION && (m.task.isGoal() || m.task.isQuest()))
+                //apply similar behavior for Question to Quests
+                if (punct==QUESTION && m.task.isQuest())
                     punct = QUEST;
 
                 single = true;

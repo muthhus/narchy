@@ -287,9 +287,6 @@ public class Derivation extends Unify {
         return evidenceDouble;
     }
 
-    public boolean overlap(boolean single) {
-        return single ? cyclic : overlap;
-    }
 }
 
 
