@@ -12,15 +12,13 @@ public class GenericVariable extends AtomicString implements Variable {
 
     @NotNull
     public final Op type;
-    @NotNull
-    public  final String label;
+
     @NotNull
     private final String str;
 
     public GenericVariable(@NotNull Op type, @NotNull String label) {
-        this.label = label;
         this.type = type;
-        this.str = type.ch + label;
+        this.str = label;
     }
 
     @Override

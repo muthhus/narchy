@@ -1,6 +1,7 @@
 package nars.term.transform;
 
 import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.GenericVariable;
@@ -23,6 +24,8 @@ import java.util.function.Function;
  *
  */
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
+
+    int count = 0;
 
     @NotNull
     public final Map<Variable /* Input Variable */, Variable /*Variable*/> map;
@@ -54,14 +57,18 @@ public class VariableNormalization extends VariableTransform implements Function
     @NotNull
     @Override
     public Variable apply(@NotNull Variable x) {
-        return newVariable(x, map.size()+1);
+        return newVariable(x, ++count);
     }
 
     @Override
     public final Term apply(@Nullable Compound ct, @NotNull Term v) {
-        if (v instanceof Variable)
-            return map.computeIfAbsent((Variable)v, this);
-        else
+        if (v instanceof Variable) {
+            if (v.equals(Op.Imdex)) {
+                return apply((Variable)v); //anonymized to a unique variable each occurrence
+            } else {
+                return map.computeIfAbsent((Variable) v, this);
+            }
+        } else
             return v;
     }
 
@@ -72,7 +79,7 @@ public class VariableNormalization extends VariableTransform implements Function
             y = ((GenericVariable) x).normalize(serial); //HACK
         } else {
             y = $.v(x.op(), serial);
-            y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
+            //y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
         }
 
         return y ;

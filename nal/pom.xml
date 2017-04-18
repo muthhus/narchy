@@ -123,12 +123,17 @@
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.nal</include>
-                    <include>**/*.proto</include>
                 </includes>
             </resource>
-
         </resources>
-
+        <testResources>
+            <testResource>
+                <directory>src/test/java</directory>
+                <includes>
+                    <include>**/*.nal</include>
+                </includes>
+            </testResource>
+        </testResources>
         <!--<plugins>-->
             <!--<plugin>-->
                 <!--<groupId>org.xolstice.maven.plugins</groupId>-->

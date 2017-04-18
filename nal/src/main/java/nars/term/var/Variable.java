@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
  **/
 public interface Variable extends Atomic {
 
+
     /** an ID by which this variable can be uniquely identified,
      * among the other existing variables with the same ID but
      * from other variable op's #$?%

@@ -40,7 +40,8 @@ public class StateGoalEvaluation extends State {
 			.getPrimitive();
 			try {
 				e.nextState = (primitive
-						.evalAsPredicate(e.currentContext.currentGoal)) ? c.GOAL_SELECTION
+						.evalAsPredicate(e.currentContext.currentGoal)) ?
+						c.GOAL_SELECTION
 								: c.BACKTRACK;
 			} catch (HaltException he) {
 				e.nextState = c.END_HALT;

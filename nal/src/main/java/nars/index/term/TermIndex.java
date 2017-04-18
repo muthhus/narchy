@@ -1,9 +1,6 @@
 package nars.index.term;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
@@ -31,6 +28,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.Op.VAR_QUERY;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -757,15 +755,17 @@ public abstract class TermIndex extends TermBuilder {
         }
     };
 
-    //    @Override
-//    protected @NotNull Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
-//        if ( op == INH && predicate instanceof Atom && !(predicate instanceof Concept) && transformImmediates() ) {
-//            //resolve atomic statement predicates in inheritance, for inline term rewriting
-//            Termed existingPredicate = get(predicate);
-//            if (existingPredicate!=null)
-//                predicate = existingPredicate.term();
-//        }
-//
-//        return super.statement(op, dt, subject, predicate);
-//    }
-}
+    @Nullable
+    public Term queryToDepVar(@NotNull Compound term) {
+        return transform(term, queryToDepVar);
+    }
+
+    /**
+     * change all query variables to dep vars
+     */
+    final static CompoundTransform queryToDepVar = (parent, subterm) -> {
+        if (subterm.op() == VAR_QUERY) {
+            return $.varDep((((Variable) subterm).id()));
+        }
+        return subterm;
+    };}

@@ -57,7 +57,7 @@ public abstract class Param  {
     //    //TODO use 'I' for SELf, it is 3 characters shorter
 //    public static final Atom DEFAULT_SELF = (Atom) $.the("I");
     public static Atom randomSelf() {
-        return $.quote("I_" + Util.uuid64());
+        return (Atom) $.quote("I_" + Util.uuid64());
     }
 
 

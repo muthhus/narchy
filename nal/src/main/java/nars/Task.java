@@ -186,7 +186,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         }
 
         //if (Param.DEBUG) {
-        if (t.containsTerm(Term.True) || t.containsTerm(Term.False))
+        if (t.containsTerm(True) || t.containsTerm(False))
             throw new InvalidTaskException(t, "term contains True or False");
         //}
 

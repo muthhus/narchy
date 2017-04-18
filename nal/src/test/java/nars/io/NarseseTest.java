@@ -653,7 +653,7 @@ public class NarseseTest {
 
 
     @Test public void testInvalidTrueFalseTask() {
-        for (Term t : new Term[] { Term.True, Term.False }) {
+        for (Term t : new Term[] { Op.True, Op.False }) {
             Compound bad = $.p("x", "y", "z");
             bad.subterms().terms()[0] = t; //directly replace it because constructing such a term wont be allowed
 

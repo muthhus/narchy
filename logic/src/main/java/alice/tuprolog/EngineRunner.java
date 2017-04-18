@@ -50,7 +50,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     private Engine last_env;
     /* Stack environments of nidicate solving */
     private final LinkedList<Engine> stackEnv = new LinkedList<>();
-    private Solution sinfo;
+    protected Solution sinfo;
     private String sinfoSetOf;
     
     /**

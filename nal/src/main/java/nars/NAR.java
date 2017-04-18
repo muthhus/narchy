@@ -932,6 +932,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return time.dur();
     }
 
+
+
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
         public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, PLink<Term>> termLinks, Bag<Task, PLink<Task>> taskLinks) {
             super(atom, termLinks, taskLinks);
@@ -1211,6 +1213,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return this;
     }
 
+    public NAR inputNarsese(@NotNull InputStream inputStream) throws IOException, NarseseException {
+        String x = new String(inputStream.readAllBytes());
+        /*List<Task> y = */input(x);
+        return this;
+    }
 
     @NotNull
     public NAR inputAt(long time, @NotNull String... tt) throws NarseseException {
@@ -1508,14 +1515,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
 
-    public @NotNull NAR input(@NotNull File input) throws IOException {
-        return input(new FileInputStream(input));
+    public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
+        return inputBinary(new FileInputStream(input));
     }
 
     @NotNull
-    public NAR output(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
-        output(ff, each);
+        outputBinary(ff, each);
         ff.close();
         return this;
     }
@@ -1527,7 +1534,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      * if this function returns null it will not output that task (use as a filter).
      */
     @NotNull
-    public NAR output(@NotNull OutputStream o, @NotNull Function<Task, Task> each) {
+    public NAR outputBinary(@NotNull OutputStream o, @NotNull Function<Task, Task> each) {
 
         //SnappyFramedOutputStream os = new SnappyFramedOutputStream(o);
 
@@ -1580,12 +1587,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @NotNull
     public NAR output(@NotNull File o, Function<Task, Task> f) throws IOException {
-        return output(new FileOutputStream(o), f);
+        return outputBinary(new FileOutputStream(o), f);
     }
 
     @NotNull
     public NAR output(@NotNull OutputStream o) {
-        return output(o, x -> x.isDeleted() ? null : x);
+        return outputBinary(o, x -> x.isDeleted() ? null : x);
     }
 
     /**
@@ -1593,7 +1600,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      * TODO use input(Stream<Task>..</Task>
      */
     @NotNull
-    public NAR input(@NotNull InputStream i) throws IOException {
+    public NAR inputBinary(@NotNull InputStream i) throws IOException {
 
         //SnappyFramedInputStream i = new SnappyFramedInputStream(tasks, true);
         DataInputStream ii = new DataInputStream(i);

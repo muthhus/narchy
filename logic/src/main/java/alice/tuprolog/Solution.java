@@ -219,4 +219,6 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
     public int result() {
         return endState;
     }
+
+
 }

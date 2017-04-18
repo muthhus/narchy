@@ -25,6 +25,7 @@ import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -181,10 +182,10 @@ public class Twenglish {
     }
 
     //shorthand punctuations
-    public static final Atom EXCLAMATION = $.quote("!");
-    public static final Atom PERIOD = $.quote(".");
-    public static final Atom QUESTION_MARK = $.quote("?");
-    public static final Atom COMMA = $.quote(",");
+    public static final Atomic EXCLAMATION = $.quote("!");
+    public static final Atomic PERIOD = $.quote(".");
+    public static final Atomic QUESTION_MARK = $.quote("?");
+    public static final Atomic COMMA = $.quote(",");
 
     @Nullable
     public static Term spanToTerm(@NotNull Span c, boolean includeWordPOS) {

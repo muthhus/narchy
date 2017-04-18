@@ -18,10 +18,10 @@ public class CommonVariableTest {
 
 
 
-    static final GenericVariable p1 = new GenericVariable(Op.VAR_PATTERN, "1");
-    static final GenericVariable p2 = new GenericVariable(Op.VAR_PATTERN, "2");
-    static final GenericVariable p3 = new GenericVariable(Op.VAR_PATTERN, "3");
-    static final GenericVariable p12 = new GenericVariable(Op.VAR_PATTERN, "12");
+    static final GenericVariable p1 = new GenericVariable(Op.VAR_PATTERN, "%1");
+    static final GenericVariable p2 = new GenericVariable(Op.VAR_PATTERN, "%2");
+    static final GenericVariable p3 = new GenericVariable(Op.VAR_PATTERN, "%3");
+    static final GenericVariable p12 = new GenericVariable(Op.VAR_PATTERN, "%12");
 
     @Test
     public void commonVariableTest1() {

@@ -14,8 +14,8 @@ import static nars.$.*;
 import static nars.Op.CONJ;
 import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTerms;
-import static nars.term.Term.False;
-import static nars.term.Term.True;
+import static nars.Op.False;
+import static nars.Op.True;
 import static nars.term.TermTest.assertValid;
 import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static org.junit.Assert.*;
@@ -585,8 +585,8 @@ public class TermReductionsTest {
 
     @Test
     public void testFilterCoNegatedStatements() throws Narsese.NarseseException {
-        assertEquals(Term.False, $("((--,(a1)) <-> (a1))"));
-        assertEquals(Term.False, $("((--,(a1)) --> (a1))"));
+        assertEquals(Op.False, $("((--,(a1)) <-> (a1))"));
+        assertEquals(Op.False, $("((--,(a1)) --> (a1))"));
     }
 
 
@@ -657,7 +657,7 @@ public class TermReductionsTest {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
-        assertEquals(Term.False, $("(&&,(--,(a==>a)),c:d,e:f)"));
+        assertEquals(Op.False, $("(&&,(--,(a==>a)),c:d,e:f)"));
 
     }
 

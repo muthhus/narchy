@@ -55,22 +55,6 @@ import static nars.time.Tense.DTERNAL;
 public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
-    /**
-     * absolute/singular Boolean truths
-     */
-    AtomicSingleton True = new AtomicSingleton("†");
-
-    AtomicSingleton False = new AtomicSingleton("Ø") {
-        @NotNull
-        @Override
-        public Term unneg() {
-            return True;
-        }
-    };
-
-    AtomicSingleton Null = new AtomicSingleton("null");
-
-
     @NotNull
     @Override
     default Term term() {

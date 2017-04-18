@@ -20,8 +20,8 @@ import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.term.Term.False;
-import static nars.term.Term.True;
+import static nars.Op.False;
+import static nars.Op.True;
 import static nars.term.Terms.pred;
 import static nars.term.Terms.subj;
 import static nars.time.Tense.DTERNAL;

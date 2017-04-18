@@ -7,6 +7,7 @@ import nars.Task;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -243,5 +244,25 @@ public class NarseseExtendedTest {
         assertEquals("( &&+0 ,a,b,c)", term("(&|, a, b, c)").toString());
     }
 
+    @Test public void testAnonymousQueryVariable() throws Narsese.NarseseException {
+
+        // (_,_) must be converted to (#1,#2)
+        String input = "((_,_) <-> x)";
+
+        Compound x = term(input);
+        //Terms.printRecursive(System.out, x);
+        assertEquals("(x<->(_,_))", x.toString());
+
+        Term y = $.terms.normalize(x);
+        //Terms.printRecursive(System.out, y);
+        assertEquals("(x<->(#1,#2))", y.toString());
+
+        Task question = task(x + "?");
+        assertEquals("(x<->(#1,#2))?", question.toStringWithoutBudget());
+
+        Task belief = task(x + ".");
+        assertEquals("(x<->(#1,#2)). %1.0;.90%", belief.toStringWithoutBudget());
+
+    }
 }
 

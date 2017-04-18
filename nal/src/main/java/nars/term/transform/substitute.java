@@ -1,6 +1,7 @@
 package nars.term.transform;
 
 import nars.$;
+import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
@@ -27,7 +28,7 @@ public final class substitute extends Functor {
         final Term x = parent.yxResolve(xx[1]); //original term (x)
 
         if (term instanceof Compound && (xx.length > 3) && xx[3].equals(STRICT) && !((Compound) term).containsTermRecursively(x)) {
-            return False;
+            return Op.False;
         }
 
         final Term y = parent.yxResolve(xx[2]); //replacement term (y)
@@ -37,7 +38,7 @@ public final class substitute extends Functor {
             return z;
         }
 
-        return False;
+        return Op.False;
     }
 
 }

@@ -11,9 +11,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Alex Benini
@@ -23,13 +22,13 @@ public class LibraryManager
 {
 
 	/* dynamically loaded built-in libraries */
-	private final ArrayList<Library> currentLibraries;
+	private final List<Library> currentLibraries;
 
 	/*  */
 	private Prolog prolog;
 	private TheoryManager theoryManager;
 	private PrimitiveManager primitiveManager;
-	private final Hashtable<String, URL> externalLibraries = new Hashtable<>();
+	private final HashMap<String, URL> externalLibraries = new HashMap<>();
 
 	/**
 	 * @author Alessio Mercurio
@@ -39,9 +38,8 @@ public class LibraryManager
 	 */
 	private String optimizedDirectory;
 
-	LibraryManager()
-	{
-		currentLibraries = new ArrayList<>();
+	LibraryManager() {
+		currentLibraries = new CopyOnWriteArrayList<>();
 	}
 
 	/**
@@ -66,7 +64,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized Library load(String className)
+	public synchronized Library loadClass(String className)
 			throws InvalidLibraryException
 	{
 		Library lib = null;
@@ -110,8 +108,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized Library load(String className, String[] paths)
-			throws InvalidLibraryException
+	public synchronized Library loadClass(String className, String[] paths) throws InvalidLibraryException
 	{
 		Library lib = null;
 		URL[] urls = null;
@@ -282,27 +279,13 @@ public class LibraryManager
 				String msg = "library " + alib.getName() + " already loaded.";
 				prolog.notifyWarning(new WarningEvent(prolog, msg));
 			}
-			unloadLibrary(name);
+			unload(name);
 		}
 		bindLibrary(lib);
 		LibraryEvent ev = new LibraryEvent(prolog, lib.getName());
 		prolog.notifyLoadedLibrary(ev);
 	}
 
-	/**
-	 * Gets the list of current libraries loaded
-	 * 
-	 * @return the list of the library names
-	 */
-	public synchronized String[] getCurrentLibraries()
-	{
-		String[] libs = new String[currentLibraries.size()];
-		for (int i = 0; i < libs.length; i++)
-		{
-			libs[i] = currentLibraries.get(i).getName();
-		}
-		return libs;
-	}
 
 	/**
 	 * Unloads a previously loaded library
@@ -312,33 +295,26 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid loaded library
 	 */
-	public synchronized void unloadLibrary(String name)
-			throws InvalidLibraryException
+	public void unload(String name) throws InvalidLibraryException
 	{
-		boolean found = false;
-		Iterator<Library> it = currentLibraries.listIterator();
-		while (it.hasNext())
-		{
-			Library lib = it.next();
-			if (lib.getName().equals(name))
-			{
-				found = true;
-				it.remove();
+		boolean found = currentLibraries.removeIf(lib -> {
+			if (lib.getName().equals(name)) 			{
 				lib.dismiss();
 				primitiveManager.deletePrimitiveInfo(lib);
-				break;
+				return true;
 			}
-		}
+			return false;
+		});
+
 		if (!found)
-		{
 			throw new InvalidLibraryException();
-		}
-		if (externalLibraries.containsKey(name))
-			externalLibraries.remove(name);
+
+		externalLibraries.remove(name);
+
 		theoryManager.removeLibraryTheory(name);
 		theoryManager.rebindPrimitives();
-		LibraryEvent ev = new LibraryEvent(prolog, name);
-		prolog.notifyUnloadedLibrary(ev);
+
+		prolog.notifyUnloadedLibrary(new LibraryEvent(prolog, name));
 	}
 
 	/**
@@ -392,48 +368,35 @@ public class LibraryManager
 	 * @return the reference to the library loaded, null if the library is not
 	 *         found
 	 */
-	public synchronized Library getLibrary(String name)
-	{
-		for (Library alib : currentLibraries)
-		{
-			if (alib.getName().equals(name))
-			{
+	public Library getLibrary(String name) {
+		for (Library alib : currentLibraries) {
+			if (alib.getName().equals(name)) {
 				return alib;
 			}
 		}
 		return null;
 	}
 
-	public synchronized void onSolveBegin(Term g)
-	{
-		for (Library alib : currentLibraries)
-		{
+	public void onSolveBegin(Term g) {
+		for (Library alib : currentLibraries) {
 			alib.onSolveBegin(g);
 		}
 	}
 
-	public synchronized void onSolveHalt()
-	{
-		for (Library alib : currentLibraries)
-		{
-			alib.onSolveHalt();
-		}
+	public void onSolveHalt()	{
+		currentLibraries.forEach(Library::onSolveHalt);
 	}
 
-	public synchronized void onSolveEnd()
-	{
-		for (Library alib : currentLibraries)
-		{
-			alib.onSolveEnd();
-		}
+	public void onSolveEnd() {
+		currentLibraries.forEach(Library::onSolveEnd);
 	}
 
-	public synchronized URL getExternalLibraryURL(String name)
+	public URL getExternalLibraryURL(String name)
 	{
 		return isExternalLibrary(name) ? externalLibraries.get(name) : null;
 	}
 
-	public synchronized boolean isExternalLibrary(String name)
+	public boolean isExternalLibrary(String name)
 	{
 		return externalLibraries.containsKey(name);
 	}

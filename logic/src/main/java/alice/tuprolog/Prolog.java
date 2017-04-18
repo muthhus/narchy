@@ -18,14 +18,12 @@
 package alice.tuprolog;
 
 import alice.tuprolog.event.*;
-import alice.tuprolog.interfaces.IProlog;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
-//import alice.tuprologx.ide.ToolBar;
 
 
 
@@ -34,7 +32,7 @@ import java.util.function.Consumer;
  * The Prolog class represents a tuProlog engine.
  *
  */
-public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
+public class Prolog  {
 
 	/*  manager of current theory */
 	private final TheoryManager theoryManager;
@@ -191,7 +189,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Gets the component managing primitives
 	 */
-	@Override
 	public PrimitiveManager getPrimitiveManager() {
 		return primitiveManager;
 	}
@@ -204,7 +201,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	}
 
 	/** Gets the component managing operators */
-	@Override
 	public OperatorManager getOperatorManager() {
 		return opManager;
 	}
@@ -270,16 +266,28 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @throws InvalidTheoryException if the new theory is not valid
 	 * @see Theory
 	 */
-	@Override
-	public void addTheory(Theory th) throws InvalidTheoryException {	//no syn
-		Theory oldTh = getTheory();
+	public Prolog addTheory(Theory th) throws InvalidTheoryException {	//no syn
+
+		Consumer<Theory> ifSuccessful;
+		if (!theoryListeners.isEmpty()) {
+			Theory oldTh = getTheory();
+			ifSuccessful = (newTheory) -> {
+				for (TheoryListener tl : theoryListeners) {
+                    tl.theoryChanged(new TheoryEvent(this, oldTh, newTheory));
+                }
+			};
+		} else {
+			ifSuccessful = null;
+		}
+
 		theoryManager.consult(th, true, null);
 		theoryManager.solveTheoryGoal();
 		Theory newTh = getTheory();
-		if (!theoryListeners.isEmpty()) {
-			TheoryEvent ev = new TheoryEvent(this, oldTh, newTh);
-			this.notifyChangedTheory(ev);
-		}
+
+		if (ifSuccessful!=null)
+			ifSuccessful.accept(newTh);
+
+		return this;
 	}
 
 	/**
@@ -287,7 +295,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @return current(dynamic) theory
 	 */
-	@Override
 	public Theory getTheory() {	//no syn
 		try {
 			return new Theory(theoryManager.getTheory(true));
@@ -310,7 +317,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Clears current theory
 	 */
-	@Override
 	public void clearTheory() {	//no syn
 		try {
 			setTheory(new Theory());
@@ -332,9 +338,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @return the reference to the Library just loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
-	@Override
 	public Library addLibrary(String className) throws InvalidLibraryException {	//no syn
-		return libraryManager.load(className);
+		return libraryManager.loadClass(className);
 	}
 
 	/**
@@ -349,7 +354,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
 	public Library addLibrary(String className, String[] paths) throws InvalidLibraryException {	//no syn
-		return libraryManager.load(className, paths);
+		return libraryManager.loadClass(className, paths);
 	}
 
 
@@ -367,16 +372,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	}
 
 
-	/**
-	 * Gets the list of current libraries loaded
-	 *
-	 * @return the list of the library names
-	 */
-	@Override
-	public String[] getCurrentLibraries() {		//no syn
-		return libraryManager.getCurrentLibraries();
-	}
-
 
 	/**
 	 * Unloads a previously loaded library
@@ -384,9 +379,8 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param name of the library to be unloaded
 	 * @throws InvalidLibraryException if name is not a valid loaded library
 	 */
-	@Override
 	public void removeLibrary(String name) throws InvalidLibraryException {		//no syn
-		libraryManager.unloadLibrary(name);
+		libraryManager.unload(name);
 	}
 
 
@@ -397,7 +391,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @return the reference to the library loaded, null if the library is
 	 *         not found
 	 */
-	@Override
 	public Library library(String name) {	//no syn
 		return libraryManager.getLibrary(name);
 	}
@@ -444,22 +437,35 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 		return sinfo;
 	}
 
-	public void solve(Term g, Consumer<Solution> eachSolution, long timeoutMS) {
+	public Prolog solve(String g, Consumer<Solution> eachSolution) {
+		return solve(term(g), eachSolution);
+	}
+
+	public Prolog solve(Term g, Consumer<Solution> eachSolution) {
+		return solve(g, eachSolution, -1);
+	}
+
+	public Prolog solve(Term g, Consumer<Solution> eachSolution, long timeoutMS) {
 		//System.out.println("ENGINE SOLVE #0: "+g);
-
-
-		Solution sinfo = engineManager.solve(g);
-		notifyNewQueryResultAvailable(this, sinfo);
-		eachSolution.accept(sinfo);
-		while (hasOpenAlternatives()) {
-			try {
-				Solution next = engineManager.solveNext( /* TODO subdivide input time */);
-				eachSolution.accept(next);
-			} catch (NoMoreSolutionException e) {
-				throw new RuntimeException(e);
+		Solution next = null;
+		do {
+			if (next == null) {
+				next = engineManager.solve(g);
+				if (next == null)
+					break; //no solutions
+			} else {
+				try {
+					next = engineManager.solveNext( /* TODO subdivide input time */);
+				} catch (NoMoreSolutionException e) {
+					e.printStackTrace();
+				}
 			}
-		}
+			notifyNewQueryResultAvailable(this, next);
+			eachSolution.accept(next);
+		} while (hasOpenAlternatives());
 
+
+		return this;
 	}
 
 	/**
@@ -469,8 +475,7 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @return the result of the demonstration
 	 * @see Solution
 	 **/
-	@Override
-	public Solution solve(String st) throws MalformedGoalException {
+	@Deprecated public Solution solve(String st) throws MalformedGoalException {
 		try {
 			return solve(term(st));
 		} catch (InvalidTermException ex) {
@@ -489,7 +494,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @throws NoMoreSolutionException if no more solutions are present
 	 * @see Solution
 	 **/
-	@Override
 	public Solution solveNext() throws NoMoreSolutionException {
 		if (hasOpenAlternatives()) {
 			Solution sinfo = engineManager.solveNext();
@@ -502,7 +506,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Halts current solve computation
 	 */
-	@Override
 	public void solveHalt() {
 		engineManager.solveHalt();
 	}
@@ -510,7 +513,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Accepts current solution
 	 */
-	@Override
 	public void solveEnd() {	//no syn
 		engineManager.solveEnd();
 	}
@@ -522,7 +524,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @return true if open alternatives are present
 	 */
-	@Override
 	public boolean hasOpenAlternatives() {		//no syn
 		boolean b =  engineManager.hasOpenAlternatives();
 		return b;
@@ -588,7 +589,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * @param term      the term to be represented as a string
 	 * @return the string representing the term
 	 */
-	@Override
 	public String toString(Term term) {		//no syn
 		return (term.toStringAsArgY(opManager, OperatorManager.OP_HIGH));
 	}
@@ -608,7 +608,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 * Switches on/off the notification of spy information events
 	 * @param state  - true for enabling the notification of spy event
 	 */
-	@Override
 	public synchronized void setSpy(boolean state) {
 		spy = state;
 	}
@@ -716,7 +715,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void addOutputListener(OutputListener l) {
 		outputListeners.add(l);
 	}
@@ -754,7 +752,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void addSpyListener(SpyListener l) {
 		spy = true;
 		spyListeners.add(l);
@@ -775,7 +772,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void addExceptionListener(ExceptionListener l) {
 		exceptionListeners.add(l);
 	}
@@ -786,7 +782,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void removeOutputListener(OutputListener l) {
 		outputListeners.remove(l);
 	}
@@ -794,7 +789,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Removes all output event listeners
 	 */
-	@Override
 	public synchronized void removeAllOutputListeners() {
 		outputListeners.clear();
 	}
@@ -832,7 +826,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void removeSpyListener(SpyListener l) {
 		spyListeners.remove(l);
 		spy = !(spyListeners.isEmpty());
@@ -841,7 +834,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Removes all spy event listeners
 	 */
-	@Override
 	public synchronized void removeAllSpyListeners() {
 		spy = false;
 		spyListeners.clear();
@@ -869,7 +861,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	 *
 	 * @param l the listener
 	 */
-	@Override
 	public synchronized void removeExceptionListener(ExceptionListener l) {
 		exceptionListeners.remove(l);
 	}
@@ -879,7 +870,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**
 	 * Removes all exception event listeners
 	 */
-	@Override
 	public synchronized void removeAllExceptionListeners() {
 		exceptionListeners.clear();
 	}
@@ -982,17 +972,6 @@ public class Prolog implements /*Castagna 06/2011*/IProlog/**/ {
 	/**/
 
 	//
-
-	/**
-	 * Notifies a new theory set or updated event
-	 *
-	 * @param e the event
-	 */
-	protected void notifyChangedTheory(TheoryEvent e) {
-		for (TheoryListener tl : theoryListeners) {
-			tl.theoryChanged(e);
-		}
-	}
 
 	/**
 	 * Notifies a library loaded event

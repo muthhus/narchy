@@ -4,6 +4,7 @@ package alice.tuprolog;
 //import java.io.IOException;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -218,6 +219,7 @@ public class EngineManager implements java.io.Serializable {
     }
 
 
+
     public Solution solve(Term query) {
         this.clearSinfoSetOf();
         synchronized (er1) {
@@ -230,29 +232,34 @@ public class EngineManager implements java.io.Serializable {
         //return er1.solve();
     }
 
-    public void solveEnd() {
-        er1.solveEnd();
-        if (!runners.isEmpty()) {
-            java.util.Enumeration<EngineRunner> ers = runners.elements();
-            while (ers.hasMoreElements()) {
-                EngineRunner current = ers.nextElement();
-                current.solveEnd();
+    public  void solveEnd() {
+        synchronized (er1) {
+            er1.solveEnd();
+            if (!runners.isEmpty()) {
+                Enumeration<EngineRunner> ers = runners.elements();
+                while (ers.hasMoreElements()) {
+                    EngineRunner current = ers.nextElement();
+                    current.solveEnd();
+                }
+                runners.clear();
+                //threads= new Hashtable<>();
+                queues.clear();
+                locks.clear();
+                id.set(0);
+                ;
             }
-            runners.clear();
-            //threads= new Hashtable<>();
-            queues.clear();
-            locks.clear();
-            id.set(0);;
         }
     }
 
     public void solveHalt() {
-        er1.solveHalt();
-        if (!runners.isEmpty()) {
-            java.util.Enumeration<EngineRunner> ers = runners.elements();
-            while (ers.hasMoreElements()) {
-                EngineRunner current = ers.nextElement();
-                current.solveHalt();
+        synchronized (er1) {
+            er1.solveHalt();
+            if (!runners.isEmpty()) {
+                java.util.Enumeration<EngineRunner> ers = runners.elements();
+                while (ers.hasMoreElements()) {
+                    EngineRunner current = ers.nextElement();
+                    current.solveHalt();
+                }
             }
         }
     }
@@ -282,7 +289,7 @@ public class EngineManager implements java.io.Serializable {
         //}
     }
 
-    private final EngineRunner runner() {
+    public final EngineRunner runner() {
         //int pid = (int) Thread.currentThread().getId();
 		/*if(!threads.containsKey(pid))
 			return er1;*/
@@ -292,9 +299,7 @@ public class EngineManager implements java.io.Serializable {
         if (id!=null) {
             return runner(id);
         } else {
-            synchronized (er1) {
-                return er1;
-            }
+            return er1;
         }
 
         //}

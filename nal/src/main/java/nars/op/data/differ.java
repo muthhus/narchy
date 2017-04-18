@@ -1,6 +1,7 @@
 package nars.op.data;
 
 import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.transform.Functor;
@@ -20,7 +21,7 @@ public class differ extends Functor.BinaryFunctor {
         if (a instanceof Compound && b instanceof Compound){
             Term y = $.terms.difference(a.op(), (Compound) a, (Compound) b);
             if (y.equals(a))
-                return False; //prevent identical fall-through
+                return Op.False; //prevent identical fall-through
             return y;
         }
 

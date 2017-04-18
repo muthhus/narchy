@@ -2,7 +2,11 @@ package nars;
 
 
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicSingleton;
+import nars.term.var.GenericVariable;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
@@ -97,11 +101,6 @@ public enum Op {
     /** for ellipsis, when seen as a term */
     SUBTERMS("...", 1, OpType.Other );
 
-
-
-    /** Image index ("imdex") symbol */
-    public static final Atomic Imdex = $.the("_");
-
     public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
@@ -138,6 +137,28 @@ public enum Op {
     public static final char STAMP_CLOSER = '}';
     public static final char STAMP_SEPARATOR = ';';
     public static final char STAMP_STARTER = ':';
+
+
+    /** Image index ("imdex") symbol for products, and anonymous variable in products */
+    public static final Atomic Imdex =
+            new GenericVariable(Op.VAR_DEP, "_") {
+                @Override
+                public @NotNull Variable normalize(int serial) {
+                    return super.normalize(serial);
+                }
+            };
+
+    public static final AtomicSingleton True = new AtomicSingleton("†");
+
+    public static final AtomicSingleton False = new AtomicSingleton("Ø") {
+        @NotNull
+        @Override
+        public Term unneg() {
+            return True;
+        }
+    };
+
+    public static final AtomicSingleton Null = new AtomicSingleton("null");
 
 
     /** string representation */

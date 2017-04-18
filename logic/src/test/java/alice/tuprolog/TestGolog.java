@@ -37,11 +37,11 @@ public class TestGolog {
 
     }
 
-    public Theory theory(String classPath) throws IOException, URISyntaxException, InvalidTheoryException {
+    public static Theory theory(String classPath) throws IOException, URISyntaxException, InvalidTheoryException {
         return new Theory(source(classPath));
     }
 
-    public String source(String classPath) throws IOException, URISyntaxException {
+    public static String source(String classPath) throws IOException, URISyntaxException {
         return Resources.toString(TestGolog.class.getResource(classPath).toURI().toURL(), java.nio.charset.Charset.defaultCharset());
     }
 

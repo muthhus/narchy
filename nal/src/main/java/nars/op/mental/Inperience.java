@@ -75,7 +75,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
     float questionFactor = 0.5f;
 
     /** multiplier for he sensory task priority to determine inperienced task priority */
-    private float priFactor = 0.5f;
+    private final float priFactor = 0.5f;
 
 //    public boolean isEnableWantBelieve() {
 //        return enableWantBelieve;
@@ -289,26 +289,15 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
         arg[k++] = self;
 
-        arg[k++] = reify((Compound)$.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        arg[k++] = nar.concepts.queryToDepVar($.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
 
         return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), false));
     }
 
-    @Nullable Term reify(@NotNull Compound term) {
-        return nar.concepts.transform(term, queryToDepVar);
-    }
 
-    /**
-     * change all query variables to dep vars
-     */
-    final static CompoundTransform queryToDepVar = (parent, subterm) -> {
-        if (subterm.op() == VAR_QUERY) {
-            return $.varDep((((Variable) subterm).id()));
-        }
-        return subterm;
-    };
+
 
 
     public static Atomic randomNonInnate(@NotNull Random r) {

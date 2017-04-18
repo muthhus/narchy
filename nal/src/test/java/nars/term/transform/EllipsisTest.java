@@ -31,7 +31,7 @@ import java.util.Set;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.derive.meta.match.Ellipsis.firstEllipsis;
-import static nars.term.Term.False;
+import static nars.Op.False;
 import static org.junit.Assert.*;
 
 /**

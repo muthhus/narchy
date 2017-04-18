@@ -300,7 +300,11 @@ public enum Terms { ;
         }
     }
 
-    public static void printRecursive(@NotNull PrintStream out, @NotNull Term x, int level) {
+    public static void printRecursive(@NotNull PrintStream out, @NotNull Term x) {
+        printRecursive(out, x, 0);
+    }
+
+    static void printRecursive(@NotNull PrintStream out, @NotNull Term x, int level) {
         //indent
         for (int i = 0; i < level; i++)
             out.print("  ");

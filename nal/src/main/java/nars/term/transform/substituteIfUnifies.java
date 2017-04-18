@@ -95,7 +95,7 @@ abstract public class substituteIfUnifies extends Functor {
             return term;
 
         Term z = unify(term, x, y);
-        return (z != null) ? z : False;
+        return (z != null) ? z : Op.False;
     }
 
     public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {

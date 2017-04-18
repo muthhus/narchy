@@ -75,9 +75,13 @@ public class TheoryManagerTestCase extends TestCase {
 		info = engine.solve("retractall(takes(s1,c2)).");
 		assertTrue(info.isSuccess());
 		info = engine.solve("takes(s1, N).");
+
+		System.out.println(info);
 		assertTrue(info.isSuccess());
+		if (info.hasOpenAlternatives())
+			System.err.println(engine.solveNext());
 		assertFalse(info.hasOpenAlternatives());
-		assertEquals("c3", info.getVarValue("N").toString());
+		assertEquals("c2", info.getVarValue("N").toString());
 	}
 
 	// TODO test retractall: ClauseDatabase#get(f/a) should return an

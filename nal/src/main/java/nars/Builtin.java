@@ -20,8 +20,8 @@ import java.util.Arrays;
 import static nars.$.quote;
 import static nars.Op.INT;
 import static nars.Op.PROD;
-import static nars.term.Term.False;
-import static nars.term.Term.True;
+import static nars.Op.False;
+import static nars.Op.True;
 import static nars.term.Terms.compoundOrNull;
 
 /**

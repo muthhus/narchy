@@ -108,7 +108,7 @@ public final class BuiltIn extends Library {
 						 if (argi instanceof Var)
 							 throw PrologError.instantiation_error(engineManager, 1);
 						 else
-							 throw PrologError.type_error(engineManager, 1, "clause", arg0); 
+							 throw PrologError.type_error(engineManager, 1, "clause", arg0);
 					 }
 				 }
 			 }
@@ -134,7 +134,7 @@ public final class BuiltIn extends Library {
 						 if (argi instanceof Var)
 							 throw PrologError.instantiation_error(engineManager, 1);
 						 else
-							 throw PrologError.type_error(engineManager, 1, "clause", arg0); 
+							 throw PrologError.type_error(engineManager, 1, "clause", arg0);
 					 }
 				 }
 			 }
@@ -147,24 +147,27 @@ public final class BuiltIn extends Library {
 			 throw PrologError.type_error(engineManager, 1, "clause", arg0);
 	 }
 
-	 public boolean $retract_1(Term arg0) throws PrologError {
-		 arg0 = arg0.getTerm();
+	 public boolean $retract_1(Term arg1) throws PrologError {
+		 Term arg0 = arg1.getTerm();
+
 		 if (!(arg0 instanceof Struct)) {
 			 if (arg0 instanceof Var)
 				 throw PrologError.instantiation_error(engineManager, 1);
 			 else
 				 throw PrologError.type_error(engineManager, 1, "clause", arg0);
 		 }
+
 		 Struct sarg0 = (Struct) arg0;
-		 ClauseInfo c = theoryManager.retract(sarg0);
+		 boolean sClause = sarg0.isClause();
+
 		 // if clause to retract found -> retract + true
-		 if (c != null) {
-			 Struct clause = null;
-			 clause = !sarg0.isClause() ? new Struct(":-", arg0, new Struct("true")) : sarg0;
-			 unify(clause, c.getClause());
-			 return true;
+		 if (theoryManager.retract(sarg0, c ->
+			 unify(!sClause ? new Struct(":-", arg0, new Struct("true")) : sarg0, c.getClause())
+		 ) > 0) {
+		 	return true;
 		 }
-		 return false;
+
+		 return true;
 	 }
 
 	 public boolean abolish_1(Term arg0) throws PrologError {
@@ -216,7 +219,7 @@ public final class BuiltIn extends Library {
 				 throw PrologError.type_error(engineManager, 1, "atom", arg0);
 		 }
 		 try {
-			 libraryManager.load(((Struct) arg0).name());
+			 libraryManager.loadClass(((Struct) arg0).name());
 			 return true;
 		 } catch (Exception ex) {
 			 throw PrologError.existence_error(engineManager, 1, "class", arg0,
@@ -245,7 +248,7 @@ public final class BuiltIn extends Library {
 			 String[] paths = getStringArrayFromStruct((Struct) arg1);
 			 if(paths == null || paths.length == 0)
 				 throw PrologError.existence_error(engineManager, 2, "paths", arg1, new Struct("Invalid paths' list."));
-			 libraryManager.load(((Struct) arg0).name(), paths);
+			 libraryManager.loadClass(((Struct) arg0).name(), paths);
 			 return true;
 			
 		 } catch (Exception ex) {
@@ -276,7 +279,7 @@ public final class BuiltIn extends Library {
 				 throw PrologError.type_error(engineManager, 1, "atom", arg0);
 		 }
 		 try {
-			 libraryManager.unloadLibrary(((Struct) arg0).name());
+			 libraryManager.unload(((Struct) arg0).name());
 			 return true;
 		 } catch (Exception ex) {
 			 throw PrologError.existence_error(engineManager, 1, "class", arg0,
@@ -601,7 +604,7 @@ public final class BuiltIn extends Library {
 	 public void $load_library_1(Term lib) throws InvalidLibraryException {
 		 lib = lib.getTerm();
 		 if (lib.isAtom())
-			 libraryManager.load(((Struct) lib).name());
+			 libraryManager.loadClass(((Struct) lib).name());
 	 }
 
 	 public void include_1(Term theory) throws

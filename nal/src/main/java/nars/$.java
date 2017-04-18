@@ -87,22 +87,30 @@ public enum $ {
 
     @NotNull
     public static Atomic the(@NotNull String id) {
+        //special cases
+        switch (id) {
+            case "_":
+                return Op.Imdex;
+        }
+
         if (quoteNecessary(id))
             return quote(id);
-        else {
-            int i = Texts.i(id, MIN_VALUE);
-            if (i != MIN_VALUE)
-                return the(i); //parsed as integer, so
-            else
-                return new Atom(id);
-        }
+
+        //try to parse int
+        int i = Texts.i(id, MIN_VALUE);
+        if (i != MIN_VALUE)
+            return the(i); //parsed as integer, so
+
+        return new Atom(id);
+
     }
 
     final static Atom emptyQuote = (Atom) $.the("\"\"");
 
     final static Escaper quoteEscaper = Escapers.builder().addEscape('\"', "\\\"").build();
 
-    @NotNull public static Atom quote(@NotNull Object text) {
+    @NotNull
+    public static Atomic quote(@NotNull Object text) {
         String s = text.toString();
 
         int length = s.length();
@@ -110,7 +118,7 @@ public enum $ {
         if (length == 0)
             return emptyQuote;
 
-        if (s.charAt(0)=='\"' && s.charAt(length -1)=='\"') {
+        if (s.charAt(0) == '\"' && s.charAt(length - 1) == '\"') {
             if (length == 1) {
                 s = "\"\\\"\"";
             } else {
@@ -120,10 +128,8 @@ public enum $ {
             s = ("\"" + quoteEscaper.escape(s) + '"');
         }
 
-        return new Atom(s);
+        return the(s);
     }
-
-
 
 
     @NotNull
@@ -152,7 +158,7 @@ public enum $ {
 
     /**
      * Op.INHERITANCE from 2 Terms: subj --> pred
-     *  returns a Term if the two inputs are equal to each other
+     * returns a Term if the two inputs are equal to each other
      */
     @Nullable
     public static <T extends Term> T inh(Term subj, Term pred) {
@@ -166,7 +172,7 @@ public enum $ {
 
     @Nullable
     public static <T extends Term> T inh(@NotNull String subj, @NotNull String pred) throws Narsese.NarseseException {
-        return (T) inh((Term)$(subj), (Term)$(pred));
+        return (T) inh((Term) $(subj), (Term) $(pred));
     }
 
 
@@ -179,14 +185,18 @@ public enum $ {
     public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
         return func($.the(opTerm), arg);
     }
+
     public static Compound func(@NotNull String opTerm, @Nullable List<Term> arg) {
         return func($.the(opTerm), arg.toArray(new Term[arg.size()]));
     }
+
     public static Compound func(@NotNull String opTerm, @Nullable String... arg) throws Narsese.NarseseException {
         return func($.the(opTerm), $.array(arg));
     }
 
-    /** function ((a,b)==>c) aka: c(a,b) */
+    /**
+     * function ((a,b)==>c) aka: c(a,b)
+     */
     @NotNull
     public static Compound func(@NotNull Atomic opTerm, @Nullable Term... arg) {
         return (Compound) the(
@@ -196,7 +206,8 @@ public enum $ {
         );
     }
 
-    @NotNull public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
+    @NotNull
+    public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
         return (Compound) the(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
@@ -220,7 +231,8 @@ public enum $ {
         return (T) terms.neg(x);
     }
 
-    @NotNull public static <T extends Term> T negIf(@NotNull Term x, boolean negate) {
+    @NotNull
+    public static <T extends Term> T negIf(@NotNull Term x, boolean negate) {
         return (T) (negate ? neg(x) : x);
     }
 
@@ -233,12 +245,15 @@ public enum $ {
     public static Compound p(@NotNull Term... t) {
         return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PROD, t);
     }
+
     @NotNull
     public static Compound p(@NotNull TermContainer t) {
-        return p((Term[])t.terms());
+        return p((Term[]) t.terms());
     }
 
-    /** creates from a sublist of a list */
+    /**
+     * creates from a sublist of a list
+     */
     @NotNull
     static Compound p(@NotNull List<Term> l, int from, int to) {
         Term[] x = new Term[to - from];
@@ -253,12 +268,15 @@ public enum $ {
     public static Compound p(@NotNull String... t) {
         return $.p((Term[]) $.the(t));
     }
+
     @NotNull
     public static Compound p(@NotNull int... t) {
         return $.p((Term[]) $.the(t));
     }
 
-    /** warning: generic variable */
+    /**
+     * warning: generic variable
+     */
     public static @NotNull Variable v(@NotNull Op type, @NotNull String name) {
 
 //        if (name.length()==1) {
@@ -267,12 +285,13 @@ public enum $ {
 //                return $.v(type, c-'0'); //explicit use of normalized var
 //        }
 
-        return new GenericVariable(type, name);
+        return new GenericVariable(type, type.ch + name);
     }
 
 
     @NotNull
-    @Deprecated public static Variable varDep(int i) {
+    @Deprecated
+    public static Variable varDep(int i) {
         return v(VAR_DEP, i);
     }
 
@@ -281,7 +300,8 @@ public enum $ {
     }
 
     @NotNull
-    @Deprecated public static Variable varIndep(int i) {
+    @Deprecated
+    public static Variable varIndep(int i) {
         return v(VAR_INDEP, i);
     }
 
@@ -307,7 +327,8 @@ public enum $ {
     /**
      * Try to make a new compound from two components. Called by the logic rules.
      * <p>
-     *  A -{- B becomes {A} --> B
+     * A -{- B becomes {A} --> B
+     *
      * @param subj The first component
      * @param pred The second component
      * @return A compound generated or null
@@ -316,10 +337,12 @@ public enum $ {
     public static <T extends Term> T inst(@NotNull Term subj, Term pred) {
         return (T) terms.inst(subj, pred);
     }
+
     @Nullable
     public static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
         return (T) terms.instprop(subject, predicate);
     }
+
     @Nullable
     public static <T extends Term> T prop(Term subject, Term predicate) {
         return (T) terms.prop(subject, predicate);
@@ -353,6 +376,7 @@ public enum $ {
     public static TaskBuilder task(@NotNull Compound term, byte punct, float freq, float conf) {
         return task(term, punct, t(freq, conf));
     }
+
     @NotNull
     public static TaskBuilder task(@NotNull Compound term, byte punct, Truth truth) {
         return new TaskBuilder(term, punct, truth);
@@ -360,16 +384,18 @@ public enum $ {
 
     @NotNull
     public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SETe, (Collection)t);
+        return (Compound) the(SETe, (Collection) t);
     }
 
-    /** construct set_ext of key,value pairs from a Map */
+    /**
+     * construct set_ext of key,value pairs from a Map
+     */
     @NotNull
-    public static Compound seteMap(@NotNull Map<Term,Term> map) {
+    public static Compound seteMap(@NotNull Map<Term, Term> map) {
         return $.sete(
                 map.entrySet().stream().map(
-                        e -> $.p(e.getKey(),e.getValue()))
-                        .collect( Collectors.toSet() )
+                        e -> $.p(e.getKey(), e.getValue()))
+                        .collect(Collectors.toSet())
         );
     }
 
@@ -384,7 +410,7 @@ public enum $ {
 
     @NotNull
     public static <X> Compound p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
-        return $.p( (Term[])terms(x, toTerm) );
+        return $.p((Term[]) terms(x, toTerm));
     }
 
     public static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
@@ -392,17 +418,18 @@ public enum $ {
     }
 
     @NotNull
-    public static <X> Compound seteMap(@NotNull Map<Term,? extends X> map, @NotNull Function<X, Term> toTerm) {
+    public static <X> Compound seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
-                        .collect( Collectors.toSet())
+                        .collect(Collectors.toSet())
         );
     }
 
-   private static Term[] array(@NotNull Collection<? extends Term> t) {
+    private static Term[] array(@NotNull Collection<? extends Term> t) {
         return t.toArray(new Term[t.size()]);
     }
+
     private static Term[] array(String... s) throws Narsese.NarseseException {
         int l = s.length;
         Term[] tt = new Term[l];
@@ -423,7 +450,9 @@ public enum $ {
 
     }
 
-    /** shorthand for extensional set */
+    /**
+     * shorthand for extensional set
+     */
     @NotNull
     public static Compound s(Term... t) {
         return sete(t);
@@ -447,12 +476,16 @@ public enum $ {
 //        return inh(subject, $.seti(predicate));
 //    }
 
-    /** unnormalized variable */
+    /**
+     * unnormalized variable
+     */
     public static @NotNull Variable v(char ch, @NotNull String name) {
         return v(AbstractVariable.typeIndex(ch), name);
     }
 
-    /** normalized variable */
+    /**
+     * normalized variable
+     */
     public static @NotNull AbstractVariable v(@NotNull Op type, int id) {
         return AbstractVariable.the(type, id);
     }
@@ -477,13 +510,14 @@ public enum $ {
     }
 
 
-
-
-    /** parallel conjunction &| aka &&+0 */
+    /**
+     * parallel conjunction &| aka &&+0
+     */
     @Nullable
     public static <T extends Term> T parallel(Term... s) {
         return (T) the(CONJ, 0, s);
     }
+
     @Nullable
     public static Term parallel(@NotNull Collection<Term> s) {
         return the(CONJ, 0, s);
@@ -497,7 +531,6 @@ public enum $ {
 
     @NotNull
     public static final Logger LOG;
-
 
 
     static {
@@ -564,6 +597,7 @@ public enum $ {
     public static Term equi(Term subject, Term pred) {
         return the(EQUI, subject, pred);
     }
+
     @Nullable
     public static Term equi(Term subject, int dt, Term pred) {
         return the(EQUI, dt, subject, pred);
@@ -583,6 +617,7 @@ public enum $ {
     public static Term imge(Term... x) {
         return the(IMGe, x);
     }
+
     @Nullable
     public static Term imgi(Term... x) {
         return the(IMGi, x);
@@ -594,11 +629,10 @@ public enum $ {
     }
 
 
-
     @Nullable
-    public static Term secti(Term... x) { return the(SECTi, x); }
-
-
+    public static Term secti(Term... x) {
+        return the(SECTi, x);
+    }
 
 
     @NotNull
@@ -615,7 +649,8 @@ public enum $ {
     public static Term the(@NotNull Op op, @NotNull Collection<Term> subterms) {
         return the(op, DTERNAL, subterms);
     }
-//    @Nullable
+
+    //    @Nullable
 //    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
 //        return terms.the(op, dt, subterms);
 //    }
@@ -625,8 +660,9 @@ public enum $ {
     }
 
 
-
-    /** create a literal atom from a class (it's name) */
+    /**
+     * create a literal atom from a class (it's name)
+     */
     @NotNull
     public static Atom the(@NotNull Class c) {
         return (Atom) $.the(c.getName());
@@ -641,10 +677,10 @@ public enum $ {
         if (o instanceof Integer) return the(o.intValue());
 
         if (o instanceof Long) {
-            if (((int)o) == o.longValue())
+            if (((int) o) == o.longValue())
                 return the(o.intValue()); //use the integer form since it will be IntTerm
             else
-                return the(Long.toString((long)o));
+                return the(Long.toString((long) o));
         }
 
         if ((o instanceof Float) || (o instanceof Double))
@@ -655,13 +691,16 @@ public enum $ {
 
     final static int MAX_CACHED_INTS = 16;
     private static final IntTerm[] digits = new IntTerm[MAX_CACHED_INTS];
+
     static {
         for (int i = 0; i < MAX_CACHED_INTS; i++) {
             digits[i] = new IntTerm(i);
         }
     }
 
-    /** gets the atomic term of an integer, with specific radix (up to 36) */
+    /**
+     * gets the atomic term of an integer, with specific radix (up to 36)
+     */
     @NotNull
     public static Atom the(int i, int radix) {
 //        //fast lookup for single digits
@@ -694,9 +733,9 @@ public enum $ {
 
     @NotNull
     public static Atomic the(float v) {
-        if (Util.equals( (float)Math.floor(v), v, Float.MIN_VALUE*2 )) {
+        if (Util.equals((float) Math.floor(v), v, Float.MIN_VALUE * 2)) {
             //close enough to be an int, so it doesnt need to be quoted
-            return the((int)v);
+            return the((int) v);
         }
         //return Atom.the(Utf8.toUtf8(name));
 
@@ -720,12 +759,11 @@ public enum $ {
     }
 
 
-
     @Nullable
     public static Term inhImageExt(@NotNull Compound x, @Nullable Term y, @NotNull Atomic oper) {
         Term[] args = x.terms();
         Term[] aa = ArrayUtils.add(args, 0, oper);
-        return inh(y, imageMask( aa.length-1, true, aa));
+        return inh(y, imageMask(aa.length - 1, true, aa));
         /*return inh(
                 y,
                 imge(x, operation.term(1)  )
@@ -769,6 +807,7 @@ public enum $ {
     public static Compound image(int relation, Term... elements) {
         return image(relation, true, elements);
     }
+
     @Nullable
     public static Compound imgi(int relation, Term... elements) {
         return image(relation, false, elements);
@@ -790,12 +829,13 @@ public enum $ {
 
     @Nullable
     public static Compound imge(int relation, @NotNull Compound product) {
-        assert(product.op() == Op.PROD);
+        assert (product.op() == Op.PROD);
         return image(relation, true, product.terms());
     }
+
     @Nullable
     public static Compound imgi(int relation, @NotNull Compound product) {
-        assert(product.op() == Op.PROD);
+        assert (product.op() == Op.PROD);
         return image(relation, false, product.terms());
     }
 
@@ -806,14 +846,16 @@ public enum $ {
 
     @Nullable
     public static Truth t(float f, float c, float minConf) {
-        return (f!=f || c!=c || c < minConf) ? null : new DefaultTruth(f, c);
+        return (f != f || c != c || c < minConf) ? null : new DefaultTruth(f, c);
     }
 
     public static Priority b(float p) {
         return new Pri(p);
     }
 
-    /** negates each entry in the array */
+    /**
+     * negates each entry in the array
+     */
     public static void neg(@NotNull Term[] s) {
         int l = s.length;
         for (int i = 0; i < l; i++) {
@@ -822,16 +864,27 @@ public enum $ {
     }
 
 
-    /** static storeless term builder */
+    /**
+     * static storeless term builder
+     */
     public static final StaticTermBuilder terms = new StaticTermBuilder();
 
-    /** determines if the string is invalid as an unquoted term according to the characters present */
+    /**
+     * determines if the string is invalid as an unquoted term according to the characters present
+     */
     public static boolean quoteNecessary(@NotNull CharSequence t) {
-        for (int i = 0; i < t.length(); i++) {
+        int len = t.length();
+
+        if (len > 1 && (t.charAt(0) == '\"') &&
+                (t.charAt(len -1) == '\"'))
+            return false; //already quoted
+
+        for (int i = 0; i < len; i++) {
             char c = t.charAt(i);
             if (!Narsese.isValidAtomChar(c))
                 return true;
         }
+
         return false;
     }
 
@@ -842,7 +895,7 @@ public enum $ {
 
     @NotNull
     public static Atomic the(byte c) {
-        return the(new byte[] { c });
+        return the(new byte[]{c});
     }
 
     @NotNull
@@ -858,30 +911,33 @@ public enum $ {
     @Nullable
     public static Term the(Object o) {
 
-        if (o instanceof Term) return ((Term)o);
+        if (o instanceof Term) return ((Term) o);
         if (o instanceof String)
-            return the((String)o);
+            return the((String) o);
         if (o instanceof StringBuilder)
             return the(o.toString());
         if (o instanceof Number)
-            return the((Number)o);
+            return the((Number) o);
 
         return null;
     }
 
-    /** conjunction sequence (2-ary) */
-    @Nullable public static Compound seq(Term x, int dt, Term y) {
+    /**
+     * conjunction sequence (2-ary)
+     */
+    @Nullable
+    public static Compound seq(Term x, int dt, Term y) {
         return compoundOrNull(the(CONJ, dt, x, y)); //must be a vector, not set
     }
 
 
     @NotNull
-    public static <K,V> Map<K, V> newHashMap() {
+    public static <K, V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
     @NotNull
-    public static <K, V> Map<K,V> newHashMap(int capacity) {
+    public static <K, V> Map<K, V> newHashMap(int capacity) {
         return new HashMap<>(capacity);
 
         //return new UnifiedMap(capacity);
@@ -966,7 +1022,7 @@ public enum $ {
 
     @NotNull
     public static <X> List<X> newArrayList(@NotNull X... x) {
-        FasterList<X> l = (FasterList)$.newArrayList(x.length);
+        FasterList<X> l = (FasterList) $.newArrayList(x.length);
         l.addAll(x);
         return l;
     }
@@ -977,7 +1033,9 @@ public enum $ {
     }
 
 
-    /** most significant digit first, least last. padded with zeros */
+    /**
+     * most significant digit first, least last. padded with zeros
+     */
     public static @NotNull Term[] radixArray(int x, int radix, int maxX) {
         String xs = Integer.toString(x, radix);
         String xx = Integer.toString(maxX, radix);
@@ -1002,7 +1060,7 @@ public enum $ {
     public static @NotNull Compound pRecurseIntersect(char prefix, @NotNull Term... t) {
         final int[] index = {0};
         return (Compound) $.secte($.terms(t, x -> {
-            return $.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic)x).toString() );
+            return $.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic) x).toString());
         }));
     }
 
@@ -1014,17 +1072,19 @@ public enum $ {
         }
         return nextInner;
     }
+
     public static @Nullable Compound inhRecurse(@NotNull Term... t) {
         int tl = t.length;
         @NotNull Term bottom = t[--tl];
         Compound nextInner = $.inh(t[--tl], bottom); //wrap innermost item in product too, for fairness
-        while (nextInner!=null && tl > 0) {
+        while (nextInner != null && tl > 0) {
             nextInner = $.inh(t[--tl], nextInner);
         }
         return nextInner;
     }
+
     public static void logLevel(Class logClass, Level l) {
-        ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logClass)).setLevel(l);
+        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logClass)).setLevel(l);
     }
 
     @NotNull
@@ -1041,11 +1101,13 @@ public enum $ {
         return command(func(functor, args));
     }
 
-    @NotNull public static String unquote(@NotNull Term s) {
+    @NotNull
+    public static String unquote(@NotNull Term s) {
         return unquote(s.toString());
     }
 
-    @NotNull public static String unquote(String x) {
+    @NotNull
+    public static String unquote(String x) {
         int len = x.length();
         if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
             return unquote(x.substring(1, len - 1));
@@ -1054,28 +1116,34 @@ public enum $ {
         }
     }
 
-    /** global shared Javascript context */
+    /**
+     * global shared Javascript context
+     */
     public final static NashornScriptEngine JS = JS();
 
-    /** instantiate new Javascript context */
+    /**
+     * instantiate new Javascript context
+     */
     public final static NashornScriptEngine JS() {
         return (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
     }
 
     public static Term nonNull(@Nullable Term term) {
-        return term != null ? term : Term.Null;
+        return term != null ? term : Null;
     }
 
     public static <X> BoolPredicate<X> IF(Term t, Predicate<X> test) {
         return new BoolPredicate.DefaultBoolPredicate<X>(t, test);
     }
+
     public static <X> BoolPredicate<X> AND(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>($.conj(a, b), (X x)->{
+        return new BoolPredicate.DefaultBoolPredicate<X>($.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
+
     public static <X> BoolPredicate<X> OR(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>($.disj(a, b), (X x)->{
+        return new BoolPredicate.DefaultBoolPredicate<X>($.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

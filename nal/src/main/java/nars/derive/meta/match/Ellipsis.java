@@ -46,7 +46,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         public final int minArity;
 
         public EllipsisPrototype(@NotNull Op type, @NotNull GenericVariable target, int minArity) {
-            super(type, target.label /* exclude variable type char */
+            super(type, target.toString()
                     + ".." + (minArity == 0 ? '*' : '+'));
             this.minArity = minArity;
 
@@ -80,7 +80,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
         public EllipsisTransformPrototype(/*Op type, */@NotNull Variable name, Term from, Term to) {
             super(Op.VAR_PATTERN,
-                    name.toString().substring(1) /* skip '%' */ + ".." + from + '=' + to + "..+");
+                    name.toString()
+                            + ".." + from + '=' + to + "..+");
             //this.name = name;
             this.from = from;
             this.to = to;
