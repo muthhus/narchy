@@ -484,19 +484,22 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public final Term neg(@NotNull Term t) {
+    public final Term neg(@NotNull Term x) {
 
-        if (t instanceof Compound) {
+        if (x instanceof Compound) {
             // (--,(--,P)) = P
-            if (t.op() == NEG)
-                return t.unneg();
-        } else if (t instanceof AtomicSingleton) {
-            if (isFalse(t)) return True;
-            if (isTrue(t)) return False;
+            if (x.op() == NEG)
+                return x.unneg();
+        } else if (x instanceof AtomicSingleton) {
+            if (isFalse(x)) return True;
+            if (isTrue(x)) return False;
         }
 
-        return finalize(NEG, t);
-        //return newCompound(Op.NEG, DTERNAL, new TermVector1(t)); //<- faster than through finalize()?
+        Term y = newCompound(NEG, DTERNAL, new Term[] { x });
+        if (y instanceof Compound && x.isNormalized()) {
+            ((Compound)y).setNormalized(); //share normalization state
+        }
+        return y;
     }
 
 

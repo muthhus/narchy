@@ -27,6 +27,7 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.Task;
 import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.container.TermContainer;
@@ -54,6 +55,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -788,18 +790,22 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term eval(TermIndex index) {
 
-        //somewhere in the subterms is a functor to eval
+        //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!hasAll(Op.OpBits))
             return this;
 
+        //unwrap negation before recursion, it should be more efficient
         if (op()==NEG) {
-            //unwrap negation before recursion, it should be more efficient
-            Compound inner = (Compound) unneg();
-            Term innerEval = inner.eval(index);
-            if (inner.equals(innerEval))
-                return this;
-            else
-                return $.neg(innerEval);
+            Compound inner = compoundOrNull(unneg());
+            if (inner == null)
+                return this; //dont go further
+            else {
+                Term outer = index.neg(inner.eval(index));
+                if (outer==null)
+                    return this; //dont go further
+                else
+                    return outer;
+            }
         }
 
         TermContainer tt = subterms();
@@ -855,6 +861,10 @@ public interface Compound extends Term, IPair, TermContainer {
                         if (dy == null || dy == this) {
                             return this; //functor returning null return value means keep the original input term
                         } else {
+                            if (dy.equals(this)) {
+                                System.err.println("redundant instance detected: " + subject + " " + dy );
+                                return this;
+                            }
                             return dy.eval(index); //recurse
                         }
 
