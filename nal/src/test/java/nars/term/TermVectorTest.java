@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Narsese;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class TermVectorTest {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
-        Compound b = (Compound) $.impl($.the("a"), $.the("b"));
+        Compound b = (Compound) $.impl(Atomic.the("a"), Atomic.the("b"));
 
         assertEquals(a.subterms(), b.subterms());
         assertEquals(a.subterms().hashCode(), b.subterms().hashCode());

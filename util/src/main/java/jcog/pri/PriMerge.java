@@ -136,16 +136,16 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
     };
 
     /** sum priority, LERP other components in proportion to the priorities */
-    PriMerge plusBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
+    PriMerge plus = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    PriMerge avgBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
+    PriMerge avg = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
 
 //    /** or priority, LERP other components in proportion to the priorities */
-    PriMerge orBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+    PriMerge or = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
 
     //    /** or priority, LERP other components in proportion to the priorities */
-    PriMerge maxBlend = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
+    PriMerge max = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
 //
 //
 //    /** AND priority, LERP other components in proportion to the priorities */
@@ -206,14 +206,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
 //        tgt.budget( nextPri, nextDur, nextQua );
 //    };
 
-    /** add priority, interpolate durability and quality according to the relative change in priority
-     *  WARNING untested
-     * */
-    PriMerge maxHard = (tgt, src, srcScaleIgnored) -> {
-        tgt.setPriority(
-            Util.max(src.priSafe(0), tgt.priSafe(0)));
-        return 0;
-    };
+
 
 
 //    /** the max priority, durability, and quality of two tasks */

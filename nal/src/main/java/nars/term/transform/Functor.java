@@ -17,7 +17,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.$.the;
+import static nars.term.atom.Atomic.the;
 import static nars.Op.INT;
 import static nars.term.Terms.atomOrNull;
 

@@ -328,7 +328,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (Param.ANSWER_REPORTING && isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                    new ArrayBag<>(PriMerge.avgBlend,
+                    new ArrayBag<>(PriMerge.max,
                             new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
             );
             float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
-import static jcog.pri.PriMerge.avgBlend;
+import static jcog.pri.PriMerge.max;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
 
@@ -44,6 +44,8 @@ import static nars.Op.PROD;
  * Created by me on 2/24/16.
  */
 public class DefaultConceptBuilder implements ConceptBuilder {
+
+    public static final PriMerge DEFAULT_BLEND = max;
 
     public DefaultConceptBuilder() {
         this(
@@ -86,8 +88,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public <X> X withBags(Term t, BiFunction<Bag<Term,PLink<Term>>,Bag<Task,PLink<Task>>,X> f) {
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term,PLink<Term>> termbag = newBag(sharedMap, avgBlend);
-        @NotNull Bag<Task,PLink<Task>> taskbag = newBag(sharedMap, avgBlend);
+        @NotNull Bag<Term,PLink<Term>> termbag = newBag(sharedMap, DEFAULT_BLEND);
+        @NotNull Bag<Task,PLink<Task>> taskbag = newBag(sharedMap, DEFAULT_BLEND);
 
 
 //        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);

@@ -9,6 +9,7 @@ import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -63,7 +64,7 @@ public class MIDI {
                         channelKey(9, i);
 
                     Compound on2 =
-                            $.inh(key, $.the("on"));
+                            $.inh(key, Atomic.the("on"));
 
                     keys.add(on2);//senseNumber(on2, midi.key(key) ));
                     s.listen(on2, sd::byHash);
@@ -148,12 +149,12 @@ public class MIDI {
                 int cmd = s.getCommand();
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
-                        Compound t = $.inh(channelKey(s), $.the("on"));
+                        Compound t = $.inh(channelKey(s), Atomic.the("on"));
                         nar.believe($.neg(t), Tense.Present);
                         //System.out.println(key(t));
                         break;
                     case ShortMessage.NOTE_ON:
-                        Compound u = $.inh(channelKey(s), $.the("on"));
+                        Compound u = $.inh(channelKey(s), Atomic.the("on"));
                         nar.believe(u, Tense.Present);
                         //key(u, 0.5f + 0.5f * s.getData2()/64f);
                         //System.out.println(key(t));

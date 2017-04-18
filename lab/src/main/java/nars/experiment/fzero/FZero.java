@@ -4,11 +4,11 @@ import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
 import nars.nar.NARBuilder;
+import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;
-import static nars.experiment.Line1D.implAccelerator;
 
 /**
  * Created by me on 3/21/17.
@@ -26,11 +26,11 @@ public class FZero extends NAgentX {
         senseCamera("fz", ()->fz.image, 32, 24, (v) -> t(v, alpha()))
                 .setResolution(0.02f);
 
-        actionToggle($.inh($.the("fz"), $.the("fwd")),
+        actionToggle($.inh(Atomic.the("fz"), Atomic.the("fwd")),
                 //(b)->{ fz.thrust = b; }
                 () -> fz.thrust = true, () -> fz.thrust = false
         );
-        actionTriState($.inh($.the("fz"), $.the("rot") ), (dh) -> {
+        actionTriState($.inh(Atomic.the("fz"), Atomic.the("rot") ), (dh) -> {
             switch (dh) {
                 case +1: fz.left = false; fz.right = true; break;
                 case 0: fz.left = fz.right = false; break;
@@ -38,10 +38,10 @@ public class FZero extends NAgentX {
             }
         });
 
-        senseNumberDifference($.inh($.the("joy"), id), happy);
-        senseNumberDifference($.inh($.the("angVel"), id), ()->(float)fz.playerAngle).resolution(0.02f);
-        senseNumberDifference($.inh($.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
-        senseNumberBi($.inh($.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
+        senseNumberDifference($.inh(Atomic.the("joy"), id), happy);
+        senseNumberDifference($.inh(Atomic.the("angVel"), id), ()->(float)fz.playerAngle).resolution(0.02f);
+        senseNumberDifference($.inh(Atomic.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]).resolution(0.02f);
+        senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

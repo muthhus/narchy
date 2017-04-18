@@ -28,7 +28,7 @@ import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.pri.PriMerge.plusBlend;
+import static jcog.pri.PriMerge.plus;
 
 /**
  * Budget functions for resources allocation
@@ -252,11 +252,11 @@ public final class BudgetFunctions extends UtilityFunctions {
             Priority tbudget = t.priority();
             if (copyOrTransfer) {
                 //COPY
-                plusBlend.merge(u, tbudget, paymentProportion);
+                plus.merge(u, tbudget, paymentProportion);
             } else {
                 //TRANSFER
                 float before = u.pri();
-                plusBlend.merge(u, tbudget, paymentProportion);
+                plus.merge(u, tbudget, paymentProportion);
                 float after = u.pri();
                 tbudget.priAdd(-(after - before));
             }

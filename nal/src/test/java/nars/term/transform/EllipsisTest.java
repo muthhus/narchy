@@ -488,7 +488,7 @@ public class EllipsisTest {
 
 
     @Test public void testEllipsisInMinArity() {
-        Atomic a = $.the("a");
+        Atomic a = Atomic.the("a");
         Ellipsis b = new EllipsisOneOrMore($.varPattern(1));
 
         for (Op o : Op.values()) {

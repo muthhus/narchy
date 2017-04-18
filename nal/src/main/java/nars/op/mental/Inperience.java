@@ -13,8 +13,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.transform.CompoundTransform;
-import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -26,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.function.Consumer;
 
-import static nars.$.the;
+import static nars.term.atom.Atomic.the;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 

@@ -21,6 +21,7 @@ import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.truth.Truth;
@@ -77,7 +78,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
                 new CurveBag.NormalizedSampler(power4BagCurve, n.random),
-                PriMerge.plusBlend, new ConcurrentHashMap()), selectionRate, n);
+                PriMerge.plus, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -201,7 +202,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
 
                     Concept alias = aliasConcept ? nar.on(AliasConcept.get(id, abbreviated, nar, abbreviation)) : null;
 
-                    Termed aliasTerm = alias != null ? alias : $.the(id);
+                    Termed aliasTerm = alias != null ? alias : Atomic.the(id);
 
                     //if (abbreviation != null) {
 
@@ -237,7 +238,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
     @Nullable
     Compound newRelation(@NotNull Compound abbreviated, @NotNull String id) {
         return compoundOrNull(
-                $.sim(abbreviated, $.the(id))
+                $.sim(abbreviated, Atomic.the(id))
                 //$.equi
 
         );

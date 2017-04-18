@@ -18,7 +18,7 @@ public class TestEinsteinsRiddle {
 
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
-        NAR n = new Default() {
+        NAR n = new Default(1024, 16, 3) {
 //            @Override
 //            public Deriver newDeriver() {
 //                return new DeriverTransform(b -> new DeriverTransform.TracedBoolPredicate(b))
@@ -31,7 +31,7 @@ public class TestEinsteinsRiddle {
         n.inputNarsese(
             resource.openStream()
         );
-        n.run(64);
+        n.run(256);
 
 
 

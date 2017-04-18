@@ -58,7 +58,7 @@ abstract public class PremiseBuilder {
 
             Compound unifiedTerm = unify(task.term(), (Compound) beliefTerm, nar);
 
-            if ((unifiedTerm != null) && (unifiedTerm.varQuery() == 0)) {
+            if (unifiedTerm != null)  {
                 unifiedTerm = compoundOrNull(unifiedTerm.unneg());
                 if (unifiedTerm!=null)
                     beliefTerm = unifiedTerm;
@@ -66,7 +66,10 @@ abstract public class PremiseBuilder {
 
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if (unifiedTerm!=null && beliefConcept instanceof TaskConcept) {
+            if ((unifiedTerm != null) &&
+                    (beliefConcept instanceof TaskConcept) &&
+                        (unifiedTerm.varQuery() == 0) &&
+                            !unifiedTerm.equals(task.term())) {
 
                 if (task.isQuestOrQuestion()) {
 

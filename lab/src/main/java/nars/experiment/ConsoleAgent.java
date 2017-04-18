@@ -43,7 +43,7 @@ public abstract class ConsoleAgent extends NAgentX {
     final ConsoleTerminal Rlabel = Vis.newInputEditor();
 
     final TestConsole R = new TestConsole(
-            $.the("it"),
+            Atomic.the("it"),
             true,
             4, 1);
     final TestConsole W;
@@ -108,7 +108,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         NAgentX.chart(this);
 
-        senseNumberDifference($.func((Atomic)id, $.the("joy")), happy);
+        senseNumberDifference($.func((Atomic)id, Atomic.the("joy")), happy);
 
     }
 
@@ -194,7 +194,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         public TestConsole write(char... vocabulary) {
             write = true;
-                actionTriState($.func("cursor", $.the("x"), id), (d) -> {
+                actionTriState($.func("cursor", Atomic.the("x"), id), (d) -> {
                     switch (d) {
                         case -1:
                             left();
@@ -205,7 +205,7 @@ public abstract class ConsoleAgent extends NAgentX {
                             break;
                     }
                 });
-                actionTriState($.func("cursor", $.the("y"), id), (d) -> {
+                actionTriState($.func("cursor", Atomic.the("y"), id), (d) -> {
                     switch (d) {
                         case -1:
                             up();
@@ -218,7 +218,7 @@ public abstract class ConsoleAgent extends NAgentX {
                     }
                 });
                 for (char c : vocabulary) {
-                    Compound ct = $.func($.the("write"), $.quote(String.valueOf(c)), id);
+                    Compound ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
 
 //                    ActionConcept m = new GoalActionConcept(ct, nar(), (b, d) -> {
 //                        boolean next = d != null && d.expectation() > 0.75f;

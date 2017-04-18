@@ -5,6 +5,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.Task;
 import nars.nar.Terminal;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
@@ -26,7 +27,7 @@ import static org.junit.Assert.*;
 public class TermReductionsTest {
 
     @Nullable
-    final Term p = $.the("P"), q = $.the("Q"), r = $.the("R"), s = $.the("S");
+    final Term p = Atomic.the("P"), q = Atomic.the("Q"), r = Atomic.the("R"), s = Atomic.the("S");
 
 
     @Test
@@ -557,7 +558,7 @@ public class TermReductionsTest {
         assertEquals($("(||,x,y)"),
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals($("x"), $.parallel($.varDep(0), $.neg($.varDep(0)), $.the("x")));
+        assertEquals($("x"), $.parallel($.varDep(0), $.neg($.varDep(0)), Atomic.the("x")));
     }
 
     @Test

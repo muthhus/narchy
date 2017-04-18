@@ -1,6 +1,5 @@
 package nars.truth.func;
 
-import nars.$;
 import nars.NAR;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -13,16 +12,16 @@ import java.util.Map;
 
 public interface TruthOperator {
 
-    Atomic NONE = $.the("None");
+    Atomic NONE = Atomic.the("None");
 
     static void permuteTruth(@NotNull TruthOperator[] values, @NotNull Map<Term, TruthOperator> table) {
         for (TruthOperator tm : values) {
-            table.put($.the(tm.toString()), tm);
-            table.put($.the(tm.toString() + 'X'), new SwappedTruth(tm));
-            table.put($.the(tm.toString() + 'N'), new NegatedTaskTruth(tm)); //ie. NP
-            table.put($.the(tm.toString() + "PN"), new NegatedBeliefTruth(tm));
-            table.put($.the(tm.toString() + "NN"), new NegatedTruths(tm));
-            table.put($.the(tm.toString() + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
+            table.put(Atomic.the(tm.toString()), tm);
+            table.put(Atomic.the(tm.toString() + 'X'), new SwappedTruth(tm));
+            table.put(Atomic.the(tm.toString() + 'N'), new NegatedTaskTruth(tm)); //ie. NP
+            table.put(Atomic.the(tm.toString() + "PN"), new NegatedBeliefTruth(tm));
+            table.put(Atomic.the(tm.toString() + "NN"), new NegatedTruths(tm));
+            table.put(Atomic.the(tm.toString() + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
         }
     }
 

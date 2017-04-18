@@ -226,7 +226,7 @@ public class NarseseExtendedTest {
 
 
     @Test public void testQuoteEscaping() throws Narsese.NarseseException {
-        assertEquals("it said: \"wtf\"",
+        assertEquals("\"it said: \\\"wtf\\\"\"",
                 $.quote("it said: \"wtf\"").toString());
     }
 
@@ -244,7 +244,24 @@ public class NarseseExtendedTest {
         assertEquals("( &&+0 ,a,b,c)", term("(&|, a, b, c)").toString());
     }
 
-    @Test public void testAnonymousQueryVariable() throws Narsese.NarseseException {
+    @Test public void testImdex() throws Narsese.NarseseException {
+        Compound x = term("<acid --> (/,reaction,_,base)>");
+        //Terms.printRecursive(System.out, x);
+        assertEquals("(acid-->(/,reaction,_,base))",
+                x.toString());
+        assertTrue(x.vars()==0);
+        assertFalse(x.containsTermRecursively(Op.Imdex));
+
+        //test that the imdex is allowed in term identifiers
+        assertEquals(
+                "(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))",
+                term("(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))").toString()
+        );
+
+
+    }
+
+    @Test public void testAnonymousVariable() throws Narsese.NarseseException {
 
         // (_,_) must be converted to (#1,#2)
         String input = "((_,_) <-> x)";

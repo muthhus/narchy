@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -273,9 +274,9 @@ public class TemporalTest {
     }
 
     @Nullable
-    static final Term A = $.the("a");
+    static final Term A = Atomic.the("a");
     @Nullable
-    static final Term B = $.the("b");
+    static final Term B = Atomic.the("b");
 
     @Test
     public void parseTemporalRelation() throws Narsese.NarseseException {

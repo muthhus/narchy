@@ -7,6 +7,7 @@ import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -101,7 +102,7 @@ public class TermIOTest {
         //multiple variables
 
         Variable q = $.varQuery(1);
-        Compound twoB = $.inh( $.varDep(2), $.the("b"));
+        Compound twoB = $.inh( $.varDep(2), Atomic.the("b"));
         assertNotEquals(
                 q.compareTo(twoB),
                 twoB.compareTo(q) );

@@ -14,6 +14,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.Concept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
@@ -73,7 +74,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         Concept c = pc.get();
 
-        c.tasklinks().commit();
+        Bag<Task, PLink<Task>> taskLinks = c.tasklinks();
+        taskLinks.commit();
         Bag<Term, PLink<Term>> termLinks = c.termlinks();
         termLinks.commit();
 
@@ -81,7 +83,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         int count = 0;
 
         for (int i = 0; i < numPremises; i++) {
-            final @Nullable PLink<Task> taskLink = c.tasklinks().sample();
+            final @Nullable PLink<Task> taskLink = taskLinks.sample();
             if (taskLink == null)
                 continue;
 
@@ -162,11 +164,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             super(focus, premiseBuilder, nar);
 
 
-            this.pending = new TaskHijackBag(3, PriMerge.avgBlend, nar.random) {
+            this.pending = new TaskHijackBag(3, PriMerge.max, nar.random) {
+
                 @Override
                 public float temperature() {
                     return 0.1f; //forget slowly
                 }
+
 //                @Override
 //                public float pri(@NotNull Task key) {
 //                    //return (1f + key.priSafe(0)) * (1f + key.qua());

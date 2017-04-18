@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAgent;
 import nars.concept.ActionConcept;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -292,10 +293,10 @@ public abstract class PixelBag implements Bitmap2D {
     public PixelBag addActions(String termRootStr, NAgent a) {
         actions = $.newArrayList(3);
 
-        Term termRoot = $.the(termRootStr);
-        actions.add(a.actionBipolar($.func("see", termRoot, $.the("rx")), this::setXRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, $.the("ry")), this::setYRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, $.the("zoom")), this::setZoom));
+        Term termRoot = Atomic.the(termRootStr);
+        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
+        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
+        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );

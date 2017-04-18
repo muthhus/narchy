@@ -8,6 +8,7 @@ import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import nars.$;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 
 import java.io.*;
@@ -44,7 +45,7 @@ public class FuzzyOntologyMiner {
         //}
         Collection<String> concepts = tf.getTerms();
         Term[] conceptTerms = concepts.stream().map(x -> $.quote(x)).toArray(i->new Term[i]);
-        System.out.println( $.inh( $.sete(conceptTerms), $.the(domain) ) + "." );
+        System.out.println( $.inh( $.sete(conceptTerms), Atomic.the(domain) ) + "." );
 
         for(String i: tf){
             for(String j: tf){

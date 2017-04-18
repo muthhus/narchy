@@ -1,10 +1,10 @@
 package nars.term.transform;
 
-import nars.$;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ public final class substitute extends Functor {
 
     @NotNull private final Derivation parent;
 
-    final static Term STRICT = $.the("strict");
+    final static Term STRICT = Atomic.the("strict");
 
     public substitute(@NotNull Derivation parent) {
         super("substitute");

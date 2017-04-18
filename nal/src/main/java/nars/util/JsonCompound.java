@@ -8,6 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
 
@@ -34,12 +35,12 @@ public enum JsonCompound  { ;
             subterms = s.toArray(new Term[s.size()]);
         } else if (j.isJsonPrimitive()) {
             op = Op.PROD;
-            subterms = new Term[]{$.the(j.toString())};
+            subterms = new Term[]{Atomic.the(j.toString())};
         } else if (j.isJsonObject()) {
             op = Op.SETe;
             subterms = j.getAsJsonObject().entrySet().stream().map(e -> {
                 //return $.p($.the(e.getKey()), fromJSON(e.getValue()));
-                return $.inh( the(e.getValue()), $.the(e.getKey()) );
+                return $.inh( the(e.getValue()), Atomic.the(e.getKey()) );
             }).toArray(Term[]::new);
         } else {// if (j.isJsonObject()) {
             throw new UnsupportedOperationException("TODO");

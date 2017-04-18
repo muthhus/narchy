@@ -6,6 +6,7 @@ import nars.NAgent;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import nars.util.data.Mix;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -13,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -95,11 +95,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 //'p';
 
             if (i >= sx && i >=sy) {
-                xy = $.the(levelPrefix + x[ix++].toString() + y[iy++].toString());
+                xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++].toString());
             } else if (i >= sx) {
-                xy = $.the(levelPrefix + x[ix++].toString() + "_");
+                xy = Atomic.the(levelPrefix + x[ix++].toString() + "_");
             } else { //if (i < y.length) {
-                xy = $.the(levelPrefix + "_" + y[iy++].toString());
+                xy = Atomic.the(levelPrefix + "_" + y[iy++].toString());
             }
             r[i] = xy;
         }

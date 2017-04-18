@@ -192,17 +192,17 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
-        return senseNumberBi($.the(id), v);
+        return senseNumberBi(Atomic.the(id), v);
     }
 
     @NotNull
     default FuzzyScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v,  (Compound)prop(id, the("hi")), (Compound)prop(id, the("lo")));
+        return senseNumber(v,  (Compound)prop(id, Atomic.the("hi")), (Compound)prop(id, Atomic.the("lo")));
     }
     @NotNull
     default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) throws Narsese.NarseseException {
         Atomic ID = $(id);
-        return senseNumber(v,  inh(ID, the("hi")), inh(ID, the("mid")), inh(ID, the("lo")));
+        return senseNumber(v,  inh(ID, Atomic.the("hi")), inh(ID, Atomic.the("mid")), inh(ID, Atomic.the("lo")));
     }
 
     default SensorConcept senseNumber(String id, DoubleSupplier v) throws Narsese.NarseseException {

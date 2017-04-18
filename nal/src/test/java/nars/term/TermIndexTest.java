@@ -1,7 +1,6 @@
 package nars.term;
 
 import jcog.random.XorShift128PlusRandom;
-import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
@@ -234,8 +233,8 @@ public class TermIndexTest {
 
     public static void testCommonPrefix(boolean direction) {
         MaplikeTermIndex i = (MaplikeTermIndex)(new Default().concepts);
-        Atomic sui = $.the("substituteIfUnifies");
-        Atomic su = $.the("substitute");
+        Atomic sui = Atomic.the("substituteIfUnifies");
+        Atomic su = Atomic.the("substitute");
 
         if (direction) {
             i.get(sui, true);

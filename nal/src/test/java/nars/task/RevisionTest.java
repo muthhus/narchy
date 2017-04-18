@@ -7,6 +7,7 @@ import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -64,7 +65,7 @@ public class RevisionTest {
     }
 
 
-    public final static Compound AB = $.inh($.the("a"), $.the("b"));
+    public final static Compound AB = $.inh(Atomic.the("a"), Atomic.the("b"));
 
     void testRevision(int delay1, boolean beliefOrGoal) {
         Param.DEBUG = true;

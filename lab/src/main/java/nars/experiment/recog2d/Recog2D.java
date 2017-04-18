@@ -12,6 +12,7 @@ import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -117,7 +118,7 @@ public class Recog2D extends NAgentX {
 
         //nar.log();
 
-        outs = new Outputs(ii -> (Compound)$.inst($.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> (Compound)$.inst(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(

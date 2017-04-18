@@ -22,7 +22,7 @@ public class PriMergeTest {
 
     @Test
     public void testPlusDQBlend() {
-        PriMerge m = PriMerge.plusBlend;
+        PriMerge m = PriMerge.plus;
 
         testMerge(z(), a, m, 1f, 1f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(z(), a, 0.5f, m, 0.5f); //scale of half should affect priority only
@@ -46,7 +46,7 @@ public class PriMergeTest {
 
     @Test
     public void testAvg() {
-        PriMerge AVG = PriMerge.avgBlend;
+        PriMerge AVG = PriMerge.avg;
 
         //z,a - averaging with zero results in half of the incoming
         testMerge(z(), a, 1.0f, AVG, 0.5f * a.pri());

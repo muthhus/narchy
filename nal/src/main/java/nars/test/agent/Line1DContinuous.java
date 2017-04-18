@@ -10,6 +10,7 @@ import nars.concept.SensorConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
+import nars.term.atom.Atomic;
 import nars.time.FrameTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
@@ -54,7 +55,7 @@ public class Line1DContinuous extends NAgent {
             int ii = i;
             //hidden
             sensors.add(new SensorConcept(
-                    $.func("h", $.the("x"), $.the( i)),
+                    $.func("h", Atomic.the("x"), $.the( i)),
                     //$.p($.the("h"), $.the(i)),
                     n, ()->{
                 return ins[ii];
@@ -62,7 +63,7 @@ public class Line1DContinuous extends NAgent {
 
             //estimated
             sensors.add(new SensorConcept(
-                    $.func("e", $.the("x"), $.the( i)),
+                    $.func("e", Atomic.the("x"), $.the( i)),
                     //$.func("e", $.the(i)),
                     //$.p($.the("e"), $.the(i)),
                     n, ()->{
@@ -72,7 +73,7 @@ public class Line1DContinuous extends NAgent {
 
         ActionConcept a;
 
-        actionBipolar($.inh($.the("move"), $.the("x")), (v) -> {
+        actionBipolar($.inh(Atomic.the("move"), Atomic.the("x")), (v) -> {
 
             yEst += (v)*speed;
 

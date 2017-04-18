@@ -74,10 +74,10 @@
         (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegativeN)
         //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> (&&,S,A..+)),       S, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (M ==> (&&,(--,%S),A..+)), S, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    ((&&,S,A..+) ==> M),       S, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
-    ((&&,(--,%S),A..+) ==> M), S, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
+    (M ==> (&&,S,A..+)), (M ==> (&&,S,A..+)), time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
+        //(M ==> (&&,(--,%S),A..+)), M, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
+    ((&&,S,A..+) ==> M), (M ==> (&&,S,A..+)), time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
+        //((&&,(--,%S),A..+) ==> M), M, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //      + Indep variable elimination

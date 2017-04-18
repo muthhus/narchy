@@ -42,7 +42,7 @@ public class LambdaQuestionTask extends ImmutableTask {
     }
 
     protected ArrayBag<Task> newBag(int history) {
-        return new ArrayBag<>(history, PriMerge.maxHard, new ConcurrentHashMap<>(history));
+        return new ArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history));
     }
 
     @Override

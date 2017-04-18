@@ -20,8 +20,8 @@ import java.util.Random;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static jcog.pri.PriMerge.maxBlend;
-import static jcog.pri.PriMerge.plusBlend;
+import static jcog.pri.PriMerge.max;
+import static jcog.pri.PriMerge.plus;
 
 /**
  * @author me
@@ -32,12 +32,12 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalArray() {
-        testBasicInsertionRemoval(new ArrayBag<>(1, plusBlend, new HashMap<>(1)));
+        testBasicInsertionRemoval(new ArrayBag<>(1, plus, new HashMap<>(1)));
     }
 
     @Test
     public void testBasicInsertionRemovalCurve() {
-        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plusBlend, new HashMap(1)));
+        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plus, new HashMap(1)));
     }
 
 
@@ -66,7 +66,7 @@ public class BagTest {
 
     @Test
     public void testBudgetMerge() {
-        ArrayBag<String> a = new ArrayBag<String>(4, plusBlend, new HashMap<>(4));
+        ArrayBag<String> a = new ArrayBag<String>(4, plus, new HashMap<>(4));
         Assert.assertEquals(0, a.size());
 
         a.put(new RawPLink("x", 0.1f));
@@ -84,7 +84,7 @@ public class BagTest {
 
     @Test
     public void testSort() {
-        ArrayBag<String> a = new ArrayBag(4, plusBlend, new HashMap<>(4));
+        ArrayBag<String> a = new ArrayBag(4, plus, new HashMap<>(4));
 
         a.put(new RawPLink("x",0.1f));
         a.put(new RawPLink("y",0.2f));
@@ -113,7 +113,7 @@ public class BagTest {
 
     @Test
     public void testCapacity() {
-        ArrayBag<String> a = new ArrayBag(2, plusBlend, new HashMap<>(2));
+        ArrayBag<String> a = new ArrayBag(2, plus, new HashMap<>(2));
 
         a.put(new RawPLink("x", 0.1f));
         a.put(new RawPLink("y", 0.2f));
@@ -132,7 +132,7 @@ public class BagTest {
 
     @Test
     public void testRemoveByKey() {
-        testRemoveByKey(new ArrayBag(2, plusBlend, new HashMap<>(2)));
+        testRemoveByKey(new ArrayBag(2, plus, new HashMap<>(2)));
     }
 
     public static void testRemoveByKey(Bag<String,PLink<String>> a) {
@@ -154,8 +154,8 @@ public class BagTest {
 
     @Test
     public void testScalePutArray() {
-        testScalePut(new ArrayBag<>(2, maxBlend, new HashMap<>(2)));
-        testScalePut2(new ArrayBag(2, plusBlend, new HashMap<>(2)));
+        testScalePut(new ArrayBag<>(2, max, new HashMap<>(2)));
+        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
 
     }
 
@@ -268,7 +268,7 @@ public class BagTest {
     private CurveBag<String> populated(int n, @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = curveBag(n, plusBlend);
+        CurveBag<String> a = curveBag(n, plus);
 
 
         //fill with uniform randomness
@@ -285,7 +285,7 @@ public class BagTest {
 
     @Test
     public void testFlatBagRemainsRandomInNormalizedSamplerCurve() {
-        @NotNull CurveBag<String> a = curveBag(8, plusBlend);
+        @NotNull CurveBag<String> a = curveBag(8, plus);
 
         testSamplingFlat(a, 0.04f);
 

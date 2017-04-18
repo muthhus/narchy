@@ -64,8 +64,8 @@ public class IRCNLP extends IRC {
 
     boolean trace;
 
-    final ArrayBag<String> out = new ArrayBag<String>(16, PriMerge.maxBlend, new ConcurrentHashMap());
-    final ArrayBag<String> prevOut = new ArrayBag<String>(512, PriMerge.maxBlend, new ConcurrentHashMap());
+    final ArrayBag<String> out = new ArrayBag<String>(16, PriMerge.max, new ConcurrentHashMap());
+    final ArrayBag<String> prevOut = new ArrayBag<String>(512, PriMerge.max, new ConcurrentHashMap());
 
     public IRCNLP(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);

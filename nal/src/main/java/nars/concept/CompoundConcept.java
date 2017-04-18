@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static jcog.pri.PriMerge.avgBlend;
 import static nars.Param.TRUTH_EPSILON;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
@@ -121,7 +120,7 @@ public class CompoundConcept implements Concept, Termlike {
 
 
     @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, avgBlend), b.newBag(sharedMap, avgBlend), nar);
+        this(term, b.newBag(sharedMap, DefaultConceptBuilder.DEFAULT_BLEND), b.newBag(sharedMap, DefaultConceptBuilder.DEFAULT_BLEND), nar);
     }
 
     @Override

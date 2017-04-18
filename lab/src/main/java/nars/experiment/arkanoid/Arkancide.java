@@ -8,6 +8,7 @@ import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.video.CameraSensor;
 import spacegraph.SpaceGraph;
 
@@ -71,7 +72,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super($.the("noid"), nar);
+        super(Atomic.the("noid"), nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 
@@ -120,7 +121,7 @@ public class Arkancide extends NAgentX {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        actionUnipolar($.inh($.the("paddle"), $.the("nx") ), (v) -> {
+        actionUnipolar($.inh(Atomic.the("paddle"), Atomic.the("nx") ), (v) -> {
             noid.paddle.moveTo(v, paddleSpeed.floatValue() * maxPaddleSpeed);
             return true;
         });

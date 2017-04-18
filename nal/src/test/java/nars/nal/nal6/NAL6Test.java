@@ -509,6 +509,15 @@ public class NAL6Test extends AbstractNALTest {
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
     }
+    @Test public void testDecomposeImplPred() {
+        test()
+            .log()
+            .believe("( z(a,$b) ==> (&&, (x-->a), (x-->$b), (x --> c) ) )")
+            .mustBelieve(8, "( z(a,$b) ==> (x-->a) )", 1f, 0.81f)
+            .mustBelieve(8, "( z(a,$b) ==> (x-->$b) )", 1f, 0.81f)
+            .mustBelieve(8, "( z(a,$b) ==> (x-->c) )", 1f, 0.81f)
+        ;
+    }
 
     @Test
     public void recursionSmall() throws nars.Narsese.NarseseException {

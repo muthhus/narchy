@@ -8,7 +8,6 @@ import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import jcog.Texts;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
@@ -50,7 +49,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.Integer.MIN_VALUE;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -74,7 +72,7 @@ public enum $ {
     ;
 
     public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
-    public static final Function<Object, Term> ToStringToTerm = (x) -> $.the(x.toString());
+    public static final Function<Object, Term> ToStringToTerm = (x) -> Atomic.the(x.toString());
 
     @NotNull
     public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
@@ -85,27 +83,7 @@ public enum $ {
 //        return new ObjRef(term, instance);
 //    }
 
-    @NotNull
-    public static Atomic the(@NotNull String id) {
-        //special cases
-        switch (id) {
-            case "_":
-                return Op.Imdex;
-        }
-
-        if (quoteNecessary(id))
-            return quote(id);
-
-        //try to parse int
-        int i = Texts.i(id, MIN_VALUE);
-        if (i != MIN_VALUE)
-            return the(i); //parsed as integer, so
-
-        return new Atom(id);
-
-    }
-
-    final static Atom emptyQuote = (Atom) $.the("\"\"");
+    final static Atom emptyQuote = (Atom) Atomic.the("\"\"");
 
     final static Escaper quoteEscaper = Escapers.builder().addEscape('\"', "\\\"").build();
 
@@ -128,7 +106,7 @@ public enum $ {
             s = ("\"" + quoteEscaper.escape(s) + '"');
         }
 
-        return the(s);
+        return Atomic.the(s);
     }
 
 
@@ -137,7 +115,7 @@ public enum $ {
         int l = id.length;
         Term[] x = new Term[l];
         for (int i = 0; i < l; i++)
-            x[i] = the(id[i]);
+            x[i] = Atomic.the(id[i]);
         return x;
     }
 
@@ -153,7 +131,7 @@ public enum $ {
 
     @NotNull
     public static Atom the(char c) {
-        return (Atom) the(String.valueOf(c));
+        return (Atom) Atomic.the(String.valueOf(c));
     }
 
     /**
@@ -183,15 +161,15 @@ public enum $ {
 
 
     public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
-        return func($.the(opTerm), arg);
+        return func(Atomic.the(opTerm), arg);
     }
 
     public static Compound func(@NotNull String opTerm, @Nullable List<Term> arg) {
-        return func($.the(opTerm), arg.toArray(new Term[arg.size()]));
+        return func(Atomic.the(opTerm), arg.toArray(new Term[arg.size()]));
     }
 
     public static Compound func(@NotNull String opTerm, @Nullable String... arg) throws Narsese.NarseseException {
-        return func($.the(opTerm), $.array(arg));
+        return func(Atomic.the(opTerm), $.array(arg));
     }
 
     /**
@@ -665,7 +643,7 @@ public enum $ {
      */
     @NotNull
     public static Atom the(@NotNull Class c) {
-        return (Atom) $.the(c.getName());
+        return (Atom) Atomic.the(c.getName());
     }
 
 
@@ -680,13 +658,13 @@ public enum $ {
             if (((int) o) == o.longValue())
                 return the(o.intValue()); //use the integer form since it will be IntTerm
             else
-                return the(Long.toString((long) o));
+                return Atomic.the(Long.toString((long) o));
         }
 
         if ((o instanceof Float) || (o instanceof Double))
             return the(o.floatValue());
 
-        return the(o.toString());
+        return Atomic.the(o.toString());
     }
 
     final static int MAX_CACHED_INTS = 16;
@@ -712,7 +690,7 @@ public enum $ {
 //        }
 //        //return Atom.the(Utf8.toUtf8(name));
 
-        return (Atom) the(Integer.toString(i, radix));
+        return (Atom) Atomic.the(Integer.toString(i, radix));
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -890,7 +868,7 @@ public enum $ {
 
     @NotNull
     public static Atomic the(@NotNull byte[] id) {
-        return the(new String(id));
+        return Atomic.the(new String(id));
     }
 
     @NotNull
@@ -908,18 +886,8 @@ public enum $ {
         return x;
     }
 
-    @Nullable
     public static Term the(Object o) {
-
-        if (o instanceof Term) return ((Term) o);
-        if (o instanceof String)
-            return the((String) o);
-        if (o instanceof StringBuilder)
-            return the(o.toString());
-        if (o instanceof Number)
-            return the((Number) o);
-
-        return null;
+        return terms.the(o);
     }
 
     /**
@@ -1060,7 +1028,7 @@ public enum $ {
     public static @NotNull Compound pRecurseIntersect(char prefix, @NotNull Term... t) {
         final int[] index = {0};
         return (Compound) $.secte($.terms(t, x -> {
-            return $.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic) x).toString());
+            return Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic) x).toString());
         }));
     }
 

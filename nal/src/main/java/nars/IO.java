@@ -194,7 +194,7 @@ public class IO {
             case ATOM: {
 
                 String s = in.readUTF();
-                Atomic a = $.the(s);
+                Atomic a = Atomic.the(s);
                 Atomic aa = (Atomic) t.get(a);
                 if (aa != null)
                     return aa; //the concept, if exists

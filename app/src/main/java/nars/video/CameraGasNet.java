@@ -58,7 +58,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
                 else
                     return Float.NaN;
             };
-            agent.senseNumber($.inh(base, $.the("x")), new FloatNormalized(v2, 0f, 1f));
+            agent.senseNumber($.inh(base, Atomic.the("x")), new FloatNormalized(v2, 0f, 1f));
             FloatSupplier v1 = () -> {
                 Node node = net.node(i);
                 if (node!=null)
@@ -66,7 +66,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
                 else
                     return Float.NaN;
             };
-            agent.senseNumber($.inh(base, $.the("y")), new FloatNormalized(v1, 0f, 1f));
+            agent.senseNumber($.inh(base, Atomic.the("y")), new FloatNormalized(v1, 0f, 1f));
             FloatSupplier v = () -> {
                 Node node = net.node(i);
                 if (node!=null)
@@ -74,7 +74,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
                 else
                     return Float.NaN;
             };
-            agent.senseNumber($.inh(base, $.the("c")), new FloatNormalized(v, 0f, 1f));
+            agent.senseNumber($.inh(base, Atomic.the("c")), new FloatNormalized(v, 0f, 1f));
 
             //TODO
             //  Size

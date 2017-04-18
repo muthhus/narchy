@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 public class DefaultTermizer implements Termizer {
 
 
-    public static final Atomic PACKAGE = $.the("package");
-    public static final Atomic PRIMITIVE = $.the("primitive");
+    public static final Atomic PACKAGE = Atomic.the("package");
+    public static final Atomic PRIMITIVE = Atomic.the("primitive");
     public static final Variable INSTANCE_VAR = $.varDep("instance");
 
     final Map<Package, Term> packages = new HashMap();
@@ -271,7 +271,7 @@ public class DefaultTermizer implements Termizer {
     public static Term classTerm(@NotNull Class c) {
         //return Atom.the(Utf8.toUtf8(name));
 
-        return $.the(c.getSimpleName());
+        return Atomic.the(c.getSimpleName());
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -297,7 +297,7 @@ public class DefaultTermizer implements Termizer {
     @NotNull
     public static Term termPackage(@NotNull Package p) {
         //TODO cache?
-        if (p == null) return $.the("package");
+        if (p == null) return Atomic.the("package");
         String n = p.getName();
         //if (n == null) return $.the(p.toString());
         String[] path = n.split("\\.");
@@ -420,7 +420,7 @@ public class DefaultTermizer implements Termizer {
             if (Modifier.isStatic(f.getModifiers())) {
                 T xx = each.apply(f);
                 if (xx!=null) {
-                    t.put($.the(f.getName()), xx);
+                    t.put(Atomic.the(f.getName()), xx);
                 }
             }
         }

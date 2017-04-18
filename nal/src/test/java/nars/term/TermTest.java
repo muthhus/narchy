@@ -20,6 +20,7 @@ import nars.*;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.term.atom.Atomic;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -119,8 +120,8 @@ public class TermTest {
 
     @Test
     public void testCommutativivity()  {
-        assertFalse($.sete($.the("x")).isCommutative());
-        assertTrue($.sete($.the("x"), $.the("y")).isCommutative());
+        assertFalse($.sete(Atomic.the("x")).isCommutative());
+        assertTrue($.sete(Atomic.the("x"), Atomic.the("y")).isCommutative());
     }
 
     @Test
@@ -616,8 +617,8 @@ public class TermTest {
         assertTrue($("(/,_,X,Y)").op().image);
         assertFalse($("(X,Y)").op().image);
 
-        assertValidTermValidConceptInvalidTaskContent(()->imageExt($.the("X"), $.the("Y")));
-        assertValidTermValidConceptInvalidTaskContent(()->imageInt($.the("X"), $.the("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageExt(Atomic.the("X"), Atomic.the("Y")));
+        assertValidTermValidConceptInvalidTaskContent(()->imageInt(Atomic.the("X"), Atomic.the("Y")));
 
         assertEquals("(/,X,_)", $("(/,X,_)").toString());
         assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());

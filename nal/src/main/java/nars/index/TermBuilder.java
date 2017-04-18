@@ -6,6 +6,7 @@ import nars.derive.meta.match.Ellipsislike;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -15,13 +16,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.Op.False;
-import static nars.Op.True;
 import static nars.term.Terms.pred;
 import static nars.term.Terms.subj;
 import static nars.time.Tense.DTERNAL;
@@ -43,8 +43,6 @@ public abstract class TermBuilder {
 
     private static final int InvalidImplicationSubject = or(EQUI, IMPL);
     private static final int InvalidImplicationPredicate = or(EQUI, IMPL);
-
-
 
 
     @NotNull
@@ -115,7 +113,8 @@ public abstract class TermBuilder {
                 if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(PROPERTY, dt, "needs 2 arg", u);
                 return prop(u[0], u[1]);
             case INSTANCE_PROPERTY:
-                if (arity != 2 || dt != DTERNAL) throw new InvalidTermException(INSTANCE_PROPERTY, dt, "needs 2 arg", u);
+                if (arity != 2 || dt != DTERNAL)
+                    throw new InvalidTermException(INSTANCE_PROPERTY, dt, "needs 2 arg", u);
                 return instprop(u[0], u[1]);
 
 
@@ -181,18 +180,23 @@ public abstract class TermBuilder {
     }
 
 
-    /** dt pre-filter */
+    /**
+     * dt pre-filter
+     */
     protected int dt(int dt) {
         return dt;
     }
 
-    /** should only be applied to subterms, not the outer-most compound */
-    @NotNull public Term productNormalize(@NotNull Term u) {
+    /**
+     * should only be applied to subterms, not the outer-most compound
+     */
+    @NotNull
+    public Term productNormalize(@NotNull Term u) {
         if (!(u instanceof Compound))
             return u;
 
         int b = u.structure();
-        if (!((b & Op.InhAndIMGbits) > 0) || !((b & INH.bit) > 0) || u.varPattern()>0)
+        if (!((b & Op.InhAndIMGbits) > 0) || !((b & INH.bit) > 0) || u.varPattern() > 0)
             return u;
 
         Term t = u.unneg();
@@ -325,14 +329,13 @@ public abstract class TermBuilder {
             case 1:
                 return new UnitCompound1(op, args[0]);
             default:*/
-                return newCompound(op, dt, intern(args));
+        return newCompound(op, dt, intern(args));
         //}
     }
 
     static public final GenericCompound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
-
 
 
     @NotNull
@@ -374,6 +377,7 @@ public abstract class TermBuilder {
     private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
         return finish(TermContainer.mustSortAndUniquify(op, dt, args.length), op, dt, args);
     }
+
     @NotNull
     private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
         if (sort) {
@@ -454,8 +458,6 @@ public abstract class TermBuilder {
     }
 
 
-
-
     @NotNull
     public Term inst(Term subj, Term pred) {
         return the(INH, the(SETe, subj), pred);
@@ -487,15 +489,15 @@ public abstract class TermBuilder {
         if (t instanceof Compound) {
             // (--,(--,P)) = P
             if (t.op() == NEG)
-                return ((Compound)t).term(0);//unneg();
+                return ((Compound) t).term(0);//unneg();
         } else if (t instanceof AtomicSingleton) {
             if (isFalse(t)) return True;
             if (isTrue(t)) return False;
         }
 
-        Term y = finalize(NEG,t);
+        Term y = finalize(NEG, t);
         if (t.isNormalized() && y instanceof Compound) {
-            ((Compound)y).setNormalized();
+            ((Compound) y).setNormalized();
         }
         return y;
 
@@ -767,13 +769,13 @@ public abstract class TermBuilder {
 
                     case INH:
 
-                        if (subject.equals( predicate) ) //equal test first to allow, ex: False<->False to result in True
+                        if (subject.equals(predicate)) //equal test first to allow, ex: False<->False to result in True
                             return True;
                         if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                             return False;
 
-                        boolean sNeg = subject.op()==NEG;
-                        boolean pNeg = predicate.op()==NEG;
+                        boolean sNeg = subject.op() == NEG;
+                        boolean pNeg = predicate.op() == NEG;
                         if (sNeg && pNeg) {
                             subject = subject.unneg();
                             predicate = predicate.unneg();
@@ -793,7 +795,7 @@ public abstract class TermBuilder {
                             return finalize(op, dt, subject, predicate);
                         }
 
-                        if ((dt!=0 && dt!=DTERNAL)) {
+                        if ((dt != 0 && dt != DTERNAL)) {
                             mustNotEqual = false; //allow repeat
                             if (dt < 0 && subject.equals(predicate)) {
                                 dt = -dt; //use only the forward direction on a repeat
@@ -802,9 +804,9 @@ public abstract class TermBuilder {
                             return True;
                         }
 
-                        if (isTrue(subject))  return predicate;
+                        if (isTrue(subject)) return predicate;
                         if (isFalse(subject)) return neg(predicate);
-                        if (isTrue(predicate))  return subject;
+                        if (isTrue(predicate)) return subject;
                         if (isFalse(predicate)) return neg(subject);
 
                         if (!validEquivalenceTerm(subject))
@@ -832,7 +834,7 @@ public abstract class TermBuilder {
                     case IMPL:
 
 
-                        if ((dt!=0 && dt!=DTERNAL)) {
+                        if ((dt != 0 && dt != DTERNAL)) {
                             mustNotEqual = false; //allow repeat
                             mustNotContain = false;
                         } else if (subject.equals(predicate)) {
@@ -906,7 +908,6 @@ public abstract class TermBuilder {
 
                         break;
                 }
-
 
 
                 if (mustNotEqual) {//Terms.equalAtemporally(ss, pp)) {
@@ -1116,4 +1117,17 @@ public abstract class TermBuilder {
     }
 
 
+    @Nullable
+    public Term the(@NotNull Object o) {
+        if (o instanceof Term)
+            return ((Term) o);
+
+        if (o instanceof Number)
+            return $.the((Number) o);
+
+        //if (o instanceof String || o instanceof StringBuilder)
+        return Atomic.the(o.toString());
+
+        //return null;
+    }
 }

@@ -69,7 +69,7 @@ public class BagLab  {
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
                 new DefaultHijackBag<Integer>(1024, 4,
-                        PriMerge.plusBlend,
+                        PriMerge.plus,
                         //BudgetMerge.maxBlend,
                         new XorShift128PlusRandom(1)) {
 

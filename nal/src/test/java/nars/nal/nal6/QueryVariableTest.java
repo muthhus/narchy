@@ -30,12 +30,12 @@ public class QueryVariableTest {
 
     @Test
     public void testQuery2() throws Narsese.NarseseException {
-        testQueryAnswered(32, 4);
+        testQueryAnswered(32, 256);
     }
 
     @Test
     public void testQuery1() throws Narsese.NarseseException {
-        testQueryAnswered(1, 32);
+        testQueryAnswered(1, 256);
     }
 
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {

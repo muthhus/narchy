@@ -10,12 +10,12 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface Termizer {
 
-	Atomic TRUE = $.the("true");
+	Atomic TRUE = Atomic.the("true");
 	@Nullable
 	Term FALSE = $.neg(TRUE);
-	Atomic VOID = $.the("void");
-	Atomic EMPTY = $.the("empty");
-	Atomic NULL = $.the("null");
+	Atomic VOID = Atomic.the("void");
+	Atomic EMPTY = Atomic.the("empty");
+	Atomic NULL = Atomic.the("null");
 
 	@Nullable
 	Term term(Object o);

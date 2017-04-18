@@ -62,8 +62,8 @@ public interface NARBuilder {
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(reprobes, PriMerge.avgBlend, rng);
-                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(reprobes, PriMerge.avgBlend, rng);
+                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND, rng);
+                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND, rng);
                 return f.apply(termlink, tasklink);
             }
 

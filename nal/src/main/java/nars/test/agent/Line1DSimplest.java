@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.term.atom.Atomic;
 
 
 /**
@@ -35,7 +36,7 @@ public class Line1DSimplest extends NAgent {
 
         in = senseNumber(
                 //$.inh($.the("i"), id),
-                $.inh($.the("i"), id),
+                $.inh(Atomic.the("i"), id),
                 this.i);
 //        FuzzyScalarConcepts in = senseNumberBi(
 //                //$.inh($.the("i"), id),
@@ -49,7 +50,7 @@ public class Line1DSimplest extends NAgent {
 //        }));
 
         //out = null;
-        out = actionTriState($.inh($.the("o"), id), (d) -> {
+        out = actionTriState($.inh(Atomic.the("o"), id), (d) -> {
             float speed = 0.1f;
             switch (d) {
                 case -1:

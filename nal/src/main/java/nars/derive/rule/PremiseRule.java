@@ -50,10 +50,10 @@ import static nars.term.Terms.*;
  */
 public class PremiseRule extends GenericCompound {
 
-    static final Term TaskAny = $.func("task", $.the("any"));
-    static final Term QUESTION_PUNCTUATION = $.inh($.the("Question"), $.the("Punctuation"));
-    static final Atomic BELIEF = $.the("Belief");
-    static final Atomic GOAL = $.the("Goal");
+    static final Term TaskAny = $.func("task", Atomic.the("any"));
+    static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
+    static final Atomic BELIEF = Atomic.the("Belief");
+    static final Atomic GOAL = Atomic.the("Goal");
 
     static final MultimapBuilder.ListMultimapBuilder<Object, Object> constraintMapBuilder =
             MultimapBuilder.
@@ -130,7 +130,7 @@ public class PremiseRule extends GenericCompound {
     private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
         @Override
         public Term apply(@NotNull Term func) {
-            return $.the(func.toString() + 'X');
+            return Atomic.the(func.toString() + 'X');
         }
     };
 //    @Nullable

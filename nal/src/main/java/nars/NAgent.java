@@ -18,6 +18,7 @@ import nars.task.ImmutableTask;
 import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.Loop;
@@ -105,7 +106,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public NAgent(@NotNull String id, @NotNull NAR nar) {
-        this(id.isEmpty() ? null : the(id), nar);
+        this(id.isEmpty() ? null : Atomic.the(id), nar);
     }
 
     public NAgent(@Nullable Term id, @NotNull NAR nar) {
@@ -116,7 +117,7 @@ abstract public class NAgent implements NSense, NAct {
         this.now = nar.time();
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : $.inh( $.the("happy"), id),
+                id == null ? p("happy") : $.inh( Atomic.the("happy"), id),
                 nar,
                 new FloatPolarNormalized(() -> rewardValue),
 

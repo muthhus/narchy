@@ -212,7 +212,7 @@ public abstract class NQuadsRDF {
 
             if (s.isEmpty()) return null;
 
-            return the(s);
+            return Atomic.the(s);
         //}
         //else
           //  return null;
@@ -244,7 +244,7 @@ public abstract class NQuadsRDF {
 
         //return Atom.the(Utf8.toUtf8(name));
 
-        return the(uri);
+        return Atomic.the(uri);
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -277,21 +277,21 @@ public abstract class NQuadsRDF {
 //        return Instance.make(clas, owlClass);
 //    }
 
-    public static final Atomic owlClass = the("Class");
-    static final Atomic parentOf = the("parentOf");
-    static final Atomic type = the("type");
-    static final Atomic subClassOf = the("subClassOf");
-    static final Atomic isPartOf = the("isPartOf");
-    static final Atomic subPropertyOf = the("subPropertyOf");
-    static final Atomic equivalentClass = the("equivalentClass");
-    static final Atomic equivalentProperty = the("equivalentProperty");
-    static final Atomic inverseOf = the("inverseOf");
-    static final Atomic disjointWith = the("disjointWith");
-    static final Atomic domain = the("domain");
-    static final Atomic range = the("range");
-    static final Atomic sameAs = the("sameAs");
-    static final Atomic differentFrom = the("differentFrom");
-    static final Atomic dataTypeProperty = the("DatatypeProperty");
+    public static final Atomic owlClass = Atomic.the("Class");
+    static final Atomic parentOf = Atomic.the("parentOf");
+    static final Atomic type = Atomic.the("type");
+    static final Atomic subClassOf = Atomic.the("subClassOf");
+    static final Atomic isPartOf = Atomic.the("isPartOf");
+    static final Atomic subPropertyOf = Atomic.the("subPropertyOf");
+    static final Atomic equivalentClass = Atomic.the("equivalentClass");
+    static final Atomic equivalentProperty = Atomic.the("equivalentProperty");
+    static final Atomic inverseOf = Atomic.the("inverseOf");
+    static final Atomic disjointWith = Atomic.the("disjointWith");
+    static final Atomic domain = Atomic.the("domain");
+    static final Atomic range = Atomic.the("range");
+    static final Atomic sameAs = Atomic.the("sameAs");
+    static final Atomic differentFrom = Atomic.the("differentFrom");
+    static final Atomic dataTypeProperty = Atomic.the("DatatypeProperty");
 
 
     @Nullable
@@ -305,8 +305,8 @@ public abstract class NQuadsRDF {
 
 
     public static final Set<Atom> predicatesIgnored = new HashSet() {{
-        add(the("comment"));
-        add(the("isDefinedBy"));
+        add(Atomic.the("comment"));
+        add(Atomic.the("isDefinedBy"));
     }};
 
     public static Task inputRaw(@NotNull NAR nar,

@@ -2,6 +2,7 @@ package nars.term;
 
 import nars.$;
 import nars.Narsese;
+import nars.term.atom.Atomic;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -89,10 +90,10 @@ public class VariableTest {
         assertEquals(-1, $.varIndep(1).compareTo($.varIndep(2)));
 
 
-        Compound k1 = $.inh($.varIndep(1), $.the("key")); //raw("($1 --> key)");
-        Compound k2 = $.inh($.varIndep(2), $.the("key")); //raw("($2 --> key)");
-        Compound l1 = $.inh($.varIndep(1), $.the("lock")); //raw("($1 --> lock)");
-        Compound l2 = $.inh($.varIndep(2), $.the("lock")); //raw("($2 --> lock)");
+        Compound k1 = $.inh($.varIndep(1), Atomic.the("key")); //raw("($1 --> key)");
+        Compound k2 = $.inh($.varIndep(2), Atomic.the("key")); //raw("($2 --> key)");
+        Compound l1 = $.inh($.varIndep(1), Atomic.the("lock")); //raw("($1 --> lock)");
+        Compound l2 = $.inh($.varIndep(2), Atomic.the("lock")); //raw("($2 --> lock)");
         assertEquals(-1, k1.compareTo(k2));
         assertEquals(+1, k2.compareTo(k1));
         assertEquals(-1, l1.compareTo(l2));

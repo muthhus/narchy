@@ -22,8 +22,8 @@ abstract class PremiseTruthTransform implements CompoundTransform, Function<Term
 
 
 
-    final static Atomic belief = $.the("Belief");
-    final static Atomic desire = $.the("Desire");
+    final static Atomic belief = Atomic.the("Belief");
+    final static Atomic desire = Atomic.the("Desire");
 
 
     protected PremiseTruthTransform(boolean includeBelief, boolean includeDesire) {

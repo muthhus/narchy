@@ -12,6 +12,7 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.budget.DependentBLink;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -303,7 +304,7 @@ public abstract class STMClustered extends STM {
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
         this.input = ThreadLocal.withInitial(() ->
-                new DefaultHijackBag<Task>(capacity.intValue(), 2, PriMerge.avgBlend, nar.random) {
+                new DefaultHijackBag<Task>(capacity.intValue(), 2, PriMerge.max, nar.random) {
 
 //            @NotNull
 //            @Override

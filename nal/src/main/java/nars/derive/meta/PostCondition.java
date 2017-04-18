@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
-import static nars.$.the;
+import static nars.term.atom.Atomic.the;
 
 /**
  * Describes a derivation postcondition

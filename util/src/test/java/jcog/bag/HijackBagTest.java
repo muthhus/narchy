@@ -12,8 +12,8 @@ import java.util.Random;
 import java.util.TreeSet;
 
 import static jcog.bag.BagTest.*;
-import static jcog.pri.PriMerge.maxBlend;
-import static jcog.pri.PriMerge.plusBlend;
+import static jcog.pri.PriMerge.max;
+import static jcog.pri.PriMerge.plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -23,32 +23,32 @@ import static org.junit.Assert.assertTrue;
 public class HijackBagTest {
 
     @Test public void testSamplingFlatHijack() {
-        testSamplingFlat(new DefaultHijackBag<String>(64, 4, maxBlend, rng()), 0.076f);
+        testSamplingFlat(new DefaultHijackBag<String>(64, 4, max, rng()), 0.076f);
     }
 
     @Test public void testRemoveByKey() {
-        BagTest.testRemoveByKey(new DefaultHijackBag(2, 3, plusBlend, rng()));
+        BagTest.testRemoveByKey(new DefaultHijackBag(2, 3, plus, rng()));
     }
 
 
     @Test
     public void testScalePutHija() {
-        BagTest.testScalePut(new DefaultHijackBag(2, 1, maxBlend, rng()));
-        BagTest.testScalePut(new DefaultHijackBag(2, 2, maxBlend, rng()));
-        BagTest.testScalePut2(new DefaultHijackBag(2, 1, plusBlend, rng()));
-        BagTest.testScalePut2(new DefaultHijackBag(2, 2, plusBlend, rng()));
+        BagTest.testScalePut(new DefaultHijackBag(2, 1, max, rng()));
+        BagTest.testScalePut(new DefaultHijackBag(2, 2, max, rng()));
+        BagTest.testScalePut2(new DefaultHijackBag(2, 1, plus, rng()));
+        BagTest.testScalePut2(new DefaultHijackBag(2, 2, plus, rng()));
     }
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new DefaultHijackBag(1, 1, maxBlend, rng()));
+        testBasicInsertionRemoval(new DefaultHijackBag(1, 1, max, rng()));
     }
 
     @Test public void testHijackFlatBagRemainsRandomInNormalizedSampler() {
 
         int n = 64;
 
-        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(n, 4, maxBlend, rng());
+        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(n, 4, max, rng());
         for (int i = 0; i < n; i++) {
             a.put(new RawPLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
         }
@@ -87,7 +87,7 @@ public class HijackBagTest {
     @Test
     public void testHijackResize() {
         Random rng = rng();
-        DefaultHijackBag b = new DefaultHijackBag(0, 7, PriMerge.maxBlend, rng);
+        DefaultHijackBag b = new DefaultHijackBag(0, 7, PriMerge.max, rng);
         BagTest.populate(b, rng, 10, 20, 0f, 1f, 0.5f);
         assertEquals(b.reprobes /*0*/, b.size());
 

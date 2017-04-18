@@ -1,5 +1,8 @@
 package nars.term.atom;
 
+import jcog.Texts;
+import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -12,9 +15,31 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.function.Predicate;
 
+import static java.lang.Integer.MIN_VALUE;
+
 
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
+
+    @NotNull
+    static Atomic the(@NotNull String id) {
+        //special cases
+        switch (id) {
+            case "_":
+                return Op.Imdex;
+        }
+
+        if ($.quoteNecessary(id))
+            return $.quote(id);
+
+        //try to parse int
+        int i = Texts.i(id, MIN_VALUE);
+        if (i != MIN_VALUE)
+            return $.the(i); //parsed as integer, so
+
+        return new Atom(id);
+
+    }
 
     @NotNull
     @Override

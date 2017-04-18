@@ -326,7 +326,7 @@ public class OWLInput  {
 
         //return Atom.the(Utf8.toUtf8(name));
 
-        return $.the(uri);
+        return Atomic.the(uri);
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -395,7 +395,7 @@ public class OWLInput  {
         nar.believe(isAClass(clas));
     }
 
-    public static final Atomic owlClass = $.the("class");
+    public static final Atomic owlClass = Atomic.the("class");
 
     public static Compound isAClass(Term clas) {
         return $.inst(clas, owlClass);

@@ -282,7 +282,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     public void setSelf(String self) {
-        setSelf((Atom) $.the(self));
+        setSelf((Atom) Atomic.the(self));
     }
 
     public void setSelf(Atom self) {
@@ -891,7 +891,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
     public final void on(@NotNull String atom, @NotNull Operator o) {
-        on((Atom) $.the(atom), o);
+        on((Atom) Atomic.the(atom), o);
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {

@@ -5,6 +5,7 @@ import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptBagFocus;
 import nars.table.*;
@@ -69,7 +70,7 @@ public class TaskConcept extends CompoundConcept {
         //TODO this isnt thread safe
         return questions == null ? (questions =
                 //new ArrayQuestionTable(state.questionCap(true)))
-                new HijackQuestionTable(state.questionCap(true), 3, PriMerge.avgBlend, nar.random))
+                new HijackQuestionTable(state.questionCap(true), 3, DefaultConceptBuilder.DEFAULT_BLEND, nar.random))
                 : questions;
 
     }
@@ -78,7 +79,7 @@ public class TaskConcept extends CompoundConcept {
     final QuestionTable questsOrNew(@NotNull NAR nar) {
         return quests == null ? (quests =
                 //new ArrayQuestionTable(state.questionCap(false)))
-                new HijackQuestionTable(state.questionCap(false), 3, PriMerge.avgBlend, nar.random))
+                new HijackQuestionTable(state.questionCap(false), 3, DefaultConceptBuilder.DEFAULT_BLEND, nar.random))
                 : quests;
     }
 

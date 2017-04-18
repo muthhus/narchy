@@ -7,6 +7,7 @@ import nars.derive.meta.Conclude;
 import nars.derive.meta.Fork;
 import nars.premise.Derivation;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,7 +96,7 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
             }
 
 
-            this.id = $.the("MatchTerm(" + pid +
+            this.id = Atomic.the("MatchTerm(" + pid +
                     ((om!=null) ? ",  " + om  : "") + ')');
 
 

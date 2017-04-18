@@ -24,7 +24,6 @@ import nars.Narsese;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -147,7 +146,7 @@ public class Twenglish {
 //                            tokens
 //                    )
 
-            Compound q = $.func("hear", $.the(source), tokens);
+            Compound q = $.func("hear", Atomic.the(source), tokens);
 
             TaskBuilder newtask = new TaskBuilder(q, BELIEF, 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
             tt.add(newtask); //TODO non-string construct
@@ -246,7 +245,7 @@ public class Twenglish {
     public static Term tagToTerm(String c) {
         c = c.toLowerCase();
         if ("word".equals(c)) return $.quote(" ");
-        return $.the(c);
+        return Atomic.the(c);
     }
 
 

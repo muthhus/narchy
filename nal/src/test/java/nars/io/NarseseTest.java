@@ -284,8 +284,8 @@ public class NarseseTest {
     }
     @Test
     public void testImplIsNotOperation() throws Narsese.NarseseException {
-        assertEquals( "((b)==>a)", $.impl($("(b)"), $.the("a")).toString() );
-        assertEquals( "((b) ==>+1 a)", $.impl($("(b)"), 1, $.the("a")).toString() );
+        assertEquals( "((b)==>a)", $.impl($("(b)"), Atomic.the("a")).toString() );
+        assertEquals( "((b) ==>+1 a)", $.impl($("(b)"), 1, Atomic.the("a")).toString() );
     }
     @Test
     public void testOperationEquivalence() throws Narsese.NarseseException {

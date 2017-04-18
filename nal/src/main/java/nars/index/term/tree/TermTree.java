@@ -2,9 +2,9 @@ package nars.index.term.tree;
 
 import jcog.byt.ByteSeq;
 import jcog.tree.radix.MyConcurrentRadixTree;
-import nars.$;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -16,7 +16,7 @@ import java.util.function.Function;
 public class TermTree extends MyConcurrentRadixTree<Termed> {
 
     public final Termed computeIfAbsent(@NotNull ByteSeq s, @NotNull Function<Term, ? extends Termed> conceptBuilder) {
-        return putIfAbsent(s, () -> conceptBuilder.apply($.the(s.toString())));
+        return putIfAbsent(s, () -> conceptBuilder.apply(Atomic.the(s.toString())));
     }
 
     @Override

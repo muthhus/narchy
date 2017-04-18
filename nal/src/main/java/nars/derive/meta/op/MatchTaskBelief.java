@@ -16,6 +16,7 @@ import nars.index.term.PatternTermIndex;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
@@ -395,7 +396,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         private final MatchConstraint c;
 
         public AddConstraint(Term t, MatchConstraint c) {
-            this.id = $.func("constrain", t, $.the(c.toString()));
+            this.id = $.func("constrain", t, Atomic.the(c.toString()));
             this.t = t;
             this.c = c;
         }

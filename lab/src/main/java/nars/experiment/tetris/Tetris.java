@@ -4,14 +4,11 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.task.util.TaskStatistics;
+import nars.term.atom.Atomic;
 import nars.time.FrameTime;
-import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.video.Bitmap2D;
@@ -130,7 +127,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
 
-        senseCamera("tetris", pixels = new CameraSensor($.the("tetris"), this, this));
+        senseCamera("tetris", pixels = new CameraSensor(Atomic.the("tetris"), this, this));
 
 
         actions(nar, state, actions);

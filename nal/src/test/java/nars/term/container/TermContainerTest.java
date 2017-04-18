@@ -4,6 +4,7 @@ import nars.$;
 import nars.Narsese;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -78,7 +79,7 @@ public class TermContainerTest {
 
     @Test
     public void testEqualityOfVector1() {
-        Term a = $.the("a");
+        Term a = Atomic.the("a");
         TermContainer x = TermVector.the(a);
         TermContainer y = TermVector.the(a);
         assertEquals(x, y);

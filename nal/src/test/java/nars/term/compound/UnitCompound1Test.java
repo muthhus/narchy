@@ -20,7 +20,7 @@ public class UnitCompound1Test {
 
     @Test
     public void testUnitCompound1() {
-        Atomic x = $.the("x");
+        Atomic x = Atomic.the("x");
         UnitCompound1 u = new UnitCompound1(PROD, x);
         Compound g = new GenericCompound(PROD, TermVector.the(x));
         assertEquals(g.hashCode(), u.hashCode());
@@ -34,18 +34,18 @@ public class UnitCompound1Test {
 
     @Test
     public void testUnitCompound2() {
-        Atomic x = $.the("x");
+        Atomic x = Atomic.the("x");
         Compound c = $.p(x);
         System.out.println(c);
         System.out.println(c.term(0));
 
-        Compound d = $.inh(x, $.the("y"));
+        Compound d = $.inh(x, Atomic.the("y"));
         System.out.println(d);
     }
     @Test
     public void testUnitCompound3() {
-        Atomic x = $.the("x");
-        Atomic y = $.the("y");
+        Atomic x = Atomic.the("x");
+        Atomic y = Atomic.the("y");
         Compound c = $.func(x, y);
         System.out.println(c);
         System.out.println(c.term(0));

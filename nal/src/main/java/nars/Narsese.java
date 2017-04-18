@@ -24,6 +24,7 @@ import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
@@ -320,7 +321,7 @@ public class Narsese extends BaseParser<Object> {
 //                firstOf(
 //                        BudgetPriorityDurabilityQuality(budget),
 //                        BudgetPriorityDurability(budget),
-                        BudgetPriority(budget),
+                BudgetPriority(budget),
 //                ),
 
                 optional(BUDGET_VALUE_MARK)
@@ -328,7 +329,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     boolean BudgetPriority(Var<Float> budget) {
-        return budget.set((Float)(pop()));
+        return budget.set((Float) (pop()));
     }
 
 //    public Rule BudgetPriorityDurability(Var<float[]> budget) {
@@ -456,9 +457,15 @@ public class Narsese extends BaseParser<Object> {
                 firstOf(
                         QuotedAtom(),
 
+                        //TODO match Ellipsis as an optional continuation of the prefix variable that was already parsed.\
+                        //popping the pushed value should be all that's needed to do this
+                        //and it should reduce the redundancy and need to run Ellipsis first
+                        //same for ColonReverseInheritance, just continue and wrap
+
                         seq(oper, ColonReverseInheritance()),
 
                         seq(meta, Ellipsis()),
+
                         Variable(),
 
                         NumberAtom(),
@@ -682,7 +689,7 @@ public class Narsese extends BaseParser<Object> {
             case GOAL:
             case QUESTION:
             case QUEST:
-            case '\"':
+            case COMMAND:
 
             case '^':
 
@@ -708,12 +715,15 @@ public class Narsese extends BaseParser<Object> {
             case '#':
             case '$':
             case ':':
-            case ';':
             case '`':
 
+            case '\"':
             case '\'':
+
             case '\t':
             case '\n':
+            case '\r':
+            case 0:
                 return false;
         }
         return true;
@@ -736,13 +746,13 @@ public class Narsese extends BaseParser<Object> {
                 dquote(), //leading quote
                 firstOf(
                         //multi-line TRIPLE quotes
-                        seq(regex("\"\"[\\s\\S]+\"\"\""), push($.the('\"' + match()))),
+                        seq(regex("\"\"[\\s\\S]+\"\"\""), push(Atomic.the('\"' + match()))),
 
                         //one quote
                         seq(
                                 //regex("[\\s\\S]+\""),
                                 regex("(?:[^\"\\\\]|\\\\.)*\""),
-                                push($.the('\"' + match())))
+                                push(Atomic.the('\"' + match())))
                 )
         );
     }
@@ -791,18 +801,22 @@ public class Narsese extends BaseParser<Object> {
                         | "?"[<word>]                        // query variable in question
                         | "%"[<word>]                        // pattern variable in rule
         */
-        return sequence(
-                anyOf(new char[]{
-                        Op.VAR_INDEP.ch,
-                        Op.VAR_DEP.ch,
-                        Op.VAR_QUERY.ch,
-                        Op.VAR_PATTERN.ch
-                }),
-                push(match()),
-                Atom(),
-                swap(),
-                push($.v(((String) pop()).charAt(0), (String) pop()))
-        );
+        return
+                firstOf(
+                        seq("_", push(Op.Imdex)),
+                        seq(
+                                anyOf(new char[]{
+                                        Op.VAR_INDEP.ch,
+                                        Op.VAR_DEP.ch,
+                                        Op.VAR_QUERY.ch,
+                                        Op.VAR_PATTERN.ch
+                                }),
+                                push(match()),
+                                Atom(),
+                                swap(),
+                                push($.v(((String) pop()).charAt(0), (String) pop()))
+                        )
+                );
     }
 
     //Rule CompoundTerm() {
@@ -880,9 +894,9 @@ public class Narsese extends BaseParser<Object> {
 
     Rule sepArgSep() {
         return firstOf(
-                        seq(s(), optional(ARGUMENT_SEPARATOR), s()),
-                        ss()
-                );
+                seq(s(), optional(ARGUMENT_SEPARATOR), s()),
+                ss()
+        );
     }
 
 
@@ -950,7 +964,7 @@ public class Narsese extends BaseParser<Object> {
         if (o instanceof String) {
             String s = (String) o;
             //return s;
-            return $.the(s);
+            return Atomic.the(s);
 
 //        int olen = name.length();
 //        switch (olen) {
@@ -1014,7 +1028,7 @@ public class Narsese extends BaseParser<Object> {
             if (p instanceof String) {
                 //throw new RuntimeException("string not expected here");
                 //Term t = $.the((String) p);
-                vectorterms.add($.the((String) p));
+                vectorterms.add(Atomic.the((String) p));
             } else if (p instanceof Term) {
                 vectorterms.add(p);
             } else if (p instanceof Op) {
@@ -1170,9 +1184,6 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-
-
-
     //r.getValueStack().clear();
 
 //        r.getValueStack().iterator().forEachRemaining(x -> {
@@ -1289,7 +1300,7 @@ public class Narsese extends BaseParser<Object> {
                 Object x = stack.pop();
 
                 if (x instanceof String)
-                    return $.the((String) x);
+                    return Atomic.the((String) x);
                 else if (x instanceof Term)
                     return (Term) x;
 

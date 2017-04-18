@@ -23,7 +23,7 @@ import static nars.Op.BELIEF;
 
 public class Hear extends Loop {
 
-    final static Atomic START = $.the("start");
+    final static Atomic START = Atomic.the("start");
 
     private final NAR nar;
     private final Term[] context;
@@ -69,7 +69,7 @@ public class Hear extends Loop {
 
         onReset = nar.eventReset.on(this::onReset);
         tokens = msg;
-        context = new Term[]{$.the("hear"), $.quote(who), Op.Imdex};
+        context = new Term[]{Atomic.the("hear"), $.quote(who), Op.Imdex};
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
         start(wordDelayMS);
     }

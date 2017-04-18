@@ -9,6 +9,7 @@ import nars.NAR;
 import nars.Op;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
@@ -289,13 +290,13 @@ public interface Termject<X> extends Term {
         for (int i = 1; i < 10; i++)
             n.believe($.sim(new IntTerm(i - 1), new IntTerm(i)), 1f, 0.9f);
         //n.believe($.sim(new IntTerm(4), $.the("x")), 1f, 0.9f);
-        n.believe($.sim(new IntInterval(0, 5), $.the("small")), 1f, 0.9f);
-        n.believe($.sim(new IntInterval(5, 10), $.the("large")), 1f, 0.9f);
-        n.question($.inh($.varDep(1), $.the("large")));
-        n.question($.inh($.varDep(1), $.the("small")));
-        n.question($.inh(new IntTerm(1), $.the("small")));
-        n.question($.inh(new IntTerm(1), $.the("large")));
-        n.question($.sim(new IntInterval(0, 15), $.the("x")));
+        n.believe($.sim(new IntInterval(0, 5), Atomic.the("small")), 1f, 0.9f);
+        n.believe($.sim(new IntInterval(5, 10), Atomic.the("large")), 1f, 0.9f);
+        n.question($.inh($.varDep(1), Atomic.the("large")));
+        n.question($.inh($.varDep(1), Atomic.the("small")));
+        n.question($.inh(new IntTerm(1), Atomic.the("small")));
+        n.question($.inh(new IntTerm(1), Atomic.the("large")));
+        n.question($.sim(new IntInterval(0, 15), Atomic.the("x")));
         n.run(1000);
     }
 }
