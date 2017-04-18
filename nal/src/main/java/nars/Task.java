@@ -4,6 +4,7 @@ import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.pri.*;
+import nars.attention.Activation;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
@@ -14,7 +15,9 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
+import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -874,4 +877,63 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         else return s - t;
     }
 
+    default void eval(NAR n) {
+
+        float inputPri = this.priSafe(-1);
+        if (inputPri < 0)
+            return; //deleted
+
+        n.emotion.busy(inputPri, this.volume());
+
+        if (this.isCommand() /* || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))*/) { //eternal, present (within duration radius), or future
+
+            Task transformed = n.execute(this);
+            if (transformed == null)
+                return;
+            else if (transformed != this) {
+                transformed.eval(n);
+                return;
+            }
+            //else: continue
+
+        }
+
+
+//        if (n.time instanceof FrameTime) {
+//            //HACK for unique serial number w/ frameclock
+//            ((FrameTime) n.time).validate(this.stamp());
+//        }
+
+        try {
+
+            Concept c = concept(n);
+
+            if (c instanceof TaskConcept) {
+
+                Activation a = ((TaskConcept) c).process(this, n);
+
+                if (a != null) {
+
+                    n.concepts.commit(c);
+
+                    if (!isInput()) //dont count direct input as learning
+                        n.emotion.learn(inputPri, volume());
+
+                    n.eventTaskProcess.emit(/*post*/(this));
+
+                    //SUCCESSFULLY PROCESSED
+                }
+
+            }
+
+        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
+
+            n.emotion.eror(this.volume());
+
+            //input.feedback(null, Float.NaN, Float.NaN, this);
+            if (Param.DEBUG)
+                n.logger.warn("task process: {} {}", e, this);
+        }
+
+    }
 }

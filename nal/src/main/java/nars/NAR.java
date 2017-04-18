@@ -589,74 +589,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      * returns the Concept (non-null) if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    @Nullable
-    public final Concept input(@NotNull Task input0) {
+    public final void input(@NotNull Task input) {
 
-        Task input;
-        try {
-            input = pre(input0);
-            if (input == null)
-                return null;
-        } catch (InvalidTermException e) {
-            emotion.eror(input0.volume());
-            return null;
-        }
+        input.eval(this);
 
-        float inputPri = input.priSafe(-1);
-        if (inputPri < 0)
-            return null; //deleted
-
-        emotion.busy(inputPri, input.volume());
-
-        if (input.isCommand() /* || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))*/) { //eternal, present (within duration radius), or future
-
-            Task transformed = execute(input);
-            if (transformed == null)
-                return null;
-            else if (transformed != input)
-                return input(transformed);
-            //else: continue
-
-
-        }
-
-
-        if (time instanceof FrameTime) {
-            //HACK for unique serial number w/ frameclock
-            ((FrameTime) time).validate(input.stamp());
-        }
-
-        try {
-
-            Concept c = input.concept(this);
-            if (c instanceof TaskConcept) {
-
-                Activation a = ((TaskConcept) c).process(input, this);
-
-                if (a != null) {
-
-                    eventTaskProcess.emit(/*post*/(input));
-
-                    if (!input.isInput()) //dont count direct input as learning
-                        emotion.learn(inputPri, input.volume());
-
-                    concepts.commit(c);
-
-                    return c; //SUCCESSFULLY PROCESSED
-                }
-
-            }
-
-        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
-
-            emotion.eror(input.volume());
-
-            //input.feedback(null, Float.NaN, Float.NaN, this);
-            if (Param.DEBUG)
-                logger.warn("task process: {} {}", e, input);
-        }
-
-        return null;
     }
 
 
@@ -679,7 +615,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
     }
 
-    private @Nullable Task execute(Task cmd) {
+    @Deprecated public @Nullable Task execute(Task cmd) {
 
 
         Compound inputTerm = cmd.term();
@@ -737,13 +673,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     }
 
-    /**
-     * override to perform any preprocessing of a task (applied before the normalization step)
-     */
-    @Nullable
-    public Task pre(@NotNull Task t) {
-        return t;
-    }
+//    /**
+//     * override to perform any preprocessing of a task (applied before the normalization step)
+//     */
+//    @Nullable
+//    public Task pre(@NotNull Task t) {
+//        return t;
+//    }
 
     @NotNull
     public Term pre(@NotNull Term t) {
