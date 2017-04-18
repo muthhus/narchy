@@ -6,7 +6,6 @@ import nars.Op;
 import nars.Param;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
@@ -14,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.CONJ;
-import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 

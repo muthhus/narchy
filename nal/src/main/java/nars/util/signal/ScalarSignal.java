@@ -2,7 +2,6 @@ package nars.util.signal;
 
 import jcog.data.FloatParam;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;

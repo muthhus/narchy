@@ -27,7 +27,6 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.Task;
 import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.container.TermContainer;

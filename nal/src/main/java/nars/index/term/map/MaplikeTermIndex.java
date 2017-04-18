@@ -1,24 +1,15 @@
 package nars.index.term.map;
 
-import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.random.XorShift128PlusRandom;
-import nars.Op;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
-import nars.index.term.CompoundBuilder;
 import nars.index.term.TermIndex;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
-
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations

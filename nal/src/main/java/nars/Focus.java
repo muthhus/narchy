@@ -31,7 +31,7 @@ public interface Focus extends Iterable<PLink<Concept>> {
         return (p == p) ? p : valueIfInactive;
     }
 
-    Iterable<PLink<Concept>> concepts();
+    @NotNull Iterable<PLink<Concept>> concepts();
 
     @NotNull
     @Override
@@ -41,9 +41,10 @@ public interface Focus extends Iterable<PLink<Concept>> {
 
 
 
-    void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c);
+    void sample(int max, @NotNull IntObjectToIntFunction<? super PLink<Concept>> c);
 
     Focus NULL_FOCUS = new Focus() {
+
         @Override
         public void activate(Concept term, float priToAdd) {
 

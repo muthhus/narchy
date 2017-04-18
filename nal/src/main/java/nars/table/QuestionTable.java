@@ -36,7 +36,7 @@ public interface QuestionTable extends TaskTable {
 //        return null;
 //    }
 
-    @Nullable QuestionTable EMPTY = new QuestionTable() {
+    @NotNull QuestionTable EMPTY = new QuestionTable() {
 
 
 

@@ -40,7 +40,7 @@ public class CompoundConcept implements Concept, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    protected transient ConceptState state;
+    protected transient ConceptState state = ConceptState.Deleted;
 
 
     /**

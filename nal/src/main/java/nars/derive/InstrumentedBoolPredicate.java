@@ -8,7 +8,7 @@ import nars.term.Term;
  * Created by me on 4/17/17.
  */
 public abstract class InstrumentedBoolPredicate<C> extends ProxyTerm<Term> implements BoolPredicate<C> {
-    protected final BoolPredicate<C> ref;
+    @Deprecated protected final BoolPredicate<C> ref;
 
     public InstrumentedBoolPredicate( BoolPredicate<C> ref) {
         super(ref);

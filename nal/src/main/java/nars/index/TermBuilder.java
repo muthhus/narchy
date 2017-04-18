@@ -22,9 +22,7 @@ import java.util.*;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
-import static nars.term.Terms.pred;
-import static nars.term.Terms.subj;
+import static nars.term.Terms.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -559,40 +557,35 @@ public abstract class TermBuilder {
             return finish(CONJ, XTERNAL, u);
         }
 
-        boolean commutes = commutive(dt);
-        if (commutes) {
-            return junctionFlat(CONJ, dt, u);
-        }
+        boolean commutive = commutive(dt);
+        if (commutive) {
 
-        if (n == 2) {
+            return junctionFlat(CONJ, dt, u);
+
+        } else {
+            //NON-COMMUTIVE
+
+            assert(n==2);
 
             Term a = u[0];
             Term b = u[1];
             boolean equal = a.equals(b);
             if (equal) {
-                if (commutes) {
-                    return a;
-                } else {
+                if (dt < 0) {
                     //make dt positive to avoid creating both (x &&+1 x) and (x &&-1 x)
-                    if (dt < 0) dt = -dt;
+                    dt = -dt;
+                }
+            } else {
+                if (a.compareTo(b) > 0) {
+                    //ensure lexicographic ordering
+
+                    Term x = u[0]; u[0] = u[1]; u[1] = x; //swap
+                    dt = -dt; //and invert time
                 }
             }
 
+            return finish(false /* already sorted */, CONJ, dt, u);
 
-//            //if dternal or parallel, dont allow the subterms to be conegative:
-//            if (commutive(dt) &&
-//                    (((a.op() == NEG) && ($.unneg(a).equals(b))) ||
-//                            ((b.op() == NEG) && ($.unneg(b).equals(a))))) {
-//                return False;
-//            }
-
-            return finish(!equal /* store sorted/deduplicated anyway, if they are not equal */,
-                    CONJ,
-                    (!equal /* avoid the following comparison if known equal: */
-                            && u[0].compareTo(u[1]) > 0) ? -dt : dt, //it will be reversed in commutative sorting, so invert dt if sort order swapped
-                    u);
-        } else {
-            throw new InvalidTermException(CONJ, dt, "temporal conjunction requires exactly 2 arguments", u);
         }
 
     }

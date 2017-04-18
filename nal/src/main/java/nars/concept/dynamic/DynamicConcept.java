@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.concept.TaskConcept;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public class DynamicConcept extends TaskConcept {
@@ -12,7 +13,7 @@ public class DynamicConcept extends TaskConcept {
     @NotNull
     @Deprecated final NAR nar;
 
-    public DynamicConcept(@NotNull Compound term, DynamicTruthModel beliefModel, DynamicTruthModel goalModel, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
+    public DynamicConcept(@NotNull Compound term, @Nullable DynamicTruthModel beliefModel, @Nullable DynamicTruthModel goalModel, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
         super(term, termLinks, taskLinks, nar);
         this.nar = nar;
         this.beliefs =

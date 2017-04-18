@@ -2,9 +2,6 @@ package nars.logic;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.derive.Deriver;
-import nars.derive.DeriverTransform;
-import nars.derive.TrieDeriver;
 import nars.nar.Default;
 import org.junit.Test;
 

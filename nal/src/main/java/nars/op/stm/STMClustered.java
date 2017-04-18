@@ -12,7 +12,6 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.budget.DependentBLink;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;

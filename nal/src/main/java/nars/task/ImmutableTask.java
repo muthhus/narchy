@@ -20,7 +20,6 @@ import java.util.Map;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 2/24/17.
@@ -37,7 +36,7 @@ public class ImmutableTask extends Pri implements Task {
     public Map meta = null;
 
 
-    public ImmutableTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
+    public ImmutableTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
 
         if (term.op() == NEG) {

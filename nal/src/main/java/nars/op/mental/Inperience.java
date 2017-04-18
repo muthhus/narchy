@@ -24,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static nars.Op.*;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.term.atom.Atomic.the;
-import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 
 /**

@@ -24,7 +24,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
-		this(n, (Compound) n.term(term));
+		this(n, n.term(term));
 	}
 
 	@NotNull

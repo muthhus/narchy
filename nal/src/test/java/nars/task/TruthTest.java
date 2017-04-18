@@ -10,9 +10,7 @@ import org.junit.Test;
 
 import static nars.$.t;
 import static nars.Param.TRUTH_EPSILON;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 
 public class TruthTest {

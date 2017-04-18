@@ -3,7 +3,6 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
-import jcog.pri.PLink;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;

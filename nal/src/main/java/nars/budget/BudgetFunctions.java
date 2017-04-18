@@ -227,7 +227,7 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
     /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
-    public static void transferPri(@Nullable Priority from, @Nullable Priority to, float s) {
+    public static void transferPri(@NotNull Priority from, @NotNull Priority to, float s) {
 
         float priToSend = from.priSafe(0) * s;
         if (priToSend > 0) {
@@ -277,10 +277,10 @@ public final class BudgetFunctions extends UtilityFunctions {
      * if either input budget is null or deleted (non-exists), the burden will shift
      * to the other budget (if exists). if neither exists, no effect results.
      */
-    public static void balancePri(@Nullable Priority a, @Nullable Priority b, float resultPri, float aStrength) {
+    public static void balancePri(@NotNull Priority a, @NotNull Priority b, float resultPri, float aStrength) {
 
-        boolean aExist = a!=null && !a.isDeleted();
-        boolean bExist = b!=null && !b.isDeleted();
+        boolean aExist = !a.isDeleted();
+        boolean bExist = !b.isDeleted();
         if (!bExist && !aExist) {
             //do nothing, the sources are non-existant
         }

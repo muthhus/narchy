@@ -7,7 +7,6 @@ import nars.Task;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

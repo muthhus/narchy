@@ -32,7 +32,7 @@ public class PostCondition implements Serializable //since there can be multiple
      */
     public final int minNAL;
 
-    public PostCondition(@NotNull Term pattern, Term beliefTruth, Term goalTruth, byte puncOverride) {
+    public PostCondition(@NotNull Term pattern, @Nullable Term beliefTruth, @Nullable Term goalTruth, byte puncOverride) {
         this.pattern = pattern;
         this.beliefTruth = beliefTruth;
         this.goalTruth = goalTruth;

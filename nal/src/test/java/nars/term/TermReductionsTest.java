@@ -13,14 +13,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
-import static nars.Op.CONJ;
+import static nars.Op.*;
 import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTerms;
-import static nars.Op.False;
-import static nars.Op.True;
-import static nars.term.TermTest.assertInvalid;
-import static nars.term.TermTest.assertValid;
-import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
+import static nars.term.TermTest.*;
 import static org.junit.Assert.*;
 
 /**

@@ -27,7 +27,6 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.subst.Unify;

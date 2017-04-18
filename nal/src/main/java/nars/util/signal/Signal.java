@@ -1,6 +1,5 @@
 package nars.util.signal;
 
-import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
@@ -8,7 +7,6 @@ import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

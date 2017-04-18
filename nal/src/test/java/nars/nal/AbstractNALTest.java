@@ -1,11 +1,9 @@
 package nars.nal;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;

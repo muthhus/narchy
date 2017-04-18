@@ -2,7 +2,10 @@ package nars.op.mental;
 
 import jcog.bag.impl.CurveBag;
 import jcog.data.MutableIntRange;
-import jcog.pri.*;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
+import jcog.pri.Priority;
+import jcog.pri.RawPLink;
 import nars.$;
 import nars.NAR;
 import nars.Op;

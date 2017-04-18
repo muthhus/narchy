@@ -56,7 +56,8 @@ public class CompoundFocus implements Focus {
                 return sub.get(0).concepts(); //avoids the concatenated iterator default case
             default:
                 return () -> {
-                    return Iterators.concat(Iterators.transform(sub.iterator(), c -> c.concepts().iterator()));
+                    return Iterators.concat(Iterators.transform(sub.iterator(),
+                            c -> c.concepts().iterator()));
                 };
         }
     }

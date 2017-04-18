@@ -102,7 +102,7 @@ public class InstrumentedExecutor extends Executioner {
 
     @Override
     public void run(@NotNull Consumer<NAR> r) {
-        exe.run( ()-> measure(()->r.accept(nar), meter(r.getClass())));
+        exe.run( ()-> measure(()->r.accept(nar()), meter(r.getClass())));
     }
 
     @Override

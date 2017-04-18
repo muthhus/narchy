@@ -1,13 +1,11 @@
 package nars.concept;
 
 import jcog.bag.Bag;
-import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activation;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
-import nars.control.ConceptBagFocus;
 import nars.table.*;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +40,7 @@ public class TaskConcept extends CompoundConcept {
     /**
      * Pending Quests to be answered by new desire values
      */
-    @Nullable
+    @NotNull
     @Override
     public final QuestionTable quests() {
         return questionTableOrEmpty(quests);

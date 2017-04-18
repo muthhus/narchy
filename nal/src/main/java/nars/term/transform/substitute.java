@@ -27,7 +27,7 @@ public final class substitute extends Functor {
 
         final Term x = parent.yxResolve(xx[1]); //original term (x)
 
-        if (term instanceof Compound && (xx.length > 3) && xx[3].equals(STRICT) && !((Compound) term).containsTermRecursively(x)) {
+        if (term instanceof Compound && (xx.length > 3) && xx[3].equals(STRICT) && !term.containsTermRecursively(x)) {
             return Op.False;
         }
 

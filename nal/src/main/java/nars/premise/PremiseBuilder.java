@@ -91,7 +91,7 @@ abstract public class PremiseBuilder {
                             //float qBefore = taskBudget.priSafe(0);
                             //float aBefore = answered.priSafe(0);
                             BudgetFunctions.transferPri(taskLink, answered.priority(),
-                                    (float) answered.conf()
+                                    answered.conf()
                                     //(1f - taskBudget.qua())
                                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
                             );

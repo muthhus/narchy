@@ -94,6 +94,17 @@ public class MultiThreadExecutor extends Executioner {
         this.ring = disruptor.getRingBuffer();
         //this.cursor = ring.getCursor();
 
+
+        WorkHandler[] taskWorker = new WorkHandler[threads];
+        for (int i = 0; i < threads; i++)
+            taskWorker[i] = new TaskEventWorkHandler();
+        EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
+
+
+        barrier = workers.asSequenceBarrier();
+
+
+
     }
 
     public MultiThreadExecutor sync(boolean b) {
@@ -110,9 +121,9 @@ public class MultiThreadExecutor extends Executioner {
 
             disruptor.shutdown();
             disruptor.halt();
-        }
 
-        nar = null;
+            super.stop();
+        }
 
     }
 
@@ -165,19 +176,10 @@ public class MultiThreadExecutor extends Executioner {
 
     @Override
     public synchronized void start(@NotNull NAR nar) {
-        super.start(nar);
-
-        WorkHandler[] taskWorker = new WorkHandler[threads];
-        for (int i = 0; i < threads; i++)
-            taskWorker[i] = new TaskEventWorkHandler(nar);
-        EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
-
-
-        barrier = workers.asSequenceBarrier();
-
-
-
-        disruptor.start();
+        synchronized (disruptor) {
+            super.start(nar);
+            disruptor.start();
+        }
 
 //        nar.eventReset.on((n) -> {
 //            sync(); //should empty all pending tasks
@@ -215,18 +217,12 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
         if (!ring.tryPublishEvent(narPublisher, r)) {
-            r.accept(nar); //execute in callee's thread
+            r.accept(nar()); //execute in callee's thread
         }
     }
 
 
-    private final static class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
-        @NotNull
-        private final NAR nar;
-
-        public TaskEventWorkHandler(@NotNull NAR nar) {
-            this.nar = nar;
-        }
+    private final class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
 
         @Override
         public final void onEvent(@NotNull TaskEvent te) {
@@ -237,7 +233,7 @@ public class MultiThreadExecutor extends Executioner {
                     ((Runnable)val).run();
                     break;
                 case NAR_CONSUMER:
-                    ((Consumer<NAR>)val).accept(nar);
+                    ((Consumer<NAR>)val).accept(nar());
                     break;
                 default:
                     throw new RuntimeException();

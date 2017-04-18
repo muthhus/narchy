@@ -9,10 +9,10 @@ import nars.derive.meta.Fork;
 import nars.premise.Derivation;
 import nars.term.Term;
 import nars.term.var.Variable;
-import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
         return roots;
     }
 
-    private BoolPredicate instrument(BoolPredicate b) {
+    private BoolPredicate instrument(@NotNull BoolPredicate b) {
 
         if (b instanceof Fork) {
             Fork f = (Fork)b;

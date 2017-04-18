@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
-import static jcog.pri.PriMerge.max;
 import static jcog.pri.PriMerge.plus;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;

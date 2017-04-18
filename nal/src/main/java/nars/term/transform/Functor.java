@@ -17,9 +17,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.term.atom.Atomic.the;
 import static nars.Op.INT;
 import static nars.term.Terms.atomOrNull;
+import static nars.term.atom.Atomic.the;
 
 /** a functor is a term transform which immediately returns
  *  a result Term from the Term[] arguments of
@@ -85,10 +85,15 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     public static <X extends Term> Concept f1(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
-        return f1(fName(termAtom), x -> x instanceof Variable ? null : ff.apply((X) x));
+        return f1(fName(termAtom), safeFunctor(ff));
     }
     public static <X extends Term> Concept f1Const(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
-        return f1(fName(termAtom), x -> x instanceof Variable ? null : ff.apply((X) x));
+        return f1(fName(termAtom), safeFunctor(ff));
+    }
+
+    public @NotNull
+    static <X extends Term> Function<Term, Term> safeFunctor(@NotNull Function<X, Term> ff) {
+        return x -> (x==null || x instanceof Variable) ? null : ff.apply((X) x);
     }
 
     /** a functor involving a concept resolved by the 1st argument term */
@@ -168,7 +173,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         }
 
         @Nullable
-        public abstract Term apply(Term x);
+        public abstract Term apply(@NotNull Term x);
     }
 
     /**
@@ -189,6 +194,6 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         }
 
         @Nullable
-        public abstract Term apply(Term a, Term b);
+        public abstract Term apply(@NotNull Term a, @NotNull Term b);
     }
 }
