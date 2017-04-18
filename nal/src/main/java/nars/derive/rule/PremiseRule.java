@@ -1242,8 +1242,6 @@ public class PremiseRule extends GenericCompound {
         public static final int ELLIPSIS_ONE_OR_MORE_ID_OFFSET = 2 * 256;
         public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
 
-        int offset;
-
         public PremiseRuleVariableNormalization() {
             super(new UnifiedMap<>(8));
         }
@@ -1257,7 +1255,7 @@ public class PremiseRule extends GenericCompound {
         protected Variable newVariable(@NotNull Variable x, int serial) {
 
 
-            int actualSerial = serial + offset;
+            int actualSerial = serial;
 
             if (x instanceof Ellipsis.EllipsisTransformPrototype) {
                 //special
@@ -1309,8 +1307,10 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         public Term applyAfter(@NotNull Variable secondary) {
-            offset++;
-            return apply(null, secondary);
+            if (secondary.equals(Op.Imdex))
+                return secondary; //dont try to normalize any imdex
+            else
+                return apply(null, secondary);
         }
     }
 

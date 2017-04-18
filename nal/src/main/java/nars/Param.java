@@ -116,9 +116,7 @@ public abstract class Param  {
 
 
     /** internal granularity which truth components are rounded to */
-    public static final float TRUTH_EPSILON = 0.01f;
-
-    public static final float DEFAULT_SENSOR_RESOLUTION = 0.01f;
+    public static final float TRUTH_EPSILON = 0.001f;
 
     /**
      * how precise unit test results must match expected values to pass

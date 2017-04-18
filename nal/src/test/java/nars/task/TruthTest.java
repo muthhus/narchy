@@ -12,6 +12,7 @@ import static nars.$.t;
 import static nars.Param.TRUTH_EPSILON;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class TruthTest {
@@ -82,7 +83,7 @@ public class TruthTest {
     @Test public void testTruthHashUnhash() {
         XorShift128PlusRandom rng = new XorShift128PlusRandom(2);
         for (int i = 0; i < 1000; i++)
-            hashUnhash(rng.nextFloat(), rng.nextFloat());
+            hashUnhash(rng.nextFloat(), Param.TRUTH_EPSILON*2 + rng.nextFloat() * (1f-Param.TRUTH_EPSILON*2));
     }
 
     static void hashUnhash(float f, float c) {
@@ -90,6 +91,7 @@ public class TruthTest {
         if (t == null)
             return;
         Truth u = Truth.intToTruth(t.hashCode());
+        assertNotNull(t +  " unhased to null via hashCode " + t.hashCode(), u);
         assertEquals(t, u);
     }
 

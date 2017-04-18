@@ -72,7 +72,8 @@ public class QueryVariableTest {
 
         NAR n = new Default(100, 4, 3);
         n.nal(2);
-        n.log()
+        n
+                //.log()
                 .input("<a <-> b>. %1.0;0.5%",
                         "<b --> a>. %1.0;0.5%")
                 .run(cyclesBeforeQuestion)

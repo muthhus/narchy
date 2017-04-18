@@ -54,19 +54,17 @@ public class IO {
     public static ImmutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
 
-        Compound term = compoundOrNull(readTerm(in, t));
-        if (term == null)
+        Compound preterm = compoundOrNull(readTerm(in, t));
+        if (preterm == null)
             throw new IOException("invalid task term");
 
-        //TODO combine these into one byte
+        Compound term = t.normalize(preterm);
+        if (term == null)
+            throw new IOException("un-normalizable task term");
+
         byte punc = in.readByte();
 
-        Truth truth;
-        if (hasTruth(punc)) {
-            truth = readTruth(in);
-        } else {
-            truth = null;
-        }
+        Truth truth = hasTruth(punc) ? readTruth(in) : null;
 
         long start = in.readLong();
         long end = in.readLong();
@@ -76,7 +74,6 @@ public class IO {
         float pri = in.readFloat();
 
         long cre = in.readLong();
-
 
         ImmutableTask mm = new ImmutableTask(term, punc, truth, cre, start, end, evi);
         mm.setPriority(pri);
@@ -187,7 +184,7 @@ public class IO {
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException, UnsupportedEncodingException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
 
         switch (o) {
 
@@ -202,11 +199,10 @@ public class IO {
                     return a; //just the term
             }
 
-            case INT: {
+            case INT:
                 return $.the(in.readInt());
-            }
 
-            default: {
+            default:
 
                 String s = in.readUTF();
                 try {
@@ -214,7 +210,6 @@ public class IO {
                 } catch (Narsese.NarseseException e) {
                     throw new UnsupportedEncodingException(e.getMessage());
                 }
-            }
         }
 
         //return (Atomic) t.get(key, true); //<- can cause synchronization deadlocks
@@ -391,7 +386,7 @@ public class IO {
         }
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException, FileNotFoundException {
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -406,7 +401,7 @@ public class IO {
         });
     }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException, FileNotFoundException {
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());

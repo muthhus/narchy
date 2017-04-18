@@ -94,13 +94,11 @@ public final class DynTruth implements Truthed {
         if (c == null)
             return null;
 
+        if (null == (c = Task.content(c, nar)))
+            return null;
 
-        c = Task.content(c, nar);
-        if (c == null) return null;
-
-        // normalize it
-        c = compoundOrNull(nar.concepts.normalize(c));
-        if (c == null) return null;
+        if (null == (c = nar.concepts.normalize(c)))
+            return null;
 
         // then if the term is valid, see if it is valid for a task
         if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, null, true)) {

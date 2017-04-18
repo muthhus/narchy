@@ -18,6 +18,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.term.Terms.compoundOrNull;
+
 /**
  * Index which is supported by Map/Cache-like operations
  */
@@ -74,13 +76,13 @@ public abstract class MaplikeTermIndex extends TermIndex {
     }
 
     @Nullable
-    public final Term normalize(@NotNull Compound x) {
+    public final Compound normalize(@NotNull Compound x) {
 
         if (x.isNormalized()) {
             return x;
         } else {
 
-            return normalize.apply(x);
+            return compoundOrNull(normalize.apply(x));
         }
 
     }

@@ -37,18 +37,20 @@ public class EllipsisTransformTest {
         assertEquals(0, a.compareTo(a));
     }
 
+
     @Test public void testEllipsisTransform() throws Narsese.NarseseException {
         String s = "%A..%B=_..+";
-        Ellipsis.EllipsisTransformPrototype t = $.$(s);
+        Ellipsis.EllipsisTransformPrototype unnormalized = $.$(s);
+        assertEquals("%A..%B=_..+", unnormalized.toString());
 
-        assertNotNull(t);
-        assertEquals($.$("%B"), t.from);
-        assertEquals(Imdex, t.to);
+        assertNotNull(unnormalized);
+        assertEquals($.$("%B"), unnormalized.from);
+        assertEquals(Imdex, unnormalized.to);
 
         TermIndex i = new PatternTermIndex();
 
         Term u = i.transform(
-                $.p(t), new PremiseRule.PremiseRuleVariableNormalization());
+                $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
         EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
         assertEquals("(%1747846151..%2=_..+)", u.toString());
         assertEquals($.$("%2").toString(), tt.from.toString());

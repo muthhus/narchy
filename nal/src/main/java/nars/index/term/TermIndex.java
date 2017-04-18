@@ -338,7 +338,7 @@ public abstract class TermIndex extends TermBuilder {
 //            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
 //    }
 
-    public Term normalize(Compound x) {
+    @Nullable public Compound normalize(@NotNull Compound x) {
 
         Term y;
 
@@ -368,14 +368,12 @@ public abstract class TermIndex extends TermBuilder {
         }
 
         if (y instanceof Compound) {
-
-            //if (c!=null) {
-            //c = compoundOrNull($.unneg((Compound) c));
-            ((Compound) y).setNormalized();
-            //}
+            Compound cy = (Compound) y;
+            cy.setNormalized();
+            return cy;
+        } else {
+            return null;
         }
-
-        return y;
     }
 
     @Nullable
@@ -723,7 +721,7 @@ public abstract class TermIndex extends TermBuilder {
         if (z == null)
             return null;
 
-        return compoundOrNull(normalize(z));
+        return normalize(z);
     }
 
     /**
