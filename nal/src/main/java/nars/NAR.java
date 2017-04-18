@@ -16,14 +16,12 @@ import nars.attention.SpreadingActivation;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.concept.TaskConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
 import nars.task.ImmutableTask;
-import nars.task.TaskBuilder;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
@@ -33,7 +31,6 @@ import nars.term.atom.Atomic;
 import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
-import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -126,8 +123,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     private NARLoop loop;
 
-    public final Mix<Object,Task> mix = new Mix();
-
+    public final Mix<Object, Task> mix = new Mix();
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -539,23 +535,27 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return y;
     }
 
-    /** ¿qué?  que-stion or que-st */
+    /**
+     * ¿qué?  que-stion or que-st
+     */
     public Task que(@NotNull Compound term, byte questionOrQuest) {
         return que(term, questionOrQuest, ETERNAL);
     }
 
-    /** ¿qué?  que-stion or que-st */
+    /**
+     * ¿qué?  que-stion or que-st
+     */
     public Task que(@NotNull Compound term, byte punc, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
-        assert((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
+        assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-            new ImmutableTask(term, punc, null,
-                time(), when, when,
-                new long[]{time.nextStamp()}
-            ).budget(this)
+                new ImmutableTask(term, punc, null,
+                        time(), when, when,
+                        new long[]{time.nextStamp()}
+                ).budget(this)
         );
     }
 
@@ -591,7 +591,21 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      */
     public final void input(@NotNull Task input) {
 
-        input.eval(this);
+        try {
+
+            input.eval(this);
+
+        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
+
+            input.delete();
+
+            emotion.eror(input.volume());
+
+            //input.feedback(null, Float.NaN, Float.NaN, this);
+            if (Param.DEBUG)
+                logger.warn("task process: {} {}", e, this);
+        }
+
 
     }
 
@@ -615,63 +629,64 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
     }
 
-    @Deprecated public @Nullable Task execute(Task cmd) {
-
-
-        Compound inputTerm = cmd.term();
-        if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
-            Term func = inputTerm.term(1);
-            if (func.op() == ATOM) {
-                Term args = inputTerm.term(0);
-                if (args.op() == PROD) {
-                    Concept funcConcept = concept(func);
-                    if (funcConcept != null) {
-                        Operator o = funcConcept.get(Operator.class);
-                        if (o != null) {
-
-
-                            /*if (isCommand)*/
-                            {
-                                Task result = o.run(cmd, this);
-                                if (result != null && result != cmd) {
-                                    //return input(result); //recurse
-                                    return result;
-                                }
-                            }
-//                            } else {
+//    @Deprecated
+//    public @Nullable Task execute(Task cmd) {
 //
-//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
-//                                    inputAt(cmd.start(), cmd); //schedule for execution later
-//                                    return null;
-//                                } else {
-//                                    if (executable(cmd)) {
-//                                        Task result = o.run(cmd, this);
-//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
-//                                            if (result == null) {
-//                                                return null; //finished
-//                                            } else {
-//                                                //input(result); //recurse until its stable
-//                                                return result;
-//                                            }
-//                                        }
-//                                    }
+//
+//        Compound inputTerm = cmd.term();
+//        if (inputTerm.hasAll(Operator.OPERATOR_BITS) && inputTerm.op() == INH) {
+//            Term func = inputTerm.term(1);
+//            if (func.op() == ATOM) {
+//                Term args = inputTerm.term(0);
+//                if (args.op() == PROD) {
+//                    Concept funcConcept = concept(func);
+//                    if (funcConcept != null) {
+//                        Operator o = funcConcept.get(Operator.class);
+//                        if (o != null) {
+//
+//
+//                            /*if (isCommand)*/
+//                            {
+//                                Task result = o.run(cmd, this);
+//                                if (result != null && result != cmd) {
+//                                    //return input(result); //recurse
+//                                    return result;
 //                                }
 //                            }
-
-                        }
-
-                    }
-                }
-            }
-        }
-
-        /*if (isCommand)*/
-        {
-            eventTaskProcess.emit(cmd);
-            return null;
-        }
-
-    }
+////                            } else {
+////
+////                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
+////                                    inputAt(cmd.start(), cmd); //schedule for execution later
+////                                    return null;
+////                                } else {
+////                                    if (executable(cmd)) {
+////                                        Task result = o.run(cmd, this);
+////                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
+////                                            if (result == null) {
+////                                                return null; //finished
+////                                            } else {
+////                                                //input(result); //recurse until its stable
+////                                                return result;
+////                                            }
+////                                        }
+////                                    }
+////                                }
+////                            }
+//
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//
+//        /*if (isCommand)*/
+//        {
+//            eventTaskProcess.emit(cmd);
+//            return null;
+//        }
+//
+//    }
 
 //    /**
 //     * override to perform any preprocessing of a task (applied before the normalization step)
@@ -810,21 +825,16 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
 
-    @NotNull
-    public void processAll(@NotNull Task... t) {
-        for (Task x : t)
-            input(x);
-    }
-
     public final void on(@NotNull String atom, @NotNull Operator o) {
         on((Atom) Atomic.the(atom), o);
     }
 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
-        PermanentAtomConcept c = builder.withBags(a, (termlink, tasklink) -> {
-            return new PermanentAtomConcept(a, termlink, tasklink);
-        });
+        PermanentAtomConcept c = builder.withBags(a,
+            (termlink, tasklink) ->
+                new PermanentAtomConcept(a, termlink, tasklink)
+        );
         c.put(Operator.class, o);
         concepts.set(c);
         operators.put(c, o);
@@ -833,31 +843,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     public void input(Function<NAR, Task>... tasks) {
         for (Function<NAR, Task> x : tasks) {
 
-            try {
+            input(x.apply(this));
 
-                input(x.apply(this));
-
-            } catch (InvalidTaskException | InvalidTermException e) {
-
-                if (x instanceof TaskBuilder) {
-
-                    TaskBuilder tb = (TaskBuilder) x;
-
-                    emotion.eror(tb.volume());
-
-                    if (tb.isInput() || Param.DEBUG_EXTRA)
-                        logger.warn("input: {}", e);
-
-                }
-
-            }
         }
     }
 
     public final int dur() {
         return time.dur();
     }
-
 
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
@@ -1141,7 +1134,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     public NAR inputNarsese(@NotNull InputStream inputStream) throws IOException, NarseseException {
         String x = new String(inputStream.readAllBytes());
-        /*List<Task> y = */input(x);
+        /*List<Task> y = */
+        input(x);
         return this;
     }
 
@@ -1252,7 +1246,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return concept(tt.term(), createIfMissing);
     }
 
-        @Nullable
+    @Nullable
     private Term conceptualizable(@NotNull Term term) {
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
@@ -1292,7 +1286,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
         if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
             return null;
-
 
 
         return term;
@@ -1404,7 +1397,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             taskStream.filter(Objects::nonNull).forEach(this::input);
         }
     }
-
 
 
     @Override

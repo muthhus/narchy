@@ -8,6 +8,7 @@ import nars.attention.Activation;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
+import nars.task.DerivedTask;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
@@ -17,7 +18,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
-import nars.time.FrameTime;
 import nars.time.Tense;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -46,7 +46,7 @@ import static nars.truth.TruthFunctions.w2c;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority, Prioritized {
+public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority {
 
 
     byte punc();
@@ -59,18 +59,23 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Override
     Compound term();
 
-    /** occurrence starting time */
+    /**
+     * occurrence starting time
+     */
     @Override
     long start();
 
-    /** occurrence ending time */
+    /**
+     * occurrence ending time
+     */
     @Override
     long end();
 
     /**
      * amount of evidence aka evidence weight
+     *
      * @param when time
-     * @param dur duration period across which evidence can decay before and after its defined start/stop time
+     * @param dur  duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
     default float evi(long when, int dur) {
@@ -125,7 +130,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-
     static boolean equivalentTo(@NotNull Task a, @NotNull Task b, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
 
         @NotNull long[] evidence = a.stamp();
@@ -144,21 +148,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (term && !a.term().equals(b.term()))
             return false;
 
-        if (punctuation && (a.punc() != b.punc()))
-            return false;
-
-        return true;
+        return !(punctuation && (a.punc() != b.punc()));
     }
 
 
     static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
         //TODO StringBuilder
 
-            for (int i = 0; i < indent; i++)
-                sb.append("  ");
-            task.appendTo(sb, null, true);
-            sb.append("\n  ");
-
+        for (int i = 0; i < indent; i++)
+            sb.append("  ");
+        task.appendTo(sb, null, true);
+        sb.append("\n  ");
 
 
         Task pt = task.getParentTask();
@@ -179,7 +179,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (!t.isNormalized())
             return fail(t, "Task Term not a normalized Compound", safe);
 
-        if (nar!=null) {
+        if (nar != null) {
             int maxVol = nar.termVolumeMax.intValue();
             if (t.volume() > maxVol)
                 return fail(t, "Term exceeds maximum volume", safe);
@@ -189,7 +189,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 return fail(t, "Term exceeds maximum NAL level", safe);
         }
 
-        if (t.op().temporal && t.dt()==XTERNAL) {
+        if (t.op().temporal && t.dt() == XTERNAL) {
             return fail(t, "top-level temporal term with dt=XTERNAL", safe);
         }
 
@@ -206,14 +206,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return taskStatementValid(t, punc, safe);
     }
 
-    @Nullable static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
-        return taskStatementValid(t, (byte)0, safe); //ignore the punctuation-specific conditions
+    @Nullable
+    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
+        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
     }
 
-    /** call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
+    /**
+     * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
      * these can all be tested prenormalization, because normalization will not affect the result
-     * */
-    @Nullable static boolean taskStatementValid(@NotNull Compound t, byte punc, boolean safe) {
+     */
+    @Nullable
+    static boolean taskStatementValid(@NotNull Compound t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
@@ -227,12 +230,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                     return fail(t, "Independent variables require statements super-terms", safe);
                 else if (op.statement && t.hasVarIndep()) {
                     Term subj = t.term(0);
-                    if (subj.op()==VAR_INDEP)
+                    if (subj.op() == VAR_INDEP)
                         return fail(t, "Statement Task's subject is VAR_INDEP", safe);
                     if (subj.varIndep() == 0)
                         return fail(t, "Statement Task's subject has no VAR_INDEP", safe);
                     Term pred = t.term(1);
-                    if (pred.op()==VAR_INDEP)
+                    if (pred.op() == VAR_INDEP)
                         return fail(t, "Statement Task's predicate is VAR_INDEP", safe);
                     if (pred.varIndep() == 0)
                         return fail(t, "Statement Task's predicate has no VAR_INDEP", safe);
@@ -267,14 +270,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
+    default boolean isQuestion() {
+        return (punc() == QUESTION);
+    }
 
-    default boolean isQuestion() { return (punc() == QUESTION);     }
     default boolean isBelief() {
         return (punc() == BELIEF);
     }
+
     default boolean isGoal() {
         return (punc() == GOAL);
     }
+
     default boolean isQuest() {
         return (punc() == QUEST);
     }
@@ -300,7 +307,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (!(c instanceof TaskConcept)) {
             if (Param.DEBUG_EXTRA)
                 throw new RuntimeException
-                //System.err.println
+                        //System.err.println
                         ("should conceptualize to TaskConcept: " + c);
             //else
             return null;
@@ -313,7 +320,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
      * TODO what about for questions/quests
      */
     void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
-
 
 
     default boolean isQuestOrQuestion() {
@@ -338,7 +344,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
      * return the input task, or a modification of it to use a customized matched premise belief. or null to
      * to cancel any matched premise belief.
      */
-    @Nullable default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
+    @Nullable
+    default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (Param.ANSWER_REPORTING && isInput()) {
             ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
                     new ArrayBag<>(PriMerge.max,
@@ -369,14 +376,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
         if (when >= s && when <= e) {
             return when; //internal
-        } else if (Math.abs(when-s) <= Math.abs(when-e)) {
+        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
             return s; //closer or beyond the start
         } else {
             return e; //closer or beyond the end
         }
     }
 
-    /** time difference to neareset 'temporal tangent' */
+    /**
+     * time difference to neareset 'temporal tangent'
+     */
     default long nearestStartOrEndTime(long when) {
         long n = nearestStartOrEnd(when);
         return Math.abs(when - n);
@@ -432,11 +441,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @NotNull
     default Appendable toString(/**@Nullable*/NAR memory) {
-            return appendTo(null, memory);
+        return appendTo(null, memory);
 
     }
 
-    default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory)  {
+    default @Nullable StringBuilder appendTo(@Nullable StringBuilder sb, /**@Nullable*/NAR memory) {
         return appendTo(sb, memory, false);
     }
 
@@ -450,17 +459,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Deprecated
     default String toStringWithoutBudget(NAR memory) {
         StringBuilder b = new StringBuilder();
-            appendTo(b, memory, true, false,
-                    false, //budget
-                    false//log
-            );
-            return b.toString();
+        appendTo(b, memory, true, false,
+                false, //budget
+                false//log
+        );
+        return b.toString();
 
     }
 
     @Nullable
     @Deprecated
-    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp)  {
+    default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp) {
         boolean notCommand = punc() != Op.COMMAND;
         return appendTo(buffer, memory, true, showStamp && notCommand,
                 notCommand, //budget
@@ -469,7 +478,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     @Nullable
-    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog)  {
+    default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
         String contentName;
         if (term) {
@@ -532,7 +541,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             priority().toBudgetStringExternal(buffer).append(' ');
         }
 
-        buffer.append(contentName).append((char)punc());
+        buffer.append(contentName).append((char) punc());
 
         if (tenseString.length() > 0)
             buffer.append(' ').append(tenseString);
@@ -554,11 +563,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-
-
-
-
-
     /**
      * Check if a Task is a direct input,
      * or if its origin has been forgotten or never known
@@ -576,7 +580,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-    @Deprecated default String getTense(long currentTime) {
+    @Deprecated
+    default String getTense(long currentTime) {
 
         long ot = start();
 
@@ -637,8 +642,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-
-
     default long mid() {
         long s = start();
         return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
@@ -647,12 +650,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     /**
      * prints this task as a TSV/CSV line.  fields:
-     *      Compound
-     *      Punc
-     *      Freq (blank space if quest/question)
-     *      Conf (blank space if quest/question)
-     *      Start
-     *      End
+     * Compound
+     * Punc
+     * Freq (blank space if quest/question)
+     * Conf (blank space if quest/question)
+     * Start
+     * End
      */
     default void appendTSV(Appendable a) throws IOException {
 
@@ -661,8 +664,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         a
                 .append(term().toString()).append(sep)
                 .append("\"" + punc() + "\"").append(sep)
-                .append(truth()!=null ? Texts.n2(truth().freq()) : " ").append(sep)
-                .append(truth()!=null ? Texts.n2(truth().conf()) : " ").append(sep)
+                .append(truth() != null ? Texts.n2(truth().freq()) : " ").append(sep)
+                .append(truth() != null ? Texts.n2(truth().conf()) : " ").append(sep)
                 .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
                 .append(!isEternal() ? Long.toString(end()) : " ").append(sep)
                 .append(proof().replace("\n", "  ")).append(sep)
@@ -709,41 +712,24 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @Nullable
     static ImmutableTask clone(@NotNull Task x, @NotNull Compound newContent) {
-//        if (!y.isNormalized()) {
-//            y = (Compound) nar.normalize(y);
-//            if (y == null)
-//                return null;
-//        }
-
-        Priority b = x.priority().clone(); //snapshot its budget
-        if (b.isDeleted())
-            return null;
 
         boolean negated = (newContent.op() == NEG);
-        if (negated)
+        if (negated) {
             newContent = compoundOrNull(newContent.unneg());
+            if (newContent == null)
+                return null;
+        }
 
-        if (newContent == null)
-            return null;
-
-        ImmutableTask y = new ImmutableTask(newContent, x.punc(), x.truth().negIf(negated), x.creation(), x.start(), x.end(), x.stamp());
-        y.setPriority(b);
-        //        if (srcCopy == null) {
-//            delete();
-//        } else {
-//            float p = srcCopy.priSafe(-1);
-//            if (p < 0) {
-//                delete();
-//            } else {
-//                setPriority(p);
-//            }
-//        }
-//
-//        return this;
+        ImmutableTask y = new ImmutableTask(newContent, x.punc(),
+                x.truth().negIf(negated),
+                x.creation(),
+                x.start(), x.end(),
+                x.stamp());
+        y.setPriority(x);
         y.meta = x.meta();
         return y;
-
     }
+
 
     Map meta();
 
@@ -761,11 +747,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
         List exist = log();
         if (exist == null) {
-            meta(String.class,  (exist = $.newArrayList(1)) );
+            meta(String.class, (exist = $.newArrayList(1)));
         }
         return exist;
     }
-
 
 
     @Nullable
@@ -789,7 +774,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-    /** auto budget by truth (if belief/goal, or punctuation if question/quest) */
+    /**
+     * auto budget by truth (if belief/goal, or punctuation if question/quest)
+     */
     default Task budget(NAR nar) {
         return budget(1f, nar);
     }
@@ -824,8 +811,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return false;
     }
 
-    /** prepares a term for use as a Task's content */
-    @Nullable static Compound content(@Nullable final Term r, NAR nar)  {
+    /**
+     * prepares a term for use as a Task's content
+     */
+    @Nullable
+    static Compound content(@Nullable final Term r, NAR nar) {
         if (r == null)
             return null;
 
@@ -865,8 +855,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return (Compound) s;
     }
 
-    /** returns the time separating this task from a target time. if the target occurrs
-     *  during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
+    /**
+     * returns the time separating this task from a target time. if the target occurrs
+     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
      */
     default long timeDistance(long t) {
         long s = start();
@@ -877,7 +868,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         else return s - t;
     }
 
-    default void eval(NAR n) {
+    default void eval(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
         float inputPri = this.priSafe(-1);
         if (inputPri < 0)
@@ -885,17 +876,29 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
         n.emotion.busy(inputPri, this.volume());
 
-        if (this.isCommand() /* || (input.isGoal() && (input.isEternal() || ((input.start() - now) >= -dur)))*/) { //eternal, present (within duration radius), or future
+        //elide if DerivedTask since it has already been evaluated
+        boolean evaluate = !(this instanceof DerivedTask) || isCommand();
 
-            Task transformed = n.execute(this);
-            if (transformed == null)
-                return;
-            else if (transformed != this) {
-                transformed.eval(n);
+        if (evaluate) {
+            Compound x = term();
+            Compound y = compoundOrNull(
+                x.eval(n.concepts)
+            );
+
+            if (y == null)
+                throw new InvalidTaskException(this, "un-evaluable");
+
+
+            if (!x.equals(y)) {
+                ImmutableTask inputY = clone(this, y);
+                assert (inputY != null);
+
+                delete(); //transfer control to clone
+
+                inputY.eval(n);
+
                 return;
             }
-            //else: continue
-
         }
 
 
@@ -904,36 +907,32 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 //            ((FrameTime) n.time).validate(this.stamp());
 //        }
 
-        try {
 
-            Concept c = concept(n);
+        TaskConcept c = concept(n);
+        if (c == null)
+            return; //unconceptualizable, which may happen due to resource constraints
 
-            if (c instanceof TaskConcept) {
 
-                Activation a = ((TaskConcept) c).process(this, n);
+        Activation a = c.process(this, n);
 
-                if (a != null) {
+        if (a != null) {
 
-                    n.concepts.commit(c);
+            n.concepts.commit(c);
 
-                    if (!isInput()) //dont count direct input as learning
-                        n.emotion.learn(inputPri, volume());
+            if (!isInput()) //dont count direct input as learning
+                n.emotion.learn(inputPri, volume());
 
-                    n.eventTaskProcess.emit(/*post*/(this));
+            n.eventTaskProcess.emit(/*post*/(this));
 
-                    //SUCCESSFULLY PROCESSED
-                }
+            // SUCCESSFULLY PROCESSED
 
-            }
+        } else {
 
-        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
+            // REDUNDANT OR IGNORED
 
-            n.emotion.eror(this.volume());
-
-            //input.feedback(null, Float.NaN, Float.NaN, this);
-            if (Param.DEBUG)
-                n.logger.warn("task process: {} {}", e, this);
         }
 
+
     }
+
 }
