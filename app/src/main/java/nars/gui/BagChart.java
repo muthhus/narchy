@@ -8,7 +8,7 @@ import nars.nar.Default;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
-import spacegraph.layout.TreeChart;
+import spacegraph.widget.meter.TreeChart;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;

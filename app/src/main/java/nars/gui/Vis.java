@@ -35,6 +35,7 @@ import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 import spacegraph.widget.console.ConsoleSurface;
 import spacegraph.widget.console.ConsoleTerminal;
+import spacegraph.widget.console.TerminalUI;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.slider.FloatSlider;
@@ -59,7 +60,7 @@ public class Vis {
 
 
     public static ConsoleTerminal newInputEditor() {
-        return new ConsoleTerminal(new ConsoleTerminal.TextEditModel(20,5));
+        return new ConsoleTerminal(new TerminalUI(20,5));
     }
 
     public static Grid beliefCharts(int window, NAR nar, Object... x) {

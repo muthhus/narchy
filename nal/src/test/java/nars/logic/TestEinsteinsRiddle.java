@@ -2,6 +2,7 @@ package nars.logic;
 
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.nar.Default;
 import org.junit.Test;
 
@@ -15,7 +16,8 @@ public class TestEinsteinsRiddle {
 
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
-        NAR n = new Default(1024, 16, 3) {
+        Param.DEBUG = true;
+        NAR n = new Default(1024, 256, 5) {
 //            @Override
 //            public Deriver newDeriver() {
 //                return new DeriverTransform(b -> new DeriverTransform.TracedBoolPredicate(b))
@@ -28,7 +30,8 @@ public class TestEinsteinsRiddle {
         n.inputNarsese(
             resource.openStream()
         );
-        n.run(256);
+        n.run(2048);
+        n.printConceptStatistics();
 
 
 

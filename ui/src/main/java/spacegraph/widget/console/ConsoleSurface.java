@@ -5,16 +5,17 @@ import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
+import java.awt.*;
+
 /**
  * Created by me on 4/1/16.
  */
 public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
-    /**
-     * height/width of each cell
-     */
-    final float charAspect = 1f;
+    public static final float thickness = 2f;
+
+
     private int cols, rows;
 
 
@@ -48,10 +49,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     public void paint(GL2 gl) {
 
 
-        float charScaleX = this.charScaleX / charAspect;
+        float charScaleX = this.charScaleX;
         float charScaleY = this.charScaleY;
-
-
 
 
         long t = System.currentTimeMillis(); //HACK
@@ -63,14 +62,12 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
         gl.glScalef(1f / (cols), 1f / (rows), 1f);
 
-
-
         //background extents
         //gl.glColor3f(0.25f, 0.25f, 0.25f);
         //Draw.rect(gl, 0, 0, cols, rows);
 
 
-        gl.glLineWidth(2f);
+        gl.glLineWidth(thickness);
 
         //gl.glColor4f(0.75f, 0.75f, 0.75f, fgAlpha);
 
@@ -92,7 +89,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
                         (float) (col - 0.5f) * 20/charScaleX, 0,
-                        (float) 20/charScaleX, charAspect*20
+                        (float) 20/charScaleX, 22
                     );
                 }
 
@@ -105,6 +102,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                 char cc = visible(c.getCharacter());
                 if ((cc != 0) && (cc != ' ')) {
+
+                    gl.glColor3f(1f, 1f, 1f);
 
                     //TODO TextColor fg = c.getForegroundColor();
                     //TODO: if (!fg.equals(previousFG))
@@ -142,9 +141,11 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     }
 
     /** return true to paint a character's background. if so, then it should set the GL color */
-    protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
-        if (c!=null) {
-            //..c.getBackgroundColor();
+    protected boolean setBackgroundColor(GL2 gl, TextCharacter ch, int col, int row) {
+        if (ch!=null) {
+            Color bg = ch.getBackgroundColor().toColor();
+            gl.glColor3f(bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
+            return true;
         }
 
         return false;

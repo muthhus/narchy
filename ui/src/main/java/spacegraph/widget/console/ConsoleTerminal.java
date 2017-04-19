@@ -4,13 +4,8 @@ import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.gui2.BasicWindow;
-import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
-import com.googlecode.lanterna.gui2.SameTextGUIThread;
-import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.jogamp.newt.event.KeyEvent;
 
@@ -21,6 +16,7 @@ import java.io.OutputStream;
  * Created by me on 11/14/16.
  */
 public class ConsoleTerminal extends ConsoleSurface implements Appendable {
+
 
     public final DefaultVirtualTerminal term;
     private final int[] cursorPos = new int[2];
@@ -169,8 +165,8 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
 
         //this.term.flush();
 
-        if (eterm instanceof TextEditModel) {
-            TextEditModel ee = (TextEditModel) eterm;
+        if (eterm instanceof TerminalUI) {
+            TerminalUI ee = (TerminalUI) eterm;
             ee.gui.getGUIThread().invokeLater(() -> {
                 try {
                     ee.gui.processInput();
@@ -183,70 +179,4 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
         return true;
     }
 
-    /**
-     * Created by me on 3/25/17.
-     */
-    public static class TextEditModel extends DefaultVirtualTerminal implements Runnable {
-        public MultiWindowTextGUI gui;
-        public TextBox textBox;
-
-
-        public TextEditModel(int c, int r) {
-            super(new TerminalSize(c, r));
-
-
-            //term.clearScreen();
-            new Thread(this).start();
-        }
-
-        public void commit() {
-            try {
-                gui.updateScreen();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void run() {
-
-            try {
-                TerminalScreen screen = new TerminalScreen(this);
-                screen.startScreen();
-                gui = new MultiWindowTextGUI(
-                        new SameTextGUIThread.Factory(),
-                        screen);
-
-
-                setCursorVisible(true);
-
-                gui.setBlockingIO(false);
-                gui.setEOFWhenNoWindows(false);
-
-                TerminalSize size = getTerminalSize();
-
-                final BasicWindow window = new BasicWindow();
-                window.setPosition(new TerminalPosition(0, 0));
-                window.setSize(new TerminalSize(size.getColumns() - 2, size.getRows() - 2));
-
-
-                this.textBox = new TextBox("", TextBox.Style.MULTI_LINE);
-                textBox.setPreferredSize(new TerminalSize(size.getColumns() - 3, size.getRows() - 3));
-
-                textBox.takeFocus();
-                window.setComponent(textBox);
-
-
-                gui.addWindow(window);
-                gui.setActiveWindow(window);
-
-                commit();
-                gui.waitForWindowToClose(window);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
 }

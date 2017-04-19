@@ -1,4 +1,4 @@
-package spacegraph.layout;
+package spacegraph.widget.meter;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
