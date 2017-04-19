@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
 
 import static nars.Op.BELIEF;
 
@@ -80,9 +81,11 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
         float next = value.floatValueOf(term);
+        Truth truth = (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null;
+
         return set(term,
-                (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null,
-                nextStamp(nar),
+                truth,
+                update(truth, nar),
                 nar);
 
 //        int maxT = this.maxTimeBetweenUpdates;
@@ -108,8 +111,8 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        return null;
     }
 
-    protected long nextStamp(@NotNull NAR nar) {
-        return nar.time.nextStamp();
+    protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+        return nar.time::nextStamp;
     }
 
 

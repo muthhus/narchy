@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -162,7 +163,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     @Override
     public void accept(NAgent a) {
 
-        frameStamp();
+        //frameStamp();
 
         src.update(1);
 
@@ -178,10 +179,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         T get(int x, int y);
     }
 
-    private long nextStamp;
-    private void frameStamp() {
-        nextStamp = nar.time.nextStamp();
-    }
+//    private long nextStamp;
+//    private void frameStamp() {
+//        nextStamp = nar.time.nextStamp();
+//    }
 
     public class PixelConcept extends SensorConcept {
 
@@ -194,10 +195,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
             setSignal(()->src.brightness(x, y));
         }
 
-        @Override
-        protected long nextStamp(@NotNull NAR nar) {
-            return nextStamp;
-        }
+//        @Override
+//        protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+//            return ()->nextStamp;
+//        }
 
     }
 

@@ -325,7 +325,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 beliefs[cx][cy].set(
                         $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
                         $.t(1f, 0.9f),
-                        nextStamp,
+                        ()->nextStamp,
                         nar);
             }
         }

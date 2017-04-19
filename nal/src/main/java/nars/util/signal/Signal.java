@@ -10,6 +10,8 @@ import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.LongSupplier;
+
 /**
  * Manages the creation of a stream of tasks for a changing Truth value
  * input signal
@@ -44,7 +46,7 @@ public class Signal {
     }
 
 
-    public Task set(Compound term, Truth nextTruth, long stamp, NAR nar) {
+    public Task set(Compound term, Truth nextTruth, LongSupplier stamper, NAR nar) {
 
         long now = nar.time();
         if (current != null) {
@@ -72,7 +74,7 @@ public class Signal {
 
         SignalTask t = task(term, nextTruth,
                 now, now,
-                this.current, stamp, nar);
+                this.current, stamper.getAsLong(), nar);
         if (t == null) {
             this.current = null; //signal dropped
             return null;

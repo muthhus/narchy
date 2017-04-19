@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
 
 
 /**
@@ -47,18 +48,24 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         this.resolution = new FloatParam(n.truthResolution.floatValue());
         this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
-            @Override
-            protected long nextStamp(@NotNull NAR nar) {
-                return SensorConcept.this.nextStamp(nar);
+            protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+                return SensorConcept.this.update(currentBelief, nar);
             }
+
         };
 
         this.signal = signal;
         this.beliefs = new SensorBeliefTable();
     }
 
-    protected long nextStamp(@NotNull NAR nar) {
-        return nar.time.nextStamp();
+    /** returns a new stamp for a sensor task */
+    protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+        Truth g = goal(nar.time(), nar.dur());
+        if (g!=null) {
+            //compare goal with belief state to determine if an adjustment task should be created
+            System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
+        }
+        return nar.time::nextStamp;
     }
 
     @Override

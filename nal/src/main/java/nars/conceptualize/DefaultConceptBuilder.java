@@ -37,6 +37,7 @@ import java.util.function.BiFunction;
 import static jcog.pri.PriMerge.plus;
 import static nars.Op.DIFFe;
 import static nars.Op.PROD;
+import static nars.term.Terms.compoundOrNull;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -191,7 +192,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.term(j++);
                         }
-                        Compound b = $.inh($.p(ee), img.term(0));
+                        Compound b = compoundOrNull($.inh($.p(ee), img.term(0)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }
@@ -241,7 +242,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.term(j++);
                         }
-                        Compound b = $.inh(img.term(0), $.p(ee));
+                        Compound b = compoundOrNull($.inh(img.term(0), $.p(ee)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }

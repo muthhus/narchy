@@ -56,7 +56,7 @@ public class GoalActionConcept extends ActionConcept {
                 this.motor.motor(
                         beliefIntegrated.commitAverage(),
                         goalIntegrated.commitAverage()),
-                nar.time.nextStamp(),
+                nar.time::nextStamp,
                 nar);
     }
 
