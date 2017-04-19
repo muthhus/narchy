@@ -420,11 +420,11 @@ public enum Terms { ;
         return compoundOr(t, null);
     }
     @Nullable
-    public static Compound normalizedOrNull(@Nullable Term t, TermIndex i) {
+    public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
         if (t == null)
             return null;
         Compound ct = compoundOrNull(t);
-        if (t == null)
+        if (ct == null)
             return null;
         return compoundOrNull(i.normalize(ct));
     }
