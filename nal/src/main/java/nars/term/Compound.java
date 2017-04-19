@@ -778,8 +778,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     }
 
-    @Override
-    default Term eval(TermIndex index) {
+
+    @Override default Term eval(TermIndex index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!hasAll(Op.OpBits))

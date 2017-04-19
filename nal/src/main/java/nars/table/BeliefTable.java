@@ -159,9 +159,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return match(when, now, dur, against, null, noOverlap);
     }
 
-    default Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap) {
-        return match(now, now, dur);
-    }
+    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap);
 
     @Nullable default Task match(long when, long now, int dur) {
         return match(when, now, dur, null, true);
@@ -232,6 +230,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
 
+    /** projects a match */
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
 
         boolean novel;

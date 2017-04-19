@@ -518,7 +518,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
 
         return TruthPolation.truth(
-                eternal != null ? eternal.match() : null,
+                eternal != null ? eternal.strongest() : null,
                 when, dur, this);
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;

@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -1195,4 +1196,13 @@ public class NAL7Test extends AbstractNALTest {
 //
 //    }
 
+    @Test public void testDecomposeImplPred() {
+        test()
+            .log()
+            .believe("( (a,#b) ==>+0 ( ( (x,#b) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
+            .mustBelieve(cycles, "( (a,#b) ==>+0 (x,#b) )", 1f, 0.73f, 0)
+            .mustBelieve(cycles, "( (a,#b) ==>+0 y )", 1f, 0.73f,0)
+            .mustBelieve(cycles, "( (a,#b) ==>+0 z )", 1f, 0.73f,0)
+        ;
+    }
 }

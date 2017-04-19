@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.math.Interval.unionLength;
 import static nars.Op.NEG;
+import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -146,20 +147,18 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     @Nullable
     void link(@NotNull Termed target, float scale, int depth) {
 
-
-        float parentActivation = scale;
-
         boolean isntVariable = !(target instanceof Variable);
-
-
 
         if (isntVariable) {
             Concept termConcept = nar.conceptualize(target);
             if (termConcept != null)
                 target = termConcept;
+        } else {
+            if (target.op()==VAR_QUERY)
+                return; //dont create termlinks for query variables
         }
 
-
+        float parentActivation = scale;
         int nextDepth = depth + 1;
         Term targetTerm = target.term();
         if (nextDepth <= termlinkDepth && targetTerm instanceof Compound) {

@@ -556,13 +556,13 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
+    //TODO not working right
     public Rule ConjunctionParallel() {
         return seq(
 
-                "&|", sepArgSep(),
+                "&|,", s(),
 
                 Term(true, false),
-                s(),
                 oneOrMore(sequence(
 
                         sepArgSep(),

@@ -47,7 +47,7 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
-    //@AllowOverlap
+    @AllowOverlap
     Deduction() {
         @Nullable
         @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, NAR m, float minConf) {
@@ -246,8 +246,6 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.decompose(T,B, true, true, true, minConf);
         }
     },
-
-
 
     @SinglePremise
     Identity() {

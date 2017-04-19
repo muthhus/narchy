@@ -4,7 +4,6 @@ import jcog.pri.PLink;
 import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
@@ -30,7 +29,6 @@ import static nars.util.UtilityFunctions.aveAri;
 abstract public class PremiseBuilder {
 
 
-
     /**
      * resolves the most relevant belief of a given term/concept
      * <p>
@@ -50,105 +48,53 @@ abstract public class PremiseBuilder {
         Term beliefTerm = termLink.get();
         Task belief = null;
 
-        int dur = nar.dur();
 
         Task task = taskLink.get();
-        long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
+
 
         if (beliefTerm instanceof Compound) {
 
-            Compound unifiedTerm = unify(task.term(), (Compound) beliefTerm, nar);
-
-            if (unifiedTerm != null)  {
-                unifiedTerm = compoundOrNull(unifiedTerm.unneg());
-                if (unifiedTerm!=null)
-                    beliefTerm = unifiedTerm;
-            }
-
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if ((unifiedTerm != null) &&
-                    (beliefConcept instanceof TaskConcept) &&
-                        (unifiedTerm.varQuery() == 0) &&
-                            !unifiedTerm.equals(task.term())) {
+            if (beliefTerm.varQuery() > 0) {
+                Compound unifiedTerm = unify(task.term(), (Compound) beliefTerm, nar);
+                if (unifiedTerm != null) {
+                    unifiedTerm = compoundOrNull(unifiedTerm.unneg());
+                    if (unifiedTerm != null)
+                        beliefTerm = unifiedTerm;
+                }
+            }
 
+            //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
+            if (beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
+
+                BeliefTable table =
+                        ((task.isQuestion() && task.isGoal()) || task.isQuest()) ?
+                            beliefConcept.goals() :
+                            beliefConcept.beliefs();
+
+                int dur = nar.dur();
+
+                Task match;
                 if (task.isQuestOrQuestion()) {
+                    long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
+                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, nar);
+                } else {
+                    long when = task.start();
+                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
+                }
 
-                    //nar.activate(answerConcept, task.priSafe(0));
+                if (match != null) {
+                    if (match.isBelief() /* not Goal */) {
+                        belief = match;
+                    }
 
-                    BeliefTable table = task.isQuest() ? beliefConcept.goals() : beliefConcept.beliefs();
-
-                    Task answered = table.answer(when, now, dur, task, unifiedTerm, nar);
-                    if (answered != null) {
-
-                        answered = task.onAnswered(answered, nar);
-                        if (answered != null && !answered.isDeleted()) {
-
-
-                            /*if (nar.input(answered)!=null)*/
-
-
-                            //transfer budget from question to answer
-                            //float qBefore = taskBudget.priSafe(0);
-                            //float aBefore = answered.priSafe(0);
-                            BudgetFunctions.transferPri(taskLink, answered.priority(),
-                                    answered.conf()
-                                    //(1f - taskBudget.qua())
-                                    //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
-                            );
-
-                            //BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
-
-                            //task.budget().set(taskBudget); //update the task budget
-
-                            //Crosslink.crossLink(task, answered, answered.conf(), nar);
-
-
-                            /*
-                            if (qBefore > 0) {
-                                float qFactor = taskBudget.priSafe(0) / qBefore;
-                                c.tasklinks().mul(task, qFactor); //adjust the tasklink's budget in the same proportion as the task was adjusted
-                            }
-
-
-                            if (aBefore > 0) {
-                                float aFactor = answered.priSafe(0) / aBefore;
-                                c.termlinks().mul(beliefTerm, aFactor);
-                            }
-                            */
-
-
-                            if (answered.punc() == Op.BELIEF) {
-                                belief = answered;
-                                beliefTerm = answered.term();
-                            }
-                        }
-
+                    if (task.isQuestOrQuestion()) {
+                        answer(taskLink, match, nar);
                     }
                 }
-
-
-
-
             }
 
-            //if belief is still not known, match from the belief table
-            if ((belief == null) && (beliefTerm.varQuery() == 0)) {
-                if (beliefConcept instanceof TaskConcept) {
-                    belief = beliefConcept.beliefs().match(when, now, dur, task, (Compound)beliefTerm,true); //in case of quest, proceed with matching belief
-                }
-
-            }
-
-//            if (belief!=null  && !(task.isEternal() && belief.isEternal()) && !belief.contains(when)) {
-//                //project it to the time
-//                belief = ((ImmutableTask)belief).project(when, dur, nar.confMin.floatValue());
-//            }
-
-//            //prevent single eternal goal by projecting to now
-//            if (belief == null && task.isGoal() && task.isEternal() && !task.contains(when)) {
-//                task= ((ImmutableTask)task).project(when, dur, nar.confMin.floatValue());
-//            }
         }
 
 
@@ -167,18 +113,18 @@ abstract public class PremiseBuilder {
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
                 task.priSafe(-1);
-                //taskLinkCopy.pri();
-                //Math.max(task.priSafe(0), taskLinkCopy.priSafe(0));
-                //taskLinkCopy.pri();
-                //aveAri(taskLinkCopy.pri(), task.priSafe(0));
+        //taskLinkCopy.pri();
+        //Math.max(task.priSafe(0), taskLinkCopy.priSafe(0));
+        //taskLinkCopy.pri();
+        //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         if (taskPri < 0)
             return null; //task deleted
 
-        float pri = beliefPriority==null ? taskPri :
+        float pri = beliefPriority == null ? taskPri :
                 //Math.max
                 aveAri
-                    (taskPri, beliefPriority.priSafe(0));
+                        (taskPri, beliefPriority.priSafe(0));
 
         if (pri < priMin)
             return null;
@@ -191,10 +137,50 @@ abstract public class PremiseBuilder {
         return newPremise(concept, task, beliefTerm, belief, pri, target, nar);
     }
 
+    void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {
+
+        @Nullable Task answered = question.get().onAnswered(match, nar);
+
+        if (answered != null && !answered.isDeleted()) {
+
+            //transfer budget from question to answer
+            //float qBefore = taskBudget.priSafe(0);
+            //float aBefore = answered.priSafe(0);
+            BudgetFunctions.transferPri(question, answered.priority(),
+                    answered.conf()
+                    //(1f - taskBudget.qua())
+                    //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
+            );
+
+            //BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
+
+            //task.budget().set(taskBudget); //update the task budget
+
+            //Crosslink.crossLink(task, answered, answered.conf(), nar);
+
+
+                /*
+                if (qBefore > 0) {
+                    float qFactor = taskBudget.priSafe(0) / qBefore;
+                    c.tasklinks().mul(task, qFactor); //adjust the tasklink's budget in the same proportion as the task was adjusted
+                }
+
+
+                if (aBefore > 0) {
+                    float aFactor = answered.priSafe(0) / aBefore;
+                    c.termlinks().mul(beliefTerm, aFactor);
+                }
+                */
+        }
+    }
+
+
+
     abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
 
-    @Nullable
-    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+    /** unify any (and only) query variables
+     * present in the 'a' term with any non-query terms in the 'q' term */
+    @Nullable private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
         if (q.op() != a.op())
             return null; //no chance

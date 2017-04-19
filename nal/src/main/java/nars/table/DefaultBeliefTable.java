@@ -100,7 +100,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap) {
 
-        final Task ete = eternal.match();
+        final Task ete = eternal.strongest();
         if (when == ETERNAL) {
             if (ete != null) {
                 return ete;

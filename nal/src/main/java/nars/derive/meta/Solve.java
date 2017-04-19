@@ -50,8 +50,9 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
                     return false; //there isnt a truth function for this punctuation
 
                 single = f.single();
-                if (!single && m.belief == null)  //double premise, but belief is null
+                if (!single && m.belief == null) {  //double premise requiring a belief, but belief is null
                     return false;
+                }
 
                 if (!f.allowOverlap() && (single ? m.cyclic : m.overlap))
                     return false;
@@ -83,9 +84,16 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
                 if (m.cyclic || m.overlap)
                     return false;
 
-                //apply similar behavior for Question to Quests
-                if (punct==QUESTION && m.task.isQuest())
-                    punct = QUEST;
+                switch (m.taskPunct) {
+                    case BELIEF:
+                        break;
+                    case QUESTION:
+                        break;
+                    case GOAL:
+                    case QUEST:
+                        punct = QUEST; //apply similar behavior for Question to Quests
+                        break;
+                }
 
                 single = true;
                 t = null;
