@@ -23,16 +23,14 @@ public class UnifySubst extends Unify {
 
 
     final Predicate<Term> target;
-    final int maxMatches;
     private Term a;
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int maxMatches) {
+    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target) {
         super(n.concepts, varType, n.random, Param.SubUnificationStackMax, Param.SubUnificationTTL);
 
         this.nar = n;
-        this.maxMatches = maxMatches;
         this.target = target;
 
     }
@@ -59,17 +57,17 @@ public class UnifySubst extends Unify {
 
         //TODO combine these two blocks to use the same sub-method
 
-        try {
+        //try {
             Term aa = resolve(a, xy);
             if (aa!=null && target.test(aa))
                 matches++;
 
-        }
-        catch (InvalidTermException e) {
-            if (Param.DEBUG)
-                logger.warn("{}",e);
-
-        }
+//        }
+//        catch (InvalidTermException e) {
+//            if (Param.DEBUG)
+//                logger.warn("{}",e);
+//
+//        }
 
 //        if ((aa == null) ||
 //        //Op aaop = aa.op();
@@ -91,14 +89,14 @@ public class UnifySubst extends Unify {
     }
 
 
-    @Nullable Term resolve(@NotNull Term t, @Nullable Map<Term,Term> subs) {
-        try {
-            return (subs == null) || (subs.isEmpty()) ?
+    @Nullable Term resolve(@NotNull Term t, @NotNull Map<Term,Term> subs) {
+        //try {
+            return subs.isEmpty() ?
                     t /* no change necessary */ :
                     nar.concepts.transform(t, new MapSubst(subs));
-        } catch (InvalidTermException e) {
-            return null;
-        }
+//        } catch (InvalidTermException e) {
+//            return null;
+//        }
     }
 
 }

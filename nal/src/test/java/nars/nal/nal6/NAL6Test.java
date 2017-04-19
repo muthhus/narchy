@@ -180,7 +180,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("(&&,<#x --> bird>,<#x --> swimmer>)"); //en("Some bird can swim.");
         tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
         tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, //en("I guess swan can swim.");
-                0.38f);
+                0.24f);
                 //0.43f);
 
     }
@@ -242,7 +242,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         tester.mustBelieve(cycles*6, "(&&,<#1 --> key>,<{lock1} --> (/,open,#1,_)>)",
                 1.00f,
-                0.43f
+                0.36f //0.43f
         ); //en("I guess there is a key that can open Lock-1.");
 
     }
@@ -402,10 +402,10 @@ public class NAL6Test extends AbstractNALTest {
     public void second_variable_introduction_induction()  {
 
         TestNAR tester = test();
-        //tester.log();
-        tester.believe("<open($1,lock1) ==> <$1 --> key>>"); //en("if something opens lock1, it is a key");
-        tester.believe("<lock1 --> lock>"); //en("lock1 is a key");
-        tester.mustBelieve(cycles, "(<#1 --> lock> && (open($2,#1) ==> <$2 --> key>))", 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+        tester.log();
+        tester.believe("(open($1,lock1) ==> key:$1)"); //en("if something opens lock1, it is a key");
+        tester.believe("lock:lock1"); //en("lock1 is a key");
+        tester.mustBelieve(cycles, "(lock:#1 && (open($2,#1) ==> key:$2))", 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
         //tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
     }

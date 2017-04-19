@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
@@ -56,13 +57,10 @@ abstract public class PremiseBuilder {
 
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if (beliefTerm.varQuery() > 0) {
-                Compound unifiedTerm = unify(task.term(), (Compound) beliefTerm, nar);
-                if (unifiedTerm != null) {
-                    unifiedTerm = compoundOrNull(unifiedTerm.unneg());
-                    if (unifiedTerm != null)
-                        beliefTerm = unifiedTerm;
-                }
+            if (beliefTerm.varQuery() > 0 && !beliefTerm.equals(task.term())) {
+                assert(beliefTerm.op()!=NEG);
+                beliefTerm = unify(task.term(), (Compound) beliefTerm, nar);
+                assert(beliefTerm.op()!=NEG);
             }
 
             //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
@@ -180,32 +178,34 @@ abstract public class PremiseBuilder {
 
     /** unify any (and only) query variables
      * present in the 'a' term with any non-query terms in the 'q' term */
-    @Nullable private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+    @NotNull private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
         if (q.op() != a.op())
-            return null; //no chance
+            return a; //fast-fail: no chance
 
-        if ((q.vars() > 0)/* || (q.varPattern() != 0)*/) {
+        final Compound[] result = { a };
+        new UnifySubst(null /* all variables */, nar, (aa) -> {
+            if (aa instanceof Compound) {
 
-            List<Term> result = $.newArrayList(1);
-            new UnifySubst(null /* all variables */, nar, (r) -> {
-                if (!r.equals(q) && !q.containsTermRecursively(r) /* HACK to prevent answering (#1 && x) with (x && x) === x */) {
-                    return result.add(r);
+                aa = aa.eval(nar.concepts);
+
+                if (!aa.equals(result[0])) {
+                    result[0] = ((Compound) aa);
+                    return false; //only this match
+                } else {
+                    return true; //keep trying
                 }
-                return false;
-            }, 1 /*Param.QUERY_ANSWERS_PER_MATCH*/).unifyAll(q, a);
-
-            if (!result.isEmpty()) {
-                Compound unified = compoundOrNull(result.get(0));
-                if (unified != null)
-                    return unified;
+            } else {
+                return true; //keep trying
             }
-        }
+        }).unifyAll(a, q);
 
-        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
-            return q;
-        else
-            return null;
+        return result[0];
+
+//        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
+//            return q;
+//        else
+//            return null;
     }
 
 }

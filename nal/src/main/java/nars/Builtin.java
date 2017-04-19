@@ -120,8 +120,9 @@ public class Builtin {
          * the compound. wont work in all situations.
          * TODO move the type restriction to another functor to wrap this
          */
-        nar.on(Functor.f1("dropAnyConj", (Compound c) -> {
-            if (c.op()!=CONJ || !commutive(c.dt()))
+        nar.on(Functor.f1((Atom)$.the("dropAnyConj"), (Term t) -> {
+            Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
+            if (c == null || c.op()!=CONJ || !commutive(c.dt()))
                 return False;
 
             //if (c.op().statement) return False;

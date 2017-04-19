@@ -24,8 +24,19 @@ public class QueryVariableTest {
         testQuestionAnswer("<a --> b>", "<?x --> b>");
     }
     @Test public void testQueryVariableAnswerUnified2() throws Narsese.NarseseException {
-
         testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
+    }
+    @Test public void testQueryVariableMatchesDepVar() throws Narsese.NarseseException {
+        testQuestionAnswer("<#c --> (a&b)>", "<?x --> (a&b)>");
+    }
+    @Test public void testQueryVariableMatchesIndepVar() throws Narsese.NarseseException {
+        testQuestionAnswer("($x ==> y($x))", "(?x ==> y(?x))");
+    }
+    @Test public void testQueryVariableMatchesTemporally() throws Narsese.NarseseException {
+        testQuestionAnswer("(x &&+1 y)", "(?x && y)");
+    }
+    @Test public void testQueryVariableMatchesTemporally2() throws Narsese.NarseseException {
+        testQuestionAnswer("(e ==> (x &&+1 y))", "(e ==> (?x && y))");
     }
 
     @Test
@@ -46,7 +57,7 @@ public class QueryVariableTest {
 
 
         Default nar = new Default();
-        //nar.log();
+        nar.log();
         Compound beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.ask(question, Tense.ETERNAL, (q,a)-> {

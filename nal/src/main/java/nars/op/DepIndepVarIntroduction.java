@@ -22,7 +22,8 @@ import static nars.Op.*;
 public class DepIndepVarIntroduction extends VarIntroduction {
 
 
-    final static int ConjOrStatementBits = Op.IMPL.bit | Op.INH.bit | Op.SIM.bit | Op.EQUI.bit | Op.CONJ.bit;
+    final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
+
     private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
 
     /** sum by complexity if passes include filter */
@@ -66,8 +67,6 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 break;
             case IMPL:
             case EQUI:
-            case INH:
-            case SIM:
                 depOrIndep = false;
                 break;
             default:
