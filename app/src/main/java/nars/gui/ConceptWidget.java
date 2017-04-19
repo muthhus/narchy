@@ -137,7 +137,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             c.tasklinks().forEach(this);
             c.termlinks().forEach(this);
 
-            edges.forEachKey(TermEdge::update);
+            float priSum = edges.priSum();
+            edges.forEachKey(x -> x.update(priSum));
 
             conceptVis.apply(this, key);
 
@@ -290,28 +291,28 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             return hash;
         }
 
-        public void update() {
+        public void update(float conceptEdgePriSum) {
 
-            float priSum = (termlinkPri + tasklinkPri);
+            float edgeSum = (termlinkPri + tasklinkPri);
 
-            if (priSum >= 0) {
+            if (edgeSum >= 0) {
 
                 //float priAvg = priSum/2f;
 
                 float minLineWidth = 10f;
                 float priToWidth = 10f;
 
-                this.width = minLineWidth + priToWidth * priSum;
+                this.width = minLineWidth + priToWidth * edgeSum;
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
 //                if (qEst!=qEst)
 //                    qEst = 0f;
 
 
-                if (priSum > 0) {
+                if (edgeSum > 0) {
                     this.b = 0.1f;
-                    this.r = 0.1f + 0.85f * (tasklinkPri / priSum);
-                    this.g = 0.1f + 0.85f * (termlinkPri / priSum);
+                    this.r = 0.1f + 0.85f * (tasklinkPri / edgeSum);
+                    this.g = 0.1f + 0.85f * (termlinkPri / edgeSum);
                 } else {
                     this.r = this.g = this.b = 0.5f;
                 }
@@ -319,9 +320,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                 //this.a = 0.1f + 0.5f * pri;
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
-                        0.9f;
+                        0.1f + 0.9f * edgeSum/conceptEdgePriSum;
 
-                this.attraction = 1f + 1f * priSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 1f + 1f * edgeSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;

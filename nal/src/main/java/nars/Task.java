@@ -338,12 +338,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return null; //ex: volume limit exceeded
 
         if (!(c instanceof TaskConcept)) {
-            //if (Param.DEBUG_EXTRA)
-            throw new RuntimeException
-                    //System.err.println
-                    ("should conceptualize to TaskConcept: " + c);
-            //else
-            //return null;
+            if (Param.DEBUG)
+                throw new RuntimeException
+                        //System.err.println
+                        ("should conceptualize to TaskConcept: " + c);
+            else
+                return null;
         }
         return (TaskConcept) c;
     }
@@ -754,7 +754,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         }
 
         ImmutableTask y = new ImmutableTask(newContent, x.punc(),
-                x.truth().negIf(negated),
+                x.isBeliefOrGoal() ? x.truth().negIf(negated) : null,
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());

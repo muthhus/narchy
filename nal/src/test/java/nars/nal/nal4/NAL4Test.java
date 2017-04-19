@@ -28,7 +28,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL4Test extends AbstractNALTest {
 
 
-    public static final int CYCLES = 250;
+    public static final int CYCLES = 450;
 
     public NAL4Test(Supplier<NAR> b) { super(b);  }
 

@@ -520,7 +520,9 @@ public abstract class TermIndex extends TermBuilder {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        @Nullable Termed c = get(term.unneg(), createIfMissing);
+        term = term.unneg();
+
+        @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
 //            if (createIfMissing) {
 //                throw new Concept.InvalidConceptException(term, "Failed to build concept");

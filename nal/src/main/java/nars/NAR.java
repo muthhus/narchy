@@ -56,7 +56,6 @@ import java.util.stream.Stream;
 import static nars.$.$;
 import static nars.$.*;
 import static nars.Op.*;
-import static nars.Op.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
@@ -819,8 +818,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     public final void on(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
         PermanentAtomConcept c = builder.withBags(a,
-            (termlink, tasklink) ->
-                new PermanentAtomConcept(a, termlink, tasklink)
+                (termlink, tasklink) ->
+                        new PermanentAtomConcept(a, termlink, tasklink)
         );
         c.put(Operator.class, o);
         concepts.set(c);
@@ -1222,7 +1221,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     public Concept concept(@NotNull Termed termed) {
         if (termed instanceof Concept) {
             //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            return ((Concept)termed);
+            return ((Concept) termed);
         }
 
         return concepts.concept(termed.term(), false);
@@ -1233,7 +1232,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
         if (termed instanceof Concept) {
             //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            return ((Concept)termed);
+            return ((Concept) termed);
         }
 
 
@@ -1266,14 +1265,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
                     if (term == null)
                         return null;
 
-                    //HACK test if the atemporalization resulted in a new term which isnt yet recognized as normalized
-                    if (normalized && !term.isNormalized()) {
-                        term = concepts.normalize((Compound) term); //TODO use the index
-                        if (term==null)
-                            return null;
-                    }
+                    //atemporalizing can reset normalization state of the result instance
+                    //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
+
+
                 }
 
+                if (!term.isNormalized()) {
+                    //see if, when normalized, it doesnt change. otherwise keep the non-normalized form
+                    Compound normalizedTerm = concepts.normalize((Compound) term);
+                    if (normalizedTerm != term && normalizedTerm != null && normalizedTerm.equals(term)) {
+                        ((Compound) term).setNormalized(); //recognize as normalized
+                    }
+
+                }
 
                 /*
                 if (term instanceof Compound) {
@@ -1300,7 +1305,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        concepts().forEach(n -> recip.accept((Concept)n.get()));
+        concepts().forEach(n -> recip.accept((Concept) n.get()));
         return this;
     }
 
@@ -1395,7 +1400,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
 
-    @Override public @Nullable PLink<Termed> activate(Termed c, float priToAdd) {
+    @Override
+    public @Nullable PLink<Termed> activate(Termed c, float priToAdd) {
         @Nullable Concept cc = conceptualize(c);
         return (cc != null) ? focus.activate(c, priToAdd) : null;
 

@@ -28,6 +28,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public final NAR nar;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
+    private final int maxNodes;
     public long now;
     public int dur;
 
@@ -38,6 +39,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public ConceptsSpace(NAR nar, int maxNodes, int bufferedNodes, int maxEdgesPerNode) {
         super(nar);
         this.nar = nar;
+        this.maxNodes = maxNodes;
         this.maxEdgesPerNode = maxEdgesPerNode;
         bag = new Bagregate<Concept>(nar.concepts(), maxNodes + bufferedNodes, UPDATE_RATE) {
             @Override
@@ -65,10 +67,11 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
 
-        bag.forEachKey((Concept concept) ->
-            displayNext.add( widgetGetOrCreate(concept) )
+        bag.forEach(maxNodes, (PLink<Concept> concept) ->
+            displayNext.add( widgetGetOrCreate(concept.get()) )
             //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
         );
+
 
         //System.out.println(nar.time() + " " + displayNext.size() );
 
@@ -120,7 +123,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Param.DEBUG = false;
 
-        Default n = new Default(256, 1, 1);
+        Default n = new Default(512, 1, 3);
         //Default n = NARBuilder.newMultiThreadNAR(1, new RealTime.DSHalf(true).durSeconds(0.05f));
         //n.nal(1);
 //        n.termVolumeMax.setValue(7f);
@@ -135,17 +138,17 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveChainTest(n, 8,  2048, inh);
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
-        n.focus.activationRate.setValue(0.1f);
+        n.focus.activationRate.setValue(0.2f);
 
-        n.loop(16f);
+        n.loop(12f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
                 "(x:c ==> x:d).",
                 "(x:d ==> x:e).",
-                "(x:e ==> x:f).",
-                "(x:f ==> x:g).",
-                "(x:g ==> x:h)."
+                "(x:e ==> x:f)."
+//                "(x:f ==> x:g).",
+//                "(x:g ==> x:h)."
 
                 );
 //        for (int i = 0; i < 10; i++) {
@@ -155,7 +158,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 128, 1) {
+        NARSpace cs = new ConceptsSpace(n, 64, 8) {
 //            @Override
 //            protected boolean include(Term term) {
 //

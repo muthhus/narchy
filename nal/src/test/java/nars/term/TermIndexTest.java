@@ -1,6 +1,7 @@
 package nars.term;
 
 import jcog.random.XorShift128PlusRandom;
+import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static nars.$.$;
 import static org.junit.Assert.*;
 
 
@@ -253,5 +255,11 @@ public class TermIndexTest {
         assertEquals(su, i.concept(su, false));
         assertNotEquals(sui, i.concept(su, false));
 
+    }
+
+    @Test public void testConceptualizable() throws Narsese.NarseseException {
+        Compound c = $.$("(((#1,#2,a02)-->#3)&&((#1,#2,a32)-->#3))");
+        assertTrue(c.isNormalized());
+        assertTrue(Task.taskContentValid(c, (byte) 0, null, true));
     }
 }

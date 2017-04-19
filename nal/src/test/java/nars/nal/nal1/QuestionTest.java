@@ -143,7 +143,7 @@ public class QuestionTest {
         DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
 
         IntFunction<NAR> narProvider = (seed) -> {
-            NAR d = new Default(512, 2, 1);
+            NAR d = new Default(512, 4, 1);
             d.random.setSeed(seed);
             d.nal(4);
             return d;

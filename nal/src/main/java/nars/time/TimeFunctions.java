@@ -632,9 +632,7 @@ public interface TimeFunctions {
     static Term resolve(@NotNull Derivation p, @NotNull Term x) {
         Term y;
         try {
-            y = p.resolve(x instanceof Compound  ?
-                    p.index.transform((Compound)x, CompoundTransform.Identity)
-                    : x);
+            y = p.resolve(p.index.productNormalize(x));
         } catch (InvalidTermException e) {
             //failed, just return the input
             y = x;
