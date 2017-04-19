@@ -12,11 +12,15 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * TODO add an instrumentation wrapper to collect statistics
+ * about cache efficiency and also processing time of the calculations
+ */
 public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements Function<K,V> {
 
-    final static float INITIAL_PRI = 0.5f;
-    final static float CACHE_HIT_PRI = 0.1f;
-    final static float sustainRate = 0.99f;
+    float CACHE_HIT_BOOST;
+    float CACHE_DENY_DAMAGE;
+
     final Function<K,V> func;
 
     public HijackMemoize(int initialCapacity, int reprobes, Random random, @NotNull Function<K, V> f) {
@@ -26,20 +30,36 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
     }
 
     @Override
+    public int capacity() {
+        int i = super.capacity();
+        this.CACHE_HIT_BOOST = 1f/(1+i);
+        this.CACHE_DENY_DAMAGE = -CACHE_HIT_BOOST/reprobes;
+        return i;
+    }
+
+    @Override
     @Nullable public V apply(@NotNull K k) {
         PLink<Pair<K, V>> exists = get(k);
         if (exists!=null) {
-            exists.priAdd(CACHE_HIT_PRI);
+            exists.priAdd(CACHE_HIT_BOOST);
             return exists.get().getTwo();
         }
         V v = func.apply(k);
-        put(new RawPLink<>(Tuples.pair(k, v), INITIAL_PRI));
+        put(new RawPLink<>(Tuples.pair(k, v), CACHE_HIT_BOOST));
         return v;
     }
 
     @Override
+    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing) {
+        if (!super.replace(incoming, existing)) {
+            existing.priSub(CACHE_DENY_DAMAGE);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public float pri(@NotNull PLink<Pair<K,V>> key) {
-        key.priMult(sustainRate);
         return key.pri();
     }
 

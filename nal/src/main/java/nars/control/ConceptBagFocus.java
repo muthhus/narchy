@@ -42,7 +42,7 @@ public class ConceptBagFocus implements Focus {
 
     @Override
     public void activate(/*Concept*/ Concept concept, float priToAdd) {
-        active.put(new RawPLink(concept, priToAdd));
+        active.put(new RawPLink<>(concept, priToAdd * activationRate.floatValue() ));
     }
 
     @Override

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.math.Interval.unionLength;
+import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -180,6 +181,9 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             //activation terminating at an atom: activate through Atom links
             parentActivation = activateAtom((AtomConcept) linkedTerm, scale);
         }
+
+        if (linkedTerm.op()==NEG)
+            throw new RuntimeException("should have been un-negated");
 
         spread.addToValue(linkedTerm, parentActivation);
     }

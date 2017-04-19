@@ -32,10 +32,14 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public int dur;
 
     public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNode) {
+        this(nar, maxNodes, maxNodes, maxEdgesPerNode);
+    }
+
+    public ConceptsSpace(NAR nar, int maxNodes, int bufferedNodes, int maxEdgesPerNode) {
         super(nar);
         this.nar = nar;
         this.maxEdgesPerNode = maxEdgesPerNode;
-        bag = new Bagregate<Concept>(nar.concepts(), maxNodes, UPDATE_RATE) {
+        bag = new Bagregate<Concept>(nar.concepts(), maxNodes + bufferedNodes, UPDATE_RATE) {
             @Override
             protected boolean include(Concept x) {
                 return ConceptsSpace.this.include(x.term());

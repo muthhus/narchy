@@ -178,6 +178,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     @Override
     public Termed get(Term key, boolean createIfMissing) {
+
         if (createIfMissing) {
             return concepts.get(key, conceptBuilder);
         } else {

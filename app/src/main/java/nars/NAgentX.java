@@ -176,18 +176,15 @@ abstract public class NAgentX extends NAgent {
                 grid(
                     new WindowButton( "conceptBudget",
                             ()->{
-                                int period = 64;
 
-
-                                double[] d = new double[10];
+                                double[] d = new double[32];
                                 return new HistogramChart(
                                         ()->d,
                                         //()->h.uniformProb(32, 0, 1.0)
                                         new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
 
-                                    int iteration = 0;
-                                    On on = nar.onCycle((r) -> {
-                                        Bag.priHistogram(nar.concepts(), d);
+                                    On on = a.onFrame((r) -> {
+                                        Bag.priHistogram(r.nar.concepts(), d);
                                     });
 
                                     @Override
@@ -201,13 +198,13 @@ abstract public class NAgentX extends NAgent {
                     ),
                     new WindowButton( "conceptTreeMap", () -> {
 
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 128, 1f/nar.dur()), 64, nar);
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 256, 0.5f), 128, nar);
 
                         return tc;
                     }),
                             //"tasks", ()-> taskChart,
                     new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar,
-                            64, 6) )
+                            64, 4) )
                 )
             ), 600, 400);
         });

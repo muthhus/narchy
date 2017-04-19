@@ -1,8 +1,11 @@
 package nars.index.term.map;
 
+import jcog.bag.impl.hijack.HijackMemoize;
+import jcog.random.XorShift128PlusRandom;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -10,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
+import static nars.term.Terms.compoundOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations
@@ -22,8 +28,6 @@ public abstract class MaplikeTermIndex extends TermIndex {
         this.conceptBuilder = conceptBuilder;
     }
 
-
-    @Nullable @Override abstract public Termed get(@NotNull Term key, boolean createIfMissing);
 
     @Override
     public final ConceptBuilder conceptBuilder() {
@@ -44,10 +48,10 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //            (C) -> super.the(C.op, C.dt, C.toArray(new Term[C.size()]))
 //    );
 //
-//    final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-//            16384, 3, new XorShift128PlusRandom(1),
-//            super::normalize
-//    );
+    final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
+            16*1024, 2, new XorShift128PlusRandom(1),
+            super::normalize
+    );
 
 //    @Override
 //    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] u) throws InvalidTermException {
@@ -64,17 +68,16 @@ public abstract class MaplikeTermIndex extends TermIndex {
 ////        return build.apply(c);
 //    }
 
-//    @Nullable
-//    @Override public final Compound normalize(@NotNull Compound x) {
-//
-//        if (x.isNormalized()) {
-//            return x;
-//        } else {
-//
-//            return compoundOrNull(normalize.apply(x));
-//        }
-//
-//    }
+    @Nullable
+    @Override public final Compound normalize(@NotNull Compound x) {
+
+        if (x.isNormalized()) {
+            return x;
+        } else {
+            return compoundOrNull(normalize.apply(x));
+        }
+
+    }
 
 
 

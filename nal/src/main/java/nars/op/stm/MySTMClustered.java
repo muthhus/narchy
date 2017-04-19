@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
+import nars.index.term.TermIndex;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -19,6 +20,7 @@ import java.util.*;
 
 import static nars.Op.CONJ;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 
 /**
  * Task Dimension Mapping:
@@ -138,7 +140,8 @@ public class MySTMClustered extends STMClustered {
                 //.parallel()
                 //.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
                 .filter(n -> {
-                    if (n.size() < minGroupSize)
+
+                    if (n == null || n.size() < minGroupSize)
                         return false;
 
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
@@ -158,7 +161,6 @@ public class MySTMClustered extends STMClustered {
                     }
                     return false;
                 })
-                .filter(Objects::nonNull)
                 .flatMap(node -> {
 
                     @Nullable double[] freqDim = node.coherence(2);
@@ -219,11 +221,10 @@ public class MySTMClustered extends STMClustered {
                         long[] evidence = Stamp.zip(uu);
 
                         @Nullable Compound conj = group(negated, uu);
-                        if ((conj == null) || (conj.op()!=CONJ) || conj.volume() > maxVol)
+                        if (conj == null)
                             return null;
 
                         long t = Math.round(startDim[0]);
-
 
                         Task m = new GeneratedTask(conj, punc,
                                 $.t(finalFreq, conf), start[0], end[0], t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
@@ -232,7 +233,6 @@ public class MySTMClustered extends STMClustered {
 //                        float priAvg = ((float)(priTotal / uu.size()));
 //
                         m.priority().setPriority(BudgetFunctions.fund(uu, (1f / uu.size()), false));
-                        m.priority();
 //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -270,6 +270,7 @@ public class MySTMClustered extends STMClustered {
     private Compound group(boolean negated, @NotNull Collection<Task> uuu) {
 
 
+        TermIndex index = nar.concepts;
         if (uuu.size() == 2) {
             //find the dt and construct a sequence
             Task early, late;
@@ -288,9 +289,9 @@ public class MySTMClustered extends STMClustered {
             int dt = (int) (late.start() - early.start());
 
 
-            return compoundOrNull(
-                nar.concepts.the(CONJ, dt, $.negIf(early.term(), negated),
-                        $.negIf(late.term(), negated)));
+            return normalizedOrNull(
+                    index.the(CONJ, dt, $.negIf(early.term(), negated),
+                            $.negIf(late.term(), negated)), index);
 
         } else {
 
@@ -300,7 +301,7 @@ public class MySTMClustered extends STMClustered {
                 $.neg(uu);
 
             //just assume they occurr simultaneously
-            return compoundOrNull( nar.concepts.the(CONJ, 0, uu ) );
+            return normalizedOrNull( index.the(CONJ, 0, uu ), index);
             //return $.secte(s);
         }
     }
