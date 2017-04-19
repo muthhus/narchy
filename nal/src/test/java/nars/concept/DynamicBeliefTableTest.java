@@ -31,11 +31,11 @@ public class DynamicBeliefTableTest {
         n.run(1);
         long now = n.time();
         int dur = n.dur();
-        assertEquals($.t(1f,0.81f), n.concept($("(a:x && a:y)"), true).belief(now, dur));
-        assertEquals($.t(0f,0.81f), n.concept($("(b:x && a:y)"), true).belief(now, dur));
-        assertEquals($.t(0f,0.81f), n.concept($("(a:x && (--,a:y))"), true).belief(now, dur));
-        assertEquals($.t(1f,0.81f), n.concept($("((--,b:x) && a:y)"), true).belief(now, dur));
-        assertEquals($.t(0f,0.81f), n.concept($("((--,b:x) && (--,a:y))"), true).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("(a:x && a:y)")).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.conceptualize($("(b:x && a:y)")).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.conceptualize($("(a:x && (--,a:y))")).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("((--,b:x) && a:y)")).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.conceptualize($("((--,b:x) && (--,a:y))")).belief(now, dur));
     }
     @Test
     public void testDynamicIntersection() throws Narsese.NarseseException {
@@ -49,17 +49,17 @@ public class DynamicBeliefTableTest {
         n.run(1);
         long now = n.time();
         int dur = n.dur();
-        assertTrue(n.concept($("((x|y)-->a)"), true) instanceof DynamicConcept);
-        assertEquals($.t(1f,0.81f), n.concept($("((x|y)-->a)"), true).belief(now, dur));
-        assertEquals($.t(0f,0.81f), n.concept($("((x|z)-->a)"), true).belief(now, dur));
-        assertEquals($.t(1f,0.81f), n.concept($("((x&z)-->a)"), true).belief(now, dur));
-        assertEquals($.t(1f,0.81f), n.concept($("(b --> (x|y))"), true).belief(now, dur));
-        assertEquals($.t(1f,0.81f), n.concept($("(b --> (x|z))"), true).belief(now, dur));
-        assertEquals($.t(0f,0.81f), n.concept($("(b --> (x&z))"), true).belief(now, dur));
+        assertTrue(n.conceptualize($("((x|y)-->a)")) instanceof DynamicConcept);
+        assertEquals($.t(1f,0.81f), n.conceptualize($("((x|y)-->a)")).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.conceptualize($("((x|z)-->a)")).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("((x&z)-->a)")).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("(b --> (x|y))")).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("(b --> (x|z))")).belief(now, dur));
+        assertEquals($.t(0f,0.81f), n.conceptualize($("(b --> (x&z))")).belief(now, dur));
 
-        assertTrue(n.concept($("((x|(--,y))-->a)"), true) instanceof DynamicConcept);
-        assertEquals($.t(0f,0.81f), n.concept($("((x|(--,y))-->a)"), true).belief(now, dur));
-        assertEquals($.t(1f,0.81f), n.concept($("((x|(--,z))-->a)"), true).belief(now, dur));
+        assertTrue(n.conceptualize($("((x|(--,y))-->a)")) instanceof DynamicConcept);
+        assertEquals($.t(0f,0.81f), n.conceptualize($("((x|(--,y))-->a)")).belief(now, dur));
+        assertEquals($.t(1f,0.81f), n.conceptualize($("((x|(--,z))-->a)")).belief(now, dur));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DynamicBeliefTableTest {
         n.believe("a:z", 1f, 0.9f);
         n.run(1);
 
-        Concept cc = n.concept($("(&&, a:x, a:y, a:z)"), true);
+        Concept cc = n.conceptualize($("(&&, a:x, a:y, a:z)"));
         Truth now = cc.belief(n.time(), n.dur());
         assertTrue($.t(1f, 0.73f).equals(now, 0.01f));
         //the truth values were provided despite the belief tables being empty:
@@ -78,14 +78,14 @@ public class DynamicBeliefTableTest {
 
         //test unknown:
         {
-            Concept ccn = n.concept($("(&&, a:x, a:w)"), true);
+            Concept ccn = n.conceptualize($("(&&, a:x, a:w)"));
             Truth nown = ccn.belief(n.time(), n.dur());
             assertNull(nown);
         }
 
         //test negation:
         {
-            Concept ccn = n.concept($("(&&, a:x, (--, a:y), a:z)"), true);
+            Concept ccn = n.conceptualize($("(&&, a:x, (--, a:y), a:z)"));
             Truth nown = ccn.belief(n.time(), n.dur());
             assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
         }
@@ -105,7 +105,7 @@ public class DynamicBeliefTableTest {
         n.believe($("(x)"), (long)0, 1f, 0.9f);
         n.believe($("(y)"), (long)4, 1f, 0.9f);
         n.run(2);
-        CompoundConcept cc = (CompoundConcept) n.concept($("((x) && (y))"), true);
+        CompoundConcept cc = (CompoundConcept) n.conceptualize($("((x) && (y))"));
 //        cc.print();
 //
 //
@@ -146,17 +146,17 @@ public class DynamicBeliefTableTest {
 
         n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
 
-        CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"), false);
+        CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"));
         int dur = n.dur();
 
         Truth t = prod.belief(n.time(), dur);
         System.out.println(t);
 
-        CompoundConcept imgX = (CompoundConcept) n.concept($("(x --> (/,f,_,y))"), true);
+        CompoundConcept imgX = (CompoundConcept) n.conceptualize($("(x --> (/,f,_,y))"));
         assertEquals(t, imgX.belief(n.time(), dur));
 
 
-        CompoundConcept imgY = (CompoundConcept) n.concept($("(y --> (/,f,x,_))"), true);
+        CompoundConcept imgY = (CompoundConcept) n.conceptualize($("(y --> (/,f,x,_))"));
         assertEquals(t, imgY.belief(n.time(), dur));
 
 
@@ -176,13 +176,13 @@ public class DynamicBeliefTableTest {
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 
-        CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"), false);
+        CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"));
         Truth t = prod.belief(0, dur);
 
-        CompoundConcept imgX = (CompoundConcept) n.concept($("((\\,f,_,y)-->x)"), true);
+        CompoundConcept imgX = (CompoundConcept) n.conceptualize($("((\\,f,_,y)-->x)"));
         assertEquals(t, imgX.belief(0, dur));
 
-        CompoundConcept imgY = (CompoundConcept) n.concept($("((\\,f,x,_)-->y)"), true);
+        CompoundConcept imgY = (CompoundConcept) n.conceptualize($("((\\,f,x,_)-->y)"));
         assertEquals(t, imgY.belief(0, dur));
 
 

@@ -16,13 +16,13 @@ import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -65,13 +65,13 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitor v) {
+    public void recurseTerms(@NotNull Consumer<Term> v) {
         term().recurseTerms(v);
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
-        term().recurseTerms(v, parent);
+    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent) {
+        return term().recurseTerms(whileTrue, parent);
     }
 
     @Override

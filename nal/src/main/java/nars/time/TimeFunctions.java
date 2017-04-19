@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.Op.*;
-import static nars.index.TermBuilder.isTrueOrFalse;
+import static nars.Op.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.*;

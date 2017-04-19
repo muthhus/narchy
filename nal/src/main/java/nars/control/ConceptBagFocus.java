@@ -25,13 +25,13 @@ public class ConceptBagFocus implements Focus {
      * concepts active in this cycle
      */
     @NotNull
-    public final Bag<Concept,PLink<Concept>> active;
+    public final Bag<Termed,PLink<Termed>> active;
 
     @Deprecated
     public final transient @NotNull NAR nar;
 
 
-    public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag) {
+    public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Termed, PLink<Termed>> conceptBag) {
 
         this.nar = nar;
 
@@ -41,8 +41,8 @@ public class ConceptBagFocus implements Focus {
 
 
     @Override
-    public void activate(/*Concept*/ Concept concept, float priToAdd) {
-        active.put(new RawPLink<>(concept, priToAdd * activationRate.floatValue() ));
+    public PLink<Termed> activate(/*Concept*/ Termed concept, float priToAdd) {
+        return active.put(new RawPLink<>(concept, priToAdd * activationRate.floatValue() ));
     }
 
     @Override
@@ -53,13 +53,13 @@ public class ConceptBagFocus implements Focus {
 
 
     @Override
-    public Iterable<PLink<Concept>> concepts() {
+    public Iterable/* <PLink<Concept>> */ concepts() {
         active.commit();
-        return active;
+        return active; //HACK here it is purposefully being ambiguous about the type whether it is Termed or more specifically Concept
     }
 
     @Override
-    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
+    public void sample(int max, IntObjectToIntFunction/*<? super PLink<Concept>>*/ c) {
         active.sample(max, c);
     }
 

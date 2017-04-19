@@ -32,8 +32,6 @@ import static nars.time.Tense.XTERNAL;
 public abstract class TermBuilder {
 
 
-    private static final Term[] TrueArray = {True};
-    private static final Term[] FalseArray = {False};
     private static final TermContainer InvalidSubterms = TermVector.the(False);
     public static final Compound InvalidCompound = new GenericCompound(Op.PROD, InvalidSubterms);
 
@@ -387,19 +385,6 @@ public abstract class TermBuilder {
         return finalize(op, DTERNAL, args);
     }
 
-    public static boolean isTrueOrFalse(@NotNull Term x) {
-        return isTrue(x) || isFalse(x);
-    }
-
-
-    protected static boolean isTrue(@NotNull Term x) {
-        return x == True;
-    }
-
-    protected static boolean isFalse(@NotNull Term x) {
-        return x == False;
-    }
-
 
     @NotNull
     private Term finalize(@NotNull Op op, @NotNull Term... args) {
@@ -588,10 +573,6 @@ public abstract class TermBuilder {
 
         }
 
-    }
-
-    public static boolean commutive(int dt) {
-        return (dt == DTERNAL) || (dt == 0);
     }
 
 

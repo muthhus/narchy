@@ -3,7 +3,6 @@ package nars;
 import jcog.Texts;
 import jcog.pri.PLink;
 import nars.concept.Concept;
-import nars.index.TermBuilder;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.data.*;
@@ -122,7 +121,7 @@ public class Builtin {
          * TODO move the type restriction to another functor to wrap this
          */
         nar.on(Functor.f1("dropAnyConj", (Compound c) -> {
-            if (c.op()!=CONJ || !TermBuilder.commutive(c.dt()))
+            if (c.op()!=CONJ || !commutive(c.dt()))
                 return False;
 
             //if (c.op().statement) return False;

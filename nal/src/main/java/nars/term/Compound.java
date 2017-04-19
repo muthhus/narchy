@@ -33,13 +33,13 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import nars.time.Tense;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,10 +75,10 @@ public interface Compound extends Term, IPair, TermContainer {
      * TODO generalize to a provided lambda predicate selector
      */
     @NotNull
-    default Set<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        Set<Term> t = $.newHashSet(volume() /* estimate */);
+    default MutableSet<Term> recurseTermsToSet(@NotNull Op onlyType) {
+        MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
         recurseTerms((t1) -> {
-            if (t1.op() == onlyType)
+            if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
                 t.add(t1);
         });
         return t;
@@ -108,7 +108,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
-        recurseTerms((SubtermVisitor) (s) -> {
+        recurseTerms((s) -> {
 
             if (!addOrRemoved && r[0]) { //on removal we can exit early
                 return; //HACK todo make a visitor with a predicate termination condition rather than have to continue traversing
@@ -159,31 +159,23 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-    @Override
-    default void recurseTerms(@NotNull SubtermVisitorX v) {
-        recurseTerms(v, this);
+    /** temporary: this will be replaced with a smart visitor api */
+    @Override default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+        return recurseTerms(whileTrue, this);
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
-        v.accept(this, parent);
-
-        TermContainer tt = subterms();
-        int s = tt.size();
-        for (int i = 0; i < s; i++) {
-            tt.term(i).recurseTerms(v, this);
+    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent) {
+        if (whileTrue.test(this, parent)) {
+            return subterms().recurseSubTerms(whileTrue, this);
         }
+        return false;
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitor v) {
+    default void recurseTerms(@NotNull Consumer<Term> v) {
         v.accept(this);
-
-        TermContainer tt = subterms();
-        int s = tt.size();
-        for (int i = 0; i < s; i++) {
-            tt.term(i).recurseTerms(v);
-        }
+        subterms().forEach(v);
     }
 
     @Override

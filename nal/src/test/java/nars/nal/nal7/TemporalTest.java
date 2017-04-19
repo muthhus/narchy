@@ -44,8 +44,7 @@ public class TemporalTest {
 
     @Test
     public void testCoNegatedSubtermConcept() throws Narsese.NarseseException {
-        assertEquals("((--,(x))&&(x))", n.concept(
-                n.term("((x) &&+10 (--,(x)))"), true).toString());
+        assertEquals("((--,(x))&&(x))", n.conceptualize(n.term("((x) &&+10 (--,(x)))")).toString());
     }
 
     @Test
@@ -70,8 +69,7 @@ public class TemporalTest {
 
     @Test
     public void testAtemporalization() throws Narsese.NarseseException {
-        assertEquals("((x)==>(y))", n.concept(
-                n.term("((x) ==>+10 (y))"), true).toString());
+        assertEquals("((x)==>(y))", n.conceptualize(n.term("((x) ==>+10 (y))")).toString());
     }
 
     @Test
@@ -115,7 +113,7 @@ public class TemporalTest {
         assertEquals("(do(that) &&+0 ((a)&&(b)))", nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("(do(that)&&((a)&&(b)))", n.concept(nt, true).toString());
+        assertEquals("(do(that)&&((a)&&(b)))", n.conceptualize(nt).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 
@@ -127,7 +125,7 @@ public class TemporalTest {
         assertEquals("(do(that) &&+1 ((a) ==>+2 (b)))", nn.toString());
 
 
-        assertEquals("(do(that)&&((a)==>(b)))", n.concept(nn, true).toString());
+        assertEquals("(do(that)&&((a)==>(b)))", n.conceptualize(nn).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ??
 
@@ -256,12 +254,12 @@ public class TemporalTest {
         Default n = new Default();
 
         for (String op : new String[] { "&&", "<=>"} ) {
-            Concept a = n.concept($("(x " + op + "   y)"), true);
-            Concept b = n.concept($("(x " + op + "+1 y)"), true);
-            Concept c = n.concept($("(x " + op + "+2 y)"), true);
-            Concept d = n.concept($("(x " + op + "-1 y)"), true);
-            Concept e = n.concept($("(x " + op + "+- y)"), true);
-            Concept f = n.concept($("(y " + op + "+- x)"), true);
+            Concept a = n.conceptualize($("(x " + op + "   y)"));
+            Concept b = n.conceptualize($("(x " + op + "+1 y)"));
+            Concept c = n.conceptualize($("(x " + op + "+2 y)"));
+            Concept d = n.conceptualize($("(x " + op + "-1 y)"));
+            Concept e = n.conceptualize($("(x " + op + "+- y)"));
+            Concept f = n.conceptualize($("(y " + op + "+- x)"));
 
             //n.concepts.forEach(System.out::println);
 
@@ -413,7 +411,7 @@ public class TemporalTest {
         n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         n.run(1);
 
-        Bag<Concept,PLink<Concept>> cb = n.focus.active;
+        @NotNull Bag<Termed, PLink<Termed>> cb = n.focus.active;
 
         assertTrue(5 <= cb.size());
         String abpill = "((a==>b)-->[pill])";
@@ -421,7 +419,7 @@ public class TemporalTest {
 
         String correctMerge = "((a ==>+4 b)-->[pill])";
 
-        Concept cc = cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+        Concept cc = (Concept) cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         //test belief match interpolated a result
         {

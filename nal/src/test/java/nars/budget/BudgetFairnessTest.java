@@ -11,6 +11,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 /**
@@ -39,10 +40,10 @@ public class BudgetFairnessTest {
         Focus c = d.focus();
         d.setFocus(new Focus() {
             @Override
-            public void activate(Concept term, float priToAdd) {
+            public @Nullable PLink<Termed> activate(@NotNull Termed term, float priToAdd) {
 
-                c.activate(term, priToAdd);
                 m.value(priToAdd, term.term());
+                return c.activate(term, priToAdd);
             }
 
             @Override

@@ -7,14 +7,14 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.container.ArrayTermVector;
 import nars.term.subst.Unify;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 /**
  * Holds results of an ellipsis match and
@@ -104,11 +104,12 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitorX v, Compound parent) {
-        forEach(x -> x.recurseTerms(v, null /*this*/));
+    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
+        return recurseSubTerms(whileTrue, parent);
     }
+
     @Override
-    public void recurseTerms(@NotNull SubtermVisitor v) {
+    public void recurseTerms(@NotNull Consumer<Term> v) {
         forEach(x -> x.recurseTerms(v));
     }
 

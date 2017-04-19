@@ -33,8 +33,6 @@ import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
@@ -46,6 +44,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static nars.Op.False;
@@ -83,13 +82,15 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     @Override
     int hashCode();
 
-    void recurseTerms(@NotNull SubtermVisitor v);
+    void recurseTerms(@NotNull Consumer<Term> v);
 
-    default void recurseTerms(@NotNull SubtermVisitorX v) {
-        recurseTerms(v, null);
+
+    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+        return recurseTerms(whileTrue, null);
     }
 
-    void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent);
+
+    boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent);
 
 
     /**

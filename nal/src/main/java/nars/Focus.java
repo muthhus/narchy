@@ -5,6 +5,7 @@ import nars.concept.Concept;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -15,10 +16,13 @@ import java.util.Iterator;
 public interface Focus extends Iterable<PLink<Concept>> {
 
     /**
-     * if the concept is active, returns the Concept while applying the boost factor to its budget
+     * if the concept is active, returns the concept link after
+     * applying the positive or negative boost factor to its budget
+     *
+     * otherwise returns null
      */
 
-    void activate(Concept term, float priToAdd);
+    @Nullable PLink<Termed> activate(@NotNull Termed term, float priToAdd);
 
 
     /**
@@ -46,8 +50,8 @@ public interface Focus extends Iterable<PLink<Concept>> {
     Focus NULL_FOCUS = new Focus() {
 
         @Override
-        public void activate(Concept term, float priToAdd) {
-
+        public PLink<Termed> activate(Termed term, float priToAdd) {
+            return null;
         }
 
         @Override

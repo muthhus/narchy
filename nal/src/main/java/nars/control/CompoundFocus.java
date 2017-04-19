@@ -23,10 +23,14 @@ public class CompoundFocus implements Focus {
     }
 
     @Override
-    public void activate(Concept term, float priToAdd) {
+    public PLink<Termed> activate(Termed term, float priToAdd) {
+
         for (int i = 0, controlSize = sub.size(); i < controlSize; i++) {
             sub.get(i).activate(term, priToAdd);
         }
+
+        //TODO collect an aggregate PLink
+        throw new UnsupportedOperationException("TODO");
     }
 
 

@@ -6,12 +6,13 @@ import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.visit.SubtermVisitorX;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 /**
@@ -191,12 +192,14 @@ public abstract class TermVector implements TermContainer {
         return hash;
     }
 
-    public final void visit(@NotNull SubtermVisitorX v, Compound parent) {
-        int cl = size();
-        for (int i = 0; i < cl; i++) {
-            v.accept(term(i), parent);
-        }
-    }
+//    public final boolean visit(@NotNull BiPredicate<Term,Compound> v, Compound parent) {
+//        int cl = size();
+//        for (int i = 0; i < cl; i++) {
+//            if (!v.test(term(i), parent))
+//                return false;
+//        }
+//        return true;
+//    }
 
     @NotNull
     public TermContainer reverse() {

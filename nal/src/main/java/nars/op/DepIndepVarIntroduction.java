@@ -43,19 +43,20 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         if (selected == Imdex)
             return null;
 
-        List<byte[]> p = input.pathsTo(selected);
-        int pSize = p.size();
+        List<byte[]> pp = input.pathsTo(selected);
+        int pSize = pp.size();
         if (pSize == 0)
             return null;
 
-        //detect an invalid top-level indep var substitution
+        byte[][] paths = pp.toArray(new byte[pSize][]);
+
+//        //detect an invalid top-level indep var substitution
         Op inOp = input.op();
-        if (inOp.statement) {
-            for (int i = 0; i < pSize; i++) {
-                if (p.get(i).length < 2)
-                    return null; //substitution would replace something at the top level of a statement}
-            }
-        }
+//        if (inOp.statement) {
+//            for (byte[] r : p)
+//                if (r.length < 2)
+//                    return null; //substitution would replace something at the top level of a statement}
+//        }
 
         //decide what kind of variable can be introduced according to the input operator
         boolean depOrIndep;
@@ -75,15 +76,15 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            byte[] path = p.get(occurrence);
+            byte[] p = paths[occurrence];
             Term t = null; //root
-            int pathLength = path.length;
+            int pathLength = p.length;
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? input : ((Compound) t).term(path[i]);
+                t = (i == -1) ? input : ((Compound) t).term(p[i]);
                 Op o = t.op();
 
                 if (!depOrIndep && validIndepVarSuperterm(o)) {
-                    byte inside = (byte) (1 << path[i + 1]);
+                    byte inside = (byte) (1 << p[i + 1]);
                     m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
                 } else if (depOrIndep && validDepVarSuperterm(o)) {
                     m.addToValue(t, (byte) 1);
@@ -105,11 +106,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     }
 
-    private static boolean validDepVarSuperterm(Op o) {
+    public static boolean validDepVarSuperterm(Op o) {
         return /*o.statement ||*/ o == CONJ;
     }
 
-    private static boolean validIndepVarSuperterm(Op o) {
+    public static boolean validIndepVarSuperterm(Op o) {
         return o == IMPL || o == EQUI;
     }
 

@@ -237,7 +237,7 @@ public class TaskConcept extends CompoundConcept {
      * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
     @Nullable
-    public final Activation process(@NotNull Task input, @NotNull NAR nar) {
+    public final Task process(@NotNull Task input, @NotNull NAR nar) {
 
 
         Task inserted = null;
@@ -263,16 +263,9 @@ public class TaskConcept extends CompoundConcept {
                 throw new RuntimeException("Invalid sentence type: " + input);
         }
 
-        if (inserted == null)
-            return null;
+        return inserted;
 
 
-        Activation a = nar.activateTask(inserted, this, 1f);
-        if (input != inserted) {
-            return null; //dont process further aside from this re-activation
-        } else {
-            return a;
-        }
 
     }
 

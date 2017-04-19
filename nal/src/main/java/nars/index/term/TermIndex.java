@@ -44,13 +44,14 @@ public abstract class TermIndex extends TermBuilder {
 
 
     /**
-     * get if not absent
+     * internal get procedure: get if not absent
      */
     @Nullable
     public Termed get(@NotNull Term t) {
         return get(t, false);
     }
 
+    /** internal get procedure */
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
 
@@ -211,7 +212,7 @@ public abstract class TermIndex extends TermBuilder {
 
                 for (; volAt < subAt; volAt++) {
                     Term st = next.get(volAt);
-                    if (filterTrueFalse && isTrueOrFalse(st)) return null;
+                    if (filterTrueFalse && Op.isTrueOrFalse(st)) return null;
                     volSum += st.volume();
                     if (volSum >= volLimit) {
                         return null;
@@ -234,7 +235,7 @@ public abstract class TermIndex extends TermBuilder {
                     changed |= (u != t);
                 }
 
-                if (filterTrueFalse && isTrueOrFalse(u))
+                if (filterTrueFalse && Op.isTrueOrFalse(u))
                     return null;
                 volSum += u.volume();
                 if (volSum >= volLimit) {
@@ -419,7 +420,7 @@ public abstract class TermIndex extends TermBuilder {
                 return null;
 
             if (y != x) {
-                if (filterTrueAndFalse && isTrueOrFalse(y)) {
+                if (filterTrueAndFalse && Op.isTrueOrFalse(y)) {
                     return null;
                 }
 
@@ -510,6 +511,7 @@ public abstract class TermIndex extends TermBuilder {
     public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) (Narsese.the().term(termToParse, this, true));
     }
+
 
     /**
      * applies normalization and anonymization to resolve the term of the concept the input term maps t

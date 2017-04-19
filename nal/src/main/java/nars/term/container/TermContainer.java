@@ -24,12 +24,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static nars.index.TermBuilder.commutive;
+import static nars.Op.commutive;
 import static org.eclipse.collections.impl.factory.Sets.immutable;
 import static org.eclipse.collections.impl.factory.Sets.mutable;
 
@@ -772,6 +773,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-
+    default boolean recurseSubTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            if (!term(i).recurseTerms(whileTrue, parent))
+                return false;
+        }
+        return true;
+    }
 
 }

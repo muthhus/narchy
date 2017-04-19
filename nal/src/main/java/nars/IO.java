@@ -30,7 +30,7 @@ import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.*;
-import static nars.index.TermBuilder.isTrueOrFalse;
+import static nars.Op.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;

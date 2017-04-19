@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -149,6 +150,7 @@ public enum Op {
             };
 
     public static final AtomicSingleton True = new AtomicSingleton("†");
+    public static final Term[] TrueArray = {True};
 
     public static final AtomicSingleton False = new AtomicSingleton("Ø") {
         @NotNull
@@ -157,6 +159,7 @@ public enum Op {
             return True;
         }
     };
+    public static final Term[] FalseArray = {False};
 
     public static final AtomicSingleton Null = new AtomicSingleton("null");
 
@@ -248,6 +251,22 @@ public enum Op {
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
         return ((existing | possiblyIncluded) == existing);
+    }
+
+    public static boolean isTrueOrFalse(@NotNull Term x) {
+        return isTrue(x) || isFalse(x);
+    }
+
+    public static boolean isTrue(@NotNull Term x) {
+        return x == True;
+    }
+
+    public static boolean isFalse(@NotNull Term x) {
+        return x == False;
+    }
+
+    public static boolean commutive(int dt) {
+        return (dt == DTERNAL) || (dt == 0);
     }
 
     /*

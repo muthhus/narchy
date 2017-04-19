@@ -3,12 +3,12 @@ package nars.term;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.subst.Unify;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -113,13 +113,13 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitor v) {
+    public void recurseTerms(@NotNull Consumer<Term> v) {
         ref.recurseTerms(v);
     }
 
     @Override
-    public void recurseTerms(@NotNull SubtermVisitorX v, @Nullable Compound parent) {
-        ref.recurseTerms(v);
+    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent) {
+        return ref.recurseTerms(whileTrue);
     }
 
     @Override

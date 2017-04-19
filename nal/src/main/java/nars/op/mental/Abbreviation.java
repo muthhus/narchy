@@ -300,7 +300,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
         private TermContainer templates;
 
         static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            Concept c = nar.concept(decompressed, true);
+            Concept c = nar.concept(decompressed);
             if (c != null) {
                 AliasConcept a = new AliasConcept(compressed, (CompoundConcept) c, nar, additionalTerms);
                 return a;

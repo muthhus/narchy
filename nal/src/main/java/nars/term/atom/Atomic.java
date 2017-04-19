@@ -7,12 +7,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.subst.Unify;
-import nars.term.visit.SubtermVisitor;
-import nars.term.visit.SubtermVisitorX;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static java.lang.Integer.MIN_VALUE;
@@ -52,12 +52,12 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitorX v, Compound parent) {
-        v.accept(this, parent);
+    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
+        return whileTrue.test(this, parent);
     }
 
     @Override
-    default void recurseTerms(@NotNull SubtermVisitor v) {
+    default void recurseTerms(@NotNull Consumer<Term> v) {
         v.accept(this);
     }
 

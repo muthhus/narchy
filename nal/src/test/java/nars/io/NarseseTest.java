@@ -1,7 +1,6 @@
 package nars.io;
 
 import nars.*;
-import nars.index.TermBuilder;
 import nars.nar.Terminal;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -615,7 +614,7 @@ public class NarseseTest {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
-                if (TermBuilder.isTrueOrFalse(e)) {
+                if (Op.isTrueOrFalse(e)) {
                     assertTrue(true);
                 } else {
                     assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception

@@ -75,7 +75,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         Term originTerm = origin.term();
         this.originTerm = originTerm;// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
-        link(src.term(), scale, 0);
+        link(src, scale, 0);
 
         spread.forEachKeyValue(this);
 
@@ -129,30 +129,28 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     }
 
     @Override
-    public void value(Termed k, float v) {
+    public void value(Termed t, float scale) {
         //System.out.println("\t" + k + " " + v);
 
+        PLink<Termed> lt = nar.activate(t, inPri * scale);
+        if (lt != null) {
 
-        Termed kk = nar.concept(k, true);
+            Concept ckk = (Concept) lt.get();
+            tasklink(ckk, scale);
 
-        if (kk != null) {
-            Concept ckk = (Concept) kk;
-
-            tasklink(ckk, v);
-
-            float qv = v * inPri;
+            float qv = scale * inPri;
             if (qv >= PLink.EPSILON_DEFAULT)
                 nar.activate(ckk, qv);
 
-        } else {
-            kk = k;
+            t = ckk;
+
         }
 
-        termBidi(kk, v * TERMLINK_BALANCE, v * (1f - TERMLINK_BALANCE));
+        termBidi(t, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
     }
 
     @Nullable
-    void link(@NotNull Term targetTerm, float scale, int depth) {
+    void link(@NotNull Termed targetTerm, float scale, int depth) {
 
 
         float parentActivation = scale;
@@ -162,7 +160,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         Termed linkedTerm;
         if (isntVariable) {
-            Concept termConcept = nar.concept(targetTerm, false);
+            Concept termConcept = nar.conceptualize(targetTerm);
             if (termConcept != null)
                 linkedTerm = termConcept;
             else

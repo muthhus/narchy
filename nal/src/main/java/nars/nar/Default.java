@@ -16,6 +16,7 @@ import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
 import nars.premise.MatrixPremiseBuilder;
 import nars.premise.PreferSimpleAndConfident;
+import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -104,14 +105,9 @@ public class Default extends NAR {
         return new PreferSimpleAndConfident();
     }
 
-    public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+    public Bag<Termed,PLink<Termed>> newConceptBag(int initialCapacity) {
 
-        return new PLinkHijackBag(initialCapacity, 3, random);
-            /*new CurveBag<Concept>(initialCapacity, ((DefaultConceptBuilder) concepts.conceptBuilder()).defaultCurveSampler,
-                BudgetMerge.plusBlend,
-                this.exe.concurrent() ? new java.util.concurrent.ConcurrentHashMap() : new HashMap());*/
-
-                //new HijackBag<>(8192, 8, BudgetMerge.maxBlend, nar.random )
+        return new PLinkHijackBag(initialCapacity, 4, random);
 
     }
 

@@ -11,14 +11,11 @@ import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
-import nars.attention.Activation;
-import nars.attention.SpreadingActivation;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
-import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
 import nars.task.ImmutableTask;
@@ -40,7 +37,6 @@ import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +56,7 @@ import java.util.stream.Stream;
 import static nars.$.$;
 import static nars.$.*;
 import static nars.Op.*;
+import static nars.Op.isTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
@@ -770,16 +767,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 //        }
 //    }
 
-    public final static ThreadLocal<ObjectFloatHashMap<Termed>> acti = ThreadLocal.withInitial(() ->
-            new ObjectFloatHashMap<>()
-    );
-
-    public Activation activateTask(@NotNull Task input, @NotNull Concept c, float scale) {
-        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-
-        //float s = scale * (0.5f + 0.5f * pri(c, 1));
-        return new SpreadingActivation(input, c, this, scale, acti.get());
-    }
 
 //    /**
 //     * meta-reasoner evaluator
@@ -1232,22 +1219,26 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
 
     @Nullable
-    public final Concept concept(@NotNull Termed t) {
-        return concept(t, false);
+    public Concept concept(@NotNull Termed termed) {
+        if (termed instanceof Concept) {
+            //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            return ((Concept)termed);
+        }
+
+        return concepts.concept(termed.term(), false);
     }
 
     @Nullable
-    public final Concept concept(@NotNull Termed tt, boolean createIfMissing) {
-        if (tt instanceof Concept)
-            return ((Concept) tt); //assumes the callee has the same instance as the instance this might return if given only a Term
-        if (tt instanceof Variable)
-            return null; //fast eliminate
+    public Concept conceptualize(@NotNull Termed termed) {
 
-        return concept(tt.term(), createIfMissing);
-    }
+        if (termed instanceof Concept) {
+            //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            return ((Concept)termed);
+        }
 
-    @Nullable
-    private Term conceptualizable(@NotNull Term term) {
+        Term term = termed.term();
+
+
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
 //            //shouldnt need to check for this here
@@ -1284,34 +1275,22 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
         }
 
-        if (term == null || (term instanceof Variable) || (TermBuilder.isTrueOrFalse(term)))
+        if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
 
-
-        return term;
-    }
-
-    public final @Nullable Concept concept(@NotNull Term t, boolean createIfMissing) {
-
-        //t = post(t);
-
-        t = conceptualizable(t);
-        if (t == null)
-            return null;
-
-        Concept c = concepts.concept(t, createIfMissing);
-        if (c != null && createIfMissing && c.isDeleted()) {
-            //try again
-            concepts.remove(c.term());
-            return concepts.concept(t, createIfMissing);
-        }
+        Concept c = concepts.concept(term, true);
+//        if (c != null && createIfMissing && c.isDeleted()) {
+//            //try again
+//            concepts.remove(c.term());
+//            return concepts.concept(term, createIfMissing);
+//        }
 
         return c;
     }
 
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        concepts().forEach(n -> recip.accept(n.get()));
+        concepts().forEach(n -> recip.accept((Concept)n.get()));
         return this;
     }
 
@@ -1406,9 +1385,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
 
-    @Override
-    public void activate(Concept c, float priToAdd) {
-        focus.activate(c, priToAdd);
+    @Override public @Nullable PLink<Termed> activate(Termed c, float priToAdd) {
+        @Nullable Concept cc = conceptualize(c);
+        return (cc != null) ? focus.activate(c, priToAdd) : null;
+
     }
 
     @Override
@@ -1436,11 +1416,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     @NotNull
     public final Concept on(@NotNull Concept c) {
 
-        Concept existing = concept(c.term());
-        if ((existing != null) && (existing != c))
-            throw new RuntimeException("concept already indexed for term: " + c.term());
+        //TODO make this a lambda atomic procedure that is passed to the concept index to update it
+        synchronized (concepts) {
+            Concept existing = concept(c.term());
+            if ((existing != null) && (existing != c))
+                throw new RuntimeException("concept already indexed for term: " + c.term());
 
-        concepts.set(c);
+            concepts.set(c);
+        }
 
         return c;
     }

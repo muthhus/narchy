@@ -3,8 +3,12 @@ package nars;
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
 import jcog.map.SynchronizedHashMap;
-import jcog.pri.*;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
+import jcog.pri.Priority;
+import jcog.pri.RawPLink;
 import nars.attention.Activation;
+import nars.attention.SpreadingActivation;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.op.Command;
@@ -23,6 +27,8 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import nars.truth.Truthed;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +39,8 @@ import java.util.Map;
 import java.util.Objects;
 
 import static nars.Op.*;
+import static nars.op.DepIndepVarIntroduction.validDepVarSuperterm;
+import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -226,25 +234,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             case 1:
                 return fail(t, "singular independent variable must be balanced elsewhere", safe);
             default:
-                if (!t.hasAny(Op.StatementBits))
+                if (!t.hasAny(Op.StatementBits)) {
                     return fail(t, "Independent variables require statements super-terms", safe);
-                else if (op.statement && t.hasVarIndep()) {
-                    Term subj = t.term(0);
-                    if (subj.op() == VAR_INDEP)
-                        return fail(t, "Statement Task's subject is VAR_INDEP", safe);
-                    if (subj.varIndep() == 0)
-                        return fail(t, "Statement Task's subject has no VAR_INDEP", safe);
-                    Term pred = t.term(1);
-                    if (pred.op() == VAR_INDEP)
-                        return fail(t, "Statement Task's predicate is VAR_INDEP", safe);
-                    if (pred.varIndep() == 0)
-                        return fail(t, "Statement Task's predicate has no VAR_INDEP", safe);
+                } else {
+                    if (!t.recurseTermsToSet(VAR_INDEP).allSatisfy(v ->
+                            variableValid(t, v)
+                    )) {
+                        return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
+                    }
                 }
-
-                //TODO more thorough test for invalid independent-variable containing compounds
-                // DepIndepVarIntroduction does this, adapt/share code from there
-
-                break;
         }
 
 
@@ -253,6 +251,70 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
         return true;
     }
+
+
+    static boolean variableValid(@NotNull Compound input, @NotNull Term selected) {
+
+
+        List<byte[]> pp = input.pathsTo(selected);
+        int pSize = pp.size();
+        assert (pSize > 0);
+
+        byte[][] paths = pp.toArray(new byte[pSize][]);
+
+        //detect an invalid top-level indep var substitution
+//        Op inOp = input.op();
+//        if (inOp.statement) {
+//            for (int i = 0; i < pSize; i++) {
+//                if (p.get(i).length < 2)
+//                    return null; //substitution would replace something at the top level of a statement}
+//            }
+//        }
+
+        //decide what kind of variable can be introduced according to the input operator
+        boolean depOrIndep;
+        switch (selected.op()) {
+            case CONJ:
+                depOrIndep = true;
+                break;
+            case IMPL:
+            case EQUI:
+                depOrIndep = false;
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
+        for (int occurrence = 0; occurrence < pSize; occurrence++) {
+            byte[] p = paths[occurrence];
+            Term t = null; //root
+            int pathLength = p.length;
+            for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
+                t = (i == -1) ? input : ((Compound) t).term(p[i]);
+                Op o = t.op();
+
+                if (!depOrIndep && validIndepVarSuperterm(o)) {
+                    byte inside = (byte) (1 << p[i + 1]);
+                    m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
+                } else if (depOrIndep && validDepVarSuperterm(o)) {
+                    m.addToValue(t, (byte) 1);
+                }
+            }
+        }
+
+
+        if (!depOrIndep) {
+            //at least one impl/equiv must have both sides covered
+            return m.anySatisfy(b -> b == 0b11);
+
+        } else {
+            //at least one conjunction must contain >=2 path instances
+            return m.anySatisfy(b -> b >= 2);
+        }
+
+    }
+
 
     @Nullable
     static boolean fail(@Nullable Term t, String reason, boolean safe) {
@@ -303,14 +365,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @Nullable
     default TaskConcept concept(@NotNull NAR n) {
-        Concept c = n.concept(term(), true);
+        Concept c = n.conceptualize(term());
+        if (c == null)
+            return null; //ex: volume limit exceeded
+
         if (!(c instanceof TaskConcept)) {
-            if (Param.DEBUG_EXTRA)
-                throw new RuntimeException
-                        //System.err.println
-                        ("should conceptualize to TaskConcept: " + c);
+            //if (Param.DEBUG_EXTRA)
+            throw new RuntimeException
+                    //System.err.println
+                    ("should conceptualize to TaskConcept: " + c);
             //else
-            return null;
+            //return null;
         }
         return (TaskConcept) c;
     }
@@ -882,7 +947,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (evaluate) {
             Compound x = term();
             Compound y = compoundOrNull(
-                x.eval(n.concepts)
+                    x.eval(n.concepts)
             );
 
             if (y == null)
@@ -913,26 +978,48 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return; //unconceptualizable, which may happen due to resource constraints
 
 
-        Activation a = c.process(this, n);
+        Task accepted = c.process(this, n);
+        if (accepted != null) {
 
-        if (a != null) {
+            // ACTIVATE
 
-            n.concepts.commit(c);
+            Activation a = activate(n, c, 1f);
 
-            if (!isInput()) //dont count direct input as learning
-                n.emotion.learn(inputPri, volume());
+            if (this == accepted) {
 
-            n.eventTaskProcess.emit(/*post*/(this));
+                n.concepts.commit(c);
 
-            // SUCCESSFULLY PROCESSED
+                if (!isInput()) //dont count direct input as learning
+                    n.emotion.learn(inputPri, volume());
+
+                n.eventTaskProcess.emit(/*post*/(this));
+
+                // SUCCESSFULLY PROCESSED
+
+            }
+
+            // ACTIVATED BUT NOT ACCEPTED: dont proceeed further, just this re-activation
 
         } else {
 
-            // REDUNDANT OR IGNORED
+            // REJECTED DUE TO PRE-EXISTING REDUNDANCY,
+            // INSUFFICIENT CONFIDENCE/PRIORITY/RELEVANCE
+            // OR OTHER REASON
 
         }
 
 
+    }
+
+    public final static ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal = ThreadLocal.withInitial(() ->
+            new ObjectFloatHashMap<>()
+    );
+
+    default Activation activate(@NotNull NAR n, @NotNull Concept c, float scale) {
+        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+
+        //float s = scale * (0.5f + 0.5f * pri(c, 1));
+        return new SpreadingActivation(this, c, n, scale, activationMapThreadLocal.get());
     }
 
 }
