@@ -214,10 +214,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return taskStatementValid(t, punc, safe);
     }
 
-    @Nullable
-    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
-        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
-    }
+//    @Nullable
+//    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
+//        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
+//    }
 
     /**
      * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
@@ -238,7 +238,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                     return fail(t, "Independent variables require statements super-terms", safe);
                 } else {
                     if (!t.recurseTermsToSet(VAR_INDEP).allSatisfy(v ->
-                            variableValid(t, v)
+                            indepValid(t, v)
                     )) {
                         return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
                     }
@@ -253,37 +253,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
 
-    static boolean variableValid(@NotNull Compound input, @NotNull Term selected) {
+    static boolean indepValid(@NotNull Compound comp, @NotNull Term selected) {
 
+        List<byte[]> pp = comp.pathsTo(selected);
 
-        List<byte[]> pp = input.pathsTo(selected);
         int pSize = pp.size();
-        assert (pSize > 0);
+        if (pSize == 0)
+            return true; //a compound which didnt contain it
 
         byte[][] paths = pp.toArray(new byte[pSize][]);
-
-        //detect an invalid top-level indep var substitution
-//        Op inOp = input.op();
-//        if (inOp.statement) {
-//            for (int i = 0; i < pSize; i++) {
-//                if (p.get(i).length < 2)
-//                    return null; //substitution would replace something at the top level of a statement}
-//            }
-//        }
-
-        //decide what kind of variable can be introduced according to the input operator
-        boolean depOrIndep;
-        switch (selected.op()) {
-            case CONJ:
-                depOrIndep = true;
-                break;
-            case IMPL:
-            case EQUI:
-                depOrIndep = false;
-                break;
-            default:
-                throw new UnsupportedOperationException();
-        }
 
         @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
@@ -291,27 +269,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? input : ((Compound) t).term(p[i]);
+                t = (i == -1) ? comp : ((Compound) t).term(p[i]);
                 Op o = t.op();
 
-                if (!depOrIndep && validIndepVarSuperterm(o)) {
+                if (validIndepVarSuperterm(o)) {
                     byte inside = (byte) (1 << p[i + 1]);
                     m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                } else if (depOrIndep && validDepVarSuperterm(o)) {
-                    m.addToValue(t, (byte) 1);
                 }
             }
         }
 
-
-        if (!depOrIndep) {
-            //at least one impl/equiv must have both sides covered
-            return m.anySatisfy(b -> b == 0b11);
-
-        } else {
-            //at least one conjunction must contain >=2 path instances
-            return m.anySatisfy(b -> b >= 2);
-        }
+        return m.anySatisfy(b -> b == 0b11);
 
     }
 
@@ -950,22 +918,26 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                     x.eval(n.concepts)
             );
 
-            if (y == null)
-                throw new InvalidTaskException(this, "un-evaluable");
+            if (y!=x) {
+                if (y == null)
+                    throw new InvalidTaskException(this, "un-evaluable");
 
 
-            if (!x.equals(y)) {
-                ImmutableTask inputY = clone(this, y);
-                assert (inputY != null);
+                if (!x.equals(y)) {
+                    ImmutableTask inputY = clone(this, y);
+                    assert (inputY != null);
 
-                delete(); //transfer control to clone
+                    delete(); //transfer control to clone
 
-                inputY.eval(n);
+                    inputY.eval(n);
 
-                return;
+                    return;
+                }
             }
         }
 
+        if (isCommand())
+            return; //done
 
 //        if (n.time instanceof FrameTime) {
 //            //HACK for unique serial number w/ frameclock

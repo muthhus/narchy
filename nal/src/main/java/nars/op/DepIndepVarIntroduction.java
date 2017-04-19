@@ -22,18 +22,18 @@ import static nars.Op.*;
 public class DepIndepVarIntroduction extends VarIntroduction {
 
 
-    final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit;
+    final static int ConjOrStatementBits = Op.IMPL.bit | Op.INH.bit | Op.SIM.bit | Op.EQUI.bit | Op.CONJ.bit;
     private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
 
     /** sum by complexity if passes include filter */
-    private static final ToIntFunction<Term> depIndepScore = t ->
+    private static final ToIntFunction<Term> depIndepFilter = t ->
             t.hasAny(DepOrIndepBits | Op.NEG.bit) ? 0 : 1;
             //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
 
     @Nullable
     @Override
     protected MutableSet<Term> select(Compound input) {
-        return Terms.substAllRepeats(input, depIndepScore, 2);
+        return Terms.substAllRepeats(input, depIndepFilter, 2);
     }
 
     @Nullable
@@ -52,11 +52,11 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
 //        //detect an invalid top-level indep var substitution
         Op inOp = input.op();
-//        if (inOp.statement) {
-//            for (byte[] r : p)
-//                if (r.length < 2)
-//                    return null; //substitution would replace something at the top level of a statement}
-//        }
+        if (inOp.statement) {
+            for (byte[] r : paths)
+                if (r.length < 2)
+                    return null; //substitution would replace something at the top level of a statement}
+        }
 
         //decide what kind of variable can be introduced according to the input operator
         boolean depOrIndep;
@@ -66,6 +66,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 break;
             case IMPL:
             case EQUI:
+            case INH:
+            case SIM:
                 depOrIndep = false;
                 break;
             default:
@@ -111,7 +113,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     }
 
     public static boolean validIndepVarSuperterm(Op o) {
-        return o == IMPL || o == EQUI;
+        return o.statement;
+        //return o == IMPL || o == EQUI;
     }
 
     public static final class VarIntro extends Functor {

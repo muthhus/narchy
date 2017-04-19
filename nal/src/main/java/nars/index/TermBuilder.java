@@ -1101,7 +1101,7 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    public Compound atemporalize(@NotNull Compound c) {
+    public Compound atemporalize(final @NotNull Compound c) {
 
         if (!c.hasTemporal())
             return c;
@@ -1132,20 +1132,12 @@ public abstract class TermBuilder {
 
             if (subsChanged)
                 newSubs = maybeNewSubs;
-
-
         }
 
         //resolve XTERNAL temporals to lexical order
         if (pdt == XTERNAL /*&& cs == 2*/) {
-            boolean swap = false;
-
             if (newSubs[0].compareTo(newSubs[1]) > 0) {
-                swap = true;
-            }
-
-
-            if (swap) {
+                newSubs = (newSubs == oldSubs) ? newSubs.clone() : newSubs;
                 Term x = newSubs[0];
                 newSubs[0] = newSubs[1];
                 newSubs[1] = x;
@@ -1181,6 +1173,8 @@ public abstract class TermBuilder {
             );
             if (xx == null)
                 throw new InvalidTermException("unable to atemporalize", c);
+
+
 
             //if (c.isNormalized())
                 //xx.setNormalized();

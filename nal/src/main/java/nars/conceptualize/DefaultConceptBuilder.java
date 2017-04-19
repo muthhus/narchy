@@ -108,19 +108,25 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return null;
         }
 
-        return withBags(t, (termbag, taskbag) -> {
+        boolean validForTask = Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true);
 
-            if (!Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true)) {
+        @NotNull Compound tt = t;
+        return withBags(tt, (termbag, taskbag) -> {
 
-                return newStatic(t, termbag, taskbag);
+            if (!validForTask) {
+
+                return newStatic(tt, termbag, taskbag);
 
             } else {
 
-                return newDynamic(t, termbag, taskbag);
+                return newDynamic(tt, termbag, taskbag);
             }
         });
     }
 
+    /** for fragmentary concepts which by themselves or due to being un-normalizable,
+     * can not be the content of Tasks yet may still exist as concepts
+     */
     private CompoundConcept newStatic(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
         return new CompoundConcept(t, termbag, taskbag, nar);
     }

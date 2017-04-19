@@ -531,18 +531,20 @@ public enum Terms { ;
         if (oi == null)
             return null;
 
-        //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
+        if (oi.size() > 1) {
+            //keep only the unique subterms which are not contained by other terms in the list
+            //renive terms which are contained by other terms in the list
 
-        //keep terms which are not contained by other terms in the list
-        //renive terms which are contained by other terms in the list
+            //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
-        oi.removeIf(b -> {
-            return oi.anySatisfy(
-                a -> (a != b) &&
-                     (a instanceof Compound) &&
-                     ((Compound) a).containsTermRecursively(b)
-            );
-        });
+            oi.removeIf(b -> {
+                return oi.anySatisfy(
+                        a -> (a != b) &&
+                                (a instanceof Compound) &&
+                                ((Compound) a).containsTermRecursively(b)
+                );
+            });
+        }
 
         return oi;
     }

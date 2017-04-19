@@ -29,10 +29,11 @@ public abstract class VarIntroduction {
             return; //earliest failure test
 
         Set<Term> selections = select(c);
-        if (selections.isEmpty())
+        int ss = selections.size();
+        if (ss == 0)
             return;
 
-        Map<Term,Term> substs = new UnifiedMap(selections.size());
+        Map<Term,Term> substs = new UnifiedMap(ss);
         int o = 0;
         for (Term u : selections) {
             Term v = next(c, u, o++);

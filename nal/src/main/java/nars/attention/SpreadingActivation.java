@@ -135,14 +135,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         PLink<Termed> lt = nar.activate(t, inPri * scale);
         if (lt != null) {
 
-            Concept ckk = (Concept) lt.get();
-            tasklink(ckk, scale);
-
-            float qv = scale * inPri;
-            if (qv >= PLink.EPSILON_DEFAULT)
-                nar.activate(ckk, qv);
-
-            t = ckk;
+            Concept u = (Concept) lt.get();
+            tasklink(u, scale);
 
         }
 
@@ -150,40 +144,36 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     }
 
     @Nullable
-    void link(@NotNull Termed targetTerm, float scale, int depth) {
+    void link(@NotNull Termed target, float scale, int depth) {
 
 
         float parentActivation = scale;
 
-        boolean isntVariable = !(targetTerm instanceof Variable);
+        boolean isntVariable = !(target instanceof Variable);
 
 
-        Termed linkedTerm;
+
         if (isntVariable) {
-            Concept termConcept = nar.conceptualize(targetTerm);
+            Concept termConcept = nar.conceptualize(target);
             if (termConcept != null)
-                linkedTerm = termConcept;
-            else
-                linkedTerm = targetTerm;
-        } else {
-            linkedTerm = targetTerm;
+                target = termConcept;
         }
 
 
         int nextDepth = depth + 1;
+        Term targetTerm = target.term();
         if (nextDepth <= termlinkDepth && targetTerm instanceof Compound) {
             parentActivation = linkSubterms(((Compound) targetTerm).subterms(), scale, nextDepth);
         }
 
-        if (linkedTerm instanceof AtomConcept) {
+        if (target instanceof AtomConcept) {
             //activation terminating at an atom: activate through Atom links
-            parentActivation = activateAtom((AtomConcept) linkedTerm, scale);
+            parentActivation = activateAtom((AtomConcept) target, scale);
         }
 
-        if (linkedTerm.op()==NEG)
-            throw new RuntimeException("should have been un-negated");
+        assert(target.op() != NEG); //should have been un-negated already
 
-        spread.addToValue(linkedTerm, parentActivation);
+        spread.addToValue(target, parentActivation);
     }
 
     protected float activateAtom(AtomConcept atom, float scale) {
@@ -266,32 +256,31 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         return scale;
     }
 
-    final void termBidi(@NotNull Termed tgt, float tlForward, float tlReverse) {
+    final void termBidi(@NotNull Termed rcpt, float tlForward, float tlReverse) {
 
-        //System.out.println( "\t" + origin + " " + src + " " + tgt + " "+ n2(scale));
+        if (rcpt == this.origin) {
+            return;
+        }
 
-        Term tgtTerm = tgt.term();
+        Term rcptTerm = rcpt.term();
 
         if (tlForward > 0)
-            termlink(origin, tgtTerm, tlForward);
+            termlink(origin, rcptTerm, tlForward);
 
-        if (tgt != origin /*(fast test to eliminate reverse self link)*/ && tlReverse > 0 && (tgt instanceof Concept)) {
-            //if (!originTerm.equals(tgtTerm)) {
-            termlink((Concept) tgt, originTerm, tlReverse);
-            //}
-        }
+        if (rcpt instanceof Concept && tlReverse > 0)
+            termlink((Concept) rcpt, originTerm, tlReverse);
 
     }
 
-    void tasklink(Concept target, float scale) {
-        target.tasklinks().put(
+    void tasklink(Concept rcpt, float scale) {
+        rcpt.tasklinks().put(
                 new RawPLink(in, inPri),
                 //new DependentBLink(src),
                 scale, null);
     }
 
-    void termlink(Concept from, Term to, float scale) {
-        from.termlinks().put(new RawPLink(to, inPri), scale, linkOverflow);
+    void termlink(Concept recipient, Term target, float scale) {
+        recipient.termlinks().put(new RawPLink(target, inPri), scale, linkOverflow);
     }
 
 

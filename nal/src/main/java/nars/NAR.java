@@ -1236,8 +1236,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
             return ((Concept)termed);
         }
 
-        Term term = termed.term();
 
+        Term term = termed.term();
+        boolean normalized = term.isNormalized();
 
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
@@ -1264,14 +1265,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
                     term = concepts.atemporalize((Compound) term);
                     if (term == null)
                         return null;
+
+                    //HACK test if the atemporalization resulted in a new term which isnt yet recognized as normalized
+                    if (normalized && !term.isNormalized()) {
+                        term = concepts.normalize((Compound) term); //TODO use the index
+                        if (term==null)
+                            return null;
+                    }
                 }
 
 
+                /*
                 if (term instanceof Compound) {
                     term = concepts.normalize((Compound) term);
                     if (term == null)
                         return null;
                 }
+                */
 
         }
 

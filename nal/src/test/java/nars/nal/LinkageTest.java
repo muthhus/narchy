@@ -109,10 +109,12 @@ public class LinkageTest extends AbstractNALTest {
         assertNotNull(premise2);
         assertEquals(nar.term(spremise2), premise2);
 
-        nar.input(getTask(punc, premise1));
-        nar.input(getTask(punc, premise2));
+        String t1 = getTask(punc, premise1);
+        nar.input(t1);
+        String t2 = getTask(punc, premise2);
+        nar.input(t2);
 
-        nar.run(frames);
+        //nar.run(frames);
 
         //List<String> fails = new ArrayList();
 

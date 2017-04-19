@@ -175,7 +175,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
         v.accept(this);
-        subterms().forEach(v);
+        subterms().forEach(s -> s.recurseTerms(v));
     }
 
     @Override
