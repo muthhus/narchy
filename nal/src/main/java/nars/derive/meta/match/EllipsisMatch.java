@@ -61,10 +61,8 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
         if (!y.op().image) {
             return match(Terms.subRange(y, from, to));
         } else {
-            if (to == y.size())
-                return ImageMatch.getRemaining(y, from);
-            else
-                throw new UnsupportedOperationException();
+            assert(to == y.size());
+            return ImageMatch.getRemaining(y, from);
         }
 
     }
@@ -147,14 +145,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
 
     /** returns whether anything has changed in the target */
     public void expand(Op op, @NotNull List<Term> target) {
-        int l = terms.length;
-        switch (l) {
-            case 1:
-                target.add(terms[0]);
-                break;
-            default:
-                Collections.addAll(target, terms);
-                break;
-        }
+        for (Term t : terms)
+            target.add(t);
     }
 }

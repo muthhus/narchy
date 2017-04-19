@@ -258,137 +258,137 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
     }
 
 
-    @Nullable
-    static ImmutableMap<Term, MatchConstraint> compact(@NotNull ListMultimap<Term, MatchConstraint> c) {
-        if (c.isEmpty()) return null;
-
-        Map<Term, MatchConstraint> con = $.newHashMap(c.size());
-        c.asMap().forEach((t, cc) -> {
-            switch (cc.size()) {
-                case 0:
-                    return;
-                case 1:
-                    con.put(t, cc.iterator().next());
-                    break;
-                default:
-                    con.put(t, new AndConstraint(cc));
-                    break;
-            }
-        });
-        return immutable.ofAll(con);
-    }
-
-    @NotNull
-    static MatchConstraint compile(@NotNull ImmutableMap<Term, MatchConstraint> mm) {
-        switch (mm.size()) {
-            case 1:
-                Term z = mm.castToMap().keySet().iterator().next();
-                return new SingleMatchConstraint(z, mm.get(z));
-            case 2:
-                Iterator<Term> mki = mm.castToMap().keySet().iterator();
-                Term x = mki.next();
-                Term y = mki.next();
-                MatchConstraint cx = mm.get(x);
-                MatchConstraint cy = mm.get(y);
-               return new DoubleMatchConstraint(x, cx, y, cy);
-            default:
-                return new MultiMatchConstraint(mm);
-        }
-
-    }
-
-    /** matches the possibility that one half of the premise must be contained within the other.
-     * this would in theory be more efficient than performing a complete match for the redundancies
-     * which we can determine as a precondition of the particular task/belief pair
-     * before even beginning the match. */
-    static final class ComponentCondition extends AtomicPredicate<Derivation> {
-
-        @NotNull
-        private final String id;
-        private final int container, contained;
-        private final byte[] path;
-
-        public ComponentCondition(int container, byte[] path, int contained) {
-            this.id = "component(" + container + ",(" + Joiner.on(",").join(
-                    Bytes.asList(path)
-            ) + ")," + contained + ')';
-
-            this.container = container;
-            this.contained = contained;
-            this.path = path;
-        }
-
-        @Override
-        public boolean test(@NotNull Derivation m) {
-
-
-            Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;
-            if (!(maybeContainer instanceof Compound))
-                return false;
-            Compound container = (Compound)maybeContainer;
-
-            Term contained = this.contained == 0 ? m.taskTerm : m.beliefTerm;
-            if (!container.impossibleSubTerm(contained)) {
-                Term whatsThere = container.subterm(path);
-                if ((whatsThere != null) && contained.equals(whatsThere))
-                    return true;
-            }
-            return false;
-        }
-
-
-        @NotNull
-        @Override
-        public String toString() {
-            return id;
-        }
-    }
-
-    public static final class SingleMatchConstraint implements MatchConstraint {
-        private final Term x;
-        private final MatchConstraint constraint;
-
-        public SingleMatchConstraint(Term x, MatchConstraint constraint) {
-            this.x = x;
-            this.constraint = constraint;
-        }
-
-        @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-            return assignee.equals(x) && constraint.invalid(assignee, value, f);
-        }
-    }
-    public static final class DoubleMatchConstraint implements MatchConstraint {
-        private final Term x, y;
-        private final MatchConstraint xConstraint, yConstraint;
-
-        public DoubleMatchConstraint(Term x, MatchConstraint xConstraint, Term y, MatchConstraint yConstraint) {
-            this.x = x;
-            this.xConstraint = xConstraint;
-            this.y = y;
-            this.yConstraint = yConstraint;
-        }
-
-        @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-            return (assignee.equals(x) && xConstraint.invalid(assignee, value, f)) ||
-                   (assignee.equals(y) && yConstraint.invalid(assignee, value, f));
-        }
-    }
-
-    public static final class MultiMatchConstraint implements MatchConstraint {
-        private final ImmutableMap<Term, MatchConstraint> mm;
-
-        public MultiMatchConstraint(ImmutableMap<Term, MatchConstraint> mm) {
-            this.mm = mm;
-        }
-
-        @Override
-        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-            MatchConstraint cN = mm.get(assignee);
-            return (cN != null) && cN.invalid(assignee, value, f);
-        }
-    }
+//    @Nullable
+//    static ImmutableMap<Term, MatchConstraint> compact(@NotNull ListMultimap<Term, MatchConstraint> c) {
+//        if (c.isEmpty()) return null;
+//
+//        Map<Term, MatchConstraint> con = $.newHashMap(c.size());
+//        c.asMap().forEach((t, cc) -> {
+//            switch (cc.size()) {
+//                case 0:
+//                    return;
+//                case 1:
+//                    con.put(t, cc.iterator().next());
+//                    break;
+//                default:
+//                    con.put(t, new AndConstraint(cc));
+//                    break;
+//            }
+//        });
+//        return immutable.ofAll(con);
+//    }
+//
+//    @NotNull
+//    static MatchConstraint compile(@NotNull ImmutableMap<Term, MatchConstraint> mm) {
+//        switch (mm.size()) {
+//            case 1:
+//                Term z = mm.castToMap().keySet().iterator().next();
+//                return new SingleMatchConstraint(z, mm.get(z));
+//            case 2:
+//                Iterator<Term> mki = mm.castToMap().keySet().iterator();
+//                Term x = mki.next();
+//                Term y = mki.next();
+//                MatchConstraint cx = mm.get(x);
+//                MatchConstraint cy = mm.get(y);
+//               return new DoubleMatchConstraint(x, cx, y, cy);
+//            default:
+//                return new MultiMatchConstraint(mm);
+//        }
+//
+//    }
+//
+//    /** matches the possibility that one half of the premise must be contained within the other.
+//     * this would in theory be more efficient than performing a complete match for the redundancies
+//     * which we can determine as a precondition of the particular task/belief pair
+//     * before even beginning the match. */
+//    static final class ComponentCondition extends AtomicPredicate<Derivation> {
+//
+//        @NotNull
+//        private final String id;
+//        private final int container, contained;
+//        private final byte[] path;
+//
+//        public ComponentCondition(int container, byte[] path, int contained) {
+//            this.id = "component(" + container + ",(" + Joiner.on(",").join(
+//                    Bytes.asList(path)
+//            ) + ")," + contained + ')';
+//
+//            this.container = container;
+//            this.contained = contained;
+//            this.path = path;
+//        }
+//
+//        @Override
+//        public boolean test(@NotNull Derivation m) {
+//
+//
+//            Term maybeContainer = this.container==0 ? m.taskTerm : m.beliefTerm;
+//            if (!(maybeContainer instanceof Compound))
+//                return false;
+//            Compound container = (Compound)maybeContainer;
+//
+//            Term contained = this.contained == 0 ? m.taskTerm : m.beliefTerm;
+//            if (!container.impossibleSubTerm(contained)) {
+//                Term whatsThere = container.subterm(path);
+//                if ((whatsThere != null) && contained.equals(whatsThere))
+//                    return true;
+//            }
+//            return false;
+//        }
+//
+//
+//        @NotNull
+//        @Override
+//        public String toString() {
+//            return id;
+//        }
+//    }
+//
+//    public static final class SingleMatchConstraint implements MatchConstraint {
+//        private final Term x;
+//        private final MatchConstraint constraint;
+//
+//        public SingleMatchConstraint(Term x, MatchConstraint constraint) {
+//            this.x = x;
+//            this.constraint = constraint;
+//        }
+//
+//        @Override
+//        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
+//            return assignee.equals(x) && constraint.invalid(assignee, value, f);
+//        }
+//    }
+//    public static final class DoubleMatchConstraint implements MatchConstraint {
+//        private final Term x, y;
+//        private final MatchConstraint xConstraint, yConstraint;
+//
+//        public DoubleMatchConstraint(Term x, MatchConstraint xConstraint, Term y, MatchConstraint yConstraint) {
+//            this.x = x;
+//            this.xConstraint = xConstraint;
+//            this.y = y;
+//            this.yConstraint = yConstraint;
+//        }
+//
+//        @Override
+//        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
+//            return (assignee.equals(x) && xConstraint.invalid(assignee, value, f)) ||
+//                   (assignee.equals(y) && yConstraint.invalid(assignee, value, f));
+//        }
+//    }
+//
+//    public static final class MultiMatchConstraint implements MatchConstraint {
+//        private final ImmutableMap<Term, MatchConstraint> mm;
+//
+//        public MultiMatchConstraint(ImmutableMap<Term, MatchConstraint> mm) {
+//            this.mm = mm;
+//        }
+//
+//        @Override
+//        public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
+//            MatchConstraint cN = mm.get(assignee);
+//            return (cN != null) && cN.invalid(assignee, value, f);
+//        }
+//    }
 
     public static class AddConstraint extends AtomicPredicate<Derivation> {
         private final Compound id;

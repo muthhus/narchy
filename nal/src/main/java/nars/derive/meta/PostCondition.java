@@ -166,11 +166,10 @@ public class PostCondition implements Serializable //since there can be multiple
         PostCondition pc = new PostCondition(pattern, beliefTruth, goalTruth, puncOverride);
 
         if (!pc.modifiesPunctuation() && pattern instanceof Compound) {
-            if (rule.getTask().equals(pattern)) {
-                throw new RuntimeException("punctuation not modified yet rule task equals pattern");
-            }
-            if (rule.getBelief().equals(pattern))
-                throw new RuntimeException("punctuation not modified yet rule belief equals pattern");
+            assert rule.getTask().equals(pattern):
+                "punctuation not modified yet rule task equals pattern";
+            assert rule.getBelief().equals(pattern):
+                "punctuation not modified yet rule belief equals pattern";
         }
 
         if (pc.minNAL != 0)

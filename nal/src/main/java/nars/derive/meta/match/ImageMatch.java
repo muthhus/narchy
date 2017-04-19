@@ -66,7 +66,6 @@ public enum ImageMatch {
         }
 
 
-        //return EllipsisMatch.match(t2);
         return new ImageEllipsisMatch(t2);
     }
 
