@@ -37,11 +37,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     @Nullable
     public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
-        float avgToBeRemoved = Util.unitize(((m + p) - (c * (1f - temperature))) / s);
-
-        //float r = Util.unitize(p / (p + m) * temperature);
-        return avgToBeRemoved >= priEpsilon ? f.valueOf(avgToBeRemoved) : null;
-
+        float estimatedExcess = (m + p) - (c * (1f - temperature));
+        float presentAndFutureExcess = estimatedExcess * 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
+        float perMember = presentAndFutureExcess / s;
+        return (perMember >= priEpsilon) ?
+            f.valueOf( Util.unitize( perMember ) ) :
+            null;
     }
 
     /**

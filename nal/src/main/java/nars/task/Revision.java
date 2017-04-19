@@ -117,7 +117,7 @@ public class Revision {
         float aProp = aw / (aw + bw);
 
         //HACK create a temorary RNG because pulling one up through the method calls would be a mess
-        Random rng = new XorShift128PlusRandom(Util.hashCombine(a.hashCode(), b.hashCode()) << 32 + Util.hashCombine((int) start, (int) now) * 31 + newTruth.hashCode());
+        Random rng = new XorShift128PlusRandom(Util.hashClojure(a.hashCode(), b.hashCode()) << 32 + Util.hashClojure((int) start, (int) now) * 31 + newTruth.hashCode());
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
         Compound cc = normalizedOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms );

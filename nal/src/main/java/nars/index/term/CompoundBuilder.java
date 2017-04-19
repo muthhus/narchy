@@ -1,10 +1,9 @@
 package nars.index.term;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import nars.Op;
 import nars.term.Term;
-
-import static jcog.Util.hashCombine;
 
 /**
  * Created by me on 4/2/17.
@@ -22,11 +21,11 @@ public class CompoundBuilder extends FasterList<Term> {
         this.op = op;
         this.dt = dt;
 
-        int hash = hashCombine(op.hashCode(), dt);
+        int hash = Util.hashClojure(op.hashCode(), dt);
 
         //include the hash as if the values were added iteratively such as in add()
         for (Term x : u)
-            hash = hashCombine(hash, x.hashCode());
+            hash = Util.hashClojure(hash, x.hashCode());
 
         this.hash = hash;
     }
@@ -37,7 +36,7 @@ public class CompoundBuilder extends FasterList<Term> {
 
         this.op = op;
         this.dt = dt;
-        this.hash = hashCombine(op.hashCode(), dt);
+        this.hash = Util.hashClojure(op.hashCode(), dt);
 
         //hash will be modified for each added subterm
     }
@@ -49,7 +48,7 @@ public class CompoundBuilder extends FasterList<Term> {
 
     @Override public boolean add(Term x) {
         super.add(x);
-        hash = hashCombine(hash, x.hashCode());
+        hash = Util.hashClojure(hash, x.hashCode());
         return true;
     }
 

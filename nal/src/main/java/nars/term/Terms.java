@@ -421,6 +421,8 @@ public enum Terms { ;
     }
     @Nullable
     public static Compound normalizedOrNull(@Nullable Term t, TermIndex i) {
+        if (t == null)
+            return null;
         Compound ct = compoundOrNull(t);
         if (t == null)
             return null;

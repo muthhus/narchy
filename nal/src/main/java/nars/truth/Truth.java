@@ -141,8 +141,8 @@ public interface Truth extends Truthed {
      * large enough such that: 0 <= h < 2^15: */
     static int truthToInt(float freq, float conf) {
 
-        int freqHash = Util.hash(freq, hashDiscreteness16) & 0x0000ffff;
-        int confHash = Util.hash(conf, hashDiscreteness16) & 0x0000ffff;
+        int freqHash = Util.hashFloat(freq, hashDiscreteness16) & 0x0000ffff;
+        int confHash = Util.hashFloat(conf, hashDiscreteness16) & 0x0000ffff;
 
         return (freqHash << 16) | confHash;
     }
@@ -150,8 +150,8 @@ public interface Truth extends Truthed {
     @Nullable
     static Truth intToTruth(int h) {
         return $.t(
-                Util.unhash( (h>>16) /* & 0xffff*/, hashDiscreteness16),
-                Util.unhash(h & 0xffff, hashDiscreteness16)
+                Util.unhashFloat( (h>>16) /* & 0xffff*/, hashDiscreteness16),
+                Util.unhashFloat(h & 0xffff, hashDiscreteness16)
         );
     }
 

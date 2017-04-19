@@ -61,6 +61,14 @@ public interface Priority extends Prioritized {
         setPriority(priSafe(0) + toAdd);
     }
     default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
+    default void priSub(float maxToSubtract, float minFractionRetained) {
+        float p = priSafe(0);
+        if (p > 0) {
+            float pMin = minFractionRetained * p;
+            float pNext = Math.max((p - maxToSubtract), pMin);
+            setPriority(pNext);
+        }
+    }
 
     @Override @NotNull
     default Priority priority() {

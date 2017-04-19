@@ -220,7 +220,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         //boolean dir = random.nextBoolean(); //choose random initial direction
 
-        int hash = x.hashCode();
+        int hash = hash(x);
         int iStart = i(c, hash);
 
         //final long ticket = add ? Treadmill.start(id, hash) : Long.MIN_VALUE /* N/A for get or remove */;
@@ -354,6 +354,17 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
 
         return !add ? found : added;
+
+    }
+
+    protected int hash(Object x) {
+
+        //return x.hashCode(); //default
+
+        //identityComparisons ? System.identityHashCode(key)
+
+        // "Applies a supplemental hash function to a given hashCode, which defends against poor quality hash functions."
+        return Util.hashWangJenkins(x.hashCode());
 
     }
 
@@ -656,7 +667,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         //throw new UnsupportedOperationException();
         float p = (float) this.pressure.getAndSet(0);
         if (p > 0) {
-            return commit(Bag.forget(size(), capacity(), p, mass, temperature(), priEpsilon(), this::forget));
+            int s = size();
+            if (s > 0) {
+                return commit(
+                        Bag.forget(s, capacity(), p, mass, temperature(), priEpsilon(), this::forget));
+            }
         }
         return this;
     }

@@ -83,7 +83,7 @@ public class ImmutableTask extends Pri implements Task {
             );
 
             if (t != null)
-                h = Util.hashCombine(h, t.hashCode());
+                h = Util.hashClojure(h, t.hashCode());
         }
 
         if (h == 0) h = 1; //reserve 0 for non-hashed

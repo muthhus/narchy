@@ -25,8 +25,6 @@ import static nars.experiment.tetris.impl.TetrisState.*;
  */
 public class Tetris extends NAgentX implements Bitmap2D {
 
-
-
     //    static final Executioner exe =
 //            //new SingleThreadExecutioner();
 ////            new MultiThreadExecutioner(2, 1024*8);

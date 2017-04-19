@@ -24,6 +24,7 @@ import java.util.function.Consumer;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.UtilityFunctions.aveAri;
 
 
 abstract public class PremiseBuilder {
@@ -174,9 +175,10 @@ abstract public class PremiseBuilder {
         if (taskPri < 0)
             return null; //task deleted
 
-        float pri =
-                Math.max(taskPri, beliefPriority !=null ? beliefPriority.priSafe(0) : 0);
-                //belief == null ? taskPri : Util.lerp(tq / (tq + bq), taskPri, beliefBudget.pri());
+        float pri = beliefPriority==null ? taskPri :
+                //Math.max
+                aveAri
+                    (taskPri, beliefPriority.priSafe(0));
 
         if (pri < priMin)
             return null;

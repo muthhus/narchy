@@ -122,7 +122,7 @@ public enum Util { ;
 //    }
 
     public static int hash(Object a, Object b) {
-        return hashCombine(a.hashCode(), b.hashCode());
+        return hashClojure(a.hashCode(), b.hashCode());
     }
 
     public static int hash(Object a, Object b, Object c) {
@@ -293,57 +293,29 @@ public enum Util { ;
 
 
 
-/*
- **************************************************************************
- *                                                                        *
- *          General Purpose Hash Function Algorithms Library              *
- *                                                                        *
- * Author: Arash Partow - 2002                                            *
- * URL: http://www.partow.net                                             *
- * URL: http://www.partow.net/programming/hashfunctions/index.html        *
- *                                                                        *
- * Copyright notice:                                                      *
- * Free use of the General Purpose Hash Function Algorithms Library is    *
- * permitted under the guidelines and in accordance with the most current *
- * version of the Common Public License.                                  *
- * http://www.opensource.org/licenses/cpl1.0.php                          *
- *                                                                        *
- **************************************************************************
-*/
+    /*
+     **************************************************************************
+     *                                                                        *
+     *          General Purpose Hash Function Algorithms Library              *
+     *                                                                        *
+     * Author: Arash Partow - 2002                                            *
+     * URL: http://www.partow.net                                             *
+     * URL: http://www.partow.net/programming/hashfunctions/index.html        *
+     *                                                                        *
+     * Copyright notice:                                                      *
+     * Free use of the General Purpose Hash Function Algorithms Library is    *
+     * permitted under the guidelines and in accordance with the most current *
+     * version of the Common Public License.                                  *
+     * http://www.opensource.org/licenses/cpl1.0.php                          *
+     *                                                                        *
+     **************************************************************************
+    */
 
 
-    /*class GeneralHashFunctionLibrary
-    {*/
 
 
-    public static long RSHash(String str) {
-        int b = 378551;
-        int a = 63689;
-        long hash = 0;
 
-        for (int i = 0; i < str.length(); i++) {
-            hash = hash * a + str.charAt(i);
-            a = a * b;
-        }
-
-        return hash;
-    }
-   /* End Of RS Hash Function */
-
-
-    public static long JSHash(String str) {
-        long hash = 1315423911;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash ^= ((hash << 5) + str.charAt(i) + (hash >> 2));
-        }
-
-        return hash;
-    }
-   /* End Of JS Hash Function */
-
-
-    public static long PJWHash(String str) {
+    public static long hashPJW(String str) {
         long BitsInUnsignedInt = (4 * 8);
         long ThreeQuarters = (BitsInUnsignedInt * 3) / 4;
         long OneEighth = BitsInUnsignedInt / 8;
@@ -381,8 +353,20 @@ public enum Util { ;
     }
 
 
+    /** from: ConcurrentReferenceHashMap.java found in Hazelcast */
+    public static int hashWangJenkins(int h) {
+        // Spread bits to regularize both segment and index locations,
+        // using variant of single-word Wang/Jenkins hash.
+        h += (h << 15) ^ 0xffffcd7d;
+        h ^= (h >>> 10);
+        h += (h << 3);
+        h ^= (h >>> 6);
+        h += (h << 2) + (h << 14);
+        return h ^ (h >>> 16);
+    }
+
     /** from clojure.Util */
-    public static int hashCombine(int seed, int hash) {
+    public static int hashClojure(int seed, int hash) {
         return seed ^ ( hash + 0x9e3779b9 + (seed << 6) + (seed >> 2) );
 
         //return seed * 31 + hash;
@@ -390,7 +374,7 @@ public enum Util { ;
 
     public static int hashCombine(int a, int b, int c) {
 
-        return hashCombine(hashCombine(a, b), c); //TODO decide if this is efficient and hashes well
+        return hashClojure(hashClojure(a, b), c); //TODO decide if this is efficient and hashes well
 
         //https://gist.github.com/badboy/6267743
 //        a=a-b;  a=a-c;  a=a^(c >>> 13);
@@ -405,18 +389,18 @@ public enum Util { ;
 //        return c;
     }
 
-    public static int hashCombine(Object[] t) {
+    public static int hashClojure(Object[] t) {
         if (t.length == 0)
             return 0;
         int x = t[0].hashCode();
         for (int i = 1; i < t.length; i++) {
-            x = hashCombine(x, t[i].hashCode());
+            x = hashClojure(x, t[i].hashCode());
         }
         return x;
     }
 
 
-    public static int ELFHashNonZero(byte[] str, int seed) {
+    public static int hashNonZeroELF(byte[] str, int seed) {
         int i  = (int) hashELF(str, seed);
         if (i == 0) i = 1;
         return i;
@@ -457,94 +441,6 @@ public enum Util { ;
         return hash;
     }
 
-
-    public static long BKDRHash(String str) {
-        long seed = 131; // 31 131 1313 13131 131313 etc..
-        long hash = 0;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash = (hash * seed) + str.charAt(i);
-        }
-
-        return hash;
-    }
-   /* End Of BKDR Hash Function */
-
-
-    public static long SDBMHash(String str) {
-        long hash = 0;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash = str.charAt(i) + (hash << 6) + (hash << 16) - hash;
-        }
-
-        return hash;
-    }
-   /* End Of SDBM Hash Function */
-
-
-    public static long DJBHash(String str) {
-        long hash = 5381;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash = ((hash << 5) + hash) + str.charAt(i);
-        }
-
-        return hash;
-    }
-   /* End Of DJB Hash Function */
-
-
-    public static long DEKHash(String str) {
-        long hash = str.length();
-
-        for (int i = 0; i < str.length(); i++) {
-            hash = ((hash << 5) ^ (hash >> 27)) ^ str.charAt(i);
-        }
-
-        return hash;
-    }
-   /* End Of DEK Hash Function */
-
-
-    public static long BPHash(String str) {
-        long hash = 0;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash = hash << 7 ^ str.charAt(i);
-        }
-
-        return hash;
-    }
-   /* End Of BP Hash Function */
-
-
-    public static long FNVHash(String str) {
-        long fnv_prime = 0x811C9DC5;
-        long hash = 0;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash *= fnv_prime;
-            hash ^= str.charAt(i);
-        }
-
-        return hash;
-    }
-   /* End Of FNV Hash Function */
-
-
-    public static long APHash(String str) {
-        long hash = 0xAAAAAAAA;
-
-        for (int i = 0; i < str.length(); i++) {
-            hash ^= (i & 1) == 0 ? (hash << 7) ^ str.charAt(i) * (hash >> 3) : ~((hash << 11) + str.charAt(i) ^ (hash >> 5));
-        }
-
-        return hash;
-    }
-   /* End Of AP Hash Function */
-
-//    }
 
 
     /**
@@ -728,10 +624,10 @@ public enum Util { ;
         return unitize(round(value, epsilon ));
     }
 
-    public static int hash(float f, int discretness) {
+    public static int hashFloat(float f, int discretness) {
         return (int)(f * discretness);
     }
-    public static float unhash(int i, int discretness) {
+    public static float unhashFloat(int i, int discretness) {
         return ((float)i) / discretness;
     }
 
