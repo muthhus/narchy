@@ -33,7 +33,7 @@ public class ArrayTermVector extends TermVector {
         if (s !=c.size())
             return false;
         for (int i = 0; i < s; i++) {
-            Term y = c.term(i);
+            Term y = c.get(i);
             Term x = terms[i];
 
             if (x == y) {
@@ -50,11 +50,11 @@ public class ArrayTermVector extends TermVector {
 
 
     @Override
-    @NotNull public final Term term(int i) {
+    @NotNull public final Term get(int i) {
         return terms[i];
     }
 
-    @NotNull @Override public final Term[] terms() {
+    @NotNull @Override public final Term[] subtermsArray() {
         return terms;
     }
 

@@ -66,25 +66,25 @@ public class Builtin {
                       a specific integer value index, from 0 to compound size
                       (a,b) pair of integers, a range of indices */
             Functor.f("slice", (args) -> {
-                if (args.length == 2) {
-                    Compound x = compoundOrNull(args[0]);
+                if (args.size() == 2) {
+                    Compound x = compoundOrNull(args.get(0));
                     if (x != null) {
                         int len = x.size();
 
-                        Term index = args[1];
+                        Term index = args.get(1);
                         Op o = index.op();
                         if (o == INT) {
                             //specific index
                             int i = ((IntTerm) index).val;
                             if (i >= 0 && i < len)
-                                return x.term(i);
+                                return x.get(i);
                             else
                                 return False;
 
                         } else if (o == PROD && index.size() == 2) {
-                            Term start = ((Compound) index).term(0);
+                            Term start = ((Compound) index).get(0);
                             if (start.op() == INT) {
-                                Term end = ((Compound) index).term(1);
+                                Term end = ((Compound) index).get(1);
                                 if (end.op() == INT) {
                                     int si = ((IntTerm) start).val;
                                     if (si >= 0 && si < len) {
@@ -93,7 +93,7 @@ public class Builtin {
                                             if (si == ei)
                                                 return Terms.ZeroProduct;
                                             if (si < ei) {
-                                                return $.p(Arrays.copyOfRange(x.terms(), si, ei));
+                                                return $.p(Arrays.copyOfRange(x.subtermsArray(), si, ei));
                                             }
                                         }
                                     }
@@ -129,7 +129,7 @@ public class Builtin {
             int size = c.size();
             if (size < 2) return False;
 
-            Term[] x = c.terms();
+            Term[] x = c.subtermsArray();
             if (size == 2) {
                 int n = nar.random.nextInt(size);
                 return Term.falseIfNull(compoundOrNull(x[n]));

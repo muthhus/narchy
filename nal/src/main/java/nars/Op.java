@@ -103,7 +103,10 @@ public enum Op {
     SUBTERMS("...", 1, OpType.Other );
 
     public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
+
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
+    public static final int EvalBits = OpBits; //just an alias for code readabiliy
+
     public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
 
     public static final byte BELIEF = '.';

@@ -18,7 +18,6 @@ import org.junit.Test;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static nars.$.$;
 import static org.junit.Assert.*;
 
 
@@ -157,7 +156,7 @@ public class TermIndexTest {
 
         //create by composition
         Compound b = (Compound) i.get(i.term('(' + s + ')'), true).term();
-        testShared(a.term(), b.term(0));
+        testShared(a.term(), b.get(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);
 
@@ -182,7 +181,7 @@ public class TermIndexTest {
         if (t1 instanceof Compound) {
             //test all subterms are shared
             for (int i = 0; i < t1.term().size(); i++)
-                testShared(((Compound) t1).term(i), ((Compound) t2).term(i));
+                testShared(((Compound) t1).get(i), ((Compound) t2).get(i));
         }
     }
 

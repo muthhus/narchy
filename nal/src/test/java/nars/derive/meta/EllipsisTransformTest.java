@@ -51,7 +51,7 @@ public class EllipsisTransformTest {
 
         Term u = i.transform(
                 $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
-        EllipsisTransform tt = (EllipsisTransform)((Compound)u).term(0);
+        EllipsisTransform tt = (EllipsisTransform)((Compound)u).get(0);
         assertEquals("(%1747846151..%2=_..+)", u.toString());
         assertEquals($.$("%2").toString(), tt.from.toString());
         assertEquals(Imdex, tt.to);

@@ -3,7 +3,6 @@ package nars.term.container;
 import com.google.common.base.Joiner;
 import jcog.Util;
 import nars.Param;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 
@@ -12,11 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 /**
- * Created by me on 11/16/16.
+ * what differentiates TermVector from TermContainer is that
+ * a TermVector specifically for subterms.  while both
+ * can be
  */
 public abstract class TermVector implements TermContainer {
     /** normal high-entropy "content" hash */
@@ -95,7 +95,7 @@ public abstract class TermVector implements TermContainer {
     }
 
 
-    @NotNull @Override public abstract Term[] terms();
+    @NotNull @Override public abstract Term[] subtermsArray();
 
 
     @Override
@@ -114,7 +114,7 @@ public abstract class TermVector implements TermContainer {
     }
 
     @Override
-    @NotNull abstract public Term term(int i);
+    @NotNull abstract public Term get(int i);
 
     @Override
     public final int volume() {
@@ -137,7 +137,7 @@ public abstract class TermVector implements TermContainer {
     @NotNull
     @Override
     public String toString() {
-        return '(' + Joiner.on(',').join(terms()) + ')';
+        return '(' + Joiner.on(',').join(subtermsArray()) + ')';
     }
 
     @Override
@@ -184,7 +184,7 @@ public abstract class TermVector implements TermContainer {
 
     @Override
     public final void copyInto(@NotNull Collection<Term> target) {
-        Collections.addAll(target, terms());
+        Collections.addAll(target, subtermsArray());
     }
 
     @Override
@@ -206,7 +206,7 @@ public abstract class TermVector implements TermContainer {
         if (size() < 2)
             return this; //no change needed
 
-        return TermVector.the( Util.reverse( terms().clone() ) );
+        return TermVector.the( Util.reverse( subtermsArray().clone() ) );
     }
 
 }

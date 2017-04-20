@@ -57,7 +57,7 @@ public abstract class TermBuilder {
         List<Term> terms = $.newArrayList(size);
 
         for (int i = 0; i < size; i++) {
-            Term x = a.term(i);
+            Term x = a.get(i);
             if (!b.containsTerm(x)) {
                 terms.add(x);
             }
@@ -201,17 +201,17 @@ public abstract class TermBuilder {
 
         if (t.op() == INH) {
             Compound ct = (Compound) t;
-            Term[] sp = ct.terms();
+            Term[] sp = ct.subtermsArray();
             Term s = sp[0];
             Op so = s.op();
             Term p = sp[1];
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii = (Compound) s;
-                t = the(Op.INH, ii.term(0), imageUnwrapToProd(p, ii));
+                t = the(Op.INH, ii.get(0), imageUnwrapToProd(p, ii));
             } else if (po == Op.IMGe && !so.image) {
                 Compound jj = (Compound) p;
-                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.term(0));
+                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.get(0));
             } else {
                 return u; //original value
             }
@@ -231,7 +231,7 @@ public abstract class TermBuilder {
         int l = image.size();
         Term[] t = new Term[l];
         int r = image.dt();
-        @NotNull Term[] imageTerms = image.terms();
+        @NotNull Term[] imageTerms = image.subtermsArray();
         for (int i = 0 /* skip the first element of the image */, j = 0; j < l; ) {
             t[j++] = ((j) == r) ? other : imageTerms[++i];
         }
@@ -639,7 +639,7 @@ public abstract class TermBuilder {
                         break;
                     case NEG:
                         Compound n = (Compound) x;
-                        Term nn = n.term(0);
+                        Term nn = n.get(0);
                         if (nn.op() == CONJ) {
                             Compound cnn = ((Compound) nn);
                             int dt = cnn.dt();
@@ -647,7 +647,7 @@ public abstract class TermBuilder {
                                 //negating unwrap each subterm of the negated conjunction to the outer level of compatible 'dt'
                                 int cnns = cnn.size();
                                 for (int i = 0; i < cnns; i++) {
-                                    Term cnt = cnn.term(i);
+                                    Term cnt = cnn.get(i);
                                     if (s.contains(cnt)) {
                                         //co-negation detected
                                         return Collections.emptySet();
@@ -692,7 +692,7 @@ public abstract class TermBuilder {
 
             Op xo = x.op();
             if ((xo == op) && (((Compound) x).dt() == dt)) {
-                flatten(op, ((Compound) x).terms(), dt, s); //recurse
+                flatten(op, ((Compound) x).subtermsArray(), dt, s); //recurse
             } else {
                 if (!s.isEmpty()) {
                     if (s.remove(neg(x))) {
@@ -1024,8 +1024,8 @@ public abstract class TermBuilder {
         Term[] args;
         if (o1 == intersection) {
             args = ArrayUtils.addAll(
-                    ((TermContainer) term1).terms(),
-                    o2 == intersection ? ((TermContainer) term2).terms() : new Term[]{term2}
+                    ((TermContainer) term1).subtermsArray(),
+                    o2 == intersection ? ((TermContainer) term2).subtermsArray() : new Term[]{term2}
             );
         } else {
             args = new Term[]{term1, term2};
@@ -1073,7 +1073,7 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
-        return the(op, dt, newSubs.terms());
+        return the(op, dt, newSubs.subtermsArray());
     }
 
     @NotNull
@@ -1107,7 +1107,7 @@ public abstract class TermBuilder {
             return c;
 
         TermContainer st = c.subterms();
-        Term[] oldSubs = st.terms();
+        Term[] oldSubs = st.subtermsArray();
         Term[] newSubs = oldSubs;
 
         Op o = c.op();

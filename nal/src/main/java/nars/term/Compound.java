@@ -24,7 +24,6 @@ import jcog.Util;
 import jcog.data.array.IntArrays;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
-import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermIndex;
@@ -48,7 +47,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -95,7 +93,7 @@ public interface Compound extends Term, IPair, TermContainer {
         TermContainer tt = subterms();
         int l = tt.size();
         for (int i = 0; i < l; i++) {
-            @NotNull Term s = tt.term(i);
+            @NotNull Term s = tt.get(i);
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 r |= (addOrRemoved) ? t.add(s) : t.remove(s);
                 if (!addOrRemoved && r) //on removal we can exit early
@@ -133,7 +131,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default public Term unneg() {
         if (op() == NEG) {
-            Term x = term(0);
+            Term x = get(0);
             if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
                 ((Compound) x).setNormalized();
             }
@@ -213,7 +211,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
-            Term s = superTerm.term(i);
+            Term s = superTerm.get(i);
             if (s.equals(target)) {
                 p.add((byte) i);
                 return p.toArray();
@@ -238,7 +236,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
-            Term s = superTerm.term(i);
+            Term s = superTerm.get(i);
             X ss = subterm.apply(s);
 
             p.add((byte) i);
@@ -384,7 +382,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Object _car() {
         //if length > 0
-        return term(0);
+        return get(0);
     }
 
     /**
@@ -398,17 +396,17 @@ public interface Compound extends Term, IPair, TermContainer {
             case 1:
                 throw new RuntimeException("Pair fault");
             case 2:
-                return term(1);
+                return get(1);
             case 3:
-                return new Pair(term(1), term(2));
+                return new Pair(get(1), get(2));
             case 4:
-                return new Pair(term(1), new Pair(term(2), term(3)));
+                return new Pair(get(1), new Pair(get(2), get(3)));
         }
 
         //this may need tested better:
         Pair p = null;
         for (int i = len - 2; i >= 0; i--) {
-            p = new Pair(term(i), p == null ? term(i + 1) : p);
+            p = new Pair(get(i), p == null ? get(i + 1) : p);
         }
         return p;
     }
@@ -455,14 +453,14 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     @Override
-    default Term term(int i) {
-        return subterms().term(i);
+    default Term get(int i) {
+        return subterms().get(i);
     }
 
     @NotNull
     @Override
-    default Term[] terms() {
-        return subterms().terms();
+    default Term[] subtermsArray() {
+        return subterms().subtermsArray();
     }
 
 
@@ -549,7 +547,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default Term last() {
         int s = size();
-        return s == 0 ? null : term(s - 1);
+        return s == 0 ? null : get(s - 1);
     }
 
 
@@ -600,7 +598,7 @@ public interface Compound extends Term, IPair, TermContainer {
     static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
         int s = container.size();
         for (int i = 0; i < s; i++) {
-            Term xx = container.term(i);
+            Term xx = container.get(i);
             if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
                 l.add((byte) i);
                 return true;
@@ -635,8 +633,8 @@ public interface Compound extends Term, IPair, TermContainer {
                     return false;
 
             Compound o = (Compound) other;
-            Term[] a = terms();
-            Term[] b = o.terms();
+            Term[] a = subtermsArray();
+            Term[] b = o.subtermsArray();
             for (int i = 0; i < s; i++) {
                 if (!a[i].equalsIgnoringVariables(b[i], requireSameTime))
                     return false;
@@ -691,7 +689,7 @@ public interface Compound extends Term, IPair, TermContainer {
         int ys = yy.size();
         int offset = 0;
         for (int yi = 0; yi < ys; yi++) {
-            Term yyy = yy.term(reverse ? ((ys - 1) - yi) : yi);
+            Term yyy = yy.get(reverse ? ((ys - 1) - yi) : yi);
             int sdt = yyy.subtermTime(x);
             if (sdt != DTERNAL)
                 return sdt + offset;
@@ -719,7 +717,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 int s = tt.size();
                 long t = offset;
                 for (int i = 0; i < s; i++) {
-                    Term st = tt.term(reverse ? (s - 1 - i) : i);
+                    Term st = tt.get(reverse ? (s - 1 - i) : i);
                     st.events(events, t);
                     t += dt + st.dtRange();
                 }
@@ -756,7 +754,7 @@ public interface Compound extends Term, IPair, TermContainer {
                             break;
                     }
 
-                    return c.term(0).dtRange() + (dt) + c.term(1).dtRange();
+                    return c.get(0).dtRange() + (dt) + c.get(1).dtRange();
 
                 } else {
                     int s = 0;
@@ -764,7 +762,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     TermContainer tt = subterms();
                     int l = tt.size();
                     for (int i = 0; i < l; i++) {
-                        @NotNull Term x = tt.term(i);
+                        @NotNull Term x = tt.get(i);
                         s = Math.max(s, x.dtRange());
                     }
 
@@ -782,7 +780,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override default Term eval(TermIndex index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
-        if (!hasAll(Op.OpBits))
+        if (!hasAll(Op.EvalBits))
             return this;
 
         //unwrap negation before recursion, it should be more efficient
@@ -807,7 +805,7 @@ public interface Compound extends Term, IPair, TermContainer {
             Term[] evalSubs = new Term[s];
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term x = tt.term(i);
+                Term x = tt.get(i);
                 Term y = x.eval(index);
                 if (!x.equals(y)) {
                     modified = true;
@@ -826,9 +824,9 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op() == INH) {
             //recursively compute contained subterm functors
 
-            final Term subject = term(0);
+            final Term subject = get(0);
             if (subject.op() == PROD) {
-                Term predicate = term(1);
+                Term predicate = get(1);
                 if (predicate.op() == ATOM) {
 
                     Functor f = null;
@@ -848,7 +846,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                     if (f != null) {
 
-                        Term dy = f.apply(((Compound) subject).terms());
+                        Term dy = f.apply(subterms());
                         if (dy == null || dy == this) {
                             return this; //functor returning null return value means keep the original input term
                         } else {

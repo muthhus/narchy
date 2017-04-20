@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static nars.Op.*;
-import static nars.op.DepIndepVarIntroduction.validDepVarSuperterm;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -269,7 +268,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : ((Compound) t).term(p[i]);
+                t = (i == -1) ? comp : ((Compound) t).get(p[i]);
                 Op o = t.op();
 
                 if (validIndepVarSuperterm(o)) {
@@ -635,7 +634,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @Nullable
     default Term term(int i) {
-        return term().term(i);
+        return term().get(i);
     }
 
     @Nullable

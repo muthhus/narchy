@@ -46,17 +46,17 @@ public class reflect  {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
-        return $.inh($.p(reflect(s.term(0)), reflect(s.term(1))), $.quote(operatorName));
+        return $.inh($.p(reflect(s.get(0)), reflect(s.get(1))), $.quote(operatorName));
     }
     @Nullable
     public static Term sop(@NotNull Compound s, Term predicate) {
-        return $.inh($.p(reflect(s.term(0)), reflect(s.term(1))), predicate);
+        return $.inh($.p(reflect(s.get(0)), reflect(s.get(1))), predicate);
     }
     @Nullable
     public static Term sop(String operatorName, @NotNull Compound c) {
         Term[] m = new Term[c.size()];
         for (int i = 0; i < c.size(); i++) {
-            if ((m[i] = reflect(c.term(i))) == null)
+            if ((m[i] = reflect(c.get(i))) == null)
                 return null;
         }
 

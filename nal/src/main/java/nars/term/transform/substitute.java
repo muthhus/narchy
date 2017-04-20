@@ -5,6 +5,7 @@ import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,17 +22,17 @@ public final class substitute extends Functor {
         this.parent = parent;
     }
 
-    @Nullable @Override public Term apply(@NotNull Term[] xx) {
+    @Nullable @Override public Term apply(@NotNull TermContainer xx) {
 
-        final Term term = xx[0]; //term to possibly transform
+        final Term term = xx.get(0); //term to possibly transform
 
-        final Term x = parent.yxResolve(xx[1]); //original term (x)
+        final Term x = parent.yxResolve(xx.get(1)); //original term (x)
 
-        if (term instanceof Compound && (xx.length > 3) && xx[3].equals(STRICT) && !term.containsTermRecursively(x)) {
+        if (term instanceof Compound && (xx.size() > 3) && xx.get(3).equals(STRICT) && !term.containsTermRecursively(x)) {
             return Op.False;
         }
 
-        final Term y = parent.yxResolve(xx[2]); //replacement term (y)
+        final Term y = parent.yxResolve(xx.get(2)); //replacement term (y)
 
         Term z = parent.transform(term, new MapSubstWithOverride(parent.yx,  x, y));
         if (z != null) {

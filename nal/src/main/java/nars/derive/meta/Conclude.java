@@ -160,13 +160,13 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
                             //                    );
                             //                }
 
-                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure" + (Param.DEBUG ? rule : ""), c1.terms()
+                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure" + (Param.DEBUG ? rule : ""), c1.subtermsArray()
                             );
                         }
 
                         int tdt = temporalized.dt();
                         if (tdt == XTERNAL || tdt == -XTERNAL) {
-                            throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak", c1.terms());
+                            throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak", c1.subtermsArray());
                         }
 
                         //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {

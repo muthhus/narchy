@@ -25,6 +25,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
@@ -1448,7 +1449,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
      * registers a term rewrite functor
      */
     @NotNull
-    public final Concept onTerm(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
+    public final Concept onTerm(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
         return on(f(termAtom, f));
     }
 

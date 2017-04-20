@@ -90,7 +90,7 @@ public final class DynTruth implements Truthed {
         if (c.op().temporal && dt == DTERNAL && start!=ETERNAL)
             dt = 0; //actually it is measured at the current time so make it parallel
 
-        c = compoundOrNull(nar.concepts.the(c.op(), dt, c.terms()));
+        c = compoundOrNull(nar.concepts.the(c.op(), dt, c.subtermsArray()));
         if (c == null)
             return null;
 

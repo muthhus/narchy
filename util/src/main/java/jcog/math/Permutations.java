@@ -100,7 +100,7 @@ public class Permutations {
 		return ind;
 	}
 
-	public int get(int index) {
+	public int permute(int index) {
 		return ind[index];
 	}
 

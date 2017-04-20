@@ -37,7 +37,7 @@ public class UnitCompound1Test {
         Atomic x = Atomic.the("x");
         Compound c = $.p(x);
         System.out.println(c);
-        System.out.println(c.term(0));
+        System.out.println(c.get(0));
 
         Compound d = $.inh(x, Atomic.the("y"));
         System.out.println(d);
@@ -48,8 +48,8 @@ public class UnitCompound1Test {
         Atomic y = Atomic.the("y");
         Compound c = $.func(x, y);
         System.out.println(c);
-        System.out.println(c.term(0));
-        System.out.println(c.term(1));
+        System.out.println(c.get(0));
+        System.out.println(c.get(1));
     }
 
 }

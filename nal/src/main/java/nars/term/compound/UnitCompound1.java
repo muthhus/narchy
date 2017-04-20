@@ -70,7 +70,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
             return false;
 
         //TODO if this is a NEG then size and dt can be assumed
-        return (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.term(0)));
+        return (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.get(0)));
     }
 
     @NotNull

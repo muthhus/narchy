@@ -218,7 +218,7 @@ public class TermTest {
         Compound cterm2 = ((Compound) term2);
 
         //test subterms
-        assertTrue(cterm1.term(0).equals(cterm2.term(0))); //'a'
+        assertTrue(cterm1.get(0).equals(cterm2.get(0))); //'a'
 
     }
 
@@ -673,12 +673,12 @@ public class TermTest {
     public void testImageInhConstruction() {
         Compound p = $.p("a", "b", "c");
         assertEquals("(a-->(/,_,b,c))", $.imge(0, p).toString());
-        assertEquals("(a-->(/,_,b,c))", $.image(0, p.terms()).toString());
+        assertEquals("(a-->(/,_,b,c))", $.image(0, p.subtermsArray()).toString());
         assertEquals("(b-->(/,a,_,c))", $.imge(1, p).toString());
         assertEquals("(c-->(/,a,b,_))", $.imge(2, p).toString());
 
         assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p).toString());
-        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.terms()).toString());
+        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.subtermsArray()).toString());
         assertEquals("((\\,a,_,c)-->b)", $.imgi(1, p).toString());
         assertEquals("((\\,a,b,_)-->c)", $.imgi(2, p).toString());
 
@@ -817,8 +817,8 @@ public class TermTest {
         assertNotEquals(a, c);
 
         Termed<Compound> x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
-        Term xa = x.term().term(0);
-        Term xb = x.term().term(1);
+        Term xa = x.term().get(0);
+        Term xb = x.term().get(1);
         int o1 = xa.compareTo(xb);
         int o2 = xb.compareTo(xa);
         assertEquals(o1, -o2);

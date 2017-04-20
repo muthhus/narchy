@@ -221,7 +221,7 @@ public class TermGraphTest {
             addVertex(t);
 
             int n = 0;
-            for (Term x : t.terms()) {
+            for (Term x : t.subtermsArray()) {
                 addVertex(x);
 
                 ObjectIntPair<Compound> e =

@@ -43,24 +43,24 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     default public TermContainer append(@NotNull Term x) {
-        return TermVector.the(ArrayUtils.add(terms(),x));
+        return TermVector.the(ArrayUtils.add(subtermsArray(),x));
     }
 
     //TODO optionally allow atomic structure positions to differ
     default boolean equivalentStructures() {
-        int t0Struct = term(0).structure();
+        int t0Struct = get(0).structure();
         for (int i = 1; i < size(); i++) {
-            if (term(i).structure()!=t0Struct)
+            if (get(i).structure()!=t0Struct)
                 return false;
         }
 
-        ByteList structureKey = term(0).structureKey();
+        ByteList structureKey = get(0).structureKey();
         {
             ByteArrayList reuseKey = new ByteArrayList(structureKey.size());
             for (int i = 1; i < size(); i++) {
                 //all subterms must share the same structure
                 //TODO only needs to construct the key while comparing equality with the first
-                if (!term(i).structureKey(reuseKey).equals(structureKey))
+                if (!get(i).structureKey(reuseKey).equals(structureKey))
                     return false;
                 reuseKey.clear();
             }
@@ -72,11 +72,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * gets subterm at index i
      */
-    @NotNull Term term(int i);
+    @NotNull Term get(int i);
 
 
     @NotNull default Compound compound(int i) {
-        return ((Compound)term(i));
+        return ((Compound) get(i));
     }
 
 
@@ -85,22 +85,22 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      */
     @Nullable
     default public <C extends Compound> C cterm(int i) {
-        return (C) term(i);
+        return (C) get(i);
     }
 
 
     @Override
     @Nullable
     default Term termOr(int i, @Nullable Term ifOutOfBounds) {
-        return size() <= i ? ifOutOfBounds : term(i);
+        return size() <= i ? ifOutOfBounds : get(i);
     }
 
     default @NotNull Set<Term> toSet() {
-        return mutable.of(terms());
+        return mutable.of(subtermsArray());
     }
 
     default @NotNull ImmutableSet<Term> toSetImmutable() {
-        return immutable.of(terms());
+        return immutable.of(subtermsArray());
     }
 
     static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
@@ -153,7 +153,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * tests if subterm i is op o
      */
     default boolean isTerm(int i, @NotNull Op o) {
-        return term(i).op() == o;
+        return get(i).op() == o;
     }
 
     /**
@@ -171,7 +171,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (!impossibleSubTerm(b)) {
             int s = size();
             for (int i = 0; i < s; i++) {
-                Term x = term(i);
+                Term x = get(i);
                 if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).containsTermRecursively(b)))) {
                     return true;
                 }
@@ -283,7 +283,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s !=c.size())
             return false;
         for (int i = 0; i < s; i++) {
-            if (!term(i).equals(c.term(i)))
+            if (!get(i).equals(c.get(i)))
                 return false;
         }
         return true;
@@ -294,7 +294,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s !=c.size())
             return false;
         for (int i = 0; i < s; i++) {
-            if (!term(i).equals(c.get(i)))
+            if (!get(i).equals(c.get(i)))
                 return false;
         }
         return true;
@@ -304,7 +304,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s !=c.length)
             return false;
         for (int i = 0; i < s; i++) {
-            if (!term(i).equals(c[i]))
+            if (!get(i).equals(c[i]))
                 return false;
         }
         return true;
@@ -319,8 +319,21 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * if this creates a new array, consider using .term(i) to access
      * subterms iteratively.
      */
-    @NotNull Term[] terms();
+    default public Term[] subtermsArray() {
+        return subtermsArray(null);
+    }
 
+    default Term[] subtermsArray(@Nullable Term[] x) {
+        int s = size();
+
+        if (x == null || x.length!=s)
+            x = new Term[s];
+
+        for (int i = 0; i < s; i++)
+            x[i] = this.get(i);
+
+        return x;
+    }
 
     @NotNull
     default Term[] terms(@NotNull IntObjectPredicate<Term> filter) {
@@ -328,7 +341,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         int s = size();
         int added = 0;
         for (int i = 0; i < s; i++) {
-            Term t = term(i);
+            Term t = get(i);
             if (filter.accept(i, t)) {
                 l.add(t);
                 added++;
@@ -364,7 +377,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     static void forEach(@NotNull TermContainer c, @NotNull Consumer action, int start, int stop) {
         for (int i = start; i < stop; i++) {
-            action.accept(c.term(i));
+            action.accept(c.get(i));
         }
     }
 
@@ -382,7 +395,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         StringBuilder sb = new StringBuilder("{[(");
         int s = t.size();
         for (int i = 0; i < s; i++) {
-            sb.append(t.term(i));
+            sb.append(t.get(i));
             if (i < s - 1)
                 sb.append(", ");
         }
@@ -402,7 +415,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         Term[] t = new Term[end - start];
         int j = 0;
         for (int i = start; i < end; i++)
-            t[j++] = term(i);
+            t[j++] = get(i);
         return t;
     }
 
@@ -413,7 +426,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (!impossibleSubTerm(t)) {
             int s = size();
             for (int i = 0; i < s; i++) {
-                if (t.equals(term(i)))
+                if (t.equals(get(i)))
                     return i;
             }
         }
@@ -517,7 +530,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default boolean OR(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
-            if (p.test(term(i)))
+            if (p.test(get(i)))
                 return true;
         }
         return false;
@@ -532,7 +545,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default boolean AND(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++) {
-            if (!p.test(term(i))) {
+            if (!p.test(get(i))) {
                 return false;
             }
         }
@@ -543,7 +556,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         int s = size();
         int count = 0;
         for (int i = 0; i < s; i++) {
-            if (match.test(term(i))) {
+            if (match.test(get(i))) {
                 count++;
             }
         }
@@ -556,7 +569,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         Set<Term> r = new HashSet(size());
         int s = size();
         for (int i = 0; i < s; i++) {
-            Term e = each.apply(term(i));
+            Term e = each.apply(get(i));
             if (e!=null)
                 r.add(e);
         }
@@ -588,7 +601,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (s < 2) return true;
 
         for (int i = 1; i < s; i++) {
-            if (term(i - 1).compareTo(term(i)) != -1)
+            if (get(i - 1).compareTo(get(i)) != -1)
                 return false;
         }
         return true;
@@ -617,8 +630,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         int inequalVariable = -1; //only need to compare the first non-equal variable term
         for (int i = 0; i < s; i++) {
-            Term x = a.term(i);
-            Term y = B.term(i);
+            Term x = a.get(i);
+            Term y = B.get(i);
             if (x instanceof Variable && y instanceof Variable) {
                 if (inequalVariable==-1 && !x.equals(y))
                     inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
@@ -633,7 +646,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         //2nd-stage:
         if (inequalVariable!=-1) {
-            return a.term(inequalVariable).compareTo(B.term(inequalVariable));
+            return a.get(inequalVariable).compareTo(B.get(inequalVariable));
         }
 
 
@@ -653,7 +666,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        }
         int j = 0;
         for (int i = 0; i < input.size(); i++) {
-            Term x = input.term(i);
+            Term x = input.get(i);
             if ((x != a) && (x != b))
                 output[j++] = x;
         }
@@ -692,7 +705,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         int cs = c.size();
         Set<Term> s = new HashSet(cs);
         for (int i = 0; i < cs; i++) {
-            Term x = c.term(i);
+            Term x = c.get(i);
             if (!toRemove.contains(x))
                 s.add(x);
         }
@@ -704,7 +717,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 
         return TermVector.the(
-                Stream.of(terms()).filter(p).toArray(i -> new Term[i])
+                Stream.of(subtermsArray()).filter(p).toArray(i -> new Term[i])
         );
     }
 
@@ -718,13 +731,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 case 0:
                     return true; //shouldnt ever happen
                 case 1:
-                    return subst.unify(term(0), Y.term(0));
+                    return subst.unify(get(0), Y.get(0));
                 case 2: {
 
-                    Term x0 = term(0);
-                    Term x1 = term(1);
-                    Term y0 = Y.term(0);
-                    Term y1 = Y.term(1);
+                    Term x0 = get(0);
+                    Term x1 = get(1);
+                    Term y0 = Y.get(0);
+                    Term y1 = Y.get(1);
 
                     boolean match0 = subst.matchType(x0) || subst.matchType(y0);
                     boolean match1 = subst.matchType(x1) || subst.matchType(y1);
@@ -751,7 +764,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                     int j = subst.random.nextInt() % s;
                     if (j < 0) j = -j;
                     for (int i = 0; i < s; i++) {
-                        if (!subst.unify(term(j), Y.term(j)))
+                        if (!subst.unify(get(j), Y.get(j)))
                             return false;
                         if (++j == s)
                             j = 0;
@@ -771,7 +784,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default boolean recurseSubTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
         int s = size();
         for (int i = 0; i < s; i++) {
-            if (!term(i).recurseTerms(whileTrue, parent))
+            if (!get(i).recurseTerms(whileTrue, parent))
                 return false;
         }
         return true;

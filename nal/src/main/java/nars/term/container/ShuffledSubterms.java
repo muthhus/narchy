@@ -55,13 +55,13 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @NotNull
     @Override
-    public Term term(int i) {
-        return srcsubs.term(super.get(i));
+    public Term get(int i) {
+        return srcsubs.get(super.permute(i));
     }
 
     @Override
     public boolean isTerm(int i, @NotNull Op o) {
-        return term(i).op() == o;
+        return this.get(i).op() == o;
     }
 
 //    @Override
@@ -131,15 +131,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         throw new UnsupportedOperationException();
     }
 
-    @NotNull
-    @Override
-    public Term[] terms() {
-        int s = size();
-        Term[] x = new Term[s];
-        for (int i = 0; i < s; i++)
-            x[i] = term(i);
-        return x;
-    }
+
 
 
 

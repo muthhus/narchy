@@ -246,7 +246,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             if (childScale >= minScale) {
                 float parentActivation = scale * parentRetention;
                 for (int i = 0; i < n; i++) {
-                    link(targetSubs.term(i).unneg(), childScale, nextDepth); //link and recurse to the concept
+                    link(targetSubs.get(i).unneg(), childScale, nextDepth); //link and recurse to the concept
                 }
                 return parentActivation;
             }

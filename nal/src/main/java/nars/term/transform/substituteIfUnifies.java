@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,22 +78,21 @@ abstract public class substituteIfUnifies extends Functor {
 
     @NotNull
     @Override
-    //public Term function(@NotNull Compound p, @NotNull PremiseEval r) {
-    public Term apply(@NotNull Term[] a) {
+    public Term apply(@NotNull TermContainer a) {
 
 //        if (xx.length < 3) {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = a[0];
+        Term term = a.get(0);
 
-        Term x = a[1];
-        Term y = a[2];
+        Term x = a.get(1);
+        Term y = a.get(2);
 
-        if (y.equals(term))
-            return term;
-        if (x.equals(y))
-            return term;
+//        if (y.equals(term))
+//            return term;
+//        if (x.equals(y))
+//            return term;
 
         Term z = unify(term, x, y);
         return (z != null) ? z : Op.False;

@@ -40,7 +40,7 @@ import static nars.time.Tense.ETERNAL;
 @FunctionalInterface public interface Operator {
 
     static Term[] args(Task t) {
-        return ((Compound)(t.term(0)/*subject*/)).terms();
+        return ((Compound)(t.term(0)/*subject*/)).subtermsArray();
     }
 
     /**

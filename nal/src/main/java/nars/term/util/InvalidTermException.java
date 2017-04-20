@@ -31,7 +31,7 @@ public final class InvalidTermException extends SoftException {
     }
 
     public InvalidTermException(@NotNull Op op, int dt, @NotNull TermContainer args, @NotNull String reason) {
-        this(op, dt, reason, args.terms());
+        this(op, dt, reason, args.subtermsArray());
     }
 
     public InvalidTermException(@NotNull Op op, int dt, @NotNull String reason, @NotNull Term... args) {

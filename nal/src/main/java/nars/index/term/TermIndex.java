@@ -201,7 +201,7 @@ public abstract class TermIndex extends TermBuilder {
         int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
-            Term t = subs.term(i);
+            Term t = subs.get(i);
             Term u = transform(t, f);
 
 
@@ -280,7 +280,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
-        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.terms());
+        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.subtermsArray());
     }
 
 //    @Override
@@ -405,7 +405,7 @@ public abstract class TermIndex extends TermBuilder {
         CompoundBuilder target = new CompoundBuilder(op, dt, s);
         for (int i = 0; i < s; i++) {
 
-            Term x = src.term(i), y;
+            Term x = src.get(i), y;
 
             y = t.apply(src, x);
 
@@ -481,7 +481,7 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean changed = false;
         for (int i = 0; i < n; ) {
-            Term x = csrc.term(i);
+            Term x = csrc.get(i);
             Term y;
             if (path.get(depth) != i) {
                 //unchanged subtree
@@ -605,7 +605,7 @@ public abstract class TermIndex extends TermBuilder {
         public Term apply(@Nullable Compound parent, @NotNull Term term) {
             if (term instanceof Compound && ((Compound) term).dt() == XTERNAL) {
                 Compound cs = (Compound) term;
-                return the(cs.op(), DTERNAL, cs.terms());
+                return the(cs.op(), DTERNAL, cs.subtermsArray());
             }
             return term;
         }

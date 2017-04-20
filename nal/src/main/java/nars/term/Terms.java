@@ -72,7 +72,7 @@ public enum Terms { ;
         int h = 1;
         int s = container.size();
         for (int i = 0; i < s; i++) {
-            h = container.term(i).hashCode() + h * 31 /*Util.PRIME1 */;
+            h = container.get(i).hashCode() + h * 31 /*Util.PRIME1 */;
         }
         return h;
     }
@@ -88,7 +88,7 @@ public enum Terms { ;
 
         int x = 0, y = from;
         for (int i = 0; i < s; i++) {
-            l[x++] = c.term(y++);
+            l[x++] = c.get(y++);
         }
 
         return l;
@@ -137,7 +137,7 @@ public enum Terms { ;
 
                 //match all subterms
                 for (int i = 0; i < aLen; i++) {
-                    if (!equalSubTermsInRespectToImageAndProduct(A.term(i), B.term(i)))
+                    if (!equalSubTermsInRespectToImageAndProduct(A.get(i), B.get(i)))
                         return false;
                 }
                 return true;
@@ -248,7 +248,7 @@ public enum Terms { ;
         if (!componentsA.contains(tb))
             return false;
 
-        Term[] sbtt = sbt.terms();
+        Term[] sbtt = sbt.subtermsArray();
         for (Term x : sbtt) {
             if (!componentsA.contains(x))
                 return false;
@@ -443,7 +443,7 @@ public enum Terms { ;
      */
     public static boolean isDisjunction(@NotNull Compound c) {
         if (c.dt() == DTERNAL && c.op() == NEG && c.isTerm(0, CONJ)) {
-            return allNegated(((Compound) c.term(0)).subterms());
+            return allNegated(((Compound) c.get(0)).subterms());
         }
         return false;
     }
@@ -646,12 +646,12 @@ public enum Terms { ;
 
     @Nullable
     public static Term subj(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).term(0);
+        return ((TermContainer) statement.term()).get(0);
     }
 
     @Nullable
     public static Term pred(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).term(1);
+        return ((TermContainer) statement.term()).get(1);
     }
 
     interface SubtermScorer {

@@ -57,7 +57,7 @@ public class PatternTermIndex extends MapTermIndex {
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
-            Term a = s.term(i);
+            Term a = s.get(i);
 
             Term b;
             if (a instanceof Compound) {
@@ -107,7 +107,7 @@ public class PatternTermIndex extends MapTermIndex {
         boolean hasEllipsisTransform = false;
         int xs = seed.size();
         for (int i = 0; i < xs; i++) {
-            if (seed.term(i) instanceof EllipsisTransform) {
+            if (seed.get(i) instanceof EllipsisTransform) {
                 hasEllipsisTransform = true;
                 break;
             }

@@ -91,9 +91,9 @@ public abstract class TermGraph {
                             //&& ((Compound)m).containsTermRecursively(t)) {
                                 ) {
                             Compound l = (Compound) m;
-                            Term s = l.term(0);
+                            Term s = l.get(0);
 
-                            Term p = l.term(1);
+                            Term p = l.get(1);
 
                             //if (!g.nodes().contains(s) || !done.contains(p)) {
                             if ((s.equals(t) || s.containsTermRecursively(t)) ||

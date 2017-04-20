@@ -328,7 +328,7 @@ public class CompoundConcept implements Concept, Termlike {
 
     @NotNull
     public Term term(int i) {
-        return term.term(i);
+        return term.get(i);
     }
 
     @Override

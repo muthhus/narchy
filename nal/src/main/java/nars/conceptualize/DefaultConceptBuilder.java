@@ -142,8 +142,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 //                    return new OperationConcept(t, termbag, taskbag, nar);
 
 
-                Term subj = t.term(0);
-                Term pred = t.term(1);
+                Term subj = t.get(0);
+                Term pred = t.get(1);
 
 
                 Op so = subj.op();
@@ -160,7 +160,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = $.inh(csubj.term(i), pred)) == null) {
+                                if ((x[i] = $.inh(csubj.get(i), pred)) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -190,9 +190,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (j == relation)
                                 ee[i++] = subj;
                             if (i < s)
-                                ee[i++] = img.term(j++);
+                                ee[i++] = img.get(j++);
                         }
-                        Compound b = compoundOrNull($.inh($.p(ee), img.term(0)));
+                        Compound b = compoundOrNull($.inh($.p(ee), img.get(0)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }
@@ -210,7 +210,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = $.inh(subj, cpred.term(i))) == null) {
+                                if ((x[i] = $.inh(subj, cpred.get(i))) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -240,9 +240,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (j == relation)
                                 ee[i++] = pred;
                             if (i < s)
-                                ee[i++] = img.term(j++);
+                                ee[i++] = img.get(j++);
                         }
-                        Compound b = compoundOrNull($.inh(img.term(0), $.p(ee)));
+                        Compound b = compoundOrNull($.inh(img.get(0), $.p(ee)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }

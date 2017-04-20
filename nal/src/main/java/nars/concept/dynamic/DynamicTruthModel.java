@@ -36,7 +36,7 @@ abstract public class DynamicTruthModel {
         @NotNull
         @Override
         public Term[] components(Compound superterm) {
-            return superterm.terms();
+            return superterm.subtermsArray();
         }
     };
 

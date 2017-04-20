@@ -36,15 +36,15 @@ public class ShuffledPermutations extends Permutations {
     }
 
     @Override
-    public final int get(int index) {
+    public final int permute(int index) {
         return ind[shuffle[index]];
     }
 
-    public int[] nextShuffled(int[] target) {
+    int[] nextPermute(int[] target) {
         next();
         int l = size;
         for (int i = 0; i < l; i++)
-            target[i] = get(i);
+            target[i] = permute(i);
         return target;
     }
 }

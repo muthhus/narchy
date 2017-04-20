@@ -87,8 +87,8 @@ public class PostCondition implements Serializable //since there can be multiple
 
             Compound i = (Compound) m;
 
-            Term type = i.term(1);
-            Term which = i.term(0);
+            Term type = i.get(1);
+            Term which = i.get(0);
 
 
             switch (type.toString()) {

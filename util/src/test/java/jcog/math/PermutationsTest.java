@@ -75,7 +75,7 @@ public class PermutationsTest {
             StringBuilder sb = new StringBuilder();
             int x;
             for (x = 0; perm.hasNext() && x < selected; x++) {
-                String aa = Arrays.toString(perm.nextShuffled(n));
+                String aa = Arrays.toString(perm.nextPermute(n));
                 arrays.add(aa);
                 sb.append(aa).append(' ');
             }

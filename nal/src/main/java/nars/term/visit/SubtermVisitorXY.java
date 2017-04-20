@@ -41,7 +41,7 @@ abstract public class SubtermVisitorXY {
                     up();
                     break;
                 case Down:
-                    Compound ny = compoundOrNull(cursorY.term(cursorX));
+                    Compound ny = compoundOrNull(cursorY.get(cursorX));
                     if (ny ==null)
                         throw new UnsupportedOperationException();
                     pathy.add(cursorY);

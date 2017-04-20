@@ -3,7 +3,6 @@ package nars.derive.rule;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.derive.meta.*;
 import nars.derive.meta.constraint.*;
@@ -100,16 +99,16 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final Compound getPremise() {
-        return (Compound) term(0);
+        return (Compound) get(0);
     }
 
     @NotNull
     public final Compound getConclusion() {
-        return (Compound) term(1);
+        return (Compound) get(1);
     }
 
     PremiseRule(@NotNull Compound premisesResultProduct) {
-        this((Compound) premisesResultProduct.term(0), (Compound) premisesResultProduct.term(1));
+        this((Compound) premisesResultProduct.get(0), (Compound) premisesResultProduct.get(1));
     }
 
     public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
@@ -337,7 +336,7 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getTask() {
-        return getPremise().term(0);
+        return getPremise().get(0);
     }
 
     /**
@@ -345,12 +344,12 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getBelief() {
-        return getPremise().term(1);
+        return getPremise().get(1);
     }
 
     @NotNull
     protected final Term getConclusionTermPattern() {
-        return getConclusion().term(0);
+        return getConclusion().get(0);
     }
 
 
@@ -373,7 +372,7 @@ public class PremiseRule extends GenericCompound {
      * deduplicate and generate match-optimized compounds for rules
      */
     public void compile(@NotNull TermIndex index) {
-        Term[] premisePattern = ((Compound) term(0)).terms();
+        Term[] premisePattern = ((Compound) get(0)).subtermsArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -394,7 +393,7 @@ public class PremiseRule extends GenericCompound {
             String name = v.toString();
             if (Character.isUpperCase(name.charAt(0)) && name.length() == 1) {
                 //do not alter postconditions
-                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.term(1)) ?
+                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.get(1)) ?
                         v : v(Op.VAR_PATTERN, v.toString());
 
             }
@@ -425,8 +424,8 @@ public class PremiseRule extends GenericCompound {
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((Compound) term(0)).terms();
-        Term[] postcons = ((Compound) term(1)).terms();
+        Term[] precon = ((Compound) get(0)).subtermsArray();
+        Term[] postcons = ((Compound) get(1)).subtermsArray();
 
 
         Set<BoolPredicate> pres =
@@ -457,7 +456,7 @@ public class PremiseRule extends GenericCompound {
         for (int i = 2; i < precon.length; i++) {
 
             Compound predicate = (Compound) precon[i];
-            Term predicate_name = predicate.term(1);
+            Term predicate_name = predicate.get(1);
 
             String predicateNameStr = predicate_name.toString();
 
@@ -466,7 +465,7 @@ public class PremiseRule extends GenericCompound {
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
-            args = ((Compound) (predicate.term(0))).terms();
+            args = ((Compound) (predicate.get(0))).subtermsArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
             /*} else {
@@ -842,7 +841,7 @@ public class PremiseRule extends GenericCompound {
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
 
-            Term[] modifiers = ((Compound) postcons[i++]).terms();
+            Term[] modifiers = ((Compound) postcons[i++]).subtermsArray();
 
             postConditions.add(PostCondition.make(this, t, sorted(modifiers)));
         }
@@ -1118,11 +1117,11 @@ public class PremiseRule extends GenericCompound {
         Compound remapped = (Compound) index.replace(this, m);
 
         //Append taskQuestion
-        Compound pc = (Compound) remapped.term(0);
-        Term[] pp = pc.terms(); //premise component
+        Compound pc = (Compound) remapped.get(0);
+        Term[] pp = pc.subtermsArray(); //premise component
         Compound newPremise;
 
-        Compound newConclusion = (Compound) remapped.term(1);
+        Compound newConclusion = (Compound) remapped.get(1);
 
         if (question) {
 
@@ -1131,13 +1130,13 @@ public class PremiseRule extends GenericCompound {
 
 
             //remove truth values and add '?' punct
-            TermContainer ss = ((Compound) newConclusion.term(1)).subterms();
+            TermContainer ss = ((Compound) newConclusion.get(1)).subterms();
             newConclusion = p(
 
-                    newConclusion.term(0), $.p(ss.filter((x) -> {
+                    newConclusion.get(0), $.p(ss.filter((x) -> {
                         return !(((Compound) x).op() == Op.INH && (
-                                ((Compound) x).term(1).equals(BELIEF)
-                                        || ((Compound) x).term(1).equals(GOAL)));
+                                ((Compound) x).get(1).equals(BELIEF)
+                                        || ((Compound) x).get(1).equals(GOAL)));
                     }).append(QUESTION_PUNCTUATION))
             );
 

@@ -397,11 +397,11 @@ public class ArithmeticInduction {
     final static Function<Term, Term> xx = x -> x;
 
     private static boolean equalNonIntegerAtoms(@NotNull TermContainer subs) {
-        Term first = subs.term(0);
+        Term first = subs.get(0);
         int ss = subs.size();
         return first.pathsTo(xx, (ByteList p, Term x) -> {
             for (int i = 1; i < ss; i++) {
-                Term y = subs.term(i);
+                Term y = subs.get(i);
                 if (!p.isEmpty()) {
                     if (!compareNonInteger(x, ((Compound) y).subterm(p)))
                         return false;

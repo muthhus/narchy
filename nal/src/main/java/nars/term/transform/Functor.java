@@ -9,6 +9,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,10 +23,10 @@ import static nars.term.Terms.atomOrNull;
 import static nars.term.atom.Atomic.the;
 
 /** a functor is a term transform which immediately returns
- *  a result Term from the Term[] arguments of
+ *  a result Term from the TermContainer arguments of
  *  a function term, for example: f(x) or f(x, y).
  */
-abstract public class Functor extends AtomConcept implements PermanentConcept, Function<Term[],Term> {
+abstract public class Functor extends AtomConcept implements PermanentConcept, Function<TermContainer,Term> {
 
     public Functor(@NotNull String atom) {
         this(fName(atom));
@@ -40,22 +41,22 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     /** creates a new functor from a term name and a lambda */
-    public static Concept f(@NotNull String termAtom, @NotNull Function<Term[], Term> f) {
+    public static Concept f(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
         return f(fName(termAtom), f);
     }
 
     /** creates a new functor from a term name and a lambda */
-    public static Concept f(@NotNull Atom termAtom, @NotNull Function<Term[], Term> f) {
+    public static Concept f(@NotNull Atom termAtom, @NotNull Function<TermContainer, Term> f) {
         return new LambdaFunctor(termAtom, f);
     }
 
-    public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
+    public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
         return f(fName(termAtom), arityRequired, ff);
     }
 
-    public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<Term[], Term> ff) {
+    public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
         return f(termAtom, (tt)->{
-            if (tt.length!=arityRequired)
+            if (tt.size()!=arityRequired)
                 return null;
                 //throw new RuntimeException(termAtom + " requires " + arityRequired + " arguments: " + Arrays.toString(tt));
 
@@ -81,7 +82,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     /** one argument functor (convenience method) */
     public static Concept f1(@NotNull Atom termAtom, @NotNull Function<Term, Term> ff) {
-        return f(termAtom, 1, (tt)-> ff.apply(tt[0]));
+        return f(termAtom, 1, (tt)-> ff.apply(tt.get(0)));
     }
 
     public static <X extends Term> Concept f1(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
@@ -111,7 +112,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     /** two argument functor (convenience method) */
     public static Concept f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
-        return f(termAtom, 2, (tt)-> ff.apply(tt[0], tt[1]));
+        return f(termAtom, 2, (tt)-> ff.apply(tt.get(0), tt.get(1)));
     }
 
     /** two argument functor (convenience method) */
@@ -141,15 +142,15 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     public static final class LambdaFunctor extends Functor {
 
-        @NotNull private final Function<Term[], Term> f;
+        @NotNull private final Function<TermContainer, Term> f;
 
-        public LambdaFunctor(@NotNull Atom termAtom, @NotNull Function<Term[], Term> f) {
+        public LambdaFunctor(@NotNull Atom termAtom, @NotNull Function<TermContainer, Term> f) {
             super(termAtom);
             this.f = f;
         }
 
         @Nullable
-        @Override public Term apply(@NotNull Term[] terms) {
+        @Override public Term apply(@NotNull TermContainer terms) {
             return f.apply(terms);
         }
     }
@@ -164,12 +165,12 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         }
 
         @Nullable
-        @Override public final Term apply(@NotNull Term[] x) {
-            if (x.length!=1)
+        @Override public final Term apply(@NotNull TermContainer x) {
+            if (x.size()!=1)
                 return null;
                 //throw new UnsupportedOperationException("# args must equal 1");
 
-            return apply(x[0]);
+            return apply(x.get(0));
         }
 
         @Nullable
@@ -186,11 +187,11 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         }
 
         @Nullable
-        @Override public final Term apply(@NotNull Term[] x) {
-            if (x.length!=2)
+        @Override public final Term apply(@NotNull TermContainer x) {
+            if (x.size()!=2)
                 throw new UnsupportedOperationException("# args must equal 2");
 
-            return apply(x[0], x[1]);
+            return apply(x.get(0), x.get(1));
         }
 
         @Nullable

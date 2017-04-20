@@ -258,7 +258,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                ((Compound) terms.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).terms()
+                ((Compound) terms.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).subtermsArray()
         );
     }
 

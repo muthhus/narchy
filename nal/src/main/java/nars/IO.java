@@ -297,7 +297,7 @@ public class IO {
         out.writeByte(siz);
 
         for (int i = 0; i < siz; i++)
-            writeTerm(out, c.term(i));
+            writeTerm(out, c.get(i));
     }
 
     public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
@@ -531,7 +531,7 @@ public class IO {
                 if ((i != 0) || bb) {
                     p.append(Op.ARGUMENT_SEPARATOR);
                 }
-                c.term(i).append(p);
+                c.get(i).append(p);
             }
         }
 
@@ -543,7 +543,7 @@ public class IO {
                 if ((i != 0) || bb) {
                     p.append(Op.ARGUMENT_SEPARATOR);
                 }
-                filter.apply(c.term(i)).append(p);
+                filter.apply(c.get(i)).append(p);
             }
         }
 
@@ -573,20 +573,20 @@ public class IO {
                 case NEG:
                     //special case disjunction: (--,(&&,.....))
                     if (Terms.isDisjunction(c)) {
-                        compoundAppend(Op.DISJ.toString(), ((Compound) c.term(0)).subterms(), $::neg, p);
+                        compoundAppend(Op.DISJ.toString(), ((Compound) c.get(0)).subterms(), $::neg, p);
                         return;
                     }
             }
 
             if (op.statement || c.size() == 2) {
-                Term subj = c.term(0);
+                Term subj = c.get(0);
 
                 //special case: functional form
                 if (op == INH && subj.op() == Op.PROD) {
-                    Term pred = c.term(1);
+                    Term pred = c.get(1);
                     Op pOp = pred.op();
                     if (pOp == ATOM) {
-                        operationAppend((Compound) c.term(0), (Atomic) pred, p);
+                        operationAppend((Compound) c.get(0), (Atomic) pred, p);
                         return;
                     }
                 }
@@ -650,7 +650,7 @@ public class IO {
             int s = product.size();
             p.append(Op.COMPOUND_TERM_OPENER);
             for (int i = 0; i < s; i++) {
-                product.term(i).append(p);
+                product.get(i).append(p);
                 if (i < s - 1) {
                     p.append(",");
                 }
@@ -668,7 +668,7 @@ public class IO {
             int relationIndex = image.dt();
             int i;
             for (i = 0; i < len; i++) {
-                Term tt = image.term(i);
+                Term tt = image.get(i);
 
                 p.append(Op.ARGUMENT_SEPARATOR);
                 //if (pretty) p.append(' ');
@@ -707,7 +707,7 @@ public class IO {
 
             p.append(opener);
             for (int i = 0; i < len; i++) {
-                Term tt = set.term(i);
+                Term tt = set.get(i);
                 if (i != 0) p.append(Op.ARGUMENT_SEPARATOR);
                 tt.append(p);
             }
@@ -724,7 +724,7 @@ public class IO {
             //        }
 
 
-            Term[] xt = argsProduct.terms();
+            Term[] xt = argsProduct.subtermsArray();
 
             p.append(operator.toString());
 

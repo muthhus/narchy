@@ -24,12 +24,12 @@ public final class TermVector2 extends TermVector {
 
     @NotNull
     @Override
-    public Term[] terms() {
+    public Term[] subtermsArray() {
         return new Term[] { x, y };
     }
 
     @Override
-    public @NotNull Term term(int i) {
+    public @NotNull Term get(int i) {
         switch (i) {
             case 0: return x;
             case 1: return y;
@@ -45,7 +45,7 @@ public final class TermVector2 extends TermVector {
 
     @Override
     public Iterator<Term> iterator() {
-        return IteratorUtils.arrayIterator(terms());
+        return IteratorUtils.arrayIterator(subtermsArray());
     }
 
     @Override

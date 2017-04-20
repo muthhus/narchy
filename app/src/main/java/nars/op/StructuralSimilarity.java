@@ -38,8 +38,8 @@ public class StructuralSimilarity implements Consumer<Task> {
                 int max = Math.max(as, bs);
                 int plus = as + bs;
                 Set<Term> e = new HashSet(plus);
-                Collections.addAll(e, A.terms());
-                Collections.addAll(e, B.terms());
+                Collections.addAll(e, A.subtermsArray());
+                Collections.addAll(e, B.subtermsArray());
                 float uniques = plus - e.size();
                 float similarity = (uniques / max);
                 if (similarity > 0) //remain silent about cases where nothing is common

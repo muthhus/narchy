@@ -41,12 +41,12 @@ public class TermVector1 implements TermContainer, Set<Term> {
 
     @NotNull
     @Override
-    public Term[] terms() {
+    public Term[] subtermsArray() {
         return new Term[] {  the };
     }
 
     @Override
-    public final @NotNull Term term(int i) {
+    public final @NotNull Term get(int i) {
         if (i!=0)
             throw new ArrayIndexOutOfBoundsException();
         return the;
@@ -107,7 +107,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     @NotNull
     @Override
     public Term[] toArray() {
-        return terms();
+        return subtermsArray();
     }
 
     @NotNull
@@ -173,7 +173,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
     @Override public boolean equalTo(@NotNull TermContainer b) {
         return //(hashCode() == b.hashCode()) &&
                 (b.size()==1) &&
-                the.equals(b.term(0));
+                the.equals(b.get(0));
     }
 
     @Override

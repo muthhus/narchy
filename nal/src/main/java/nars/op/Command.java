@@ -28,7 +28,7 @@ public interface Command extends Operator {
     default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
         Compound c = t.term();
         try {
-            run((Atomic) (c.term(1)), ((Compound) (t.term(0))).terms(), nar);
+            run((Atomic) (c.get(1)), ((Compound) (t.term(0))).subtermsArray(), nar);
             return t;
         } catch (Throwable error) {
             if (Param.DEBUG)
