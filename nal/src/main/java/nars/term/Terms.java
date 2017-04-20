@@ -26,7 +26,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import static nars.Op.*;
+import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 /**

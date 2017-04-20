@@ -18,7 +18,6 @@ import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

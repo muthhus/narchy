@@ -5,11 +5,9 @@ import jcog.Util;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
 

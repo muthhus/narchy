@@ -1,9 +1,9 @@
 package nars;
 
 import jcog.bag.Bag;
+import jcog.bag.util.Bagregate;
 import jcog.data.FloatParam;
 import jcog.event.On;
-import jcog.bag.util.Bagregate;
 import nars.concept.Concept;
 import nars.gui.BagChart;
 import nars.gui.HistogramChart;

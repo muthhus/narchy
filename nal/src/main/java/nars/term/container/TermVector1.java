@@ -6,7 +6,6 @@ import nars.term.Term;
 import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;

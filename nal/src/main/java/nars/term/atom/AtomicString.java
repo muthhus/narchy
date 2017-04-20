@@ -1,8 +1,5 @@
 package nars.term.atom;
 
-import nars.index.term.TermIndex;
-import nars.term.Term;
-
 /**
  * Created by me on 1/1/16.
  */

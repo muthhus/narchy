@@ -3,7 +3,6 @@ package nars.concept;
 import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
-import nars.attention.Activation;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.*;

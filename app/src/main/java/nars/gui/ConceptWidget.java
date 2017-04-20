@@ -1,9 +1,9 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import nars.$;
 import nars.NAR;
 import nars.Task;

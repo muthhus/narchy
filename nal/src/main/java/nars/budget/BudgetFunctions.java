@@ -26,7 +26,6 @@ import nars.Task;
 import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static jcog.pri.PriMerge.plus;
 

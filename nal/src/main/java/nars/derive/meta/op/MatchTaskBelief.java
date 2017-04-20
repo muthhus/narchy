@@ -1,11 +1,7 @@
 package nars.derive.meta.op;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.ListMultimap;
-import com.google.common.primitives.Bytes;
 import nars.$;
 import nars.Op;
-import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
@@ -13,19 +9,14 @@ import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.index.term.PatternTermIndex;
 import nars.premise.Derivation;
-import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
-import nars.term.atom.Atomic;
-import nars.term.subst.Unify;
-import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-
-import static java.util.Comparator.*;
-import static org.eclipse.collections.impl.factory.Maps.immutable;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
 
 
 public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<Derivation> {

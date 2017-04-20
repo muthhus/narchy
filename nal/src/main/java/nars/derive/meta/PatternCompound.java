@@ -15,7 +15,6 @@ import nars.term.mutate.Choose2;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 

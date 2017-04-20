@@ -1,9 +1,9 @@
 package jcog.bag;
 
 import com.google.common.base.Joiner;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.stat.Frequency;
 import org.junit.Test;

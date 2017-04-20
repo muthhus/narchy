@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static nars.Op.CONJ;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 
 /**

@@ -1,17 +1,5 @@
 package jcog.io;
 
-import com.google.common.primitives.Ints;
-import jcog.cache.ByteUtil;
-import org.eclipse.collections.impl.collector.Collectors2;
-
-import java.math.BigDecimal;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 /**
  * Binar <-> Text Transducers
  */

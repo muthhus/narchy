@@ -3,10 +3,8 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicPredicate;
-import nars.derive.meta.BoolPredicate;
 import nars.premise.Derivation;
 import nars.term.Compound;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**

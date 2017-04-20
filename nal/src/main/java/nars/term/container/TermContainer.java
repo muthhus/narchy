@@ -1,6 +1,5 @@
 package nars.term.container;
 
-import jcog.data.array.DirectArrayUnenforcedSet;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -14,7 +13,6 @@ import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
-import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -30,7 +28,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Op.commutive;
-import static org.eclipse.collections.impl.factory.Sets.immutable;
 
 
 /**

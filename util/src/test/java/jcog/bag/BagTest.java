@@ -1,10 +1,10 @@
 package jcog.bag;
 
+import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
-import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.CurveBag;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;

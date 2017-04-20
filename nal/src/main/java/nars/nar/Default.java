@@ -5,7 +5,6 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;
 import nars.control.FireConcepts;

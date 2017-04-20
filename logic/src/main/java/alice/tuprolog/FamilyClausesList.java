@@ -4,7 +4,6 @@ package alice.tuprolog;
 import jcog.list.FasterList;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * <code>FamilyClausesList</code> is a common <code>LinkedList</code>

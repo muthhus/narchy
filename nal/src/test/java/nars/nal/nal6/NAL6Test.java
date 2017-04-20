@@ -3,7 +3,6 @@ package nars.nal.nal6;
 import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
-import nars.time.Tense;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,10 +1,10 @@
 package nars.gui;
 
+import jcog.bag.util.Bagregate;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import jcog.bag.util.Bagregate;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;

@@ -1,7 +1,5 @@
 package nars.derive.meta.constraint;
 
-import nars.$;
-import nars.derive.meta.op.MatchTaskBelief;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

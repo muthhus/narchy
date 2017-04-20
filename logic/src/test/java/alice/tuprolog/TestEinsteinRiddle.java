@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import static alice.tuprolog.TestGolog.source;
 import static alice.tuprolog.TestGolog.theory;
 import static org.junit.Assert.assertEquals;
 

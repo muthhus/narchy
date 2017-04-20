@@ -8,7 +8,6 @@ import nars.derive.meta.Fork;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

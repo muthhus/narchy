@@ -1,11 +1,6 @@
 package nars.video;
 
 
-import jcog.data.FloatParam;
-import jcog.random.XorShift128PlusRandom;
-
-import java.util.Random;
-
 public interface Bitmap2D {
 
     /** explicit refresh update the image */

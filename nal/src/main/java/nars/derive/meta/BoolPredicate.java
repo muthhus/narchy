@@ -2,7 +2,6 @@ package nars.derive.meta;
 
 import nars.term.Compound;
 import nars.term.ProxyCompound;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 
 import java.util.function.Predicate;

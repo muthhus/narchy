@@ -1,6 +1,5 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
 import nars.premise.Derivation;
 import nars.term.Compound;

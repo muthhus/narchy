@@ -3,8 +3,6 @@ package nars.experiment;
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.newt.event.KeyEvent;
 import com.jogamp.opengl.GL2;
-import jcog.Util;
-import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;

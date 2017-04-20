@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;

@@ -1,12 +1,9 @@
 package nars.derive.meta.constraint;
 
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.$.func;
 
 
 public final class NotEqualConstraint extends MatchConstraint {

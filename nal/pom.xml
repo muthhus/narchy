@@ -4,12 +4,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nal</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <inceptionYear>2016</inceptionYear>
     <parent>
-        <groupId>opennars</groupId>
+        <groupId>narchy</groupId>
         <artifactId>narchy</artifactId>
-        <version>1.8-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <packaging>jar</packaging>
     <licenses>
@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>automenta</groupId>
-            <artifactId>jcog</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>narchy</groupId>
+            <artifactId>util</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
 

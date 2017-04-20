@@ -6,7 +6,6 @@ import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;

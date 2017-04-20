@@ -9,8 +9,6 @@ import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.False;
-
 /**
  * substituteIfUnifies....(term, varFrom, varTo)
  *

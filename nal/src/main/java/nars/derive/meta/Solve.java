@@ -6,7 +6,6 @@ import nars.premise.TruthPuncEvidence;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
-import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;

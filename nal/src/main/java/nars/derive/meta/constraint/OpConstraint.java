@@ -2,7 +2,6 @@ package nars.derive.meta.constraint;
 
 import nars.$;
 import nars.Op;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;

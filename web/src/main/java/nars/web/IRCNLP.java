@@ -3,13 +3,13 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.Util;
+import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import jcog.bag.impl.ArrayBag;
 import nars.bag.leak.LeakOut;
-import jcog.pri.PriMerge;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;

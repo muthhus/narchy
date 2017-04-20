@@ -3,7 +3,6 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;

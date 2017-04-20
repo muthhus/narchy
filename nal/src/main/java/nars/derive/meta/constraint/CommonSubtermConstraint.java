@@ -1,6 +1,5 @@
 package nars.derive.meta.constraint;
 
-import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;

@@ -1,7 +1,6 @@
 package nars.derive.meta.constraint;
 
 import nars.term.Compound;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;

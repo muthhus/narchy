@@ -1,12 +1,11 @@
 package jcog.data.array;
 
-import jcog.list.ArrayUnenforcedSet;
 import jcog.data.sorted.AbstractSet;
 import org.apache.commons.collections4.iterators.ArrayIterator;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * wraps an array which you promise is duplicate free and/or sorted

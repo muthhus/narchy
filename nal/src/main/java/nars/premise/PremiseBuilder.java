@@ -2,7 +2,6 @@ package nars.premise;
 
 import jcog.pri.PLink;
 import jcog.pri.Priority;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
@@ -13,16 +12,13 @@ import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import static nars.Op.NEG;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 

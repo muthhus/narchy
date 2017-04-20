@@ -1,7 +1,7 @@
 package jcog.bloom.quantitative;
 
-import jcog.bloom.LeakySet;
 import jcog.bloom.BloomFilterBuilder;
+import jcog.bloom.LeakySet;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
