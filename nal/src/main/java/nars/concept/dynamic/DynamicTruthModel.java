@@ -9,7 +9,6 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.obj.Termject;
 import nars.truth.Truth;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -36,7 +35,7 @@ abstract public class DynamicTruthModel {
         @NotNull
         @Override
         public Term[] components(Compound superterm) {
-            return superterm.subtermsArray();
+            return superterm.toArray();
         }
     };
 
@@ -227,7 +226,7 @@ abstract public class DynamicTruthModel {
         @NotNull private final Term[] comp;
 
         protected Intersection() {
-            this.comp = Terms.empty;
+            this.comp = Term.EmptyArray;
         }
 
         public Intersection(@NotNull Term... comp) {

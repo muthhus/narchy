@@ -280,7 +280,7 @@ public abstract class TermIndex extends TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
-        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.subtermsArray());
+        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.toArray());
     }
 
 //    @Override
@@ -605,7 +605,7 @@ public abstract class TermIndex extends TermBuilder {
         public Term apply(@Nullable Compound parent, @NotNull Term term) {
             if (term instanceof Compound && ((Compound) term).dt() == XTERNAL) {
                 Compound cs = (Compound) term;
-                return the(cs.op(), DTERNAL, cs.subtermsArray());
+                return the(cs.op(), DTERNAL, cs.toArray());
             }
             return term;
         }

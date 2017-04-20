@@ -1,5 +1,6 @@
 package nars.term.container;
 
+import jcog.data.array.DirectArrayUnenforcedSet;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -17,13 +18,11 @@ import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -32,7 +31,6 @@ import java.util.stream.Stream;
 
 import static nars.Op.commutive;
 import static org.eclipse.collections.impl.factory.Sets.immutable;
-import static org.eclipse.collections.impl.factory.Sets.mutable;
 
 
 /**
@@ -43,13 +41,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     default public TermContainer append(@NotNull Term x) {
-        return TermVector.the(ArrayUtils.add(subtermsArray(),x));
+
+        return TermVector.the(ArrayUtils.add(toArray(),x));
     }
 
     //TODO optionally allow atomic structure positions to differ
     default boolean equivalentStructures() {
         int t0Struct = get(0).structure();
-        for (int i = 1; i < size(); i++) {
+        int s = size();
+        for (int i = 1; i < s; i++) {
             if (get(i).structure()!=t0Struct)
                 return false;
         }
@@ -57,7 +57,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         ByteList structureKey = get(0).structureKey();
         {
             ByteArrayList reuseKey = new ByteArrayList(structureKey.size());
-            for (int i = 1; i < size(); i++) {
+            for (int i = 1; i < s; i++) {
                 //all subterms must share the same structure
                 //TODO only needs to construct the key while comparing equality with the first
                 if (!get(i).structureKey(reuseKey).equals(structureKey))
@@ -96,16 +96,28 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default @NotNull Set<Term> toSet() {
-        return mutable.of(subtermsArray());
+        int s = size();
+        if (s == 0) {
+            return Collections.emptySet();
+        } else {
+            UnifiedSet u = new UnifiedSet(s);
+            forEach(u::add);
+            return u;
+        }
+
+//        return new DirectArrayUnenforcedSet<Term>(Terms.sorted(toArray())) {
+//            @Override
+//            public boolean removeIf(Predicate<? super Term> filter) {
+//
+//                return false;
+//            }
+//        };
     }
 
-    default @NotNull ImmutableSet<Term> toSetImmutable() {
-        return immutable.of(subtermsArray());
-    }
 
-    static @NotNull MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
+    static @Nullable MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         if ((a.structure() & b.structure()) == 0)
-            return Sets.mutable.empty(); //nothing in common
+            return null; //nothing in common
         else
             return Sets.intersect(a.toSet(), b.toSet());
     }
@@ -310,21 +322,19 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
-    void copyInto(Collection<Term> target);
-
-
-    /**
-     * expected to provide a non-copy reference to an internal array,
-     * if it exists. otherwise it should create such array.
-     * if this creates a new array, consider using .term(i) to access
-     * subterms iteratively.
-     */
-    default public Term[] subtermsArray() {
-        return subtermsArray(null);
+    default void copyInto(Collection<Term> target) {
+        forEach(target::add);
     }
 
-    default Term[] subtermsArray(@Nullable Term[] x) {
+
+    default public Term[] toArray() {
+        return toArray(null);
+    }
+
+    default Term[] toArray(@Nullable Term[] x) {
         int s = size();
+        if (s == 0)
+            return Term.EmptyArray;
 
         if (x == null || x.length!=s)
             x = new Term[s];
@@ -347,7 +357,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 added++;
             }
         }
-        return added > 0 ? Terms.empty : l.toArray(new Term[added]);
+        return added > 0 ? Term.EmptyArray : l.toArray(new Term[added]);
     }
 
 
@@ -665,7 +675,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //            throw new RuntimeException("wrong size");
 //        }
         int j = 0;
-        for (int i = 0; i < input.size(); i++) {
+        int l = input.size();
+        for (int i = 0; i < l; i++) {
             Term x = input.get(i);
             if ((x != a) && (x != b))
                 output[j++] = x;
@@ -700,13 +711,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
     @NotNull
-    static Set<Term> exceptToSet(@NotNull TermContainer c, @NotNull MutableSet<Term> toRemove) {
+    static Set<Term> toSetExcept(@NotNull TermContainer c, @NotNull MutableSet<Term> except) {
 
         int cs = c.size();
         Set<Term> s = new HashSet(cs);
         for (int i = 0; i < cs; i++) {
             Term x = c.get(i);
-            if (!toRemove.contains(x))
+            if (!except.contains(x))
                 s.add(x);
         }
         return s;
@@ -717,7 +728,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 
         return TermVector.the(
-                Stream.of(subtermsArray()).filter(p).toArray(i -> new Term[i])
+                Stream.of(toArray()).filter(p).toArray(i -> new Term[i])
         );
     }
 
@@ -788,6 +799,23 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 return false;
         }
         return true;
+    }
+
+            /**
+     * match a range of subterms of Y.
+     */
+    @NotNull
+    default public Term[] toArraySubRange(int from, int to) {
+        int s = to - from;
+
+        Term[] l = new Term[to - from];
+
+        int x = 0, y = from;
+        for (int i = 0; i < s; i++) {
+            l[x++] = get(y++);
+        }
+
+        return l;
     }
 
 }

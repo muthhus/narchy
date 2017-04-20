@@ -255,7 +255,7 @@ public class NarseseTest {
 
     private void testOperationStructure(@NotNull Compound t) {
         //Term[] aa = Operator.argArray(t);
-        Term[] aa = ((Compound)t.get(0)).subtermsArray();
+        Term[] aa = ((Compound)t.get(0)).toArray();
         assertEquals(2, aa.length);
         assertEquals("believe", t.get(1).toString());
         //assertEquals("^believe", Operator.operator(t).toString());
@@ -648,17 +648,6 @@ public class NarseseTest {
 
     }
 
-
-    @Test public void testInvalidTrueFalseTask() {
-        for (Term t : new Term[] { Op.True, Op.False }) {
-            Compound bad = $.p("x", "y", "z");
-            bad.subterms().subtermsArray()[0] = t; //directly replace it because constructing such a term wont be allowed
-
-            assertInvalidTasks(()->$.task(bad, Op.BELIEF, $.t(1f, 0.9f)).apply(n));
-            assertInvalidTasks(()->$.task(bad, Op.QUESTION, $.t(1f, 0.9f)).apply(n));
-        }
-
-    }
 
     @Test public void testEmptyProduct() throws Narsese.NarseseException {
         Compound e = term("()");

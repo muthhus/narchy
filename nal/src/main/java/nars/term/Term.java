@@ -54,6 +54,9 @@ import static nars.time.Tense.DTERNAL;
 public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
 
+    //@NotNull public static final int[] ZeroIntArray = new int[0];
+    @NotNull Term[] EmptyArray = new Term[0];
+
     @NotNull
     @Override
     default Term term() {
@@ -392,14 +395,17 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
         return op();
     }
 
-    Term eval(TermIndex index);
+    default Term eval(TermIndex index) {
+        return this;
+    }
 
     default void events(List<ObjectLongPair<Term>> events, long dt) {
         events.add(PrimitiveTuples.pair(this, dt));
     }
 
 
-    @NotNull public static Term falseIfNull(@Nullable Term maybeNull) {
+    @NotNull
+    static Term falseIfNull(@Nullable Term maybeNull) {
         return (maybeNull==null) ? False : maybeNull;
     }
 

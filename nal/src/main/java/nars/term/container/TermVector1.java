@@ -7,6 +7,7 @@ import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -15,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Size 1 TermVector
  */
-public class TermVector1 implements TermContainer, Set<Term> {
+public class TermVector1 implements TermContainer {
 
     public final Term the;
 
@@ -41,7 +42,7 @@ public class TermVector1 implements TermContainer, Set<Term> {
 
     @NotNull
     @Override
-    public Term[] subtermsArray() {
+    public Term[] toArray() {
         return new Term[] {  the };
     }
 
@@ -78,9 +79,8 @@ public class TermVector1 implements TermContainer, Set<Term> {
         return 1;
     }
 
-
     @Override @NotNull public Set<Term> toSet() {
-        return this; //this is why this class implements Set
+        return Collections.singleton(the);
     }
 
     @NotNull
@@ -90,73 +90,33 @@ public class TermVector1 implements TermContainer, Set<Term> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        return the.equals(o);
-    }
-
-    @Override
     public Iterator<Term> iterator() {
         return Iterators.singletonIterator(the);
     }
 
-    @NotNull
-    @Override
-    public Term[] toArray() {
-        return subtermsArray();
-    }
+//    @NotNull
+//    @Override
+//    public Term[] toArray() {
+//        return subtermsArray();
+//    }
+//
+//    @NotNull
+//    @Override
+//    public <T> T[] toArray(T[] ts) {
+//        throw new UnsupportedOperationException();
+//    }
 
-    @NotNull
-    @Override
-    public <T> T[] toArray(T[] ts) {
-        throw new UnsupportedOperationException();
-    }
 
-    @Override
-    public boolean add(Term term) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> collection) {
-        int cs = collection.size();
-        switch (cs) {
-            case 0:
-                throw new UnsupportedOperationException(); //?
-            case 1:
-                return the.equals(collection.iterator().next());
-        }
-        return false;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Term> collection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> collection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> collection) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException();
-    }
+//    public boolean containsAll(Collection<?> collection) {
+//        int cs = collection.size();
+//        switch (cs) {
+//            case 0:
+//                throw new UnsupportedOperationException(); //?
+//            case 1:
+//                return the.equals(collection.iterator().next());
+//        }
+//        return false;
+//    }
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
@@ -176,10 +136,6 @@ public class TermVector1 implements TermContainer, Set<Term> {
                 the.equals(b.get(0));
     }
 
-    @Override
-    public void copyInto(Collection<Term> target) {
-        target.add(the);
-    }
 
     @Override
     public boolean containsTerm(@NotNull Termlike t) {

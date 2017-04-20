@@ -4,14 +4,12 @@ import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.container.ArrayTermVector;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -34,7 +32,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
 //    }
 
 
-    public final static EllipsisMatch empty = new EllipsisMatch(Terms.empty);
+    public final static EllipsisMatch empty = new EllipsisMatch(Term.EmptyArray);
 
 
     protected EllipsisMatch(Term[] t) {
@@ -59,7 +57,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
         }
 
         if (!y.op().image) {
-            return match(Terms.subRange(y, from, to));
+            return match( y.toArraySubRange(from, to));
         } else {
             assert(to == y.size());
             return ImageMatch.getRemaining(y, from);

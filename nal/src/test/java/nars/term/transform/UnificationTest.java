@@ -84,11 +84,6 @@ public class UnificationTest {
             Unify sub = new Unify($.terms, type,
                     nar.random, Param.UnificationStackMax, Param.UnificationTTL) {
 
-//            @Override
-//            public void onPartial() {
-//                super.onPartial();
-//                System.out.println(xy);
-//            }
 
                 @Override
                 public boolean onMatch() {

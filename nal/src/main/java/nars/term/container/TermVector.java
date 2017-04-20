@@ -95,8 +95,6 @@ public abstract class TermVector implements TermContainer {
     }
 
 
-    @NotNull @Override public abstract Term[] subtermsArray();
-
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action) {
@@ -137,7 +135,7 @@ public abstract class TermVector implements TermContainer {
     @NotNull
     @Override
     public String toString() {
-        return '(' + Joiner.on(',').join(subtermsArray()) + ')';
+        return '(' + Joiner.on(',').join(toArray()) + ')';
     }
 
     @Override
@@ -182,10 +180,6 @@ public abstract class TermVector implements TermContainer {
     }
 
 
-    @Override
-    public final void copyInto(@NotNull Collection<Term> target) {
-        Collections.addAll(target, subtermsArray());
-    }
 
     @Override
     public final int hashCode() {
@@ -206,7 +200,7 @@ public abstract class TermVector implements TermContainer {
         if (size() < 2)
             return this; //no change needed
 
-        return TermVector.the( Util.reverse( subtermsArray().clone() ) );
+        return TermVector.the( Util.reverse( toArray().clone() ) );
     }
 
 }

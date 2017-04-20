@@ -93,7 +93,7 @@ public class Builtin {
                                             if (si == ei)
                                                 return Terms.ZeroProduct;
                                             if (si < ei) {
-                                                return $.p(Arrays.copyOfRange(x.subtermsArray(), si, ei));
+                                                return $.p(Arrays.copyOfRange(x.toArray(), si, ei));
                                             }
                                         }
                                     }
@@ -129,7 +129,7 @@ public class Builtin {
             int size = c.size();
             if (size < 2) return False;
 
-            Term[] x = c.subtermsArray();
+            Term[] x = c.toArray();
             if (size == 2) {
                 int n = nar.random.nextInt(size);
                 return Term.falseIfNull(compoundOrNull(x[n]));

@@ -38,9 +38,6 @@ import static nars.time.Tense.DTERNAL;
  */
 public enum Terms { ;
 
-    //@NotNull public static final int[] ZeroIntArray = new int[0];
-    @NotNull
-    public static final Term[] empty = new Term[0];
     @NotNull
     public static final TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
     @NotNull
@@ -77,185 +74,166 @@ public enum Terms { ;
         return h;
     }
 
-    /**
-     * match a range of subterms of Y.
-     */
-    @NotNull
-    public static Term[] subRange(@NotNull Compound c, int from, int to) {
-        int s = to - from;
-
-        Term[] l = new Term[to - from];
-
-        int x = 0, y = from;
-        for (int i = 0; i < s; i++) {
-            l[x++] = c.get(y++);
-        }
-
-        return l;
-    }
-
-
-
-    @Deprecated
-    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
-
-        /*if (a == null || b == null) {
-            return false;
-        } else {*/
-        Op o = a.op();
-        boolean equalOps = (o == b.op());
-
-        if (equalOps) {
-
-            switch (o) {
-                case INH:
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
-
-                case SIM:
-                    //only half seems necessary:
-                    //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
-                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
-
-                default:
-                    if (Terms.equalAtemporally(a, b))
-                        return false;
-                    break;
-            }
-        }
-
-
-        if ((a instanceof Compound) && (b instanceof Compound)) {
-            //both are compounds
-
-
-            Compound A = ((Compound) a);
-            Compound B = ((Compound) b);
-            int aLen = A.size();
-            if (aLen != B.size()) {
-                return false;
-            } else {
-
-                //match all subterms
-                for (int i = 0; i < aLen; i++) {
-                    if (!equalSubTermsInRespectToImageAndProduct(A.get(i), B.get(i)))
-                        return false;
-                }
-                return true;
-            }
-        }
-
-        return false;
-
-
-    }
-
-
-    public static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Compound A, @NotNull Compound B) {
-
-        if (A.equals(B)) {
-            return true;
-        }
-
-
-        if (/*!hasAny(as, Op.PRODUCT) || */!A.hasAny(Op.ImageBits))
-            return false;
-
-        if (/*!hasAny(bs, Op.PRODUCT) || */!B.hasAny(Op.ImageBits))
-            return false;
-
-//        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
-//            //product and one of either image types
-//            return false; //the remaining comparisons are unnecessary
+//    @Deprecated
+//    public static boolean equalSubTermsInRespectToImageAndProduct(@Nullable Term a, @Nullable Term b) {
+//
+//        /*if (a == null || b == null) {
+//            return false;
+//        } else {*/
+//        Op o = a.op();
+//        boolean equalOps = (o == b.op());
+//
+//        if (equalOps) {
+//
+//            switch (o) {
+//                case INH:
+//                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+//
+//                case SIM:
+//                    //only half seems necessary:
+//                    //boolean y = equalSubjectPredicateInRespectToImageAndProduct((Compound) b, (Compound) a);
+//                    return equalSubjectPredicateInRespectToImageAndProduct((Compound) a, (Compound) b);
+//
+//                default:
+//                    if (Terms.equalAtemporally(a, b))
+//                        return false;
+//                    break;
+//            }
 //        }
-
-        Term subjA = subj(A);
-        Term predA = pred(A);
-        Term subjB = subj(B);
-        Term predB = pred(B);
-
-        Term ta = null, tb = null; //the compound term to put itself in the comparison set
-        Term sa = null, sb = null; //the compound term to put its components in the comparison set
-
-        Op sao = subjA.op();
-        Op sbo = subjB.op();
-        Op pao = predA.op();
-        Op pbo = predB.op();
-
-
-        if ((sao == PROD) && (pbo == IMGe)) {
-            ta = predA;
-            sa = subjA;
-            tb = subjB;
-            sb = predB;
-        }
-
-        if ((sbo == PROD) && (pao == IMGe)) {
-            ta = subjA;
-            sa = predA;
-            tb = predB;
-            sb = subjB;
-        }
-
-        if ((pao == IMGe) && (pbo == IMGe)) {
-            ta = subjA;
-            sa = predA;
-            tb = subjB;
-            sb = predB;
-        }
-
-        if ((sao == IMGi) && (sbo == IMGi)) {
-            ta = predA;
-            sa = subjA;
-            tb = predB;
-            sb = subjB;
-        }
-
-        if ((pao == PROD) && (sbo == IMGi)) {
-            ta = subjA;
-            sa = predA;
-            tb = predB;
-            sb = subjB;
-        }
-
-        if ((pbo == PROD) && (sao == IMGi)) {
-            ta = predA;
-            sa = subjA;
-            tb = subjB;
-            sb = predB;
-        }
-
-        if (ta != null) {
-            //original code did not check relation index equality
-            //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
-            //if (requireEqualImageRelation) {
-            //if (sa.op().isImage() && sb.op().isImage()) {
-            Compound csa = (Compound) sa;
-            Compound csb = (Compound) sb;
-
-            return csa.dt() == csb.dt() && containsAll(csa, ta, csb, tb);
-        } else {
-            return false;
-        }
-
-    }
-
-    private static boolean containsAll(@NotNull TermContainer sat, Term ta, @NotNull TermContainer sbt, Term tb) {
-        //set for fast containment check
-        Set<Term> componentsA = sat.toSet();
-        componentsA.add(ta);
-
-        //test A contains B
-        if (!componentsA.contains(tb))
-            return false;
-
-        Term[] sbtt = sbt.subtermsArray();
-        for (Term x : sbtt) {
-            if (!componentsA.contains(x))
-                return false;
-        }
-
-        return true;
-    }
+//
+//
+//        if ((a instanceof Compound) && (b instanceof Compound)) {
+//            //both are compounds
+//
+//
+//            Compound A = ((Compound) a);
+//            Compound B = ((Compound) b);
+//            int aLen = A.size();
+//            if (aLen != B.size()) {
+//                return false;
+//            } else {
+//
+//                //match all subterms
+//                for (int i = 0; i < aLen; i++) {
+//                    if (!equalSubTermsInRespectToImageAndProduct(A.get(i), B.get(i)))
+//                        return false;
+//                }
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//
+//
+//    }
+//
+//
+//    public static boolean equalSubjectPredicateInRespectToImageAndProduct(@NotNull Compound A, @NotNull Compound B) {
+//
+//        if (A.equals(B)) {
+//            return true;
+//        }
+//
+//
+//        if (/*!hasAny(as, Op.PRODUCT) || */!A.hasAny(Op.ImageBits))
+//            return false;
+//
+//        if (/*!hasAny(bs, Op.PRODUCT) || */!B.hasAny(Op.ImageBits))
+//            return false;
+//
+////        if (!A.hasAny(Op.PRODUCT) || !B.hasAny(Op.PRODUCT) || !A.hasAny(Op.ImageBits) || !B.hasAny(Op.ImageBits)) {
+////            //product and one of either image types
+////            return false; //the remaining comparisons are unnecessary
+////        }
+//
+//        Term subjA = subj(A);
+//        Term predA = pred(A);
+//        Term subjB = subj(B);
+//        Term predB = pred(B);
+//
+//        Term ta = null, tb = null; //the compound term to put itself in the comparison set
+//        Term sa = null, sb = null; //the compound term to put its components in the comparison set
+//
+//        Op sao = subjA.op();
+//        Op sbo = subjB.op();
+//        Op pao = predA.op();
+//        Op pbo = predB.op();
+//
+//
+//        if ((sao == PROD) && (pbo == IMGe)) {
+//            ta = predA;
+//            sa = subjA;
+//            tb = subjB;
+//            sb = predB;
+//        }
+//
+//        if ((sbo == PROD) && (pao == IMGe)) {
+//            ta = subjA;
+//            sa = predA;
+//            tb = predB;
+//            sb = subjB;
+//        }
+//
+//        if ((pao == IMGe) && (pbo == IMGe)) {
+//            ta = subjA;
+//            sa = predA;
+//            tb = subjB;
+//            sb = predB;
+//        }
+//
+//        if ((sao == IMGi) && (sbo == IMGi)) {
+//            ta = predA;
+//            sa = subjA;
+//            tb = predB;
+//            sb = subjB;
+//        }
+//
+//        if ((pao == PROD) && (sbo == IMGi)) {
+//            ta = subjA;
+//            sa = predA;
+//            tb = predB;
+//            sb = subjB;
+//        }
+//
+//        if ((pbo == PROD) && (sao == IMGi)) {
+//            ta = predA;
+//            sa = subjA;
+//            tb = subjB;
+//            sb = predB;
+//        }
+//
+//        if (ta != null) {
+//            //original code did not check relation index equality
+//            //https://code.google.com/p/open-nars/source/browse/trunk/nars_core_java/nars/language/CompoundTerm.java
+//            //if (requireEqualImageRelation) {
+//            //if (sa.op().isImage() && sb.op().isImage()) {
+//            Compound csa = (Compound) sa;
+//            Compound csb = (Compound) sb;
+//
+//            return csa.dt() == csb.dt() && containsAll(csa, ta, csb, tb);
+//        } else {
+//            return false;
+//        }
+//
+//    }
+//
+//    private static boolean containsAll(@NotNull TermContainer sat, Term ta, @NotNull TermContainer sbt, Term tb) {
+//        //set for fast containment check
+//        Set<Term> componentsA = sat.toSet();
+//        componentsA.add(ta);
+//
+//        //test A contains B
+//        if (!componentsA.contains(tb))
+//            return false;
+//
+//        Term[] sbtt = sbt.toArray();
+//        for (Term x : sbtt) {
+//            if (!componentsA.contains(x))
+//                return false;
+//        }
+//
+//        return true;
+//    }
 
 
 
@@ -276,7 +254,7 @@ public enum Terms { ;
         switch (len) {
 
             case 0:
-                return Terms.empty;
+                return Term.EmptyArray;
 
             case 1:
                 return arg; //new Term[] { arg[0] };
@@ -384,7 +362,7 @@ public enum Terms { ;
     @NotNull
     public static Term[] toArray(@NotNull Collection<Term> l) {
         int s = l.size();
-        return s == 0 ? Terms.empty : l.toArray(new Term[s]);
+        return s == 0 ? Term.EmptyArray : l.toArray(new Term[s]);
     }
 
     /**

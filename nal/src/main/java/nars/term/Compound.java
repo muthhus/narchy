@@ -459,8 +459,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     @Override
-    default Term[] subtermsArray() {
-        return subterms().subtermsArray();
+    default Term[] toArray() {
+        return subterms().toArray();
     }
 
 
@@ -633,8 +633,8 @@ public interface Compound extends Term, IPair, TermContainer {
                     return false;
 
             Compound o = (Compound) other;
-            Term[] a = subtermsArray();
-            Term[] b = o.subtermsArray();
+            Term[] a = toArray();
+            Term[] b = o.toArray();
             for (int i = 0; i < s; i++) {
                 if (!a[i].equalsIgnoringVariables(b[i], requireSameTime))
                     return false;
@@ -846,7 +846,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                     if (f != null) {
 
-                        Term dy = f.apply(subterms());
+                        Term dy = f.apply(((Compound)subject).subterms());
                         if (dy == null || dy == this) {
                             return this; //functor returning null return value means keep the original input term
                         } else {

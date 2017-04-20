@@ -47,7 +47,6 @@ public final class CommutivePermutations extends Termutator {
         ShuffledSubterms p = new ShuffledSubterms(f.random,  x);
         //p.reset(f.random); //why is this needed when its called in SHuffledSubterms constructor
 
-
         while (p.hasNext()) {
 
             if (!f.versioning.tick()) break;

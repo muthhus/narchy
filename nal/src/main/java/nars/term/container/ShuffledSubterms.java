@@ -136,12 +136,9 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
 
 
-    @Override
-    public void copyInto(@NotNull Collection<Term> set) {
-        forEach(set::add);
-    }
 
-    public void reset(Random rng) {
+
+    protected void reset(Random rng) {
         restart(srcsubs.size(), rng);
     }
 

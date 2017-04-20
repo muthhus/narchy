@@ -359,13 +359,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                 yFree.removeIf(alreadyInY::contains);
 
-                Iterator<Term> xx = xFree.iterator();
-                while (xx.hasNext()) {
-                    if (yFree.remove(xx.next())) {
-                        xx.remove(); //eliminated
-                    }
-                }
-
+                xFree.removeIf(yFree::remove); //eliminated
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

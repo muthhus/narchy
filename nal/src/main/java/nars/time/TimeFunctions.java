@@ -410,7 +410,7 @@ public interface TimeFunctions {
         if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size() && task.term().vars() == derived.vars())) {
             //something wrong happened with the ellipsis selection.
             //being a decomposition it should produce a smaller result
-            throw new InvalidTermException(derived.op(), derived.subtermsArray(), "ellipsis commutive match fault: same as parent");
+            throw new InvalidTermException(derived.op(), derived.toArray(), "ellipsis commutive match fault: same as parent");
         }
 
         Task belief = p.belief;
@@ -644,7 +644,7 @@ public interface TimeFunctions {
     @Nullable
     static Compound noTemporalBasis(@NotNull Compound derived) {
         if (Param.DEBUG_EXTRA)
-            throw new InvalidTermException(derived.op(), derived.dt(), "no basis for relating other occurrence to derived", derived.subtermsArray()
+            throw new InvalidTermException(derived.op(), derived.dt(), "no basis for relating other occurrence to derived", derived.toArray()
             );
         else
             return null;
@@ -737,7 +737,7 @@ public interface TimeFunctions {
             } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
                 if (derived.size() != 2)
-                    throw new InvalidTermException(derived.op(), derived.subtermsArray(), "expectd arity=2");
+                    throw new InvalidTermException(derived.op(), derived.toArray(), "expectd arity=2");
 
                 //assume derived has 2 terms exactly
                 Term da = derived.get(0);

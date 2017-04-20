@@ -78,7 +78,7 @@ public class TermVectorTest {
         assertTrue(a.isSorted());
         TermContainer b = TermVector.the($.$("b"), $.$("a"));
         assertFalse(b.isSorted());
-        TermContainer s = TermVector.the(Terms.sorted(b.subtermsArray()));
+        TermContainer s = TermVector.the(Terms.sorted(b.toArray()));
         assertTrue(s.isSorted());
         assertEquals(a, s);
         assertNotEquals(b, s);

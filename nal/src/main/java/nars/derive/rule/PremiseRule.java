@@ -372,7 +372,7 @@ public class PremiseRule extends GenericCompound {
      * deduplicate and generate match-optimized compounds for rules
      */
     public void compile(@NotNull TermIndex index) {
-        Term[] premisePattern = ((Compound) get(0)).subtermsArray();
+        Term[] premisePattern = ((Compound) get(0)).toArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -424,8 +424,8 @@ public class PremiseRule extends GenericCompound {
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((Compound) get(0)).subtermsArray();
-        Term[] postcons = ((Compound) get(1)).subtermsArray();
+        Term[] precon = ((Compound) get(0)).toArray();
+        Term[] postcons = ((Compound) get(1)).toArray();
 
 
         Set<BoolPredicate> pres =
@@ -465,7 +465,7 @@ public class PremiseRule extends GenericCompound {
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
-            args = ((Compound) (predicate.get(0))).subtermsArray();
+            args = ((Compound) (predicate.get(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
             /*} else {
@@ -841,7 +841,7 @@ public class PremiseRule extends GenericCompound {
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
 
-            Term[] modifiers = ((Compound) postcons[i++]).subtermsArray();
+            Term[] modifiers = ((Compound) postcons[i++]).toArray();
 
             postConditions.add(PostCondition.make(this, t, sorted(modifiers)));
         }
@@ -1118,7 +1118,7 @@ public class PremiseRule extends GenericCompound {
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.get(0);
-        Term[] pp = pc.subtermsArray(); //premise component
+        Term[] pp = pc.toArray(); //premise component
         Compound newPremise;
 
         Compound newConclusion = (Compound) remapped.get(1);

@@ -34,8 +34,4 @@ public abstract class AtomicString implements Atomic {
         return toString().hashCode();
     }
 
-    @Override
-    public Term eval(TermIndex termIndex) {
-        return this;
-    }
 }

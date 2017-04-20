@@ -226,7 +226,7 @@ public enum $ {
 
     @NotNull
     public static Compound p(@NotNull TermContainer t) {
-        return p((Term[]) t.subtermsArray());
+        return p((Term[]) t.toArray());
     }
 
     /**
@@ -739,7 +739,7 @@ public enum $ {
 
     @Nullable
     public static Term inhImageExt(@NotNull Compound x, @Nullable Term y, @NotNull Atomic oper) {
-        Term[] args = x.subtermsArray();
+        Term[] args = x.toArray();
         Term[] aa = ArrayUtils.add(args, 0, oper);
         return inh(y, imageMask(aa.length - 1, true, aa));
         /*return inh(
@@ -775,7 +775,7 @@ public enum $ {
         );*/
         Term[] argument = new Term[pl];
         argument[0] = relation;
-        System.arraycopy(product.subtermsArray(), 0, argument, 1, pl - 1);
+        System.arraycopy(product.toArray(), 0, argument, 1, pl - 1);
 
         return image(0, true, argument);
         //return the(IMGe, argument);
@@ -808,13 +808,13 @@ public enum $ {
     @Nullable
     public static Compound imge(int relation, @NotNull Compound product) {
         assert (product.op() == Op.PROD);
-        return image(relation, true, product.subtermsArray());
+        return image(relation, true, product.toArray());
     }
 
     @Nullable
     public static Compound imgi(int relation, @NotNull Compound product) {
         assert (product.op() == Op.PROD);
-        return image(relation, false, product.subtermsArray());
+        return image(relation, false, product.toArray());
     }
 
     @Nullable

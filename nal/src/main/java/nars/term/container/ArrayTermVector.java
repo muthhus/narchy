@@ -54,7 +54,7 @@ public class ArrayTermVector extends TermVector {
         return terms[i];
     }
 
-    @NotNull @Override public final Term[] subtermsArray() {
+    @NotNull @Override public final Term[] toArray() {
         return terms;
     }
 

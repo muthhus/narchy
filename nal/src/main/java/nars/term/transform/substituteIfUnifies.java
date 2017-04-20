@@ -80,19 +80,19 @@ abstract public class substituteIfUnifies extends Functor {
     @Override
     public Term apply(@NotNull TermContainer a) {
 
-//        if (xx.length < 3) {
-//            throw new UnsupportedOperationException();
-//        }
+        if (a.size() < 3) {
+            throw new UnsupportedOperationException();
+        }
 
         Term term = a.get(0);
 
         Term x = a.get(1);
         Term y = a.get(2);
 
-//        if (y.equals(term))
-//            return term;
-//        if (x.equals(y))
-//            return term;
+        if (y.equals(term))
+            return term;
+        if (x.equals(y))
+            return term;
 
         Term z = unify(term, x, y);
         return (z != null) ? z : Op.False;

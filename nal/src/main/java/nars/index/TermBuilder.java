@@ -201,7 +201,7 @@ public abstract class TermBuilder {
 
         if (t.op() == INH) {
             Compound ct = (Compound) t;
-            Term[] sp = ct.subtermsArray();
+            Term[] sp = ct.toArray();
             Term s = sp[0];
             Op so = s.op();
             Term p = sp[1];
@@ -231,7 +231,7 @@ public abstract class TermBuilder {
         int l = image.size();
         Term[] t = new Term[l];
         int r = image.dt();
-        @NotNull Term[] imageTerms = image.subtermsArray();
+        @NotNull Term[] imageTerms = image.toArray();
         for (int i = 0 /* skip the first element of the image */, j = 0; j < l; ) {
             t[j++] = ((j) == r) ? other : imageTerms[++i];
         }
@@ -692,7 +692,7 @@ public abstract class TermBuilder {
 
             Op xo = x.op();
             if ((xo == op) && (((Compound) x).dt() == dt)) {
-                flatten(op, ((Compound) x).subtermsArray(), dt, s); //recurse
+                flatten(op, ((Compound) x).toArray(), dt, s); //recurse
             } else {
                 if (!s.isEmpty()) {
                     if (s.remove(neg(x))) {
@@ -835,21 +835,23 @@ public abstract class TermBuilder {
                                 TermContainer preds = cpred.subterms();
 
                                 MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                                int commonSize = common.size();
-                                if (commonSize > 0) {
+                                if (common!=null) {
+                                    int commonSize = common.size();
+                                    if (commonSize > 0) {
 
-                                    if (commonSize == preds.size())
-                                        return False; //shortcut: predicate was entirely removed
+                                        if (commonSize == preds.size())
+                                            return False; //shortcut: predicate was entirely removed
 
-                                    subject = commonSize != subjs.size() ? the(csub, TermContainer.exceptToSet(subjs, common)) : False;
-                                    if (subjNeg)
-                                        subject = neg(subject); //reapply negation
+                                        subject = commonSize != subjs.size() ? the(csub, TermContainer.toSetExcept(subjs, common)) : False;
+                                        if (subjNeg)
+                                            subject = neg(subject); //reapply negation
 
-                                    if (isFalse(subject))
-                                        return False; //shortcut: subject is False, means this will reduce to False regardless
+                                        if (isFalse(subject))
+                                            return False; //shortcut: subject is False, means this will reduce to False regardless
 
-                                    predicate = the(cpred, TermContainer.exceptToSet(preds, common));
-                                    continue;
+                                        predicate = the(cpred, TermContainer.toSetExcept(preds, common));
+                                        continue;
+                                    }
                                 }
                             }
                         }
@@ -1024,8 +1026,8 @@ public abstract class TermBuilder {
         Term[] args;
         if (o1 == intersection) {
             args = ArrayUtils.addAll(
-                    ((TermContainer) term1).subtermsArray(),
-                    o2 == intersection ? ((TermContainer) term2).subtermsArray() : new Term[]{term2}
+                    ((TermContainer) term1).toArray(),
+                    o2 == intersection ? ((TermContainer) term2).toArray() : new Term[]{term2}
             );
         } else {
             args = new Term[]{term1, term2};
@@ -1043,7 +1045,7 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s.isEmpty() ? False : (Compound) finalize(o, s);
+        return s==null || s.isEmpty() ? False : (Compound) finalize(o, s);
     }
 
 
@@ -1073,7 +1075,7 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
-        return the(op, dt, newSubs.subtermsArray());
+        return the(op, dt, newSubs.toArray());
     }
 
     @NotNull
@@ -1107,7 +1109,7 @@ public abstract class TermBuilder {
             return c;
 
         TermContainer st = c.subterms();
-        Term[] oldSubs = st.subtermsArray();
+        Term[] oldSubs = st.toArray();
         Term[] newSubs = oldSubs;
 
         Op o = c.op();

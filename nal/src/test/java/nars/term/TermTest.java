@@ -673,12 +673,12 @@ public class TermTest {
     public void testImageInhConstruction() {
         Compound p = $.p("a", "b", "c");
         assertEquals("(a-->(/,_,b,c))", $.imge(0, p).toString());
-        assertEquals("(a-->(/,_,b,c))", $.image(0, p.subtermsArray()).toString());
+        assertEquals("(a-->(/,_,b,c))", $.image(0, p.toArray()).toString());
         assertEquals("(b-->(/,a,_,c))", $.imge(1, p).toString());
         assertEquals("(c-->(/,a,b,_))", $.imge(2, p).toString());
 
         assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p).toString());
-        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.subtermsArray()).toString());
+        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.toArray()).toString());
         assertEquals("((\\,a,_,c)-->b)", $.imgi(1, p).toString());
         assertEquals("((\\,a,b,_)-->c)", $.imgi(2, p).toString());
 

@@ -724,7 +724,7 @@ public class IO {
             //        }
 
 
-            Term[] xt = argsProduct.subtermsArray();
+            Term[] xt = argsProduct.toArray();
 
             p.append(operator.toString());
 

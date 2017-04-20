@@ -24,7 +24,7 @@ public final class TermVector2 extends TermVector {
 
     @NotNull
     @Override
-    public Term[] subtermsArray() {
+    public Term[] toArray() {
         return new Term[] { x, y };
     }
 
@@ -45,7 +45,7 @@ public final class TermVector2 extends TermVector {
 
     @Override
     public Iterator<Term> iterator() {
-        return IteratorUtils.arrayIterator(subtermsArray());
+        return IteratorUtils.arrayIterator(toArray());
     }
 
     @Override
