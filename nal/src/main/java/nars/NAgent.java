@@ -342,6 +342,7 @@ abstract public class NAgent implements NSense, NAct {
 //                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
 //        );
 
+//                    question(impl($.varQuery(1), happiness), ETERNAL)
 
         //predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
         //predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
@@ -352,7 +353,7 @@ abstract public class NAgent implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     quest((Compound) (action.term()),
-                            now)
+                            now),
                             //ETERNAL)
 
                     //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
@@ -360,8 +361,9 @@ abstract public class NAgent implements NSense, NAct {
 
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
-//                    question(impl(action, 0, happiness), ETERNAL),
-//                    question(impl(neg(action), 0, happiness), ETERNAL)
+
+                    question(impl(action, 0, happiness), ETERNAL),
+                    question(impl(neg(action), 0, happiness), ETERNAL)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -601,6 +603,8 @@ abstract public class NAgent implements NSense, NAct {
     public Task prediction(@NotNull Compound term, byte punct, Truth truth, long start, long end) {
         if (truth == null && !(punct == QUESTION || punct == QUEST))
             return null; //0 conf or something
+
+        term = nar.concepts.normalize(term);
 
         return new ImmutableTask(term, punct, truth, nar.time(), start, end, new long[]{nar.time.nextStamp()});
     }

@@ -26,6 +26,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     final TruthAccumulator
             beliefIntegrated = new TruthAccumulator(),
             goalIntegrated = new TruthAccumulator();
+    private long now;
 
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
@@ -58,7 +59,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     @Override
     public void accept(NAR nar) {
-        long now = nar.time();
+        now = nar.time();
         int dur = nar.dur();
         beliefIntegrated.add( belief( now, dur ));
         goalIntegrated.add( goal( now, dur ));
@@ -112,7 +113,13 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
             super(tCap, historicCap, r);
         }
 
-
+        @Override
+        public float pri(@NotNull Task t) {
+            float mult = 1f;
+            if (t.start() > now)
+                mult = 4f;
+            return mult *  super.pri(t);
+        }
 
         @Override
         protected boolean save(Task t) {

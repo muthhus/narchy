@@ -28,7 +28,7 @@ public class GoalActionConcept extends ActionConcept {
         this.feedback = new Signal(BELIEF, resolution);
 
         this.motor = motor;
-        this.goals = newBeliefTable(nar, false); //pre-create
+        //this.goals = newBeliefTable(nar, false); //pre-create
 
     }
 
@@ -51,7 +51,6 @@ public class GoalActionConcept extends ActionConcept {
 //            tdb = tdg = null;
 //        }
 
-        int dur = nar.dur();
         return feedback.set(term(),
                 this.motor.motor(
                         beliefIntegrated.commitAverage(),

@@ -60,11 +60,11 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     /** returns a new stamp for a sensor task */
     protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
-        Truth g = goal(nar.time(), nar.dur());
-        if (g!=null) {
+        //Truth g = goal(nar.time(), nar.dur());
+        //if (g!=null) {
             //compare goal with belief state to determine if an adjustment task should be created
-            System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
-        }
+            //System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
+        //}
         return nar.time::nextStamp;
     }
 
