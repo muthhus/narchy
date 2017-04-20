@@ -8,6 +8,8 @@ import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.False;
+
 /**
  * substituteIfUnifies....(term, varFrom, varTo)
  *
@@ -80,56 +82,33 @@ abstract public class substituteIfUnifies extends Functor {
     @Override
     public Term apply(@NotNull TermContainer a) {
 
-        if (a.size() < 3) {
-            throw new UnsupportedOperationException();
-        }
+//        if (a.size() < 3) {
+//            throw new UnsupportedOperationException();
+//        }
 
         Term term = a.get(0);
 
         Term x = a.get(1);
         Term y = a.get(2);
 
-        if (y.equals(term))
-            return term;
+//        if (y.equals(term))
+//            return term;
         if (x.equals(y))
-            return term;
-
-        Term z = unify(term, x, y);
-        return (z != null) ? z : Op.False;
-    }
-
-    public @Nullable Term unify(@NotNull Term term, @NotNull Term x, @NotNull Term y) {
-
-//        if (forwardOnly()) {
-//            if (!(term instanceof Compound))
-//                return null;
-//            int dt = ((Compound)term).dt();
-//            if (!(dt == DTERNAL || dt == 0 || term.subtermTime( x ) == 0))
-//                return null;
-//        }
-
-        if (x.equals(y))
-            return null; //no effect
+            return term; //unificatoin would occurr but no changes would result
 
         @Nullable Op op = unifying();
         boolean hasAnyOp =
-                (op==null && (x.vars() + x.varPattern() + y.vars() + y.varPattern()  > 0))
+                (op==null && (x.vars() + x.varPattern()  > 0))
                 ||
                 (op!=null && (x.hasAny(op) || y.hasAny(op)));
 
         if (!hasAnyOp/* && mustSubstitute()*/) {
-            return null; //FAILED
+            return term; //no change
         }
 
-
-        return new SubUnify(parent, op).tryMatch(parent, term, x, y);
-
+        Term z = new SubUnify(parent, op).tryMatch(parent, term, x, y);
+        return (z != null) ? z : term;
     }
-
-//    protected boolean forwardOnly() {
-//        return false;
-//    }
-
 
     public static class substituteIfUnifiesAny extends substituteIfUnifies {
 

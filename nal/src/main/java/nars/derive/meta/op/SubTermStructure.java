@@ -13,6 +13,10 @@ import java.util.List;
  * requires a specific subterm to have minimum bit structure
  */
 public final class SubTermStructure extends AtomicPredicate<Derivation> {
+
+    /** higher number means a stucture with more enabled bits will be decomposed to its components */
+    public static final int SPLIT_THRESHOLD = 3;
+
     public final int subterm;
     public final int bits;
     @NotNull
@@ -21,7 +25,7 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
     public static List<SubTermStructure> get(int subterm, int bits) {
         int numBits = Integer.bitCount(bits);
         assert (numBits > 0);
-        if ((numBits == 1) || (numBits > 3)) {
+        if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
             return Collections.singletonList(new SubTermStructure(subterm, bits));
         } else {
             int i = 0;
