@@ -599,30 +599,25 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return compareTo(this, o);
 //    }
 
-    static int compare(@NotNull TermContainer A, @NotNull Termlike b) {
-        if (A == b) return 0;
+    static int compare(@NotNull TermContainer a, @NotNull Termlike b) {
 
         int diff;
 
-        if ((diff = (A.structure() - b.structure())) != 0)
+        if ((diff = (a.structure() - b.structure())) != 0)
             return diff;
 
-        if ((diff = (A.volume() - b.volume())) != 0)
+        if ((diff = (a.volume() - b.volume())) != 0)
             return diff;
 
         int s;
-        if ((diff = ((s = A.size()) - b.size())) != 0)
+        if ((diff = ((s = a.size()) - b.size())) != 0)
             return diff;
-
-//        if ((diff = ( A.vars() - b.vars())) != 0)
-//            return diff;
 
         TermContainer B = (TermContainer) b;
 
-
         int inequalVariable = -1; //only need to compare the first non-equal variable term
         for (int i = 0; i < s; i++) {
-            Term x = A.term(i);
+            Term x = a.term(i);
             Term y = B.term(i);
             if (x instanceof Variable && y instanceof Variable) {
                 if (inequalVariable==-1 && !x.equals(y))
@@ -638,7 +633,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         //2nd-stage:
         if (inequalVariable!=-1) {
-            return A.term(inequalVariable).compareTo(B.term(inequalVariable));
+            return a.term(inequalVariable).compareTo(B.term(inequalVariable));
         }
 
 

@@ -322,17 +322,22 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             Compound cx = (Compound) this;
             Compound cy = (Compound) y;
 
-            int diff3 = TermContainer.compare(cx.subterms(), cy.subterms());
-            if (diff3 != 0)
-                return diff3;
+            TermContainer cxx = cx.subterms();
+            TermContainer cyy = cy.subterms();
 
-            return cx.dt() - cy.dt();
+            if (!cxx.equals(cyy)) {
+                int c = TermContainer.compare(cxx, cyy);
+                if (c > 0) return +1;
+                else if (c < 0) return -1;
+            }
+
+            return Integer.compare(cx.dt(), cy.dt());
 
         } else if ((this instanceof Atomic) && (y instanceof Atomic)) {
 
             if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
                 //hashcode serves as the ordering too
-                return hashCode() - y.hashCode();
+                return Integer.compare(hashCode() , y.hashCode() );
             }
 
             //if the op is the same, it is required to be a subclass of Atomic
