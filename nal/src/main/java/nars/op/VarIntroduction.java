@@ -1,6 +1,7 @@
 package nars.op;
 
 import nars.$;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -29,11 +30,11 @@ public abstract class VarIntroduction {
             return; //earliest failure test
 
         Set<Term> selections = select(c);
+        if (selections == null) return;
         int ss = selections.size();
-        if (ss == 0)
-            return;
+        if (ss == 0) return;
 
-        Map<Term,Term> substs = new UnifiedMap(ss);
+        Map<Term,Term> substs = new UnifiedMap<>(ss);
         int o = 0;
         for (Term u : selections) {
             Term v = next(c, u, o++);
@@ -42,7 +43,7 @@ public abstract class VarIntroduction {
             substs.put(u, v);
         }
 
-        Term newContent = $.terms.replace(c, substs);
+        Term newContent = index().replace(c, substs);
 
         if ((newContent instanceof Compound) && !newContent.equals(c)) {
             each.accept((Compound) newContent);
@@ -70,6 +71,9 @@ public abstract class VarIntroduction {
 //        }
     }
 
+    protected TermIndex index() {
+        return $.terms;
+    }
 
 
     @Nullable

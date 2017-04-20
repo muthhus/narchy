@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.Op.*;
-import static nars.Op.isTrueOrFalse;
 import static nars.task.Revision.chooseByConf;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.*;
@@ -105,7 +104,7 @@ public interface TimeFunctions {
 
         int dt;
         int ttd = taskTerm.dt();
-        int btd = beliefTerm instanceof Compound ? ((Compound)beliefTerm).dt() : DTERNAL;
+        int btd = beliefTerm instanceof Compound ? ((Compound) beliefTerm).dt() : DTERNAL;
         if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
                 case -2:
@@ -183,7 +182,7 @@ public interface TimeFunctions {
             occReturn[0] = union.a;
 
             if (/*merge && */derived.op() == CONJ) {
-                assert(polarity==1);
+                assert (polarity == 1);
 
                 occReturn[1] = union.b;
 
@@ -209,7 +208,6 @@ public interface TimeFunctions {
             }
 
 
-
         }
 
         //conjunction duration??
@@ -224,17 +222,19 @@ public interface TimeFunctions {
         return derived;
     }
 
-    @Nullable static Compound merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+    @Nullable
+    static Compound merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
 
         List<ObjectLongPair<Term>> events = $.newArrayList();
 
         a.events(events, aStart);
         b.events(events, bStart);
 
-        events.sort((x,y) -> Long.compare(x.getTwo(), y.getTwo()));
+        events.sort((x, y) -> Long.compare(x.getTwo(), y.getTwo()));
 
 
-        int ee = events.size(); assert(ee > 1);
+        int ee = events.size();
+        assert (ee > 1);
 
         //group all parallel clusters
         {
@@ -244,24 +244,29 @@ public interface TimeFunctions {
             for (int i = 1; i <= ee; i++) {
                 long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
                 if (nextAt == headAt) {
-                    if (groupStart == -1) groupStart = i-1;
+                    if (groupStart == -1) groupStart = i - 1;
                 } else {
-                    if (groupStart!=-1) {
+                    if (groupStart != -1) {
                         int groupEnd = i;
-                        Term[] p = new Term[groupEnd - groupStart];  assert(p.length > 1);
+                        Term[] p = new Term[groupEnd - groupStart];
+                        assert (p.length > 1);
                         long when = events.get(groupStart).getTwo();
                         for (int k = 0, j = groupStart; j < groupEnd; j++) {
                             p[k++] = events.get(groupStart).getOne();
-                            events.remove(groupStart);  i--; ee--;
+                            events.remove(groupStart);
+                            i--;
+                            ee--;
                         }
                         Term replacement = $.parallel(p);
-                        if (replacement==null)
+                        if (replacement == null)
                             return null; //failure
                         if (events.isEmpty()) {
                             //got them all here
                             return compoundOrNull(replacement);
                         }
-                        events.add(i, PrimitiveTuples.pair(replacement, when)); i++; ee++;
+                        events.add(i, PrimitiveTuples.pair(replacement, when));
+                        i++;
+                        ee++;
                         groupStart = -1; //reset
                     }
                 }
@@ -339,19 +344,19 @@ public interface TimeFunctions {
     }
 
     static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Compound x) {
-        if ((x!=null) && p.task.isGoal() && p.punct.get().punc==GOAL && (occReturn[0]!=ETERNAL)) {
+        if ((x != null) && p.task.isGoal() && p.punct.get().punc == GOAL && (occReturn[0] != ETERNAL)) {
             long taskStart = p.task.start();
 
 
             //dont derive a past-tense goal (before the task)
-            if (taskStart!=ETERNAL) {
+            if (taskStart != ETERNAL) {
 
 
                 long now = p.nar.time();
 
-                assert(occReturn[1] != ETERNAL);
+                assert (occReturn[1] != ETERNAL);
 
-                    //occReturn[1] = occReturn[0]; //HACK
+                //occReturn[1] = occReturn[0]; //HACK
 
                 if (taskStart > occReturn[0]) {
 
@@ -374,10 +379,12 @@ public interface TimeFunctions {
     }
 
 
-    /** the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound */
+    /**
+     * the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound
+     */
     @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, float[] confScale) -> {
 
-        if (derived.size()==2) {
+        if (derived.size() == 2) {
 
             Compound from = p.task.term();
             int occA = from.subtermTime(derived.get(0));
@@ -417,18 +424,18 @@ public interface TimeFunctions {
         if (taskSize <= 2) { //conjunction of 1 can not occur actually, but for completeness use the <=
             //a decomposition of this will result in a complete subterm (half) of the input.
             //if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
-                //call "decomposeTask"
+            //call "decomposeTask"
             //return decompose(derived, p, occReturn, true);
 
 
             Term resolvedTaskTerm = resolve(p, taskTerm);
             int derivedInTask = resolvedTaskTerm.subtermTime(derived);
 
-            if (derivedInTask!=DTERNAL) {
+            if (derivedInTask != DTERNAL) {
 
-                if (task.isGoal() && derivedInTask!=0) {
+                if (task.isGoal() && derivedInTask != 0) {
                     //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
-                        //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
+                    //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
                     //otherwise it is the conditional decompose
                     if (d.goal.single())
                         return null;
@@ -436,14 +443,14 @@ public interface TimeFunctions {
 
                 if (!task.isEternal()) {
                     occReturn[0] = task.start() + derivedInTask;
-                    occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
+                    occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
                 } else if (belief != null && !belief.isEternal()) {
-                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p,p.beliefTerm));
-                    if (timeOfBeliefInTask==DTERNAL)
+                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p, p.beliefTerm));
+                    if (timeOfBeliefInTask == DTERNAL)
                         timeOfBeliefInTask = 0;
                     long taskOcc = belief.start() - timeOfBeliefInTask;
                     occReturn[0] = taskOcc + derivedInTask;
-                    occReturn[1] = occReturn[0] + (derived.op()==CONJ ? derived.dtRange() : 0);
+                    occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
                 } else {
                     //both eternal - no temporal basis
                     return null;
@@ -513,118 +520,157 @@ public interface TimeFunctions {
             if ((ddt == 0 || ddt == DTERNAL || ddt == XTERNAL)) {
                 return derived; //allow eternal decompose since no temporal information is inside the decomposed term
             } else {
-                return noTemporalBasis(derived);
+                return derived;
+                //noTemporalBasis(derived);
             }
 
         }
 
-
-        long occ = ETERNAL;
-
-
-        if (decomposedTerm.size() != 2) {
-            //probably a (&&+0, ...)
-            occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
+        long occ;
+        if (decomposeTask) {
+            occ = solveDecompose(occDecomposed, derived, p, decomposedTerm); //occOther is the belief's start time
         } else {
-
-            @Nullable Term rDecomposed = resolve(p, decomposedTerm);
-
-            if (rDecomposed!=null) {
-
-                @Nullable Term rDerived = resolve(p, derived);
-
-                if (rDerived != null) {
-                    int dt = rDecomposed.subtermTime(rDerived);
-
-                    //prefer the task's occurrence first
-                    if (dt != DTERNAL) {
-
-                        if (!task.isEternal()) {
-
-                            occ = task.start();
-
-                            Term rTaskTerm = resolve(p, task.term());
-                            if (rTaskTerm!=null) {
-                                Term rOtherTerm = resolve(p, p.beliefTerm);
-                                if (rOtherTerm != null) {
-                                    int taskInDecomposed = rDecomposed.subtermTime(rTaskTerm);
-                                    if (taskInDecomposed!= DTERNAL) { //???
-                                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
-                                        if (otherInDecomposed != DTERNAL) { //???
-                                            occ = task.start() - (otherInDecomposed + rDerived.dtRange()) - taskInDecomposed + dt;
-                                        }
-                                    }
-                                }
-                            }
-
-                        } else if (occDecomposed != ETERNAL) {
-
-                            occ = occDecomposed + dt;
-
-                        }
-
-                    }
-                }
-
-                if (occ == ETERNAL && occOther != ETERNAL) {
+            //occOther is the task's start time. try this first
+            occ = solveDecompose(occOther, derived, p, decomposedTerm);
+        }
 
 
-                    @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm : p.taskTerm);
-                    if (rOtherTerm != null) {
+//        if (occ == ETERNAL && occOther != ETERNAL) {
+//            //try to resolve by using the other's occ
+//            if (occ == ETERNAL && occOther != ETERNAL) {
+//
+//
+//                @Nullable Term rOtherTerm = resolve(p, decomposeTask ? p.beliefTerm : p.taskTerm);
+//                if (rOtherTerm != null) {
+//
+//                    @Nullable Term rDecomposed = resolve(p, decomposedTerm);
+//
+//                    int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
+//
+//                    @Nullable Term rDerived = resolve(p, derived);
+//
+//                    if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
+//                        //special case for &&+0 having undergone some unrecognizable change
+//                        occ = occOther - 0; //+0 should ensure it has the same time as this sibling event
+//
+//                    } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
+//                        int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
+//                        if (derivedInDecomposed != DTERNAL) {
+//                            occ = occOther + derivedInDecomposed;
+//                            if (otherInDecomposed != DTERNAL) { //???
+//                                if (derivedInDecomposed == 0) {
+//                                    occ -= otherInDecomposed + rDerived.dtRange();
+//                                } else {
+//                                    occ -= otherInDecomposed; //<---- TODO subsent_1
+//                                }
+//                            }
+//
+//                        } else {
+//                            //could not back substitute resolve
+//                            return null;
+//                        }
+//                    }
+//
+//                }
+//
+//            }
+//
+//        }
 
-                        //                        if (derivationMatch(rOtherTerm, derived, p)) {
-                        //                            occ = occOther; } else
-                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
-                        if (decomposedTerm.dt() == 0 && otherInDecomposed == 0) {
-                            //special case for &&+0 having undergone some unrecognizable change
-                            occ = occOther - 0; //+0 should ensure it has the same time as this sibling event
+//        if (decomposedTerm.size() != 2) {
+//            //probably a (&&+0, ...)
+//            occ = occDecomposed != ETERNAL ? occDecomposed : occOther;
+//        } else
+//         {
+//
+//            @Nullable Term rDecomposed = resolve(p, decomposedTerm);
+//
+//            if (rDecomposed!=null) {
+//
+//                @Nullable Term rDerived = resolve(p, derived);
+//
+//                if (rDerived != null) {
+//                    int dt = rDecomposed.subtermTime(rDerived);
+//
+//                    //prefer the task's occurrence first
+//                    if (dt != DTERNAL) {
+//                        if (occDecomposed != ETERNAL) {
+//                            occ = occDecomposed + dt;
+//                        } else {
+//
+//                            //try resolving in the otherTask ?
+//
+////                        if (!task.isEternal()) {
+//
+////                            occ = task.start() + dt;
+////
+////                            Term rTaskTerm = resolve(p, task.term());
+////                            if (rTaskTerm!=null) {
+////                                Term rOtherTerm = resolve(p, p.beliefTerm);
+////                                if (rOtherTerm != null) {
+////                                    int taskInDecomposed = rDecomposed.subtermTime(rTaskTerm);
+////                                    if (taskInDecomposed!= DTERNAL) { //???
+////                                        int otherInDecomposed = rDecomposed.subtermTime(rOtherTerm);
+////                                        if (otherInDecomposed != DTERNAL) { //???
+////                                            occ = task.start() - (otherInDecomposed + rDerived.dtRange()) - taskInDecomposed + dt;
+////                                        }
+////                                    }
+////                                }
+////                            }
+////
+////                        } else if (occDecomposed != ETERNAL) {
+////
+////                            occ = occDecomposed + dt;
+////
+////                        }
+////
+//                        }
+//                    }
+//                }
+//
+//
+//                //default:
+//                /*if (occ == ETERNAL)
+//                    occ = occOther;*/
+//
+//            }
+//        }
 
-                        } else if (rDerived != null) { //{ && otherInDecomposed != DTERNAL) {
-                            int derivedInDecomposed = rDecomposed.subtermTime(rDerived);
-                            if (derivedInDecomposed != DTERNAL) {
-                                occ = occOther + derivedInDecomposed;
-                                if (otherInDecomposed != DTERNAL) { //???
-                                    if (derivedInDecomposed == 0) {
-                                        occ -= otherInDecomposed + rDerived.dtRange();
-                                    } else {
-                                        occ -= otherInDecomposed; //<---- TODO subsent_1
-                                    }
-                                }
 
-                            } else {
-                                //could not back substitute resolve
-                                return null;
-                            }
-                        }
-
-                    }
-
-                }
-
-                //default:
-                /*if (occ == ETERNAL)
-                    occ = occOther;*/
-
-            }
-
-
-
-            if (occ == ETERNAL) {
-                return noTemporalBasis(derived);
-            }
-
+        if (occ == ETERNAL) {
+            return noTemporalBasis(derived);
         }
 
 
         occReturn[0] = occ;
 
         //TODO decide if this is right
-        if (occ!=ETERNAL)
+        if (occ != ETERNAL)
             occReturn[1] = occ + derived.dtRange();
 
 
         return derived;
 
+    }
+
+    static long solveDecompose(long occ, @NotNull Compound x, @NotNull Derivation p, Compound container) {
+
+        //occ = occDecomposed + offset of derived task in decomposedTask
+        @Nullable Term rDecomposed = resolve(p, container);
+        if (rDecomposed != null) {
+
+            @Nullable Term rDerived = resolve(p, x);
+            if (rDerived != null) {
+
+                int dt = rDecomposed.subtermTime(rDerived);
+                if (dt != DTERNAL) {
+                    occ += dt;
+                }
+            }
+
+        }
+
+        return occ;
     }
 
     @Nullable
@@ -660,8 +706,8 @@ public interface TimeFunctions {
         Task b = p.belief;
 
         long tOcc = t.start();
-        if (b!=null) {
-            if (t.isQuestOrQuestion() || tOcc==ETERNAL)
+        if (b != null) {
+            if (t.isQuestOrQuestion() || tOcc == ETERNAL)
                 tOcc = b.start(); //use belief time when task is a question, or task is eternal
         }
 
@@ -687,7 +733,6 @@ public interface TimeFunctions {
         } else {
             occReturn[0] = tOcc; //the original behavior, but may not be right
         }
-
 
 
         int dtdt = ((Compound) dtTerm).dt();
@@ -717,7 +762,8 @@ public interface TimeFunctions {
     /**
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
-    @Nullable static Compound dtCombiner(@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, boolean pre, boolean post) {
+    @Nullable
+    static Compound dtCombiner(@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, boolean pre, boolean post) {
 
         Task task = p.task;
         int taskDT = ((Compound) p.taskTerm.unneg()).dt();
@@ -726,8 +772,7 @@ public interface TimeFunctions {
         int beliefDT = (bt instanceof Compound) ? ((Compound) bt.unneg()).dt() : DTERNAL;
         int eventDelta = DTERNAL;
 
-        if (derived.size()>1) {
-
+        if (derived.size() > 1) {
 
 
             if (taskDT == DTERNAL && beliefDT == DTERNAL) {
@@ -790,13 +835,13 @@ public interface TimeFunctions {
 
 
             Compound preSub = (Compound) derived.get(0);
-            boolean neg = preSub.op()==NEG;
+            boolean neg = preSub.op() == NEG;
             if (neg) {
                 preSub = (Compound) preSub.unneg(); //unwrap
             }
 
             int preDT;
-            if ((taskDT != DTERNAL) && (taskDT!=XTERNAL) && (beliefDT != DTERNAL) && (beliefDT!=XTERNAL)) {
+            if ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL)) {
                 preDT = (taskDT - beliefDT);
                 if (!task.term(0).equals(preSub.get(0)))
                     preDT = -preDT; //reverse the order
@@ -804,25 +849,25 @@ public interface TimeFunctions {
                 preDT = DTERNAL;
             }
 
-            Term newPresub = p.index.the( preSub, preDT );
+            Term newPresub = p.index.the(preSub, preDT);
 
             if (!(newPresub instanceof Compound))
                 return null;
 
             derived = compoundOrNull((p.index.the(derived,
-                    new Term[] { $.negIf(newPresub, neg), derived.get(1) })
+                    new Term[]{$.negIf(newPresub, neg), derived.get(1)})
             ));
         }
         if (post && derived.get(1) instanceof Compound) {
 
             Compound postSub = (Compound) derived.get(1);
-            boolean neg = postSub.op()==NEG;
+            boolean neg = postSub.op() == NEG;
             if (neg) {
                 postSub = (Compound) postSub.unneg(); //unwrap
             }
 
             int postDT;
-            if ((taskDT != DTERNAL) && (taskDT!=XTERNAL) && (beliefDT != DTERNAL) && (beliefDT!=XTERNAL)) {
+            if ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL)) {
                 postDT = (taskDT - beliefDT);
                 if (task.term().size() > 1 && postSub.size() > 1 && !task.term(1).equals(postSub.get(1)))
                     postDT = -postDT; //reverse the order
@@ -839,7 +884,7 @@ public interface TimeFunctions {
 
 
             derived = compoundOrNull(
-                    p.index.the(derived, new Term[] { derived.get(0), $.negIf(newSubterm1,neg) } )
+                    p.index.the(derived, new Term[]{derived.get(0), $.negIf(newSubterm1, neg)})
             );
 
         }
@@ -1013,7 +1058,7 @@ public interface TimeFunctions {
         if (occ != ETERNAL) {
 
             Term T = resolve(p, tt);
-            if (T!=null) {
+            if (T != null) {
                 Term B = resolve(p, bb);
 
                 if (belief != null) {
@@ -1152,7 +1197,7 @@ public interface TimeFunctions {
         }
 
         long bo = b.start();
-        if (t.isQuestOrQuestion() || to==ETERNAL)
+        if (t.isQuestOrQuestion() || to == ETERNAL)
             return bo; //use belief time when task is a question, or task is eternal
 
         if (bo == ETERNAL)
@@ -1189,8 +1234,8 @@ public interface TimeFunctions {
             //TODO decide if this is correct
             if (
                     o.temporal
-                        //o==CONJ //conjunctions only
-                    && occReturn[0]!=ETERNAL && occReturn[1] == ETERNAL)
+                            //o==CONJ //conjunctions only
+                            && occReturn[0] != ETERNAL && occReturn[1] == ETERNAL)
                 occReturn[1] = occReturn[0] + n.dtRange();
 
             return (Compound) n;

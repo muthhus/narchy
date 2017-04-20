@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
@@ -89,6 +90,11 @@ abstract public class substituteIfUnifies extends Functor {
         Term term = a.get(0);
 
         Term x = a.get(1);
+        if (x instanceof Atom)
+            return term;
+
+
+
         Term y = a.get(2);
 
 //        if (y.equals(term))
