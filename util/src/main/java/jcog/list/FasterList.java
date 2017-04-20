@@ -48,8 +48,8 @@ public class FasterList<X> extends FastList<X> {
         super(size, x);
     }
 
-    @SafeVarargs
-    public FasterList(X... x) {
+
+    public FasterList(X[] x) {
         super(x);
     }
 

@@ -1,6 +1,7 @@
 package nars.derive.meta.match;
 
 import nars.Op;
+import nars.index.term.AppendProtoCompound;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -76,7 +77,7 @@ public enum ImageMatch {
         }
 
         @Override
-        public void expand(@NotNull Op op, @NotNull List<Term> target) {
+        public void expand(@NotNull Op op, @NotNull AppendProtoCompound target) {
             if (op.image) {
                 //expand normally because imdexes will be included in the expansion
                 super.expand(op, target);

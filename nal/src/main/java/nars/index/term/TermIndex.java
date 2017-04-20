@@ -191,7 +191,7 @@ public abstract class TermIndex extends TermBuilder {
         boolean changed = false;
         Op cop = curr.op();
 
-        CompoundBuilder next = new CompoundBuilder(cop, curr.dt(), len);
+        AppendProtoCompound next = new AppendProtoCompound(cop, curr.dt(), len);
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(cop);
@@ -211,7 +211,7 @@ public abstract class TermIndex extends TermBuilder {
                 subAt = next.size();
 
                 for (; volAt < subAt; volAt++) {
-                    Term st = next.get(volAt);
+                    Term st = next.sub(volAt);
                     if (filterTrueFalse && Op.isTrueOrFalse(st)) return null;
                     volSum += st.volume();
                     if (volSum >= volLimit) {
@@ -260,8 +260,8 @@ public abstract class TermIndex extends TermBuilder {
             return curr;
     }
 
-    protected final Term the(CompoundBuilder t) {
-        return the(t.op, t.dt, t.toArray(new Term[t.size()]));
+    protected Term the(ProtoCompound t) {
+        return the(t.op(), t.dt(), t.subterms());
     }
 
 //    @NotNull
@@ -402,7 +402,7 @@ public abstract class TermIndex extends TermBuilder {
         boolean filterTrueAndFalse = disallowTrueOrFalse(op);
 
         int s = src.size(), modifications = 0;
-        CompoundBuilder target = new CompoundBuilder(op, dt, s);
+        AppendProtoCompound target = new AppendProtoCompound(op, dt, s);
         for (int i = 0; i < s; i++) {
 
             Term x = src.get(i), y;

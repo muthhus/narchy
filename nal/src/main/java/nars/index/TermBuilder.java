@@ -83,7 +83,7 @@ public abstract class TermBuilder {
      * main entry point for compound construction - creates an immutable result
      */
     @NotNull
-    public final Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
+    public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
 
 
         int arity = u.length;
