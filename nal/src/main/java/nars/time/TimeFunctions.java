@@ -428,7 +428,7 @@ public interface TimeFunctions {
             //return decompose(derived, p, occReturn, true);
 
 
-            Term resolvedTaskTerm = resolve(p, taskTerm);
+            Term resolvedTaskTerm = resolve(taskTerm, p);
             int derivedInTask = resolvedTaskTerm.subtermTime(derived);
 
             if (derivedInTask != DTERNAL) {
@@ -445,7 +445,7 @@ public interface TimeFunctions {
                     occReturn[0] = task.start() + derivedInTask;
                     occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
                 } else if (belief != null && !belief.isEternal()) {
-                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p, p.beliefTerm));
+                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p.beliefTerm, p));
                     if (timeOfBeliefInTask == DTERNAL)
                         timeOfBeliefInTask = 0;
                     long taskOcc = belief.start() - timeOfBeliefInTask;
@@ -469,7 +469,7 @@ public interface TimeFunctions {
                 if (!task.isEternal()) {
                     occReturn[0] = task.start();
                 } else if ((belief != null && !belief.isEternal())) {
-                    Term resolvedTaskTerm = resolve(p, taskTerm);
+                    Term resolvedTaskTerm = resolve(taskTerm, p);
                     int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(p.beliefTerm);
                     occReturn[0] = belief.start() - timeOfBeliefInTask;
                 } else {
@@ -510,7 +510,7 @@ public interface TimeFunctions {
 
         long occDecomposed = decomposeTask ? task.start() : (belief != null ? belief.start() : task.start());
         long occOther = (otherTask != null) ? otherTask.start() : ETERNAL;
-
+        Term otherTerm = decomposeTask ? p.beliefTerm : p.taskTerm;
 
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result
@@ -526,12 +526,76 @@ public interface TimeFunctions {
 
         }
 
-        long occ;
+        long occ = ETERNAL;
+
         if (decomposeTask) {
-            occ = solveDecompose(occDecomposed, derived, p, decomposedTerm); //occOther is the belief's start time
+            if (occDecomposed != ETERNAL) {
+
+
+                Compound rDecomposedTerm = compoundOrNull(resolve(decomposedTerm, p));
+                if (rDecomposedTerm != null) {
+                    Term rDerived = resolve(derived, p);
+                    if (rDerived != null) {
+                        occ = solveDecompose(occDecomposed, rDerived, rDecomposedTerm); //occOther is the belief's start time
+                    }
+                }
+
+            }
         } else {
+
             //occOther is the task's start time. try this first
-            occ = solveDecompose(occOther, derived, p, decomposedTerm);
+            Term rDerived = resolve(derived, p);
+            if (rDerived != null) {
+
+                Compound rDecomposed = compoundOrNull(resolve(decomposedTerm, p));
+                if (rDecomposed != null) {
+                    if (occOther != ETERNAL) {
+
+                        Compound rOtherTerm = compoundOrNull(resolve(otherTerm, p));
+                        long derivedInTask = solveDecompose(occOther, rDerived, (Compound) rOtherTerm);
+                        if (derivedInTask != ETERNAL) {
+
+                            int taskInBelief = rDecomposed.subtermTime(rOtherTerm /* task */);
+                            if (taskInBelief != DTERNAL) {
+                                occ = derivedInTask - taskInBelief;
+                            }
+
+                        } else {
+                            if (rDerived != null && rOtherTerm != null) {
+                                int derivedInBelief = rDecomposed.subtermTime(rDerived);
+                                if (derivedInBelief != DTERNAL) {
+                                    int taskInBelief = rDecomposed.subtermTime(rOtherTerm);
+                                    if (taskInBelief != DTERNAL) {
+                                        occ = occOther /* task occ */ + derivedInBelief - taskInBelief;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (occ == ETERNAL && occDecomposed!=ETERNAL) {
+                        //task could not resolve temporally; try to resolve using only the belief
+                        occ = solveDecompose(occDecomposed, rDerived, rDecomposed);
+                    }
+
+                }
+
+            }
+
+//                if (derivedInTask == ETERNAL) {
+            //try further:
+//                    Compound rDecomposedTerm = compoundOrNull(resolve(p, decomposedTerm));
+//                    if (rDecomposedTerm != null) {
+//                            if (rDerived != null) {
+//                                long taskInBelief = solveDecompose(occOther, rOtherTerm, p, rDecomposedTerm);
+//
+//                                long derivedInBelief = solveDecompose(
+//                                        //long derivedInTask
+//                            }
+//                        }
+//                    }
+//                }
+
         }
 
 
@@ -653,28 +717,21 @@ public interface TimeFunctions {
 
     }
 
-    static long solveDecompose(long occ, @NotNull Compound x, @NotNull Derivation p, Compound container) {
+    static long solveDecompose(long occ, @NotNull Term x, @Nullable Compound container) {
 
-        //occ = occDecomposed + offset of derived task in decomposedTask
-        @Nullable Term rDecomposed = resolve(p, container);
-        if (rDecomposed != null) {
+        assert (occ != ETERNAL);
 
-            @Nullable Term rDerived = resolve(p, x);
-            if (rDerived != null) {
-
-                int dt = rDecomposed.subtermTime(rDerived);
-                if (dt != DTERNAL) {
-                    occ += dt;
-                }
+        if (container != null) {
+            int dt = container.subtermTime(x);
+            if (dt != DTERNAL) {
+                return occ + dt;
             }
-
         }
 
-        return occ;
+        return ETERNAL;
     }
 
-    @Nullable
-    static Term resolve(@NotNull Derivation p, @NotNull Term x) {
+    static Term resolve(@NotNull Term x, @NotNull Derivation p) {
         Term y;
         try {
             y = p.resolve(p.index.productNormalize(x));
@@ -1057,9 +1114,9 @@ public interface TimeFunctions {
         //apply occurrence shift
         if (occ != ETERNAL) {
 
-            Term T = resolve(p, tt);
+            Term T = resolve(tt, p);
             if (T != null) {
-                Term B = resolve(p, bb);
+                Term B = resolve(bb, p);
 
                 if (belief != null) {
                     //TODO cleanup simplify this is messy and confusing

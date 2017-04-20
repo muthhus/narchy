@@ -85,7 +85,10 @@ public abstract class Unify extends Termutator implements Subst {
 
         public boolean add(Term x, MatchConstraint m) {
 
-//            //check that constraint isnt violated by existing conditions:
+
+            //check that constraint isnt violated by existing conditions:
+            //shouldnt be necessary if working correctly
+
 //            Term y = xy.get(x);
 //            if (y!=null) {
 //                if (m.invalid(x, y, Unify.this))

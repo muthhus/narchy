@@ -97,8 +97,8 @@ abstract public class substituteIfUnifies extends Functor {
 
         Term y = a.get(2);
 
-//        if (y.equals(term))
-//            return term;
+        if (y.equals(term))
+            return term;
         if (x.equals(y))
             return term; //unificatoin would occurr but no changes would result
 

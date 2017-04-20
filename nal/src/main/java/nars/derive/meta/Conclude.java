@@ -215,7 +215,21 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
                             c3 = m.index.normalize(c3);
                         }
 
+
                         if (c3 != null) {
+
+                            if (c3.op() == NEG) {
+                                c3 = compoundOrNull(c3.unneg());
+                                if (c3 == null)
+                                    return;
+
+                                if (truth!=null)
+                                    truth = truth.negated();
+                            }
+
+                            if (!Task.taskContentValid(c3, ct.punc, nar, true)) {
+                                return;
+                            }
 
                             //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                             // also confidence should not be changed after this budgeting
