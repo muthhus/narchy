@@ -7,7 +7,6 @@ import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
-import nars.derive.meta.constraint.AndConstraint;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
@@ -15,6 +14,7 @@ import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.index.term.PatternTermIndex;
 import nars.premise.Derivation;
 import nars.term.Compound;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
@@ -22,48 +22,37 @@ import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static java.util.Comparator.*;
 import static org.eclipse.collections.impl.factory.Maps.immutable;
 
 
-@Deprecated
-public class MatchTaskBelief extends AtomicPredicate<Derivation> {
-
-
-    @NotNull
-    final String id;
+public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<Derivation> {
 
 
 
-    @NotNull
-    public final Term[] post;
-    @NotNull
-    public final Term[] pre;
+
+    public final List<BoolPredicate> post;
+    public final List<BoolPredicate> pre;
+    public final Set<MatchConstraint> constraints;
 
 //    @NotNull
 //    public final Term term;
 
 
-    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
-
-        //this.pattern = pattern;
-        //compiled = new TermPattern(pattern, constraints);
-
-        //this.term = pattern;
-        this.id = getClass().getSimpleName() + '(' + taskPattern + ',' + beliefPattern + ')';
-
+    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
+        super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
 
         List<BoolPredicate> pre = $.newArrayList();
-        List<BoolPredicate> code = $.newArrayList();
 
-        compile(taskPattern, beliefPattern, pre, code, index, constraints);
+        List<BoolPredicate> post = $.newArrayList();
 
-        this.pre = pre.toArray(new BoolPredicate[pre.size()]);
-        this.post = code.toArray(new BoolPredicate[code.size()]);
+        compile(taskPattern, beliefPattern, pre, post, index, constraints);
 
+        this.pre = pre;
+        this.constraints = constraints; //sorted, at the end of the preMatch
+        this.post = post;
 
         //Term beliefPattern = pattern.term(1);
 
@@ -94,16 +83,10 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         throw new RuntimeException("this should not be called");
     }
 
-    @NotNull
-    @Override
-    public final String toString() {
-        return id;
-    }
-
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
                                 @NotNull List<BoolPredicate> pre, @NotNull List<BoolPredicate> code,
-                                @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+                                @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
 
         //BoolPredicate preGuard = null;
 
@@ -152,7 +135,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
     }
 
     private static void compileTaskBelief(@NotNull List<BoolPredicate> pre,
-                                          @NotNull List<BoolPredicate> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull ListMultimap<Term, MatchConstraint> constraints) {
+                                          @NotNull List<BoolPredicate> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -164,7 +147,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
             pre.add(new PatternOp(1, belief.op()));
 
         if (task!=null && !taskIsPatVar)
-            pre.add(new SubTermStructure(0, task.structure()));
+            pre.addAll(SubTermStructure.get(0, task.structure()));
 
 //        if (belief!=null && task instanceof Compound && !task.isCommutative()) {
 //            int beliefInTask = ((Compound)task).indexOf(belief);
@@ -174,7 +157,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 //        }
 
         if (belief!=null && !belIsPatVar)
-            pre.add(new SubTermStructure(1, belief.structure()));
+            pre.addAll(SubTermStructure.get(1, belief.structure()));
 
         //        } else {
         //            if (x0.containsTermRecursively(x1)) {
@@ -186,9 +169,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 
 
         //ImmutableMap<Term, MatchConstraint> cc = compact(constraints);
-        constraints.forEach((t, c) -> {
-            pre.add(new AddConstraint(t, c));
-        });
+
 
         if (task!=null && belief!=null) {
 
@@ -236,7 +217,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
         if (task.size() == 0) {
             return true;
         }
-        
+
         //prefer non-ellipsis matches first
         Ellipsis beliefEllipsis = Ellipsis.firstEllipsisRecursive(belief);
         if (beliefEllipsis!=null) {
@@ -390,28 +371,7 @@ public class MatchTaskBelief extends AtomicPredicate<Derivation> {
 //        }
 //    }
 
-    public static class AddConstraint extends AtomicPredicate<Derivation> {
-        private final Compound id;
-        private final Term t;
-        private final MatchConstraint c;
 
-        public AddConstraint(Term t, MatchConstraint c) {
-            this.id = $.func("constrain", t, Atomic.the(c.toString()));
-            this.t = t;
-            this.c = c;
-        }
-
-        @Override
-        public boolean test(Derivation p) {
-            return p.constraints.add(t, c);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return id.toString();
-        }
-    }
 
 //    private void compile(Term x, List<BooleanCondition<PremiseMatch>> code) {
 //        //??

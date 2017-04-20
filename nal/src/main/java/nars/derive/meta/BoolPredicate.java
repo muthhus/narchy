@@ -1,5 +1,7 @@
 package nars.derive.meta;
 
+import nars.term.Compound;
+import nars.term.ProxyCompound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 
@@ -10,11 +12,20 @@ import java.util.function.Predicate;
  */
 public interface BoolPredicate<X> extends Term, Predicate<X> {
 
-    class DefaultBoolPredicate<X> extends ProxyTerm<Term> implements BoolPredicate<X> {
+    abstract class AbstractBoolPredicate<X> extends ProxyCompound implements BoolPredicate<X> {
+
+
+        public AbstractBoolPredicate(Compound term) {
+            super(term);
+        }
+
+    }
+
+    class DefaultBoolPredicate<X> extends AbstractBoolPredicate<X> {
 
         private final Predicate<X> test;
 
-        public DefaultBoolPredicate(Term term, Predicate<X> p) {
+        public DefaultBoolPredicate(Compound term, Predicate<X> p) {
             super(term);
             this.test = p;
         }
@@ -24,20 +35,6 @@ public interface BoolPredicate<X> extends Term, Predicate<X> {
             return test.test(x);
         }
     }
-
-
-    //void accept(PremiseEval c, int now);
-
-    @Override
-    boolean test(X p);
-
-
-
-//    static void run(@NotNull BoolCondition b, @NotNull PremiseEval m) {
-//        final int stack = m.now();
-//        b.booleanValueOf(m, stack);
-//        m.revert(stack);
-//    }
 
 
 }

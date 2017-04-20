@@ -314,7 +314,7 @@ public class PremiseRuleSet {
     }
 
     public void permute(@NotNull PremiseRule preNormRule, String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur) {
-        posNegPermute(preNormRule, src, ur, index,
+        add(preNormRule, src, ur, index,
                 (PremiseRule r) -> permuteSwap(r, src, index, ur,
                         (PremiseRule s) -> permuteBackward(src, index, ur, r)));
     }
@@ -334,7 +334,7 @@ public class PremiseRuleSet {
         }
     }
 
-    protected static void posNegPermute(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternTermIndex index, @NotNull Consumer<PremiseRule> each) {
+    protected static void add(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternTermIndex index, @NotNull Consumer<PremiseRule> each) {
         PremiseRule pos = add(preNorm.positive(index), src, ur, index);
         if (pos != null)
             each.accept(pos);

@@ -6,6 +6,7 @@ import nars.derive.meta.BoolPredicate;
 import nars.derive.meta.Conclude;
 import nars.derive.meta.Fork;
 import nars.premise.Derivation;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -23,23 +24,19 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
     @Nullable
     private BoolPredicate eachMatch;
 
+    @NotNull
+    protected Compound id;
 
     @NotNull
-    protected final Term pid;
-
-    @NotNull
-    protected Term id;
+    protected final Compound pid;
 
     public final Term pattern;
 
     /** derivation handlers; use the array form for fast iteration */
-    //private final Set<Derive> derive = Global.newHashSet(1);
     private final Set<Conclude> conclude = $.newHashSet(1);
 
+    public MatchTermPrototype(@NotNull Compound id, Term pattern) {
 
-
-
-    public MatchTermPrototype(@NotNull Term id, Term pattern) {
         this.id = this.pid = id;
 
         this.pattern = pattern;
@@ -96,9 +93,8 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
             }
 
 
-            this.id = Atomic.the("MatchTerm(" + pid +
-                    ((om!=null) ? ",  " + om  : "") + ')');
-
+            this.id = om!=null ? $.func("MatchTerm",  pid , om) :
+                                 $.func( "MatchTerm", pid );
 
             this.eachMatch = om;
         }

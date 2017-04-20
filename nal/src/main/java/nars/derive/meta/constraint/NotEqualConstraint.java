@@ -1,22 +1,26 @@
 package nars.derive.meta.constraint;
 
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.$.func;
 
-public final class NotEqualConstraint implements MatchConstraint {
 
-    private final Term b;
+public final class NotEqualConstraint extends MatchConstraint {
 
-    public NotEqualConstraint(Term b) {
-        this.b = b;
+    private final Term x;
+
+    public NotEqualConstraint(Term target, Term x) {
+        super("neq", target, x);
+        this.x = x;
     }
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
-        Term canNotEqual = f.xy.get(b);
+        Term canNotEqual = f.xy.get(this.x);
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -29,9 +33,5 @@ public final class NotEqualConstraint implements MatchConstraint {
                 //y.equals(canNotEqual);
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "neq:" + b;
-    }
+
 }

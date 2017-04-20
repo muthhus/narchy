@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 2/24/17.
@@ -38,6 +39,10 @@ public class ImmutableTask extends Pri implements Task {
 
     public ImmutableTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
+        if ((punc == BELIEF) || (punc == GOAL)) {
+            if (truth == null)
+                throw new InvalidTaskException(term, "null truth");
+        }
 
         if (term.op() == NEG) {
             term = compoundOrNull(term.unneg());
@@ -48,24 +53,25 @@ public class ImmutableTask extends Pri implements Task {
                 truth = truth.negated();
         }
 
-        if ((punc == BELIEF) || (punc == GOAL)) {
-            if (truth == null)
-                throw new InvalidTaskException(term, "null truth");
-
-        }
-
         Task.taskContentValid(term, punc, null, false);
 
         this.priority = 0;
 
         this.term = term;
+
         this.truth = truth;
+
         this.punc = punc;
-        this.creation = creation;
+
+        assert((start==ETERNAL&&end==ETERNAL) || (start <= end) );
         this.start = start;
         this.end = end;
+
+        //EVIDENCE STAMP
+        assert(punc == COMMAND || (stamp.length > 0) );
         this.stamp = stamp;
 
+        //CALCULATE HASH
         int h = Util.hashCombine(
                 term.hashCode(),
                 punc,
@@ -86,9 +92,10 @@ public class ImmutableTask extends Pri implements Task {
                 h = Util.hashClojure(h, t.hashCode());
         }
 
-        if (h == 0) h = 1; //reserve 0 for non-hashed
-
         this.hash = h;
+        this.creation = creation;
+
+        //READY
     }
 
     @Override

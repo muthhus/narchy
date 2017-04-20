@@ -3,6 +3,8 @@ package nars.derive.meta.op;
 import nars.derive.meta.AtomicPredicate;
 import nars.derive.meta.BoolPredicate;
 import nars.premise.Derivation;
+import nars.term.Compound;
+import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,30 +12,16 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 5/26/16.
  */
-abstract public class MatchTerm extends AtomicPredicate<Derivation> {
+abstract public class MatchTerm extends ProxyCompound implements BoolPredicate<Derivation> {
 
-
-//    @NotNull
-//    private final Term id;
-
-    @NotNull
-    public final Term pattern;
-
+    @NotNull public final Term pattern;
 
     public final @Nullable BoolPredicate eachMatch;
 
-    private final String idString;
-
-    public MatchTerm(@NotNull Term id, @NotNull Term pattern, @Nullable BoolPredicate eachMatch) {
-        //this.pid = pid;
-        //this.id = id;
-        this.idString = id.toString();
+    public MatchTerm(@NotNull Compound id, @NotNull Term pattern, @Nullable BoolPredicate eachMatch) {
+        super(id);
         this.pattern = pattern;
         this.eachMatch = eachMatch;
     }
 
-    @Override
-    public @NotNull final String toString() {
-        return idString;
-    }
 }

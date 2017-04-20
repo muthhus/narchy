@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import nars.premise.Derivation;
+import nars.term.Compound;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class SolvePuncFromTask extends Solve {
 
-    public SolvePuncFromTask(String i, Conclude der, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
+    public SolvePuncFromTask(Compound i, Conclude der, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
         super(i, der, belief, desire, beliefProjected);
     }
 

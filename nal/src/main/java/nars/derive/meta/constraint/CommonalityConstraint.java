@@ -1,6 +1,7 @@
 package nars.derive.meta.constraint;
 
 import nars.term.Compound;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
@@ -9,18 +10,16 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 10/16/16.
  */
-public abstract class CommonalityConstraint implements MatchConstraint {
-    @NotNull
-    protected final Term b;
+public abstract class CommonalityConstraint extends MatchConstraint {
 
-    public CommonalityConstraint(@NotNull Term b) {
-        this.b = b;
+    public CommonalityConstraint(String func, Term target, Term... args) {
+        super(func, target, args);
     }
 
     @Override
     public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
 
-        Term bb = f.xy(b);
+        Term bb = f.xy(ref);
 
         if (bb == null) return false;
 

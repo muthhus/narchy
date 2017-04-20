@@ -1,9 +1,13 @@
 package nars.derive.meta.op;
 
+import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * requires a specific subterm to have minimum bit structure
@@ -14,12 +18,30 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
     @NotNull
     private final transient String id;
 
+    public static List<SubTermStructure> get(int subterm, int bits) {
+        int numBits = Integer.bitCount(bits);
+        assert (numBits > 0);
+        if ((numBits == 1) || (numBits > 3)) {
+            return Collections.singletonList(new SubTermStructure(subterm, bits));
+        } else {
+            int i = 0;
+            List<SubTermStructure> components = $.newArrayList(numBits);
+            for (Op o : Op.values()) {
 
-    public SubTermStructure(int subterm, int bits) {
+                int b = o.bit;
+                if ((bits & b) > 0) { //HACK
+                    components.add(new SubTermStructure(subterm, b));
+                }
+            }
+            return components;
+        }
+    }
+
+    private SubTermStructure(int subterm, int bits) {
         this(Op.VAR_PATTERN, subterm, bits);
     }
 
-    public SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
+    private SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
         this.subterm = subterm;
 
 
@@ -27,8 +49,13 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
         if (this.bits == 0) {
             throw new RuntimeException("no filter effected");
         }
-        id = "SubTermStruct" + subterm + ':' +
-                Integer.toBinaryString(bits);
+        id = "subTermStruct(" + subterm + ',' +
+                ((Integer.bitCount(bits) == 1) ?
+                        ("has_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
+                            :
+                        ("hasAll_" + Integer.toBinaryString(bits))
+                ) + ")";
+
     }
 
 
@@ -50,7 +77,7 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
         if (matchingType != Op.VAR_PATTERN)
             bits &= (~matchingType.bit);
 
-        bits &= (~Op.NEG.bit); //filter based on negation
+        //bits &= (~Op.NEG.bit); //filter based on negation
 
         return bits;
     }

@@ -3,8 +3,10 @@ package nars.derive.meta;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
+import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
+import org.eclipse.collections.api.block.predicate.primitive.BooleanPredicate;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;
@@ -12,9 +14,8 @@ import static nars.Op.*;
 /**
  * Evaluates the truth of a premise
  */
-abstract public class Solve extends AtomicPredicate<Derivation> {
+abstract public class Solve extends BoolPredicate.AbstractBoolPredicate<Derivation> {
 
-    private final transient String id;
 
     public final Conclude conclude;
 
@@ -22,20 +23,14 @@ abstract public class Solve extends AtomicPredicate<Derivation> {
     public final TruthOperator goal;
     public final boolean beliefProjected;
 
-    public Solve(String id, Conclude conclude, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
-        super();
-        this.id = id;
+    public Solve(Compound id, Conclude conclude, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
+        super(id);
         this.conclude = conclude;
         this.belief = belief;
         this.goal = goal;
         this.beliefProjected = beliefProjected;
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return id;
-    }
 
     final boolean measure(@NotNull Derivation m, byte punct) {
 

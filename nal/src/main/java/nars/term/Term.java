@@ -309,7 +309,11 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default int compareTo(@NotNull Termlike y) {
         if (this == y /*|| this.equals(y)*/) return 0;
 
-        int d = this.op().ordinal() - ((Term) y).op().ordinal();
+//        int diff2 = hashCode() - y.hashCode();
+//        if (diff2 != 0)
+//            return diff2;
+
+        int d = this.op().compareTo( ((Term)y).op() );
         if (d != 0)
             return d;
 
@@ -345,8 +349,6 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
             //return Hack.compare(toString(), y.toString());
 
         }
-        if (y instanceof ProxyTerm)
-            return compareTo(((ProxyTerm)y).ref);
 
         throw new RuntimeException("ordering exception: " + this + ", " + y);
     }

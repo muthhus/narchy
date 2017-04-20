@@ -52,6 +52,8 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     @Override
     public void clear() {
+//        if (size()==0)
+//            return;
         throw new RuntimeException("unimpl yet");
     }
 

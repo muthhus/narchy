@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class BeliefPositive extends AtomicPredicate<Derivation> {
 
     public static final BeliefPositive thePos = new BeliefPositive();
+    public static final BeliefNegative theNeg = new BeliefNegative();
 
     @Override
     public boolean test(@NotNull Derivation m) {
@@ -29,7 +30,6 @@ public class BeliefPositive extends AtomicPredicate<Derivation> {
 
     public static final class BeliefNegative extends BeliefPositive {
 
-        public static final BeliefNegative the = new BeliefNegative();
 
         @Override
         public boolean test(@NotNull Derivation m) {

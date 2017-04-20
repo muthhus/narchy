@@ -1100,18 +1100,18 @@ public enum $ {
         return term != null ? term : Null;
     }
 
-    public static <X> BoolPredicate<X> IF(Term t, Predicate<X> test) {
+    public static <X> BoolPredicate<X> IF(Compound t, Predicate<X> test) {
         return new BoolPredicate.DefaultBoolPredicate<X>(t, test);
     }
 
     public static <X> BoolPredicate<X> AND(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>($.conj(a, b), (X x) -> {
+        return new BoolPredicate.DefaultBoolPredicate<X>((Compound)$.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
     public static <X> BoolPredicate<X> OR(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>($.disj(a, b), (X x) -> {
+        return new BoolPredicate.DefaultBoolPredicate<X>((Compound)$.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

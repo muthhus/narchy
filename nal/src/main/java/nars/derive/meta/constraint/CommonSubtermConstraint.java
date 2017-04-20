@@ -1,17 +1,18 @@
 package nars.derive.meta.constraint;
 
+import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by me on 10/31/16.
+ * (recursive)
  */
 public final class CommonSubtermConstraint extends CommonalityConstraint {
 
-    public CommonSubtermConstraint(@NotNull Term b) {
-        super(b);
+    public CommonSubtermConstraint(Term target, @NotNull Term x) {
+        super("neqAndCom", target, x);
     }
 
     @NotNull
@@ -21,10 +22,5 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
         return x.equals(y) || !TermContainer.commonSubtermsRecurse(x, y, true);
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "neqAndCom(" + b + ')';
-    }
 
 }

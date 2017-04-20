@@ -3,6 +3,7 @@ package nars.derive.meta.op;
 import nars.Op;
 import nars.derive.meta.BoolPredicate;
 import nars.index.term.PatternTermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,11 +20,12 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
     private final boolean finish;
 
     public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish, @NotNull PatternTermIndex index) {
-        super(
+        super( (Compound)(
                 (subterm == 0 ?
                         index.the(Op.PROD, id(x), Op.Imdex) :
-                        index.the(Op.PROD, Op.Imdex, id(x))),
-                x);
+                        index.the(Op.PROD, Op.Imdex, id(x)))),
+                x
+        );
         this.subterm = subterm;
         this.finish = finish;
     }

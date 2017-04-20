@@ -1,17 +1,20 @@
 package nars.derive.meta.constraint;
 
+import nars.$;
 import nars.Op;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class OpConstraint implements MatchConstraint {
+public final class OpConstraint extends MatchConstraint {
 
     @NotNull
     private final Op op;
 
-    public OpConstraint(@NotNull Op o) {
+    public OpConstraint(Term target, @NotNull Op o) {
+        super("op", target, $.quote(o.toString()));
         op = o;
     }
 
@@ -22,10 +25,5 @@ public final class OpConstraint implements MatchConstraint {
         return value.op()!=op;
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "op:\"" + op.str + '"';
-    }
 }
 

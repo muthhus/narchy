@@ -2,6 +2,7 @@ package nars.derive.meta.op;
 
 import nars.derive.meta.BoolPredicate;
 import nars.premise.Derivation;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,7 @@ public final class MatchOneSubterm extends MatchTerm {
     /** which premise component, 0 (task) or 1 (belief) */
     private final int subterm;
 
-    public MatchOneSubterm(@NotNull Term id, int subterm, @NotNull Term pattern, @Nullable BoolPredicate eachMatch) {
+    public MatchOneSubterm(@NotNull Compound id, int subterm, @NotNull Term pattern, @Nullable BoolPredicate eachMatch) {
         super(id, pattern, eachMatch);
         this.subterm = subterm;
     }

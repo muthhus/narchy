@@ -1,11 +1,12 @@
 package nars.derive.meta.constraint;
 
+import nars.$;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class StructureExclusionConstraint implements MatchConstraint {
+public final class StructureExclusionConstraint extends MatchConstraint {
 
     private final int structure;
 
@@ -13,7 +14,8 @@ public final class StructureExclusionConstraint implements MatchConstraint {
 //        this(o.bit);
 //    }
 
-    public StructureExclusionConstraint(int opVector) {
+    public StructureExclusionConstraint(Term target, int opVector) {
+        super("StructExcl", target, $.the(Integer.toHexString(opVector)));
         this.structure = opVector;
     }
 
@@ -22,10 +24,5 @@ public final class StructureExclusionConstraint implements MatchConstraint {
         return value.hasAny(structure);
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return "structureExclusion:" + Integer.toHexString(structure);
-    }
 }
 

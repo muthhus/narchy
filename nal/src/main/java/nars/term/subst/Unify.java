@@ -185,7 +185,6 @@ public abstract class Unify extends Termutator implements Subst {
      */
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
 
-        //int s = now();
         boolean result;
         try {
             if (unify(x, y)) {
@@ -194,24 +193,26 @@ public abstract class Unify extends Termutator implements Subst {
                     result = true; //return to callee to continue in subsequent operation
                 } else {
                     @Nullable List<Termutator> t = termutes;
-                    if (t != null) {
+                    if (t == null) {
+                        result = onMatch();
+                    } else {
 
                         //shuffle the ordering of the termutes themselves
-                        Collections.shuffle(t, random);
+                        if (t.size() > 1)
+                            Collections.shuffle(t, random);
 
-                        t.add(this); //call-back
+                        t.add(this); //append call-back at the end
+
                         result = mutate(this, t, -2);
 
-                    } else {
-                        result = onMatch();
                     }
                 }
 
             } else {
                 result = false;
             }
-        } catch (Exception e) {
-            if (Param.DEBUG_EXTRA)
+        } catch (Throwable e) {
+            if (Param.DEBUG)
                 logger.error("{}", e);
             result = false;
             finish = true;

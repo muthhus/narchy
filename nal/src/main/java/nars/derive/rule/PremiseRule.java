@@ -1,18 +1,15 @@
 package nars.derive.rule;
 
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.derive.meta.*;
 import nars.derive.meta.constraint.*;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.*;
-import nars.derive.meta.op.AbstractPatternOp.PatternOpNot;
-import nars.derive.meta.op.AbstractPatternOp.PatternOpNotContained;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
@@ -36,12 +33,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
-import static nars.derive.meta.TaskBeliefSubterms.withinNonCommutive;
 import static nars.term.Terms.*;
 
 /**
@@ -55,57 +50,19 @@ public class PremiseRule extends GenericCompound {
     static final Atomic BELIEF = Atomic.the("Belief");
     static final Atomic GOAL = Atomic.the("Goal");
 
-    static final MultimapBuilder.ListMultimapBuilder<Object, Object> constraintMapBuilder =
-            MultimapBuilder.
-                    hashKeys()
-                    //treeKeys()
-                    .arrayListValues();
-
-
-    public boolean allowBackward;
+    public boolean allowBackward = false;
     public boolean allowForward = false;
 
-//    @NotNull
-//    @Override
-//    public String toString() {
-//        return "PremiseRule{" +
-//                "\t prePreconditions=" + Arrays.toString(precon) +
-//                "\t match=" + match +
-//                "\t postconditions=" + Arrays.toString(postconditions) +
-//                "\t temporalize=" + timeFunction +
-//                "\t eternalize=" + eternalize +
-//                "\t anticipate=" + anticipate +
-//                "\t minNAL=" + minNAL +
-//                "\t source='" + source + '\'' +
-//                '}';
-//    }
 
-    //    /**
-//     * blank marker trie node indicating the derivation and terminating the branch
-//     */
-//    public static final BooleanCondition END = new AtomicBooleanCondition<PremiseEval>() {
-//
-//        @Override
-//        public boolean booleanValueOf(PremiseEval versioneds) {
-//            return true;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "End";
-//        }
-//    };
-
-
-    /** conditions which can be tested before unification */
+    /**
+     * conditions which can be tested before unification
+     */
     public BoolPredicate[] PRE;
 
-    /** consequences applied after unification */
+    /**
+     * consequences applied after unification
+     */
     public PostCondition[] POST;
-
-//    public PatternCompound pattern;
-
-    //it has certain pre-conditions, all given as predicates after the two input premises
 
 
     /**
@@ -173,7 +130,7 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public List<Term> conditions(@NotNull PostCondition post) {
 
-        Set<Term> s = newHashSet(2); //for ensuring uniqueness / no duplicates
+        Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
         Solve truth = solve(post, this, timeFunction, beliefProjected);
 
         //PREFIX
@@ -182,18 +139,18 @@ public class PremiseRule extends GenericCompound {
 
             s.add(truth);
 
-            addAll(s, match.pre);
+            s.addAll(match.pre);
+
+            s.addAll(match.constraints);
         }
 
         List<Term> l = sort(new FasterList(s));
 
         //SUFFIX (order already determined for matching)
         {
-
-            addAll(l, match.post);
+            l.addAll(match.post);
 
             l.add(truth.conclude); //will be linked to and invoked by match callbacks
-
         }
 
         return l;
@@ -245,25 +202,23 @@ public class PremiseRule extends GenericCompound {
 
         put(TaskPunctuation.class, rank--);
 
-        put(Solve.class, rank--);
-        put(SubTermsStructure.class, rank--);
-
-        put(MatchTaskBelief.AddConstraint.class, rank--);
+        put(events.class, rank--);
 
         put(SubTermStructure.class, rank--);
 
-        put(PatternOpNot.class, rank--);
+        put(Solve.class, rank--);
+
+        put(MatchConstraint.class, rank--);
 
 
-        put(TermNotEquals.class, rank--);
-        put(events.class, rank--);
+
+//        put(TermNotEquals.class, rank--);
 
 //        put(PatternOpNot.class, rank--);
 
 
         put(TaskPositive.class, rank--); //includes both positive or negative
-
-
+        put(BeliefPositive.class, rank--); //includes both positive or negative
 
 
 //        put(SubTermOp.class, 10);
@@ -277,13 +232,10 @@ public class PremiseRule extends GenericCompound {
         if (b instanceof AbstractPatternOp.PatternOp)
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
 
-
-        if (b == neq)// || (b == neqCom) || (b == neqRCom))
-            return TermNotEquals.class;
-
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
-        if ((b == BeliefPositive.thePos) || (b == BeliefPositive.BeliefNegative.the)) return TaskPositive.class;
+        if ((b == BeliefPositive.thePos) || (b == BeliefPositive.theNeg)) return BeliefPositive.class;
 
+        if (b instanceof MatchConstraint) return MatchConstraint.class;
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
@@ -291,22 +243,12 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
         if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
 
-        if (b instanceof TermNotEquals) return TermNotEquals.class;
+//        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
-//        if (b instanceof PatternOpNot) return PatternOpNot.class;
-        if (b instanceof PatternOpNotContained) return PatternOpNot.class;
-
-        //if (b == TaskPunctuation.NotGoal) return TaskPunctuation.class;
-        //if (b == TaskPunctuation.NotBelief) return TaskPunctuation.class;
-
-        //if (b == events.after) return events.class;
+        if (b == events.bothEvents) return events.class;
         if (b == events.afterOrEternal) return events.class;
         if (b == events.eventsOrEternals) return events.class;
-        //if (b == events.nonEternal) return events.class;
         if (b == events.beliefDTSimultaneous) return events.class;
-
-        //if (b == IfTermLinkBefore.ifTermLinkBefore) return events.class;
-        //if (b == IfTermLinkBefore.ifBeliefBefore) return events.class;
 
         if (b instanceof Solve) return Solve.class;
 
@@ -356,17 +298,19 @@ public class PremiseRule extends GenericCompound {
                 temporalizer);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
-        String desireLabel = desire != null ? desire.toString() : "_";
+        String goalLabel = desire != null ? desire.toString() : "_";
 
-        StringBuilder i =
-                new StringBuilder().append("Truth(").append(beliefLabel).append(',')
-                        .append(desireLabel).append(",punc:\"").append(puncOverride == 0 ? '_' : ((char)puncOverride))
-                        .append('\"');
+        List<Term> args = $.newArrayList(
+                $.the(beliefLabel),
+                $.the(goalLabel)
+        );
+        if (puncOverride!=0)
+            args.add($.the("conc" + ((char) puncOverride) ));
+
         if (!beliefProjected)
-            i.append(",unprojBelief");
-        i.append(')');
+            args.add($.the("unproj"));
 
-        String ii = i.toString();
+        Compound ii = $.func("truth", args);
 
         return puncOverride == 0 ?
                 new SolvePuncFromTask(ii, der, belief, desire, beliefProjected) :
@@ -504,7 +448,7 @@ public class PremiseRule extends GenericCompound {
         //pattern = PatternCompound.make(p(taskTermPattern, beliefTermPattern));
 
 
-        ListMultimap<Term, MatchConstraint> constraints = constraintMapBuilder.build();
+        SortedSet<MatchConstraint> constraints = new TreeSet();
 
         char taskPunc = 0;
 
@@ -542,24 +486,24 @@ public class PremiseRule extends GenericCompound {
 
 
                 case "neqAndCom":
-                    //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
-                    constraints.put(X, new CommonSubtermConstraint(Y));
-                    constraints.put(Y, new CommonSubtermConstraint(X));
+                    neq(constraints, X, Y);
+                    constraints.add(new CommonSubtermConstraint(X, Y));
+                    constraints.add(new CommonSubtermConstraint(Y, X));
                     break;
 
                 case "neqCom":
-                    //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqCom);
-                    constraints.put(X, new NoCommonSubtermConstraint(Y, false));
-                    constraints.put(Y, new NoCommonSubtermConstraint(X, false));
+                    neq(constraints, X, Y);
+                    constraints.add(new NoCommonSubtermConstraint(X, Y, false));
+                    constraints.add(new NoCommonSubtermConstraint(Y, X, false));
 
                     break;
                 case "neqRCom":
-                    //includes neq:
                     //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neqRCom);
-                    constraints.put(X, new NoCommonSubtermConstraint(Y, true));
-                    constraints.put(Y, new NoCommonSubtermConstraint(X, true));
+                    neq(constraints, X, Y);
+                    constraints.add(new NoCommonSubtermConstraint(X, Y, true));
+                    constraints.add(new NoCommonSubtermConstraint(Y, X, true));
                     break;
 
                 case "notSet":
@@ -568,31 +512,33 @@ public class PremiseRule extends GenericCompound {
 
                 case "setext":
                     //assumes arity=2 but arity=1 support can be written
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y);
-                    constraints.put(X, new OpConstraint(Op.SETe));
-                    constraints.put(Y, new OpConstraint(Op.SETe));
-                    pres.add(new SubTermsStructure(Op.SETe.bit));
+                    constraints.add(new OpConstraint(X, Op.SETe));
+                    constraints.add(new OpConstraint(Y, Op.SETe));
+                    pres.addAll(SubTermStructure.get(0, Op.SETe.bit));
+                    pres.addAll(SubTermStructure.get(1, Op.SETe.bit));
                     ////additionally prohibits the two terms being equal
                     break;
 
                 case "setint":
                     //assumes arity=2 but arity=1 support can be written
-                    neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
+                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
                     neq(constraints, X, Y);
-                    constraints.put(X, new OpConstraint(Op.SETi));
-                    constraints.put(Y, new OpConstraint(Op.SETi));
-                    pres.add(new SubTermsStructure(Op.SETi.bit));
+                    constraints.add(new OpConstraint(Y, Op.SETi));
+                    constraints.add(new OpConstraint(X, Op.SETi));
+                    pres.addAll(SubTermStructure.get(0, Op.SETi.bit));
+                    pres.addAll(SubTermStructure.get(1, Op.SETi.bit));
                     //additionally prohibits the two terms being equal
                     break;
 
 
                 case "notEqui":
-                    opNotContained(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
+                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
                     break;
 
                 case "notImplEqui":
-                    opNotContained(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
+                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
                     break;
 
 //                case "events":
@@ -833,7 +779,7 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add(BeliefPositive.BeliefNegative.the);
+                            pres.add(BeliefPositive.theNeg);
                             break;
                         case "positive":
                             pres.add(BeliefPositive.thePos);
@@ -961,87 +907,60 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void opNot(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNot(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
-        boolean prefiltered = false;
-        if (t.equals(task)) {
-            pres.add(new PatternOpNot(0, structure));
-            prefiltered = true;
-        } else if (t.equals(belief)) {
-            pres.add(new PatternOpNot(1, structure));
-            prefiltered = true;
-        }
-
-        if (!prefiltered)
-            constraints.put(t, new OpNotConstraint(structure));
-    }
-
-
-    public static void opNotContained(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term t, int structure) {
-
-
-        boolean prefiltered = false;
-
-        if (t.equals(task)) {
-            pres.add(new PatternOpNotContained(0, structure));
-            prefiltered = true;
-        } else if (t.equals(belief)) {
-            pres.add(new PatternOpNotContained(1, structure));
-            prefiltered = true;
-        }
-
-        if (!prefiltered)
-            constraints.put(t, new StructureExclusionConstraint(structure));
-
-    }
-
-    public void neq(@NotNull ListMultimap<Term, MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
-        //find if the two compared terms are recursively contained as subterms of either the task or belief
-        //and if so, create a precondition constraint rather than a matcher constraint
-
-
-        constraints.put(x, new NotEqualConstraint(y));
-        constraints.put(y, new NotEqualConstraint(x));
-
-    }
-
-
-    /**
-     * returns whether the prefilter was successful, otherwise a constraint must be tested
-     */
-    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2, Function<TaskBeliefSubterms, BoolPredicate[]> filter) {
-        TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
-        if (tb != null) {
-            //cheaper to compute this in precondition
-            BoolPredicate[] bp = filter.apply(tb);
-            for (BoolPredicate b : bp)
-                pres.add(b);
-            return true;
-        }
-
-        return false;
-    }
-
-
-    @NotNull private static BoolPredicate the_equals(TaskBeliefSubterms p) {
-        return TermNotEquals.the(p, com.google.common.base.Objects::equal);
-    }
-
-
-    final static Function<TaskBeliefSubterms, BoolPredicate[]> neq = (p) -> new BoolPredicate[]{
-        the_equals(p)
-    };
-
-//    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqCom = (p) -> new BoolPredicate[]{
-//        the_equals(p),
-//        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, false, true))
-//    };
+//        boolean prefiltered = false;
+//        if (t.equals(task)) {
+//            pres.add(new PatternOpNot(0, structure));
+//            prefiltered = true;
+//        } else if (t.equals(belief)) {
+//            pres.add(new PatternOpNot(1, structure));
+//            prefiltered = true;
+//        }
 //
-//    final static Function<TaskBeliefSubterms, BoolPredicate[]> neqRCom = (p) -> new BoolPredicate[]{
-//        the_equals(p),
-//        TermNotEquals.the(p, (a, b) -> TermContainer.isSubtermOfTheOther(a, b, true, true))
-//    };
+//        if (!prefiltered)
+            constraints.add(new OpNotConstraint(t, structure));
+    }
 
+
+    public static void opNotContaining(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+
+
+        boolean prefiltered = false;
+//
+//        if (t.equals(task)) {
+//            pres.add(new PatternOpNotContaining(0, structure));
+//            prefiltered = true;
+//        } else if (t.equals(belief)) {
+//            pres.add(new PatternOpNotContaining(1, structure));
+//            prefiltered = true;
+//        }
+
+        //if (!prefiltered)
+            constraints.add(new StructureExclusionConstraint(t, structure));
+    }
+
+    public void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
+        constraints.add(new NotEqualConstraint(x, y));
+        constraints.add(new NotEqualConstraint(y, x));
+    }
+
+
+//    /**
+//     * returns whether the prefilter was successful, otherwise a constraint must be tested
+//     */
+//    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2, Function<TaskBeliefSubterms, BoolPredicate[]> filter) {
+//        TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
+//        if (tb != null) {
+//            //cheaper to compute this in precondition
+//            BoolPredicate[] bp = filter.apply(tb);
+//            for (BoolPredicate b : bp)
+//                pres.add(b);
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
 
     /**
@@ -1313,6 +1232,7 @@ public class PremiseRule extends GenericCompound {
                 return apply(null, secondary);
         }
     }
+
 
 }
 
