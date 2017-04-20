@@ -1,5 +1,6 @@
 package nars.experiment.fzero;
 
+import georegression.metric.UtilAngle;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
@@ -8,7 +9,9 @@ import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
+import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
+import org.joml.GeometryUtils;
 
 import static nars.$.t;
 
@@ -25,8 +28,8 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 24, 12, (v) -> t(v, alpha()))
-                .setResolution(0.05f);
+        senseCamera("fz", ()->fz.image, 30, 20, (v) -> t(v, alpha()))
+                .setResolution(0.03f);
 
         actionToggle($.inh(Atomic.the("fwd"),id),
                 //(b)->{ fz.thrust = b; }
@@ -43,7 +46,9 @@ public class FZero extends NAgentX {
         senseNumberDifference($.inh(Atomic.the("joy"), id), happy);
         SensorConcept sensorConcept1 = senseNumberDifference($.inh(Atomic.the("angVel"), id), ()->(float)fz.playerAngle);
         SensorConcept sensorConcept = senseNumberDifference($.inh(Atomic.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]);
-        senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() -> (float)fz.playerAngle%(2*3.14f)));
+        senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() ->
+            (float)(MathUtils.normalizeAngle(fz.playerAngle%(2*3.14f), 0 )/Math.PI)
+        ));
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

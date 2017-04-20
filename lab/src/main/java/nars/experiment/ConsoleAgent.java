@@ -46,7 +46,7 @@ public abstract class ConsoleAgent extends NAgentX {
     final TestConsole R = new TestConsole(
             Atomic.the("it"),
             true,
-            4, 1);
+            2, 2);
     final TestConsole W;
 
 
