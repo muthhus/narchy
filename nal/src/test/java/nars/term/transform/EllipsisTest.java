@@ -447,7 +447,7 @@ public class EllipsisTest {
         testCombinations(
                 $("((|,%X,%A..+) --> (|,%Y,%A..+))"),
                 $("((|,bird,swimmer)-->(|,animal,swimmer))"),
-                2 /* weird but true. %x and %a both can bind to swimmer */);
+                4 /* weird but true. %x and %a both can bind to swimmer */);
     }
     @Test public void testRepeatEllipsisA2() throws Narsese.NarseseException {
 

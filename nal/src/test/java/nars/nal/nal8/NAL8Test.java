@@ -1237,7 +1237,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 10) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
