@@ -12,8 +12,8 @@ import java.util.Random;
 public class HijackQuestionTable extends TaskHijackBag implements QuestionTable {
 
 
-    public HijackQuestionTable(int cap, int reprobes, PriMerge merge, Random random) {
-        super(reprobes, merge, random);
+    public HijackQuestionTable(int cap, int reprobes) {
+        super(reprobes);
 
         capacity(cap);
     }

@@ -1,9 +1,8 @@
 package jcog.bag.impl.hijack;
 
-import jcog.bag.impl.HijackBag;
-import jcog.pri.PForget;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -14,15 +13,32 @@ import java.util.function.Consumer;
  */
 public class DefaultHijackBag<K> extends PriorityHijackBag<K,PLink<K>> {
 
-    public DefaultHijackBag(int capacity, int reprobes, PriMerge merge) {
-        this(reprobes, merge);
+    protected final PriMerge merge;
+
+    public DefaultHijackBag(PriMerge merge, int capacity, int reprobes) {
+        this(merge, reprobes);
         setCapacity(capacity);
     }
 
-    public DefaultHijackBag(int reprobes, PriMerge merge) {
-        super(merge, reprobes);
-        this.map.set(HijackBag.EMPTY_ARRAY);
+    @Override
+    protected PLink<K> merge(@Nullable PLink<K> existing, @NotNull PLink<K> incoming, float scale) {
+        if (existing==null) {
+            existing = new RawPLink(incoming.get(), 0f);
+            merge.merge(existing, incoming, scale);
+            incoming.setPriority(existing); //modify incoming
+            return incoming;
+        } else {
+            merge.merge(existing, incoming, scale); //modify existing
+            return existing;
+        }
     }
+
+    public DefaultHijackBag(PriMerge merge, int reprobes) {
+        super(reprobes);
+        this.merge = merge;
+    }
+
+
 
     @Override
     protected Consumer<PLink<K>> forget(float avgToBeRemoved) {
@@ -38,7 +54,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K,PLink<K>> {
 
     @Override
     protected float priEpsilon() {
-        return PLink.EPSILON_DEFAULT;
+        return Priority.EPSILON_DEFAULT;
     }
 
 

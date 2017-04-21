@@ -46,6 +46,8 @@ public interface Prioritized {
         return Util.equals(priSafe(-1), t.priSafe(-1), epsilon);
     }
 
+
+
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {
 //
 //        float priSum = Prioritized.priSum(l);

@@ -2,6 +2,7 @@ package nars.table;
 
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -62,6 +63,7 @@ public interface TaskTable  {
 
     /** returns true if the task was removed */
     boolean removeTask(Task x);
+
 
 
     //boolean contains(Task t);

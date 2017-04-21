@@ -18,7 +18,7 @@ public interface QuestionTable extends TaskTable {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    Task add(@NotNull Task t, @NotNull NAR n);
+    Task add(@NotNull Task t);
 
     void capacity(int newCapacity, NAR nar);
 
@@ -56,7 +56,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public Task add(Task t, NAR n) {
+        public Task add(Task t) {
             return null;
         }
 

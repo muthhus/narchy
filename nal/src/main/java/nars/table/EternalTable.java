@@ -188,7 +188,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             if (x.equals(input)) {
                 if (x != input)
-                    PriMerge.max.apply(x, input.priority());
+                    PriMerge.max(x, input.priority());
                 return x;
             }
 

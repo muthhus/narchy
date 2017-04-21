@@ -23,32 +23,32 @@ import static org.junit.Assert.assertTrue;
 public class HijackBagTest {
 
     @Test public void testSamplingFlatHijack() {
-        testSamplingFlat(new DefaultHijackBag<String>(64, 4, max), 0.076f);
+        testSamplingFlat(new DefaultHijackBag<String>(max, 64, 4), 0.076f);
     }
 
     @Test public void testRemoveByKey() {
-        BagTest.testRemoveByKey(new DefaultHijackBag(2, 3, plus));
+        BagTest.testRemoveByKey(new DefaultHijackBag(plus, 2, 3));
     }
 
 
     @Test
     public void testScalePutHija() {
-        BagTest.testScalePut(new DefaultHijackBag(2, 1, max));
-        BagTest.testScalePut(new DefaultHijackBag(2, 2, max));
-        BagTest.testScalePut2(new DefaultHijackBag(2, 1, plus));
-        BagTest.testScalePut2(new DefaultHijackBag(2, 2, plus));
+        BagTest.testScalePut(new DefaultHijackBag(max, 2, 1));
+        BagTest.testScalePut(new DefaultHijackBag(max, 2, 2));
+        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
+        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
     }
 
     @Test
     public void testBasicInsertionRemovalHijack() {
-        testBasicInsertionRemoval(new DefaultHijackBag(1, 1, max));
+        testBasicInsertionRemoval(new DefaultHijackBag(max, 1, 1));
     }
 
     @Test public void testHijackFlatBagRemainsRandomInNormalizedSampler() {
 
         int n = 64;
 
-        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(n, 4, max);
+        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(max, n, 4);
         for (int i = 0; i < n; i++) {
             a.put(new RawPLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
         }
@@ -87,7 +87,7 @@ public class HijackBagTest {
     @Test
     public void testHijackResize() {
         Random rng = rng();
-        DefaultHijackBag b = new DefaultHijackBag(0, 7, PriMerge.max);
+        DefaultHijackBag b = new DefaultHijackBag(PriMerge.max, 0, 7);
         BagTest.populate(b, rng, 10, 20, 0f, 1f, 0.5f);
         assertEquals(b.reprobes /*0*/, b.size());
 

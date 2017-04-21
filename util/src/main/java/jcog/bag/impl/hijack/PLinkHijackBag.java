@@ -3,19 +3,18 @@ package jcog.bag.impl.hijack;
 import jcog.bag.impl.HijackBag;
 import jcog.pri.PForget;
 import jcog.pri.PLink;
+import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-import static jcog.pri.PLink.EPSILON_DEFAULT;
+import static jcog.pri.Priority.EPSILON_DEFAULT;
 
 /**
  * Created by me on 2/17/17.
  */
 public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
-    public PLinkHijackBag(int initialCapacity, int reprobes, Random random) {
+    public PLinkHijackBag(int initialCapacity, int reprobes) {
         super(initialCapacity, reprobes);
     }
 
@@ -64,14 +63,13 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
 
     @Override
-    protected float merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
-        float pAdd = incoming.priSafe(0) * scale;
-        if (existing != null) {
-            float pBefore = existing.priSafe(0);
-            existing.priAdd(pAdd);
-            pAdd -= pBefore;
-        }
-        return pAdd;
+    protected PLink<X> merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
+        float pressure = Priority.combine(existing, incoming, scale);
+
+        if (pressure >= Priority.EPSILON_DEFAULT)
+            pressurize(pressure);
+
+        return existing!=null ? existing : incoming;
     }
 
     @Override

@@ -3,7 +3,6 @@ package nars.concept;
 import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.*;
 import nars.term.Compound;
@@ -67,7 +66,7 @@ public class TaskConcept extends CompoundConcept {
         //TODO this isnt thread safe
         return questions == null ? (questions =
                 //new ArrayQuestionTable(state.questionCap(true)))
-                new HijackQuestionTable(state.questionCap(true), 3, DefaultConceptBuilder.DEFAULT_BLEND, nar.random()))
+                new HijackQuestionTable(state.questionCap(true), 3))
                 : questions;
 
     }
@@ -76,7 +75,7 @@ public class TaskConcept extends CompoundConcept {
     final QuestionTable questsOrNew(@NotNull NAR nar) {
         return quests == null ? (quests =
                 //new ArrayQuestionTable(state.questionCap(false)))
-                new HijackQuestionTable(state.questionCap(false), 3, DefaultConceptBuilder.DEFAULT_BLEND, nar.random()))
+                new HijackQuestionTable(state.questionCap(false), 3))
                 : quests;
     }
 
@@ -194,21 +193,7 @@ public class TaskConcept extends CompoundConcept {
      * @return the relevant task
      */
     Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
-
-        final QuestionTable questionTable;
-        //final BeliefTable answerTable;
-        if (q.isQuestion()) {
-            //if (questions == null) questions = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = questionsOrNew(nar);
-            //answerTable = beliefs();
-        } else { // else if (q.isQuest())
-            //if (quests == null) quests = new ArrayQuestionTable(nar.conceptQuestionsMax.intValue());
-            questionTable = questsOrNew(nar);
-            //answerTable = goals();
-        }
-
-
-        return questionTable.add(q, nar);
+        return (q.isQuestion() ? questionsOrNew(nar) : questsOrNew(nar)).add(q);
     }
 
 

@@ -50,13 +50,13 @@ public abstract class MaplikeTermIndex extends TermIndex {
         return next;
     };
 
-    final Function<ProtoCompound,Term> build = new HijackMemoize<>(
-            16*1024, 2, Util.rng(),
+    final HijackMemoize<ProtoCompound,Term> build = new HijackMemoize<>(
+            32*1024, 3,
             (C) -> super.the(C.op(), C.dt(), C.subterms())
     );
 
-    final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-            16*1024, 2, Util.rng(),
+    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
+            16*1024, 2,
             super::normalize
     );
 
@@ -77,7 +77,6 @@ public abstract class MaplikeTermIndex extends TermIndex {
         }
     }
 
-
     protected boolean cacheable(ProtoCompound c) {
 
         return c.size() > 1 &&
@@ -94,12 +93,11 @@ public abstract class MaplikeTermIndex extends TermIndex {
         } else {
             return compoundOrNull(normalize.apply(x));
         }
-
     }
 
 
-
-
-
-
+    @Override
+    public @NotNull String summary() {
+        return "CACHE: build=" + build.summary() + " normalize=" + normalize.summary();
+    }
 }

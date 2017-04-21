@@ -23,8 +23,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     Truth truth(long when, int dur, EternalTable eternal);
 
-    @Nullable Task add(@NotNull Task input, Concept concept, @NotNull NAR nar);
-
     void capacity(int c, NAR nar);
 
     void clear();
@@ -39,6 +37,11 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         public int capacity() {
             //throw new UnsupportedOperationException();
             return Integer.MAX_VALUE;
+        }
+
+        @Override
+        public @Nullable Task add(@NotNull Task input) {
+            return null;
         }
 
         @Override
@@ -72,11 +75,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable Task add(@NotNull Task input, Concept concept, @NotNull NAR nar) {
-            return null;
-        }
-
-        @Override
         public void capacity(int c, NAR nar) { /* N/A */ }
 
 
@@ -86,5 +84,6 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
     };
 
-    //void range(long[] t);
+    @Nullable Task add(@NotNull Task input);
+
 }

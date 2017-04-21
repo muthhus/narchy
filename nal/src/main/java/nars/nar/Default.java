@@ -103,7 +103,7 @@ public class Default extends NAR {
 
     public Bag<Termed,PLink<Termed>> newConceptBag(int initialCapacity) {
 
-        return new PLinkHijackBag(initialCapacity, 4, random());
+        return new PLinkHijackBag(initialCapacity, 4);
 
     }
 

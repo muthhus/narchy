@@ -127,7 +127,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
     public Inperience(@NotNull NAR n, float rate, int capacity) {
         super(
             //new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap())
-            new PLinkHijackBag(capacity, 4, n.random())
+            new PLinkHijackBag(capacity, 4)
             , rate, n
         );
         this.nar = n;

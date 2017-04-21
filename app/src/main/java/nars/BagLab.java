@@ -6,7 +6,6 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
-import jcog.random.XorShift128PlusRandom;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
 import spacegraph.SpaceGraph;
@@ -68,8 +67,8 @@ public class BagLab  {
     public static void main(String[] arg) {
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
-                new DefaultHijackBag<Integer>(1024, 4,
-                        PriMerge.plus) {
+                new DefaultHijackBag<Integer>(PriMerge.plus, 1024, 4
+                ) {
                         //BudgetMerge.maxBlend) {
 
                 }

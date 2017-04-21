@@ -23,9 +23,7 @@ import java.util.stream.Stream;
  */
 public abstract class HijackBag<K, V> implements Bag<K, V> {
 
-
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
-
 
     public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
@@ -159,7 +157,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         boolean add = adding != null;
         boolean remove = (!add && (scale == -1));
 
-        V added = null,  found = null; //get or remove
+        V added = null,
+          found = null; //get: the found item,  remove: the hijacked item
 
         boolean merged = false;
 
@@ -172,7 +171,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int iStart = i(c, hash);
 
-        Random random = random();
         try {
 
             V target = null;
@@ -188,9 +186,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 //                    if (i >= c) i -= c;
 //                    else if (i < 0) i += c;
 
-                    V ii = map.get(i);
+                    V current = map.get(i);
 
-                    if (ii == null) {
+                    if (current == null) {
                         if (add && targetPri != Float.NEGATIVE_INFINITY) {
                             //empty, plan to take this if
                             // another empty has not been planned
@@ -200,35 +198,51 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             targetPri = Float.NEGATIVE_INFINITY;
                         }
                     } else {
-                        K y = key(ii);
+                        K y = key(current);
                         if (y == x || equals(y, x)) { //existing
 
                             if (!add) {
 
                                 if (remove) { //remove
-                                    //.compareAndSet
-                                    if (map.weakCompareAndSetPlain(i, ii, null)) {
-                                        found = ii;
+                                    if (map.compareAndSet(i, current, null)) {
+                                        found = current;
                                     }
                                 } else {
-                                    found = ii; //get
+                                    found = current; //get
                                 }
 
                             } else { //put
-                                pressurize(merge(ii, adding, scale));
+                                if (current != adding) {
+                                    V next = merge(current, adding, scale);
+                                    if (next!= current) {
+                                        //replace
+                                        if (!map.compareAndSet(i, current, next)) {
+                                            //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
+                                        } else {
+                                            //replaced
+                                            targetIndex = -1;
+                                            added = next;
+                                            merged = true;
+                                            break;
+                                        }
 
-                                targetIndex = -1;
-                                added = ii;
-                                merged = true;
+                                    } else {
+                                        //keep original
+                                        targetIndex = -1;
+                                        added = current;
+                                        merged = true;
+                                        break;
+                                    }
+                                }
                             }
 
                             break; //continue below
 
                         } else if (add) {
-                            float iiPri = priSafe(ii, -1);
+                            float iiPri = priSafe(current, -1);
                             if (targetPri > iiPri) {
                                 //select a better target
-                                target = ii;
+                                target = current;
                                 targetIndex = i;
                                 targetPri = iiPri;
                             }
@@ -248,17 +262,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
                         //insert to empty
                         if (map.compareAndSet(targetIndex, null, adding)) {
-                            pressurize(merge(null, adding, scale));
-                            added = adding;
+                            added = merge(null, adding, scale);
                         }
 
                     } else {
-                        if (replace(adding, target, random)) {
+                        if (replace(adding, target)) {
                             if (map.compareAndSet(targetIndex, target, adding)) { //inserted
-                                //pressure -= targetPri;
-                                pressurize(merge(null, adding, scale));
                                 found = target;
-                                added = adding;
+                                added = merge(null, adding, scale);
                             }
                         }
                     }
@@ -303,7 +314,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 //        }
 
 
-        return !add ? found : added;
+        return add ? added : found;
 
     }
 
@@ -324,7 +335,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * this should modify the existing value if it exists,
      * or the incoming value if none.
      *
-     * @return the pressure increase the merge causes.
+     * if adding content, pressurize() appropriately
+     *
      * <p>
      * NOTE:
      * this should usually equal the amount of priority increased by the
@@ -335,7 +347,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * second-order budgeting advantage of not contributing as much
      * to the presssure as new insertions.
      */
-    protected abstract float merge(@Nullable V existing, @NotNull V incoming, float scale);
+    @NotNull protected abstract V merge(@Nullable V existing, @NotNull V incoming, float scale);
 
     /**
      * can override in subclasses for custom replacement policy.
@@ -343,9 +355,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      *
      * a potential eviction can be intercepted here
      */
-    protected boolean replace(V incoming, V existing, Random random) {
-        float incomingPri = pri(incoming);
-        return hijackSoftmax(incomingPri, pri(existing), random);
+    protected boolean replace(V incoming, V existing) {
+        return replace(pri(incoming), pri(existing));
+    }
+
+    protected boolean replace(float incoming, float existing) {
+        return hijackSoftmax(incoming, existing, random());
     }
 
     /**
@@ -376,12 +391,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     /**
      */
     @Override
-    public V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    public final V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
         V y = update(key(v), v, scale);
 
         if (y != null)
-            startsRange(priSafe(y, 0));
+            stretchRange(pri(y));
 
         return y;
     }
@@ -392,13 +407,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * this value will be updated for certain during a commit, so this value
      * only improves accuracy between commits.
      */
-    private float startsRange(float p) {
-        if (p != p)
-            throw new RuntimeException("NaN prioritization");
-
-        if (p > priMax) priMax = p;
-        if (p < priMin) priMin = p;
-        return p;
+    private void stretchRange(float p) {
+        if (p == p) {
+            if (p > priMax) priMax = p;
+            if (p < priMin) priMin = p;
+        }
     }
 
     @Override

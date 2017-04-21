@@ -401,8 +401,8 @@ public class UDPeer extends UDP {
             }
 
             @Override
-            protected float merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
-                return 0;
+            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
+                return (existing!=null ? existing : incoming);
             }
 
             @Override
@@ -425,7 +425,7 @@ public class UDPeer extends UDP {
 
         them.setCapacity(PEERS_CAPACITY);
 
-        seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4, rng);
+        seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4);
     }
 
     protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {

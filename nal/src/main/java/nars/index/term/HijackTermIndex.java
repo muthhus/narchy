@@ -47,14 +47,14 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 100;
 
-        this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1)) {
+        this.table = new PLinkHijackBag<Termed>(capacity, reprobes) {
             @Override
-            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, Random random) {
+            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing) {
                 if (incoming.get() instanceof PermanentConcept)
                     return true;
                 if (existing.get() instanceof PermanentConcept)
                     return false;
-                return super.replace(incoming, existing, random);
+                return super.replace(incoming, existing);
             }
         };
     }

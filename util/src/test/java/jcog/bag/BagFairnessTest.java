@@ -21,7 +21,7 @@ public class BagFairnessTest {
 
     @Test
     public void test1() {
-        test(new PLinkHijackBag<String>(16, 4, rng));
+        test(new PLinkHijackBag<String>(16, 4));
     }
 
     private void test(Bag<String,PLink<String>> b) {

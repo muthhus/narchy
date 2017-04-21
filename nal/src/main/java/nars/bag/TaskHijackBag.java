@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Task;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -17,9 +18,8 @@ import java.util.function.Consumer;
  */
 public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskTable {
 
-
-    public TaskHijackBag(int reprobes, PriMerge merge, Random random) {
-        super(merge, reprobes);
+    public TaskHijackBag(int reprobes) {
+        super(reprobes);
     }
 
     @Override
@@ -31,6 +31,25 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
     @Override
     public float pri(@NotNull Task key) {
         return key.priSafe(0);
+    }
+
+    @Override
+    protected Task merge(@Nullable Task existing, @NotNull Task incoming, float scaleIgnored) {
+        if (existing!=null) {
+            Task next;
+
+            //prefer the newer task because it could be an input task which has grown in timespan
+            if (existing.creation() < incoming.creation()) {
+                PriMerge.max(incoming, existing);
+                next = incoming; //use the newer task
+            } else {
+                PriMerge.max(existing, incoming);
+                next = existing; //use the existing
+            }
+            return next;
+        } else {
+            return incoming;
+        }
     }
 
     @NotNull
@@ -63,22 +82,14 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     @Override
     public boolean removeTask(Task x) {
-        return remove(x)!=null;
+        if (remove(x)!=null) {
+            commit();
+            return true;
+        }
+        return false;
     }
 
-
-    //long lastForget = ETERNAL;
-
-    public Task add(@NotNull Task t, @NotNull NAR n) {
-
-        //BLinkHijackBag.flatForget(this );
-
-        //new Forget( Util.unitize(1f/capacity() + forgetRate) )
-
-//        int dur = n.dur();
-//        /*if (lastForget + dur < now)*/ {
-//            lastForget = now;
-//        }
+    public Task add(@NotNull Task t) {
 
         Task x = put(t);
 

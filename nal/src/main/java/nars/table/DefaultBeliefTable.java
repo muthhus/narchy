@@ -161,7 +161,7 @@ public class DefaultBeliefTable implements BeliefTable {
                 }
             }
 
-            return temporal.add(input, concept, nar);
+            return temporal.add(input);
         }
     }
 

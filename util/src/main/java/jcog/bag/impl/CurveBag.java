@@ -2,6 +2,7 @@ package jcog.bag.impl;
 
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
+import jcog.pri.Priority;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -479,7 +480,7 @@ public class CurveBag<V> extends ArrayBag<V> {
      */
     public static final class NormalizedSampler extends CurveSampler {
 
-        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(PLink.EPSILON_DEFAULT) /* heuristic */;
+        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(Priority.EPSILON_DEFAULT) /* heuristic */;
         private float range;
 
         public NormalizedSampler(CurveBag.BagCurve curve, Random random) {

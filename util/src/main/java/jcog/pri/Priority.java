@@ -16,12 +16,19 @@ public interface Priority extends Prioritized {
 
     /**common instance for a 'Deleted budget'.*/
     Priority Deleted = new ROBudget(Float.NaN);
+
     /** common instance for a 'full budget'.*/
     Priority One = new ROBudget(1f);
+
     /** common instance for a 'half budget'.*/
     Priority Half = new ROBudget(0.5f);
+
     /** common instance for a 'zero budget'.*/
     Priority Zero = new ROBudget(0);
+
+    /** minimum difference necessary to indicate a significant modification in budget float number components */
+    float EPSILON_DEFAULT = 0.000001f;
+
 
     static String toString(@NotNull Priority b) {
         return toStringBuilder(null, Texts.n4(b.pri())).toString();
@@ -57,6 +64,34 @@ public interface Priority extends Prioritized {
         }
     }
 
+    /**
+     * simple additive Priority merging
+     * if existing is not null, then priority from incoming is applied to it * scale
+     * if existing is null, then incoming enters existence with incoming priority * scale
+     * returns the delta change in ambient pressure
+     */
+    static float combine(@Nullable Priority existing, @NotNull Priority incoming, float scale) {
+        float pAdd = incoming.priSafe(0) * scale;
+        float pressure;
+
+        if (existing != null) {
+            float before = existing.priSafe(0);
+
+            //modify existing
+            existing.priAdd(pAdd);
+
+            pressure = existing.priSafe(0) - before;
+        } else {
+            //modify incoming
+            incoming.setPriority(pAdd);
+            pressure = (pAdd);
+        }
+        return pressure;
+    }
+
+    default void priMax(float max) {
+        setPriority(Math.max(priSafe(0), max));
+    }
     default void priAdd(float toAdd) {
         setPriority(priSafe(0) + toAdd);
     }
@@ -162,15 +197,15 @@ public interface Priority extends Prioritized {
 //
 //    }
 
-    default void absorb(@Nullable MutableFloat overflow) {
-        if (overflow!=null) {
-            float taken = Math.min(overflow.floatValue(), 1f - priSafe(0));
-            if (taken > PLink.EPSILON_DEFAULT) {
-                overflow.subtract(taken);
-                priAdd(taken);
-            }
-        }
-    }
+//    default void absorb(@Nullable MutableFloat overflow) {
+//        if (overflow!=null) {
+//            float taken = Math.min(overflow.floatValue(), 1f - priSafe(0));
+//            if (taken > EPSILON_DEFAULT) {
+//                overflow.subtract(taken);
+//                priAdd(taken);
+//            }
+//        }
+//    }
 
     /** returns null if already deleted */
     @Nullable Priority clone();

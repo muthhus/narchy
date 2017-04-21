@@ -952,8 +952,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         Task accepted = c.process(this, n);
         if (accepted != null) {
 
-            // ACTIVATE
-
             Activation a = activate(n, c, 1f);
 
             if (this == accepted) {

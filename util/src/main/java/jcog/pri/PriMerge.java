@@ -32,13 +32,19 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
     }
 
     @Nullable
-    default Priority apply(@NotNull Priority target, @NotNull Prioritized incoming, float scale) {
-        merge(target, incoming, scale);
-        return target;
+    default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming, float scale) {
+        merge(existing, incoming, scale);
+        return existing;
     }
 
-    default float merge(Priority prev, Prioritized next) {
-        return merge(prev, next, 1f);
+    default float merge(Priority existing, Prioritized incoming) {
+        return merge(existing, incoming, 1f);
+    }
+
+    static void max(Priority existing, Priority incoming) {
+        float p = incoming.priSafe(0);
+        if (p > 0)
+            existing.priMax(p);
     }
 
     enum PriMergeOp {

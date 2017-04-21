@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
-import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -33,7 +32,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     public HijackTemporalBeliefTable(int initialCapacity, Random random) {
-        super(4 /* reprobes */, PriMerge.max, random);
+        super(4 /* reprobes */);
         setCapacity(initialCapacity);
     }
 
@@ -107,11 +106,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    protected boolean replace(Task incoming, Task existing, Random rng) {
+    protected boolean replace(Task incoming, Task existing) {
         if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;
 
-        return super.replace(incoming, existing, rng);
+        return super.replace(incoming, existing);
     }
 
     @Override
@@ -121,71 +120,9 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         if (p >= 0)
             return Util.or((1f + p), (1f + t.conf()));
         else
-            return 0;
+            return -1;
     }
 
-    @Nullable
-    @Override
-    public final Task add(@NotNull Task input, @Deprecated Concept concept, @NotNull NAR nar) {
-
-
-        return add(input, nar);
-
-//        int cap = capacity();
-//        if (cap == 0)
-//            return null;
-//
-//
-//
-//        //the result of compression is processed separately
-//        final TruthDelta[] delta = new TruthDelta[1];
-//
-//
-//        withWriteLockAndDelegate(l -> {
-//
-//            //1. check for duplicate, merge budget. exit
-//            int size = l.size();
-//            for (int i = 0; i < size; i++) {
-//                Task x = l.get(i);
-//                if (x == input)
-//                    return; //same instance
-//
-//                if (x.equals(input)) {
-//                    BudgetMerge.maxBlend.apply(x.budget(), input.budget(), 1f);
-//                    return;
-//                }
-//            }
-//
-//            final Truth before;
-//
-//            Time time = nar.time;
-//            long now = time.time();
-//            int dur = time.dur();
-//
-//            before = truth(now, dur, eternal, l);
-//
-//            Task next;
-//
-//            float confMin = nar.confMin.floatValue();
-//            if ((next = compress(input, now, l, dur, confMin)) != null) {
-//
-//                l.add(input);
-//                //this will be inserted to the index in a callee method
-//
-//                if (next != input /*&& list.size() + 1 <= cap*/) {
-//                    l.add(next);
-//                }
-//
-//                final Truth after = truth(now, dur, eternal, l);
-//                delta[0] = new TruthDelta(before, after);
-//
-//                if (Param.SIBLING_TEMPORAL_TASK_FEEDBACK)
-//                    feedback(l, input);
-//            }
-//        });
-//
-//        return delta[0];
-    }
 
 //    /**
 //     * apply feedback for a newly inserted task

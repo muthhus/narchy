@@ -7,7 +7,6 @@ import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.event.On;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;
@@ -163,7 +162,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             super(focus, premiseBuilder, nar);
 
 
-            this.pending = new TaskHijackBag(3, PriMerge.max, nar.random()) {
+            this.pending = new TaskHijackBag(3) {
 
                 @Override
                 public float temperature() {

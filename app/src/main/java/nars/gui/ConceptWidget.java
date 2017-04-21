@@ -61,7 +61,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-                new PLinkHijackBag(numEdges, 2, nar.random());
+                new PLinkHijackBag(numEdges, 3);
         //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
