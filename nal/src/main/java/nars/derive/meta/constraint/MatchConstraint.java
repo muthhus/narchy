@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 
 public abstract class MatchConstraint extends ProxyCompound implements BoolPredicate<Derivation> {
@@ -21,15 +22,15 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPredi
 
     @Override
     public boolean test(Derivation p) {
-        return p.constraints.add(target, this);
+        return p.addConstraint(target, this);
     }
 
 
     /**
-     * @param targetVariable X target variable that is being considering assignment
-     * @param potentialValue Y potential value
+     * @param targetVariable current value of the target variable (null if none is set)
+     * @param potentialValue potential value to assign to the target variable
      * @param f              match context
      * @return true if match is INVALID, false if VALID (reversed)
      */
-    abstract public boolean invalid(@NotNull Term targetVariable, @NotNull Term potentialValue, @NotNull Unify f);
+    abstract public boolean invalid(@NotNull Term y, @NotNull Unify f);
 }

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by me on 12/22/15.
  */
-public class Choose2 extends Termutator {
+public class Choose2 extends Termutator.AbstractTermutator {
 
     @NotNull
     final Combinations comb;
@@ -33,20 +33,13 @@ public class Choose2 extends Termutator {
     @NotNull
     private final ShuffledSubterms yy;
 
-    @NotNull
     @Override
-    public String toString() {
-
-        return "Choose2{" +
-                "yFree=" + Arrays.toString(yFree) +
-                ", xEllipsis=" + xEllipsis +
-                ", x=" + x[0] + ',' + x[1] +
-                '}';
-
+    protected Object newKey() {
+        return Util.tuple(Choose2.class,xEllipsis, x/*, yFreeSet*/);
     }
 
     public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
-        super(Util.tuple(Choose2.class,xEllipsis, x, yFreeSet));
+        super();
         this.f = f;
         this.xEllipsis = xEllipsis;
         this.x = x.toArray(new Term[x.size()]);

@@ -206,8 +206,6 @@ public class FZero extends NAgentX {
                 new RealTime.DSHalf(true)
                         .durFPS(10f), true);
 
-        n.truthResolution.setValue(0.2f);
-
         FZero a = new FZero(n);
         a.runRT(10f);
 

@@ -6,7 +6,7 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public final class OpNotConstraint extends MatchConstraint {
+public final class OpExclusionConstraint extends MatchConstraint {
 
     private final int op;
 
@@ -14,14 +14,14 @@ public final class OpNotConstraint extends MatchConstraint {
 //        this(o.bit);
 //    }
 
-    public OpNotConstraint(Term target, int opVector) {
-        super("opNot", target, $.the(Integer.toBinaryString(opVector)));
+    public OpExclusionConstraint(Term target, int opVector) {
+        super("opExcl", target, $.the(Integer.toBinaryString(opVector)));
         this.op = opVector;
     }
 
     @Override
-    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-        return value.op().in(op);
+    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
+        return y.op().in(op);
     }
 
 

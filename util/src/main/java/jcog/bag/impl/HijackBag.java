@@ -612,15 +612,15 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
 
-    /**
-     * a value between 0 and 1 of how much percent of the priority range
-     * to accept an item which is below the current sampling target priority.
-     * generally this should be a monotonically increasing function of
-     * the scan progress proportion, a value in 0..1.0 also.
-     */
-    protected static float tolerance(float scanProgressProportion) {
-        return /*Util.sqr*/(Util.sqr(scanProgressProportion)); /* polynomial curve */
-    }
+//    /**
+//     * a value between 0 and 1 of how much percent of the priority range
+//     * to accept an item which is below the current sampling target priority.
+//     * generally this should be a monotonically increasing function of
+//     * the scan progress proportion, a value in 0..1.0 also.
+//     */
+//    protected static float tolerance(float scanProgressProportion) {
+//        return /*Util.sqr*/(Util.sqr(scanProgressProportion)); /* polynomial curve */
+//    }
 
     @Override
     public int size() {

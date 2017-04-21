@@ -20,8 +20,8 @@ public final class StructureExclusionConstraint extends MatchConstraint {
     }
 
     @Override
-    public boolean invalid(@NotNull Term assignee, @NotNull Term value, @NotNull Unify f) {
-        return value.hasAny(structure);
+    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
+        return y.hasAny(structure);
     }
 
 }

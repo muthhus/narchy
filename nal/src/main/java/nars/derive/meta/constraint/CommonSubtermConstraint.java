@@ -18,7 +18,7 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
     @Override
     protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
         //return x.op().var || y.containsTermRecursively(x);
-        return x.equals(y) || !TermContainer.commonSubtermsRecurse(x, y, true);
+        return !TermContainer.commonSubtermsRecurse(x, y, true);
     }
 
 

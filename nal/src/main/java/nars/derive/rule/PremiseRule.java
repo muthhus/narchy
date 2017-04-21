@@ -918,7 +918,7 @@ public class PremiseRule extends GenericCompound {
 //        }
 //
 //        if (!prefiltered)
-            constraints.add(new OpNotConstraint(t, structure));
+            constraints.add(new OpExclusionConstraint(t, structure));
     }
 
 

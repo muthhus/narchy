@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * choose 1 at a time from a set of N, which means iterating up to N
  */
-public class Choose1 extends Termutator {
+public class Choose1 extends Termutator.AbstractTermutator {
 
     @NotNull
     private final Set<Term> yFree;
@@ -23,21 +23,13 @@ public class Choose1 extends Termutator {
     @NotNull
     private final Term[] yy;
 
-    @NotNull
     @Override
-    public String toString() {
-
-        return "Choose1{" +
-                "yFree=" + yFree +
-                ", xEllipsis=" + xEllipsis +
-                ", x=" + x +
-                '}';
+    protected Object newKey() {
+        return Util.tuple(xEllipsis, x);
     }
 
     public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
-        super(Util.tuple(xEllipsis, x, yFree));
-
-
+        super();
 
         int ysize = yFree.size();
         if (ysize < 2) {

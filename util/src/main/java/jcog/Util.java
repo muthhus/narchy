@@ -1200,11 +1200,14 @@ public enum Util { ;
         return result;
     }
 
+    public static Pair tuple(Object a, Object b) {
+        return Tuples.pair(a, b);
+    }
     public static Pair tuple(Object a, Object b, Object c) {
-        return Tuples.pair(Tuples.pair(a, b), c);
+        return tuple(tuple(a, b), c);
     }
     public static Pair tuple(Object a, Object b, Object c, Object d) {
-        return Tuples.pair(tuple(a, b, c), d);
+        return tuple(tuple(a, b, c), d);
     }
 
     /** min is inclusive, max is exclusive: [min, max) */

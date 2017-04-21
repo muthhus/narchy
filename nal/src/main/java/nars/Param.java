@@ -29,6 +29,7 @@ public abstract class Param  {
     /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
+
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;
 
@@ -83,10 +84,15 @@ public abstract class Param  {
     public final static int UnificationStackMax = 64;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTL = 2048;
+    public final static int UnificationTTL = 512;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;
+
+    public static final int MaxMatchConstraintsPerVariable = 8;
+    public static final int MaxUnificationVariables = 32;
+    public static final int MaxUnificationVariableStack = 8; //may be able to reduce to 1
+
 
     public static int DEFAULT_NAL_LEVEL = 8;
 

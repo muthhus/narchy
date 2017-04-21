@@ -143,7 +143,7 @@ public class TermutatorTest {
         //int blocked = 0;
         final int[] duplicates = {0};
 
-        t.mutate(f, Lists.newArrayList( t, new Termutator("evaluate") {
+        t.mutate(f, Lists.newArrayList( t, new Termutator() {
 
             @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
                 if (s.add( f.xy.toString() )) {

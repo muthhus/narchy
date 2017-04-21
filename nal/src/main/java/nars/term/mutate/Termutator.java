@@ -8,30 +8,53 @@ import java.util.List;
 /**
  * AIKR choicepoint used in deciding possible mutations to apply in deriving new compounds
  */
-public abstract class Termutator  {
+public interface Termutator {
 
-    /** should have .equals() consistency */
-    @NotNull
-    public final Object key;
+    /**
+     * match all termutations recursing to the next after each successful one
+     */
+    boolean mutate(Unify f, List<Termutator> chain, int current);
 
-    protected Termutator(@NotNull Object key) {
-        this.key = key;
+    default int getEstimatedPermutations() {
+        return -1; /* unknown */
     }
 
-    /** match all termutations recursing to the next after each successful one */
-    public abstract boolean mutate(Unify f, List<Termutator> chain, int current);
+    abstract class AbstractTermutator implements Termutator {
 
-    public abstract int getEstimatedPermutations();
+        /**
+         * cached key
+         */
+        private Object key = null;
 
+        @Override
+        public String toString() {
+            return key().toString();
+        }
 
-    @Override
-    public final boolean equals(@NotNull Object obj) {
-        return (this == obj) || key.equals(((Termutator)obj).key);
+        @Override
+        public final boolean equals(@NotNull Object obj) {
+            return (this == obj) ||
+                    obj instanceof AbstractTermutator
+                        &&
+                    key().equals(((AbstractTermutator) obj).key());
+        }
+
+        @Override
+        public final int hashCode() {
+            return key().hashCode();
+        }
+
+        public Object key() {
+            Object k = this.key;
+            if (k == null) {
+                k = newKey();
+            }
+            return k;
+        }
+
+        /**
+         * lazily generate a key for identity comparison
+         */
+        abstract protected Object newKey();
     }
-
-    @Override
-    public final int hashCode() {
-        return key.hashCode();
-    }
-
 }

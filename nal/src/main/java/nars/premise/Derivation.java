@@ -207,9 +207,7 @@ public class Derivation extends Unify {
     }
 
 
-    protected final void set(@NotNull Term t) {
-        setXY(t, t);
-    }
+
 
     /**
      * only one thread should be in here at a time

@@ -11,25 +11,19 @@ import java.util.List;
 /**
  * Created by me on 12/22/15.
  */
-public final class CommutivePermutations extends Termutator {
+public final class CommutivePermutations extends Termutator.AbstractTermutator {
 
     @NotNull
     private final TermContainer y;
     private final TermContainer x;
 
-    @NotNull
     @Override
-    public String toString() {
-
-            return "CommutivePermutations{" +
-                    //"perm=" + perm.srcsubs +
-                    ", x=" + x +
-                    ", y=" + y +
-                    '}';
+    protected Object newKey() {
+        return Util.tuple(CommutivePermutations.class, x, y);
     }
 
     public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
-        super(Util.tuple(CommutivePermutations.class, x, y));
+        super();
         this.y = y;
         this.x = x;
     }

@@ -8,7 +8,6 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
 
@@ -16,19 +15,21 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
     private final Versioning context;
     public final Map<X, Versioned<Y>> map;
-    final static int elementStackSize = 8;
+    public final int elementStackSizeDefault; //stackSizePerElement
 
-    public VersionMap(Versioning context, int initialSize) {
+    public VersionMap(Versioning context, int initialSize, int elementStackSizeDefault) {
         this(context,
             new HashMap(initialSize)
             //new UnifiedMap(initialSize)
             //new LinkedHashMap<>(initialSize)
+            , elementStackSizeDefault
         );
     }
 
-    public VersionMap(Versioning context, Map<X, Versioned<Y>/*<Y>*/> map) {
+    public VersionMap(Versioning context, Map<X, Versioned<Y>/*<Y>*/> map, int elementStackSizeDefault) {
         this.context = context;
         this.map = map;
+        this.elementStackSizeDefault = elementStackSizeDefault;
     }
 
 
@@ -97,6 +98,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         return getOrCreateIfAbsent(key).set(value)!=null;
     }
 
+
     public final void putConstant(X key, Y value) {
         map.put(key, new Versioned(value));
     }
@@ -106,14 +108,10 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     @NotNull
-    public final Versioned<Y> newEntry(X keyIgnoredk) {
-        return new Versioned<>(context, elementStackSize);
+    public Versioned<Y> newEntry(X keyIgnoredk) {
+        return new Versioned<>(context, elementStackSizeDefault);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);
-    }
-
-    public final boolean computeAssignable(X x, @NotNull BiFunction r) {
-        return map.compute(x, r)!=null;
     }
 
     public boolean forEachVersioned(@NotNull BiPredicate<? super X, ? super Y> each) {

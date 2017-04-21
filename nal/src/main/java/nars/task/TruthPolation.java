@@ -23,8 +23,9 @@ public enum TruthPolation  {
     /** dt > 0 */
     public static float evidenceDecay(float evi, int dur, long dt) {
 
-        return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
-        //return evi / ( 1 + (((float)dt)/dur) ); //inverse linear
+        //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
+        return evi / ( 1 + (((float)dt)/dur) ); //inverse linear
+
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 
         //return evi * Math.max(0, 1f - dt / dur ); //hard linear

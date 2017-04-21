@@ -5,41 +5,44 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 10/16/16.
  */
 public abstract class CommonalityConstraint extends MatchConstraint {
 
-    public CommonalityConstraint(String func, Term target, Term... args) {
-        super(func, target, args);
+    private final Term other;
+
+    public CommonalityConstraint(String func, Term target, Term other) {
+
+        super(func, target, other);
+        this.other = other;
     }
 
     @Override
-    public boolean invalid(@NotNull Term x, @NotNull Term y, @NotNull Unify f) {
+    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
-        Term bb = f.xy(ref);
+        Term x = f.xy(other);
+        if (x!=null) {
+            boolean bCompound = x instanceof Compound;
+            if ((y instanceof Compound)) {
 
-        if (bb == null) return false;
+                Compound C = (Compound) y;
 
-        if (bb.equals(y)) return true;
-        if (bb instanceof Variable) return false; //only if bb!=y
+                return bCompound ?
+                        invalid((Compound) x, C)
+                        :
+                        invalid(/*(Term)*/x, C);
 
-        boolean bCompound = bb instanceof Compound;
-        if (!(y instanceof Compound)) {
-
-            return bCompound && bb.containsTerm(y); //B.equals(y);
-        } else {
-
-            Compound C = (Compound) y;
-
-            return bCompound ?
-                    invalid((Compound) bb, C)
-                    :
-                    invalid(/*(Term)*/bb, C);
-
+            } else if (!(y instanceof Variable)) {
+                return bCompound && x.containsTerm(y); //B.equals(y);
+            } else {
+                //probably a variable
+            }
         }
 
+        return false;
     }
 
     @NotNull protected abstract boolean invalid(Compound x, Compound y);

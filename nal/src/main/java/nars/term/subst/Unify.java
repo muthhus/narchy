@@ -1,6 +1,5 @@
 package nars.term.subst;
 
-import jcog.list.FasterList;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -8,6 +7,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
+import nars.derive.meta.constraint.NotEqualConstraint;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.mutate.Termutator;
@@ -20,10 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
+
+import static nars.Param.MaxMatchConstraintsPerVariable;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -41,7 +40,9 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class Unify extends Termutator implements Subst {
+public abstract class Unify implements Termutator, Subst {
+
+    final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     @NotNull
     public final Random random;
@@ -58,77 +59,24 @@ public abstract class Unify extends Termutator implements Subst {
     @NotNull
     public final TermIndex index;
 
-    /**
-     * variables whose contents are disallowed to equal each other
-     */
-    @NotNull
-    public final Constraints constraints;
-    @NotNull
-    public final Reassigner<Term, Term> reassignerXY;//, reassignerYX;
-
     @NotNull
     public final VersionMap<Term, Term> xy;
+
     @NotNull
     public final VersionMap<Term, Term> yx;
-
 
 
     public final boolean mutate(List<Termutator> chain, int next) {
         return chain.get(++next).mutate(this, chain, next);
     }
 
-    public final class Constraints extends VersionMap<Term,List<MatchConstraint>> implements BiPredicate<Term, Term> {
-
-        public Constraints(@NotNull Versioning context, int maxConstr) {
-            super(context, maxConstr);
-        }
-
-        public boolean add(Term x, MatchConstraint m) {
-
-
-            //check that constraint isnt violated by existing conditions:
-            //shouldnt be necessary if working correctly
-
-//            Term y = xy.get(x);
-//            if (y!=null) {
-//                if (m.invalid(x, y, Unify.this))
-//                    return false;
-//            }
-
-            List<MatchConstraint> ccc = get(x);
-            if (ccc == null)
-                ccc = $.newArrayList(1);
-            else {
-                int s = ccc.size();
-                FasterList ddd = new FasterList(s + 1); //clone
-                ddd.addAll(ccc);
-                ccc = ddd;
-            }
-            ccc.add(m);
-            return tryPut(x, ccc);
-        }
-
-        @Override
-        public boolean test(@NotNull Term x, @NotNull Term y) {
-            List<MatchConstraint> ccc = get(x);
-            if (ccc==null)
-                return true;
-
-            int s = ccc.size();
-            for (int i = 0; i < s; i++) {
-                if (ccc.get(i).invalid(x, y, Unify.this))
-                    return false;
-            }
-            return true;
-        }
-    }
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int ttl) {
         this(index, type, random, new Versioning(stackMax, ttl));
     }
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
-        super(Unify.class);
+        super();
 
         this.index = index;
 
@@ -137,13 +85,15 @@ public abstract class Unify extends Termutator implements Subst {
 
         this.versioning = versioning;
 
-        int constraintsLimit = 16;
-        constraints = new Constraints(versioning, constraintsLimit);
+        xy = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack) {
+            @NotNull
+            @Override
+            public Versioned newEntry(Object keyIgnoredk) {
+                return new ConstrainedVersionedTerm();
+            }
+        };
 
-        xy = new VersionMap(versioning, 32);
-        reassignerXY = new Reassigner(constraints, xy);
-
-        yx = new VersionMap(versioning, 16);
+        yx = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
         //reassignerYX = new VersionMap.Reassigner<>(constraintPredicate, yx);
     }
 
@@ -177,8 +127,9 @@ public abstract class Unify extends Termutator implements Subst {
         return this;
     }
 
-
-    final static Logger logger = LoggerFactory.getLogger(Unify.class);
+    public final void set(@NotNull Term t) {
+        xy.putConstant(t, t);
+    }
 
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
@@ -231,7 +182,8 @@ public abstract class Unify extends Termutator implements Subst {
     }
 
 
-    @Override public boolean tryPut(@NotNull Unify m) {
+    @Override
+    public boolean tryPut(@NotNull Unify m) {
         return m.xy.forEachVersioned(this::replaceXY);
     }
 
@@ -240,12 +192,11 @@ public abstract class Unify extends Termutator implements Subst {
         if (!f.versioning.tick())
             return false;
 
-        return (seq==-2) ?
-            f.mutate(n, -1) //start combinatorial recurse
+        return (seq == -2) ?
+                f.mutate(n, -1) //start combinatorial recurse
                 :
-            f.onMatch(); //end combinatorial recurse
+                f.onMatch(); //end combinatorial recurse
     }
-
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
@@ -330,19 +281,6 @@ public abstract class Unify extends Termutator implements Subst {
         }
 
         return t.add(x);
-
-        /*
-        int s = t.size();
-
-        for (int i = 0; i < s; i++) {
-            Termutator y = t.get(i);
-            if (x.equals(y)) {
-                return true; //TODO maybe bifurcate a termutator tree with an OR branch?
-            }
-        }
-
-        return t.add(x);
-        */
     }
 
 
@@ -381,19 +319,104 @@ public abstract class Unify extends Termutator implements Subst {
         return yx.tryPut(y, x);
     }
 
+
+
+    class ConstrainedVersionedTerm extends Versioned<Term> {
+
+        /** divide constraints into two classes: fast and slow, fast obviously checked first */
+        Versioned<MatchConstraint> constraints = null;
+        Versioned<MatchConstraint> fastConstraints = null;
+
+        ConstrainedVersionedTerm() {
+            super(versioning,  Param.MaxUnificationVariableStack);
+        }
+//        ConstrainedVersionedTerm(Versioned<Term> adopt) {
+//            super(adopt);
+//        }
+
+        @Nullable
+        @Override
+        protected Versioned<Term> set(@Nullable Term current, @NotNull Term next) {
+
+            if (fastConstraints!=null && !valid(next, fastConstraints))
+                return null;
+
+            if (constraints!=null && !valid(next, constraints))
+                return null;
+
+            return super.set(current, next);
+        }
+
+        boolean valid(@NotNull Term next, Versioned<MatchConstraint> c) {
+            int s = c.size();
+            for (int i = 0; i < s; i++) {
+                if (c.get(i).invalid(next, Unify.this ))
+                    return false;
+            }
+            return true;
+        }
+
+        public boolean addConstraint(MatchConstraint m) {
+            Versioned<MatchConstraint> cc;
+            if (m instanceof NotEqualConstraint) {
+                cc = fastConstraints!=null ? fastConstraints : (this.fastConstraints = newConstraints());
+            } else {
+                cc = constraints !=null ? constraints : (this.constraints = newConstraints());
+            }
+            return cc.add(m);
+        }
+
+        public Versioned newConstraints() {
+            return new Versioned(versioning,MaxMatchConstraintsPerVariable);
+        }
+    }
+
+    public boolean addConstraint(Term x, MatchConstraint m) {
+
+
+        final boolean[] valid = {true};
+        Versioned<Term> v = xy.getOrCreateIfAbsent(x);
+        return ((ConstrainedVersionedTerm)v).addConstraint(m);
+
+//        xy.map.computeIfAbsent(x, (xx) -> return
+//            ConstrainedVersionedTerm cv;
+////            if (v instanceof ConstrainedVersionedTerm) {
+////                cv = (ConstrainedVersionedTerm)v;
+////            } else if (v!=null) {
+////                Term vv = v.get();
+////                assert(vv==null);
+//////                if (vv!=null && m.invalid(vv, Unify.this)) {
+//////                     //tried to put constraint on a variable with an existing invalid value
+//////                    valid[0] = false;
+//////                    return v;
+//////                }
+//////
+//////                //it will be valid; promote this to non-constrained versioned entry's values
+//////                cv = new ConstrainedVersionedTerm(v);
+////                cv = new ConstrainedVersionedTerm();
+//
+//            if (v == null) {
+//                v = new ConstrainedVersionedTerm();
+//            } else {
+//                System.out.println("what is it: " + v);
+//            }
+//
+//            return v;
+//        });
+//
+//        return valid[0];
+    }
+
+
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        return reassignerXY.compute(x, y);
+    public final boolean putXY(@NotNull Term xVar /* usually a Variable */, @NotNull Term y /* value */) {
+        return xy.tryPut(xVar, y);
     }
 
     public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
         return xy.tryPut(x, y);
-    }
-
-    public final void setXY(Term x /* usually a Variable */, @NotNull Term y) {
-        xy.putConstant(x, y);
     }
 
     public final int now() {
@@ -415,42 +438,6 @@ public abstract class Unify extends Termutator implements Subst {
     }
 
 
-    private static class Reassigner<X,Y> implements BiFunction<X, Versioned<Y>, Versioned<Y>> {
-
-        protected Y y;
-        protected final VersionMap<X,Y> map;
-        private final BiPredicate<X,Y> assigner;
-
-        Reassigner(@NotNull BiPredicate<X,Y> assigner, @NotNull final VersionMap<X,Y> map) {
-            this.map = map;
-            this.assigner = assigner;
-        }
-
-        @Override
-        public Versioned<Y> apply(X x, @Nullable Versioned<Y> vy) {
-            final Y y = this.y;
-
-            if (vy == null) {
-                return assigner.test(x, y) ?  map.newEntry(x).set(y) : null;
-            } else {
-                Y yy = vy.get();
-                if (yy == null) {
-                    if (!assigner.test(x, y) || (vy.set(y)==null))
-                        return null;
-                } else if (!Objects.equals(yy, y)) {
-                    return null; //conflict
-                }
-                return vy;
-            }
-        }
-
-        /** should not be used by multiple threads at once! */
-        public final boolean compute(@NotNull X x, @NotNull Y y) {
-            this.y = y;
-            return map.computeAssignable(x, this);
-        }
-
-    }
 }
 
 

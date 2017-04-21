@@ -28,7 +28,6 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
         if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
             return Collections.singletonList(new SubTermStructure(subterm, bits));
         } else {
-            int i = 0;
             List<SubTermStructure> components = $.newArrayList(numBits);
             for (Op o : Op.values()) {
 

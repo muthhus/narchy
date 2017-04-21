@@ -13,15 +13,18 @@ public class Versioned<X> extends FasterList<X> {
     @NotNull
     private final Versioning context;
 
-    public Versioned(@NotNull Versioning context, int initialCapacity) {
-        super(initialCapacity);
-        this.context = context;
+    public Versioned(@NotNull Versioned<X> copy) {
+        super(copy);
+        this.context = copy.context;
     }
 
-    public Versioned(X... constValue) {
-        super();
-        this.items = constValue;
-        this.size = constValue.length;
+    public Versioned(@NotNull Versioning sharedContext, int initialCapacity) {
+        super(initialCapacity);
+        this.context = sharedContext;
+    }
+
+    protected Versioned(X... constValue) {
+        super(constValue.length, constValue);
         this.context = null;
     }
 
@@ -63,14 +66,13 @@ public class Versioned<X> extends FasterList<X> {
     public final Versioned<X> set(X nextValue) {
 
         X current = get();
-        if (current!=null && current.equals(nextValue))
-            return this; //no change
+        return set(current, nextValue);
+    }
 
-        //if (current == null || !current.equals(nextValue)) {
-        if (context.nextChange(this, nextValue))
-            return this;
-        else
-            return null;
+    @Nullable protected Versioned<X> set(@Nullable X current, @NotNull X next) {
+        return ((current!=null) ?
+            current.equals(next) :
+            context.nextChange(this, next)) ? this : null;
     }
 
     @Override

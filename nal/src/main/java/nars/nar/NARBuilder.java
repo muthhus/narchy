@@ -187,26 +187,26 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(512);
-        nar.deriver.conceptsFiredPerBatch.setValue(64);
-        nar.deriver.derivationsInputPerCycle.setValue(128);
+        nar.deriver.conceptsFiredPerCycle.setValue(768);
+        nar.deriver.conceptsFiredPerBatch.setValue(32);
+        nar.deriver.derivationsInputPerCycle.setValue(384);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(96);
 
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.beliefConfidence(0.8f);
+        nar.goalConfidence(0.8f);
 
         float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
 
         //nar.stmLinkage.capacity.set(0);
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
+        nar.truthResolution.setValue(0.06f);
 
 
         //NARTune tune = new NARTune(nar);

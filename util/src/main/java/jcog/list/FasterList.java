@@ -37,8 +37,8 @@ public class FasterList<X> extends FastList<X> {
         super(capacity);
     }
 
-    public FasterList(Collection<X> x) {
-        super(x);
+    public FasterList(Collection<X> copy) {
+        super(copy);
     }
 
     /**
