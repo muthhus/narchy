@@ -269,11 +269,9 @@ public class IRCNLP extends IRC {
     @NotNull
     public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
 
-        Random random = new XorShift128PlusRandom(System.currentTimeMillis());
-
         MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024, true);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 3, random,
+        Default nar = new Default(activeConcepts, conceptsPerFrame, 3,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
