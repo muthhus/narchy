@@ -1,6 +1,5 @@
 package nars.derive.meta.op;
 
-import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicPredicate;
 import nars.premise.Derivation;

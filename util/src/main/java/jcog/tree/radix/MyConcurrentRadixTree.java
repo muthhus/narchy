@@ -1180,7 +1180,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
                         // Create new nodes...
                         Node newChild = createNode(suffixFromExistingEdge, foundValue, oedges, false);
 
-                        Node newParent = createNode(commonPrefix, newValue, new FasterList(newChild), false);
+                        Node newParent = createNode(commonPrefix, newValue, new FasterList(new Node[] { newChild }), false);
 
                         // Add the new parent to the parent of the node being replaced (replacing the existing node)...
                         result.parentNode.updateOutgoingEdge(newParent);

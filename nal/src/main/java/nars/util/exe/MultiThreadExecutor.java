@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 8/16/16.
  */
-public class MultiThreadExecutor extends Executioner {
+public class MultiThreadExecutor extends Executioner implements ExceptionHandler<MultiThreadExecutor.TaskEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
@@ -37,15 +37,28 @@ public class MultiThreadExecutor extends Executioner {
     private long cursor;
     private boolean sync = true;
 
+    @Override
+    public void handleEventException(Throwable ex, long sequence, TaskEvent event) {
+        logger.error("work: {}", ex);
+    }
+
+    @Override
+    public void handleOnStartException(Throwable ex) {
+        logger.error("start: {}", ex);
+    }
+
+    @Override
+    public void handleOnShutdownException(Throwable ex) {
+        logger.error("stop: {}", ex);
+    }
+
 
     enum EventType {
         RUNNABLE, NAR_CONSUMER
     }
 
     static final class TaskEvent {
-        @Nullable EventType e;
         @Nullable Object val;
-
     }
 
     @NotNull
@@ -99,6 +112,7 @@ public class MultiThreadExecutor extends Executioner {
         for (int i = 0; i < threads; i++)
             taskWorker[i] = new TaskEventWorkHandler();
         EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
+        disruptor.setDefaultExceptionHandler(this);
 
 
         barrier = workers.asSequenceBarrier();
@@ -197,12 +211,10 @@ public class MultiThreadExecutor extends Executioner {
 
 
     final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
-        x.e = EventType.RUNNABLE;
         x.val = b;
     };
 
     final static EventTranslatorOneArg<TaskEvent, Consumer<NAR>> narPublisher = (TaskEvent x, long seq, Consumer<NAR> b) -> {
-        x.e = EventType.NAR_CONSUMER;
         x.val = b;
     };
 
@@ -217,7 +229,7 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public final void run(@NotNull Consumer<NAR> r) {
         if (!ring.tryPublishEvent(narPublisher, r)) {
-            r.accept(nar()); //execute in callee's thread
+            r.accept(nar); //execute in callee's thread
         }
     }
 
@@ -226,18 +238,16 @@ public class MultiThreadExecutor extends Executioner {
 
         @Override
         public final void onEvent(@NotNull TaskEvent te) {
+
             Object val = te.val;
             te.val = null;
-            switch (te.e) {
-                case RUNNABLE:
-                    ((Runnable)val).run();
-                    break;
-                case NAR_CONSUMER:
-                    ((Consumer<NAR>)val).accept(nar());
-                    break;
-                default:
-                    throw new RuntimeException();
+
+            if (val instanceof Runnable) {
+                ((Runnable)val).run();
+            } else {
+                ((Consumer)val).accept(nar);
             }
+
         }
 
 

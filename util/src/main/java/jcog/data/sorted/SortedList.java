@@ -40,9 +40,6 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
         super(capacity);
     }
 
-    public SortedList(E singleton) {
-        super(singleton);
-    }
 
     /** uses array directly */
     public SortedList(E[] toSort, E[] scratch) {

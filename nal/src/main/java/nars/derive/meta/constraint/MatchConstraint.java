@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 public abstract class MatchConstraint extends ProxyCompound implements BoolPredicate<Derivation> {

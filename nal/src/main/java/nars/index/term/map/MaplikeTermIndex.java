@@ -18,7 +18,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.ATOM;
 import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.term.Terms.compoundOrNull;

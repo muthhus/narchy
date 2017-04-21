@@ -6,8 +6,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 import static nars.Op.Imdex;
 
 /**

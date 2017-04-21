@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  */
 abstract public class Executioner implements Executor {
     @Nullable
-    private NAR nar;
+    protected NAR nar;
 
     public boolean isRunning() {
         return nar!=null;
@@ -79,9 +79,6 @@ abstract public class Executioner implements Executor {
         run(command);
     }
 
-    public NAR nar() {
-        return nar;
-    }
 }
 
 //package nars.nar.exe;

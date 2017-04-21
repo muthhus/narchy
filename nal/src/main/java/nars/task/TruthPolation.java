@@ -8,7 +8,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

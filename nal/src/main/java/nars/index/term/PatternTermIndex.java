@@ -16,7 +16,6 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.NEG;
 

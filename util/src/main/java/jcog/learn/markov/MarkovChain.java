@@ -207,7 +207,8 @@ public class MarkovChain<T> {
             } else {
                 Node n = findOrCreate(tu);
                 current[0] = current[0].learn(n, strength);
-                tuple[0] = new FasterList<T>(t);
+                tuple[0] = new FasterList<T>();
+                tuple[0].add(t);
                 //tuple[0].add(t);
             }
         });

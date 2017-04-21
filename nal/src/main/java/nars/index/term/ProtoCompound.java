@@ -1,10 +1,8 @@
 package nars.index.term;
 
-import jcog.list.FasterList;
 import nars.Op;
 import nars.term.Term;
 
-import java.util.Arrays;
 import java.util.function.Predicate;
 
 /**
