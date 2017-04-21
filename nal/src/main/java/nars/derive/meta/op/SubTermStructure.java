@@ -25,19 +25,19 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
     public static List<SubTermStructure> get(int subterm, int bits) {
         int numBits = Integer.bitCount(bits);
         assert (numBits > 0);
-        if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
+        //if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
             return Collections.singletonList(new SubTermStructure(subterm, bits));
-        } else {
-            List<SubTermStructure> components = $.newArrayList(numBits);
-            for (Op o : Op.values()) {
-
-                int b = o.bit;
-                if ((bits & b) > 0) { //HACK
-                    components.add(new SubTermStructure(subterm, b));
-                }
-            }
-            return components;
-        }
+//        } else {
+//            List<SubTermStructure> components = $.newArrayList(numBits);
+//            for (Op o : Op.values()) {
+//
+//                int b = o.bit;
+//                if ((bits & b) > 0) { //HACK
+//                    components.add(new SubTermStructure(subterm, b));
+//                }
+//            }
+//            return components;
+//        }
     }
 
     private SubTermStructure(int subterm, int bits) {
@@ -54,9 +54,9 @@ public final class SubTermStructure extends AtomicPredicate<Derivation> {
         }
         id = "subTermStruct(" + subterm + ',' +
                 ((Integer.bitCount(bits) == 1) ?
-                        ("has_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
+                        ("onBit_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
                             :
-                        ("hasAll_" + Integer.toBinaryString(bits))
+                        ("onAll_" + Integer.toBinaryString(bits))
                 ) + ")";
 
     }

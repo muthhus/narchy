@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.ATOM;
 import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.term.Terms.compoundOrNull;
@@ -79,10 +80,11 @@ public abstract class MaplikeTermIndex extends TermIndex {
     private static final int PROD_or_INH_bits = Op.or(PROD,INH);
 
     protected boolean cacheable(ProtoCompound c) {
-
-        return (c.size() > 1) &&
-               !c.op().in(PROD_or_INH_bits)
-               && c.AND(x -> !x.hasAny(PROD_or_INH_bits));
+        return false;
+//        return c.size() > 1 &&
+//                 !(c.op()==INH && c.sub(1).op()==ATOM /* functor */ && c.sub(0).op()==PROD )
+//                 &&
+//                 !c.OR(x -> x.hasAll(Op.EvalBits));
     }
 
     @Nullable

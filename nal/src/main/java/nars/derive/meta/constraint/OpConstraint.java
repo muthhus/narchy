@@ -19,6 +19,7 @@ public final class OpConstraint extends MatchConstraint {
 
     @Override
     public boolean invalid(@NotNull Term y, @NotNull Unify f) {
+
         return y.op()!=op;
     }
 

@@ -80,11 +80,12 @@ public class AppendProtoCompound implements ProtoCompound {
     }
 
     @Override public boolean AND(Predicate<Term> t) {
-        for (Term x : subs) {
-            if (!t.test(x))
-                return false;
-        }
+        for (Term x : subs) if (!t.test(x)) return false;
         return true;
+    }
+    @Override public boolean OR(Predicate<Term> t) {
+        for (Term x : subs) if (t.test(x)) return true;
+        return false;
     }
 
     public boolean add(Term x) {
@@ -120,7 +121,16 @@ public class AppendProtoCompound implements ProtoCompound {
     }
 
 
-    public Term sub(int i) {
+    @Override public Term sub(int i) {
         return subs[i];
+    }
+
+    @Override
+    public String toString() {
+        return "AppendProtoCompound{" +
+                "op=" + op +
+                ", dt=" + dt +
+                ", subs=" + Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
+                '}';
     }
 }

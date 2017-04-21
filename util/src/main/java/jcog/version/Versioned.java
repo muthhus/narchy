@@ -70,9 +70,7 @@ public class Versioned<X> extends FasterList<X> {
     }
 
     @Nullable protected Versioned<X> set(@Nullable X current, @NotNull X next) {
-        return ((current!=null) ?
-            current.equals(next) :
-            context.nextChange(this, next)) ? this : null;
+        return context.nextChange(this, next) ? this : null;
     }
 
     @Override

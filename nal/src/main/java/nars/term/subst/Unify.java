@@ -330,9 +330,6 @@ public abstract class Unify implements Termutator, Subst {
         ConstrainedVersionedTerm() {
             super(versioning,  Param.MaxUnificationVariableStack);
         }
-//        ConstrainedVersionedTerm(Versioned<Term> adopt) {
-//            super(adopt);
-//        }
 
         @Nullable
         @Override
@@ -363,7 +360,7 @@ public abstract class Unify implements Termutator, Subst {
             } else {
                 cc = constraints !=null ? constraints : (this.constraints = newConstraints());
             }
-            return cc.add(m);
+            return cc.set(m)!=null;
         }
 
         public Versioned newConstraints() {
@@ -374,7 +371,7 @@ public abstract class Unify implements Termutator, Subst {
     public boolean addConstraint(Term x, MatchConstraint m) {
 
 
-        final boolean[] valid = {true};
+        //final boolean[] valid = {true};
         Versioned<Term> v = xy.getOrCreateIfAbsent(x);
         return ((ConstrainedVersionedTerm)v).addConstraint(m);
 

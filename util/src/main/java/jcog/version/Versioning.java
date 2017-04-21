@@ -53,13 +53,13 @@ public class Versioning extends FasterList<Versioned> {
     /** reverts/undo to previous state */
     public final void revert(int when) {
         int n = size - when;
-        pop(n);
+        if (n > 0)
+            pop(n);
     }
 
     public final void pop(int count) {
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++)
             revert();
-        }
     }
 
     @Override

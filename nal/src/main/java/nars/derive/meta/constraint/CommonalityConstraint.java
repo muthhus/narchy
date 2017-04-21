@@ -21,25 +21,37 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     }
 
     @Override
-    public boolean invalid(@NotNull Term y, @NotNull Unify f) {
+    public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
         Term x = f.xy(other);
+
         if (x!=null) {
-            boolean bCompound = x instanceof Compound;
-            if ((y instanceof Compound)) {
 
-                Compound C = (Compound) y;
+            boolean result;
 
-                return bCompound ?
-                        invalid((Compound) x, C)
-                        :
-                        invalid(/*(Term)*/x, C);
+            if (x.equals(y))
+                result = true; //match
+            else if (x instanceof Variable)
+                result = false; //only if x!=y
+            else {
 
-            } else if (!(y instanceof Variable)) {
-                return bCompound && x.containsTerm(y); //B.equals(y);
-            } else {
-                //probably a variable
+                boolean bCompound = x instanceof Compound;
+                if (!(y instanceof Compound)) {
+                    result = bCompound && x.containsTerm(y); //B.equals(y);
+                } else {
+
+                    Compound C = (Compound) y;
+
+                    result = bCompound ?
+                            invalid((Compound) x, C)
+                            :
+                            invalid(/*(Term)*/x, C);
+
+                }
             }
+
+
+            return result;
         }
 
         return false;

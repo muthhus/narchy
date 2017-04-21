@@ -39,20 +39,18 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
 
     @Override
     public final boolean test(@NotNull Derivation m) {
-        boolean result = true;
-       // int start = m.now();
         for (BoolPredicate x : termCache) {
             boolean b = x.test(m);
+
 //            if (m.now() > 0)
 //                System.out.println(m.now() + " " + x.getClass() + " " + m + " " + x + " = " + b);
-            if (!b) {
-                result = false;
-                break;
-            }
-        }
+//            if (!b)
+//                System.out.println("fail: " + m.task + " " + m.beliefTerm + "\t" + x);
 
-        //m.revert(start);
-        return result;
+            if (!b)
+                return false;
+        }
+        return true;
     }
 
     public static @Nullable BoolPredicate the(@NotNull List<BoolPredicate> cond) {

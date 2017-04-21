@@ -24,6 +24,9 @@ public interface ProtoCompound  {
     /** returns true if the predicate is true for all items */
     boolean AND(Predicate<Term> t);
 
+    /** returns true if the predicate is true for any items */
+    boolean OR(Predicate<Term> t);
+
     /** subterms as an array for construction */
     Term[] subterms();
 
@@ -35,4 +38,6 @@ public interface ProtoCompound  {
 
     @Override
     int hashCode();
+
+    Term sub(int i);
 }

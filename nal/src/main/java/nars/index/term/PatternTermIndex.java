@@ -15,6 +15,7 @@ import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.NEG;
@@ -30,8 +31,8 @@ public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex(int capacity) {
         super(ConceptBuilder.Null,
-            new ConcurrentHashMap<>(capacity),
-            new ConcurrentHashMap<>(capacity));
+            new HashMap<>(capacity),
+            new HashMap<>(capacity));
 
     }
 
@@ -139,5 +140,8 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
-
+    @Override
+    protected boolean cacheable(ProtoCompound c) {
+        return false; //HACK
+    }
 }
