@@ -107,13 +107,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    protected boolean replace(Task incoming, Task existing) {
-        if (incoming instanceof SignalTask)
+    protected boolean replace(Task incoming, Task existing, Random rng) {
+        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;
 
-        float incomingPri = pri(incoming);
-        return hijackSoftmax(incomingPri, pri(existing));
-        //return hijackGreedy(incomingPri, pri(existing));
+        return super.replace(incoming, existing, rng);
     }
 
     @Override

@@ -5,7 +5,6 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
-import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -41,7 +40,6 @@ public interface NARBuilder {
     }
 
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
-        Random rng = new XorShift128PlusRandom(1);
 
         if (threads == -1)
             threads = (int) Math.ceil(Runtime.getRuntime().availableProcessors()/2);
@@ -62,15 +60,15 @@ public interface NARBuilder {
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND, rng);
-                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND, rng);
+                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND);
+                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(reprobes, DefaultConceptBuilder.DEFAULT_BLEND);
                 return f.apply(termlink, tasklink);
             }
 
             @NotNull
             @Deprecated @Override
             public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-                return new DefaultHijackBag<>(reprobes, blend, rng);
+                return new DefaultHijackBag<>(reprobes, blend);
             }
         };
 
@@ -80,7 +78,7 @@ public interface NARBuilder {
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                1, 4, rng,
+                1, 4,
 
                 //new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -335,61 +333,61 @@ public interface NARBuilder {
         return new XorShift128PlusRandom(1);
     }*/
 
-    class MutableNARBuilder implements NARBuilder {
-
-
-        private Executioner exec;
-        private Time time;
-        private TermIndex index;
-        private Random rng;
-
-        @Override
-        public NAR get() {
-            NAR n = new NAR(getTime(), getIndex(), getRandom(), getExec());
-
-            return n;
-        }
-
-        public MutableNARBuilder exec(Executioner exec) {
-            this.exec = exec;
-            return this;
-        }
-
-        public MutableNARBuilder time(Time time) {
-            this.time = time;
-            return this;
-        }
-
-        public MutableNARBuilder index(TermIndex index) {
-            this.index = index;
-            return this;
-        }
-
-        public MutableNARBuilder random(Random rng) {
-            this.rng = rng;
-            return this;
-        }
-
-        @Override
-        public Executioner getExec() {
-            return exec;
-        }
-
-        @Override
-        public Time getTime() {
-            return time;
-        }
-
-        @Override
-        public TermIndex getIndex() {
-            return index;
-        }
-
-        @Override
-        public Random getRandom() {
-            return rng;
-        }
-    }
+//    class MutableNARBuilder implements NARBuilder {
+//
+//
+//        private Executioner exec;
+//        private Time time;
+//        private TermIndex index;
+//        private Random rng;
+//
+//        @Override
+//        public NAR get() {
+//            NAR n = new NAR(getTime(), getIndex(), getRandom(), getExec());
+//
+//            return n;
+//        }
+//
+//        public MutableNARBuilder exec(Executioner exec) {
+//            this.exec = exec;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder time(Time time) {
+//            this.time = time;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder index(TermIndex index) {
+//            this.index = index;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder random(Random rng) {
+//            this.rng = rng;
+//            return this;
+//        }
+//
+//        @Override
+//        public Executioner getExec() {
+//            return exec;
+//        }
+//
+//        @Override
+//        public Time getTime() {
+//            return time;
+//        }
+//
+//        @Override
+//        public TermIndex getIndex() {
+//            return index;
+//        }
+//
+//        @Override
+//        public Random getRandom() {
+//            return rng;
+//        }
+//    }
 
 
     class NARTune implements Runnable {
@@ -408,7 +406,7 @@ public interface NARBuilder {
             next = new double[outputs];
             predict = new double[outputs];
 
-            this.net = new SimpleLSTM(nar.random, inputs, outputs, /* estimate: */ inputs * outputs * 2);
+            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
 
             nar.onCycle(this);
 

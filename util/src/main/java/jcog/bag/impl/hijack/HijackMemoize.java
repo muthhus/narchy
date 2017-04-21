@@ -28,7 +28,7 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
 
     public HijackMemoize(int initialCapacity, int reprobes, Random random, @NotNull Function<K, V> f) {
 
-        super(initialCapacity, reprobes, random);
+        super(initialCapacity, reprobes);
         this.func = f;
     }
 
@@ -60,8 +60,8 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
     }
 
     @Override
-    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing) {
-        if (!super.replace(incoming, existing)) {
+    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing,Random random) {
+        if (!super.replace(incoming, existing,random)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return true;
         }

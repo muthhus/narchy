@@ -131,10 +131,10 @@ public class Builtin {
 
             Term[] x = c.toArray();
             if (size == 2) {
-                int n = nar.random.nextInt(size);
+                int n = nar.random().nextInt(size);
                 return Term.falseIfNull(compoundOrNull(x[n]));
             } else {
-                Term[] y = ArrayUtils.remove(x, nar.random.nextInt( size ));
+                Term[] y = ArrayUtils.remove(x, nar.random().nextInt( size ));
                 return Term.falseIfNull(nar.concepts.the(c.op(), c.dt(), y));
             }
         }));

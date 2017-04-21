@@ -8,7 +8,7 @@ import java.util.Timer;
  */
 public interface Time extends Serializable {
 
-	Timer real = new Timer("Realtime");
+	//Timer real = new Timer("Realtime");
 
 	/** called when memory reset */
 	void clear();

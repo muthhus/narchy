@@ -386,7 +386,7 @@ public class UDPeer extends UDP {
 
         XorShift128PlusRandom rng = new XorShift128PlusRandom(System.currentTimeMillis());
 
-        them = new HijackBag<InetSocketAddress, UDProfile>(4, rng) {
+        them = new HijackBag<InetSocketAddress, UDProfile>(4) {
 
             @Override
             public void onAdded(UDProfile p) {

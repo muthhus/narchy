@@ -37,11 +37,10 @@ public class NQuadsRDFTest {
     @Test
     public void testSchema1() throws Exception {
 
-        Random rng = new XorShift128PlusRandom(1);
         //Multi nar = new Multi(3,512,
         Executioner e = new SynchronousExecutor();
         Default n = new Default(1024,
-                72, 2, rng,
+                72, 2,
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
                 new FrameTime(), e

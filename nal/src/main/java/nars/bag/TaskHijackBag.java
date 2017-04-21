@@ -19,7 +19,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
 
     public TaskHijackBag(int reprobes, PriMerge merge, Random random) {
-        super(random, merge, reprobes);
+        super(merge, reprobes);
     }
 
     @Override
@@ -71,8 +71,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     public Task add(@NotNull Task t, @NotNull NAR n) {
 
-        commit();
-
         //BLinkHijackBag.flatForget(this );
 
         //new Forget( Util.unitize(1f/capacity() + forgetRate) )
@@ -82,21 +80,12 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 //            lastForget = now;
 //        }
 
+        Task x = put(t);
 
-        return put(t);
+        if (x != null)
+            commit();
 
-        //commit();
-
-//        if (inserted!=null) {
-//            //signal successful insert when inserted item is what is inserted, not a pre-existing duplicate
-//            if (inserted.equals(t)) {
-//                //merged budget with an existing but unique instance
-//                return inserted.isInput() ? t : null; //ignore duplicate derivations
-//            }
-//        }
-//
-//        //failed insert
-//        return null;
+        return x;
     }
 
 //    public static void flatForget(TaskHijackBag b, @NotNull NAR n) {

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -263,7 +264,7 @@ abstract public class NAgent implements NSense, NAct {
 
         return actionStream().map(action -> {
 
-            if (nar.random.nextFloat() < curiosityProb.floatValue()) {
+            if (nar.random().nextFloat() < curiosityProb.floatValue()) {
                 return action.curiosity(conf, next, nar);
             }/* else {
                 nar.activate(action, 1f);
@@ -456,6 +457,8 @@ abstract public class NAgent implements NSense, NAct {
         return runRT(fps, -1);
     }
 
+    final AtomicReference<Timer> timer = new AtomicReference(null);
+
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
@@ -464,7 +467,8 @@ abstract public class NAgent implements NSense, NAct {
 
         init();
 
-        Timer t = RealTime.real;
+        Timer t = timer.getAndUpdate((x)-> x==null ? new Timer() : x);
+
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -493,7 +497,7 @@ abstract public class NAgent implements NSense, NAct {
         float pp = predictorProbability.floatValue();
 
         return IntStream.range(0, num).mapToObj(i -> {
-            if (nar.random.nextFloat() > pp)
+            if (nar.random().nextFloat() > pp)
                 return null;
 
             Task x = predictors.get(i);
@@ -544,7 +548,7 @@ abstract public class NAgent implements NSense, NAct {
         if (t.start() != ETERNAL) {
 
             //only shift for questions
-            long shift = horizon > 0 && t.isQuestOrQuestion() ? nar.random.nextInt(horizon) : 0;
+            long shift = horizon > 0 && t.isQuestOrQuestion() ? nar.random().nextInt(horizon) : 0;
 
             long range = t.end() - t.start();
             //System.out.println(now + " " + nar.time() + " -> " + next + "+" + shift + " = " + (next+shift));

@@ -236,7 +236,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         Compound t = normalizedOrNull(Revision.intermpolate(
                 input.term(), oldBelief.term(),
                 aProp,
-                nar.random,
+                nar.random(),
                 true
         ), nar.concepts);
 

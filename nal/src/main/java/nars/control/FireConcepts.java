@@ -163,7 +163,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             super(focus, premiseBuilder, nar);
 
 
-            this.pending = new TaskHijackBag(3, PriMerge.max, nar.random) {
+            this.pending = new TaskHijackBag(3, PriMerge.max, nar.random()) {
 
                 @Override
                 public float temperature() {

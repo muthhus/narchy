@@ -48,10 +48,7 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static nars.$.$;
@@ -89,7 +86,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
 
     public final Executioner exe;
     @NotNull
-    public final Random random;
+    private final Supplier<Random> random;
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
@@ -185,7 +182,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
     }
 
 
-    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
+    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Supplier<Random> rng, @NotNull Executioner exe) {
 
         this.random = rng;
 
@@ -839,6 +836,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return time.dur();
     }
 
+    /** provides a Random number generator */
+    public Random random() {
+        return random.get();
+    }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
         public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, PLink<Term>> termLinks, Bag<Task, PLink<Task>> taskLinks) {

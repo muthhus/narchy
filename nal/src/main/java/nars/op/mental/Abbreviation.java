@@ -77,7 +77,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
-                new CurveBag.NormalizedSampler(power4BagCurve, n.random),
+                new CurveBag.NormalizedSampler(power4BagCurve, n.random()),
                 PriMerge.plus, new ConcurrentHashMap()), selectionRate, n);
 
         this.nar = n;

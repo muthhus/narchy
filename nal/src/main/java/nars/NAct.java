@@ -47,7 +47,7 @@ public interface NAct {
     @Nullable default ActionConcept actionTogglePWM(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
         ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float df = d != null ? d.freq() : 0.5f;
-            boolean corrupt = nar().random.nextFloat() > Math.abs(df - 0.5f) * 2f;
+            boolean corrupt = nar().random().nextFloat() > Math.abs(df - 0.5f) * 2f;
 
             boolean next = df > 0.5f;
             if (corrupt) next = !next;
@@ -148,9 +148,9 @@ public interface NAct {
                 } else if (f == 0) {
                     ii = -1;
                 } else if (f > 0.5f) {
-                    ii = nar().random.nextFloat() <= ((f - 0.5f)*2f) ? +1 : 0;
+                    ii = nar().random().nextFloat() <= ((f - 0.5f)*2f) ? +1 : 0;
                 } else if (f < 0.5f) {
-                    ii = nar().random.nextFloat() <= ((0.5f - f)*2f) ? -1 : 0;
+                    ii = nar().random().nextFloat() <= ((0.5f - f)*2f) ? -1 : 0;
                 } else
                     ii = 0;
             }

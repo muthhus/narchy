@@ -2,7 +2,6 @@ package jcog.bag.impl;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.data.ConcurrentLongSet;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
@@ -11,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -26,12 +26,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
 
-    /**
-     * max # of times allowed to scan through until either the next item is
-     * accepted with final tolerance or gives up.
-     * for safety, should be >= 1.0
-     */
-    protected final Random random;
+
     public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
     final AtomicInteger capacity = new AtomicInteger(0);
@@ -43,16 +38,18 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     float priMin;
     float priMax;
 
-    public HijackBag(int initialCapacity, int reprobes, Random random) {
-        this(reprobes, random);
+    public HijackBag(int initialCapacity, int reprobes) {
+        this(reprobes);
         setCapacity(initialCapacity);
     }
 
-    public HijackBag(int reprobes, Random random) {
-        this.random = random;
+    public HijackBag(int reprobes) {
         this.reprobes = reprobes;
-        //this.id = Treadmill.newTarget();
         this.map = new AtomicReference<>(EMPTY_ARRAY);
+    }
+
+    protected Random random() {
+        return ThreadLocalRandom.current();
     }
 
     @Contract(pure = true)
@@ -175,6 +172,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int iStart = i(c, hash);
 
+        Random random = random();
         try {
 
             V target = null;
@@ -255,7 +253,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
 
                     } else {
-                        if (replace(adding, target)) {
+                        if (replace(adding, target, random)) {
                             if (map.compareAndSet(targetIndex, target, adding)) { //inserted
                                 //pressure -= targetPri;
                                 pressurize(merge(null, adding, scale));
@@ -341,11 +339,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     /**
      * can override in subclasses for custom replacement policy.
-     * true allows the incoming to replace the existing
+     * true allows the incoming to replace the existing.
+     *
+     * a potential eviction can be intercepted here
      */
-    protected boolean replace(V incoming, V existing) {
+    protected boolean replace(V incoming, V existing, Random random) {
         float incomingPri = pri(incoming);
-        return hijackSoftmax(incomingPri, pri(existing));
+        return hijackSoftmax(incomingPri, pri(existing), random);
     }
 
     /**
@@ -361,7 +361,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return update(k, null, -1);
     }
 
-    protected boolean hijackSoftmax(float newPri, float oldPri) {
+    protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
 
         float priEpsilon = priEpsilon();
 
@@ -465,6 +465,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             return 0;
 
 
+        final Random random = random();
         int i = random.nextInt(c);
 
 

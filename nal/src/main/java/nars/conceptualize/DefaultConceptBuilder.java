@@ -294,7 +294,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         CurveBag.power2BagCurve,
                         //CurveBag.power4BagCurve,
                         //CurveBag.power6BagCurve,
-                        nar.random);
+                        nar.random());
     }
 
 

@@ -282,7 +282,7 @@ public class Recog2D extends NAgentX {
 
     protected int nextImage() {
 
-        image = nar.random.nextInt(maxImages);
+        image = nar.random().nextInt(maxImages);
 
 
         return image;
@@ -333,7 +333,7 @@ public class Recog2D extends NAgentX {
             this.outs = outs;
 
 
-            this.trainer = new MLP(ins.size(), new int[]{ (ins.size()+outs.states)/2,  outs.states }, nar.random);
+            this.trainer = new MLP(ins.size(), new int[]{ (ins.size()+outs.states)/2,  outs.states }, nar.random());
             trainer.layers[1].setIsSigmoid(false);
 
         }

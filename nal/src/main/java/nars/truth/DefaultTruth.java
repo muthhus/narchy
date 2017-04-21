@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public class DefaultTruth implements Truth {
 
     public final float freq, conf;
+    private final int hash;
 
     @Override
     public final float freq() {
@@ -25,19 +26,10 @@ public class DefaultTruth implements Truth {
     }
 
     public DefaultTruth(float f, float c, float epsilon) {
-        float C = Truth.conf(c, epsilon);
-        this.freq = Truth.freq(f, epsilon);
-        this.conf = C;
-    }
-
-
-    public DefaultTruth(byte punctuation, @NotNull NAR m) {
-        this(1.0f, m.confDefault(punctuation));
-    }
-
-
-    public DefaultTruth(@NotNull Truth truth) {
-        this(truth.freq(), truth.conf());
+        this.hash = Truth.truthToInt(
+            this.freq = Truth.freq(f, epsilon),
+            this.conf = Truth.conf(c, epsilon)
+        );
     }
 
 
@@ -58,23 +50,13 @@ public class DefaultTruth implements Truth {
     }
 
     @Override
-    public final boolean equals(@NotNull Object that) {
-
-        //if (that instanceof DefaultTruth) {
-
-        //return ((DefaultTruth)that).hash == hash; //shortcut, since perfect hash for this instance
-        /*} else */
-        if (that instanceof Truth) {
-            //Truth t = (Truth)that;
-            //return freq == t.freq() && conf == t.conf();
-            return hashCode() == that.hashCode();
-        }
-        return false;
+    public final boolean equals(Object that) {
+        return (that instanceof Truth) && (hash == that.hashCode());
     }
 
     @Override
     public final int hashCode() {
-        return Truth.truthToInt(freq, conf);
+        return hash;
     }
 
     @NotNull

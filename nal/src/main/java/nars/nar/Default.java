@@ -24,6 +24,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Supplier;
 
 /**
  * Various extensions enabled
@@ -49,28 +51,23 @@ public class Default extends NAR {
     }
 
     public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept) {
-        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, new XorShift128PlusRandom(1));
+        this(activeConcepts,
+            conceptsFirePerCycle,
+            termLinksPerConcept,
+            ()->new XorShift128PlusRandom(1),
+            new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
+            new FrameTime(),
+            new SynchronousExecutor());
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Random random) {
-        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, random, new FrameTime());
+
+    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, ThreadLocalRandom::current, concepts, time, exe);
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Random random, @NotNull Time time) {
-        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, random,
-                new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
-                time);
-    }
-
-
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex index, @NotNull Time time) {
-        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, random, index, time, new SynchronousExecutor());
-    }
-
-
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
         ConceptBagFocus f = new ConceptBagFocus(this, newConceptBag(activeConcepts));
@@ -106,7 +103,7 @@ public class Default extends NAR {
 
     public Bag<Termed,PLink<Termed>> newConceptBag(int initialCapacity) {
 
-        return new PLinkHijackBag(initialCapacity, 4, random);
+        return new PLinkHijackBag(initialCapacity, 4, random());
 
     }
 

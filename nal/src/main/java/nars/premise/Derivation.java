@@ -107,7 +107,7 @@ public class Derivation extends Unify {
     public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
                       DerivationBudgeting b,
                       int stack, int ttl) {
-        super(nar.concepts, VAR_PATTERN, nar.random, stack, ttl);
+        super(nar.concepts, VAR_PATTERN, nar.random(), stack, ttl);
 
         this.budgeting = b;
 

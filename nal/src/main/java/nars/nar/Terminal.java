@@ -17,8 +17,6 @@ import java.util.Random;
  */
 public class Terminal extends NAR {
 
-    //final Predicate<Task> taskFilter = Task::isCommand;
-
     public Terminal() {
         this(1024);
     }
@@ -28,7 +26,7 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(time, new Default.DefaultTermTermIndex(capacity), random, new SynchronousExecutor());
+        super(time, new Default.DefaultTermTermIndex(capacity), ()->random, new SynchronousExecutor());
     }
 
 }

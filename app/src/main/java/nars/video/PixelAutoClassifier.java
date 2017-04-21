@@ -72,7 +72,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
      * metabits must consistently return an array of the same size, since now the size of this autoencoder is locked to its dimension
      */
     public PixelAutoClassifier(String root, float[][] pixIn, int sw, int sh, MetaBits metabits, int states, NAgent agent) {
-        super(sw * sh + metabits.get(0, 0).length, states, agent.nar.random);
+        super(sw * sh + metabits.get(0, 0).length, states, agent.nar.random());
         this.metabits = metabits;
         this.agent = agent;
         this.nar = agent.nar;

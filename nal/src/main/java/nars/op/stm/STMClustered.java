@@ -303,7 +303,7 @@ public abstract class STMClustered extends STM {
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
         this.input = ThreadLocal.withInitial(() ->
-                new DefaultHijackBag<Task>(capacity.intValue(), 2, PriMerge.max, nar.random) {
+                new DefaultHijackBag<Task>(capacity.intValue(), 3, PriMerge.max) {
 
 //            @NotNull
 //            @Override

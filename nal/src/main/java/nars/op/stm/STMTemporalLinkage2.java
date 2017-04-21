@@ -32,7 +32,7 @@ public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
     float strength = 1f;
 
     public STMTemporalLinkage2(@NotNull NAR nar, int capacity, int leaksPerCycle, int linksPerLeak) {
-        super(new PLinkHijackBag<Task>(capacity, 4, nar.random), leaksPerCycle, nar);
+        super(new PLinkHijackBag<Task>(capacity, 4, nar.random()), leaksPerCycle, nar);
         this.nar = nar;
         this.allowNonInput = true;
         this.linksPerLeak = linksPerLeak;

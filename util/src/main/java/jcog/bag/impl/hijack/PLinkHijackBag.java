@@ -16,7 +16,7 @@ import static jcog.pri.PLink.EPSILON_DEFAULT;
 public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     public PLinkHijackBag(int initialCapacity, int reprobes, Random random) {
-        super(initialCapacity, reprobes, random);
+        super(initialCapacity, reprobes);
     }
 
     @Override

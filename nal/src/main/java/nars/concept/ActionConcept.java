@@ -46,7 +46,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         long now = nar.time();
         long when = now;// + nar.dur();
         CuriosityTask t = new CuriosityTask(term, punc,
-                $.t(nar.random.nextFloat(), conf),
+                $.t(nar.random().nextFloat(), conf),
                 now,
                 now,
                 when,
@@ -68,7 +68,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random);
+        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
 
 //        return
 //                new HijackTemporalBeliefTable(

@@ -18,10 +18,7 @@ import spacegraph.audio.sample.SonarSample;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -35,6 +32,7 @@ public class SoNAR extends TimerTask {
 
     private final NAR nar;
     public final Audio audio;
+    final static Timer real = new Timer("Audio");
 
     public static class SampleDirectory {
         final Map<String, SonarSample> samples = new ConcurrentHashMap<>();
@@ -91,7 +89,8 @@ public class SoNAR extends TimerTask {
         this.nar = n;
         this.audio = audio;
 
-        Time.real.scheduleAtFixedRate(this, 0, updatePeriodMS);
+
+        real.scheduleAtFixedRate(this, 0, updatePeriodMS);
 
 //        Granulize ts =
 //                new Granulize(sample("/tmp/awake.wav"), 0.25f, 0.9f)

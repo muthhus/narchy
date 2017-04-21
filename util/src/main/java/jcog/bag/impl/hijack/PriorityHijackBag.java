@@ -17,8 +17,8 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
 
     protected final PriMerge merge;
 
-    public PriorityHijackBag(Random random, PriMerge merge, int reprobes) {
-        super(reprobes, random);
+    public PriorityHijackBag(PriMerge merge, int reprobes) {
+        super(reprobes);
         this.merge = merge;
     }
 

@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /** increments time on each frame */
 public class FrameTime implements Time {
 
-    private final AtomicLong nextStamp = new AtomicLong(1);
+    private final AtomicLong nextStamp = new AtomicLong(0);
 
     long t;
     int dt;
@@ -66,7 +66,7 @@ public class FrameTime implements Time {
      * produces a new stamp serial #, used to uniquely identify inputs
      */
     @Override public final long nextStamp() {
-        return nextStamp.getAndIncrement();
+        return nextStamp.incrementAndGet();
     }
 
     /** used to ensure that the next system stamp serial is beyond the range of any input */

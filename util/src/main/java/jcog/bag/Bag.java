@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -102,6 +103,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     @Deprecated
     V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
+
 
 
 //    /**

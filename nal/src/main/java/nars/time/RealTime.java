@@ -12,22 +12,20 @@ public abstract class RealTime implements Time {
 
 
     private final int unitsPerSecod;
-    long t, t0 = -1;
+    volatile long t;
+    long t0 = -1;
     private long start;
 
     long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000; //???
 
-    final AtomicLong nextStamp = new AtomicLong(1);
+    final AtomicLong nextStamp = new AtomicLong(seed);
+
     private int dur = 1;
-
-
 
     protected RealTime(int unitsPerSecond, boolean relativeToStart) {
         super();
         this.unitsPerSecod = unitsPerSecond;
         this.start = relativeToStart ? getRealTime() : 0L;
-
-
     }
 
 
@@ -37,7 +35,7 @@ public abstract class RealTime implements Time {
 
     @Override
     public long nextStamp() {
-        return seed | nextStamp.getAndIncrement();
+        return nextStamp.getAndIncrement();
     }
 
     @Override

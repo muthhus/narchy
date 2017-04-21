@@ -169,7 +169,7 @@ public class Line1DSimplestTest {
         //n.log();
         for (int i = 0; i < time; i++) {
             if (i % changePeriod == 0)
-                a.i.setValue( n.random.nextBoolean() ?  1f : 0f );
+                a.i.setValue( n.random().nextBoolean() ?  1f : 0f );
             n.run(1);
         }
 

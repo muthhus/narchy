@@ -112,7 +112,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 
             while (/*(iterationLimit-- > 0) &&*/ ((sizeEst() - sizeLimit) > maxConceptsThatCanBeRemovedAtATime)) {
 
-                Random rng = nar.random;
+                Random rng = nar.random();
 
                 MyConcurrentRadixTree.Node subRoot = volumeWeightedRoot(rng);
 

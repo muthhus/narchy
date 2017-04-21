@@ -5,7 +5,6 @@ import jcog.pri.PForget;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -15,13 +14,13 @@ import java.util.function.Consumer;
  */
 public class DefaultHijackBag<K> extends PriorityHijackBag<K,PLink<K>> {
 
-    public DefaultHijackBag(int capacity, int reprobes, PriMerge merge, Random random) {
-        this(reprobes, merge, random);
+    public DefaultHijackBag(int capacity, int reprobes, PriMerge merge) {
+        this(reprobes, merge);
         setCapacity(capacity);
     }
 
-    public DefaultHijackBag(int reprobes, PriMerge merge, Random random) {
-        super(random, merge, reprobes);
+    public DefaultHijackBag(int reprobes, PriMerge merge) {
+        super(merge, reprobes);
         this.map.set(HijackBag.EMPTY_ARRAY);
     }
 

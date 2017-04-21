@@ -144,7 +144,7 @@ public class QuestionTest {
 
         IntFunction<NAR> narProvider = (seed) -> {
             NAR d = new Default(512, 4, 1);
-            d.random.setSeed(seed);
+            d.random().setSeed(seed);
             d.nal(4);
             return d;
         };

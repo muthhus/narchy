@@ -16,6 +16,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
@@ -48,12 +49,12 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
         this.table = new PLinkHijackBag<Termed>(capacity, reprobes, new XorShift128PlusRandom(1)) {
             @Override
-            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing) {
+            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, Random random) {
                 if (incoming.get() instanceof PermanentConcept)
                     return true;
                 if (existing.get() instanceof PermanentConcept)
                     return false;
-                return super.replace(incoming, existing);
+                return super.replace(incoming, existing, random);
             }
         };
     }

@@ -124,7 +124,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
         for (int w = 0; w < width; w++) {
             for (int h = 0; h < height; h++) {
                 float color = src.brightness(w, h);
-                if (nar.random.nextFloat() - 0.05f <= color)
+                if (nar.random().nextFloat() - 0.05f <= color)
                 //if (color > 0.1f)
                     net.learn(w/((float)width), h/((float)height), color );
             }

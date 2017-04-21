@@ -180,7 +180,10 @@ public class DynamicBeliefTableTest {
         Truth t = prod.belief(0, dur);
 
         CompoundConcept imgX = (CompoundConcept) n.conceptualize($("((\\,f,_,y)-->x)"));
-        assertEquals(t, imgX.belief(0, dur));
+        assertNotNull(imgX);
+        Truth xb = imgX.belief(0, dur);
+        assertNotNull(xb);
+        assertEquals(t, xb);
 
         CompoundConcept imgY = (CompoundConcept) n.conceptualize($("((\\,f,x,_)-->y)"));
         assertEquals(t, imgY.belief(0, dur));
