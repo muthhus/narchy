@@ -56,16 +56,31 @@
 
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.5.0</version>
-            </plugin>
+
 
             <!--<plugin>-->
             <!--<groupId>org.apache.maven.plugins</groupId>-->
             <!--<artifactId>maven-site-plugin</artifactId>-->
             <!--<version>3.5.1</version>-->
+            <!--</plugin>-->
+
+
+
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<version>3.0.1</version>-->
+                <!--<configuration>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<addClasspath>true</addClasspath>-->
+                            <!--<mainClass>nars.Repl</mainClass>-->
+                            <!--<classpathPrefix>lib/</classpathPrefix>-->
+                            <!--<classpathLayoutType>repository</classpathLayoutType>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                <!--</configuration>-->
             <!--</plugin>-->
 
         </plugins>

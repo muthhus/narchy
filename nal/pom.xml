@@ -19,9 +19,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <properties>
-        <jacoco-maven-plugin.haltOnFailure>false</jacoco-maven-plugin.haltOnFailure>
-    </properties>
 
 
     <dependencies>
@@ -152,7 +149,20 @@
                 <!--</executions>-->
             <!--</plugin>-->
         <!--</plugins>-->
+
+
+
+        <plugins>
+            <plugin>
+                <artifactId>exec-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <version>1.5.0</version>
+            </plugin>
+
+
+        </plugins>
     </build>
+
 
 
 </project>

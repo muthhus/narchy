@@ -37,11 +37,10 @@
         </dependency>
 
 
-
         <!--<dependency>-->
-            <!--<groupId>org.infinispan</groupId>-->
-            <!--<artifactId>infinispan-embedded-query</artifactId>-->
-            <!--<version>9.0.0.Beta1</version>-->
+        <!--<groupId>org.infinispan</groupId>-->
+        <!--<artifactId>infinispan-embedded-query</artifactId>-->
+        <!--<version>9.0.0.Beta1</version>-->
         <!--</dependency>-->
 
     </dependencies>
@@ -50,12 +49,16 @@
 
 
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.5.0</version>
                 <configuration>
                     <mainClass>nars.Repl</mainClass>
+                    <commandlineArgs>
+                        --permit-illegal-access -Dsun.java2d.opengl=True -Xmx1024m
+                    </commandlineArgs>
                 </configuration>
             </plugin>
 
@@ -76,17 +79,17 @@
                 </configuration>
             </plugin>
             <!--<plugin>-->
-                <!--<groupId>com.hubspot.maven.plugins</groupId>-->
-                <!--<artifactId>slimfast-plugin</artifactId>-->
-                <!--<version>0.12</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>copy</goal>-->
-                        <!--</goals>-->
-                        <!--<phase>package</phase>-->
-                    <!--</execution>-->
-                <!--</executions>-->
+            <!--<groupId>com.hubspot.maven.plugins</groupId>-->
+            <!--<artifactId>slimfast-plugin</artifactId>-->
+            <!--<version>0.12</version>-->
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<goals>-->
+            <!--<goal>copy</goal>-->
+            <!--</goals>-->
+            <!--<phase>package</phase>-->
+            <!--</execution>-->
+            <!--</executions>-->
             <!--</plugin>-->
 
         </plugins>
