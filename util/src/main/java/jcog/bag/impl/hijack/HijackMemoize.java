@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -23,11 +24,20 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
 
     final Function<K,V> func;
 
+    public final AtomicLong hit = new AtomicLong(), miss = new AtomicLong(), evict = new AtomicLong();
+
     public HijackMemoize(int initialCapacity, int reprobes, Random random, @NotNull Function<K, V> f) {
 
         super(initialCapacity, reprobes, random);
         this.func = f;
     }
+
+    public void statisticsReset() {
+        hit.set(0);
+        miss.set(0);
+        evict.set(0);
+    }
+
 
     @Override
     public int capacity() {
@@ -78,6 +88,7 @@ public class HijackMemoize<K,V> extends HijackBag<K,PLink<Pair<K,V>>> implements
     protected Consumer<PLink<Pair<K, V>>> forget(float rate) {
         return null;
     }
+
 
 
 }

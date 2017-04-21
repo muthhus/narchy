@@ -1,7 +1,7 @@
 package nars.index.term.map;
 
+import jcog.Util;
 import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.random.XorShift128PlusRandom;
 import nars.Op;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
@@ -18,6 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static nars.Op.ATOM;
 import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.term.Terms.compoundOrNull;
@@ -50,12 +51,12 @@ public abstract class MaplikeTermIndex extends TermIndex {
     };
 
     final Function<ProtoCompound,Term> build = new HijackMemoize<>(
-            64384, 3, new XorShift128PlusRandom(1),
+            16*1024, 2, Util.rng(),
             (C) -> super.the(C.op(), C.dt(), C.subterms())
     );
 
     final Function<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-            16*1024, 2, new XorShift128PlusRandom(1),
+            16*1024, 2, Util.rng(),
             super::normalize
     );
 
@@ -76,14 +77,13 @@ public abstract class MaplikeTermIndex extends TermIndex {
         }
     }
 
-    private static final int PROD_or_INH_bits = Op.or(PROD,INH);
 
     protected boolean cacheable(ProtoCompound c) {
-        return false;
-//        return c.size() > 1 &&
-//                 !(c.op()==INH && c.sub(1).op()==ATOM /* functor */ && c.sub(0).op()==PROD )
-//                 &&
-//                 !c.OR(x -> x.hasAll(Op.EvalBits));
+
+        return c.size() > 1 &&
+                 !(c.op()==INH && c.sub(1).op()==ATOM /* functor */ && c.sub(0).op()==PROD )
+                 &&
+                 !c.OR(x -> x.hasAll(Op.EvalBits));
     }
 
     @Nullable

@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.data.ConcurrentLongSet;
@@ -12,9 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.concurrent.atomic.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -34,52 +31,15 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * accepted with final tolerance or gives up.
      * for safety, should be >= 1.0
      */
-    private static final float SCAN_ITERATIONS = 1f;
     protected final Random random;
     public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
-    final AtomicInteger size = new AtomicInteger(0);
     final AtomicInteger capacity = new AtomicInteger(0);
 
-    /**
-     * ID of this bag, for use in constructing keys for the global treadmill
-     */
-    //private final int id;
+    public final DoubleAdder pressure = new DoubleAdder();
 
-
-    /**
-     * lock-free int -> int mapping used as a ticket barrier
-     */
-    static final class Treadmill {
-
-        static final ConcurrentLongSet map = new ConcurrentLongSet(Util.MAX_CONCURRENCY * 2);
-
-        static final AtomicInteger ticket = new AtomicInteger(0);
-
-        public static int newTarget() {
-            return ticket.incrementAndGet();
-        }
-
-        public static long start(int target, int hash) {
-
-            long ticket = (((long) target) << 32) | hash;
-
-            map.putIfAbsentRetry(ticket);
-
-            return ticket;
-        }
-
-        public static void end(long ticket) {
-            map.remove(ticket);
-        }
-    }
-
-
-    /**
-     * pressure from outside trying to enter
-     */
-    public final AtomicDouble pressure = new AtomicDouble();
-    public float mass;
+    int size = 0;
+    float mass;
     float priMin;
     float priMax;
 
@@ -115,12 +75,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public void pressurize(float f) {
-        pressure.addAndGet(f);
+        pressure.add(f);
     }
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = 0; j < c; j++) {
-            Y v = map.get(j);
+            Y v = map.getOpaque(j);
             if (v != null && accept.test(v)) {
                 e.accept(v);
             }
@@ -129,7 +89,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public static <Y> void forEach(AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = -1; ++j < c; ) {
-            Y v = map.get(j);
+            Y v = map.getOpaque(j);
             if (v != null) {
                 e.accept(v);
             }
@@ -155,15 +115,16 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                     return next;
                 } else return x;
             })) {
+
                 List<V> removed = new FasterList<>();
 
                 //copy items from the previous map into the new map. they will be briefly invisibile while they get transferred.  TODO verify
                 forEachActive(this, prev[0], (b) -> {
-                    size.decrementAndGet(); //decrement size in any case. it will be re-incremented if the value was accepted during the following put
-                    if (put(b) == null) {
+                    if (put(b) == null)
                         removed.add(b);
-                    }
                 });
+
+                commit(null);
 
                 removed.forEach(this::onRemoved);
             }
@@ -185,49 +146,41 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Nullable
     public AtomicReferenceArray<V> reset() {
-        if (!size.compareAndSet(0, 0)) {
-            AtomicReferenceArray<V> prevMap = map.getAndSet(new AtomicReferenceArray<V>(capacity()));
-            this.pressure.set(0);
-            this.priMax = 0;
-            this.priMin = 0;
-            return prevMap;
-        } else {
-            return null;
-        }
+
+        AtomicReferenceArray<V> newMap = new AtomicReferenceArray<>(capacity());
+
+        AtomicReferenceArray<V> prevMap = map.getAndSet(newMap);
+
+        commit(null);
+
+        return prevMap;
     }
 
     @Nullable
     protected V update(Object x, @Nullable V adding /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
+
+        boolean add = adding != null;
+        boolean remove = (!add && (scale == -1));
+
+        V added = null,  found = null; //get or remove
+
+        boolean merged = false;
+
+        final int hash = hash(x);
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
             return null;
 
-
-        boolean add = adding != null;
-        boolean remove = (!add && (scale == -1));
-
-        V added = null;
-
-        V found = null; //get or remove
-
-        boolean merged = false;
-
-
-        int targetIndex = -1;
-        V target = null;
-
-        //boolean dir = random.nextBoolean(); //choose random initial direction
-
-        int hash = hash(x);
         int iStart = i(c, hash);
-
-        //final long ticket = add ? Treadmill.start(id, hash) : Long.MIN_VALUE /* N/A for get or remove */;
 
         try {
 
+            V target = null;
             for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/) {
+
+                int targetIndex = -1;
 
                 float targetPri = Float.POSITIVE_INFINITY;
                 int i = iStart; //dir ? iStart : (iStart + reprobes) - 1;
@@ -255,7 +208,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                             if (!add) {
 
                                 if (remove) { //remove
-                                    if (map.compareAndSet(i, ii, null)) {
+                                    //.compareAndSet
+                                    if (map.weakCompareAndSetPlain(i, ii, null)) {
                                         found = ii;
                                     }
                                 } else {
@@ -327,12 +281,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         if (!merged) {
             if (found != null && (add || remove)) {
-                size.decrementAndGet();
                 onRemoved(found);
             }
 
             if (added != null) {
-                size.incrementAndGet();
                 onAdded(added);
             } else if (add) {
                 //rejected: add but not added and not merged
@@ -422,12 +374,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     /**
-     * warning: the instance 'bb' that is passed here may be modified by this
      */
     @Override
-    public V put(@NotNull V bb, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    public V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
-        V y = update(key(bb), bb, scale);
+        V y = update(key(v), v, scale);
 
         if (y != null)
             startsRange(priSafe(y, 0));
@@ -535,6 +486,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int skipped = 0;
 
         //final int N = n;
+        int removed = 0;
+
         while (n > 0 && skipped < c) {
 
             //if (di) {
@@ -543,7 +496,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 if (--i == -1) i = c - 1;
             }*/
 
-            V v = map.get(i);
+            V v = map.getOpaque(i);
             if (v != null) {
                 float p = pri(v);
                 if (p == p) {
@@ -557,12 +510,12 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                     }
 
                     if (hits > 0) {
-                        if (map.compareAndSet(i, v, null)) {
+                        if (map.weakCompareAndSetVolatile(i, v, null)) {
                             int taken = each.intValueOf(hits, v);
                             boolean popped = (taken < 0);
                             if (popped) {
-                                size.decrementAndGet();
                                 onRemoved(v);
+                                removed++;
                                 if (--s <= 0) {
                                     break;
                                 } else {
@@ -575,8 +528,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
                                     if (put(v) == null) { //try to insert as if normally
                                         //but if it didnt happen, give up, admit that it lost it
-                                        size.decrementAndGet();
                                         onRemoved(v);
+                                        removed++;
                                         if (--s <= 0)
                                             break;
                                         else {
@@ -608,6 +561,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         }
 
+        if (removed > 0) {
+            commit(null);
+        }
+
         return selected;
     }
 
@@ -624,7 +581,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public int size() {
-        return size.get();
+        return size;
     }
 
     @Override
@@ -664,16 +621,16 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     @Deprecated
     public Bag<K, V> commit() {
-        //throw new UnsupportedOperationException();
-        float p = (float) this.pressure.getAndSet(0);
-        if (p > 0) {
-            int s = size();
-            if (s > 0) {
-                return commit(
-                        Bag.forget(s, capacity(), p, mass, temperature(), priEpsilon(), this::forget));
-            }
-        }
-        return this;
+
+        double p = this.pressure.sumThenReset();
+        int s = size();
+
+        return commit(
+            ((s > 0) && (p > 0)) ?
+                Bag.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
+                null
+        );
+
     }
 
     abstract protected Consumer<V> forget(float rate);
@@ -689,51 +646,60 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return Float.MIN_VALUE;
     }
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
     @NotNull
     @Override
     public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
 
-        if (update != null) {
-            update(update);
-        }
+        if (!busy.compareAndSet(false, true))
+            return this;
 
-        float mass = 0;
-        float min = Float.POSITIVE_INFINITY;
-        float max = Float.NEGATIVE_INFINITY;
-        int count = 0;
+        try {
+            if (update != null) {
+                update(update);
+            }
 
-        AtomicReferenceArray<V> a = map.get();
-        int len = a.length();
-        for (int i = 0; i < len; i++) {
-            V f = a.get(i);
-            if (f == null)
-                continue;
+            float mass = 0;
+            float min = Float.POSITIVE_INFINITY;
+            float max = Float.NEGATIVE_INFINITY;
+            int count = 0;
 
-            float p = priSafe(f, -1);
-            if (p >= 0) {
-                count++;
-                if (p > max) max = p;
-                if (p < min) min = p;
-                mass += p;
-            } else {
-                if (a.compareAndSet(i, f, null)) {
-                    size.decrementAndGet(); onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
+            AtomicReferenceArray<V> a = map.get();
+            int len = a.length();
+            for (int i = 0; i < len; i++) {
+                V f = a.getOpaque(i);
+                if (f == null)
+                    continue;
+
+                float p = priSafe(f, -1);
+                if (p >= 0) {
+                    count++;
+                    if (p > max) max = p;
+                    if (p < min) min = p;
+                    mass += p;
+                } else {
+                    if (a.compareAndSet(i, f, null)) {
+                        onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
+                    }
                 }
             }
+
+            this.size = count;
+
+            if (min == Float.POSITIVE_INFINITY) {
+                this.priMin = 0;
+                this.priMax = 0;
+            } else {
+                this.priMin = min;
+                this.priMax = max;
+            }
+
+            this.mass = mass;
+
+        } finally {
+            busy.set(false);
         }
-
-        this.size.set(count);
-
-        if (min == Float.POSITIVE_INFINITY) {
-            this.priMin = 0;
-            this.priMax = 0;
-        } else {
-            this.priMin = min;
-            this.priMax = max;
-        }
-
-        this.mass = mass;
 
         return this;
     }
@@ -782,3 +748,34 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 //    }
 
 }
+///**
+// * ID of this bag, for use in constructing keys for the global treadmill
+// */
+// private final int id;
+
+//    /**
+//     * lock-free int -> int mapping used as a ticket barrier
+//     */
+//    static final class Treadmill {
+//
+//        static final ConcurrentLongSet map = new ConcurrentLongSet(Util.MAX_CONCURRENCY * 2);
+//
+//        static final AtomicInteger ticket = new AtomicInteger(0);
+//
+//        public static int newTarget() {
+//            return ticket.incrementAndGet();
+//        }
+//
+//        public static long start(int target, int hash) {
+//
+//            long ticket = (((long) target) << 32) | hash;
+//
+//            map.putIfAbsentRetry(ticket);
+//
+//            return ticket;
+//        }
+//
+//        public static void end(long ticket) {
+//            map.remove(ticket);
+//        }
+//    }
