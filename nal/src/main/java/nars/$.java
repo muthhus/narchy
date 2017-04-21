@@ -14,7 +14,8 @@ import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.conceptualize.ConceptBuilder;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.BoolPred;
+import nars.derive.meta.LambdaPred;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -1100,18 +1101,18 @@ public enum $ {
         return term != null ? term : Null;
     }
 
-    public static <X> BoolPredicate<X> IF(Compound t, Predicate<X> test) {
-        return new BoolPredicate.DefaultBoolPredicate<X>(t, test);
+    public static <X> BoolPred<X> IF(Compound t, Predicate<X> test) {
+        return new LambdaPred<X>(t, test);
     }
 
-    public static <X> BoolPredicate<X> AND(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>((Compound)$.conj(a, b), (X x) -> {
+    public static <X> BoolPred<X> AND(BoolPred<X> a, BoolPred<X> b) {
+        return new LambdaPred<X>((Compound)$.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
-    public static <X> BoolPredicate<X> OR(BoolPredicate<X> a, BoolPredicate<X> b) {
-        return new BoolPredicate.DefaultBoolPredicate<X>((Compound)$.disj(a, b), (X x) -> {
+    public static <X> BoolPred<X> OR(BoolPred<X> a, BoolPred<X> b) {
+        return new LambdaPred<X>((Compound)$.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

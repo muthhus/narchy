@@ -169,7 +169,7 @@ public class Revision {
 
                     Term[] x = new Term[len];
                     for (int i = 0; i < len; i++) {
-                        x[i] = intermpolate(ca.get(i), cb.get(i), aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
+                        x[i] = intermpolate(ca.sub(i), cb.sub(i), aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
                     }
 
                     return $.the(
@@ -191,15 +191,15 @@ public class Revision {
         Term a0, a1, b0, b1;
         int adt = a.dt();
         if ((adt >= 0) || (adt == DTERNAL)) {
-            a0 = a.get(0); a1 = a.get(1);
+            a0 = a.sub(0); a1 = a.sub(1);
         } else {
-            a0 = a.get(1); a1 = a.get(0); adt = -adt;
+            a0 = a.sub(1); a1 = a.sub(0); adt = -adt;
         }
         int bdt = b.dt();
         if ((bdt >= 0) || (bdt == DTERNAL)) {
-            b0 = b.get(0); b1 = b.get(1);
+            b0 = b.sub(0); b1 = b.sub(1);
         } else {
-            b0 = b.get(1); b1 = b.get(0); bdt = -bdt;
+            b0 = b.sub(1); b1 = b.sub(0); bdt = -bdt;
         }
 
         depth/=2f;

@@ -46,17 +46,21 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public final @NotNull Term get(int i) {
+    public final @NotNull Term sub(int i) {
         if (i!=0)
             throw new ArrayIndexOutOfBoundsException();
         return the;
     }
 
     @Override
-    public boolean isTerm(int i, @NotNull Op o) {
+    public boolean subOpIs(int i, Op o) {
         return i == 0 && the.op() == o;
     }
 
+    @Override
+    public boolean isDynamic() {
+        return the.isDynamic();
+    }
 
     /** vol and complexity are reported as if they were already part of an enclosing Compound */
     @Override public int volume() {
@@ -132,12 +136,12 @@ public class TermVector1 implements TermContainer {
     @Override public boolean equalTo(@NotNull TermContainer b) {
         return //(hashCode() == b.hashCode()) &&
                 (b.size()==1) &&
-                the.equals(b.get(0));
+                the.equals(b.sub(0));
     }
 
 
     @Override
-    public boolean containsTerm(@NotNull Termlike t) {
+    public boolean contains(@NotNull Termlike t) {
         return the.equals(t);
     }
 

@@ -106,7 +106,7 @@ public enum ImageMatch {
         for (int i = from; i < l; ) {
             if ((i >= (y.dt() - from)) && (i-from == (dt - 1)))
                 t2[j++] = Imdex;
-            t2[j++] = y.get(i);
+            t2[j++] = y.sub(i);
             i++;
         }
         if (m > j)

@@ -4,7 +4,7 @@ import jcog.meter.event.PeriodMeter;
 import jcog.version.VersionMap;
 import nars.$;
 import nars.derive.meta.AndCondition;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.BoolPred;
 import nars.derive.meta.Fork;
 import nars.premise.Derivation;
 import nars.term.Term;
@@ -25,25 +25,25 @@ import static java.util.stream.Collectors.toList;
 
 public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
 
-    private final Function<BoolPredicate, BoolPredicate> transform;
+    private final Function<BoolPred, BoolPred> transform;
 
-    public DeriverTransform(Function<BoolPredicate,BoolPredicate> xy) {
+    public DeriverTransform(Function<BoolPred,BoolPred> xy) {
         this.transform = xy;
     }
 
     public TrieDeriver apply(TrieDeriver x) {
-        BoolPredicate[] y = instrument(x.roots.clone());
+        BoolPred[] y = instrument(x.roots.clone());
         return new TrieDeriver(y);
     }
 
-    private BoolPredicate[] instrument(BoolPredicate[] roots) {
+    private BoolPred[] instrument(BoolPred[] roots) {
         for (int i = 0, rootsLength = roots.length; i < rootsLength; i++) {
             roots[i] = instrument(roots[i]);
         }
         return roots;
     }
 
-    private BoolPredicate instrument(@NotNull BoolPredicate b) {
+    private BoolPred instrument(@NotNull BoolPred b) {
 
         if (b instanceof Fork) {
             Fork f = (Fork)b;
@@ -57,11 +57,11 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
     }
 
 
-    public static class TracedBoolPredicate extends InstrumentedBoolPredicate<Derivation> {
+    public static class TracedBoolPred extends InstrumentedBoolPred<Derivation> {
 
         private final Logger logger;
 
-        public TracedBoolPredicate(BoolPredicate b) {
+        public TracedBoolPred(BoolPred b) {
             super(b);
             logger = LoggerFactory.getLogger(ref.getClass());
         }
@@ -91,11 +91,11 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
         }
     }
 
-    public static class TimedBoolPredicate extends InstrumentedBoolPredicate<Derivation> {
+    public static class TimedBoolPred extends InstrumentedBoolPred<Derivation> {
 
         private final PeriodMeter hits;
 
-        public TimedBoolPredicate(BoolPredicate<Derivation> b) {
+        public TimedBoolPred(BoolPred<Derivation> b) {
             super(b);
 
             synchronized (predicates) {
@@ -115,7 +115,7 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
             }
             return result;
         }
-        static final Map<BoolPredicate, PeriodMeter> predicates = new ConcurrentHashMap();
+        static final Map<BoolPred, PeriodMeter> predicates = new ConcurrentHashMap();
         static {
             Runtime.getRuntime().addShutdownHook(new Thread(()->{
                 print();
@@ -125,19 +125,19 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
         public static void print() {
 
             int os = predicates.size();
-            List<BoolPredicate> bySum = $.newArrayList(os);
+            List<BoolPred> bySum = $.newArrayList(os);
 
             predicates.forEach((k,m) -> {
                 bySum.add(k);
             });
 
-            List<BoolPredicate> byAvg = $.newArrayList();
+            List<BoolPred> byAvg = $.newArrayList();
             byAvg.addAll(bySum);
 
-            byAvg.sort((BoolPredicate a, BoolPredicate b) -> {
+            byAvg.sort((BoolPred a, BoolPred b) -> {
                 return Double.compare(predicates.get(b).mean(), predicates.get(a).mean());
             });
-            bySum.sort((BoolPredicate a, BoolPredicate b) -> {
+            bySum.sort((BoolPred a, BoolPred b) -> {
                 return Double.compare(predicates.get(b).sum(), predicates.get(a).sum());
             });
 

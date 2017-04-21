@@ -91,13 +91,13 @@ public abstract class TermGraph {
                             //&& ((Compound)m).containsTermRecursively(t)) {
                                 ) {
                             Compound l = (Compound) m;
-                            Term s = l.get(0);
+                            Term s = l.sub(0);
 
-                            Term p = l.get(1);
+                            Term p = l.sub(1);
 
                             //if (!g.nodes().contains(s) || !done.contains(p)) {
-                            if ((s.equals(t) || s.containsTermRecursively(t)) ||
-                                    (p.equals(t) || p.containsTermRecursively(t))) {
+                            if ((s.equals(t) || s.containsRecursively(t)) ||
+                                    (p.equals(t) || p.containsRecursively(t))) {
                                 next.add(s);
                                 next.add(p);
                                 impl(g, nar, when, l, s, p);

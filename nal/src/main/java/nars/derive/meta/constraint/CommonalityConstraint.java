@@ -36,7 +36,7 @@ public abstract class CommonalityConstraint extends MatchConstraint {
 
                 boolean bCompound = x instanceof Compound;
                 if (!(y instanceof Compound)) {
-                    result = bCompound && x.containsTerm(y); //B.equals(y);
+                    result = bCompound && x.contains(y); //B.equals(y);
                 } else {
 
                     Compound C = (Compound) y;
@@ -59,6 +59,6 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @NotNull protected abstract boolean invalid(Compound x, Compound y);
 
     @NotNull protected boolean invalid(Term x, Compound y) {
-        return y.containsTerm(x);
+        return y.contains(x);
     }
 }

@@ -39,7 +39,7 @@ public class FastCompound extends GenericCompound {
             @NotNull
             @Override
             public SubtermVisitorXY.Next accept(int subterm, Compound superterm, int depth) {
-                System.out.println(superterm + "(" + subterm + "): " + superterm.get(subterm) + ", depth=" + depth);
+                System.out.println(superterm + "(" + subterm + "): " + superterm.sub(subterm) + ", depth=" + depth);
                 return Next.Next;
             }
         };

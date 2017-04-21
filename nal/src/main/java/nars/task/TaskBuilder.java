@@ -103,7 +103,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
         //unwrap top-level negation
         Compound tt = term.term();
         if (tt.op() == Op.NEG) {
-            Term nt = tt.get(0);
+            Term nt = tt.sub(0);
             if (nt instanceof Compound) {
                 tt = (Compound) nt;
 

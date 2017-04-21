@@ -201,7 +201,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         }
 
         //if (Param.DEBUG) {
-        if (t.containsTerm(True) || t.containsTerm(False))
+        if (t.contains(True) || t.contains(False))
             throw new InvalidTaskException(t, "term contains True or False");
         //}
 
@@ -268,7 +268,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : ((Compound) t).get(p[i]);
+                t = (i == -1) ? comp : ((Compound) t).sub(p[i]);
                 Op o = t.op();
 
                 if (validIndepVarSuperterm(o)) {
@@ -634,7 +634,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @Nullable
     default Term term(int i) {
-        return term().get(i);
+        return term().sub(i);
     }
 
     @Nullable

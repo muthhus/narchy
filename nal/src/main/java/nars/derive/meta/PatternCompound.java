@@ -102,7 +102,7 @@ abstract public class PatternCompound extends GenericCompound {
             //TODO check for shim and subtract xsize?
 
             while (i < xsize) {
-                Term x = get(i++);
+                Term x = sub(i++);
 
                 if (x instanceof Ellipsis) {
                     int available = ysize - j;
@@ -144,7 +144,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                     }
                 } else {
-                    if (ysize <= j || !subst.unify(x, Y.get(j++)))
+                    if (ysize <= j || !subst.unify(x, Y.sub(j++)))
                         return false;
                 }
             }
@@ -311,7 +311,7 @@ abstract public class PatternCompound extends GenericCompound {
 
             int s = size();
             for (int i = 0; i < s; i++) {
-                Term x = get(i);
+                Term x = sub(i);
 
                 //boolean xVar = x.op() == type;
                 //ellipsis to be matched in stage 2
@@ -334,7 +334,7 @@ abstract public class PatternCompound extends GenericCompound {
 
                 } else if (v != null) {
 
-                    if (y.containsTerm(v)) {
+                    if (y.contains(v)) {
                         alreadyInY.add(v);
                     } else {
                         //required but not actually present in Y

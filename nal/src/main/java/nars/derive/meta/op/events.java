@@ -1,8 +1,8 @@
 package nars.derive.meta.op;
 
 import nars.Task;
-import nars.derive.meta.AtomicPredicate;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.AtomicPred;
+import nars.derive.meta.BoolPred;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * True if the premise task and belief are both non-eternal events
  */
-abstract public class events extends AtomicPredicate<Derivation> {
+abstract public class events extends AtomicPred<Derivation> {
 
 //    /** task is before or simultaneous with belief which follows (T ... B) */
 //    public static final events nonEternal = new events() {
@@ -93,7 +93,7 @@ abstract public class events extends AtomicPredicate<Derivation> {
 //
 //    };
 
-    public static final BoolPredicate<Derivation> beliefDTSimultaneous = new events() {
+    public static final BoolPred<Derivation> beliefDTSimultaneous = new events() {
 
         @Override
         public String toString() {

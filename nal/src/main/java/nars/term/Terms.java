@@ -70,7 +70,7 @@ public enum Terms { ;
         int h = 1;
         int s = container.size();
         for (int i = 0; i < s; i++) {
-            h = container.get(i).hashCode() + h * 31 /*Util.PRIME1 */;
+            h = container.sub(i).hashCode() + h * 31 /*Util.PRIME1 */;
         }
         return h;
     }
@@ -421,8 +421,8 @@ public enum Terms { ;
      * (--, (&&, --A, --B, .., --Z) )
      */
     public static boolean isDisjunction(@NotNull Compound c) {
-        if (c.dt() == DTERNAL && c.op() == NEG && c.isTerm(0, CONJ)) {
-            return allNegated(((Compound) c.get(0)).subterms());
+        if (c.dt() == DTERNAL && c.op() == NEG && c.subOpIs(0, CONJ)) {
+            return allNegated(((Compound) c.sub(0)).subterms());
         }
         return false;
     }
@@ -522,7 +522,7 @@ public enum Terms { ;
                 return oi.anySatisfy(
                         a -> (a != b) &&
                                 (a instanceof Compound) &&
-                                ((Compound) a).containsTermRecursively(b)
+                                ((Compound) a).containsRecursively(b)
                 );
             });
         }
@@ -625,12 +625,12 @@ public enum Terms { ;
 
     @Nullable
     public static Term subj(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).get(0);
+        return ((TermContainer) statement.term()).sub(0);
     }
 
     @Nullable
     public static Term pred(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).get(1);
+        return ((TermContainer) statement.term()).sub(1);
     }
 
     interface SubtermScorer {

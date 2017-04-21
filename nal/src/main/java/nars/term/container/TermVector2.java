@@ -29,7 +29,7 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
-    public @NotNull Term get(int i) {
+    public @NotNull Term sub(int i) {
         switch (i) {
             case 0: return x;
             case 1: return y;

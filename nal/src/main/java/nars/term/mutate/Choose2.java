@@ -84,11 +84,11 @@ public class Choose2 extends Termutator.AbstractTermutator {
             int c1 = c[1];
             IntArrays.reverse(c); //swap to try the reverse next iteration
 
-            Term y1 = yy.get(c0);
+            Term y1 = yy.sub(c0);
 
             if (f.unify(x[0], y1)) {
 
-                Term y2 = yy.get(c1);
+                Term y2 = yy.sub(c1);
 
                 if (f.unify(x[1], y2) &&
                         f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {

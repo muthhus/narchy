@@ -134,7 +134,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     @Nullable public static Ellipsis firstEllipsis(@NotNull TermContainer x) {
         int xsize = x.size();
         for (int i = 0; i < xsize; i++) {
-            Term xi = x.get(i);
+            Term xi = x.sub(i);
             if (xi instanceof Ellipsis) {
                 return (Ellipsis) xi;
             }
@@ -155,7 +155,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull TermContainer x) {
         int xsize = x.size();
         for (int i = 0; i < xsize; i++) {
-            Term xi = x.get(i);
+            Term xi = x.sub(i);
             Ellipsis ex = firstEllipsisRecursive(xi);
             if (ex!=null)
                 return ex;

@@ -102,7 +102,7 @@ public class TemporalTest {
 
     @Test
     public void testHasTemporal() throws Narsese.NarseseException {
-        assertTrue($("(?x &&+1 y)").hasTemporal());
+        assertTrue($("(?x &&+1 y)").isTemporal());
     }
 
     @Test

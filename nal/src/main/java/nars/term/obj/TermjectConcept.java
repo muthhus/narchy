@@ -105,18 +105,18 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
     }
 
     @Override
-    public boolean containsTerm(Termlike t) {
-        return term().containsTerm(t);
+    public boolean contains(Termlike t) {
+        return term().contains(t);
     }
 
     @Override
-    public boolean hasTemporal() {
-        return term().hasTemporal();
+    public boolean isTemporal() {
+        return term().isTemporal();
     }
 
     @Override
-    public @Nullable Term termOr(int i, @Nullable Term ifOutOfBounds) {
-        return term().termOr(i, ifOutOfBounds);
+    public @Nullable Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return term().sub(i, ifOutOfBounds);
     }
 
     @Override

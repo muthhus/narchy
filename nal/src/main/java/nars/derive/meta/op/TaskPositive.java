@@ -1,12 +1,12 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.AtomicPred;
 import nars.premise.Derivation;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /** task truth is postiive */
-public class TaskPositive extends AtomicPredicate<Derivation> {
+public class TaskPositive extends AtomicPred<Derivation> {
 
     public static final TaskPositive the = new TaskPositive();
 

@@ -82,7 +82,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? input : ((Compound) t).get(p[i]);
+                t = (i == -1) ? input : ((Compound) t).sub(p[i]);
                 Op o = t.op();
 
                 if (!depOrIndep && validIndepVarSuperterm(o)) {
@@ -129,7 +129,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         @Override
         public @NotNull Term apply(@NotNull TermContainer args) {
-            return introduce(args.get(0));
+            return introduce(args.sub(0));
         }
 
         @NotNull

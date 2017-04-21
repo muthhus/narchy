@@ -1,8 +1,8 @@
 package nars.derive.meta.op;
 
 import nars.$;
-import nars.derive.meta.AtomicPredicate;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.AtomicPred;
+import nars.derive.meta.BoolPred;
 import nars.derive.meta.Conclude;
 import nars.derive.meta.Fork;
 import nars.premise.Derivation;
@@ -18,10 +18,10 @@ import java.util.Set;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
+abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
 
     @Nullable
-    private BoolPredicate eachMatch;
+    private BoolPred eachMatch;
 
     @NotNull
     protected Compound id;
@@ -73,11 +73,11 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
         conclude.add(x);
     }
 
-    public final @NotNull BoolPredicate build() {
+    public final @NotNull BoolPred build() {
         if (this.eachMatch == null) {
 
 
-            BoolPredicate om;
+            BoolPred om;
 
             switch (conclude.size()) {
                 case 0:
@@ -102,7 +102,7 @@ abstract public class MatchTermPrototype extends AtomicPredicate<Derivation> {
     }
 
     @NotNull
-    abstract protected BoolPredicate build(BoolPredicate eachMatch);
+    abstract protected BoolPred build(BoolPred eachMatch);
 
     @Override
     public boolean test(Derivation derivation) {

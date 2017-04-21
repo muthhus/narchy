@@ -6,6 +6,8 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -24,7 +26,7 @@ public class AppendProtoCompound implements ProtoCompound {
     public final Op op;
     public final int dt;
 
-    @NotNull private Term[] subs;
+    @NotNull private Term[] subs = Term.EmptyArray;
     int size;
 
     private int hash;
@@ -70,25 +72,33 @@ public class AppendProtoCompound implements ProtoCompound {
         return dt;
     }
 
+
     /** safe for use during final build step */
     @Override public Term[] subterms() {
         if (subs.length == size) {
-            return subs; //dont reallocate it's just fine
+            return subs; //dont reallocate it's just fine to share
         } else {
             return subs = Arrays.copyOfRange(subs, 0, size);
         }
     }
 
-    @Override public boolean AND(Predicate<Term> t) {
-        for (Term x : subs) if (!t.test(x)) return false;
+    @Override public boolean AND(@NotNull Predicate<Term> t) {
+        for (Term x : subs) {
+            if (x == null) break;
+            if (t.test(x)) return false;
+        }
         return true;
     }
-    @Override public boolean OR(Predicate<Term> t) {
-        for (Term x : subs) if (t.test(x)) return true;
+
+    @Override public boolean OR(@NotNull Predicate<Term> t) {
+        for (Term x : subs) {
+            if (x == null) break;
+            if (t.test(x)) return true;
+        }
         return false;
     }
 
-    public boolean add(Term x) {
+    public boolean add(@NotNull Term x) {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
@@ -104,9 +114,10 @@ public class AppendProtoCompound implements ProtoCompound {
         return true;
     }
 
-    public void addAll(Term[] u) {
-        for (Term x : u)
+    public void addAll(@NotNull Term[] u) {
+        for (Term x : u) {
             add(x);
+        }
     }
 
     @Override
@@ -126,11 +137,22 @@ public class AppendProtoCompound implements ProtoCompound {
     }
 
     @Override
+    public void forEach(Consumer<? super Term> action, int start, int stop) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
     public String toString() {
         return "AppendProtoCompound{" +
                 "op=" + op +
                 ", dt=" + dt +
                 ", subs=" + Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
                 '}';
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Term> iterator() {
+        throw new UnsupportedOperationException("TODO");
     }
 }

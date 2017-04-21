@@ -35,7 +35,7 @@ import static nars.time.Tense.XTERNAL;
  * <p>
  * Each rule corresponds to a unique instance of this
  */
-public final class Conclude extends AtomicStringConstant implements BoolPredicate<Derivation> {
+public final class Conclude extends AtomicStringConstant implements BoolPred<Derivation> {
 
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
@@ -209,7 +209,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPredicat
 
                         //the derived compound indicated a potential dt, but the premise was actually atemporal;
                         // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-                        if (c3.hasTemporal()) {
+                        if (c3.isTemporal()) {
                             c3 = m.index.retemporalize(c3); //retemporalize does normalize at the end
                         } else if (!c3.isNormalized()) {
                             c3 = m.index.normalize(c3);

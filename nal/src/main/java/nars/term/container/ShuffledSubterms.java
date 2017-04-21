@@ -54,13 +54,12 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @NotNull
     @Override
-    public Term get(int i) {
-        return srcsubs.get(super.permute(i));
+    public Term sub(int i) {
+        return srcsubs.sub(super.permute(i));
     }
 
-    @Override
     public boolean isTerm(int i, @NotNull Op o) {
-        return this.get(i).op() == o;
+        return this.sub(i).op() == o;
     }
 
 //    @Override

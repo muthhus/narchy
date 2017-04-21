@@ -79,10 +79,7 @@ public class GenericCompound implements Compound {
     }
 
 
-    @Override
-    public final int hashCodeSubTerms() {
-        return subterms.hashCode();
-    }
+
 
     @NotNull
     @Override
@@ -149,7 +146,7 @@ public class GenericCompound implements Compound {
 
         //return subterms.equals(cthat.subterms()) &&
         return
-                subterms.equivalent(cthat.subterms())
+                subterms.equals(cthat.subterms())
                 &&
                 (op == cthat.op())
                 &&

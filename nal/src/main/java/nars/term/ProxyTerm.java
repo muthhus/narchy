@@ -28,18 +28,18 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public boolean containsTerm(Termlike t) {
-        return ref.containsTerm(t);
+    public boolean contains(Termlike t) {
+        return ref.contains(t);
     }
 
     @Override
-    public boolean hasTemporal() {
-        return ref.hasTemporal();
+    public boolean isTemporal() {
+        return ref.isTemporal();
     }
 
     @Override
-    public @Nullable Term termOr(int i, @Nullable Term ifOutOfBounds) {
-        return ref.termOr(i, ifOutOfBounds);
+    public @Nullable Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return ref.sub(i, ifOutOfBounds);
     }
 
     @Override
@@ -141,4 +141,10 @@ public class ProxyTerm<T extends Term> implements Term {
     public Term eval(TermIndex index) {
         return ref.eval(index);
     }
+
+    @Override
+    public boolean isDynamic() {
+        return ref.isDynamic();
+    }
+
 }

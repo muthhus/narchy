@@ -47,7 +47,10 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
         }
     }
 
-
+    @Override
+    @NotNull public final Term term() {
+        return this;
+    }
 
     public static Term match(@NotNull Compound y, int from, int to) {
 
@@ -133,7 +136,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
         for (Term e : terms) {
-            if (!(y.containsTerm(e) && target.add(e)))
+            if (!(y.contains(e) && target.add(e)))
                 return false;
             n++;
         }

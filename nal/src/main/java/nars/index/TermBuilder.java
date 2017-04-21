@@ -57,8 +57,8 @@ public abstract class TermBuilder {
         List<Term> terms = $.newArrayList(size);
 
         for (int i = 0; i < size; i++) {
-            Term x = a.get(i);
-            if (!b.containsTerm(x)) {
+            Term x = a.sub(i);
+            if (!b.contains(x)) {
                 terms.add(x);
             }
         }
@@ -208,10 +208,10 @@ public abstract class TermBuilder {
             Op po = p.op();
             if (so == Op.IMGi && !po.image) {
                 Compound ii = (Compound) s;
-                t = the(Op.INH, ii.get(0), imageUnwrapToProd(p, ii));
+                t = the(Op.INH, ii.sub(0), imageUnwrapToProd(p, ii));
             } else if (po == Op.IMGe && !so.image) {
                 Compound jj = (Compound) p;
-                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.get(0));
+                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.sub(0));
             } else {
                 return u; //original value
             }
@@ -639,7 +639,7 @@ public abstract class TermBuilder {
                         break;
                     case NEG:
                         Compound n = (Compound) x;
-                        Term nn = n.get(0);
+                        Term nn = n.sub(0);
                         if (nn.op() == CONJ) {
                             Compound cnn = ((Compound) nn);
                             int dt = cnn.dt();
@@ -647,7 +647,7 @@ public abstract class TermBuilder {
                                 //negating unwrap each subterm of the negated conjunction to the outer level of compatible 'dt'
                                 int cnns = cnn.size();
                                 for (int i = 0; i < cnns; i++) {
-                                    Term cnt = cnn.get(i);
+                                    Term cnt = cnn.sub(i);
                                     if (s.contains(cnt)) {
                                         //co-negation detected
                                         return Collections.emptySet();
@@ -890,8 +890,8 @@ public abstract class TermBuilder {
                 }
 
                 if (mustNotContain) {
-                    if ((subject instanceof Compound && subject.varPattern() == 0 && subject.containsTerm(predicate)) ||
-                            (predicate instanceof Compound && predicate.varPattern() == 0 && predicate.containsTerm(subject))) {
+                    if ((subject instanceof Compound && subject.varPattern() == 0 && subject.contains(predicate)) ||
+                            (predicate instanceof Compound && predicate.varPattern() == 0 && predicate.contains(subject))) {
                         return False; //self-reference
                     }
                 }
@@ -1105,7 +1105,7 @@ public abstract class TermBuilder {
     @NotNull
     public Compound atemporalize(final @NotNull Compound c) {
 
-        if (!c.hasTemporal())
+        if (!c.isTemporal())
             return c;
 
         TermContainer st = c.subterms();

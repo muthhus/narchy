@@ -57,12 +57,12 @@ public class PatternTermIndex extends MapTermIndex {
         Term[] bb = new Term[ss];
         boolean changed = false;//, temporal = false;
         for (int i = 0; i < ss; i++) {
-            Term a = s.get(i);
+            Term a = s.sub(i);
 
             Term b;
             if (a instanceof Compound) {
 
-                if (!canBuildConcept(a) || a.hasTemporal()) {
+                if (!canBuildConcept(a) || a.isTemporal()) {
                     //temporal = true;//dont store subterm arrays containing temporal compounds
                     b = a;
                 } else {
@@ -107,7 +107,7 @@ public class PatternTermIndex extends MapTermIndex {
         boolean hasEllipsisTransform = false;
         int xs = seed.size();
         for (int i = 0; i < xs; i++) {
-            if (seed.get(i) instanceof EllipsisTransform) {
+            if (seed.sub(i) instanceof EllipsisTransform) {
                 hasEllipsisTransform = true;
                 break;
             }
@@ -139,7 +139,6 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
-    @Override
     protected boolean cacheable(ProtoCompound c) {
         return false; //HACK
     }

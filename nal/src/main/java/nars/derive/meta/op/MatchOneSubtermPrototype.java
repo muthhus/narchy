@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.BoolPred;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -32,7 +32,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     @NotNull
     @Override
-    protected BoolPredicate build(BoolPredicate eachMatch) {
+    protected BoolPred build(BoolPred eachMatch) {
         return new MatchOneSubterm(id, subterm, pattern, finish ? eachMatch : null);
     }
 

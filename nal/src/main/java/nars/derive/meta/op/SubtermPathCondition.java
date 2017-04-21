@@ -1,6 +1,6 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.AtomicPred;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 /**
  * Created by me on 10/6/16.
  */
-public abstract class SubtermPathCondition extends AtomicPredicate<Derivation> {
+public abstract class SubtermPathCondition extends AtomicPred<Derivation> {
     @NotNull
     public final byte[] aPath;
     @NotNull

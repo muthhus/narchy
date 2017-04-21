@@ -35,11 +35,11 @@ abstract class PremiseTruthTransform implements CompoundTransform, Function<Term
     @Override
     public Term apply(@NotNull Compound parent, @NotNull Term o) {
         if (o.op() == INH) {
-            Term pred = ((Compound) o).get(1);
+            Term pred = ((Compound) o).sub(1);
             if ((pred.equals(belief)) || (pred.equals(desire))) {
                 Compound tf = (Compound) o;
-                Term func = tf.get(0);
-                Term mode = tf.get(1);
+                Term func = tf.sub(0);
+                Term mode = tf.sub(1);
 
                 if (func.equals(TruthOperator.NONE))
                     return o; //no change

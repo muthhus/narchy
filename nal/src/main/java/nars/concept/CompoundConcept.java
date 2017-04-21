@@ -328,7 +328,7 @@ public class CompoundConcept implements Concept, Termlike {
 
     @NotNull
     public Term term(int i) {
-        return term.get(i);
+        return term.sub(i);
     }
 
     @Override
@@ -337,21 +337,21 @@ public class CompoundConcept implements Concept, Termlike {
     }
 
     /** first-level only */
-    @Deprecated @Override public boolean containsTerm(@NotNull Termlike t) {
-        return term.containsTerm(t);
+    @Deprecated @Override public boolean contains(@NotNull Termlike t) {
+        return term.contains(t);
     }
 
     @Deprecated
     @Override
-    public boolean hasTemporal() {
-        return term.hasTemporal();
+    public boolean isTemporal() {
+        return term.isTemporal();
     }
 
     @Nullable
     @Deprecated
     @Override
-    public Term termOr(int i, @Nullable Term ifOutOfBounds) {
-        return term.termOr(i, ifOutOfBounds);
+    public Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return term.sub(i, ifOutOfBounds);
     }
 
     @Deprecated

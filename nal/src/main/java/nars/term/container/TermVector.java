@@ -17,6 +17,7 @@ import java.util.function.Consumer;
  * can be
  */
 public abstract class TermVector implements TermContainer {
+
     /** normal high-entropy "content" hash */
     public  final int hash;
     /**
@@ -64,6 +65,7 @@ public abstract class TermVector implements TermContainer {
         this.structure = meta[5];
     }
 
+
     @NotNull
     public static TermVector1 the(@NotNull Term the) {
         return new TermVector1(the);
@@ -110,7 +112,7 @@ public abstract class TermVector implements TermContainer {
     }
 
     @Override
-    @NotNull abstract public Term get(int i);
+    @NotNull abstract public Term sub(int i);
 
     @Override
     public final int volume() {
@@ -174,7 +176,7 @@ public abstract class TermVector implements TermContainer {
         return
             (this == obj)
             ||
-            ((hash == obj.hashCode()) && (obj instanceof TermContainer) && equalTerms((TermContainer)obj));
+            ((hash == obj.hashCode()) && (obj instanceof TermContainer) && equivalent((TermContainer)obj));
     }
 
 

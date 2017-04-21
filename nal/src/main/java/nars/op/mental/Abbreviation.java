@@ -108,7 +108,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
             return;
 
         if (vol <= volume.hi()) {
-            if (t.vars() == 0 && !t.hasTemporal()) {
+            if (t.vars() == 0 && !t.isTemporal()) {
                 Concept abbreviable = (Concept) nar.concept(t);
                 if ((abbreviable == null) ||
                         !(abbreviable instanceof PermanentConcept) &&

@@ -82,7 +82,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     /** one argument functor (convenience method) */
     public static Concept f1(@NotNull Atom termAtom, @NotNull Function<Term, Term> ff) {
-        return f(termAtom, 1, (tt)-> ff.apply(tt.get(0)));
+        return f(termAtom, 1, (tt)-> ff.apply(tt.sub(0)));
     }
 
     public static <X extends Term> Concept f1(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
@@ -112,7 +112,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     /** two argument functor (convenience method) */
     public static Concept f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
-        return f(termAtom, 2, (tt)-> ff.apply(tt.get(0), tt.get(1)));
+        return f(termAtom, 2, (tt)-> ff.apply(tt.sub(0), tt.sub(1)));
     }
 
     /** two argument functor (convenience method) */
@@ -170,7 +170,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
                 return null;
                 //throw new UnsupportedOperationException("# args must equal 1");
 
-            return apply(x.get(0));
+            return apply(x.sub(0));
         }
 
         @Nullable
@@ -191,7 +191,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
             if (x.size()!=2)
                 throw new UnsupportedOperationException("# args must equal 2");
 
-            return apply(x.get(0), x.get(1));
+            return apply(x.sub(0), x.sub(1));
         }
 
         @Nullable

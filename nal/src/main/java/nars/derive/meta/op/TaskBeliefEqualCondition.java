@@ -1,6 +1,6 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.AtomicPred;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * this would in theory be more efficient than performing a complete match for the redundancies
  * which we can determine as a precondition of the particular task/belief pair
  * before even beginning the match. */
-final class TaskBeliefEqualCondition extends AtomicPredicate<Derivation> {
+final class TaskBeliefEqualCondition extends AtomicPred<Derivation> {
 
     @Override
     public boolean test(@NotNull Derivation m) {

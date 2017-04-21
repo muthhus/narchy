@@ -203,8 +203,8 @@ public class QuestionTest {
         Param.DEBUG = true;
 
         n.onTerm("odd", a->{
-            if (a.size() == 1 && a.get(0).op()== Op.INT) {
-                return ((IntTerm)a.get(0)).val() % 2 == 0 ? Op.False : Op.True;
+            if (a.size() == 1 && a.sub(0).op()== Op.INT) {
+                return ((IntTerm)a.sub(0)).val() % 2 == 0 ? Op.False : Op.True;
             }
             return null; //$.f("odd", a[0]); //vars, etc.
         });

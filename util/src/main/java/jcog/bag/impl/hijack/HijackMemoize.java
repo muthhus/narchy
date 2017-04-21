@@ -1,6 +1,5 @@
 package jcog.bag.impl.hijack;
 
-import jcog.bag.impl.HijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
@@ -9,8 +8,6 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -65,7 +62,7 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
             return exists.get().getTwo();
         } else {
             V v = func.apply(k);
-            if (put(new RawPLink<>(Tuples.pair(k, v), cost(k)))!=null) {
+            if (put(new RawPLink<>(Tuples.pair(k, v), value(k)))!=null) {
                 miss.increment();
             } else {
                 reject.increment();
@@ -74,8 +71,11 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
         }
     }
 
-    /** quickly estimates the cost of computing the input */
-    public float cost(@NotNull K k) {
+    /** quickly estimates the value of computing the input.
+     * easier items will introduce lower priority, allowing
+     * harder items to sustain longer
+     * */
+    public float value(@NotNull K k) {
         return 1f;
     }
 

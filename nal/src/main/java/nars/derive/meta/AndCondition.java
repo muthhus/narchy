@@ -15,17 +15,17 @@ import java.util.List;
 /**
  * Created by me on 12/31/15.
  */
-public final class AndCondition extends GenericCompound implements BoolPredicate<Derivation> {
+public final class AndCondition extends GenericCompound implements BoolPred<Derivation> {
 
     @NotNull
-    public final BoolPredicate[] termCache;
+    public final BoolPred[] termCache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
     }*/
-    public AndCondition(@NotNull Collection<BoolPredicate> p) {
+    public AndCondition(@NotNull Collection<BoolPred> p) {
         super(Op.PROD, TermVector.the(p));
-        this.termCache = p.toArray(new BoolPredicate[p.size()]);
+        this.termCache = p.toArray(new BoolPred[p.size()]);
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
     }
@@ -39,7 +39,7 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
 
     @Override
     public final boolean test(@NotNull Derivation m) {
-        for (BoolPredicate x : termCache) {
+        for (BoolPred x : termCache) {
             boolean b = x.test(m);
 
 //            if (m.now() > 0)
@@ -53,7 +53,7 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
         return true;
     }
 
-    public static @Nullable BoolPredicate the(@NotNull List<BoolPredicate> cond) {
+    public static @Nullable BoolPred the(@NotNull List<BoolPred> cond) {
 
         //remove suffix 'TRUE'
         int s = cond.size();
@@ -71,9 +71,9 @@ public final class AndCondition extends GenericCompound implements BoolPredicate
         return new AndCondition(cond);
     }
 
-    public @Nullable BoolPredicate without(BoolPredicate condition) {
+    public @Nullable BoolPred without(BoolPred condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        BoolPredicate[] x = ArrayUtils.removeElement(termCache, condition);
+        BoolPred[] x = ArrayUtils.removeElement(termCache, condition);
         if (x.length == termCache.length)
             throw new RuntimeException("element missing for removal");
 

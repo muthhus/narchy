@@ -13,7 +13,7 @@ import static nars.Op.*;
 /**
  * Evaluates the truth of a premise
  */
-abstract public class Solve extends BoolPredicate.AbstractBoolPredicate<Derivation> {
+abstract public class Solve extends AbstractPred<Derivation> {
 
 
     public final Conclude conclude;

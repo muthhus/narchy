@@ -87,8 +87,8 @@ public class NarseseExtendedTest {
     public void testColonReverseInheritance() throws Narsese.NarseseException {
         Compound t = term("namespace:named");
         assertEquals(t.op(), Op.INH);
-        assertEquals("named", t.get(0).toString());
-        assertEquals("namespace", t.get(1).toString());
+        assertEquals("named", t.sub(0).toString());
+        assertEquals("namespace", t.sub(1).toString());
 
 
 
@@ -205,7 +205,7 @@ public class NarseseExtendedTest {
         Compound nab = term("--(a & b)");
         assertTrue(nab.op() == Op.NEG);
 
-        assertTrue(nab.get(0).op() == Op.SECTe);
+        assertTrue(nab.sub(0).op() == Op.SECTe);
 
 //        try {
 //            task("(-- negated illegal_extra_term)!");
@@ -249,7 +249,7 @@ public class NarseseExtendedTest {
         assertEquals("(acid-->(/,reaction,_,base))",
                 x.toString());
         assertTrue(x.vars()==0);
-        assertFalse(x.containsTermRecursively(Op.Imdex));
+        assertFalse(x.containsRecursively(Op.Imdex));
 
         //test that the imdex is allowed in term identifiers
         assertEquals(

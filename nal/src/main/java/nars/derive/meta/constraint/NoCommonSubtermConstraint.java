@@ -29,7 +29,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
     }
 
     @NotNull @Override protected boolean invalid(Term x, Compound y) {
-        return (recurse ? y.containsTermRecursively(x) : y.containsTerm(x));
+        return (recurse ? y.containsRecursively(x) : y.contains(x));
     }
 
     //commonSubtermsRecurse((Compound) B, C, true, new HashSet())

@@ -1,8 +1,8 @@
 package nars.index.term.map;
 
-import jcog.Util;
 import jcog.bag.impl.hijack.HijackMemoize;
 import nars.Op;
+import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.AppendProtoCompound;
@@ -16,11 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import static nars.Op.ATOM;
-import static nars.Op.INH;
-import static nars.Op.PROD;
 import static nars.term.Terms.compoundOrNull;
 
 /**
@@ -51,13 +47,18 @@ public abstract class MaplikeTermIndex extends TermIndex {
     };
 
     final HijackMemoize<ProtoCompound,Term> build = new HijackMemoize<>(
-            32*1024, 3,
-            (C) -> super.the(C.op(), C.dt(), C.subterms())
+        32*1024, 4,
+        (C) -> super.the(C.op(), C.dt(), C.subterms())
     );
+//        @Override
+//        public float value(@NotNull ProtoCompound protoCompound) {
+//            //??
+//        }
+//    };
 
-    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<Compound,Term>(
-            16*1024, 2,
-            super::normalize
+    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<>(
+        16 * 1024, 3,
+        super::normalize
     );
 
     @Override
@@ -70,20 +71,14 @@ public abstract class MaplikeTermIndex extends TermIndex {
 
     @Override protected Term the(ProtoCompound c) {
 
-        if (!cacheable(c)) {
+        if (!c.isDynamic()) {
             return super.the(c.op(), c.dt(), c.subterms()); //immediate construct
         } else {
+            build.miss.increment();
             return build.apply(c);
         }
     }
 
-    protected boolean cacheable(ProtoCompound c) {
-
-        return c.size() > 1 &&
-                 !(c.op()==INH && c.sub(1).op()==ATOM /* functor */ && c.sub(0).op()==PROD )
-                 &&
-                 !c.OR(x -> x.hasAll(Op.EvalBits));
-    }
 
     @Nullable
     @Override public final Compound normalize(@NotNull Compound x) {

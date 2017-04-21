@@ -6,8 +6,8 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.derive.meta.AtomicPredicate;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.AtomicPred;
+import nars.derive.meta.BoolPred;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -21,19 +21,19 @@ import java.util.function.Consumer;
 /**
  * Generic handler for matching individual Tasks's
  */
-abstract public class TaskMatch extends AtomicPredicate<Task> implements Consumer<Task> {
+abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Task> {
 
     @NotNull protected final NAR nar;
     private final On on;
-    private BoolPredicate<Term> term = null;
-    private BoolPredicate<Truth> truth = null;
-    private BoolPredicate<Byte> punctuation = null;
-    private BoolPredicate<LongLongPair> time = null;
-    private BoolPredicate<Priority> budget = null;
+    private BoolPred<Term> term = null;
+    private BoolPred<Truth> truth = null;
+    private BoolPred<Byte> punctuation = null;
+    private BoolPred<LongLongPair> time = null;
+    private BoolPred<Priority> budget = null;
 
 
 
-    abstract public static class TermMatch extends AtomicPredicate<Term> {
+    abstract public static class TermMatch extends AtomicPred<Term> {
 
         public final Term term;
 
@@ -60,11 +60,11 @@ abstract public class TaskMatch extends AtomicPredicate<Task> implements Consume
         this.on = n.onTask(this);
     }
 
-    public void setTerm(BoolPredicate<Term> term) {
+    public void setTerm(BoolPred<Term> term) {
         this.term = term;
     }
 
-    public void setPunctuation(BoolPredicate<Byte> punctuation) {
+    public void setPunctuation(BoolPred<Byte> punctuation) {
         this.punctuation = punctuation;
     }
 

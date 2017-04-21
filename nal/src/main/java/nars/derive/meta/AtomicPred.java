@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * this will be better than expecting each implementation's toString() method to remain
  * constant
  */
-public abstract class AtomicPredicate<X> extends AtomicString implements BoolPredicate<X> {
+public abstract class AtomicPred<X> extends AtomicString implements BoolPred<X> {
 
     @NotNull
     public abstract String toString();

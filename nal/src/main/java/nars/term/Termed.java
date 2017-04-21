@@ -5,14 +5,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** has, or is associated with a specific term */
-@FunctionalInterface
-public interface Termed<T extends Term>  {
+public interface Termed<T extends Term> /* TODO finish implementing: extends Termlike */ {
 
     @NotNull T term();
 
     @NotNull
     default Op op() { return term().op(); }
 
+    default int varPattern() {
+        return term().varPattern();
+    }
+
+    default int varQuery() {
+        return term().varQuery();
+    }
+
+    default int varIndep() {
+        return term().varIndep();
+    }
+
+    default int varDep() {
+        return term().varDep();
+    }
 
     default boolean levelValid(int nal) {
         return term().levelValid(nal);

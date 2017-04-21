@@ -2,7 +2,7 @@ package nars.derive.meta.op;
 
 import nars.$;
 import nars.Op;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.BoolPred;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
@@ -19,13 +19,13 @@ import java.util.Set;
 import java.util.SortedSet;
 
 
-public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<Derivation> {
+public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPred<Derivation> {
 
 
 
 
-    public final List<BoolPredicate> post;
-    public final List<BoolPredicate> pre;
+    public final List<BoolPred> post;
+    public final List<BoolPred> pre;
     public final Set<MatchConstraint> constraints;
 
 //    @NotNull
@@ -35,9 +35,9 @@ public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<De
     public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
         super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
 
-        List<BoolPredicate> pre = $.newArrayList();
+        List<BoolPred> pre = $.newArrayList();
 
-        List<BoolPredicate> post = $.newArrayList();
+        List<BoolPred> post = $.newArrayList();
 
         compile(taskPattern, beliefPattern, pre, post, index, constraints);
 
@@ -76,7 +76,7 @@ public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<De
 
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
-                                @NotNull List<BoolPredicate> pre, @NotNull List<BoolPredicate> code,
+                                @NotNull List<BoolPred> pre, @NotNull List<BoolPred> code,
                                 @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
 
         //BoolPredicate preGuard = null;
@@ -125,8 +125,8 @@ public class MatchTaskBelief extends ProxyTerm<Term> implements BoolPredicate<De
 
     }
 
-    private static void compileTaskBelief(@NotNull List<BoolPredicate> pre,
-                                          @NotNull List<BoolPredicate> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
+    private static void compileTaskBelief(@NotNull List<BoolPred> pre,
+                                          @NotNull List<BoolPred> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 

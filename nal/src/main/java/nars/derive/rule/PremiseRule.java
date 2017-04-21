@@ -56,7 +56,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before unification
      */
-    public BoolPredicate[] PRE;
+    public BoolPred[] PRE;
 
     /**
      * consequences applied after unification
@@ -99,16 +99,16 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final Compound getPremise() {
-        return (Compound) get(0);
+        return (Compound) sub(0);
     }
 
     @NotNull
     public final Compound getConclusion() {
-        return (Compound) get(1);
+        return (Compound) sub(1);
     }
 
     PremiseRule(@NotNull Compound premisesResultProduct) {
-        this((Compound) premisesResultProduct.get(0), (Compound) premisesResultProduct.get(1));
+        this((Compound) premisesResultProduct.sub(0), (Compound) premisesResultProduct.sub(1));
     }
 
     public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
@@ -336,7 +336,7 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getTask() {
-        return getPremise().get(0);
+        return getPremise().sub(0);
     }
 
     /**
@@ -344,12 +344,12 @@ public class PremiseRule extends GenericCompound {
      */
     @NotNull
     public final Term getBelief() {
-        return getPremise().get(1);
+        return getPremise().sub(1);
     }
 
     @NotNull
     protected final Term getConclusionTermPattern() {
-        return getConclusion().get(0);
+        return getConclusion().sub(0);
     }
 
 
@@ -372,7 +372,7 @@ public class PremiseRule extends GenericCompound {
      * deduplicate and generate match-optimized compounds for rules
      */
     public void compile(@NotNull TermIndex index) {
-        Term[] premisePattern = ((Compound) get(0)).toArray();
+        Term[] premisePattern = ((Compound) sub(0)).toArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
@@ -393,7 +393,7 @@ public class PremiseRule extends GenericCompound {
             String name = v.toString();
             if (Character.isUpperCase(name.charAt(0)) && name.length() == 1) {
                 //do not alter postconditions
-                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.get(1)) ?
+                return (containingCompound.op() == Op.INH) && PostCondition.reservedMetaInfoCategories.contains(containingCompound.sub(1)) ?
                         v : v(Op.VAR_PATTERN, v.toString());
 
             }
@@ -424,11 +424,11 @@ public class PremiseRule extends GenericCompound {
         //1. construct precondition term array
         //Term[] terms = terms();
 
-        Term[] precon = ((Compound) get(0)).toArray();
-        Term[] postcons = ((Compound) get(1)).toArray();
+        Term[] precon = ((Compound) sub(0)).toArray();
+        Term[] postcons = ((Compound) sub(1)).toArray();
 
 
-        Set<BoolPredicate> pres =
+        Set<BoolPred> pres =
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
@@ -456,7 +456,7 @@ public class PremiseRule extends GenericCompound {
         for (int i = 2; i < precon.length; i++) {
 
             Compound predicate = (Compound) precon[i];
-            Term predicate_name = predicate.get(1);
+            Term predicate_name = predicate.sub(1);
 
             String predicateNameStr = predicate_name.toString();
 
@@ -465,7 +465,7 @@ public class PremiseRule extends GenericCompound {
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
-            args = ((Compound) (predicate.get(0))).toArray();
+            args = ((Compound) (predicate.sub(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
             /*} else {
@@ -856,7 +856,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         //store to arrays
-        this.PRE = pres.toArray(new BoolPredicate[pres.size()]);
+        this.PRE = pres.toArray(new BoolPred[pres.size()]);
 
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
@@ -906,7 +906,7 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void opNot(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 //        boolean prefiltered = false;
 //        if (t.equals(task)) {
@@ -922,7 +922,7 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    public static void opNotContaining(Term task, Term belief, @NotNull Set<BoolPredicate> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNotContaining(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 
         boolean prefiltered = false;
@@ -1117,11 +1117,11 @@ public class PremiseRule extends GenericCompound {
         Compound remapped = (Compound) index.replace(this, m);
 
         //Append taskQuestion
-        Compound pc = (Compound) remapped.get(0);
+        Compound pc = (Compound) remapped.sub(0);
         Term[] pp = pc.toArray(); //premise component
         Compound newPremise;
 
-        Compound newConclusion = (Compound) remapped.get(1);
+        Compound newConclusion = (Compound) remapped.sub(1);
 
         if (question) {
 
@@ -1130,13 +1130,13 @@ public class PremiseRule extends GenericCompound {
 
 
             //remove truth values and add '?' punct
-            TermContainer ss = ((Compound) newConclusion.get(1)).subterms();
+            TermContainer ss = ((Compound) newConclusion.sub(1)).subterms();
             newConclusion = p(
 
-                    newConclusion.get(0), $.p(ss.filter((x) -> {
+                    newConclusion.sub(0), $.p(ss.asFiltered((x) -> {
                         return !(((Compound) x).op() == Op.INH && (
-                                ((Compound) x).get(1).equals(BELIEF)
-                                        || ((Compound) x).get(1).equals(GOAL)));
+                                ((Compound) x).sub(1).equals(BELIEF)
+                                        || ((Compound) x).sub(1).equals(GOAL)));
                     }).append(QUESTION_PUNCTUATION))
             );
 

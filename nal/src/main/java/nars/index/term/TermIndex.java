@@ -201,7 +201,7 @@ public abstract class TermIndex extends TermBuilder {
         int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
         int volSum = 0, volAt = 0, subAt = 0;
         for (int i = 0; i < len; i++) {
-            Term t = subs.get(i);
+            Term t = subs.sub(i);
             Term u = transform(t, f);
 
 
@@ -405,7 +405,7 @@ public abstract class TermIndex extends TermBuilder {
         AppendProtoCompound target = new AppendProtoCompound(op, dt, s);
         for (int i = 0; i < s; i++) {
 
-            Term x = src.get(i), y;
+            Term x = src.sub(i), y;
 
             y = t.apply(src, x);
 
@@ -481,7 +481,7 @@ public abstract class TermIndex extends TermBuilder {
 
         boolean changed = false;
         for (int i = 0; i < n; ) {
-            Term x = csrc.get(i);
+            Term x = csrc.sub(i);
             Term y;
             if (path.get(depth) != i) {
                 //unchanged subtree

@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.Op;
-import nars.derive.meta.AtomicPredicate;
+import nars.derive.meta.AtomicPred;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * requires a specific subterm to have minimum bit structure
  */
-public final class SubTermStructure extends AtomicPredicate<Derivation> {
+public final class SubTermStructure extends AtomicPred<Derivation> {
 
     /** higher number means a stucture with more enabled bits will be decomposed to its components */
     public static final int SPLIT_THRESHOLD = 3;

@@ -179,7 +179,7 @@ public class TermKey extends HashCachedDynByteSeq {
 
         int siz = c.size();
         for (int i = 0; i < siz; i++) {
-            writeTermSeq(out, c.get(i), includeTemporal);
+            writeTermSeq(out, c.sub(i), includeTemporal);
             if (i < siz-1)
                 out.writeByte(',');
         }

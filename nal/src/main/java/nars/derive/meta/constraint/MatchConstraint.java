@@ -1,7 +1,7 @@
 package nars.derive.meta.constraint;
 
 import nars.$;
-import nars.derive.meta.BoolPredicate;
+import nars.derive.meta.BoolPred;
 import nars.premise.Derivation;
 import nars.term.ProxyCompound;
 import nars.term.Term;
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 
-public abstract class MatchConstraint extends ProxyCompound implements BoolPredicate<Derivation> {
+public abstract class MatchConstraint extends ProxyCompound implements BoolPred<Derivation> {
 
     public final Term target;
 

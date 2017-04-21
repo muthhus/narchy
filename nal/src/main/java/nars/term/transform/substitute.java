@@ -1,13 +1,11 @@
 package nars.term.transform;
 
-import jcog.version.VersionMap;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
@@ -27,21 +25,21 @@ public final class substitute extends Functor {
 
     @Nullable @Override public Term apply(@NotNull TermContainer xx) {
 
-        final Term input = xx.get(0); //term to possibly transform
-        Term x = xx.get(1); //original term (x)
+        final Term input = xx.sub(0); //term to possibly transform
+        Term x = xx.sub(1); //original term (x)
 
         boolean hasYX = !parent.yx.map.isEmpty(); //optimize in case where yx is empty
         if (hasYX)
-            x = parent.yxResolve(xx.get(1));
+            x = parent.yxResolve(xx.sub(1));
 
-        boolean strict = (xx.size() > 3) && xx.get(3).equals(STRICT);
+        boolean strict = (xx.size() > 3) && xx.sub(3).equals(STRICT);
 
-        if (strict && (!(input instanceof Compound) || !input.containsTermRecursively(x)))
+        if (strict && (!(input instanceof Compound) || !input.containsRecursively(x)))
             return Op.False;
 
-        Term y = xx.get(2); //replacement term (y)
+        Term y = xx.sub(2); //replacement term (y)
         if (hasYX)
-            y = parent.yxResolve(xx.get(2));
+            y = parent.yxResolve(xx.sub(2));
 
         Term output = parent.transform(input,
             hasYX ?

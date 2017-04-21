@@ -218,7 +218,7 @@ public class TermTest {
         Compound cterm2 = ((Compound) term2);
 
         //test subterms
-        assertTrue(cterm1.get(0).equals(cterm2.get(0))); //'a'
+        assertTrue(cterm1.sub(0).equals(cterm2.sub(0))); //'a'
 
     }
 
@@ -294,8 +294,8 @@ public class TermTest {
         Term t = _t.term();
         if (t.op() == Op.INH) { //Op.hasAll(t.structure(), Op.OperationBits) &&
             Compound c = (Compound) t;
-            return c.isTerm(1, Op.ATOM) &&
-                    c.isTerm(0, Op.PROD);
+            return c.subOpIs(1, Op.ATOM) &&
+                    c.subOpIs(0, Op.PROD);
         }
         return false;
     }
@@ -817,8 +817,8 @@ public class TermTest {
         assertNotEquals(a, c);
 
         Termed<Compound> x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
-        Term xa = x.term().get(0);
-        Term xb = x.term().get(1);
+        Term xa = x.term().sub(0);
+        Term xb = x.term().sub(1);
         int o1 = xa.compareTo(xb);
         int o2 = xb.compareTo(xa);
         assertEquals(o1, -o2);

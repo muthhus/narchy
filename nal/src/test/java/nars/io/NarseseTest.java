@@ -104,8 +104,8 @@ public class NarseseTest {
         assertNotNull(t);
         assertEquals(Op.INH, t.op());
         Compound i = t.term();
-        assertEquals("a", i.get(0).toString());
-        assertEquals("b", i.get(1).toString());
+        assertEquals("a", i.sub(0).toString());
+        assertEquals("b", i.sub(1).toString());
         assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);
         //assertEquals(Global.DEFAULT_JUDGMENT_DURABILITY, t.getDurability(), 0.001);
@@ -157,9 +157,9 @@ public class NarseseTest {
 
     protected void testProductABC(@NotNull Compound p) throws Narsese.NarseseException {
         assertEquals(p.toString() + " should have 3 sub-terms", 3, p.size());
-        assertEquals("a", p.get(0).toString());
-        assertEquals("b", p.get(1).toString());
-        assertEquals("c", p.get(2).toString());
+        assertEquals("a", p.sub(0).toString());
+        assertEquals("b", p.sub(1).toString());
+        assertEquals("c", p.sub(2).toString());
     }
 
 
@@ -213,8 +213,8 @@ public class NarseseTest {
         Compound t = term("(x & y)");
         assertEquals(Op.SECTe, t.op());
         assertEquals(2, t.size());
-        assertEquals("x", t.get(0).toString());
-        assertEquals("y", t.get(1).toString());
+        assertEquals("x", t.sub(0).toString());
+        assertEquals("y", t.sub(1).toString());
 
         Compound a = term("(x | y)");
         assertEquals(Op.SECTi, a.op());
@@ -228,7 +228,7 @@ public class NarseseTest {
         assertEquals(Op.CONJ, c.op());
         assertEquals(2, c.size());
         assertEquals(5, c.complexity());
-        assertEquals(Op.INH, c.get(1).op());
+        assertEquals(Op.INH, c.sub(1).op());
     }
 
 
@@ -255,9 +255,9 @@ public class NarseseTest {
 
     private void testOperationStructure(@NotNull Compound t) {
         //Term[] aa = Operator.argArray(t);
-        Term[] aa = ((Compound)t.get(0)).toArray();
+        Term[] aa = ((Compound)t.sub(0)).toArray();
         assertEquals(2, aa.length);
-        assertEquals("believe", t.get(1).toString());
+        assertEquals("believe", t.sub(1).toString());
         //assertEquals("^believe", Operator.operator(t).toString());
         assertEquals("a", aa[0].toString());
         assertEquals("b", aa[1].toString());
@@ -306,7 +306,7 @@ public class NarseseTest {
         assertEquals(a.op(), b.op());
         assertEquals(a.getClass(), b.getClass());
 
-        assertEquals(Op.ATOM, b.get(1).op());
+        assertEquals(Op.ATOM, b.sub(1).op());
 
     }
 
@@ -379,17 +379,17 @@ public class NarseseTest {
         Compound xInt = term("[x]");
         assertEquals(Op.SETi, xInt.op());
         assertEquals(1, xInt.size());
-        assertEquals("x", xInt.get(0).toString());
+        assertEquals("x", xInt.sub(0).toString());
 
         Compound xExt = term("{x}");
         assertEquals(Op.SETe, xExt.op());
         assertEquals(1, xExt.size());
-        assertEquals("x", xExt.get(0).toString());
+        assertEquals("x", xExt.sub(0).toString());
 
         Compound abInt = term("[a,b]");
         assertEquals(2, abInt.size());
-        assertEquals("a", abInt.get(0).toString());
-        assertEquals("b", abInt.get(1).toString());
+        assertEquals("a", abInt.sub(0).toString());
+        assertEquals("b", abInt.sub(1).toString());
 
         assertEquals(abInt, term("[ a,b]"));
         assertEquals(abInt, term("[a,b ]"));
@@ -509,13 +509,13 @@ public class NarseseTest {
 
     private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
         Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.get(0)).dt()  );
+        assertEquals(relationIndexExpected, ((Compound)ti.sub(0)).dt()  );
         assertEquals(imageTerm, ti.toString());
     }
 
     private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
         Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.get(1)).dt() );
+        assertEquals(relationIndexExpected, ((Compound)ti.sub(1)).dt() );
         assertEquals(imageTerm, ti.toString());
     }
 

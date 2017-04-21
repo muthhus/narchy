@@ -67,24 +67,24 @@ public class Builtin {
                       (a,b) pair of integers, a range of indices */
             Functor.f("slice", (args) -> {
                 if (args.size() == 2) {
-                    Compound x = compoundOrNull(args.get(0));
+                    Compound x = compoundOrNull(args.sub(0));
                     if (x != null) {
                         int len = x.size();
 
-                        Term index = args.get(1);
+                        Term index = args.sub(1);
                         Op o = index.op();
                         if (o == INT) {
                             //specific index
                             int i = ((IntTerm) index).val;
                             if (i >= 0 && i < len)
-                                return x.get(i);
+                                return x.sub(i);
                             else
                                 return False;
 
                         } else if (o == PROD && index.size() == 2) {
-                            Term start = ((Compound) index).get(0);
+                            Term start = ((Compound) index).sub(0);
                             if (start.op() == INT) {
-                                Term end = ((Compound) index).get(1);
+                                Term end = ((Compound) index).sub(1);
                                 if (end.op() == INT) {
                                     int si = ((IntTerm) start).val;
                                     if (si >= 0 && si < len) {

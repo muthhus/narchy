@@ -85,15 +85,15 @@ abstract public class substituteIfUnifies extends Functor {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = a.get(0);
+        Term term = a.sub(0);
 
-        Term x = a.get(1);
+        Term x = a.sub(1);
         if (x instanceof Atom)
             return term;
 
 
 
-        Term y = a.get(2);
+        Term y = a.sub(2);
 
         if (y.equals(term))
             return term;

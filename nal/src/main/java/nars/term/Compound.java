@@ -62,6 +62,15 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface Compound extends Term, IPair, TermContainer {
 
+    @NotNull
+    TermContainer subterms();
+
+    @Override
+    default int hashCodeSubTerms() {
+        return subterms().hashCode();
+    }
+
+
     /**
      * if the compound tracks normalization state, this will set the flag internally
      */
@@ -93,7 +102,7 @@ public interface Compound extends Term, IPair, TermContainer {
         TermContainer tt = subterms();
         int l = tt.size();
         for (int i = 0; i < l; i++) {
-            @NotNull Term s = tt.get(i);
+            @NotNull Term s = tt.sub(i);
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 r |= (addOrRemoved) ? t.add(s) : t.remove(s);
                 if (!addOrRemoved && r) //on removal we can exit early
@@ -131,7 +140,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default public Term unneg() {
         if (op() == NEG) {
-            Term x = get(0);
+            Term x = sub(0);
             if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
                 ((Compound) x).setNormalized();
             }
@@ -189,7 +198,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default byte[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this)) return IntArrays.EMPTY_BYTES;
-        if (!containsTermRecursively(subterm)) return null;
+        if (!containsRecursively(subterm)) return null;
         return pathTo(new ByteArrayList(0), this, subterm);
     }
 
@@ -211,14 +220,14 @@ public interface Compound extends Term, IPair, TermContainer {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
-            Term s = superTerm.get(i);
+            Term s = superTerm.sub(i);
             if (s.equals(target)) {
                 p.add((byte) i);
                 return p.toArray();
             }
             if (s instanceof Compound) {
                 Compound cs = (Compound) s;
-                if (cs.containsTermRecursively(target)) {
+                if (cs.containsRecursively(target)) {
                     p.add((byte) i);
                     return pathTo(p, cs, target);
                 }
@@ -236,7 +245,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         int n = superTerm.size();
         for (int i = 0; i < n; i++) {
-            Term s = superTerm.get(i);
+            Term s = superTerm.sub(i);
             X ss = subterm.apply(s);
 
             p.add((byte) i);
@@ -353,7 +362,12 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Nullable
     default Term subterm(@NotNull ByteList path) {
-        return subterm(path.toArray()); //HACK avoid creation of new array
+        Term ptr = this;
+        int s = path.size();
+        for (int i = 0; i < s; i++)
+            if ((ptr = ptr.sub(path.get(i), null)) == null)
+                return null;
+        return ptr;
     }
 
     /**
@@ -363,26 +377,22 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default Term subterm(@NotNull byte... path) {
         Term ptr = this;
-        for (int i : path) {
-            if ((ptr = ptr.termOr(i, null)) == null)
+        for (int i : path)
+            if ((ptr = ptr.sub(i, null)) == null)
                 return null;
-        }
         return ptr;
     }
 
-    default Term termOr(int i, @Nullable Term ifOutOfBounds) {
-        return subterms().termOr(i, ifOutOfBounds);
+    default Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return subterms().sub(i, ifOutOfBounds);
     }
 
-
-    @NotNull
-    TermContainer subterms();
 
     @Nullable
     @Override
     default Object _car() {
         //if length > 0
-        return get(0);
+        return sub(0);
     }
 
     /**
@@ -396,17 +406,17 @@ public interface Compound extends Term, IPair, TermContainer {
             case 1:
                 throw new RuntimeException("Pair fault");
             case 2:
-                return get(1);
+                return sub(1);
             case 3:
-                return new Pair(get(1), get(2));
+                return new Pair(sub(1), sub(2));
             case 4:
-                return new Pair(get(1), new Pair(get(2), get(3)));
+                return new Pair(sub(1), new Pair(sub(2), sub(3)));
         }
 
         //this may need tested better:
         Pair p = null;
         for (int i = len - 2; i >= 0; i--) {
-            p = new Pair(get(i), p == null ? get(i + 1) : p);
+            p = new Pair(sub(i), p == null ? sub(i + 1) : p);
         }
         return p;
     }
@@ -453,8 +463,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     @Override
-    default Term get(int i) {
-        return subterms().get(i);
+    default Term sub(int i) {
+        return subterms().sub(i);
     }
 
     @NotNull
@@ -530,10 +540,7 @@ public interface Compound extends Term, IPair, TermContainer {
         subterms().copyInto(set);
     }
 
-    @Override
-    default boolean isTerm(int i, @NotNull Op o) {
-        return subterms().isTerm(i, o);
-    }
+
 
 
 //    @Nullable
@@ -542,13 +549,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        //return subterms().firstEllipsis();
 //        return null;
 //    }
-
-
-    @Nullable
-    default Term last() {
-        int s = size();
-        return s == 0 ? null : get(s - 1);
-    }
 
 
     @Override
@@ -571,9 +571,6 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     int dt();
 
-    default boolean temporal() {
-        return dt() != Tense.DTERNAL;
-    }
 
 
     /**
@@ -586,7 +583,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!impossibleSubTerm(t)) {
             ByteArrayList l = new ByteArrayList();
 
-            if (isSubterm(this, t, l)) {
+            if (pathFirst(this, t, l)) {
 
                 return Util.reverse(l);
             }
@@ -595,11 +592,15 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    static boolean isSubterm(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
+    /**
+     * finds the first occurring index path to a recursive subterm equal
+     * to 't'
+     */
+    static boolean pathFirst(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
         int s = container.size();
         for (int i = 0; i < s; i++) {
-            Term xx = container.get(i);
-            if (xx.equals(t) || ((xx.containsTerm(t)) && isSubterm((Compound) xx, t, l))) {
+            Term xx = container.sub(i);
+            if (xx.equals(t) || ((xx.contains(t)) && pathFirst((Compound) xx, t, l))) {
                 l.add((byte) i);
                 return true;
             } //else, try next subterm and its subtree
@@ -645,12 +646,10 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default boolean hasTemporal() {
-        if (hasAny(Op.TemporalBits)) {
-            int dt = dt();
-            return ((dt != DTERNAL) && isAny(Op.TemporalBits)) || OR(Term::hasTemporal);
-        }
-        return false;
+    default boolean isTemporal() {
+        return (isAny(Op.TemporalBits) && (dt() != DTERNAL))
+                        ||
+               (hasAny(Op.TemporalBits) && OR(Term::isTemporal));
     }
 
     @Override
@@ -689,7 +688,7 @@ public interface Compound extends Term, IPair, TermContainer {
         int ys = yy.size();
         int offset = 0;
         for (int yi = 0; yi < ys; yi++) {
-            Term yyy = yy.get(reverse ? ((ys - 1) - yi) : yi);
+            Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
             int sdt = yyy.subtermTime(x);
             if (sdt != DTERNAL)
                 return sdt + offset;
@@ -717,7 +716,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 int s = tt.size();
                 long t = offset;
                 for (int i = 0; i < s; i++) {
-                    Term st = tt.get(reverse ? (s - 1 - i) : i);
+                    Term st = tt.sub(reverse ? (s - 1 - i) : i);
                     st.events(events, t);
                     t += dt + st.dtRange();
                 }
@@ -754,7 +753,7 @@ public interface Compound extends Term, IPair, TermContainer {
                             break;
                     }
 
-                    return c.get(0).dtRange() + (dt) + c.get(1).dtRange();
+                    return c.sub(0).dtRange() + (dt) + c.sub(1).dtRange();
 
                 } else {
                     int s = 0;
@@ -762,7 +761,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     TermContainer tt = subterms();
                     int l = tt.size();
                     for (int i = 0; i < l; i++) {
-                        @NotNull Term x = tt.get(i);
+                        @NotNull Term x = tt.sub(i);
                         s = Math.max(s, x.dtRange());
                     }
 
@@ -805,7 +804,7 @@ public interface Compound extends Term, IPair, TermContainer {
             Term[] evalSubs = new Term[s];
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term x = tt.get(i);
+                Term x = tt.sub(i);
                 Term y = x.eval(index);
                 if (!x.equals(y)) {
                     modified = true;
@@ -824,9 +823,9 @@ public interface Compound extends Term, IPair, TermContainer {
         if (op() == INH) {
             //recursively compute contained subterm functors
 
-            final Term subject = get(0);
+            final Term subject = sub(0);
             if (subject.op() == PROD) {
-                Term predicate = get(1);
+                Term predicate = sub(1);
                 if (predicate.op() == ATOM) {
 
                     Functor f = null;

@@ -76,10 +76,7 @@ public interface Atomic extends Term {
 //        return toString();
 //    }
 
-    @Override
-    default boolean hasTemporal() {
-        return false;
-    }
+
 
 
     @Override
@@ -100,7 +97,7 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean containsTerm(Termlike t) {
+    default boolean contains(Termlike t) {
         return false;
     }
 
@@ -116,7 +113,7 @@ public interface Atomic extends Term {
 
     @Nullable
     @Override
-    default Term termOr(int i, @Nullable Term ifOutOfBounds) {
+    default Term sub(int i, @Nullable Term ifOutOfBounds) {
         //no superterms to select
         return ifOutOfBounds;
     }
@@ -135,5 +132,13 @@ public interface Atomic extends Term {
         return op().bit;
     }
 
+    @Override
+    default boolean isDynamic() {
+        return false;
+    }
 
+    @Override
+    default boolean subOpIs(int i, Op o) {
+        return false;
+    }
 }

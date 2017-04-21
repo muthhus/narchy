@@ -10,19 +10,19 @@ import java.util.function.Predicate;
  * Features exhibited by, and which can classify terms
  * and termlike productions
  */
-public interface Termlike {
+public interface Termlike extends Termed {
 
     /**
      * volume = total number of terms = complexity + # total variables
      */
-    int volume();
+    default int volume() { return 0; }
 
     /**
      * total number of leaf terms, excluding variables which have a complexity of zero
      */
-    int complexity();
+    default int complexity() { return complexity(); }
 
-    int structure();
+    default int structure() { return 0; }
 
     /**
      * number of subterms. if atomic, size=0
@@ -34,15 +34,18 @@ public interface Termlike {
      *  false if term is atomic since it can contain nothing
      *
      */
-    boolean containsTerm(Termlike t);
+    boolean contains(Termlike t);
 
-    default boolean containsTermRecursively(Term t) {
-        return containsTerm(t);
+    default boolean containsRecursively(Term t) {
+        return contains(t);
     }
 
 
-    /** whether any subterms (recursively) have a non-DTernal temporal relation */
-    boolean hasTemporal();
+    /** whether any subterms (recursively) have
+     *  non-DTernal temporal relation */
+    default boolean isTemporal() {
+        return false;
+    }
 
     default boolean hasAll(int structuralVector) {
         return Op.hasAll(structure(), structuralVector);
@@ -74,7 +77,10 @@ public interface Termlike {
         return otherTermsVolume > volume();
     }
 
-    @Nullable Term termOr(int i, @Nullable Term ifOutOfBounds);
+    /** tries to get the ith subterm (if this is a TermContainer),
+     *  or of is out of bounds or not a container,
+     *  returns the provided ifOutOfBounds */
+    @Nullable <T extends Term> T sub(int i, @Nullable T ifOutOfBounds);
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >
@@ -126,25 +132,52 @@ public interface Termlike {
      * @param v*/
     boolean OR(Predicate<Term> v);
 
+    /** returns the number of subterms (1st layer) having the provided operator */
+    default int subCount(Op o) {
+        return 0;
+    }
+
     /** total # of variables, excluding pattern variables */
     default int vars() {
         return varDep() + varIndep() + varQuery();
     }
 
-    /** # of contained independent variables */
-    int varIndep();
-    /** # of contained dependent variables */
-    int varDep();
-    /** # of contained query variables */
-    int varQuery();
-    /** # of contained pattern variables */
-    int varPattern();
+    /** # of contained independent variables in subterms (1st layer only) */
+    default int varIndep() { return 0; }
+    /** # of contained dependent variables in subterms (1st layer only) */
+    default int varDep() { return 0; }
+    /** # of contained query variables in subterms (1st layer only) */
+    default int varQuery() { return 0; }
+    /** # of contained pattern variables in subterms (1st layer only) */
+    default int varPattern() { return 0; }
 
 
-    default boolean unificationPossible(@Nullable Op t) {
+
+    default boolean unifyPossible(@Nullable Op t) {
         return (t == Op.VAR_PATTERN) ?
                 (varPattern() > 0) :
                 hasAny(t == null ? Op.VariableBits : t.bit);
+    }
+
+    /** used to decide if a compound is "potentially" dynamic, or
+     *  whether it can safely be cached/memoized -- or if it must be evaluated.
+     *  if unsure, err on the side of caution and return true.
+     */
+    default boolean isDynamic() {
+        return false;
+    }
+
+    /** return whether a subterm op at an index is an operator.
+     * if there is no subterm or the index is out of bounds, returns false.
+     */
+    default boolean subOpIs(int i, Op o) {
+        Term x = sub(i, null);
+        return x != null && x.op() == o;
+    }
+
+    /** @return null for no-Op / not-applicable */
+    @Nullable default Op op() {
+        return null;
     }
 
 }

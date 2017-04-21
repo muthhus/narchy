@@ -156,7 +156,7 @@ public class TermIndexTest {
 
         //create by composition
         Compound b = (Compound) i.get(i.term('(' + s + ')'), true).term();
-        testShared(a.term(), b.get(0));
+        testShared(a.term(), b.sub(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);
 
@@ -181,7 +181,7 @@ public class TermIndexTest {
         if (t1 instanceof Compound) {
             //test all subterms are shared
             for (int i = 0; i < t1.term().size(); i++)
-                testShared(((Compound) t1).get(i), ((Compound) t2).get(i));
+                testShared(((Compound) t1).sub(i), ((Compound) t2).sub(i));
         }
     }
 

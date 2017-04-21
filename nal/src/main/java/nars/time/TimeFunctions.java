@@ -187,7 +187,7 @@ public interface TimeFunctions {
                 occReturn[1] = union.b;
 
                 //merge all events
-                derived = merge(derived.get(0), taskStart, derived.get(1), beliefStart);
+                derived = merge(derived.sub(0), taskStart, derived.sub(1), beliefStart);
 
             } else {
 
@@ -195,7 +195,7 @@ public interface TimeFunctions {
                 if (derived.isCommutative()) {
 
                     Term bt = p.beliefTerm;
-                    Term d0 = derived.get(0);
+                    Term d0 = derived.sub(0);
 
                     if (derivationMatch(bt, d0))
                         dt *= -1;
@@ -387,11 +387,11 @@ public interface TimeFunctions {
         if (derived.size() == 2) {
 
             Compound from = p.task.term();
-            int occA = from.subtermTime(derived.get(0));
+            int occA = from.subtermTime(derived.sub(0));
 
             if (occA != DTERNAL) {
 
-                int occB = from.subtermTime(derived.get(1));
+                int occB = from.subtermTime(derived.sub(1));
 
                 if (occB != DTERNAL) {
                     if (!p.task.isEternal()) {
@@ -773,7 +773,7 @@ public interface TimeFunctions {
             int derivedInT = dtTerm.subtermTime(derived);
             if (derivedInT == DTERNAL && derived.op() == Op.IMPL) {
                 //try to find the subtermTime of the implication's subject
-                derivedInT = dtTerm.subtermTime(derived.get(0));
+                derivedInT = dtTerm.subtermTime(derived.sub(0));
             }
 
             if (derivedInT == DTERNAL) {
@@ -842,8 +842,8 @@ public interface TimeFunctions {
                     throw new InvalidTermException(derived.op(), derived.toArray(), "expectd arity=2");
 
                 //assume derived has 2 terms exactly
-                Term da = derived.get(0);
-                Term db = derived.get(1);
+                Term da = derived.sub(0);
+                Term db = derived.sub(1);
 
                 Compound tt = task.term();
                 int ta = tt.subtermTime(da);
@@ -887,11 +887,11 @@ public interface TimeFunctions {
 
         occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
 
-        if (pre && derived.get(0) instanceof Compound) {
+        if (pre && derived.sub(0) instanceof Compound) {
             //set subterm 0's DT
 
 
-            Compound preSub = (Compound) derived.get(0);
+            Compound preSub = (Compound) derived.sub(0);
             boolean neg = preSub.op() == NEG;
             if (neg) {
                 preSub = (Compound) preSub.unneg(); //unwrap
@@ -900,7 +900,7 @@ public interface TimeFunctions {
             int preDT;
             if ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL)) {
                 preDT = (taskDT - beliefDT);
-                if (!task.term(0).equals(preSub.get(0)))
+                if (!task.term(0).equals(preSub.sub(0)))
                     preDT = -preDT; //reverse the order
             } else {
                 preDT = DTERNAL;
@@ -912,12 +912,12 @@ public interface TimeFunctions {
                 return null;
 
             derived = compoundOrNull((p.index.the(derived,
-                    new Term[]{$.negIf(newPresub, neg), derived.get(1)})
+                    new Term[]{$.negIf(newPresub, neg), derived.sub(1)})
             ));
         }
-        if (post && derived.get(1) instanceof Compound) {
+        if (post && derived.sub(1) instanceof Compound) {
 
-            Compound postSub = (Compound) derived.get(1);
+            Compound postSub = (Compound) derived.sub(1);
             boolean neg = postSub.op() == NEG;
             if (neg) {
                 postSub = (Compound) postSub.unneg(); //unwrap
@@ -926,7 +926,7 @@ public interface TimeFunctions {
             int postDT;
             if ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL)) {
                 postDT = (taskDT - beliefDT);
-                if (task.term().size() > 1 && postSub.size() > 1 && !task.term(1).equals(postSub.get(1)))
+                if (task.term().size() > 1 && postSub.size() > 1 && !task.term(1).equals(postSub.sub(1)))
                     postDT = -postDT; //reverse the order
             } else {
                 postDT = DTERNAL;
@@ -934,14 +934,14 @@ public interface TimeFunctions {
 
 
             //set subterm 1's DT
-            Term newSubterm1 = p.index.the((Compound) derived.get(1), postDT);
+            Term newSubterm1 = p.index.the((Compound) derived.sub(1), postDT);
 
             if (isTrueOrFalse(newSubterm1))
                 return null;
 
 
             derived = compoundOrNull(
-                    p.index.the(derived, new Term[]{derived.get(0), $.negIf(newSubterm1, neg)})
+                    p.index.the(derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)})
             );
 
         }
@@ -981,7 +981,7 @@ public interface TimeFunctions {
         if (derived.op().temporal && cp instanceof Compound) {
 
             Compound ccc = (Compound) cp;
-            Term ca = ccc.get(0);
+            Term ca = ccc.sub(0);
 
             //System.out.println(tt + " "  + bb);
 
@@ -999,7 +999,7 @@ public interface TimeFunctions {
          */
             int s = cp.size();
             if (s == 2) {
-                Term cb = ccc.get(1);
+                Term cb = ccc.sub(1);
 
                 //chained relations
 //                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
