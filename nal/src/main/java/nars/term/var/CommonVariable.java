@@ -64,10 +64,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
             //throw new RuntimeException("variable oob");
         }
 
-        if (a == b) {
-            throw new RuntimeException("variables equal");
-            //return A;
-        }
+        assert(a!=b);
 
         //lexical ordering: swap
         if (b > a) {
@@ -77,6 +74,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
         }
 
         Op type = A.op();
+
         assert(B.op()==type);
 
 

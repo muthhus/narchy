@@ -119,22 +119,8 @@ public interface Atomic extends Term {
     }
 
     @Override
-    int varIndep();
-
-    @Override
-    int varDep();
-
-    @Override
-    int varQuery();
-
-    @Override
     default int structure() {
         return op().bit;
-    }
-
-    @Override
-    default boolean isDynamic() {
-        return false;
     }
 
     @Override

@@ -70,8 +70,4 @@ public interface Variable extends Atomic {
         return hashCode();
     }
 
-    @Override
-    default Term eval(TermIndex termIndex) {
-        return this;
-    }
 }

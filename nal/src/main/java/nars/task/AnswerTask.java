@@ -42,17 +42,7 @@ public class AnswerTask extends ImmutableTask {
         return false;
     }
 
-    @Nullable
-    @Override
-    public Task getParentTask() {
-        return null; //return aBelief;
-    }
 
-    @Nullable
-    @Override
-    public Task getParentBelief() {
-        return null; //return bBelief;
-    }
 
     @Nullable
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {

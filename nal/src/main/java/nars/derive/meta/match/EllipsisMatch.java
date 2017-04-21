@@ -128,11 +128,6 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
         w.append(toString());
     }
 
-    @Override
-    public Term eval(TermIndex index) {
-        return this;
-    }
-
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
         for (Term e : terms) {

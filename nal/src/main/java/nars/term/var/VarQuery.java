@@ -18,31 +18,14 @@ public final class VarQuery extends AbstractVariable {
         return Op.VAR_QUERY;
     }
 
-
-
     @Override
     public int vars() {
         return 1;
     }
 
     @Override
-    public int varDep() {
-        return 0;
-    }
-
-    @Override
-    public int varIndep() {
-        return 0;
-    }
-
-    @Override
     public int varQuery() {
         return 1;
-    }
-
-    @Override
-    public int varPattern() {
-        return 0;
     }
 
 }

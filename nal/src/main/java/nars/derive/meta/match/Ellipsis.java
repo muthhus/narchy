@@ -297,21 +297,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     }
 
     @Override
-    public int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public int varDep() {
-        return 0;
-    }
-
-    @Override
-    public int varQuery() {
-        return 0;
-    }
-
-    @Override
     public int varPattern() {
         return 1;
     }

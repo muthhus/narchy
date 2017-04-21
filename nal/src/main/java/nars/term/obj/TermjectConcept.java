@@ -234,8 +234,4 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
         return term().toString();
     }
 
-    @Override
-    public Term eval(TermIndex index) {
-        return this;
-    }
 }

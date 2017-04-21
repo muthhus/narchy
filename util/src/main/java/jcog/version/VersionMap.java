@@ -72,8 +72,8 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException();
-        //return size() == 0; //slow
+        //throw new UnsupportedOperationException();
+        return map.isEmpty() || size() == 0; //slow
     }
 
 

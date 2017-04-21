@@ -30,25 +30,4 @@ public abstract class AtomicPred<X> extends AtomicString implements BoolPred<X> 
         return Op.ATOM;
     }
 
-
-    @Override
-    public int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public int varDep() {
-        return 0;
-    }
-
-    @Override
-    public int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public int varPattern() {
-        return 0;
-    }
-
 }

@@ -54,9 +54,9 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
 
     @Override
     public final Term eval(TermIndex index) {
+        //safe to return itself because it's probably what is being resolved anyway
         return this;
     }
-
 
     @Override
     public ConceptState state() {
@@ -126,4 +126,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         Concept.delete(this, nar);
         meta = null;
     }
+
+
+
 }

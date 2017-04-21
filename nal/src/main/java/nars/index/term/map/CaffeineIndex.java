@@ -107,14 +107,6 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     }
 
-    @Override
-    public void start(NAR nar) {
-        super.start(nar);
-//        nar.onCycle(()->{
-//            concepts.cleanUp();
-//            subterms.cleanUp();
-//        });
-    }
 
     @NotNull
     @Override
@@ -186,10 +178,10 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         }
     }
 
-    @Override
-    public void commit(Concept c) {
-        //concepts.getIfPresent(c.term());
-    }
+//    @Override
+//    public void commit(Concept c) {
+//        //concepts.getIfPresent(c.term());
+//    }
 
     //    protected Termed theCompoundCreated(@NotNull Compound x) {
 //

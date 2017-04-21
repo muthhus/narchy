@@ -69,9 +69,8 @@ public class Atom extends AtomicString {
 
     @Override public Term eval(TermIndex index) {
         Termed existing = index.get(this); //resolve atoms to their concepts for efficiency
-        if (existing != null)
-            return existing.term(); //assumes the AtomConcept returned is the Term itself, as .term() would return
-        return this;
+        //assumes the AtomConcept returned is the Term itself, as .term() would return
+        return existing != null ? existing.term() : this;
     }
 }
 

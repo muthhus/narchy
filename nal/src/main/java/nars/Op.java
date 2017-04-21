@@ -145,12 +145,7 @@ public enum Op {
 
     /** Image index ("imdex") symbol for products, and anonymous variable in products */
     public static final Atomic Imdex =
-            new GenericVariable(Op.VAR_DEP, "_") {
-                @Override
-                public @NotNull Variable normalize(int serial) {
-                    return super.normalize(serial);
-                }
-            };
+            new GenericVariable(Op.VAR_DEP, "_");
 
     public static final AtomicSingleton True = new AtomicSingleton("†");
     public static final Term[] TrueArray = {True};

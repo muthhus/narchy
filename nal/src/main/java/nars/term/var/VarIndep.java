@@ -26,22 +26,9 @@ public final class VarIndep extends AbstractVariable {
     }
 
     @Override
-    public int varDep() {
-        return 0;
-    }
-
-    @Override
     public int varIndep() {
         return 1;
     }
 
-    @Override
-    public int varQuery() {
-        return 0;
-    }
 
-    @Override
-    public int varPattern() {
-        return 0;
-    }
 }

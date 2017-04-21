@@ -22,11 +22,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         super(reprobes);
     }
 
-    @Override
-    public void forEach(int max, @NotNull Consumer<? super Task> action) {
-        super.forEach(max, action);
-    }
-
 
     @Override
     public float pri(@NotNull Task key) {
@@ -97,6 +92,11 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
             commit();
 
         return x;
+    }
+
+    @Override
+    public void forEach(int max, @NotNull Consumer<? super Task> action) {
+        super.forEach(max, action);
     }
 
 //    public static void flatForget(TaskHijackBag b, @NotNull NAR n) {

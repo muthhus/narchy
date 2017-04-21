@@ -12,8 +12,6 @@ public final class VarDep extends AbstractVariable {
         super(Op.VAR_DEP, id);
     }
 
-
-
     @NotNull
     @Override
     public Op op() {
@@ -30,18 +28,4 @@ public final class VarDep extends AbstractVariable {
         return 1;
     }
 
-    @Override
-    public int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public int varPattern() {
-        return 0;
-    }
 }
