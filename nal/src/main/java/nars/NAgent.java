@@ -467,7 +467,7 @@ abstract public class NAgent implements NSense, NAct {
 
         init();
 
-        Timer t = timer.getAndUpdate((x)-> x==null ? new Timer() : x);
+        Timer t = timer.updateAndGet((x)-> x==null ? new Timer() : x);
 
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
