@@ -47,8 +47,8 @@
         </dependency>
         <dependency>
             <groupId>narchy</groupId>
-            <artifactId>oakgp</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <artifactId>gp</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

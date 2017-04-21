@@ -1,22 +1,15 @@
 {
   "name": "nars_web",
-  "version": "0.0.0",
-  "homepage": "https://github.com/automenta/opennars",
-  "description": "HTML/JS OpenNARS Web Client",
+  "version": "1.0",
+  "homepage": "https://github.com/automenta/narchy",
+  "description": "HTML/JS NARchy Web GUI",
   "directory": "lib/",
   "dependencies": {
     "jquery": "latest",
     "jquery-ui": "latest",
     "lodash": "latest",
     "labjs": "latest",
-    "cytoscape": "latest",
-    "object-editor": "latest",
-    "codemirror": "latest",
-    "golden-layout": "latest",
-    "fastdom": "latest",
-    "jsoneditor": "latest",
-    "d3": "latest",
-    "cesium": "AnalyticalGraphicsInc/cesium#master"
+    "fastdom": "latest"
   },
   "keywords": [
     "nars",
