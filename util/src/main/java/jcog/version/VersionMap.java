@@ -1,5 +1,6 @@
 package jcog.version;
 
+import jcog.data.sexpression.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jgrapht.util.ArrayUnenforcedSet;
@@ -11,18 +12,19 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 
 
-public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
+public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 
     private final Versioning context;
     public final Map<X, Versioned<Y>> map;
     public final int elementStackSizeDefault; //stackSizePerElement
 
+
     public VersionMap(Versioning context, int initialSize, int elementStackSizeDefault) {
         this(context,
-            new HashMap(initialSize)
-            //new UnifiedMap(initialSize)
-            //new LinkedHashMap<>(initialSize)
-            , elementStackSizeDefault
+                new HashMap(initialSize)
+                //new UnifiedMap(initialSize)
+                //new LinkedHashMap<>(initialSize)
+                , elementStackSizeDefault
         );
     }
 
@@ -39,7 +41,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         Versioned<Y> x = map.remove(key);
         if (x != null) {
             Y value = x.get();
-            x.clear();
+            //x.clear();
             return value;
         } else {
             return null;
@@ -61,29 +63,51 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     @Override
     public final int size() {
         final int[] count = {0};
-        map.forEach((k,v)->{
-           if (v.get()!=null)
-               count[0]++;
+        map.forEach((k, v) -> {
+            if (v.get() != null)
+                count[0]++;
         });
         return count[0];
     }
 
     @Override
-    public final boolean isEmpty() {
-        return size()==0;
+    public boolean isEmpty() {
+        throw new UnsupportedOperationException();
+        //return size() == 0; //slow
     }
 
 
-    /** avoid using this if possible because it involves transforming the entries from the internal map to the external form */
+    /**
+     * avoid using this if possible because it involves transforming the entries from the internal map to the external form
+     */
     @NotNull
-    @Override public Set<Entry<X, Y>> entrySet() {
-//        throw new UnsupportedOperationException("inefficient");
-        ArrayUnenforcedSet<Entry<X,Y>> e = new ArrayUnenforcedSet<>(size());
-        map.forEach( (k, v) -> e.add(new SimpleEntry<>(k, v.get())));
+    @Override
+    public Set<Entry<X, Y>> entrySet() {
+        ArrayUnenforcedSet<Entry<X, Y>> e = new ArrayUnenforcedSet<>();
+        map.forEach((k, v) -> e.add(
+            //TODO new LazyMapEntry(k, v)
+            new SimpleEntry<>(k, v.get()))
+        );
         return e;
     }
 
-
+//    public static class LazyMapEntry<K,V>  implements Map.Entry<K,V> {
+//
+//        @Override
+//        public K getKey() {
+//            return key;
+//        }
+//
+//        @Override
+//        public V getValue() {
+//            return null;
+//        }
+//
+//        @Override
+//        public V setValue(V value) {
+//            return null;
+//        }
+//    }
 
     /**
      * records an assignment operation
@@ -94,10 +118,9 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         throw new UnsupportedOperationException("use tryPut(k,v)");
     }
 
-    public final boolean tryPut(X key, Y value) {
-        return getOrCreateIfAbsent(key).set(value)!=null;
+    public boolean tryPut(X key, Y value) {
+        return getOrCreateIfAbsent(key).set(value) != null;
     }
-
 
     public final void putConstant(X key, Y value) {
         map.put(key, new Versioned(value));
@@ -108,7 +131,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
     }
 
     @NotNull
-    public Versioned<Y> newEntry(X keyIgnoredk) {
+    public Versioned<Y> newEntry(Object ignored) {
         return new Versioned<>(context, elementStackSizeDefault);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);
@@ -118,7 +141,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         Set<Entry<X, Versioned<Y>>> ee = map.entrySet();
         for (Entry<X, Versioned<Y>> e : ee) {
             Y y = e.getValue().get();
-            if (y!=null) {
+            if (y != null) {
                 X x = e.getKey();
                 if (!each.test(x, y)) {
                     return false;
@@ -130,7 +153,7 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 
 
     @Override
-    public final Y get(/*X*/Object key) {
+    public Y get(/*X*/Object key) {
         Versioned<Y> v = map.get(key);
         return v != null ? v.get() : null;
     }
@@ -146,12 +169,10 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
 //        return o;
 //    }
 
-    public final Versioned<Y> version(X key) {
+    final Versioned<Y> version(X key) {
         //return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
         return map.get(key);
     }
-
-
 
 
     @Override
@@ -166,5 +187,18 @@ public class VersionMap<X,Y> extends AbstractMap<X, Y>  {
         throw new UnsupportedOperationException(); //requires filtering
         //return map.keySet();
     }
+
+    public static final VersionMap Empty = new VersionMap(new Versioning(0, 0), 0, 0) {
+
+        @Override
+        public boolean tryPut(Object key, Object value) {
+            return false;
+        }
+
+        @Override
+        public Object get(Object key) {
+            return null;
+        }
+    };
 
 }

@@ -89,10 +89,6 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    public final X[] toArrayExact(X[] array) {
-        System.arraycopy(this.items, 0, array, 0, this.size);
-        return array;
-    }
 
 
     public final boolean addIfCapacity(X newItem) {

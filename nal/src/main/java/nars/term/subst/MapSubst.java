@@ -12,6 +12,7 @@ public class MapSubst implements Subst {
     public final Map<Term, Term> xy;
 
     public MapSubst(Map<Term, Term> xy) {
+        assert(!xy.isEmpty());
         this.xy = xy;
     }
 

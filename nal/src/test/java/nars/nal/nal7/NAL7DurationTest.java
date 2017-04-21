@@ -36,7 +36,7 @@ public class NAL7DurationTest {
     @Test
     public void testTemporalIntersection() throws Narsese.NarseseException {
 
-        NAR n = new Default(1024, 1, 3);
+        NAR n = new Default(1024, 4, 3);
         //n.log();
         n.inputAt( 0,"a:x. :|:");
         n.inputAt(10,"a:y. :|:");

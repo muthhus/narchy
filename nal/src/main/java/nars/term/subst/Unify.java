@@ -6,6 +6,7 @@ import jcog.version.Versioning;
 import nars.$;
 import nars.Op;
 import nars.Param;
+import nars.derive.meta.constraint.CommonalityConstraint;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.constraint.NotEqualConstraint;
 import nars.index.term.TermIndex;
@@ -66,11 +67,6 @@ public abstract class Unify implements Termutator, Subst {
     public final VersionMap<Term, Term> yx;
 
 
-    public final boolean mutate(List<Termutator> chain, int next) {
-        return chain.get(++next).mutate(this, chain, next);
-    }
-
-
     protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int ttl) {
         this(index, type, random, new Versioning(stackMax, ttl));
     }
@@ -94,8 +90,9 @@ public abstract class Unify implements Termutator, Subst {
         };
 
         yx = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
-        //reassignerYX = new VersionMap.Reassigner<>(constraintPredicate, yx);
     }
+
+
 
 
     /**
@@ -105,6 +102,9 @@ public abstract class Unify implements Termutator, Subst {
      */
     public abstract boolean onMatch();
 
+    public final boolean mutate(List<Termutator> chain, int next) {
+        return chain.get(++next).mutate(this, chain, next);
+    }
 
     @Override
     public final void clear() {
@@ -189,13 +189,11 @@ public abstract class Unify implements Termutator, Subst {
 
     @Override
     public final boolean mutate(Unify f, List<Termutator> n, int seq) {
-        if (!f.versioning.tick())
-            return false;
-
-        return (seq == -2) ?
-                f.mutate(n, -1) //start combinatorial recurse
-                :
-                f.onMatch(); //end combinatorial recurse
+        return f.versioning.tick() &&
+               (seq == -2) ?
+                    f.mutate(n, -1) //start combinatorial recurse
+                    :
+                    f.onMatch(); //end combinatorial recurse
     }
 
 
@@ -205,7 +203,7 @@ public abstract class Unify implements Termutator, Subst {
                 ||
                 x.unify(y, this)
                 ||
-                (/*y instanceof AbstractVariable && */matchType(y) && matchVarY(x, y))
+                (matchType(y) && matchVarY(x, y))
                 ;
     }
 
@@ -252,11 +250,6 @@ public abstract class Unify implements Termutator, Subst {
         }
         return false;
 
-    }
-
-    @Override
-    public final boolean isEmpty() {
-        return xy.isEmpty();
     }
 
 
@@ -311,6 +304,10 @@ public abstract class Unify implements Termutator, Subst {
         }
     }
 
+    @Override
+    public boolean isEmpty() {
+        throw new UnsupportedOperationException("slow");
+    }
 
     /**
      * returns true if the assignment was allowed, false otherwise
@@ -319,11 +316,10 @@ public abstract class Unify implements Termutator, Subst {
         return yx.tryPut(y, x);
     }
 
+    final class ConstrainedVersionedTerm extends Versioned<Term> {
 
-
-    class ConstrainedVersionedTerm extends Versioned<Term> {
-
-        /** divide constraints into two classes: fast and slow, fast obviously checked first */
+        /** divide constraints into two classes: fast and slow,
+         * fast ieally are checked first */
         Versioned<MatchConstraint> constraints = null;
         Versioned<MatchConstraint> fastConstraints = null;
 
@@ -333,15 +329,15 @@ public abstract class Unify implements Termutator, Subst {
 
         @Nullable
         @Override
-        protected Versioned<Term> set(@Nullable Term current, @NotNull Term next) {
+        public Versioned<Term> set(@NotNull Term next) {
 
-            if (fastConstraints!=null && !valid(next, fastConstraints))
+            if (fastConstraints != null && !valid(next, fastConstraints))
                 return null;
 
-            if (constraints!=null && !valid(next, constraints))
+            if (constraints != null && !valid(next, constraints))
                 return null;
 
-            return super.set(current, next);
+            return super.set(next);
         }
 
         boolean valid(@NotNull Term next, Versioned<MatchConstraint> c) {
@@ -355,12 +351,16 @@ public abstract class Unify implements Termutator, Subst {
 
         public boolean addConstraint(MatchConstraint m) {
             Versioned<MatchConstraint> cc;
-            if (m instanceof NotEqualConstraint) {
+            if (isFast(m)) {
                 cc = fastConstraints!=null ? fastConstraints : (this.fastConstraints = newConstraints());
             } else {
                 cc = constraints !=null ? constraints : (this.constraints = newConstraints());
             }
             return cc.set(m)!=null;
+        }
+
+        boolean isFast(MatchConstraint m) {
+            return !(m instanceof CommonalityConstraint);
         }
 
         public Versioned newConstraints() {
@@ -429,9 +429,9 @@ public abstract class Unify implements Termutator, Subst {
 //    }
 
     @NotNull
-    public final Term yxResolve(@NotNull Term y) {
-        Term y1 = yx.get(y);
-        return (y1 == null) ? y : y1;
+    public final Term yxResolve(@NotNull Term t) {
+        Term u = yx.get(t);
+        return (u != null) ? u : t;
     }
 
 

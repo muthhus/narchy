@@ -76,23 +76,16 @@ public abstract class Param  {
 
 
 
-
-    /**
-     * maximum changes logged in deriver's stack.
-     * bigger number means deeper unification depth for bigger compounds and more permutations
-     */
-    public final static int UnificationStackMax = 64;
+    public final static int UnificationStackMax = 32;
+    public static final int MaxMatchConstraintsPerVariable = 8;
+    public static final int MaxUnificationVariables = 32;
+    public static final int MaxUnificationVariableStack = 2; //may be able to reduce to 1
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTL = 1024;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;
-
-    public static final int MaxMatchConstraintsPerVariable = 8;
-    public static final int MaxUnificationVariables = 32;
-    public static final int MaxUnificationVariableStack = 8; //may be able to reduce to 1
-
 
     public static int DEFAULT_NAL_LEVEL = 8;
 

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class Versioned<X> extends FasterList<X> {
 
     @NotNull
-    private final Versioning context;
+    protected final Versioning context;
 
     public Versioned(@NotNull Versioned<X> copy) {
         super(copy);
@@ -33,9 +33,6 @@ public class Versioned<X> extends FasterList<X> {
         return this == otherVersioned;
     }
 
-
-
-
 //    boolean revertNext(int count) {
 //        int p = size - count;
 //        if (p >= 0) {
@@ -52,8 +49,7 @@ public class Versioned<X> extends FasterList<X> {
      */
     @Nullable
     public final X get() {
-        //return getLast();
-        int s = this.size();
+        int s = this.size;
         return s > 0 ? this.items[s - 1] : null;
     }
 
@@ -63,15 +59,10 @@ public class Versioned<X> extends FasterList<X> {
      * returns null if the capacity was hit, or some other error
      */
     @Nullable
-    public final Versioned<X> set(X nextValue) {
-
-        X current = get();
-        return set(current, nextValue);
+    public Versioned<X> set(X nextValue) {
+        return context.nextChange(this, nextValue) ? this : null;
     }
 
-    @Nullable protected Versioned<X> set(@Nullable X current, @NotNull X next) {
-        return context.nextChange(this, next) ? this : null;
-    }
 
     @Override
     public final String toString() {

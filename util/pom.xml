@@ -30,19 +30,18 @@
     </properties>
 
 
-
     <!--<reporting>-->
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-javadoc-plugin</artifactId>-->
-                <!--<version>2.10.3</version>-->
-                <!--<configuration>-->
-                    <!--<failOnError>false</failOnError>-->
-                    <!--<force>true</force>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
+    <!--<plugins>-->
+    <!--<plugin>-->
+    <!--<groupId>org.apache.maven.plugins</groupId>-->
+    <!--<artifactId>maven-javadoc-plugin</artifactId>-->
+    <!--<version>2.10.3</version>-->
+    <!--<configuration>-->
+    <!--<failOnError>false</failOnError>-->
+    <!--<force>true</force>-->
+    <!--</configuration>-->
+    <!--</plugin>-->
+    <!--</plugins>-->
     <!--</reporting>-->
 
     <build>
@@ -72,6 +71,9 @@
                 <version>1.5.0</version>
             </plugin>
 
+
+
+
             <!--<plugin>-->
             <!--<groupId>org.apache.maven.plugins</groupId>-->
             <!--<artifactId>maven-site-plugin</artifactId>-->
@@ -80,7 +82,6 @@
 
         </plugins>
     </build>
-
 
 
     <dependencies>
@@ -146,10 +147,10 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.codehaus.janino</groupId>-->
-            <!--<artifactId>janino</artifactId>-->
-            <!--<version>3.0.6</version>-->
-            <!---->
+        <!--<groupId>org.codehaus.janino</groupId>-->
+        <!--<artifactId>janino</artifactId>-->
+        <!--<version>3.0.6</version>-->
+        <!---->
         <!--</dependency>-->
 
 
@@ -178,7 +179,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
-            
+
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -189,7 +190,7 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.3</version>
-            
+
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
@@ -224,23 +225,23 @@
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.googlecode.concurrent-trees/concurrent-trees &ndash;&gt;-->
         <!--<dependency>-->
-            <!--<groupId>com.googlecode.concurrent-trees</groupId>-->
-            <!--<artifactId>concurrent-trees</artifactId>-->
-            <!--<version>2.6.0</version>-->
-            <!---->
+        <!--<groupId>com.googlecode.concurrent-trees</groupId>-->
+        <!--<artifactId>concurrent-trees</artifactId>-->
+        <!--<version>2.6.0</version>-->
+        <!---->
         <!--</dependency>-->
 
         <!--<dependency>-->
-            <!--<groupId>ognl</groupId>-->
-            <!--<artifactId>ognl</artifactId>-->
-            <!--<version>3.1.12</version>-->
-            <!---->
-            <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<artifactId>javassist</artifactId>-->
-                    <!--<groupId>org.javassist</groupId>-->
-                <!--</exclusion>-->
-            <!--</exclusions>-->
+        <!--<groupId>ognl</groupId>-->
+        <!--<artifactId>ognl</artifactId>-->
+        <!--<version>3.1.12</version>-->
+        <!---->
+        <!--<exclusions>-->
+        <!--<exclusion>-->
+        <!--<artifactId>javassist</artifactId>-->
+        <!--<groupId>org.javassist</groupId>-->
+        <!--</exclusion>-->
+        <!--</exclusions>-->
         <!--</dependency>-->
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.addthis/stream-lib &ndash;&gt;-->
@@ -251,13 +252,11 @@
         <!--</dependency>-->
 
 
-
-
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
             <version>2.5.1</version>
-            
+
         </dependency>
 
         <dependency>
@@ -276,24 +275,24 @@
                 </exclusion>
             </exclusions>
         </dependency>
-            <!--<dependency>-->
-                <!--<groupId>org.powermock</groupId>-->
-                <!--<artifactId>powermock-module-junit4</artifactId>-->
-                <!--<version>1.6.6</version>-->
-                <!--&lt;!&ndash;<scope>test</scope>&ndash;&gt;-->
-            <!--</dependency>-->
-            <!--<dependency>-->
-                <!--<groupId>org.powermock</groupId>-->
-                <!--<artifactId>powermock-api-mockito2</artifactId>-->
-                <!--<version>1.6.6</version>-->
-                <!--&lt;!&ndash;<scope>test</scope>&ndash;&gt;-->
-            <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.powermock</groupId>-->
+        <!--<artifactId>powermock-module-junit4</artifactId>-->
+        <!--<version>1.6.6</version>-->
+        <!--&lt;!&ndash;<scope>test</scope>&ndash;&gt;-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--<groupId>org.powermock</groupId>-->
+        <!--<artifactId>powermock-api-mockito2</artifactId>-->
+        <!--<version>1.6.6</version>-->
+        <!--&lt;!&ndash;<scope>test</scope>&ndash;&gt;-->
+        <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
         <!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher -->
         <!--<dependency>-->
-            <!--<groupId>org.junit.platform</groupId>-->
-            <!--<artifactId>junit-platform-launcher</artifactId>-->
-            <!--<version>1.0.0-M3</version>-->
+        <!--<groupId>org.junit.platform</groupId>-->
+        <!--<artifactId>junit-platform-launcher</artifactId>-->
+        <!--<version>1.0.0-M3</version>-->
         <!--</dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine -->
@@ -311,17 +310,17 @@
         <!--<scope>test</scope>-->
         <!--</dependency>-->
         <!--<dependency>-->
-            <!--<groupId>junit</groupId>-->
-            <!--<artifactId>junit</artifactId>-->
-            <!--<version>4.12</version>-->
-            <!--<scope>test</scope>-->
+        <!--<groupId>junit</groupId>-->
+        <!--<artifactId>junit</artifactId>-->
+        <!--<version>4.12</version>-->
+        <!--<scope>test</scope>-->
         <!--</dependency>-->
 
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>2.4.0</version>
-            
+
         </dependency>
 
 
@@ -372,9 +371,9 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>javax.inject</groupId>-->
-            <!--<artifactId>javax.inject</artifactId>-->
-            <!--<version>1</version>-->
+        <!--<groupId>javax.inject</groupId>-->
+        <!--<artifactId>javax.inject</artifactId>-->
+        <!--<version>1</version>-->
         <!--</dependency>-->
 
 
@@ -384,7 +383,6 @@
             <artifactId>truth</artifactId>
             <scope>test</scope>
         </dependency>
-
 
 
     </dependencies>

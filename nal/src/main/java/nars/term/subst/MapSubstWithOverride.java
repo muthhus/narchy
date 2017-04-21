@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import nars.Param;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,6 +15,7 @@ public final class MapSubstWithOverride extends MapSubst {
         super(xy);
         this.ox = ox;
         this.oy = oy;
+        if (Param.DEBUG && ox.equals(oy)) throw new RuntimeException("pointless substitution");
     }
 
     @Override

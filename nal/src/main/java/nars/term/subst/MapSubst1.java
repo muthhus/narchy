@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import nars.Param;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,10 @@ public class MapSubst1 implements Subst {
     /**
      * creates a substitution of one variable; more efficient than supplying a Map
      */
-    public MapSubst1(Term from, Term to) {
+    public MapSubst1(@NotNull Term from, @NotNull Term to) {
+        if (Param.DEBUG && from.equals(to))
+            throw new RuntimeException("pointless substitution");
+
         this.from = from;
         this.to = to;
     }
