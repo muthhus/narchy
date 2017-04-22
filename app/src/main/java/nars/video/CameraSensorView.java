@@ -32,7 +32,10 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     public void accept(NAR nn) {
         now = nn.time();
         dur = nn.dur();
-        maxConceptPriority = nar instanceof Default ? ((Default) nar).focus.active.priMax() : 1; //HACK TODO cache this
+        maxConceptPriority = 1;
+//            nar instanceof Default ?
+//                ((Default) nar).focus.active.priMax() :
+//                1; //HACK TODO cache this
     }
 
     @Override

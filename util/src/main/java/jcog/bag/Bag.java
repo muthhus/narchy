@@ -1,6 +1,7 @@
 package jcog.bag;
 
 import jcog.Util;
+import jcog.pri.PForget;
 import jcog.pri.PLink;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -55,11 +56,14 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
         float estimatedExcess = (m + p) - (c * (1f - temperature));
-        float presentAndFutureExcess = estimatedExcess * 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-        float perMember = presentAndFutureExcess / s;
-        return (perMember >= priEpsilon) ?
-            f.valueOf( Util.unitize( perMember ) ) :
-            null;
+        if (estimatedExcess > 0) {
+            float presentAndFutureExcess = estimatedExcess;
+                    //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
+            float perMember = Util.unitize(presentAndFutureExcess / s);
+            if (perMember >= priEpsilon)
+                return f.valueOf(presentAndFutureExcess);
+        }
+        return null;
     }
 
     /**
@@ -280,27 +284,33 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     /**
-     * slow, probably want to override in subclasses
+     * default slow implementation.
+     * returns a value between 0..1.0. if empty, returns 0
      */
     default float priMin() {
         float[] min = {Float.POSITIVE_INFINITY};
         forEach(b -> {
-            float p = priSafe(b, 0);
+            float p = priSafe(b, Float.POSITIVE_INFINITY);
             if (p < min[0]) min[0] = p;
         });
-        return min[0];
+        float m = min[0];
+        if (Float.isFinite(m)) return m;
+        else return 0;
     }
 
     /**
-     * slow, probably want to override in subclasses
+     * default slow implementation.
+     * returns a value between 0..1.0. if empty, returns 0
      */
     default float priMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
         forEach(b -> {
-            float p = priSafe(b, 0);
+            float p = priSafe(b, Float.NEGATIVE_INFINITY);
             if (p > max[0]) max[0] = p;
         });
-        return max[0];
+        float m = max[0];
+        if (Float.isFinite(m)) return m;
+        else return 0;
     }
 
 

@@ -55,7 +55,6 @@ public class ConceptBagFocus implements Focus {
 
     @Override
     public Iterable<PLink<Concept>>/* <PLink<Concept>> */ concepts() {
-        active.commit();
         return active; //HACK here it is purposefully being ambiguous about the type whether it is Termed or more specifically Concept
     }
 

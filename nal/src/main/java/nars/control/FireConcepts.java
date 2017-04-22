@@ -45,7 +45,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * since results between batches can affect the next one.
      */
     public final MutableIntRange termlinksFiredPerConcept = new MutableIntRange(1, 1);
-    public final MutableInteger derivationsInputPerCycle;
+//    public final MutableInteger derivationsInputPerCycle;
+//    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
     protected final NAR nar;
     private final On on;
     public final Focus source;
@@ -161,7 +162,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         this.premiser = premiseBuilder;
 
         this.rate = new FloatParam(0.25f);
-        this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
+
         this.on = nar.onCycle(this);
     }
 

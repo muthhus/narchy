@@ -26,12 +26,6 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
     }
 
     @Override
-    protected Consumer<V> forget(float rate) {
-        return null;
-    }
-
-
-    @Override
     public float pri(@NotNull V key) {
         return key.pri();
     }

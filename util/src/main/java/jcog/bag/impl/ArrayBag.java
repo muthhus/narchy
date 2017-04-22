@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Consumer;
 
 
@@ -29,7 +30,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     /**
      * inbound pressure sum since last commit
      */
-    public float pressure, mass;
+    public final DoubleAdder pressure = new DoubleAdder();
+
+    float mass;
 
     private final AtomicBoolean unsorted = new AtomicBoolean(false);
 
@@ -70,7 +73,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     @Override
     public void pressurize(float f) {
-        pressure += f;
+        pressure.add(f);
     }
 
     @NotNull
@@ -322,9 +325,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflow) {
 
-        final boolean[] isNew = {false};
+        pressurize(b.pri() * scale);
 
-        pressure += b.pri() * scale;
+        final boolean[] isNew = {false};
 
         X key = key(b);
         PLink<X> v = map.compute(key, (kk, existing) -> {
@@ -340,7 +343,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 float oo = mergeFunction.merge(n, b, scale);
                 float np = n.pri();
 
-                if (size() >= capacity && np < priMin()) {
+                if (size() >= capacity && np < priMinFast()) {
                     res = null; //failed insert
                     o = 0;
                 } else {
@@ -393,10 +396,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     @Deprecated
     public Bag<X, PLink<X>> commit() {
-        float p = this.pressure;
+        double p = this.pressure.sumThenReset();
         if (p > 0) {
-            this.pressure = 0;
-            return commit(PForget.forget(size(), capacity(), p, mass, PForget::new));
+            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget::new));
         }
         return this;
     }
@@ -434,9 +436,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      */
     @NotNull
     protected ArrayBag<X> update(@Nullable Consumer<PLink<X>> each, boolean checkCapacity) {
-
-        if (each != null)
-            this.pressure = 0; //reset pressure accumulator
 
         synchronized (items) {
 
@@ -733,16 +732,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
     }
 
-
-    @Override
-    public float priMax() {
-        PLink x;
-        //synchronized (items) {
-        x = items.first();
-        //}
-        return x != null ? x.priSafe(-1) : 0f;
-    }
-
     protected void ensureSorted() {
         if (unsorted.compareAndSet(true, false)) {
             sort();
@@ -750,12 +739,29 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     @Override
+    public float priMax() {
+        PLink x;
+        ensureSorted();
+        //synchronized (items) {
+        x = items.first();
+        //}
+        return x != null ? x.priSafe(0) : 0f;
+    }
+
+    @Override
     public float priMin() {
         PLink x;
-        //synchronized (items) {
+        ensureSorted();
+        return priMinFast();
+
+
+    }
+
+    /** doesnt ensure sorting to avoid synchronization */
+    float priMinFast() {
+        PLink x;
         x = items.last();
-        //}
-        return x != null ? x.priSafe(-1) : 0f;
+        return x != null ? x.priSafe(0) : 0f;
     }
 
 

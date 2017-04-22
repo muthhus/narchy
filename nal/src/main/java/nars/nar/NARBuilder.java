@@ -65,11 +65,11 @@ public interface NARBuilder {
                 return f.apply(termlink, tasklink);
             }
 
-            @NotNull
-            @Deprecated @Override
-            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-                return new DefaultHijackBag<>(blend, reprobes);
-            }
+//            @NotNull
+//            @Deprecated @Override
+//            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+//                return new DefaultHijackBag<>(blend, reprobes);
+//            }
         };
 
 
@@ -185,15 +185,14 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(16 * 768);
-        nar.deriver.derivationsInputPerCycle.setValue(16 * 384);
+        nar.deriver.rate.setValue(0.25f);
 
         nar.termVolumeMax.setValue(96);
 
         nar.beliefConfidence(0.8f);
         nar.goalConfidence(0.8f);
 
-        float p = 1f;
+        float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;

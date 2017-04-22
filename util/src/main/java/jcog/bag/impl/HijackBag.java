@@ -30,10 +30,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public final DoubleAdder pressure = new DoubleAdder();
 
-    int size = 0;
+    int size;
     float mass;
-    float priMin;
-    float priMax;
 
     public HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
@@ -295,7 +293,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 onAdded(added);
             } else if (add) {
                 //rejected: add but not added and not merged
-                pressurize(pri(adding) * scale);
             }
 
 
@@ -391,36 +388,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     @Override
     public final V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
-        V y = update(key(v), v, scale);
+        pressurize(priSafe(v, 0) * scale);
 
-        if (y != null)
-            stretchRange(pri(y));
+        V y = update(key(v), v, scale);
 
         return y;
     }
 
 
-    /**
-     * considers if this priority value stretches the current min/max range
-     * this value will be updated for certain during a commit, so this value
-     * only improves accuracy between commits.
-     */
-    private void stretchRange(float p) {
-        if (p == p) {
-            if (p > priMax) priMax = p;
-            if (p < priMin) priMin = p;
-        }
-    }
-
-    @Override
-    public float priMin() {
-        return priMin;
-    }
-
-    @Override
-    public float priMax() {
-        return priMax;
-    }
 
     @Override
     public @Nullable V get(@NotNull Object key) {
@@ -662,8 +637,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             }
 
             float mass = 0;
-            float min = Float.POSITIVE_INFINITY;
-            float max = Float.NEGATIVE_INFINITY;
+
             int count = 0;
 
             AtomicReferenceArray<V> a = map.get();
@@ -676,8 +650,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 float p = priSafe(f, -1);
                 if (p >= 0) {
                     count++;
-                    if (p > max) max = p;
-                    if (p < min) min = p;
                     mass += p;
                 } else {
                     if (a.compareAndSet(i, f, null)) {
@@ -687,14 +659,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             }
 
             this.size = count;
-
-            if (min == Float.POSITIVE_INFINITY) {
-                this.priMin = 0;
-                this.priMax = 0;
-            } else {
-                this.priMin = min;
-                this.priMax = max;
-            }
 
             this.mass = mass;
 
