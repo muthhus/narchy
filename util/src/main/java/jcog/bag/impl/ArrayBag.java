@@ -39,8 +39,14 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         this(0, mergeFunction, map);
     }
 
+    static final class SortedPLinks extends SortedArray {
+        @Override protected Object[] newArray(int oldSize) {
+            return new PLink[grow(oldSize)];
+        }
+    }
+
     public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
-        super(PLink[]::new, map);
+        super(new SortedPLinks(), map);
 
         this.mergeFunction = mergeFunction;
         this.capacity = cap;
@@ -285,21 +291,12 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     @NotNull
     @Override
-    public ArrayBag<X> sample(int n, @NotNull Predicate<? super PLink<X>> target) {
-        forEachWhile(target, n);
-        return this;
-    }
-
-    @Override
-    public Bag<X, PLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super PLink<X>> target) {
-        //HACK
-        forEachWhile(x -> target.intValueOf(1, x) > 0, n);
-        return this;
+    public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflow) {
-
 
         final boolean[] isNew = {false};
 

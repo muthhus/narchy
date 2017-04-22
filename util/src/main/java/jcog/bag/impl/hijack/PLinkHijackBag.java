@@ -7,6 +7,8 @@ import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static jcog.pri.Priority.EPSILON_DEFAULT;
 
 /**
@@ -27,6 +29,12 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     @Override
     public X key(PLink<X> value) {
         return value.get();
+    }
+
+    /** optimized for PLink */
+    @Override
+    public void forEachKey(@NotNull Consumer<? super X> each) {
+        forEach(x -> each.accept(x.get()));
     }
 
 //    @NotNull

@@ -6,8 +6,8 @@ import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.Focus;
 import nars.NAR;
+import nars.concept.Concept;
 import nars.term.Termed;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,13 +24,13 @@ public class ConceptBagFocus implements Focus {
      * concepts active in this cycle
      */
     @NotNull
-    public final Bag<Termed,PLink<Termed>> active;
+    public final Bag<Concept,PLink<Concept>> active;
 
     @Deprecated
     public final transient @NotNull NAR nar;
 
 
-    public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Termed, PLink<Termed>> conceptBag) {
+    public ConceptBagFocus(@NotNull NAR nar, @NotNull Bag<Concept, PLink<Concept>> conceptBag) {
 
         this.nar = nar;
 
@@ -39,9 +39,11 @@ public class ConceptBagFocus implements Focus {
 
 
 
-    @Override
-    public PLink<Termed> activate(/*Concept*/ Termed concept, float priToAdd) {
-        return active.put(new RawPLink<>(concept, priToAdd * activationRate.floatValue() ));
+    @NotNull
+    public PLink<Concept> activate(@NotNull Concept concept, float priToAdd) {
+        RawPLink<Concept> link = new RawPLink<>(concept, priToAdd * activationRate.floatValue());
+        active.put(link);
+        return link; //return the link even if the put failed and returned null
     }
 
     @Override
@@ -52,14 +54,14 @@ public class ConceptBagFocus implements Focus {
 
 
     @Override
-    public Iterable/* <PLink<Concept>> */ concepts() {
+    public Iterable<PLink<Concept>>/* <PLink<Concept>> */ concepts() {
         active.commit();
         return active; //HACK here it is purposefully being ambiguous about the type whether it is Termed or more specifically Concept
     }
 
     @Override
-    public void sample(int max, IntObjectToIntFunction/*<? super PLink<Concept>>*/ c) {
-        active.sample(max, c);
+    public void sample(Bag.BagCursor<? super PLink<Concept>> c) {
+        active.sample(c);
     }
 
 

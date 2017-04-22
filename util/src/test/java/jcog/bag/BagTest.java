@@ -217,15 +217,10 @@ public class BagTest {
     public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
         DoubleArrayList f = new DoubleArrayList(n);
         if (!b.isEmpty()) {
-            for (int i = 0; i < n; i++) {
-                @Nullable Prioritized sample = b.sample();
-                if (sample!=null) {
-                    float p = sample.pri();
-                    f.add(p);
-                } else {
-                    f.add(-1); //miss
-                }
-            }
+            b.sample(n, x -> {
+                f.add(x.pri());
+            });
+
         }
         EmpiricalDistribution e = new EmpiricalDistribution(bins);
         e.load(f.toArray());

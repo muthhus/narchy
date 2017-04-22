@@ -775,7 +775,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 }
             }
 
-            float p = nar.pri(s, Float.NaN);
+            float p = nar.pri(s);
             g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
 
             return b != null ? b.conf() : 0;

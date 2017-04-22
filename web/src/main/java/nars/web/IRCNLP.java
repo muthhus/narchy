@@ -73,22 +73,22 @@ public class IRCNLP extends IRC {
         this.nar = nar;
         this.channels = channels;
 
-        new Thread(()->{
-            while (true) {
-                if (!out.isEmpty()) {
-                    try {
-                        PLink<String> next = out.pop();
-                        String s = next.get();
-                        send(channels, s).run();
-                        prevOut.commit();
-                        prevOut.put(next);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                Util.pause(5500);
-            }
-        }).start();
+//        new Thread(()->{
+//            while (true) {
+//                if (!out.isEmpty()) {
+//                    try {
+//                        PLink<String> next = out.pop();
+//                        String s = next.get();
+//                        send(channels, s).run();
+//                        prevOut.commit();
+//                        prevOut.put(next);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                Util.pause(5500);
+//            }
+//        }).start();
 
         new MyLeakOut(nar, channels);
 

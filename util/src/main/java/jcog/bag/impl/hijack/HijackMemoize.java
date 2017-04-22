@@ -79,7 +79,7 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
      * harder items to sustain longer
      * */
     public float value(@NotNull K k) {
-        return 0.25f;
+        return 0.5f;
     }
 
     @Override

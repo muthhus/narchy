@@ -25,10 +25,10 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     protected final @NotNull SortedArray<L> items;
 
 
-    public SortedListTable(IntFunction<L[]> builder, @NotNull Map<V, L> map) {
+    public SortedListTable(SortedArray<L> items, @NotNull Map<V, L> map) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
-        this.items = new SortedArray<>(builder);
+        this.items = items;
     }
 
     @NotNull

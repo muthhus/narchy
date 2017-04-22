@@ -130,42 +130,34 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     }
 
     @Override
-    public void value(Termed t, float scale) {
+    public void value(Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        PLink<Termed> lt = nar.activate(t, inPri * scale);
-        if (lt != null) {
+        termBidi(c, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
 
-            Concept u = (Concept) lt.get();
-            tasklink(u, scale);
+        if (c instanceof Concept)
+            tasklink((Concept)c, scale);
 
-        }
-
-        termBidi(t, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
     }
 
     @Nullable
     void link(@NotNull Termed target, float scale, int depth) {
 
-        boolean isntVariable = !(target instanceof Variable);
-
-        if (isntVariable) {
-            Concept termConcept = nar.conceptualize(target);
-            if (termConcept != null)
-                target = termConcept;
-        } else {
+        if ((target instanceof Variable)) {
             if (target.op()==VAR_QUERY)
                 return; //dont create termlinks for query variables
+        } else {
+            @Nullable PLink<Concept> termConcept = nar.activate(target, inPri * scale);
+            if (termConcept != null)
+                target = termConcept.get();
         }
 
         float parentActivation = scale;
-        int nextDepth = depth + 1;
         Term targetTerm = target.term();
-        if (nextDepth <= termlinkDepth && targetTerm instanceof Compound) {
-            parentActivation = linkSubterms(((Compound) targetTerm).subterms(), scale, nextDepth);
-        }
-
-        if (target instanceof AtomConcept) {
+        if (target instanceof Compound) {
+            if (depth + 1 <= termlinkDepth)
+                parentActivation = linkSubterms(((Compound) targetTerm).subterms(), scale, depth + 1);
+        } else if (target instanceof AtomConcept) {
             //activation terminating at an atom: activate through Atom links
             parentActivation = activateAtom((AtomConcept) target, scale);
         }

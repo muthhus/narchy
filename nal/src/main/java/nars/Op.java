@@ -147,16 +147,21 @@ public enum Op {
     public static final Atomic Imdex =
             new GenericVariable(Op.VAR_DEP, "_");
 
-    public static final AtomicSingleton True = new AtomicSingleton("†");
-    public static final Term[] TrueArray = {True};
+    /** absolute true/always */
+    public static final AtomicSingleton True = new AtomicSingleton("†") {
+        @NotNull @Override public Term unneg() {
+            return False;
+        }
+    };
 
+    /** absolute false/never */
     public static final AtomicSingleton False = new AtomicSingleton("Ø") {
-        @NotNull
-        @Override
-        public Term unneg() {
+        @NotNull @Override public Term unneg() {
             return True;
         }
     };
+
+    public static final Term[] TrueArray = {True};
     public static final Term[] FalseArray = {False};
 
     public static final AtomicSingleton Null = new AtomicSingleton("null");

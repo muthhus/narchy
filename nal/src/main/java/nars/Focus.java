@@ -1,9 +1,9 @@
 package nars;
 
+import jcog.bag.Bag;
 import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,15 +15,7 @@ import java.util.Iterator;
  */
 public interface Focus extends Iterable<PLink<Concept>> {
 
-    /**
-     * if the concept is active, returns the concept link after
-     * applying the positive or negative boost factor to its budget
-     *
-     * otherwise returns null
-     */
-
-    @Nullable PLink<Termed> activate(@NotNull Termed term, float priToAdd);
-
+    @NotNull PLink<Concept> activate(@NotNull Concept term, float priToAdd);
 
     /**
      * @return current priority of the concept, or NaN if concept isnt active
@@ -43,21 +35,15 @@ public interface Focus extends Iterable<PLink<Concept>> {
         return concepts().iterator();
     }
 
-
-
-    void sample(int max, @NotNull IntObjectToIntFunction<? super PLink<Concept>> c);
+    void sample(@NotNull Bag.BagCursor<? super PLink<Concept>> c);
 
     Focus NULL_FOCUS = new Focus() {
 
         @Override
-        public PLink<Termed> activate(Termed term, float priToAdd) {
+        public PLink<Concept> activate(Concept term, float priToAdd) {
             return null;
         }
 
-        @Override
-        public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
-
-        }
 
         @Override
         public float pri(@NotNull Termed concept) {
@@ -67,6 +53,11 @@ public interface Focus extends Iterable<PLink<Concept>> {
         @Override
         public Iterable<PLink<Concept>> concepts() {
             return Collections.emptyList();
+        }
+
+        @Override
+        public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> c) {
+
         }
     };
 

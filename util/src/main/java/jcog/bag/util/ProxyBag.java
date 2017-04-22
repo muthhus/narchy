@@ -13,32 +13,24 @@ import java.util.function.Predicate;
 
 /**
  * proxies to a delegate bag
+
+ * TODO find any inherited methods which would return the proxied
+ * bag instead of this instance
  */
-public class ProxyBag<X> implements Bag<X,PLink<X>> {
+abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
 
-    @NotNull Bag<X,PLink<X>> bag;
+    @NotNull Bag<X,Y> bag;
 
-    public ProxyBag(Bag<X,PLink<X>> delegate) {
+    public ProxyBag(Bag<X,Y> delegate) {
         set(delegate);
     }
 
-    @Override
-    public float pri(@NotNull PLink<X> key) {
-        return key.pri();
-    }
-
-    @NotNull
-    @Override
-    public X key(PLink<X> value) {
-        return value.get();
-    }
-
-    public void set(Bag<X,PLink<X>> delegate) {
+    public void set(Bag<X,Y> delegate) {
         bag = delegate;
     }
 
     @Override
-    public @Nullable PLink<X> get(@NotNull Object key) {
+    public @Nullable Y get(@NotNull Object key) {
         return bag.get(key);
     }
 
@@ -48,12 +40,12 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super PLink<X>> each, int n) {
+    public void forEachWhile(@NotNull Predicate<? super Y> each, int n) {
         bag.forEachWhile(each, n);
     }
 
     @Override
-    public void forEach(Consumer<? super PLink<X>> action) {
+    public void forEach(Consumer<? super Y> action) {
         bag.forEach(action);
     }
 
@@ -63,12 +55,12 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super PLink<X>> action) {
+    public void forEachWhile(@NotNull Predicate<? super Y> action) {
         bag.forEachWhile(action);
     }
 
     @Override
-    public void forEach(int max, @NotNull Consumer<? super PLink<X>> action) {
+    public void forEach(int max, @NotNull Consumer<? super Y> action) {
         throw new UnsupportedOperationException(); //typing issue, TODO
     }
 
@@ -79,25 +71,20 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
 
     @Nullable
     @Override
-    public PLink<X> remove(@NotNull X x) {
+    public Y remove(@NotNull X x) {
         return bag.remove(x);
     }
 
     @Override
-    public PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflowing) {
+    public Y put(@NotNull Y b, float scale, @Nullable MutableFloat overflowing) {
         return bag.put(b, scale, overflowing);
     }
 
-    @Override
-    public Bag<X, PLink<X>> sample(int n, @NotNull IntObjectToIntFunction<? super PLink<X>> target) {
-        bag.sample(n, target);
-        return this;
-    }
 
     @NotNull
     @Override
-    public Bag<X,PLink<X>> sample(int n, @NotNull Predicate<? super PLink<X>> target) {
-        bag.sample(n, target);
+    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
+        bag.sample(each);
         return this;
     }
 
@@ -108,7 +95,7 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull
     @Override
-    public Iterator<PLink<X>> iterator() {
+    public Iterator<Y> iterator() {
         return bag.iterator();
     }
 
@@ -140,7 +127,7 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull
     @Override
-    public Bag<X,PLink<X>> commit(Consumer<PLink<X>> update) {
+    public Bag<X,Y> commit(Consumer<Y> update) {
         bag.commit(update);
         return this;
     }
@@ -148,17 +135,17 @@ public class ProxyBag<X> implements Bag<X,PLink<X>> {
 
 
     @Override
-    public void onAdded(PLink<X> v) {
+    public void onAdded(Y v) {
         bag.onAdded(v);
     }
 
     @Override
-    public void onRemoved(@NotNull PLink<X> v) {
+    public void onRemoved(@NotNull Y v) {
         bag.onRemoved(v);
     }
 
     @Override
-    public Bag<X,PLink<X>> commit() {
+    public Bag<X,Y> commit() {
         bag.commit();
         return this;
     }

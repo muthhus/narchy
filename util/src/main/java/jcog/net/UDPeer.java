@@ -451,14 +451,14 @@ public class UDPeer extends UDP {
             byte[] bytes = o.array();
 
             final int[] count = {0};
-            them.sample((int) Math.ceil(pri * them.size()), (to) -> {
-                //logger.debug("({} =/> {})", o, to.addr);
-                if (o.originEquals(to.addrBytes))
-                    return false;
-
-                outBytes(bytes, to.addr);
-                count[0]++;
-                return true;
+            int max = (int) Math.ceil(pri * them.size());
+            them.sample((to) -> {
+                if (!o.originEquals(to.addrBytes)) {
+                    outBytes(bytes, to.addr);
+                    return (count[0]++) < max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+                } else {
+                    return Bag.BagCursorAction.Next;
+                }
             });
             return count[0];
         }

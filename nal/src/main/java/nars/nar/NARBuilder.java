@@ -185,7 +185,7 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.conceptsFiredPerCycle.setValue(768);
+        nar.deriver.derivationsPerCycle.setValue(768);
         nar.deriver.conceptsFiredPerBatch.setValue(32);
         nar.deriver.derivationsInputPerCycle.setValue(384);
 

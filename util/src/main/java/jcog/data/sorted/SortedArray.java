@@ -45,15 +45,15 @@ import java.util.function.IntFunction;
  * @param <E>
  * @author Andreas Hollmann
  */
-public class SortedArray<E> implements Iterable<E> {
+abstract public class SortedArray<E> implements Iterable<E> {
 
 
     final static Object[] zeroList = new Object[0];
 
     public static final int binarySearchThreshold = 8;
-    @Deprecated
-    protected final IntFunction<E[]> builder;
+
     protected E[] list = (E[]) zeroList;
+
     private int size;
 
     public E[] array() {
@@ -145,10 +145,17 @@ public class SortedArray<E> implements Iterable<E> {
      * @param preSort  if true the the list, which is the parameter in the
      *                 constructor will be sorted, before it will be decorated
      */
-    public SortedArray(final IntFunction<E[]> builder) {
-        //this.setDecoratedInternally(decorated); //Collections_1x4.failFastList(decorated));
+    @Deprecated  public static <E> SortedArray<E> get(final IntFunction<E[]> builder) {
+        return new SortedArray<>() {
+            @Override
+            protected E[] newArray(int oldSize) {
+                return builder.apply(grow(oldSize));
+            }
+        };
+    }
 
-        this.builder = builder;
+
+    public SortedArray() {
         this.list = (E[]) zeroList; //builder.apply(initialCapacity);
     }
 
@@ -218,7 +225,7 @@ public class SortedArray<E> implements Iterable<E> {
         int s = this.size;
         E[] l = this.list;
         if (l.length == s) {
-            E[] newList = builder.apply(grow(s));
+            E[] newList = newArray(s);
             System.arraycopy(l, 0, newList, 0, s);
             this.list = l = newList;
         }
@@ -241,7 +248,7 @@ public class SortedArray<E> implements Iterable<E> {
         int oldSize = this.size++;
         E[] list = this.list;
         if (list.length == oldSize) {
-            E[] newItems = builder.apply(grow(oldSize)); //new Object[this.sizePlusFiftyPercent(oldSize)];
+            E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
             if (index > 0) {
                 System.arraycopy(list, 0, newItems, 0, index);
             }
@@ -253,7 +260,9 @@ public class SortedArray<E> implements Iterable<E> {
         list[index] = element;
     }
 
-    private static int grow(int oldSize) {
+    abstract protected E[] newArray(int oldSize);
+
+    protected static int grow(int oldSize) {
         return oldSize == 0 ? 4 : oldSize * 2;
     }
 

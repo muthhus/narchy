@@ -74,17 +74,21 @@ public class Leak<X, Y> {
                     long dt = now - last;
                     if (dt > 0) {
 
-                        float hits = Math.min(rate.floatValue() * dt, maxCost.floatValue());
+                        float budget = Math.min(rate.floatValue() * dt, maxCost.floatValue());
 
-                        final int[] totalCost = {0};
-                        bag.sample((int) Math.ceil(hits), (h, v) -> {
-                            float costf = onOut(v);
-                            int cost = (int) Math.ceil(costf);
-                            totalCost[0] += cost;
-                            return -cost;
+                        final float[] spent = {0};
+                        bag.sample((v) -> {
+                            float cost = onOut(v);
+                            float spe = spent[0] + cost;
+                            if (spe <= budget) {
+                                spent[0] = spe;
+                                return Bag.BagCursorAction.Remove; //continue
+                            } else {
+                                return Bag.BagCursorAction.RemoveAndStop;
+                            }
                         });
 
-                        if (totalCost[0] > 0) {
+                        if (spent[0] > 0) {
                             this.lastLeak = now; //only set time if some cost was spent
                         }
                     }

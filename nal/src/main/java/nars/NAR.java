@@ -78,7 +78,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, Cycles<NAR> {
+public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<NAR> {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
@@ -1401,15 +1401,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return this == obj;
     }
 
-
-    @Override
-    public @Nullable PLink<Termed> activate(Termed c, float priToAdd) {
+    @Nullable public PLink<Concept> activate(Termed c, float priToAdd) {
         @Nullable Concept cc = conceptualize(c);
-        return (cc != null) ? focus.activate(c, priToAdd) : null;
-
+        return (cc != null) ? focus.activate(cc, priToAdd) : null;
     }
 
-    @Override
+    /**
+     * @return current priority of the named concept, or NaN if concept isnt active
+     */
     public float pri(@NotNull Termed termed) {
         return focus.pri(termed);
     }
@@ -1601,9 +1600,5 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Focus, 
         return eventReset.onWeak(o);
     }
 
-    @Override
-    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
-        focus.sample(max, c);
-    }
 
 }

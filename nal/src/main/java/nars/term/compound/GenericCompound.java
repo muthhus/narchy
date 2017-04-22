@@ -50,7 +50,7 @@ public class GenericCompound implements Compound {
 
     public GenericCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
 
-        if (Param.DEBUG && dt != DTERNAL) {
+        if (Param.DEBUG) {
 
             int size = subterms.size();
 
@@ -69,8 +69,9 @@ public class GenericCompound implements Compound {
 
         this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal(), dt);
 
-        this.normalized = vars() + varPattern() == 0;
+        this.normalized = vars()>0 || varPattern()>0;
 
+        //HACK
         this.dynamic =
                 (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
                         ||

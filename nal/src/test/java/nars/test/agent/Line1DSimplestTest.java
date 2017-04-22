@@ -139,7 +139,7 @@ public class Line1DSimplestTest {
 //                return Deriver.get("induction.nal");
 //            }
         };
-        n.deriver.conceptsFiredPerCycle.setValue(16);
+        n.deriver.derivationsPerCycle.setValue(16);
 
         n.truthResolution.setValue(0.01f);
         n.termVolumeMax.setValue(16);

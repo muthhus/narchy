@@ -271,7 +271,7 @@ public class Vis {
         NARSpace active = new NARSpace(nar) {
 
             final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
-            final FloatFunction<Term> termFloatFunction = k -> nar.pri(k, Float.NaN);
+            final FloatFunction<Term> termFloatFunction = k -> nar.pri(k);
 
             @Override
             protected void get(Collection displayNext) {

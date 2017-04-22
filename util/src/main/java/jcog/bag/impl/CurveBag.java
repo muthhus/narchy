@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.Priority;
@@ -12,6 +13,7 @@ import java.util.Random;
 import java.util.function.Predicate;
 
 import static jcog.Util.clamp;
+import static jcog.Util.rng;
 
 /**
  * Bag which stores items, sorted, in one array.
@@ -78,11 +80,34 @@ public class CurveBag<V> extends ArrayBag<V> {
 //    }
 
 
+    @NotNull
+    @Override
+    public Bag<V, PLink<V>> sample(@NotNull Bag.BagCursor<? super PLink<V>> each) {
+        int s = size();
+
+        int i = rng().nextInt(s);
+        boolean modified = false;
+        BagCursorAction next = BagCursorAction.Next;
+        int spins = 0;
+        while (!next.stop && spins++ < s /* emegency termination */) {
+            PLink<V> x = get(i++); if (i == s) i = 0; //modulo s
+            if (x != null && (next = each.next(x)).remove) {
+                remove(key(x));
+            }
+        }
+        if (modified) {
+            commit(null);
+        }
+        return this;
+    }
+
+
     /**
      * simplified one item sample
      */
     @Nullable
     @Override
+    @Deprecated
     public PLink<V> sample() {
         ensureSorted();
         int s = size();
@@ -212,7 +237,7 @@ public class CurveBag<V> extends ArrayBag<V> {
 //    }
 
 
-    //    public static long fastRound(final double d) {
+//    public static long fastRound(final double d) {
 //        if (d > 0) {
 //            return (long) (d + 0.5d);
 //        } else {
@@ -222,7 +247,7 @@ public class CurveBag<V> extends ArrayBag<V> {
 //    
 
 
-    //    /**
+//    /**
 //     * calls overflow() on an overflown object
 //     * returns the updated or created concept (not overflow like PUT does (which follows Map.put() semantics)
 //     * NOTE: this is the generic version which may or may not work, or be entirely efficient in some subclasses
@@ -383,15 +408,15 @@ public class CurveBag<V> extends ArrayBag<V> {
 //    }
 
 
-    /**
-     * Defines the focus curve.  x is a proportion between 0 and 1 (inclusive).
-     * x=0 represents low priority (bottom of bag), x=1.0 represents high priority
-     *
-     * @return
-     */
-    @FunctionalInterface
-    public interface BagCurve extends FloatToFloatFunction {
-    }
+/**
+ * Defines the focus curve.  x is a proportion between 0 and 1 (inclusive).
+ * x=0 represents low priority (bottom of bag), x=1.0 represents high priority
+ *
+ * @return
+ */
+@FunctionalInterface
+public interface BagCurve extends FloatToFloatFunction {
+}
 
 //    public static class RandomSampler implements ToIntFunction<CurveBag>, Serializable {
 //
@@ -473,75 +498,75 @@ public class CurveBag<V> extends ArrayBag<V> {
     public static final BagCurve power6BagCurve = new Power6BagCurve();
 
 
+/**
+ * LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
+ * this is probably equivalent to a naive 1st-order approximation of a way
+ * to convert percentile to probability but it should suffice for now
+ */
+public static final class NormalizedSampler extends CurveSampler {
+
+    private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(Priority.EPSILON_DEFAULT) /* heuristic */;
+    private float range;
+
+    public NormalizedSampler(CurveBag.BagCurve curve, Random random) {
+        super(curve, random);
+        this.range = 1f;
+    }
+
+    @Override
+    protected void commit(@NotNull CurveBag bag) {
+        float max = bag.priMax();
+        float min = bag.priMin();
+        this.range = max - min;
+    }
+
+    @Override
+    float sample(int size) {
+
+
+        float dynamicRange = (range);
+
+        float uniform = random.nextFloat();
+        if (dynamicRange < MIN_DYNAMIC_RANGE) {
+            //if there is not enough dynamic range (variation from max to min) then just choose randomly (no curve)
+            return uniform;
+        } else {
+            return ((1f - dynamicRange) * uniform) +
+                    (dynamicRange * curve.valueOf(uniform));
+        }
+    }
+}
+
+public static final class DirectSampler extends CurveSampler {
+
+    public DirectSampler(CurveBag.BagCurve curve, Random random) {
+        super(curve, random);
+    }
+
+    @Override
+    float sample(int size) {
+        return this.curve.valueOf(random.nextFloat());
+    }
+}
+
+public static abstract class CurveSampler {
+    public final CurveBag.BagCurve curve;
+    public final Random random;
+
+    protected CurveSampler(CurveBag.BagCurve curve, Random random) {
+        this.curve = curve;
+        this.random = random;
+    }
+
     /**
-     * LERPs between the curve and a flat line (y=x) in proportion to the amount the dynamic range falls short of 1.0;
-     * this is probably equivalent to a naive 1st-order approximation of a way
-     * to convert percentile to probability but it should suffice for now
+     * called at the end of each commit
      */
-    public static final class NormalizedSampler extends CurveSampler {
+    protected void commit(CurveBag bag) {
 
-        private static final float MIN_DYNAMIC_RANGE = /*(float) Math.sqrt*/(Priority.EPSILON_DEFAULT) /* heuristic */;
-        private float range;
-
-        public NormalizedSampler(CurveBag.BagCurve curve, Random random) {
-            super(curve, random);
-            this.range = 1f;
-        }
-
-        @Override
-        protected void commit(@NotNull CurveBag bag) {
-            float max = bag.priMax();
-            float min = bag.priMin();
-            this.range = max - min;
-        }
-
-        @Override
-        float sample(int size) {
-
-
-            float dynamicRange = (range);
-
-            float uniform = random.nextFloat();
-            if (dynamicRange < MIN_DYNAMIC_RANGE) {
-                //if there is not enough dynamic range (variation from max to min) then just choose randomly (no curve)
-                return uniform;
-            } else {
-                return ((1f - dynamicRange) * uniform) +
-                        (dynamicRange * curve.valueOf(uniform));
-            }
-        }
     }
 
-    public static final class DirectSampler extends CurveSampler {
-
-        public DirectSampler(CurveBag.BagCurve curve, Random random) {
-            super(curve, random);
-        }
-
-        @Override
-        float sample(int size) {
-            return this.curve.valueOf(random.nextFloat());
-        }
-    }
-
-    public static abstract class CurveSampler {
-        public final CurveBag.BagCurve curve;
-        public final Random random;
-
-        protected CurveSampler(CurveBag.BagCurve curve, Random random) {
-            this.curve = curve;
-            this.random = random;
-        }
-
-        /**
-         * called at the end of each commit
-         */
-        protected void commit(CurveBag bag) {
-
-        }
-
-        abstract float sample(int size);
-    }
+    abstract float sample(int size);
+}
 
 //    public static class CubicBagCurve implements CurveBag.BagCurve {
 //
@@ -562,36 +587,36 @@ public class CurveBag<V> extends ArrayBag<V> {
 //        }
 //    }
 
-    public static class Power4BagCurve implements BagCurve {
+public static class Power4BagCurve implements BagCurve {
 
-        @Override
-        public final float valueOf(float x) {
-            float nnx = x * x;
-            return (nnx * nnx);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "Power4BagCurve";
-        }
+    @Override
+    public final float valueOf(float x) {
+        float nnx = x * x;
+        return (nnx * nnx);
     }
 
-    public static class Power6BagCurve implements BagCurve {
-
-        @Override
-        public final float valueOf(float x) {
-            /** x=0, y=0 ... x=1, y=1 */
-            float nnx = x * x;
-            return (nnx * nnx * nnx);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "Power6BagCurve";
-        }
+    @NotNull
+    @Override
+    public String toString() {
+        return "Power4BagCurve";
     }
+}
+
+public static class Power6BagCurve implements BagCurve {
+
+    @Override
+    public final float valueOf(float x) {
+        /** x=0, y=0 ... x=1, y=1 */
+        float nnx = x * x;
+        return (nnx * nnx * nnx);
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return "Power6BagCurve";
+    }
+}
 
 //    /**
 //     * Approximates priority -> probability fairness with an exponential curve
@@ -611,22 +636,22 @@ public class CurveBag<V> extends ArrayBag<V> {
 //
 //    }
 
-    public static class Power2BagCurve implements BagCurve {
+public static class Power2BagCurve implements BagCurve {
 
-        @Override
-        public final float valueOf(float x) {
-            return (x * x);
-        }
-
-        @NotNull
-        @Override
-        public String toString() {
-            return "QuadraticBagCurve";
-        }
-
+    @Override
+    public final float valueOf(float x) {
+        return (x * x);
     }
 
-    //    @Override
+    @NotNull
+    @Override
+    public String toString() {
+        return "QuadraticBagCurve";
+    }
+
+}
+
+//    @Override
 //    protected int update(BagTransaction<K, V> tx, V[] batch, int start, int stop, int maxAdditionalAttempts) {
 //
 //        super.update()

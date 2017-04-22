@@ -5,6 +5,7 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;
 import nars.control.FireConcepts;
@@ -76,16 +77,16 @@ public class Default extends NAR {
 
         derivationBudgeting = newDerivationBudgeting();
 
-        deriver = exe.concurrent() ?
-                new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
-                :
+        deriver = //exe.concurrent() ?
+                //new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
+                //:
                 new FireConcepts.FireConceptsDirect(newPremiseBuilder(), this);
         ;
 
 
-        deriver.termlinksFiredPerFiredConcept.set(1, termLinksPerConcept);
+        deriver.termlinksFiredPerConcept.set(1, termLinksPerConcept);
         //deriver.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        deriver.conceptsFiredPerCycle.set(conceptsFirePerCycle);
+        deriver.derivationsPerCycle.set(conceptsFirePerCycle);
 
     }
 
@@ -101,7 +102,7 @@ public class Default extends NAR {
         return new PreferSimpleAndConfident();
     }
 
-    public Bag<Termed,PLink<Termed>> newConceptBag(int initialCapacity) {
+    public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
         return new PLinkHijackBag(initialCapacity, 4);
 

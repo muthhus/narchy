@@ -115,11 +115,9 @@ public class BagLab  {
         List<PLink<Integer>> sampled = $.newArrayList(1024);
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
-            bag.sample(batchSize, (h, v) -> {
-                System.out.println(h + " " + v);
-                for (int k = 0; k < h; k++)
-                    sampled.add(v);
-                return h;
+            bag.sample(batchSize, (v) -> {
+                //System.out.println(h + " " + v);
+                sampled.add(v);
             });
 
             //BLink<Integer> sample = bag.sample();

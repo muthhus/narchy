@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -434,151 +433,140 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super V> each, int n) {
+    @Deprecated public void forEachWhile(@NotNull Predicate<? super V> each, int n) {
         throw new UnsupportedOperationException("yet");
     }
 
-    @Nullable
-    @Override
-    public HijackBag<K, V> sample(int n, @NotNull IntObjectToIntFunction<? super V> target) {
-        scan(n, target);
-        return this;
-    }
 
-    @Nullable
-    @Override
-    public HijackBag<K, V> sample(int n, @NotNull Predicate<? super V> target) {
-        scan(n, (h, v) -> {
-            for (int i = 0; i < h; i++)
-                target.test(v);
-            return h;
-        });
-        return this;
-    }
-
-    @Nullable
-    @Override
-    public int pop(int n, @NotNull Predicate<? super V> target) {
-        return scan(n, (h, v) -> {
-            return (target.test(v) ? -1 : 0);
-        });
-    }
-
-
-    public int scan(int n, IntObjectToIntFunction<? super V> each) {
+    @NotNull public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
 
         int s = size();
         if (s == 0)
-            return 0;
+            return this;
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
-            return 0;
-
+            return this;
 
         final Random random = random();
         int i = random.nextInt(c);
 
-
-//        float min = priMin;
-//        float max = priMax;
-//        float priRange = max - min;
-
-        //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
-
-
-        //boolean di = random.nextBoolean(); //randomly choose traversal direction
-
-        int selected = 0;
-
-        //int nulls = c - s; //approximate number of empty slots that would be expected
-
-        float priToHits = Math.max(1, ((n) / ((float)(s))));
-
-        int skipped = 0;
-
-        //final int N = n;
-        int removed = 0;
-
-        while (n > 0 && skipped < c) {
-
-            //if (di) {
-            if (++i == c) i = 0;
-            /*} else {
-                if (--i == -1) i = c - 1;
-            }*/
-
-            V v = map.getOpaque(i);
-            if (v != null) {
-                float p = pri(v);
-                if (p == p) {
-
-                    float fhits = (p * priToHits);
-                    int hits = (int) Math.floor(fhits);
-                    float remainder = fhits - hits;
-                    if (remainder > 0) {
-                        if (remainder >= random.nextFloat()) //use the change to select +1 probabalistically
-                            hits++;
-                    }
-
-                    if (hits > 0) {
-                        if (map.weakCompareAndSetVolatile(i, v, null)) {
-                            int taken = each.intValueOf(hits, v);
-                            boolean popped = (taken < 0);
-                            if (popped) {
-                                onRemoved(v);
-                                removed++;
-                                if (--s <= 0) {
-                                    break;
-                                } else {
-                                    skipped++;
-                                    taken = -taken; //make positive
-                                }
-                            } else if (taken > 0) {
-                                //try to reinsert in that slot we removed it temporarily from
-                                if (!map.compareAndSet(i, null, v)) {
-
-                                    if (put(v) == null) { //try to insert as if normally
-                                        //but if it didnt happen, give up, admit that it lost it
-                                        onRemoved(v);
-                                        removed++;
-                                        if (--s <= 0)
-                                            break;
-                                        else {
-                                            skipped++;
-                                            continue;
-                                        }
-                                    }
-                                }
-
-                            }
-
-                            n -= taken;
-                            selected += taken;
-                        }
-
-                    } else {
-                        skipped++;
-                    }
+        int spins = 0;
+        BagCursorAction next = BagCursorAction.Next;
+        boolean modified = false;
+        while (!next.stop && spins < c /* emegency termination */) {
+            V v = map.get(i++);  if (i == c) i = 0; //modulo c
+            if (v != null && (next = each.next(v)).remove) {
+                if (map.weakCompareAndSetVolatile(i, v, null)) {
+                    modified = true;
                 }
-            } else {
-                skipped++;
-                //early deletion nullify
-//                    if (map.compareAndSet(m, v, null)) {
-//                        size.decrementAndGet();
-//                        onRemoved(v);
-//                    }
             }
-
-
         }
 
-        if (removed > 0) {
+        if (modified)
             commit(null);
-        }
 
-        return selected;
+        return this;
+//
+////        float min = priMin;
+////        float max = priMax;
+////        float priRange = max - min;
+//
+//        //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
+//
+//
+//        //boolean di = random.nextBoolean(); //randomly choose traversal direction
+//
+//        int selected = 0;
+//
+//        //int nulls = c - s; //approximate number of empty slots that would be expected
+//
+//        float priToHits = Math.max(1, ((n) / ((float)(s))));
+//
+//        int skipped = 0;
+//
+//        //final int N = n;
+//        int removed = 0;
+//
+//        while (n > 0 && skipped < c) {
+//
+//            //if (di) {
+//            if (++i == c) i = 0;
+//            /*} else {
+//                if (--i == -1) i = c - 1;
+//            }*/
+//
+//            V v = map.getOpaque(i);
+//            if (v != null) {
+//                float p = pri(v);
+//                if (p == p) {
+//
+//                    float fhits = (p * priToHits);
+//                    int hits = (int) Math.floor(fhits);
+//                    float remainder = fhits - hits;
+//                    if (remainder > 0) {
+//                        if (remainder >= random.nextFloat()) //use the change to select +1 probabalistically
+//                            hits++;
+//                    }
+//
+//                    if (hits > 0) {
+//                        if (map.weakCompareAndSetVolatile(i, v, null)) {
+//                            int taken = each.intValueOf(hits, v);
+//                            boolean popped = (taken < 0);
+//                            if (popped) {
+//                                onRemoved(v);
+//                                removed++;
+//                                if (--s <= 0) {
+//                                    break;
+//                                } else {
+//                                    skipped++;
+//                                    taken = -taken; //make positive
+//                                }
+//                            } else if (taken > 0) {
+//                                //try to reinsert in that slot we removed it temporarily from
+//                                if (!map.compareAndSet(i, null, v)) {
+//
+//                                    if (put(v) == null) { //try to insert as if normally
+//                                        //but if it didnt happen, give up, admit that it lost it
+//                                        onRemoved(v);
+//                                        removed++;
+//                                        if (--s <= 0)
+//                                            break;
+//                                        else {
+//                                            skipped++;
+//                                            continue;
+//                                        }
+//                                    }
+//                                }
+//
+//                            }
+//
+//                            n -= taken;
+//                            selected += taken;
+//                        }
+//
+//                    } else {
+//                        skipped++;
+//                    }
+//                }
+//            } else {
+//                skipped++;
+//                //early deletion nullify
+////                    if (map.compareAndSet(m, v, null)) {
+////                        size.decrementAndGet();
+////                        onRemoved(v);
+////                    }
+//            }
+//
+//
+//        }
+//
+//        if (removed > 0) {
+//            commit(null);
+//        }
+//
+//        return selected;
     }
 
 

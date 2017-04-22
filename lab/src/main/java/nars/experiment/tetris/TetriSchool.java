@@ -162,7 +162,7 @@ public class TetriSchool implements Runnable {
                               g = c.getGreen()/256f,
                               b = c.getBlue()/256f;
 
-                        float pri = n.pri( t.cell(x, y), Float.NaN);
+                        float pri = n.pri( t.cell(x, y));
                         gl.glColor3f(r * pri, g * pri, b * pri);
 
                         float m = 0.05f;

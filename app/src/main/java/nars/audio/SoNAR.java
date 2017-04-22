@@ -6,7 +6,6 @@ import nars.Narsese;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.time.Time;
 import nars.truth.Truth;
 import spacegraph.audio.Audio;
 import spacegraph.audio.Sound;
@@ -189,7 +188,7 @@ public class SoNAR extends TimerTask {
 
     public static void main(String[] args) throws LineUnavailableException, InterruptedException, Narsese.NarseseException {
         Default n = new Default();
-        n.deriver.conceptsFiredPerCycle.set(2);
+        n.deriver.derivationsPerCycle.set(2);
         //n.log();
         n.input("a:b. :|: (--,b:c). c:d. d:e. (--,e:f). f:g. b:f. a:g?");
         n.loop(64);

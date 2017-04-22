@@ -5,14 +5,12 @@ import jcog.pri.PLink;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -22,6 +20,24 @@ import java.util.function.Predicate;
  * K=key, V = item/value of type Item
  */
 public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
+
+    enum BagCursorAction {
+        Next(false, false),
+        Remove(true, false),
+        Stop(false, true),
+        RemoveAndStop(true, true);
+
+        public boolean remove;
+        public boolean stop;
+        BagCursorAction(boolean remove, boolean stop) {
+            this.remove = remove; this.stop = stop;
+        }
+    }
+
+    /** used for sampling */
+    @FunctionalInterface interface BagCursor<V> {
+        @NotNull BagCursorAction next(@NotNull V x);
+    }
 
     /**
      * temperature parameter, in the range of 0..1.0 controls the target average priority that
@@ -59,9 +75,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     @Nullable
     default V sample() {
         Object[] result = new Object[1];
-        sample(1, (x) -> {
+        sample((x) -> {
             result[0] = x;
-            return true;
+            return BagCursorAction.Stop;
         });
         return (V) result[0];
     }
@@ -105,32 +121,31 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
 
 
-
-//    /**
-//     * iterates in sequence starting from the top until predicate returns false, limited by max iterations (n)
-//     */
-//    abstract public void top(int n, Predicate<BagBudget<V>> each);
-//        int[] toFire = { n };
-//        top(c -> (each.test(c) && (toFire[0]--) > 0));
+    /* sample the bag, optionally removing each visited element as decided by the visitor's
+     * return value */
+    @NotNull Bag<K,V> sample(@NotNull Bag.BagCursor<? super V> each);
 
 
-    /**
-     * fills a collection with at-most N items, if an item passes the predicate.
-     * returns how many items added
-     */
-    //@Deprecated
-    //Bag<K, V> sample(int n, @NotNull Predicate<? super V> target);
-    @Deprecated /* HACK */ default Bag<K,V> sample(int max, Predicate<? super V> c) {
-        sample(max, (h, v) -> {
-            if (!c.test(v)) return 0;
-            for (int i = 0; i < h - 1; i++)
-                c.test(v);
-            return h;
+    /** convenience macro for using sample(BagCursor).
+     * continues while either the predicate hasn't returned false and
+     * < max true's have been returned */
+    default Bag<K,V> sample(int max, Predicate<? super V> kontinue) {
+        final int[] count = {0};
+        return sample((x) -> {
+            return (kontinue.test(x) && ((count[0]++) < max)) ?
+                    Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
         });
-        return this;
     }
 
-    Bag<K, V> sample(int n, @NotNull IntObjectToIntFunction<? super V> target);
+    /** convenience macro */
+    default Bag<K,V> sample(int max, Consumer<? super V> kontinue) {
+        final int[] count = {0};
+        return sample((x) -> {
+            kontinue.accept(x);
+            return ((count[0]++) < max) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+        });
+    }
+
 
     /**
      * The number of items in the bag
@@ -229,16 +244,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * resolves the key associated with a particular value
      */
     @NotNull K key(V value);
-
-
-//    /**
-//     * implements the Supplier<V> interface; invokes a remove()
-//     */
-//    @Nullable
-//    @Override
-//    default PLink<V> get() {
-//        return pop();
-//    }
 
 
     default void print() {
@@ -477,10 +482,13 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     @Nullable Bag EMPTY = new Bag() {
 
+        @NotNull
         @Override
-        public void clear() {
-
+        public Bag sample(@NotNull Bag.@NotNull BagCursor each) {
+            return this;
         }
+
+        @Override public void clear() {        }
 
         @Override
         public Object key(Object value) {
@@ -492,11 +500,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
             return 0;
         }
 
-        @Nullable
-        @Override
-        public Object sample() {
-            return null;
-        }
 
         @Nullable
         @Override
@@ -548,11 +551,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         }
 
 
-        @Override
-        public Bag sample(int n, @NotNull IntObjectToIntFunction target) {
-            return null;
-        }
-
         @Nullable
         @Override
         public Object get(@NotNull Object key) {
@@ -591,48 +589,11 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         forEach(b -> each.accept(key(b)));
     }
 
-
-    /**
-     * samples and removes the sampled item. returns null if bag empty, or for some other reason the sample did not succeed
-     */
-    @Nullable
-    default V pop() {
-        V x = sample();
-        return (x != null) ? remove(key(x)) : null;
-    }
-
-    @Nullable
-    default V pop(Predicate<? super V> each) {
-        V x = sample();
-        if (x != null) {
-            if (each.test(x))
-                return remove(key(x));
-            return x;
-        }
-        return null;
-    }
-
-    default Bag<K, V> copy(@NotNull Bag target, int limit) {
-        return this.sample(limit, t -> {
-            target.put(t);
-            return true; //assume it worked
-        });
-    }
-
     default Bag<K, V> capacity(int i) {
         setCapacity(i);
         return this;
     }
 
-    default int pop(int num, Predicate<? super V> each) {
-        int i;
-        for (i = 0; i < num; i++) {
-            V x = pop(each);
-            if (x == null)
-                break;
-        }
-        return i;
-    }
 
 //    default boolean putIfAbsent(V b) {
 //        K x = b.get();

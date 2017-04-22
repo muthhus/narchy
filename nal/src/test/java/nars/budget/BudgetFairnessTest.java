@@ -1,5 +1,6 @@
 package nars.budget;
 
+import jcog.bag.Bag;
 import jcog.math.MultiStatistics;
 import jcog.pri.PLink;
 import nars.Focus;
@@ -39,16 +40,16 @@ public class BudgetFairnessTest {
         Default d = new Default(1024, conceptsFirePerCycle, 3);
         Focus c = d.focus();
         d.setFocus(new Focus() {
-            @Override
-            public @Nullable PLink<Termed> activate(@NotNull Termed term, float priToAdd) {
 
+            @Override
+            public @Nullable PLink<Concept> activate(@NotNull Concept term, float priToAdd) {
                 m.value(priToAdd, term.term());
                 return c.activate(term, priToAdd);
             }
 
             @Override
-            public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> p) {
-                c.sample(max, p);
+            public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> e) {
+                c.sample(e);
             }
 
             @Override

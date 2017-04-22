@@ -1,7 +1,7 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.control.BagFlow;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -11,13 +11,11 @@ import nars.Focus;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.bag.TaskHijackBag;
 import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
-import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,14 +37,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * How many concepts to fire each cycle; measures degree of parallelism in each cycle
      */
     @Range(min = 0, max = 64, unit = "Concept")
-    public final @NotNull MutableInteger conceptsFiredPerCycle;
+    public final @NotNull MutableInteger derivationsPerCycle;
     /**
      * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
      * reducing this value should provide finer-grained / higher-precision concept selection
      * since results between batches can affect the next one.
      */
     public final @NotNull MutableInteger conceptsFiredPerBatch;
-    public final MutableIntRange termlinksFiredPerFiredConcept = new MutableIntRange(1, 1);
+    public final MutableIntRange termlinksFiredPerConcept = new MutableIntRange(1, 1);
     public final MutableInteger derivationsInputPerCycle;
     protected final NAR nar;
     private final On on;
@@ -68,6 +66,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //        }
 //    }
 
+    /** returns # of derivations processed */
     int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numPremises) {
 
         Concept c = pc.get();
@@ -127,8 +126,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
         @Override public void fire() {
-            source.sample(conceptsFiredPerCycle.intValue(), (h,c) -> {
-                return premiseVector(nar, c, nar::input, h);
+            final int[] num = {derivationsPerCycle.intValue()};
+            source.sample((c) -> {
+                int taken = premiseVector(nar, c, nar::input,
+                    Util.lerp(c.pri(),
+                        termlinksFiredPerConcept.lo(), termlinksFiredPerConcept.hi()
+                ));
+                num[0] -= taken;
+                return (num[0] > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });
         }
 
@@ -139,92 +144,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     }
 
-    /**
-     * Multithread safe concept firer; uses Bag to buffer derivations before choosing some or all of them for input
-     */
-    public static class FireConceptsBuffered extends FireConcepts {
-
-        /** flow from concept bag to derived task bag */
-        final BagFlow flow;
-
-        /**
-         * pending derivations to be input after this cycle
-         */
-        final TaskHijackBag pending;
-
-        private final Mix.MixStream<Object,Task> in;
-
-        public FireConceptsBuffered(@NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
-            this(nar.focus(), premiseBuilder, nar);
-        }
-
-        public FireConceptsBuffered(@NotNull Focus focus, @NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
-            super(focus, premiseBuilder, nar);
-
-
-            this.pending = new TaskHijackBag(3) {
-
-                @Override
-                public float temperature() {
-                    return 0.1f; //forget slowly
-                }
-
-//                @Override
-//                public float pri(@NotNull Task key) {
-//                    //return (1f + key.priSafe(0)) * (1f + key.qua());
-//                    //return (1f + key.priSafe(0)) * (1f + key.qua());
-//                }
-
-//                @Override
-//                public void onRemoved(@NotNull Task value) {
-//                    System.out.println(value);
-//                }
-            };
-
-            nar.onReset((n) -> {
-                pending.clear();
-            });
-
-            this.in = nar.mix.stream("Derive");
-
-            this.flow = new BagFlow<PLink<Concept>,Task>(
-                ((ConceptBagFocus)nar.focus()).active,
-                pending,
-                nar.exe, (concept, h, target) -> {
-                    premiseVector(nar, concept, target::put, h);
-                },
-                x->nar.input(in.apply(x)));
-
-        }
-
-        @Override
-        public void fire() {
-
-            int inputsPerCycle = derivationsInputPerCycle.intValue();
-            pending.capacity(inputsPerCycle * 4);
-            pending.commit();
-            this.flow.update(0.05f, 0.75f);
-
-
-        }
-
-        @Override
-        public void accept(DerivedTask d) {
-            pending.put(d);
-        }
-
-    }
-
-
-
-
     public FireConcepts(@NotNull Focus source, MatrixPremiseBuilder premiseBuilder, NAR nar) {
 
         this.nar = nar;
         this.source = source;
         this.premiser = premiseBuilder;
 
-        this.conceptsFiredPerCycle = new MutableInteger(1);
+        this.derivationsPerCycle = new MutableInteger(1);
         this.conceptsFiredPerBatch = new MutableInteger(1);
         this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
 

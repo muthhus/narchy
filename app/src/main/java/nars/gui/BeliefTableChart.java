@@ -108,7 +108,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         cc = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
         if (cc != null) {
-            cp = nar.pri(cc, 0);
+            cp = nar.pri(cc); if (cp!=cp) cp = 0;
             beliefs.set(cc.beliefs(), now, dur);
             goals.set(cc.goals(), now, dur);
         } else {

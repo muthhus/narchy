@@ -411,7 +411,7 @@ public class TemporalTest {
         n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
         n.run(1);
 
-        @NotNull Bag<Termed, PLink<Termed>> cb = n.focus.active;
+        @NotNull Bag<Concept, PLink<Concept>> cb = n.focus.active;
 
         assertTrue(5 <= cb.size());
         String abpill = "((a==>b)-->[pill])";

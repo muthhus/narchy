@@ -1,6 +1,7 @@
 package nars.control;
 
 import com.google.common.collect.Iterators;
+import jcog.bag.Bag;
 import jcog.list.SynchronizedArrayList;
 import jcog.pri.PLink;
 import nars.Focus;
@@ -23,7 +24,7 @@ public class CompoundFocus implements Focus {
     }
 
     @Override
-    public PLink<Termed> activate(Termed term, float priToAdd) {
+    public PLink<Concept> activate(Concept term, float priToAdd) {
 
         for (int i = 0, controlSize = sub.size(); i < controlSize; i++) {
             sub.get(i).activate(term, priToAdd);
@@ -34,9 +35,8 @@ public class CompoundFocus implements Focus {
     }
 
 
-
     @Override
-    public void sample(int max, IntObjectToIntFunction<? super PLink<Concept>> c) {
+    public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> c) {
         throw new UnsupportedOperationException("TODO");
     }
 

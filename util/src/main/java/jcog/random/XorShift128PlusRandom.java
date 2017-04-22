@@ -44,7 +44,6 @@ import java.util.Random;
  * @see XorShift128PlusRandomGenerator
  */
 public class XorShift128PlusRandom extends Random {
-	private static final long serialVersionUID = 1L;
 
 	/** 2<sup>-53</sup>. */
 	private static final double NORM_53 = 1.0 / ( 1L << 53 );
