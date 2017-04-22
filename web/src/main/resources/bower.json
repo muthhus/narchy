@@ -9,11 +9,15 @@
     "jquery-ui": "latest",
     "lodash": "latest",
     "labjs": "latest",
-    "fastdom": "latest"
+    "cytoscape": "latest",
+    "codemirror": "latest",
+    "golden-layout": "latest",
+    "fastdom": "latest",
+    "object-editor": "latest",
+    "jsoneditor": "latest"
   },
   "keywords": [
     "nars",
-    "ai",
     "logic",
     "semantic",
     "web",

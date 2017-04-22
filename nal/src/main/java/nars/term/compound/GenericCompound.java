@@ -6,13 +6,15 @@ import nars.Op;
 import nars.Param;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.CONJ;
+import static nars.Op.*;
+import static nars.Op.EvalBits;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -39,7 +41,7 @@ public class GenericCompound implements Compound {
     public final Op op;
 
 
-    public transient boolean normalized;
+    public transient boolean normalized, dynamic;
 
 
     public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
@@ -59,16 +61,9 @@ public class GenericCompound implements Compound {
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.toArray());
         }
 
-//        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > 2000000)
-//            System.err.println("time oob");
-
         this.op = op;
 
         this.subterms = subterms;
-
-        this.normalized = false; //force normalization to evaluate any contained functor subterms
-        //!(op==INH&&subterms.term(1) instanceof AtomicString && subterms.term(0).op()==PROD)
-        ///&& subterms.constant();  /* to force functor evaluation at normalization */;
 
         this.dt = dt;
 
@@ -76,10 +71,17 @@ public class GenericCompound implements Compound {
 
         this.normalized = vars() + varPattern() == 0;
 
+        this.dynamic =
+                (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
+                        ||
+                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
     }
 
 
-
+    @Override
+    public boolean isDynamic() {
+        return dynamic;
+    }
 
     @NotNull
     @Override

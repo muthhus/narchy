@@ -146,7 +146,10 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean OR(@NotNull Predicate<Term> p) {
+    public boolean OR(@NotNull Predicate<Term> p) { return p.test(the);    }
+
+    @Override
+    public boolean AND(@NotNull Predicate<Term> p) {
         return p.test(the);
     }
 
@@ -170,10 +173,7 @@ public class TermVector1 implements TermContainer {
         return the.varPattern();
     }
 
-    @Override
-    public boolean AND(@NotNull Predicate<Term> p) {
-        return p.test(the);
-    }
+
 
 
 }

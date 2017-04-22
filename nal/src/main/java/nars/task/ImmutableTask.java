@@ -106,10 +106,9 @@ public class ImmutableTask extends Pri implements Task {
     @Override
     public final boolean equals(Object that) {
         return this == that ||
-                (that instanceof Task &&
-                        hashCode() == that.hashCode() &&
-                        Task.equivalentTo(this, (Task) that, true, true, true, true, true));
-
+                (hashCode() == that.hashCode() &&
+                    that instanceof Task &&
+                    Task.equivalentTo(this, (Task) that, true, true, true, true, true));
     }
 
     @Nullable

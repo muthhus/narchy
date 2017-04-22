@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Holds a vector or tuple of terms.
@@ -80,4 +81,18 @@ public class ArrayTermVector extends TermVector {
             action.accept(x);
     }
 
+    @Override
+    public final boolean OR(@NotNull Predicate<Term> p) {
+        for (Term i : terms)
+            if (p.test(i))
+                return true;
+        return false;
+    }
+
+    @Override public final boolean AND(@NotNull Predicate<Term> p) {
+        for (Term i : terms)
+            if (!p.test(i))
+                return false;
+        return true;
+    }
 }

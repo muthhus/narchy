@@ -23,11 +23,6 @@ public interface ProtoCompound extends TermContainer {
 
     int dt();
 
-    /** returns true if the predicate is true for all items */
-    boolean AND(@NotNull Predicate<Term> t);
-
-    /** returns true if the predicate is true for any items */
-    boolean OR(@NotNull Predicate<Term> t);
 
     /** subterms as an array for construction */
     @NotNull Term[] subterms();
@@ -42,4 +37,39 @@ public interface ProtoCompound extends TermContainer {
     int hashCode();
 
     Term sub(int i);
+
+    /** since it has potentially any structure... */
+    @Override default int structure() {
+        return ~0;
+    }
+
+    @Override
+    default boolean hasAll(int structuralVector) {
+        return true;
+    }
+
+    @Override
+    default boolean hasAny(@NotNull Op op) {
+        return true;
+    }
+
+    @Override
+    default boolean impossibleSubTerm( @NotNull Termlike target) {
+        return false;
+    }
+
+    @Override
+    default boolean impossibleSubTermOrEquality(@NotNull Term target) {
+        return false;
+    }
+
+    @Override
+    default boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
+        return false;
+    }
+
+    @Override
+    default boolean impossibleSubTermVolume(int otherTermVolume) {
+        return false;
+    }
 }

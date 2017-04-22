@@ -164,7 +164,6 @@
 
                     <exclude>public/lib/labjs/tests/**</exclude>
 
-                    <exclude>public/lib/cesium/**</exclude>
                     <exclude>public/lib/moment/**</exclude>
 
                     <exclude>public/lib/jquery/src/**</exclude>

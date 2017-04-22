@@ -50,13 +50,7 @@ public class Grid extends Layout {
 
     /** previous scale */
     float lw, lh;
-    @Override
-    protected void paint(GL2 gl) {
-        Draw.colorHash(gl, this, 0.5f);
-        Draw.rect(gl, 0, 0, 1, 1);
 
-        //super.paint(gl);
-    }
 
     public boolean isGrid() {
         float a = gridAspect;

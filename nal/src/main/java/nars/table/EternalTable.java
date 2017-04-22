@@ -332,36 +332,25 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         Task revised = null;
 
 
-            if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
-                //AXIOMATIC/CONSTANT BELIEF/GOAL
-                synchronized (this) {
-                    addEternalAxiom(input, this, nar);
-                    return input;
-                }
+        if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
+            //AXIOMATIC/CONSTANT BELIEF/GOAL
+            synchronized (this) {
+                addEternalAxiom(input, this, nar);
+                return input;
             }
+        }
 
-            //Try forming a revision and if successful, inputs to NAR for subsequent cycle
+        //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             /*if (!(input instanceof AnswerTask))*/
 
-            revised = tryRevision(input, concept, nar);
-            if (revised != null) {
-                if (revised.equals(input)) {
-                    //duplicate
-                    //TODO decide what to do here
-                    return revised;
-                }
-
-//                    if (revised.isDeleted()) {
-//                        revised = null;
-//                    } else if (Param.DEBUG) {
-//
-////                        if (revised.isDeleted())
-////                            throw new RuntimeException("revised task is deleted");
-//                        if (revised.equals(input)) // || BeliefTable.stronger(revised, input)==input) {
-//                            throw new RuntimeException("useless revision");
-//                    }
+        revised = tryRevision(input, concept, nar);
+        if (revised != null) {
+            if (revised.equals(input)) {
+                //duplicate
+                //TODO decide what to do here
+                return revised;
             }
-
+        }
 
 
         boolean inserted;

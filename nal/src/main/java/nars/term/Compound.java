@@ -149,6 +149,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return this;
     }
 
+
     //    @NotNull
 //    default MutableSet<Term> termsToSet(boolean recurse, int inStructure, MutableSet<Term> t) {
 //        if (recurse) {
@@ -779,7 +780,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override default Term eval(TermIndex index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
-        if (!hasAll(Op.EvalBits))
+        if (!isDynamic()) //!hasAll(Op.EvalBits))
             return this;
 
         //unwrap negation before recursion, it should be more efficient

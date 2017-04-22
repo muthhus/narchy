@@ -63,8 +63,8 @@ public class Widget extends Stacking {
 //        }
 
         //rainbow backgrounds
-        Draw.colorHash(gl, this.hashCode(), 0.8f, 0.2f, 0.25f);
-        Draw.rect(gl, 0, 0, 1, 1);
+        //Draw.colorHash(gl, this.hashCode(), 0.8f, 0.2f, 0.25f);
+        //Draw.rect(gl, 0, 0, 1, 1);
 
 
         if (touchedBy != null) {
