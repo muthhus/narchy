@@ -1,7 +1,6 @@
 package nars.web;
 
 import jcog.pri.PLink;
-import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.Op.BELIEF;
@@ -226,7 +224,7 @@ public class IRCAgent extends IRC {
 
         MultiThreadExecutor exe = new MultiThreadExecutor(4, 1024, true);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 3,
+        Default nar = new Default(activeConcepts, 3,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),

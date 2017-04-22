@@ -81,7 +81,7 @@ public class QueryVariableTest {
                 "<b --> a>" /* existing solution, to test finding existing solutions */;
 
 
-        NAR n = new Default(100, 4, 3);
+        NAR n = new Default(100, 3);
         n.nal(2);
         n
                 //.log()

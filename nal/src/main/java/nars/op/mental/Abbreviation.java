@@ -37,7 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static jcog.bag.impl.CurveBag.power4BagCurve;
 import static nars.Op.BELIEF;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -77,8 +76,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
-                new CurveBag.NormalizedSampler(power4BagCurve, n.random()),
-                PriMerge.plus, new ConcurrentHashMap()), selectionRate, n);
+                PriMerge.plus, new ConcurrentHashMap<>(capacity)), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;

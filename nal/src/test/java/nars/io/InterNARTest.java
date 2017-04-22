@@ -1,7 +1,6 @@
 package nars.io;
 
 import jcog.Util;
-import jcog.random.XorShift128PlusRandom;
 import nars.InterNAR;
 import nars.NAR;
 import nars.Narsese;
@@ -82,7 +81,7 @@ public class InterNARTest {
     }
 
     private static Default newNAR() {
-        return new Default(1024, 2, 3,
+        return new Default(1024, 3,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
                 new RealTime.DSHalf(), new MultiThreadExecutor(3, 128, Executors.newCachedThreadPool()));
     }

@@ -1,8 +1,10 @@
 package nars.nar;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
@@ -16,7 +18,6 @@ import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
 import nars.premise.MatrixPremiseBuilder;
 import nars.premise.PreferSimpleAndConfident;
-import nars.term.Termed;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 
@@ -48,13 +50,12 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(1024, 1, 3);
+        this(1024, 3);
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept) {
+    public Default(int activeConcepts, int termLinksPerConcept) {
         this(activeConcepts,
-            conceptsFirePerCycle,
-            termLinksPerConcept,
+                termLinksPerConcept,
             ()->new XorShift128PlusRandom(1),
             new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new FrameTime(),
@@ -64,11 +65,11 @@ public class Default extends NAR {
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
 
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
-        this(activeConcepts, conceptsFirePerCycle, termLinksPerConcept, ThreadLocalRandom::current, concepts, time, exe);
+    public Default(int activeConcepts, int termLinksPerConcept, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+        this(activeConcepts, termLinksPerConcept, ThreadLocalRandom::current, concepts, time, exe);
     }
 
-    public Default(int activeConcepts, int conceptsFirePerCycle, int termLinksPerConcept, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+    public Default(int activeConcepts, int termLinksPerConcept, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
         ConceptBagFocus f = new ConceptBagFocus(this, newConceptBag(activeConcepts));
@@ -86,7 +87,7 @@ public class Default extends NAR {
 
         deriver.termlinksFiredPerConcept.set(1, termLinksPerConcept);
         //deriver.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        deriver.derivationsPerCycle.set(conceptsFirePerCycle);
+        //deriver.rate.setValue(conceptsFirePerCycle);
 
     }
 
@@ -104,7 +105,12 @@ public class Default extends NAR {
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
-        return new PLinkHijackBag(initialCapacity, 4);
+        //return new PLinkHijackBag(initialCapacity, 4);
+        return new CurveBag<>(initialCapacity, PriMerge.plus,
+                exe.concurrent() ?
+                    new ConcurrentHashMap<>(initialCapacity*2, 0.9f) :
+                    new HashMap<>(initialCapacity*2, 0.9f)
+        );
 
     }
 

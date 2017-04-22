@@ -1276,10 +1276,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                 if (!term.isNormalized()) {
                     //see if, when normalized, it doesnt change. otherwise keep the non-normalized form
                     Compound normalizedTerm = concepts.normalize((Compound) term);
-                    if (normalizedTerm != term && normalizedTerm != null && normalizedTerm.equals(term)) {
+                    if (normalizedTerm!=null && normalizedTerm.equals(term)) {
                         ((Compound) term).setNormalized(); //recognize as normalized
                     }
-
                 }
 
                 /*

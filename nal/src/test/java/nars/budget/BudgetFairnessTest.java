@@ -10,7 +10,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class BudgetFairnessTest {
                 volumeIn(2,3),
                 volumeIn(4,5)
         );
-        Default d = new Default(1024, conceptsFirePerCycle, 3);
+        Default d = new Default(1024, 3);
         Focus c = d.focus();
         d.setFocus(new Focus() {
 

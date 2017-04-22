@@ -154,7 +154,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         float parentActivation = scale;
         Term targetTerm = target.term();
-        if (target instanceof Compound) {
+        if (targetTerm instanceof Compound) {
             if (depth + 1 <= termlinkDepth)
                 parentActivation = linkSubterms(((Compound) targetTerm).subterms(), scale, depth + 1);
         } else if (target instanceof AtomConcept) {

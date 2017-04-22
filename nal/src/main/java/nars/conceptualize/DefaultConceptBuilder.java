@@ -69,7 +69,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @NotNull
     @Deprecated public <X> Bag<X,PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-        return new CurveBag<>(8, defaultCurveSampler, blend, m);
+        return new CurveBag<>(8, blend, m);
     }
 
 
@@ -260,9 +260,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             case NEG:
                 throw new RuntimeException("negation terms must not be conceptualized");
-
         }
-
 
         return
                 dmt != null ?
@@ -275,26 +273,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return !subterms.OR(x -> x instanceof Variable);
     }
 
-
-
-    @NotNull
-    public CurveBag.CurveSampler defaultCurveSampler; //shared
-
-
-    @Override
-    public void start(@NotNull NAR nar) {
-
+    @Override public void start(@NotNull NAR nar) {
         this.nar = nar;
-
-        this.defaultCurveSampler =
-                //new CurveBag.DirectSampler(
-                new CurveBag.NormalizedSampler(
-                        //new CurveBag.DirectSampler(
-                        //CurveBag.linearBagCurve,
-                        CurveBag.power2BagCurve,
-                        //CurveBag.power4BagCurve,
-                        //CurveBag.power6BagCurve,
-                        nar.random());
     }
 
 

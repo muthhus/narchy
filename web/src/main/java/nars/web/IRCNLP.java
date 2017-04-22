@@ -2,12 +2,10 @@
 package nars.web;
 
 import com.google.common.base.Joiner;
-import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
-import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
 import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -271,7 +268,7 @@ public class IRCNLP extends IRC {
 
         MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024, true);
 
-        Default nar = new Default(activeConcepts, conceptsPerFrame, 3,
+        Default nar = new Default(activeConcepts, 3,
 
                 new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),

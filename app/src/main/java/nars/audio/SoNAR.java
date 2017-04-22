@@ -188,7 +188,7 @@ public class SoNAR extends TimerTask {
 
     public static void main(String[] args) throws LineUnavailableException, InterruptedException, Narsese.NarseseException {
         Default n = new Default();
-        n.deriver.derivationsPerCycle.set(2);
+
         //n.log();
         n.input("a:b. :|: (--,b:c). c:d. d:e. (--,e:f). f:g. b:f. a:g?");
         n.loop(64);

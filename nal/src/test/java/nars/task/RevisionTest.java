@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 public class RevisionTest {
 
     public static Default newNAR(int maxBeliefs) {
-        Default d = new Default(256, 1, 3);
+        Default d = new Default(256, 3);
         d.nal(7);// {
 
         /*

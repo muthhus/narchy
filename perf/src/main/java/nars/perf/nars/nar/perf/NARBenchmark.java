@@ -58,7 +58,7 @@ public class NARBenchmark {
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
-        n.deriver.derivationsPerCycle.setValue(64);
+        n.deriver.rate.setValue(64);
 
 
         new DeductiveMeshTest(n, new int[]{16, 16});

@@ -54,10 +54,10 @@ public class GenericCompound implements Compound {
 
             int size = subterms.size();
 
-            if (op.image && ((dt < 0) || (dt > size))) {
+            if (op.image && ((dt < 0) || (dt > size)) && !(dt==DTERNAL && subterms.varPattern() > 0) )
                 throw new InvalidTermException(op, dt, "Invalid dt value for image " + op, subterms.toArray());
-            }
-            if (op != CONJ && (op.temporal && size != 2))
+
+            if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.toArray());
         }
 
@@ -69,7 +69,7 @@ public class GenericCompound implements Compound {
 
         this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal(), dt);
 
-        this.normalized = vars()>0 || varPattern()>0;
+        this.normalized = !(vars()>0 || varPattern()>0);
 
         //HACK
         this.dynamic =

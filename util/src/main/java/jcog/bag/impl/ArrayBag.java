@@ -6,7 +6,6 @@ import jcog.list.FasterList;
 import jcog.pri.*;
 import jcog.table.SortedListTable;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 
 /**
@@ -40,7 +38,8 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     static final class SortedPLinks extends SortedArray {
-        @Override protected Object[] newArray(int oldSize) {
+        @Override
+        protected Object[] newArray(int oldSize) {
             return new PLink[grow(oldSize)];
         }
     }
@@ -289,10 +288,35 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
 
+    /**
+     * iterates in sorted order, descending
+     */
     @NotNull
     @Override
     public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
-        throw new UnsupportedOperationException();
+        if (size() > 0)
+            sample(each, 0);
+        return this;
+    }
+
+    protected void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<X>> each, int startingIndex) {
+        int i = startingIndex % size();
+        boolean modified = false;
+        BagCursorAction next = BagCursorAction.Next;
+        int s;
+        while (!next.stop && (0 < (s = size()))) {
+            if (i >= s) i = 0;
+            PLink<X> x = get(i++);
+
+            if (x != null && (next = each.next(x)).remove) {
+                if (remove(key(x))!=null)
+                    modified = true;
+            }
+        }
+
+        if (modified) {
+            commit(null);
+        }
     }
 
     @Override
@@ -499,7 +523,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
         return sorted;
     }
-
 
 
     private int removeDeleted(@NotNull Collection<PLink<X>> removed, int minRemoved) {
@@ -715,7 +738,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     public float priMax() {
         PLink x;
         //synchronized (items) {
-            x = items.first();
+        x = items.first();
         //}
         return x != null ? x.priSafe(-1) : 0f;
     }
@@ -730,7 +753,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     public float priMin() {
         PLink x;
         //synchronized (items) {
-            x = items.last();
+        x = items.last();
         //}
         return x != null ? x.priSafe(-1) : 0f;
     }

@@ -1,6 +1,5 @@
 package nars.rdfowl;
 
-import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
@@ -15,7 +14,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Random;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -40,7 +38,7 @@ public class NQuadsRDFTest {
         //Multi nar = new Multi(3,512,
         Executioner e = new SynchronousExecutor();
         Default n = new Default(1024,
-                72, 2,
+                2,
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
                 new FrameTime(), e

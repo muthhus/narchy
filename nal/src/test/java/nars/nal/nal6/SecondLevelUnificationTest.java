@@ -13,7 +13,7 @@ public class SecondLevelUnificationTest {
 
     @Test
     public void test1() throws Narsese.NarseseException {
-        NAR n = new Default(512, 1, 3);
+        NAR n = new Default(512, 3);
 
         //n.log();
 //        n.eventTaskRemoved.on(t -> {
@@ -27,7 +27,7 @@ public class SecondLevelUnificationTest {
     }
     @Test
     public void test2() throws Narsese.NarseseException {
-        NAR n = new Default(512, 1, 3);
+        NAR n = new Default(512, 3);
 
         //n.log();
 //        n.eventTaskRemoved.on(t -> {

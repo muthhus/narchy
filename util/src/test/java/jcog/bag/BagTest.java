@@ -9,7 +9,6 @@ import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,7 +36,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalCurve() {
-        testBasicInsertionRemoval(new CurveBag<>(1, defaultSampler, plus, new HashMap(1)));
+        testBasicInsertionRemoval(new CurveBag<>(1, plus, new HashMap(1)));
     }
 
 
@@ -197,21 +196,6 @@ public class BagTest {
         );
     }
 
-    @NotNull
-    public static EmpiricalDistribution getSamplingDistribution(@NotNull CurveBag b, int n) {
-        return getSamplingIndexDistribution(b, n, 10);
-    }
-
-    @NotNull
-    public static EmpiricalDistribution getSamplingIndexDistribution(@NotNull CurveBag b, int n, int bins) {
-        DoubleArrayList f = new DoubleArrayList(n);
-        for (int i = 0; i < n; i++)
-            f.add(b.sampleIndex());
-        EmpiricalDistribution e = new EmpiricalDistribution(bins);
-        e.load(f.toArray());
-        return e;
-    }
-
 
     @NotNull
     public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
@@ -278,27 +262,6 @@ public class BagTest {
 
     }
 
-    @Test
-    public void testFlatBagRemainsRandomInNormalizedSamplerCurve() {
-        @NotNull CurveBag<String> a = curveBag(8, plus);
-
-        testSamplingFlat(a, 0.04f);
-
-
-        int n = a.capacity();
-        int rrr = 100;
-        EmpiricalDistribution d = getSamplingIndexDistribution(a, n * rrr, n - 1);
-        //printDist(d);
-        for (int i = 0; i < n - 1; i++) {
-            long bi = d.getBinStats().get(i).getN();
-            //assertTrue("bin " + i + " sampled x " + bi, bi > (rrr / 4)); //received enough samples
-            System.out.println("bin " + i + " sampled x " + bi);
-        }
-
-    }
-
-
-
     public static void testSamplingFlat(Bag<String,PLink<String>> a, float level) {
         int n = a.capacity()*2;
 
@@ -314,11 +277,9 @@ public class BagTest {
 
     }
 
-    static final CurveBag.CurveSampler defaultSampler = new CurveBag.NormalizedSampler(CurveBag.power6BagCurve, rng);
-
     @NotNull
     public CurveBag<String> curveBag(int n, PriMerge mergeFunction) {
-        return new CurveBag(n, defaultSampler, mergeFunction, new HashMap());
+        return new CurveBag(n, mergeFunction, new HashMap<>(n));
     }
 
     public static void populate(Bag<String,PLink<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {

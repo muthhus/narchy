@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.Range;
@@ -34,16 +35,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
     /**
-     * How many concepts to fire each cycle; measures degree of parallelism in each cycle
+     *
      */
-    @Range(min = 0, max = 64, unit = "Concept")
-    public final @NotNull MutableInteger derivationsPerCycle;
+    @Range(min = 0, max = 8, unit = "Concept")
+    public final @NotNull FloatParam rate;
     /**
      * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
      * reducing this value should provide finer-grained / higher-precision concept selection
      * since results between batches can affect the next one.
      */
-    public final @NotNull MutableInteger conceptsFiredPerBatch;
     public final MutableIntRange termlinksFiredPerConcept = new MutableIntRange(1, 1);
     public final MutableInteger derivationsInputPerCycle;
     protected final NAR nar;
@@ -72,8 +72,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         Concept c = pc.get();
 
         Bag<Task, PLink<Task>> taskLinks = c.tasklinks();
-        taskLinks.commit();
+        if (taskLinks.isEmpty())
+            return 0;
+
         Bag<Term, PLink<Term>> termLinks = c.termlinks();
+        if (termLinks.isEmpty())
+            return 0;
+
+        taskLinks.commit();
         termLinks.commit();
 
         long now = nar.time();
@@ -126,13 +132,17 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
         @Override public void fire() {
-            final int[] num = {derivationsPerCycle.intValue()};
+            int count = (int) Math.ceil(rate.floatValue() * ((ConceptBagFocus) source).active.size());
+            if (count == 0)
+                return; //idle
+
+            final int[] num = { count };
             source.sample((c) -> {
-                int taken = premiseVector(nar, c, nar::input,
-                    Util.lerp(c.pri(),
-                        termlinksFiredPerConcept.lo(), termlinksFiredPerConcept.hi()
+                int derivations = premiseVector(nar, c, nar::input,
+                    Util.lerp(c.priSafe(0),
+                        termlinksFiredPerConcept.hi(), termlinksFiredPerConcept.lo()
                 ));
-                num[0] -= taken;
+                num[0]--;
                 return (num[0] > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });
         }
@@ -150,11 +160,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         this.source = source;
         this.premiser = premiseBuilder;
 
-        this.derivationsPerCycle = new MutableInteger(1);
-        this.conceptsFiredPerBatch = new MutableInteger(1);
+        this.rate = new FloatParam(0.25f);
         this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
-
-
         this.on = nar.onCycle(this);
     }
 

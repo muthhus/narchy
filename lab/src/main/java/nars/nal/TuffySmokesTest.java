@@ -116,7 +116,7 @@ public class TuffySmokesTest {
 
         //Global.DEBUG = true;
 
-        n = new Default(1000, 300, 2);
+        n = new Default(1000, 2);
         //n.conceptActivation.setValue(0.75f);
         //n.conceptRemembering.setValue(12);
 
