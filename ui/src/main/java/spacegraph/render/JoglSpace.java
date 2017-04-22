@@ -251,7 +251,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return show("", w, h );
     }
 
-    public GLWindow show(String title, int w, int h, int x, int y) {
+    public synchronized GLWindow show(String title, int w, int h, int x, int y) {
+        if (this.window!=null)
+            return this.window;
         GLWindow g = window(this);
         this.window = g;
         g.setTitle(title);

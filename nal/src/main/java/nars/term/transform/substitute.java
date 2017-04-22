@@ -1,9 +1,11 @@
 package nars.term.transform;
 
+import nars.$;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst1;
@@ -18,8 +20,10 @@ public final class substitute extends Functor {
 
     final static Term STRICT = Atomic.the("strict");
 
+    final static Atom func = (Atom) $.the("substitute");
+
     public substitute(@NotNull Derivation parent) {
-        super("substitute");
+        super(func);
         this.parent = parent;
     }
 

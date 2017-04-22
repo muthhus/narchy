@@ -48,32 +48,34 @@ public abstract class AbstractNALTest {
     }
 
 
-
     @Before
     public void start() {
         tester = new TestNAR(nar());
     }
+
     @After
     public void end() {
         tester.run();
     }
 
     @NotNull
-    @Deprecated public static Iterable<Supplier<NAR>> nars(int level) {
+    @Deprecated
+    public static Iterable<Supplier<NAR>> nars(int level) {
 
 
-        List<Supplier<NAR>> l = $.newArrayList(2);
+        List<Supplier<NAR>> l = $.newArrayList(1);
 
 
-            for (int c : new int[] { 128/*, 2, 4 */}) { /// fired per cycle
-                l.add(supply("Default[NAL<=" + level + ",c=" + c + ']', () -> {
-                        Default d =
-                            new Default(768, 3 );
-                        d.nal(level);
-                        d.termVolumeMax.setValue(32);
-                        return d;
-                    }
-                ));
+        l.add(supply("Default[NAL<=" + level + ']', () -> {
+                    Default d =
+                            new Default(768, 2);
+
+                    d.nal(level);
+                    d.termVolumeMax.setValue(64);
+                    d.deriver.rate.setValue(0.1f);
+                    return d;
+                }
+        ));
                 /*if (level < 8) {
                     l.add(supply("Default[NAL8, c=" + c + "]", () -> {
                                 Default d = new Default(512, c, 2, 3);
@@ -82,7 +84,7 @@ public abstract class AbstractNALTest {
                             }
                     ));
                 }*/
-            }
+
 
 //            l.add(supply("Alann[NAL<=" + level + ']',
 //                () -> {

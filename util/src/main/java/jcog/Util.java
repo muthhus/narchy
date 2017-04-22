@@ -494,6 +494,7 @@ public enum Util { ;
     public static long lerp(float factor, long target, long current) {
         return current + Math.round((target-current) * ((double)unitize(factor)));
     }
+
     public static int lerp(float factor, int target, int current) {
         return current + Math.round((target-current) * unitize(factor));
     }

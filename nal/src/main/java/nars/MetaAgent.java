@@ -3,6 +3,7 @@ package nars;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatSupplier;
+import nars.nar.Default;
 
 import static nars.$.func;
 import static nars.$.p;
@@ -37,13 +38,16 @@ public class MetaAgent extends NAgent {
         senseNumber(p("lernVol") /*$.func($.the("lern"),$.the("vol"))*/, agentNAR.emotion::learningVol);
         senseNumber(p("dext"), agent::dexterity);
 
-        actionLerp(p("curiConf"), (c) -> {
-            agent.curiosityConf.setValue(Util.unitize(c));
-        }, -0.02f /* non-zero deadzone */, 0.25f);
+//        actionLerp(p("curiConf"), (c) -> {
+//            agent.curiosityConf.setValue(Util.unitize(c));
+//        }, -0.02f /* non-zero deadzone */, 0.25f);
         actionLerp(p("curiProb"), (c) -> {
             agent.curiosityProb.setValue(Util.unitize(c));
-        }, -0.02f /* non-zero deadzone */, 0.5f);
+        }, -0.02f /* non-zero deadzone */, 0.1f);
 
+        actionLerp(p("activationRate"), (c) -> {
+            ((Default)nar).focus.activationRate.setValue(Util.unitize(c));
+        }, 0f /* non-zero deadzone */, 1f);
 
         //actionLerp(p("quaMin"), agentNAR.quaMin::setValue, 0f, 0.5f);
 

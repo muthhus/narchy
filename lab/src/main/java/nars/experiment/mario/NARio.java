@@ -50,7 +50,8 @@ public class NARio extends NAgentX {
 
 
         PixelBag cc = PixelBag.of(() -> mario.image, 40, 40);
-        cc.setClarity(0.5f, 1f);
+        cc.setClarity(0.75f, 1f);
+
         nar.onCycle(() -> {
 
             Scene scene1 = mario.scene;
@@ -73,8 +74,8 @@ public class NARio extends NAgentX {
         sc.setResolution(0.04f);
 
         //new CameraGasNet($.the("camF"), cc, this, 64);
-
-        senseCameraRetina("narioGlobal", ()->mario.image, 30, 18, (v) -> t(v, alpha()));//.setResolution(0.1f);
+        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
+        sc.setResolution(0.1f);
 
         nar.believe("nario:{narioLocal, narioGlobal}");
 

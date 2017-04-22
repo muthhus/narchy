@@ -372,7 +372,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("(<robin --> [flying]> ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((&&,swimmer:robin,<robin --> [flying]>) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
-        tester.mustBelieve(cycles*4,"swimmer:robin",1.00f,0.45f); //.en("I guess robin swims.");
+        tester.mustBelieve(cycles*4,"swimmer:robin",1.00f,0.4f); //.en("I guess robin swims.");
 
     }
 
@@ -412,7 +412,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<R --> [f]>,<R --> [w]>) ==> <R --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<R --> [f]>,<R --> b>) ==> <R --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",1.00f,0.33f /*0.36f*/);
+        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",1.00f,0.42f /*0.36f*/);
         tester.mustBelieve(cycles*2,"<<R --> [w]> ==> <R --> b>>",0.90f,0.42f /*0.45f*/);
     }
 
@@ -436,7 +436,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<r --> [f]>,<r --> [w]>) ==> <r --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<r --> [f]>,<r --> b>) ==> <r --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<r --> b> ==> <r --> [w]>>",1.00f,0.42f);
+        tester.mustBelieve(cycles*2,"<<r --> b> ==> <r --> [w]>>",0.90f,0.42f);
         tester.mustBelieve(cycles*2,"<<r --> [w]> ==> <r --> b>>",0.90f,0.45f);
     }
 

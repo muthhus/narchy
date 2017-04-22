@@ -30,7 +30,7 @@ public class TestEinsteinsRiddle {
         n.inputNarsese(
             resource.openStream()
         );
-        n.run(2048);
+        n.run(128);
         n.printConceptStatistics();
 
 

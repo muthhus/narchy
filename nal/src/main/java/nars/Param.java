@@ -35,9 +35,6 @@ public abstract class Param  {
 
     public static boolean ANSWER_REPORTING = true;
 
-    /** default initial value for ConceptBagControl */
-    public static int TASKS_INPUT_PER_CYCLE_MAX = 256;
-
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -72,9 +69,7 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 12;
-
-
+    public static final int STAMP_CAPACITY = 10;
 
     public final static int UnificationStackMax = 32;
     public static final int MaxMatchConstraintsPerVariable = 8;
@@ -82,7 +77,7 @@ public abstract class Param  {
     public static final int MaxUnificationVariableStack = 2; //may be able to reduce to 1
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTL = 1024;
+    public final static int UnificationTTL = 512;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;

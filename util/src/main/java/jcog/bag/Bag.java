@@ -134,19 +134,19 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * continues while either the predicate hasn't returned false and
      * < max true's have been returned */
     default Bag<K,V> sample(int max, Predicate<? super V> kontinue) {
-        final int[] count = {0};
+        final int[] count = {max};
         return sample((x) -> {
-            return (kontinue.test(x) && ((count[0]++) < max)) ?
+            return (kontinue.test(x) && ((count[0]--) > 0)) ?
                     Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
         });
     }
 
     /** convenience macro */
     default Bag<K,V> sample(int max, Consumer<? super V> kontinue) {
-        final int[] count = {0};
+        final int[] count = {max};
         return sample((x) -> {
             kontinue.accept(x);
-            return ((count[0]++) < max) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+            return ((count[0]--) > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
         });
     }
 

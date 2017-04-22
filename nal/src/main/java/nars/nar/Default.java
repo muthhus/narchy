@@ -50,7 +50,7 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(1024, 3);
+        this(1024, 2);
     }
 
     public Default(int activeConcepts, int termLinksPerConcept) {
@@ -85,10 +85,10 @@ public class Default extends NAR {
         ;
 
 
-        deriver.termlinksFiredPerConcept.set(1, termLinksPerConcept);
-        //deriver.tasklinksFiredPerFiredConcept.set(taskLinksPerConcept);
-        //deriver.rate.setValue(conceptsFirePerCycle);
-
+        //used for both:
+        deriver.taskLinksFiredPerConcept.set(1, termLinksPerConcept);
+        deriver.termLinksFiredPerTaskLink.set(1, termLinksPerConcept);
+        deriver.rate.setValue(0.1f);
     }
 
     public Deriver newDeriver() {
@@ -105,11 +105,11 @@ public class Default extends NAR {
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
-        //return new PLinkHijackBag(initialCapacity, 4);
+//        return new PLinkHijackBag(initialCapacity, 4);
         return new CurveBag<>(initialCapacity, PriMerge.plus,
                 exe.concurrent() ?
-                    new ConcurrentHashMap<>(initialCapacity*2, 0.9f) :
-                    new HashMap<>(initialCapacity*2, 0.9f)
+                    new ConcurrentHashMap<>(initialCapacity, 0.9f) :
+                    new HashMap<>(initialCapacity, 0.9f)
         );
 
     }

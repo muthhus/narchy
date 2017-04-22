@@ -198,15 +198,15 @@ abstract public class NAgentX extends NAgent {
                     ),
                     new WindowButton( "conceptTreeMap", () -> {
 
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 256, 0.5f), 128, nar);
+                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.concepts(), 128, 0.5f), 128, nar);
 
                         return tc;
                     }),
                             //"tasks", ()-> taskChart,
                     new WindowButton( "conceptGraph", ()-> Vis.conceptsWindow3D(nar,
-                            64, 4) )
+                            32, 5) )
                 )
-            ), 600, 400);
+            ), 900, 600);
         });
     }
 

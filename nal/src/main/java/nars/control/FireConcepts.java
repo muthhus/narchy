@@ -4,13 +4,11 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
-import jcog.data.MutableInteger;
 import jcog.data.Range;
 import jcog.event.On;
 import jcog.pri.PLink;
 import nars.Focus;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.premise.Derivation;
@@ -37,14 +35,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      *
      */
-    @Range(min = 0, max = 8, unit = "Concept")
-    public final @NotNull FloatParam rate;
+    public final @NotNull FloatParam rate = new FloatParam(1f);
     /**
      * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
      * reducing this value should provide finer-grained / higher-precision concept selection
      * since results between batches can affect the next one.
      */
-    public final MutableIntRange termlinksFiredPerConcept = new MutableIntRange(1, 1);
+    public final MutableIntRange taskLinksFiredPerConcept = new MutableIntRange(1, 1);
+    public final MutableIntRange termLinksFiredPerTaskLink = new MutableIntRange(1, 1);
+
 //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
     protected final NAR nar;
@@ -68,53 +67,50 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //    }
 
     /** returns # of derivations processed */
-    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numPremises) {
+    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numTaskLinks) {
 
         Concept c = pc.get();
 
-        Bag<Task, PLink<Task>> taskLinks = c.tasklinks();
-        if (taskLinks.isEmpty())
+        Bag<Task, PLink<Task>> taskLinks = c.tasklinks().commit();
+        numTaskLinks = Math.min(numTaskLinks, taskLinks.size());
+        if (numTaskLinks==0)
             return 0;
 
-        Bag<Term, PLink<Term>> termLinks = c.termlinks();
-        if (termLinks.isEmpty())
-            return 0;
 
-        taskLinks.commit();
-        termLinks.commit();
+        Bag<Term, PLink<Term>> termLinks = c.termlinks().commit();
+        int availTermLinks = termLinks.size();
+        if (availTermLinks==0)
+            return 0;
 
         long now = nar.time();
-        int count = 0;
+        final int[] count = {0};
 
-        for (int i = 0; i < numPremises; i++) {
-            final @Nullable PLink<Task> taskLink = taskLinks.sample();
-            if (taskLink == null)
-                continue;
+        taskLinks.sample(numTaskLinks, taskLink -> {
 
-            PLink<Term> termLink = termLinks.sample();
-            if (termLink==null)
-                continue;
+            int numTermLinks = Math.min(availTermLinks, termLinksFiredPerTaskLink.lerp(taskLink.priSafe(0)));
+            termLinks.sample(numTermLinks, termLink -> {
 
-            Derivation d = premiser.premise(c, taskLink, termLink, now, nar, -1f, target);
-            if (d != null) {
-                premiser.deriver.accept(d);
-                count++;
-            }
+                Derivation d = premiser.premise(c, taskLink, termLink, now, nar, -1f, target);
+                if (d != null) {
+                    premiser.deriver.accept(d);
+                    count[0]++;
+                }
 
 
-//            int termlinksPerForThisTask = termlinksFiredPerFiredConcept
-//                    .hi();
-                    //.lerp( pc.pri()  );
+                //            int termlinksPerForThisTask = termlinksFiredPerFiredConcept
+                //                    .hi();
+                //.lerp( pc.pri()  );
 
-//            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-//            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
-//                termLinks.add(v);
-//                return 1;
-//            });
+                //            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
+                //            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
+                //                termLinks.add(v);
+                //                return 1;
+                //            });
 
+            });
+        });
 
-        }
-        return count;
+        return count[0];
     }
 
 
@@ -133,16 +129,16 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
         @Override public void fire() {
-            int count = (int) Math.ceil(rate.floatValue() * ((ConceptBagFocus) source).active.size());
+            ConceptBagFocus csrc = (ConceptBagFocus) source;
+            int count = Math.min(csrc.active.size(), (int) Math.ceil(rate.floatValue() * csrc.active.capacity()));
             if (count == 0)
                 return; //idle
 
             final int[] num = { count };
             source.sample((c) -> {
                 int derivations = premiseVector(nar, c, nar::input,
-                    Util.lerp(c.priSafe(0),
-                        termlinksFiredPerConcept.hi(), termlinksFiredPerConcept.lo()
-                ));
+                    taskLinksFiredPerConcept.lerp(c.priSafe(0))
+                );
                 num[0]--;
                 return (num[0] > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });
@@ -160,8 +156,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         this.nar = nar;
         this.source = source;
         this.premiser = premiseBuilder;
-
-        this.rate = new FloatParam(0.25f);
 
         this.on = nar.onCycle(this);
     }

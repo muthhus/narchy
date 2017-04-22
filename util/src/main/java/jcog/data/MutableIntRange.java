@@ -56,7 +56,7 @@ public class MutableIntRange {
         int l = lo;
         int h = hi;
         if (l == h) return l;
-        else return Util.lerp(x, lo, hi);
+        else return Util.lerp(x, hi, lo);
     }
 
 }

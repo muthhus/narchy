@@ -29,7 +29,8 @@ public class PForget<X extends Priority> implements Consumer<X> {
     public void accept(@NotNull X b) {
         b.priSub(avgToBeRemoved
             //,0.5f //50% retained
-            ,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+            ,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
         );
     }
 

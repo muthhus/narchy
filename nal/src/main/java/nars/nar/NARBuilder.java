@@ -10,6 +10,7 @@ import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
@@ -65,11 +66,11 @@ public interface NARBuilder {
                 return f.apply(termlink, tasklink);
             }
 
-//            @NotNull
-//            @Deprecated @Override
-//            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-//                return new DefaultHijackBag<>(blend, reprobes);
-//            }
+            @NotNull
+            @Deprecated @Override
+            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+                return new DefaultHijackBag<>(blend, reprobes);
+            }
         };
 
 
@@ -78,16 +79,16 @@ public interface NARBuilder {
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                4,
+                3,
 
-                //new HijackTermIndex(cb, 1024 * 256, reprobes)
+//                new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
                 new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
                     exe
                     //null /* null = fork join common pool */
-                ),
+                )
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
-                time,
+                ,time,
                 exe) {
 
 //            @Override
@@ -189,8 +190,8 @@ public interface NARBuilder {
 
         nar.termVolumeMax.setValue(96);
 
-        nar.beliefConfidence(0.8f);
-        nar.goalConfidence(0.8f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 1f * p;

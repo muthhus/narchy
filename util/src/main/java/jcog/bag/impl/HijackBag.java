@@ -427,16 +427,17 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         final Random random = random();
         int i = random.nextInt(c);
 
-        int spins = 0;
+
         BagCursorAction next = BagCursorAction.Next;
         boolean modified = false;
-        while (!next.stop && spins < c /* emegency limit */) {
-            V v = map.get(i++);  if (i == c) i = 0; //modulo c
+        while (!next.stop) {
+            V v = map.get(i++);
             if (v != null && (next = each.next(v)).remove) {
                 if (map.weakCompareAndSetVolatile(i, v, null)) {
                     modified = true;
                 }
             }
+            if (i == c) i = 0; //modulo c
         }
 
         if (modified)

@@ -303,7 +303,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     protected void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<X>> each, int startingIndex) {
-        int i = startingIndex % size();
+        int i = startingIndex;
         boolean modified = false;
         BagCursorAction next = BagCursorAction.Next;
         int s;
@@ -343,7 +343,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 float oo = mergeFunction.merge(n, b, scale);
                 float np = n.pri();
 
-                if (size() >= capacity && np < priMinFast()) {
+                if (size() >= capacity && np < priMin()) {
                     res = null; //failed insert
                     o = 0;
                 } else {
@@ -742,19 +742,14 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     public float priMax() {
         PLink x;
         ensureSorted();
-        //synchronized (items) {
         x = items.first();
-        //}
         return x != null ? x.priSafe(0) : 0f;
     }
 
     @Override
     public float priMin() {
-        PLink x;
         ensureSorted();
         return priMinFast();
-
-
     }
 
     /** doesnt ensure sorting to avoid synchronization */

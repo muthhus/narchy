@@ -140,8 +140,8 @@ abstract public class NAgent implements NSense, NAct {
             }
         };
 
-        curiosityConf = new FloatParam(nar.confMin.floatValue() * 5);
-        curiosityProb = new FloatParam(0.5f);
+        curiosityConf = new FloatParam(Math.max(nar.confMin.floatValue(), nar.confDefault(Op.GOAL)/10f));
+        curiosityProb = new FloatParam(1f);
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
@@ -262,9 +262,10 @@ abstract public class NAgent implements NSense, NAct {
         if (conf < confMin)
             return Stream.empty();
 
+        float curiPerMotor = curiosityProb.floatValue() / actions.size();
         return actionStream().map(action -> {
 
-            if (nar.random().nextFloat() < curiosityProb.floatValue()) {
+            if (nar.random().nextFloat() < curiPerMotor) {
                 return action.curiosity(conf, next, nar);
             }/* else {
                 nar.activate(action, 1f);

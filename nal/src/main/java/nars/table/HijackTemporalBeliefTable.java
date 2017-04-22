@@ -1,9 +1,11 @@
 package nars.table;
 
 import jcog.Util;
+import jcog.bag.impl.HijackBag;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
+import jcog.pri.PForget;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -20,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
@@ -113,13 +116,23 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
     @Override
+    protected Consumer<Task> forget(float avgToBeRemoved) {
+        return new PForget<Task>(avgToBeRemoved) {
+            @Override public void accept( @NotNull Task b) {
+                b.priSub(avgToBeRemoved * (1f - b.conf()));
+            }
+        };
+    }
+
+    @Override
     public float pri(@NotNull Task t) {
-        //return (1f + t.priSafe(0)) * (1f + t.conf());
-        float p = t.priSafe(-1);
-        if (p >= 0)
-            return Util.or((1f + p), (1f + t.conf()));
-        else
-            return -1;
+        return t.pri();
+//        //return (1f + t.priSafe(0)) * (1f + t.conf());
+//        float p = t.priSafe(-1);
+//        if (p >= 0)
+//            return Util.or((1f + p), (1f + t.conf()));
+//        else
+//            return -1;
     }
 
 

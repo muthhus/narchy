@@ -1,5 +1,6 @@
 package nars.term.transform;
 
+import nars.$;
 import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Term;
@@ -63,7 +64,7 @@ abstract public class substituteIfUnifies extends Functor {
     //private final OneMatchFindSubst subMatcher;
     protected final Derivation parent; //parent matcher context
 
-    protected substituteIfUnifies(String id, Derivation parent) {
+    protected substituteIfUnifies(Atom id, Derivation parent) {
         super(id);
         this.parent = parent;
         //this.subMatcher = sub;
@@ -116,9 +117,10 @@ abstract public class substituteIfUnifies extends Functor {
 
     public static class substituteIfUnifiesAny extends substituteIfUnifies {
 
+        final static Atom func = (Atom) $.the("subIfUnifiesAny");
 
         public substituteIfUnifiesAny(Derivation parent) {
-            super("subIfUnifiesAny", parent);
+            super(func, parent);
         }
 
         @Override
@@ -129,9 +131,10 @@ abstract public class substituteIfUnifies extends Functor {
 
     public static final class substituteIfUnifiesDep extends substituteIfUnifies {
 
+        final static Atom func = (Atom) $.the("subIfUnifiesDep");
 
         public substituteIfUnifiesDep(Derivation parent) {
-            super("subIfUnifiesDep", parent);
+            super(func, parent);
         }
 
 
