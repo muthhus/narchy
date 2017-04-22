@@ -88,7 +88,7 @@ public class Default extends NAR {
         //used for both:
         deriver.taskLinksFiredPerConcept.set(1, termLinksPerConcept);
         deriver.termLinksFiredPerTaskLink.set(1, termLinksPerConcept);
-        deriver.rate.setValue(0.1f);
+        deriver.rate.setValue(0.05f);
     }
 
     public Deriver newDeriver() {

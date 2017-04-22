@@ -45,9 +45,7 @@ abstract public class PremiseBuilder {
         Term beliefTerm = termLink.get();
         Task belief = null;
 
-
         Task task = taskLink.get();
-
 
         if (beliefTerm instanceof Compound) {
 

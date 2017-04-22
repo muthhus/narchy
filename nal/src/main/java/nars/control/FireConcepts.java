@@ -67,9 +67,12 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //    }
 
     /** returns # of derivations processed */
-    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target, int numTaskLinks) {
+    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target) {
 
         Concept c = pc.get();
+        float cPri = pc.priSafe(0);
+
+        int numTaskLinks = taskLinksFiredPerConcept.lerp(cPri);
 
         Bag<Task, PLink<Task>> taskLinks = c.tasklinks().commit();
         numTaskLinks = Math.min(numTaskLinks, taskLinks.size());
@@ -87,7 +90,12 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         taskLinks.sample(numTaskLinks, taskLink -> {
 
-            int numTermLinks = Math.min(availTermLinks, termLinksFiredPerTaskLink.lerp(taskLink.priSafe(0)));
+            int numTermLinks = Math.min(
+                    availTermLinks,
+                    termLinksFiredPerTaskLink.lerp(
+                        cPri * taskLink.pri()
+                    ));
+
             termLinks.sample(numTermLinks, termLink -> {
 
                 Derivation d = premiser.premise(c, taskLink, termLink, now, nar, -1f, target);
@@ -136,9 +144,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             final int[] num = { count };
             source.sample((c) -> {
-                int derivations = premiseVector(nar, c, nar::input,
-                    taskLinksFiredPerConcept.lerp(c.priSafe(0))
-                );
+                int derivations = premiseVector(nar, c, nar::input);
                 num[0]--;
                 return (num[0] > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });

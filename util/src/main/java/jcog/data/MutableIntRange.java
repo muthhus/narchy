@@ -50,6 +50,8 @@ public class MutableIntRange {
     }
 
     public int lerp(float x) {
+        if (x!=x)
+            x = 0;
         if (x < 0 || x > 1)
             throw new UnsupportedOperationException("out of range");
 
