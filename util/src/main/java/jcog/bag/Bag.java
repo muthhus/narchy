@@ -204,7 +204,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * @param it An item
      * @return Whether the Item is in the Bag
      */
-    boolean contains(@NotNull K it);
+    default boolean contains(@NotNull K it) {
+        return get(it)!=null;
+    }
 
     default boolean isEmpty() {
         return size() == 0;
@@ -322,20 +324,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         float m = max[0];
         if (Float.isFinite(m)) return m;
         else return 0;
-    }
-
-
-    /**
-     * default implementation; more optimal implementations will avoid instancing an iterator
-     */
-    default void forEach(int max, @NotNull Consumer<? super V> action) {
-
-        Iterator<V> ii = iterator();
-        int n = 0;
-        while (ii.hasNext() && (n++ < max)) {
-            action.accept(ii.next());
-        }
-
     }
 
 

@@ -1,10 +1,10 @@
 package nars.control;
 
-import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.event.On;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import nars.Focus;
 import nars.NAR;
 import nars.Task;
@@ -15,9 +15,7 @@ import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -114,11 +112,20 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             if (count == 0)
                 return; //idle
 
-            final Set<Task> in = new LinkedHashSet(count * 32 /* estimate */);
+            final Map<Task,Task> in = new LinkedHashMap<>(count * 8 /* estimate */);
             csrc.active.sampleToList(count).forEach(p -> {
-                int derivations = premiseVector(nar, p, in::add);
+                int derivations = premiseVector(nar, p, (x)->{
+                    in.merge(x, x, (prev, next)->{
+                        if (prev!=null) {
+                            PriMerge.max.merge(prev, next);
+                            return prev;
+                        } else {
+                            return next;
+                        }
+                    });
+                });
             });
-            nar.input(in);
+            nar.input(in.values());
         }
 
         @Override

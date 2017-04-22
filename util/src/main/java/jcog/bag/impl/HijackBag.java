@@ -590,10 +590,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
     }
 
-    @Override
-    public boolean contains(@NotNull K it) {
-        return get(it) != null;
-    }
 
     @Override
     @Deprecated
@@ -608,6 +604,15 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 null
         );
 
+    }
+
+    @Override
+    public float priMin() {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public float priMax() {
+        throw new UnsupportedOperationException();
     }
 
     abstract protected Consumer<V> forget(float rate);

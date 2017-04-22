@@ -57,7 +57,6 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
         bag.forEachWhile(action);
     }
 
-    @Override
     public void forEach(int max, @NotNull Consumer<? super Y> action) {
         throw new UnsupportedOperationException(); //typing issue, TODO
     }
@@ -97,15 +96,6 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
         return bag.iterator();
     }
 
-    @Override
-    public boolean contains(@NotNull X it) {
-        return bag.contains(it);
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return bag.isEmpty();
-    }
 
     @Override
     public boolean setCapacity(int c) {

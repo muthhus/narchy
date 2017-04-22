@@ -3,6 +3,7 @@ package jcog.bag.impl.hijack;
 import jcog.bag.impl.HijackBag;
 import jcog.pri.PForget;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +73,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected PLink<X> merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
-        float pressure = Priority.combine(existing, incoming, scale);
+        float pressure = PriMerge.combine(existing, incoming, scale);
 
         if (pressure >= Priority.EPSILON_DEFAULT)
             pressurize(pressure);

@@ -1210,8 +1210,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);
             if (includeConceptGoals) c.goals().forEach(maxPerConcept, recip);
             if (includeConceptQuests) c.quests().forEach(maxPerConcept, recip);
-            if (includeTaskLinks)
-                c.tasklinks().forEach(maxPerConcept, t -> recip.accept(t.get()));
+            if (includeTaskLinks) {
+                Consumer<? super PLink<Task>> action = t -> recip.accept(t.get());
+                c.tasklinks().sample(maxPerConcept, action);
+            }
         });
 
         return this;
@@ -1386,10 +1388,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         });
     }
 
-    public final void input(@Nullable Stream<Task> taskStream) {
-        if (taskStream != null) {
-            taskStream.filter(Objects::nonNull).forEach(this::input);
-        }
+    public final void input(@NotNull Stream<Task> taskStream) {
+        taskStream.filter(Objects::nonNull).forEach(this::input);
     }
 
 

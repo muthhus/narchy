@@ -96,10 +96,10 @@ public class MultiThreadExecutor extends Executioner implements ExceptionHandler
                 exe,
                 ProducerType.MULTI,
                 //new BusySpinWaitStrategy()
-                new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
-                        new SleepingWaitStrategy())
+                //new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
+                //        new SleepingWaitStrategy())
                 //new LiteBlockingWaitStrategy()
-                //new SleepingWaitStrategy()
+                new SleepingWaitStrategy()
                 //new BlockingWaitStrategy()
                 //new LiteTimeoutBlockingWaitStrategy(1, TimeUnit.MILLISECONDS)
         );

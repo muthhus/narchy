@@ -93,10 +93,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         return x;
     }
 
-    @Override
-    public void forEach(int max, @NotNull Consumer<? super Task> action) {
-        super.forEach(max, action);
-    }
+
 
 //    public static void flatForget(TaskHijackBag b, @NotNull NAR n) {
 //        double p = b.pressure.get();

@@ -63,31 +63,6 @@ public interface Priority extends Prioritized {
         }
     }
 
-    /**
-     * simple additive Priority merging
-     * if existing is not null, then priority from incoming is applied to it * scale
-     * if existing is null, then incoming enters existence with incoming priority * scale
-     * returns the delta change in ambient pressure
-     */
-    static float combine(@Nullable Priority existing, @NotNull Priority incoming, float scale) {
-        float pAdd = incoming.priSafe(0) * scale;
-        float pressure;
-
-        if (existing != null) {
-            float before = existing.priSafe(0);
-
-            //modify existing
-            existing.priAdd(pAdd);
-
-            pressure = existing.priSafe(0) - before;
-        } else {
-            //modify incoming
-            incoming.setPriority(pAdd);
-            pressure = (pAdd);
-        }
-        return pressure;
-    }
-
     default void priMax(float max) {
         setPriority(Math.max(priSafe(0), max));
     }

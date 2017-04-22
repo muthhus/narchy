@@ -16,7 +16,9 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.LambdaPred;
+import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
+import nars.index.term.map.MaplikeTermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -1085,10 +1087,6 @@ public enum $ {
         }
     }
 
-    /**
-     * global shared Javascript context
-     */
-    public final static NashornScriptEngine JS = JS();
 
     /**
      * instantiate new Javascript context
@@ -1117,7 +1115,19 @@ public enum $ {
         });
     }
 
-    public static final class StaticTermBuilder extends TermIndex {
+    /** note: has an internal cache by extending the MaplikeTermIndex */
+    public static final class StaticTermBuilder extends MaplikeTermIndex {
+
+        public StaticTermBuilder() {
+            super(new ConceptBuilder.NullConceptBuilder());
+        }
+
+//        @Override
+//        protected Term the(ProtoCompound c) {
+////            if (Math.random() < 0.01f)
+////                System.out.println(build.summary());
+//            return super.the(c);
+//        }
 
         @Override
         public
@@ -1161,11 +1171,6 @@ public enum $ {
         }
 
 
-        @Nullable
-        @Override
-        public ConceptBuilder conceptBuilder() {
-            return null;
-        }
 
     }
 

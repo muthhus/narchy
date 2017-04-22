@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 4/24/16.
@@ -127,13 +128,14 @@ public class ActiveConceptService extends PeriodicWebsocketService {
         IO.writeUTF8WithPreLen(c.toString(), out);
 
         Bag<Term,PLink<Term>> b = c.termlinks();
-        b.forEach(termlinks, t -> {
+        Consumer<? super PLink<Term>> action = t -> {
             try {
                 IO.writeBudget(out, t);
                 IO.writeUTF8WithPreLen(t.get().toString(), out);
                 //TODO write budget info
             } catch (IOException e) {            }
-        });
+        };
+        b.sample(termlinks, action);
 
         out.writeFloat(-1); //end of termlinks, will be detected when trying to read next priority
     }

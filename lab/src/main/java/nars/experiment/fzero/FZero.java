@@ -28,8 +28,8 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 32, 24, (v) -> t(v, alpha()))
-                .setResolution(0.05f);
+        senseCamera("fz", ()->fz.image, 128, 64, (v) -> t(v, alpha()))
+                .setResolution(0.02f);
 
         actionToggle($.inh(Atomic.the("fwd"),id),
                 //(b)->{ fz.thrust = b; }
