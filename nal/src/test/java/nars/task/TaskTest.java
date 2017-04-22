@@ -23,7 +23,7 @@ public class TaskTest {
 
         assertEquals(3276, $.t(0, 0.1f).hashCode());
 
-        assertEquals(2147385309, $.t(1, 1.0f).hashCode());
+        assertEquals(2147385014, $.t(1, 1.0f).hashCode());
     }
 
 //    /** tests the ordering of tasks that differ by truth values,

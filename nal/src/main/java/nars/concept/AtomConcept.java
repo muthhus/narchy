@@ -23,7 +23,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
     private final Bag<Term,PLink<Term>> termLinks;
     private final Bag<Task,PLink<Task>> taskLinks;
 
-    @Nullable private transient ConceptState state = ConceptState.Deleted;
+    @Nullable private transient ConceptState state = ConceptState.Inactive;
 
     @NotNull
     private final Op op;
@@ -43,7 +43,7 @@ public class AtomConcept extends AtomicStringConstant implements Concept {
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
 
-        this.state = ConceptState.Deleted;
+        this.state = ConceptState.Inactive;
     }
 
     @NotNull

@@ -100,7 +100,7 @@ public class NAL6MultistepTest {
             // burglary.print();  earthquake.print();
             //long now = d.time();
             System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0));
-            d.run(400);
+            d.run(100);
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%

@@ -1,4 +1,4 @@
-package nars.perf.nars.nar.perf;
+package nars.perf;
 
 
 import nars.NAR;

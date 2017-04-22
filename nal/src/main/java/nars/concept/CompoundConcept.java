@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import nars.NAR;
+import nars.Op;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
@@ -12,6 +13,7 @@ import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.container.TermContainer;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -24,8 +26,7 @@ import java.util.function.Predicate;
 import static nars.Param.TRUTH_EPSILON;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
-public class CompoundConcept implements Concept, Termlike {
-
+public class CompoundConcept implements Concept, Compound, Termlike {
 
     @NotNull
     private final Bag<Task,PLink<Task>> taskLinks;
@@ -40,7 +41,7 @@ public class CompoundConcept implements Concept, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    protected transient ConceptState state = ConceptState.Deleted;
+    protected transient ConceptState state = ConceptState.Inactive;
 
 
     /**
@@ -57,7 +58,7 @@ public class CompoundConcept implements Concept, Termlike {
         this.taskLinks = taskLinks;
 
 
-        this.state = ConceptState.Deleted;
+        this.state = ConceptState.Inactive;
     }
 
 
@@ -81,10 +82,20 @@ public class CompoundConcept implements Concept, Termlike {
         return BeliefTable.EMPTY;
     }
 
+    @Override
+    public @NotNull TermContainer subterms() {
+        return term.subterms();
+    }
+
     @NotNull
     @Override
     public Compound term() {
         return term;
+    }
+
+    @Override
+    public @NotNull Op op() {
+        return term.op();
     }
 
 
@@ -411,6 +422,16 @@ public class CompoundConcept implements Concept, Termlike {
     @Override
     public int volume() {
         return term.volume();
+    }
+
+    @Override
+    public boolean isNormalized() {
+        return term.isNormalized();
+    }
+
+    @Override
+    public int dt() {
+        return term.dt();
     }
 
 

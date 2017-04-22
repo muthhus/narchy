@@ -343,7 +343,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 float oo = mergeFunction.merge(n, b, scale);
                 float np = n.pri();
 
-                if (size() >= capacity && np < priMin()) {
+                if (size() >= capacity && np < priMinFast()) {
                     res = null; //failed insert
                     o = 0;
                 } else {
@@ -446,8 +446,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
                 boolean needsSort;
                 if (each != null) {
-                    updateBudget(each);
-                    needsSort = true;
+                    needsSort = !updateBudget(each);
                 } else {
                     needsSort = false;
                 }

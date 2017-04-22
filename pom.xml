@@ -101,6 +101,5 @@
         <module>app</module>
         <module>lab</module>
         <module>web</module>
-        <module>perf</module>
     </modules>
 </project>

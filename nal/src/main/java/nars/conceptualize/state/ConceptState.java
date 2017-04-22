@@ -30,7 +30,7 @@ public abstract class ConceptState extends AtomicStringConstant {
     public abstract int questionCap(boolean questionOrQuest);
 
 
-    public static final ConceptState Deleted = new ConceptState("deleted") {
+    public static final ConceptState Inactive = new ConceptState("deleted") {
 
 
         @Override

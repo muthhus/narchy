@@ -29,9 +29,11 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package nars.perf.nars.nar.perf;
+package nars.perf;
 
+import nars.$;
 import nars.nar.Default;
+import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
@@ -51,18 +53,17 @@ public class NARBenchmark {
 
 
     @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
+    @BenchmarkMode(value = Mode.All)
     public void deductiveChainTest1() {
 
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
-        n.deriver.rate.setValue(0.1f);
-
+        n.deriver.rate.setValue(0.05f);
 
         new DeductiveMeshTest(n, new int[]{16, 16});
-        //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+        new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 
         n.run(100);
 
@@ -96,7 +97,7 @@ public class NARBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARBenchmark.class, 2, 2);
+        perf(NARBenchmark.class, 1, 1);
     }
 
 }

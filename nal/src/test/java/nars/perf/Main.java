@@ -1,5 +1,8 @@
 package nars.perf;
 
+import org.openjdk.jmh.profile.HotspotMemoryProfiler;
+import org.openjdk.jmh.profile.HotspotRuntimeProfiler;
+import org.openjdk.jmh.profile.HotspotThreadProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -44,9 +47,9 @@ public enum Main {
 				//.addProfiler(LinuxPerfAsmProfiler.class)
 				//.addProfiler(LinuxPerfNormProfiler.class)
 
-				//.addProfiler(HotspotRuntimeProfiler.class)
-				//.addProfiler(HotspotMemoryProfiler.class)
-				// .addProfiler(HotspotThreadProfiler.class)
+				.addProfiler(HotspotRuntimeProfiler.class)
+				.addProfiler(HotspotMemoryProfiler.class)
+				.addProfiler(HotspotThreadProfiler.class)
 
 				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)

@@ -155,7 +155,7 @@ public interface Concept extends Termed {
         //c.questions().clear(); //TODO?
         //c.quests().clear();
 
-        c.state(ConceptState.Deleted, nar);
+        c.state(ConceptState.Inactive, nar);
 
 
 
@@ -181,7 +181,7 @@ public interface Concept extends Termed {
 
 
     default boolean isDeleted() {
-        return state() == ConceptState.Deleted;
+        return state() == ConceptState.Inactive;
     }
 
 

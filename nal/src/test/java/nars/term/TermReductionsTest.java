@@ -501,7 +501,7 @@ public class TermReductionsTest {
     }
 
     @Test public void testConegatedConjunctionTerms1() throws Narsese.NarseseException {
-        assertEquals($("(&&,(x),--(y),--(z))"), $("((x) && --((y) && (z)))"));
+        assertEquals($("((--,((y)&&(z)))&&(x))"), $("((x) && --((y) && (z)))"));
     }
     @Test public void testConegatedConjunctionTerms1not() throws Narsese.NarseseException {
         //dont unwrap due to different 'dt'

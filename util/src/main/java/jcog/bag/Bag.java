@@ -1,6 +1,7 @@
 package jcog.bag;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -127,6 +129,16 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     /* sample the bag, optionally removing each visited element as decided by the visitor's
      * return value */
     @NotNull Bag<K,V> sample(@NotNull Bag.BagCursor<? super V> each);
+
+    default List<V> sampleToList(int n) {
+        if (n == 0)
+            return Collections.emptyList();
+
+        List<V> l = new FasterList(n);
+        sample(n, (Predicate<? super V>) l::add);
+        return l;
+    }
+
 
 
     /** convenience macro for using sample(BagCursor).

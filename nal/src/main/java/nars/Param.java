@@ -69,7 +69,7 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 12;
 
     public final static int UnificationStackMax = 32;
     public static final int MaxMatchConstraintsPerVariable = 8;
@@ -109,12 +109,12 @@ public abstract class Param  {
 
 
     /** internal granularity which truth components are rounded to */
-    public static final float TRUTH_EPSILON = 0.001f;
+    public static final float TRUTH_EPSILON = 0.01f;
 
     /**
      * how precise unit test results must match expected values to pass
      */
-    public static float TESTS_TRUTH_ERROR_TOLERANCE = 0.01f;
+    public static float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
 
 

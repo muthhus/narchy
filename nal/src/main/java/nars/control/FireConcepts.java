@@ -15,6 +15,9 @@ import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -68,54 +71,26 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         Concept c = pc.get();
         float cPri = pc.priSafe(0);
+        int numLinksSqr = taskLinksFiredPerConcept.lerp(cPri); //TODO see if there is a sqr/sqrt relationship that can be made
 
-        int numTaskLinks = taskLinksFiredPerConcept.lerp(cPri);
-
-        Bag<Task, PLink<Task>> taskLinks = c.tasklinks().commit();
-        numTaskLinks = Math.min(numTaskLinks, taskLinks.size());
-        if (numTaskLinks==0)
-            return 0;
-
-
-        Bag<Term, PLink<Term>> termLinks = c.termlinks().commit();
-        int availTermLinks = termLinks.size();
-        if (availTermLinks==0)
-            return 0;
-
-        long now = nar.time();
+        List<PLink<Task>> tasklinks = c.tasklinks().commit().sampleToList(numLinksSqr);
+        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(numLinksSqr);
         final int[] count = {0};
 
-        taskLinks.sample(numTaskLinks, taskLink -> {
-
-            int numTermLinks = Math.min(
-                    availTermLinks,
-                    termLinksFiredPerTaskLink.lerp(
-                        cPri * taskLink.pri()
-                    ));
-
-            termLinks.sample(numTermLinks, termLink -> {
-
-                Derivation d = premiser.premise(c, taskLink, termLink, now, nar, -1f, target);
+        long now = nar.time();
+        for (PLink<Task> tasklink : tasklinks) {
+            for (PLink<Term> termlink : termlinks) {
+                Derivation d = premiser.premise(c, tasklink, termlink, now, nar, -1f, target);
                 if (d != null) {
                     premiser.deriver.accept(d);
                     count[0]++;
                 }
 
-
-                //            int termlinksPerForThisTask = termlinksFiredPerFiredConcept
-                //                    .hi();
-                //.lerp( pc.pri()  );
-
-                //            FasterList<PLink<Term>> termLinks = new FasterList(termlinksPerForThisTask);
-                //            c.termlinks().sample(termlinksPerForThisTask, (h,v) -> {
-                //                termLinks.add(v);
-                //                return 1;
-                //            });
-
-            });
-        });
+            }
+        }
 
         return count[0];
+
     }
 
 
@@ -139,12 +114,11 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             if (count == 0)
                 return; //idle
 
-            final int[] num = { count };
-            source.sample((c) -> {
-                int derivations = premiseVector(nar, c, nar::input);
-                num[0]--;
-                return (num[0] > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+            final Set<Task> in = new LinkedHashSet(count * 32 /* estimate */);
+            csrc.active.sampleToList(count).forEach(p -> {
+                int derivations = premiseVector(nar, p, in::add);
             });
+            nar.input(in);
         }
 
         @Override

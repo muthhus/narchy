@@ -36,7 +36,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
         @Override
         public @NotNull ConceptState init() {
-            return ConceptState.Deleted;
+            return ConceptState.Inactive;
         }
 
         @Override
