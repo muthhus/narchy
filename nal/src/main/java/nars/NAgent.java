@@ -19,7 +19,6 @@ import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.data.Mix;

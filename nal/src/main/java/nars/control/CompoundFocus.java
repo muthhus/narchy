@@ -7,7 +7,6 @@ import jcog.pri.PLink;
 import nars.Focus;
 import nars.concept.Concept;
 import nars.term.Termed;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

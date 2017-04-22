@@ -3,14 +3,12 @@ package nars.bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.PForget;
 import jcog.pri.PriMerge;
-import nars.NAR;
 import nars.Task;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.Consumer;
 
 /**

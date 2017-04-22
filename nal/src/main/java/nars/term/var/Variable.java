@@ -1,7 +1,5 @@
 package nars.term.var;
 
-import nars.index.term.TermIndex;
-import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 

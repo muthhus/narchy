@@ -2,7 +2,6 @@ package nars.nar;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.random.XorShift128PlusRandom;

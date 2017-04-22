@@ -36,7 +36,6 @@ import nars.util.Cycles;
 import nars.util.data.Mix;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.tuple.Twin;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;

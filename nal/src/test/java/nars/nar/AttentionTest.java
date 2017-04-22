@@ -5,19 +5,6 @@
 package nars.nar;
 
 
-import com.google.common.collect.Iterables;
-import jcog.pri.PLink;
-import nars.Narsese;
-import nars.concept.Concept;
-import nars.term.Termed;
-import org.junit.Test;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 /**
  * TODO test this for each different kind of attention/bag etc
  */

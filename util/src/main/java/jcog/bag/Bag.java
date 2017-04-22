@@ -1,7 +1,6 @@
 package jcog.bag;
 
 import jcog.Util;
-import jcog.pri.PForget;
 import jcog.pri.PLink;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;

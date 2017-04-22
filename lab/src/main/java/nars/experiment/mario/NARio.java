@@ -70,20 +70,20 @@ public class NARio extends NAgentX {
             //cc.setXRelative( mario.)
         });
 
-        CameraSensor<PixelBag> sc = senseCamera("narioLocal" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
+        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
         sc.setResolution(0.04f);
 
-        //new CameraGasNet($.the("camF"), cc, this, 64);
-        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
-        sc.setResolution(0.1f);
+//        //new CameraGasNet($.the("camF"), cc, this, 64);
+//        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
+//        sc.setResolution(0.1f);
 
-        nar.believe("nario:{narioLocal, narioGlobal}");
+//        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
-        vx = senseNumberDifference($("vx(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
-        senseNumberDifference($("vy(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
+        vx = senseNumberDifference($("nario:vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);
+        senseNumberDifference($("nario:vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0);
 
-        actionTriState($("x(nario)"), i -> {
+        actionTriState($("nario:x"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -104,7 +104,7 @@ public class NARio extends NAgentX {
             mario.scene.toggleKey(Mario.KEY_LEFT, n);
             mario.scene.toggleKey(Mario.KEY_RIGHT, p);
         });
-        actionTriState($("y(nario)"), i -> {
+        actionTriState($("nario:y"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -128,7 +128,7 @@ public class NARio extends NAgentX {
         });
 
 
-        actionToggle($("speed(nario)"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+        actionToggle($("nario:speed"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
 
 
 //        frame.addKeyListener(mario);

@@ -2,15 +2,16 @@ package nars.nar;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
@@ -76,10 +77,10 @@ public interface NARBuilder {
 
         int maxConcepts = 512 * 1024;
 
-        int activeConcepts = 1024;
+        int activeConcepts = 512;
 
         Default nar = new Default(activeConcepts,
-                3,
+                2,
 
 //                new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
@@ -87,9 +88,13 @@ public interface NARBuilder {
                     exe
                     //null /* null = fork join common pool */
                 )
-                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
+//                new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {
+
+            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+                return new PLinkHijackBag(initialCapacity, 3);
+            }
 
 //            @Override
 //            public Deriver newDeriver() {
@@ -186,7 +191,7 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(0.25f);
+        nar.deriver.rate.setValue(0.01f);
 
         nar.termVolumeMax.setValue(96);
 
@@ -203,7 +208,7 @@ public interface NARBuilder {
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.06f);
+        nar.truthResolution.setValue(0.03f);
 
 
         //NARTune tune = new NARTune(nar);

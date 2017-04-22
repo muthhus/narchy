@@ -1,10 +1,8 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
-import jcog.data.Range;
 import jcog.event.On;
 import jcog.pri.PLink;
 import nars.Focus;
@@ -16,7 +14,6 @@ import nars.premise.MatrixPremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;

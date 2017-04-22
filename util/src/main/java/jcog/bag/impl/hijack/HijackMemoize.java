@@ -99,7 +99,6 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
     }
 
 
-
     @Override
     protected Consumer<PLink<Pair<K, V>>> forget(float rate) {
         return null;

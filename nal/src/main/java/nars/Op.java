@@ -6,7 +6,6 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.var.GenericVariable;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;

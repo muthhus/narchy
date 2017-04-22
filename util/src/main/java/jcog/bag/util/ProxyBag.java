@@ -1,9 +1,7 @@
 package jcog.bag.util;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

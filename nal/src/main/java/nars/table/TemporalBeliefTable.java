@@ -2,7 +2,6 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Param;
 import nars.derive.meta.constraint.CommonalityConstraint;
 import nars.derive.meta.constraint.MatchConstraint;
-import nars.derive.meta.constraint.NotEqualConstraint;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.mutate.Termutator;

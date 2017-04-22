@@ -5,8 +5,6 @@ import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 /**
  * Created by me on 2/17/17.
  */

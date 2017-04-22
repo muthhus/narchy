@@ -121,7 +121,7 @@ public class DynamicBeliefTableTest {
 
             DynTruth xt = xtable.truth(0, template, true);
             assertNotNull(xt);
-            assertEquals($.t(1f, 0.81f), xt.truth());
+            assertEquals($.t(1f, 0.85f), xt.truth());
 
             for (int i = -4; i <= n.time() + 4; i++) {
                 System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));

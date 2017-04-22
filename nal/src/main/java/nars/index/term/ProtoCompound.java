@@ -6,8 +6,6 @@ import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
-
 /**
  * a lightweight Compound builder
  *      - fast-write

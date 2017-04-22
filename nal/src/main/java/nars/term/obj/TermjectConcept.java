@@ -7,7 +7,6 @@ import nars.Op;
 import nars.Task;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
-import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;

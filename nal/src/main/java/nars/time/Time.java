@@ -1,7 +1,6 @@
 package nars.time;
 
 import java.io.Serializable;
-import java.util.Timer;
 
 /**
  * Time state

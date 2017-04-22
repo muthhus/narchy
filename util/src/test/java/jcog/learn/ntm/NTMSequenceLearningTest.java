@@ -17,7 +17,7 @@ public class NTMSequenceLearningTest {
         SequenceLearner s = new RunSequenceLearner(8);
         double startError = s.run();
         assertTrue(startError > 0.1f);
-        for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 8000; i++) {
             s.run();
         }
 

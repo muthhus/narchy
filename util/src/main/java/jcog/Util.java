@@ -1499,8 +1499,4 @@ public enum Util { ;
         return 1.0f -((1.0f - a) * (1.0f - b) * (1.0f - c));
     }
 
-    /** default random number generator */
-    public static Random rng() {
-        return new XorShift128PlusRandom(1);
-    }
 }

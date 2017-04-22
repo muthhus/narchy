@@ -1,7 +1,5 @@
 package nars.table;
 
-import jcog.Util;
-import jcog.bag.impl.HijackBag;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;

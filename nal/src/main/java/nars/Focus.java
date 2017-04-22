@@ -5,7 +5,6 @@ import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;

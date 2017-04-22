@@ -2,7 +2,6 @@ package jcog.pri;
 
 import jcog.Texts;
 import jcog.bag.Bag;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

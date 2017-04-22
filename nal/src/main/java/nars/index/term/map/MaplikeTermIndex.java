@@ -2,7 +2,6 @@ package nars.index.term.map;
 
 import jcog.bag.impl.hijack.HijackMemoize;
 import nars.Op;
-import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.AppendProtoCompound;
