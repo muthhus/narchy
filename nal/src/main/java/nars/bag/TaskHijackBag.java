@@ -33,8 +33,9 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         if (existing!=null) {
             Task next;
 
-            //prefer the newer task because it could be an input task which has grown in timespan
-            if (existing.creation() < incoming.creation()) {
+            //prefer the existing task unless the newer has a grown start/stop range
+            //  (which is possible from an input task which has grown in timespan)
+            if (incoming.isInput() && (incoming.start() < existing.start() || incoming.end() > existing.end())) {
                 PriMerge.max(incoming, existing);
                 next = incoming; //use the newer task
             } else {
@@ -88,7 +89,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
         Task x = put(t);
 
-        if (x != null)
+        if (x == t)
             commit();
 
         return x;

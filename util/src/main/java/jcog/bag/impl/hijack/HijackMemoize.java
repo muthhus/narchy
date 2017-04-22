@@ -39,6 +39,7 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
     }
 
     public void statReset(ObjectLongProcedure<String> eachStat) {
+        //eachStat.accept("S" /* size */, size() );
         eachStat.accept("H" /* hit */, hit.sumThenReset() );
         eachStat.accept("M" /* miss */, miss.sumThenReset() );
         eachStat.accept("R" /* reject */, reject.sumThenReset() );
@@ -46,11 +47,13 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
     }
 
     @Override
-    public int capacity() {
-        int i = super.capacity();
-        this.CACHE_HIT_BOOST = 1f/(1+i);
-        this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST/reprobes;
-        return i;
+    public boolean setCapacity(int i) {
+        if (super.setCapacity(i)) {
+            this.CACHE_HIT_BOOST = i > 0 ? reprobes / (float)Math.sqrt(i) : 0;
+            this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST;
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -76,16 +79,16 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
      * harder items to sustain longer
      * */
     public float value(@NotNull K k) {
-        return 1f;
+        return 0.25f;
     }
 
     @Override
-    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing) {
-        if (!super.replace(incoming, existing)) {
+    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing, float scale) {
+        if (!super.replace(incoming, existing, scale)) {
             existing.priSub(CACHE_DENY_DAMAGE);
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
 

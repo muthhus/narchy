@@ -69,12 +69,14 @@ public class NARio extends NAgentX {
             //cc.setXRelative( mario.)
         });
 
-        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
+        CameraSensor<PixelBag> sc = senseCamera("narioLocal" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
         sc.setResolution(0.04f);
 
         //new CameraGasNet($.the("camF"), cc, this, 64);
 
-        //senseCameraRetina("(nario,global)", ()->mario.image, 30, 18, (v) -> t(v, alpha()));//.setResolution(0.1f);
+        senseCameraRetina("narioGlobal", ()->mario.image, 30, 18, (v) -> t(v, alpha()));//.setResolution(0.1f);
+
+        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
         vx = senseNumberDifference($("vx(nario)"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0);

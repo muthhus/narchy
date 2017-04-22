@@ -52,10 +52,10 @@ public class EllipsisTransformTest {
         Term u = i.transform(
                 $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
         Object tt = ((Compound)u).sub(0);
-        assertEquals(Ellipsis.EllipsisTransformPrototype.class, tt.getClass());
+
         assertEquals("(%1747846151..%2=_..+)", u.toString());
 
-        Ellipsis.EllipsisTransformPrototype ttt = (Ellipsis.EllipsisTransformPrototype) tt;
+        EllipsisTransform ttt = (EllipsisTransform) tt;
         assertEquals($.$("%2").toString(), ttt.from.toString());
         assertEquals(Imdex, ttt.to);
     }

@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -160,9 +159,9 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                     }
 
                     @Override
-                    protected boolean replace(Object incoming, Object existing) {
+                    protected boolean replace(Object incoming, Object existing, float scale) {
                         return hijackGreedy(
-                            ((Abbr)incoming).priSafe(-1),
+                            ((Abbr)incoming).priSafe(-1) * scale,
                             ((Abbr)existing).priSafe(-1)
                         );
                     }

@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
-import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
@@ -16,7 +15,6 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 
@@ -49,12 +47,12 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
         this.table = new PLinkHijackBag<Termed>(capacity, reprobes) {
             @Override
-            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing) {
+            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, float scale) {
                 if (incoming.get() instanceof PermanentConcept)
                     return true;
                 if (existing.get() instanceof PermanentConcept)
                     return false;
-                return super.replace(incoming, existing);
+                return super.replace(incoming, existing, scale);
             }
         };
     }

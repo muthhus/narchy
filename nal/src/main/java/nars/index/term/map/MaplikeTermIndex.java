@@ -47,7 +47,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
     };
 
     final HijackMemoize<ProtoCompound,Term> build = new HijackMemoize<>(
-        32*1024, 4,
+        128*1024, 4,
         (C) -> super.the(C.op(), C.dt(), C.subterms())
     );
 //        @Override
@@ -57,7 +57,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //    };
 
     final HijackMemoize<Compound,Term> normalize = new HijackMemoize<>(
-        16 * 1024, 3,
+        64 * 1024, 3,
         super::normalize
     );
 

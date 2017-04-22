@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
-import nars.concept.Concept;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.TruthPolation;
@@ -106,11 +105,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    protected boolean replace(Task incoming, Task existing) {
+    protected boolean replace(Task incoming, Task existing, float scale) {
         if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;
 
-        return super.replace(incoming, existing);
+        return super.replace(incoming, existing, scale);
     }
 
     @Override

@@ -175,9 +175,5 @@ public interface Termlike extends Termed {
         return x != null && x.op() == o;
     }
 
-    /** @return null for no-Op / not-applicable */
-    @Nullable default Op op() {
-        return null;
-    }
 
 }

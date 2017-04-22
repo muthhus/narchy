@@ -92,12 +92,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    public final boolean setCapacity(int _newCapacity) {
+    public boolean setCapacity(int _newCapacity) {
 
         int newCapacity = Math.max(_newCapacity, reprobes);
 
         if (capacity.getAndSet(newCapacity) != newCapacity) {
-
 
             final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
@@ -266,7 +265,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
 
                     } else {
-                        if (replace(adding, target)) {
+                        if (replace(adding, target, scale)) {
                             if (map.compareAndSet(targetIndex, target, adding)) { //inserted
                                 found = target;
                                 added = merge(null, adding, scale);
@@ -355,8 +354,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      *
      * a potential eviction can be intercepted here
      */
-    protected boolean replace(V incoming, V existing) {
-        return replace(pri(incoming), pri(existing));
+    protected boolean replace(V incoming, V existing, float scale) {
+        return replace(pri(incoming) * scale, pri(existing));
     }
 
     protected boolean replace(float incoming, float existing) {
