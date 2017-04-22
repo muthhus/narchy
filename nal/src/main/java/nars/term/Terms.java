@@ -360,11 +360,6 @@ public enum Terms { ;
         return arr;
     }
 
-    @NotNull
-    public static Term[] toArray(@NotNull Collection<Term> l) {
-        int s = l.size();
-        return s == 0 ? Term.EmptyArray : l.toArray(new Term[s]);
-    }
 
     /**
      * returns lev distance divided by max(a.length(), b.length()

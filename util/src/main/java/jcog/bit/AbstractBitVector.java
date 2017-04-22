@@ -268,11 +268,7 @@ public abstract class AbstractBitVector implements BitVector {
 	public void size( int newSize ) {
 		length( newSize );
 	}
-	
-	@Override
-	public long size64() {
-		return length();
-	}
+
 	
 	public void clear() {
 		length( 0 );

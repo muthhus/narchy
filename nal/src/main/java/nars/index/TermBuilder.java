@@ -74,7 +74,7 @@ public abstract class TermBuilder {
 
     }
 
-    public Term the(@NotNull Op op, int dt, List<Term> sub) {
+    public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
         int ss = sub.size();
         return the(op, dt, sub.toArray(new Term[ss]));
     }
@@ -395,7 +395,7 @@ public abstract class TermBuilder {
      * NOTE: terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    private Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
+    protected Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
 
         int s = args.length;
         assert(s!=0);
@@ -475,7 +475,7 @@ public abstract class TermBuilder {
             if (isTrue(x)) return False;
         }
 
-        Term y = compound(NEG, DTERNAL, new Term[] { x });
+        Term y = compound(NEG, DTERNAL, x);
         if (y instanceof Compound && x.isNormalized()) {
             ((Compound)y).setNormalized(); //share normalization state
         }
@@ -545,7 +545,7 @@ public abstract class TermBuilder {
         boolean commutive = commutive(dt);
         if (commutive) {
 
-            return junctionFlat(CONJ, dt, u);
+            return junctionFlat(dt, u);
 
         } else {
             //NON-COMMUTIVE
@@ -577,23 +577,21 @@ public abstract class TermBuilder {
 
 
     /**
-     * flattening junction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
+     * flattening conjunction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
     @NotNull
-    private Term junctionFlat(@NotNull Op op, int dt, @NotNull Term... u) {
+    private Term junctionFlat( int dt, @NotNull Term... u) {
 
         if (u.length == 0)
             return False;
 
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
-        Set<Term> s = new HashSet<>(u.length);
-        //new TreeSet();
-        flatten(op, u, dt, s);
-        if (s.isEmpty())
-            return False;
 
-        //boolean negate = false;
+        Set<Term> s = new LinkedHashSet<>(u.length*2);
+
+        flatten(CONJ, u, dt, s);
+
         int n = s.size();
         switch (n) {
             case 0:
@@ -605,7 +603,7 @@ public abstract class TermBuilder {
                 if (!cs.isEmpty()) {
                     Set<Term> ts = conjTrueFalseFilter(cs);
                     if (ts == cs || !ts.isEmpty())
-                        return finalize(op, dt, ts);
+                        return finalize(CONJ, dt, ts);
                 }
                 return False;
         }
@@ -622,9 +620,14 @@ public abstract class TermBuilder {
      * @param innerDT will either 0 or DTERNAL (commutive relation)
      */
     private @NotNull Set<Term> junctionGroupNonDTSubterms(@NotNull Set<Term> s, int innerDT) {
-        Set<Term> outer = new UnifiedSet<>(0);
+
+        Set<Term> outer = null;
+
         Iterator<Term> ss = s.iterator();
+
         while (ss.hasNext()) {
+            Term toOuter = null;
+
             Term x = ss.next();
             if (isTrue(x)) {
                 ss.remove();
@@ -634,7 +637,7 @@ public abstract class TermBuilder {
                 switch (x.op()) {
                     case CONJ:
                         // dt will be something other than 'innerDT' having just been flattened
-                        outer.add(x);
+                        toOuter = x;
                         ss.remove();
                         break;
                     case NEG:
@@ -652,31 +655,34 @@ public abstract class TermBuilder {
                                         //co-negation detected
                                         return Collections.emptySet();
                                     }
-
-                                    outer.add(neg(cnt));
+                                    toOuter = neg(cnt);
                                 }
                                 ss.remove();
                             }
                         }
                         break;
                 }
-
+            }
+            if (toOuter!=null) {
+                if (outer == null) outer =  new UnifiedSet(2);
+                outer.add(x);
             }
         }
-        if (outer.isEmpty()) {
-            return s; //no change
-        }
 
-        if (s.isEmpty()) {
+        if (outer != null) { //something changed
+            int sts = s.size();
+            if (sts > 0) {
+                Term[] sa = s.toArray(new Term[sts]);
+
+                Term next = (sa.length == 1) ? sa[0] : the(CONJ, innerDT, sa);
+                if (next == null)
+                    return Collections.emptySet();
+
+                outer.add(next);
+            }
             return outer;
         } else {
-            Term[] sa = Terms.toArray(s);
-
-            Term next;
-            next = (sa.length == 1) ? sa[0] : the(CONJ, innerDT, sa);
-
-            outer.add(next);
-            return outer;
+            return s;
         }
 
     }
@@ -686,24 +692,34 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
-
+    private static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
         for (Term x : u) {
-
-            Op xo = x.op();
-            if ((xo == op) && (((Compound) x).dt() == dt)) {
-                flatten(op, ((Compound) x).toArray(), dt, s); //recurse
-            } else {
-                if (!s.isEmpty()) {
-                    if (s.remove(neg(x))) {
-                        //co-negation detected, skip this term
-                        continue;
-                    }
-                }
-                s.add(x);
-            }
+            flatten(op, dt, s, x);
         }
     }
+    private static void flatten(@NotNull Op op, @NotNull TermContainer u, int dt, @NotNull Set<Term> s) {
+        for (Term x : u) {
+            flatten(op, dt, s, x);
+        }
+    }
+
+    private static void flatten(@NotNull Op op, int dt, @NotNull Set<Term> s, Term x) {
+        Op xo = x.op();
+        if ((xo == op) && (((Compound) x).dt() == dt)) {
+            flatten(op, ((Compound) x).subterms(), dt, s); //recurse
+        } else {
+            if (!s.isEmpty()) {
+                if (s.remove(
+                        $.neg(x) //construct on stack
+                    )) {
+                    //co-negation detected, skip this term
+                    return;
+                }
+            }
+            s.add(x);
+        }
+    }
+
 
 
     @NotNull

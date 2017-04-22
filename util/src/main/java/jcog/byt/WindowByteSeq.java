@@ -60,7 +60,7 @@ public class WindowByteSeq extends ArrayByteSeq /*implements CharSequence*/ {
     }
 
     public String toString() {
-        return new String(bytes);
+        return new String(array());
     }
 
 
