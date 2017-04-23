@@ -435,14 +435,14 @@ public class KIFInput implements Runnable {
                //d.forEachTask(b -> {
                    miniDeriver.test(new Derivation(
                            e,
-                           //e::input,
-                           x -> {
-                               System.out.println(x);
-                               e.input(x);
-                           },
                            budgeting,
-                           Param.UnificationStackMax, Param.UnificationTTL*1000
-                   ).restart(new Premise( t, Terms.ZeroProduct, null, 1f)));
+                           Param.UnificationStackMax, 0
+                   ) {
+                       @Override
+                       public void derive(Task x) {
+                           e.input(x);
+                       }
+                   }.restart(new Premise( t, Terms.ZeroProduct, null, 1f), Param.UnificationTTL));
                //});
            }
         });
