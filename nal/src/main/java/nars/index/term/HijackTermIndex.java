@@ -48,12 +48,17 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         this.table = new PLinkHijackBag<Termed>(capacity, reprobes) {
             @Override
             protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, float scale) {
-                if (incoming.get() instanceof PermanentConcept)
-                    return true;
                 if (existing.get() instanceof PermanentConcept)
                     return false;
+                if (incoming.get() instanceof PermanentConcept)
+                    return true;
                 return super.replace(incoming, existing, scale);
             }
+//
+//            @Override
+//            public void onRemoved( @NotNull PLink<Termed> value) {
+//                assert(!(value.get() instanceof PermanentConcept));
+//            }
         };
     }
 
@@ -123,7 +128,6 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     @Override
     public @NotNull String summary() {
-
         return table.size() + " concepts"; // (" + permanent.size() + " permanent)";
     }
 

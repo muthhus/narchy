@@ -1,9 +1,6 @@
 package nars.perf;
 
-import org.openjdk.jmh.profile.HotspotMemoryProfiler;
-import org.openjdk.jmh.profile.HotspotRuntimeProfiler;
-import org.openjdk.jmh.profile.HotspotThreadProfiler;
-import org.openjdk.jmh.profile.StackProfiler;
+import org.openjdk.jmh.profile.*;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -40,22 +37,18 @@ public enum Main {
 
 				//.addProfiler(StackProfiler.class)
 				.addProfiler(StackProfiler.class,
-						"lines=10;top=20;period=2;detailLine=true")
+						"lines=7;top=20;period=1;detailLine=true")
 				 //.addProfiler(GCProfiler.class)
 
-				//.addProfiler(LinuxPerfProfiler.class)
-				//.addProfiler(LinuxPerfAsmProfiler.class)
-				//.addProfiler(LinuxPerfNormProfiler.class)
-
-				.addProfiler(HotspotRuntimeProfiler.class)
-				.addProfiler(HotspotMemoryProfiler.class)
-				.addProfiler(HotspotThreadProfiler.class)
+				//.addProfiler(HotspotRuntimeProfiler.class)
+				//.addProfiler(HotspotMemoryProfiler.class)
+				//.addProfiler(HotspotThreadProfiler.class)
 
 				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)
-				/*.addProfiler(LinuxPerfProfiler.class)
+				//.addProfiler(LinuxPerfProfiler.class) // sudo sysctl kernel.perf_event_paranoid=0
 				  .addProfiler(LinuxPerfAsmProfiler.class)
-				  .addProfiler(LinuxPerfNormProfiler.class)*/
+				  .addProfiler(LinuxPerfNormProfiler.class)
 
 				//.addProfiler(CompilerProfiler.class)
 

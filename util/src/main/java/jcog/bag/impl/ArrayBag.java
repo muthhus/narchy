@@ -130,10 +130,8 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
                 int ss = size();
                 if (ss < c) {
-                    ensureSorted();
                     items.add(toAdd, this);
                     result = true;
-                    //items.addInternal(toAdd); //grows the list if necessary
                 } else {
                     //throw new RuntimeException("list became full during insert");
                     result = false;

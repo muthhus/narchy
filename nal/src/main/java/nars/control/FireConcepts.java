@@ -16,8 +16,11 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import static java.lang.System.nanoTime;
 
 
 /** controls an active focus of concepts */
@@ -108,24 +111,60 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Override public void fire() {
             ConceptBagFocus csrc = (ConceptBagFocus) source;
-            int count = Math.min(csrc.active.size(), (int) Math.ceil(rate.floatValue() * csrc.active.capacity()));
+            int count = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() * csrc.active.capacity());
             if (count == 0)
                 return; //idle
 
-            final Map<Task,Task> in = new LinkedHashMap<>(count * 8 /* estimate */);
-            csrc.active.sampleToList(count).forEach(p -> {
-                int derivations = premiseVector(nar, p, (x)->{
-                    in.merge(x, x, (prev, next)->{
-                        if (prev!=null) {
-                            PriMerge.max.merge(prev, next);
-                            return prev;
-                        } else {
-                            return next;
-                        }
+            if (nar.exe.concurrent()) {
+                int remain = count;
+                float granularity = 8;
+                float batchDivisor = nar.exe.concurrency() * granularity;
+                int batchSize = (int)Math.ceil(remain/batchDivisor);
+                while (remain > 0) {
+                    int nextBatchSize = Math.min(remain, batchSize);
+                    nar.runLater(() -> {
+                        //long start = nanoTime();
+
+                        fire(csrc, nextBatchSize);
+
+                        //long end = nanoTime();
+                        //double dt = (end - start) / ((float)nextBatchSize);
+                        //rate.hitNano(dt);
+                    });
+                    remain -= nextBatchSize;
+                }
+
+            } else {
+                fire(csrc, count);
+            }
+        }
+
+        ThreadLocal<Map<Task,Task>> buffer = ThreadLocal.withInitial(()->new HashMap<>());
+        public void fire(ConceptBagFocus csrc, int count) {
+//            final Map<Task,Task> in =
+//                    //new LinkedHashMap<>(count * 8 /* estimate */);
+//                    new HashMap<>(count * 8 /* estimate */);
+            Map<Task, Task> in = buffer.get();
+            try {
+                //csrc.active.sample(count).forEach(
+                csrc.active.sample(count, p -> {
+                    int derivations = premiseVector(nar, p, (x) -> {
+                        in.merge(x, x, (prev, next) -> {
+                            if (prev != null) {
+                                PriMerge.max.merge(prev, next);
+                                return prev;
+                            } else {
+                                return next;
+                            }
+                        });
                     });
                 });
-            });
-            nar.input(in.values());
+
+                nar.input(in.values());
+
+            } finally {
+                in.clear();
+            }
         }
 
         @Override

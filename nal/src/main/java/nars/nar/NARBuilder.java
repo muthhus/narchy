@@ -12,6 +12,7 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
@@ -44,7 +45,7 @@ public interface NARBuilder {
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
 
         if (threads == -1)
-            threads = (int) Math.ceil(Runtime.getRuntime().availableProcessors()/2);
+            threads = (int) Math.ceil(Runtime.getRuntime().availableProcessors()-2);
 
         Executioner exe =
                 //new SynchronousExecutor();
@@ -53,7 +54,7 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 3;
+        final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
@@ -77,23 +78,23 @@ public interface NARBuilder {
 
         int maxConcepts = 512 * 1024;
 
-        int activeConcepts = 512;
+        int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                2,
+                3,
 
-//                new HijackTermIndex(cb, 1024 * 256, reprobes)
+                new HijackTermIndex(cb, 1024 * 512, reprobes*2)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
-                    exe
-                    //null /* null = fork join common pool */
-                )
+//                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+//                    exe
+//                    //null /* null = fork join common pool */
+//                )
 //                new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {
 
             public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
-                return new PLinkHijackBag(initialCapacity, 3);
+                return new PLinkHijackBag(initialCapacity, reprobes);
             }
 
 //            @Override
@@ -191,7 +192,7 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(0.2f);
+        nar.deriver.rate.setValue(0.1f);
 
         nar.termVolumeMax.setValue(64);
 
