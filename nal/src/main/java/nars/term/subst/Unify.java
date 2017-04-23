@@ -80,13 +80,7 @@ public abstract class Unify implements Termutator, Subst {
 
         this.versioning = versioning;
 
-        xy = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack) {
-            @NotNull
-            @Override
-            public Versioned newEntry(Object keyIgnoredk) {
-                return new ConstrainedVersionedTerm();
-            }
-        };
+        xy = new ConstrainedVersionMap(versioning);
 
         yx = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
     }
@@ -362,7 +356,7 @@ public abstract class Unify implements Termutator, Subst {
             return !(m instanceof CommonalityConstraint);
         }
 
-        public Versioned newConstraints() {
+        Versioned newConstraints() {
             return new Versioned(versioning,MaxMatchConstraintsPerVariable);
         }
     }
@@ -434,6 +428,17 @@ public abstract class Unify implements Termutator, Subst {
     }
 
 
+    private class ConstrainedVersionMap extends VersionMap {
+        public ConstrainedVersionMap(@NotNull Versioning versioning) {
+            super(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
+        }
+
+        @NotNull
+        @Override
+        public Versioned newEntry(Object keyIgnoredk) {
+            return new ConstrainedVersionedTerm();
+        }
+    }
 }
 
 

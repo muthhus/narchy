@@ -28,8 +28,6 @@ public class Versioning extends FasterList<Versioned> {
         if (add(v)) {
             if (v!=null) {
                 if (!v.add(x)) {
-                    //if this returns false? shouldnt happen but if it did it would require that this.remove(v)
-                    //removeLast();
                     return false;
                 }
             }
@@ -43,21 +41,17 @@ public class Versioning extends FasterList<Versioned> {
     }
 
 
-    /** reverts to previous state */
-    public final void revert() {
-        Versioned versioned = removeLast();
-        if (versioned!=null)
-            versioned.removeLast();
-    }
-
     /** reverts/undo to previous state */
     public final void revert(int when) {
         pop(size - when );
     }
 
     public final void pop(int count) {
-        for (int i = 0; i < count; i++)
-            revert();
+        for (int i = 0; i < count; i++) {
+            Versioned versioned = removeLast();
+            if (versioned!=null)
+                versioned.removeLast();
+        }
     }
 
     @Override

@@ -77,7 +77,7 @@ public abstract class Param  {
     public static final int MaxUnificationVariableStack = 2; //may be able to reduce to 1
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTL = 512;
+    public final static int UnificationTTL = 1024;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
     public final static int SubUnificationTTL = UnificationTTL/2;

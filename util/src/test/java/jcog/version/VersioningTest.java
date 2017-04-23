@@ -82,22 +82,22 @@ public class VersioningTest {
         System.out.println(v);
         assertEquals(6, v.size()); assertEquals("a3 b1", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(5, v.size()); assertEquals("a3 b0", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(4, v.size()); assertEquals("a2 b0", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(3, v.size()); assertEquals("a1 b0", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(2, v.size());  assertEquals("a1 null", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(1, v.size());  assertEquals("a0 null", s.get());
 
-        v.revert(); System.out.println(v);
+        v.pop(1); System.out.println(v);
         assertEquals(0, v.size()); assertEquals("null null", s.get());
 
     }
@@ -125,7 +125,7 @@ public class VersioningTest {
         assertEquals(3, v.size());
         assertEquals(3, v.size()); assertEquals("a1 b0", s.get());
 
-        v.revert();  System.out.println(v);
+        v.pop(1);  System.out.println(v);
         assertEquals(2, v.size());
         assertEquals(2, v.size()); assertEquals("a1 null", s.get());
 

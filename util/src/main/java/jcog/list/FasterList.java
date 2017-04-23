@@ -72,7 +72,10 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public X removeLast() {
-        return this.items[--size];
+        X[] ii = this.items;
+        X x = ii[--size];
+        ii[size] = null; //GC help
+        return x;
     }
 
     @Nullable
