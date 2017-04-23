@@ -40,7 +40,7 @@ public class GenericCompound implements Compound {
     public final Op op;
 
 
-    public transient boolean normalized, dynamic;
+    public transient boolean normalized;
 
 
     public GenericCompound(@NotNull Op op, @NotNull TermContainer subterms) {
@@ -70,18 +70,18 @@ public class GenericCompound implements Compound {
 
         this.normalized = !(vars()>0 || varPattern()>0);
 
-        //HACK
-        this.dynamic =
-                (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
-                        ||
-                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
+//        //HACK
+//        this.dynamic =
+//                (op() == INH && subOpIs(1,ATOM) && subOpIs(0, PROD)) /* potential function */
+//                        ||
+//                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
     }
 
 
-    @Override
-    public boolean isDynamic() {
-        return dynamic;
-    }
+//    @Override
+//    public boolean isDynamic() {
+//        return dynamic;
+//    }
 
     @NotNull
     @Override
@@ -132,25 +132,25 @@ public class GenericCompound implements Compound {
 
         if (this == that)
             return true;
-        if (hashCode()!=that.hashCode())
+        if (hash!=that.hashCode())
             return false;
 
         Compound cthat;
         if (that instanceof Compound) {
             cthat = (Compound) that;
-        } else if (that instanceof CompoundConcept) { //Termed but not Task
+        } /*else if (that instanceof CompoundConcept) { //Termed but not Task
             cthat = ((CompoundConcept) that).term();
             if (this == cthat)
                 return true;
-        } else {
+        } */ else {
             return false;
         }
 
         //return subterms.equals(cthat.subterms()) &&
         return
-                subterms.equals(cthat.subterms())
-                &&
                 (op == cthat.op())
+                &&
+                subterms.equals(cthat.subterms())
                 &&
                 (dt == cthat.dt());
 

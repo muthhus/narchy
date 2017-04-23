@@ -1274,8 +1274,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
                 }
 
+                //see if, when normalized, it doesnt change. otherwise keep the non-normalized form
                 if (!term.isNormalized()) {
-                    //see if, when normalized, it doesnt change. otherwise keep the non-normalized form
                     Compound normalizedTerm = concepts.normalize((Compound) term);
                     if (normalizedTerm!=null && normalizedTerm.equals(term)) {
                         ((Compound) term).setNormalized(); //recognize as normalized
@@ -1307,7 +1307,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        concepts().forEach(n -> recip.accept((Concept) n.get()));
+        focus().concepts().forEach(n -> recip.accept((Concept) n.get()));
         return this;
     }
 
@@ -1409,10 +1409,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     public float pri(@NotNull Termed termed) {
         return focus.pri(termed);
-    }
-
-    public Iterable<PLink<Concept>> concepts() {
-        return focus().concepts();
     }
 
     @NotNull

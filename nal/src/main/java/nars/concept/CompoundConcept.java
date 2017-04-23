@@ -426,7 +426,12 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Override
     public boolean isNormalized() {
-        return term.isNormalized();
+        return term.isNormalized(); //compound concepts may be un-normalized
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return false; //concepts themselves are always non-dynamic
     }
 
     @Override
