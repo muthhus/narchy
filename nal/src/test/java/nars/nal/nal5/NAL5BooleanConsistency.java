@@ -32,10 +32,10 @@ public class NAL5BooleanConsistency {
                 d.log();
 
                 String[] outcomes = {
-                        "(x --> (0,0))",
-                        "(x --> (1,0))",
-                        "(x --> (0,1))",
-                        "(x --> (1,1))"};
+                        "(x-->(0,0))",
+                        "(x-->(1,0))",
+                        "(x-->(0,1))",
+                        "(x-->(1,1))"};
                 String expected = "(x --> (" + i + "," + j + "))";
 
                 d.believe("(((x-->i) && (x-->j)) <=> " + outcomes[3] + ")");
@@ -50,10 +50,9 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(16);
+                d.run(32);
 
                 System.out.println(i + " " + j);
-
                 for (String s : outcomes) {
                     System.out.println("\t" + s + "\t" + d.concept(s).belief(d.time(), d.dur()));
                 }
