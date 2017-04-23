@@ -61,18 +61,18 @@ public interface NARBuilder {
                 new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
                 new DefaultConceptState("awake", 16, 16, 4, 32, 24)
         ) {
-            @Override
-            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-                return f.apply(termlink, tasklink);
-            }
-
-            @NotNull
-            @Deprecated @Override
-            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-                return new DefaultHijackBag<>(blend, reprobes);
-            }
+//            @Override
+//            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
+//                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//                return f.apply(termlink, tasklink);
+//            }
+//
+//            @NotNull
+//            @Deprecated @Override
+//            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+//                return new DefaultHijackBag<>(blend, reprobes);
+//            }
         };
 
 
@@ -83,19 +83,19 @@ public interface NARBuilder {
         Default nar = new Default(activeConcepts,
                 3,
 
-                new HijackTermIndex(cb, 1024 * 512, reprobes*2)
+//                new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
-//                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
-//                    exe
-//                    //null /* null = fork join common pool */
-//                )
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+                    exe
+                    //null /* null = fork join common pool */
+                )
 //                new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {
 
-            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
-                return new PLinkHijackBag(initialCapacity, reprobes);
-            }
+//            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+//                return new PLinkHijackBag(initialCapacity, reprobes);
+//            }
 
 //            @Override
 //            public Deriver newDeriver() {
@@ -192,12 +192,12 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(0.1f);
+        nar.deriver.rate.setValue(0.05f);
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -209,7 +209,7 @@ public interface NARBuilder {
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
+        nar.truthResolution.setValue(0.03f);
 
 
         //NARTune tune = new NARTune(nar);
@@ -221,7 +221,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.01f, 4);
+        new Inperience(nar, 0.005f, 6);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

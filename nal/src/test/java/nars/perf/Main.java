@@ -36,7 +36,7 @@ public enum Main {
 //        		.addProfiler(SafepointsProfiler.class)
 
 				.addProfiler(StackProfiler.class,
-			 "lines=10;top=20;period=1;detailLine=true;excludePackages=true" +
+			 "lines=10;top=20;period=3;detailLine=true;excludePackages=true" +
 					";excludePackageNames=java., jdk., javax., sun., " +
 					 "sunw., com.sun., org.openjdk.jmh."
 				)

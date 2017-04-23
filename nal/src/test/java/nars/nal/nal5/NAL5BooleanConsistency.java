@@ -5,6 +5,7 @@ import nars.Narsese;
 import nars.Param;
 import nars.derive.Deriver;
 import nars.nar.Default;
+import nars.term.Compound;
 import org.junit.Test;
 
 /**
@@ -43,14 +44,18 @@ public class NAL5BooleanConsistency {
                 d.believe("(((x-->i) && --(x-->j)) <=> " + outcomes[1] + ")");
                 d.believe("((--(x-->i) && (x-->j)) <=> " + outcomes[2] + ")");
 
-                d.believe($.negIf($.$("(x-->i)"), i==0));
-                d.believe($.negIf($.$("(x-->j)"), j==0));
+                Compound I = $.negIf($.$("(x-->i)"), i == 0);
+                Compound J = $.negIf($.$("(x-->j)"), j == 0);
+//                d.believe(I);
+//                d.believe(J);
+
+                d.believe($.conj(I,J));
 
 //                for (String s : outcomes) {
 //                    d.ask(s);
 //                }
 
-                d.run(32);
+                d.run(64);
 
                 System.out.println(i + " " + j);
                 for (String s : outcomes) {

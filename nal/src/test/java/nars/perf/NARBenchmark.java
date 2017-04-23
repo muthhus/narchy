@@ -32,6 +32,7 @@
 package nars.perf;
 
 import nars.$;
+import nars.derive.DefaultDeriver;
 import nars.nar.Default;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
@@ -50,6 +51,7 @@ public class NARBenchmark {
 
         n = new Default();
         n.deriver.rate.setValue(0.05f);
+        Object xzx = DefaultDeriver.the; //warm it
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);

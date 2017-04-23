@@ -237,7 +237,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .input("--(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S <=> R)
-                .mustDesire(cycles, "(S)", 0.0f, 0.81f, 0);
+                .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0);
 
     }
 
@@ -1186,14 +1186,14 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.04f /*0.45f*/, 13)
+                .mustDesire(cycles, "(out)", 1f, 0.26f /*0.45f*/, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
     }
     @Test public void testPredictiveImplicationTemporalTemporalNeg() {
         test()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.05f /*0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.35f /*0.81f*/, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -1215,7 +1215,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.05f /* decayed from: 0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 1f, 0.35f /* decayed from: 0.81f*/, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
     @Test public void testPredictiveEquivalenceTemporalEternal() {
@@ -1230,21 +1230,21 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "(--(out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.05f /*0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.35f /*0.81f*/, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
     @Test public void conjDecoposeGoalAfter() {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 10) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
         test()
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 0f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 0f, 0.48f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL);
     }
 
@@ -1252,14 +1252,14 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.14f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { 3, 0, 10, ETERNAL } );
     }
     @Test public void conjDecoposeGoalBefore() {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(a)! :|:")
-                .mustDesire(cycles, "(b)", 1f, 0.14f, 16)
+                .mustDesire(cycles, "(b)", 1f, 0.48f, 16)
                 .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
     }
     @Test public void deriveNegInhGoal() {

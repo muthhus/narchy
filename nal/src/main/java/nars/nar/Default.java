@@ -44,6 +44,8 @@ public class Default extends NAR {
 
     public final ConceptBagFocus focus;
 
+    static final Deriver defaultDeriver = DefaultDeriver.the;
+
     //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
 
 
@@ -91,7 +93,7 @@ public class Default extends NAR {
     }
 
     public Deriver newDeriver() {
-        return DefaultDeriver.the;
+        return defaultDeriver;
     }
 
     public MatrixPremiseBuilder newPremiseBuilder() {

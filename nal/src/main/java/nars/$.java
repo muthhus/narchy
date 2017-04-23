@@ -472,8 +472,8 @@ public enum $ {
     }
 
     @Nullable
-    public static Term conj(Term... a) {
-        return the(CONJ, a);
+    public static <T extends Term> T conj(Term... a) {
+        return (T) the(CONJ, a);
     }
 
     @Nullable

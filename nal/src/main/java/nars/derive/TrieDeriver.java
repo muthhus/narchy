@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.trie.TrieNode;
 import nars.$;
 import nars.Op;
@@ -23,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+
+
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
  */
@@ -30,6 +33,7 @@ public class TrieDeriver implements Deriver {
 
     @NotNull
     public final BoolPred[] roots;
+    final BoolPred<Derivation> rootsForked;
     public final PremiseRuleSet rules;
 
     /**
@@ -76,6 +80,8 @@ public class TrieDeriver implements Deriver {
     public TrieDeriver(BoolPred[] root) {
         this.roots = root;
         this.rules = null;
+
+        rootsForked = Fork.compile(roots);
     }
 
     public TrieDeriver(@NotNull PremiseRuleSet ruleset) {
@@ -92,6 +98,8 @@ public class TrieDeriver implements Deriver {
             roots[i] = build(roots[i]);
         }
 
+        rootsForked = Fork.compile(roots);
+
         /*
         for (ProcTerm<PremiseMatch> p : roots) {
             try {
@@ -104,13 +112,54 @@ public class TrieDeriver implements Deriver {
         */
     }
 
-    @Override
-    public final void accept(@NotNull Derivation d) {
-        int now = d.now();
-        for (BoolPred r : roots) {
-            r.test(d);
-            d.revert(now);
-        }
+//    private enum Next {
+//        Pop, Push
+//    }
+//
+//    @Override
+//    public final void accept(@NotNull Derivation d) {
+//        FasterList<BoolPred<Derivation>> stack = $.newArrayList(16);
+//        BoolPred b = rootsForked;
+//        do {
+//            Next next = null;
+//            if (b instanceof Fork) {
+//
+//                int now = d.now();
+//                for (BoolPred bf : ((Fork)b).termCache) {
+//                    bf.test(d);
+//                    d.revert(now);
+//                }
+//
+//            } else if (b instanceof AndCondition) {
+//
+//            } else {
+//                if (!b.test(d))
+//                    next = Pop;
+//            }
+//
+//            switch (next) {
+//                case Pop:
+//                    if (stack.isEmpty()) {
+//                        break;
+//                    } else {
+//                        b = stack.removeLast();
+//                    }
+//                    break;
+//
+//            }
+//
+//
+//        } while (b!=null);
+//    }
+
+    //original interpeter
+    public void accept(@NotNull Derivation d) {
+        rootsForked.test(d);
+//        int now = d.now();
+//        for (BoolPred r : roots) {
+//            r.test(d);
+//            d.revert(now);
+//        }
     }
 
     /**

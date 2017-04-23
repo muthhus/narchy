@@ -38,12 +38,11 @@ public final class Fork extends GenericCompound implements BoolPred<Derivation> 
         return true;
     }
 
-    @Nullable
-    public static BoolPred compile(@NotNull List<BoolPred> t) {
+    public static BoolPred<? extends Object> compile(List<BoolPred> t) {
         return compile(t.toArray(new BoolPred[t.size()]));
     }
 
-    @Nullable public static BoolPred compile(@NotNull BoolPred[] n) {
+    @Nullable public static BoolPred compile(@NotNull BoolPred<Derivation>[] n) {
         switch (n.length) {
             case 0: return null;
             case 1: return n[0];

@@ -517,6 +517,33 @@ public class NAL6Test extends AbstractNALTest {
             .mustBelieve(cycles, "( (a,#b) ==> z )", 1f, 0.73f)
         ;
     }
+    @Test public void testEquivSpecific() {
+        //B, (A <=> C), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+        test()
+            .believe("(($x) <=> ($x,y))")
+            .believe("(y)")
+            .mustBelieve(cycles, "(y,y)", 1f, 0.81f)
+        ;
+    }
+    @Test public void testEquivSpecificNeg1() {
+        //    B, (A <=> C), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:Analogy, Goal:Deduction)
+        test()
+            .log()
+            .believe("--(($x) <=> ($x,y))")
+            .believe("(y)")
+            .mustBelieve(cycles, "(y,y)", 0f, 0.81f)
+        ;
+    }
+    @Test public void testImplSpecificNeg() {
+        // B, (C ==> A), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+        test()
+            .log()
+            .believe("--(($x) ==> ($x,y))")
+            .believe("(y)")
+            .mustBelieve(cycles, "(y,y)", 0f, 0.81f)
+        ;
+    }
+
 
     @Test
     public void recursionSmall() throws nars.Narsese.NarseseException {

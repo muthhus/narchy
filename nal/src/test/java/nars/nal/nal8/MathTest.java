@@ -26,10 +26,10 @@ public class MathTest {
         t.input("i:{2}.");
         t.input("i:{4}.");
         t.input("((&&,({$x} --> i),({$y} --> i)) ==> ({($x,$y),($y,$x)} --> j)).");
-        t.run(1000);
+        t.run(100);
 
         t.input("(({(#x,#y)} --> j) ==> ({add(#x,#y)} --> i)).");
-        t.run(1000);
+        t.run(100);
 
         //t.input("(({#x,#y} --> i) && (add(#x,#y)<->sum)).");
         //t.input("(({$x,$y} --> i) ==> (add($x,$y)<->sum)).");
