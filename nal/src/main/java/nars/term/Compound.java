@@ -375,12 +375,16 @@ public interface Compound extends Term, IPair, TermContainer {
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist
      */
-    @Nullable
-    default Term sub(@NotNull byte... path) {
+    @Nullable default Term sub(@NotNull byte... path) {
+        return sub(path.length, path);
+    }
+
+    @Nullable default Term sub(int n, @NotNull byte... path) {
         Term ptr = this;
-        for (int i : path)
-            if ((ptr = ptr.sub(i, null)) == null)
+        for (int i = 0; i < n; i++) {
+            if ((ptr = ptr.sub((int) path[i], null)) == null)
                 return null;
+        }
         return ptr;
     }
 
@@ -895,7 +899,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (i == 0)
             return this;
         else {
-            return sub(Arrays.copyOfRange(subpaths.get(0), 0, i));
+            return sub(i, subpaths.get(0));
         }
 
     }

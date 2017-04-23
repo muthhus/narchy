@@ -276,14 +276,18 @@ In keeping with a design preference for unity and balanced spectral continuity, 
 
 ## Contents
 
- - **nal** - Logic Reasoner
- - **guifx** - JavaFX GUI
- - **app** - Application-level and supporting tools
+ - **util** - JCog: supporting utilities
+ - **ui** - SpaceGraph: Fractal GUI (OpenGL)
+ - **logic** - Non-NARS specific TuProlog fork
+
+ - **nal** - NARchy Non-Axiomatic Logic Reasoner
+ 
+ - **app** - Applications and supporting tools
  - **web** - Web server and client
+
  - **lab** - Experiments & demos
- - **util** - Non-NARS specific supporting utilities
- - **logic** - Non-NARS specific supporting logic
- - **perf** - JMH benchmarks
+ 
+
 
 ## Requirements
  - Java 9 (OpenJDK or Oracle JDK)

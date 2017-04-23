@@ -1,16 +1,16 @@
 package nars.op;
 
+import jcog.list.FasterList;
 import nars.$;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import org.apache.commons.collections4.map.Flat3Map;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -32,7 +32,7 @@ public abstract class VarIntroduction {
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test
 
-        Set<Term> selections = select(c);
+        List<Term> selections = select(c);
         if (selections == null) return;
         int sels = selections.size();
         if (sels == 0) return;
@@ -44,16 +44,17 @@ public abstract class VarIntroduction {
         } else {
             //choose randomly
             assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
-            Term[] sa = selections.toArray(new Term[sels]);
-            selections = Collections.singleton(sa[ThreadLocalRandom.current().nextInt(sels)]);
-            sels = Math.min(sels, maxSubstitutions);
+            selections = $.newArrayList(
+                    selections.get(ThreadLocalRandom.current().nextInt(sels))
+            );
         }
 
 
-        Map<Term,Term> substs = new UnifiedMap<>(sels);
+        Map<Term,Term> substs = new Flat3Map<>();
         int o = 0;
         boolean found = false;
-        for (Term u : selections) {
+        for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
+            Term u = selections.get(i);
             Term v = next(c, u, o++);
             if (v != null) {
                 substs.put(u, v);
@@ -98,7 +99,7 @@ public abstract class VarIntroduction {
 
 
     @Nullable
-    abstract protected Set<Term> select(Compound input);
+    abstract protected FasterList<Term> select(Compound input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */

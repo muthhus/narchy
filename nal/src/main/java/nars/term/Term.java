@@ -34,6 +34,7 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -56,6 +57,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
     @NotNull Term[] EmptyArray = new Term[0];
+    ImmutableByteList EmptyByteList = ByteLists.immutable.empty();
 
     @NotNull
     @Override
@@ -290,10 +292,10 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     @NotNull
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
-        List<byte[]> list = $.newArrayList();
+        List<byte[]> list = $.newArrayList(0);
         pathsTo(
-                (x) -> x.equals(subterm) ? x : null,
-                (l, t) -> { if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray()); return true; }
+            (x) -> x.equals(subterm) ? x : null,
+            (l, t) -> { if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray()); return true; }
         );
         return list;
     }
@@ -305,7 +307,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
     default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
         if (ss != null)
-            return receiver.test(ByteLists.immutable.empty(), ss);
+            return receiver.test(EmptyByteList, ss);
         return true;
     }
 

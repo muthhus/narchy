@@ -1,5 +1,6 @@
 package nars.op;
 
+import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -35,7 +36,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Nullable
     @Override
-    protected MutableSet<Term> select(Compound input) {
+    protected FasterList<Term> select(Compound input) {
         return Terms.substAllRepeats(input, depIndepFilter, 2);
     }
 
@@ -89,7 +90,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
 
-        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
+        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(0);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
             byte[] p = paths.get(occurrence);
             Term t = null; //root

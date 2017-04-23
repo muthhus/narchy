@@ -3,6 +3,7 @@ package nars.term;
 import jcog.Texts;
 import jcog.Util;
 import jcog.data.sorted.SortedList;
+import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
@@ -21,10 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
@@ -505,9 +503,9 @@ public enum Terms { ;
      * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
      */
     @Nullable
-    public static MutableSet<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
-        MutableSet<Term> oi = getUniqueRepeats(c, score, minCount);
-        if (oi == null)
+    public static FasterList<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+        FasterList<Term> oi = getUniqueRepeats(c, score, minCount);
+        if (oi == null || oi.isEmpty())
             return null;
 
         if (oi.size() > 1) {
@@ -516,30 +514,31 @@ public enum Terms { ;
 
             //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
-            oi.removeIf(b -> {
-                return oi.anySatisfy(
-                        a -> (a != b) &&
-                                (a instanceof Compound) &&
-                                ((Compound) a).containsRecursively(b)
-                );
-            });
+            oi.removeIf(b ->
+                oi.anySatisfy(
+                    a ->
+                        (a != b) &&
+                        (a instanceof Compound) &&
+                        ((Compound) a).containsRecursively(b)
+                )
+            );
         }
 
         return oi;
     }
 
-    @Nullable static MutableSet<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+    /** returns a list but its contents will be unique */
+    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c, score);
         int us = uniques.size();
         if (us == 0)
             return null;
 
-        MutableSet<Term> oi = new UnifiedSet();
+        FasterList<Term> oi = new FasterList(0);
 
         uniques.forEachWithOccurrences((Term t, int count) -> {
-            if (count >= minCount) {
+            if (count >= minCount)
                 oi.add(t);
-            }
         });
 
         return oi;
