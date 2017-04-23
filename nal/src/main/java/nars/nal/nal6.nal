@@ -11,15 +11,15 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqRCom(S,P), time(dtSum)                               |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neqCom(S,P), time(dtSum)                               |- (S ==>+- P), (Belief:Deduction)
 
-    (P ==> M), (S ==> M), neqRCom(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
-
-
-    (M ==> P), (M ==> S), neqRCom(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT),                 notEqui(P) |- (S ==>+- P), (Belief:Induction)
 
 
-    (P ==> M), (M ==> S), neqRCom(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S)             |- (S ==>+- P), (Belief:Abduction)
+
+
+    (P ==> M), (M ==> S), neqCom(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
 
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
@@ -55,11 +55,11 @@
     //Note: the P && S subterm of the conclusion may get rewritten with appropraite 'dt' as per dtCombinePre/dtCombinePost.
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
-    (P ==> M), (S ==> M), neqRCom(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
-        (P ==> M), (S ==> M), neqRCom(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((P && S) ==>+- M), (Belief:Union)
+        (P ==> M), (S ==> M), neqCom(S,P), time(dtCombinePre) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
-    (M ==> P), (M ==> S), neqRCom(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
-        (M ==> P), (M ==> S), neqRCom(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (P && S)), (Belief:Intersection)
+        (M ==> P), (M ==> S), neqCom(S,P), time(dtCombinePost) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////
@@ -87,17 +87,17 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), notImplEqui(B), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), notImplEqui(B), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), notImplEqui(B), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), notImplEqui(B), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), notImplEqui(B), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), notImplEqui(B), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
     //B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
         //B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
-    B, (A <=> C), notImplEqui(B), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)

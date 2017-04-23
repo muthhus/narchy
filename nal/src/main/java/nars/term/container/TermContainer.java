@@ -101,6 +101,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return size() <= i ? ifOutOfBounds : sub(i);
     }
 
+    @Nullable
+    default boolean subEquals(int i, @NotNull Term x) {
+        return size() <= i ? false: sub(i).equals(x);
+    }
+
     @Override
     default boolean isDynamic() {
         return

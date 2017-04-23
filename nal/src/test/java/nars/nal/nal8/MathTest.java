@@ -19,7 +19,7 @@ public class MathTest {
     public void testImplVarAdd1() throws Narsese.NarseseException {
         Param.DEBUG = true;
         Default t = new Default();
-        t.log();
+        //t.log();
         //t.input("i:{0,1,2,3,4}.");
         //t.input("i:{0,1,2}.");
         t.input("i:{1}.");

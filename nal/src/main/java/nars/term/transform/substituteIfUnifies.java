@@ -91,30 +91,27 @@ abstract public class substituteIfUnifies extends Functor {
         Term term = a.sub(0);
 
         Term x = a.sub(1);
-        if (x instanceof Atom)
-            return term;
-
-
-
         Term y = a.sub(2);
+        boolean strict = a.subEquals(3, substitute.STRICT);
+        Term failureTerm = strict ? False : term;
 
         if (y.equals(term))
-            return term;
+            return failureTerm;
         if (x.equals(y))
-            return term; //unificatoin would occurr but no changes would result
+            return failureTerm; //unification would occurr but no changes would result
 
         @Nullable Op op = unifying();
         boolean hasAnyOp =
                 (op==null && (x.vars() + x.varPattern()  > 0))
                 ||
-                (op!=null && (x.hasAny(op) || y.hasAny(op)));
+                (op!=null && x.hasAny(op));
 
         if (!hasAnyOp/* && mustSubstitute()*/) {
-            return False; //no change
+            return failureTerm; //no change
         }
 
         Term z = new SubUnify(parent, op).tryMatch(parent, term, x, y);
-        return (z != null) ? z : term;
+        return (z != null) ? z : failureTerm;
     }
 
     public static class substituteIfUnifiesAny extends substituteIfUnifies {
