@@ -14,24 +14,24 @@ import static nars.time.Tense.DTERNAL;
 
 
 /** parallel branching */
-public final class Fork extends GenericCompound implements BoolPred<Derivation> {
+public class Fork extends GenericCompound implements BoolPred<Derivation> {
 
     @NotNull
-    public final BoolPred[] termCache;
+    public final BoolPred[] cached;
 
     protected Fork(@NotNull BoolPred[] actions) {
         super(CONJ, TermContainer.the(CONJ, DTERNAL, (Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
-        this.termCache = actions;
+        this.cached = actions;
     }
 
     @Override
     public boolean test(@NotNull Derivation m) {
 
         int now = m.now();
-        for (int i = 0, termCacheLength = termCache.length; i < termCacheLength; i++) {
-            termCache[i].test(m);
+        for (int i = 0, termCacheLength = cached.length; i < termCacheLength; i++) {
+            cached[i].test(m);
             m.revert(now);
         }
 

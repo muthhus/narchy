@@ -51,7 +51,6 @@ public class NARBenchmark {
 
         n = new Default();
         n.deriver.rate.setValue(0.05f);
-        Object xzx = DefaultDeriver.the; //warm it
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
@@ -64,7 +63,7 @@ public class NARBenchmark {
     @Benchmark
     @BenchmarkMode(value = Mode.AverageTime)
     public void deductiveChainTest1() {
-        n.run(10);
+        n.run(1000);
     }
 
 //    @Benchmark

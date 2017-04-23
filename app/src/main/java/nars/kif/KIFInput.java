@@ -411,7 +411,7 @@ public class KIFInput implements Runnable {
 
         TrieDeriver miniDeriver =
                 //new TrieDeriver(PremiseRuleSet.rules(false, "nal6.nal"));
-                new TrieDeriver(new PremiseRuleSet(
+                TrieDeriver.get(new PremiseRuleSet(
                         k.impl.parallelStream().map(tt -> {
                             try {
                                 return PremiseRuleSet.parse(tt.getOne() + ", () |- " + tt.getTwo() + ", (Belief:Identity)\n");
@@ -433,7 +433,7 @@ public class KIFInput implements Runnable {
         e.onTask(t -> {
            if (t.isInput()) {
                //d.forEachTask(b -> {
-                   miniDeriver.accept(new Derivation(
+                   miniDeriver.test(new Derivation(
                            e,
                            new Premise( t, Terms.ZeroProduct, null, 1f),
                            //e::input,

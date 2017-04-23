@@ -168,11 +168,6 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 //        return o;
 //    }
 
-    final Versioned<Y> version(X key) {
-        //return map.computeIfPresent(key, (k, v) -> v == null || v.isEmpty() ? null : v);
-        return map.get(key);
-    }
-
 
     @Override
     public final boolean containsKey(Object key) {

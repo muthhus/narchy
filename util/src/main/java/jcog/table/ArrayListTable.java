@@ -53,10 +53,8 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 
     @Override
     public void clear() {
-        synchronized (_items()) {
-            super.clear(); //clears map
-            listClear();
-        }
+        super.clear(); //clears map
+        listClear();
     }
 
     abstract protected void listClear();
@@ -96,7 +94,6 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 
     /**
      * Take out the first or last E in a level from the itemTable
-     * TODO make protected/private should only be called in synchronized (items)
      * @return The first Item
      */
     public final V removeItem(int index) {

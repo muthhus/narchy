@@ -65,6 +65,7 @@ abstract public class SortedArray<E> implements Iterable<E> {
     }
 
 
+
     public E remove(int index) {
 //        if (size < index)
 //            throw new ArrayIndexOutOfBoundsException(index);
@@ -87,6 +88,7 @@ abstract public class SortedArray<E> implements Iterable<E> {
             System.arraycopy(list, index + 1, list, index, totalOffset);
         list[--this.size] = null;
     }
+
 
 
     /**
@@ -279,10 +281,7 @@ abstract public class SortedArray<E> implements Iterable<E> {
     public Iterator<E> iterator() {
         //throw new UnsupportedOperationException();
         int s = size();
-        if (s == 0)
-            return Collections.emptyIterator();
-        else
-            return new ArrayIterator(list, 0, s);
+        return (s == 0) ? Collections.emptyIterator() : new ArrayIterator(list, 0, s);
     }
 
 

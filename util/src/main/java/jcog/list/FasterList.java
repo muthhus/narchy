@@ -340,6 +340,12 @@ public class FasterList<X> extends FastList<X> {
         ii[--size] = null;
     }
 
+    public void removeBelow(int index) {
+        if (size <= index)
+            return; // no change
+        this.items = Arrays.copyOfRange(items, 0, this.size = index);
+    }
+
     public int capacity() {
         return items.length;
     }

@@ -1,5 +1,6 @@
 package nars.derive;
 
+import nars.derive.meta.BoolPred;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,7 @@ import java.util.function.Consumer;
  * <p>
  * Created by patrick.hammer on 30.07.2015.
  */
-public interface Deriver extends Consumer<Derivation> {
+public interface Deriver extends BoolPred<Derivation> {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
 
@@ -29,7 +30,7 @@ public interface Deriver extends Consumer<Derivation> {
 
     @NotNull
     static Deriver get(String... path) {
-        return new TrieDeriver(PremiseRuleSet.rules(true, path));
+        return TrieDeriver.get(PremiseRuleSet.rules(true, path));
     }
 
     //    @NotNull

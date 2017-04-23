@@ -51,9 +51,10 @@ abstract public class PremiseBuilder {
 
             Concept beliefConcept = nar.concept(beliefTerm);
 
-            if (beliefTerm.varQuery() > 0 && !beliefTerm.equals(task.term())) {
+            Compound taskTerm = task.term();
+            if (beliefTerm.varQuery() > 0 && !beliefTerm.equals(taskTerm)) {
                 assert(beliefTerm.op()!=NEG);
-                beliefTerm = unify(task.term(), (Compound) beliefTerm, nar);
+                beliefTerm = unify(taskTerm, (Compound) beliefTerm, nar);
                 assert(beliefTerm.op()!=NEG);
             }
 

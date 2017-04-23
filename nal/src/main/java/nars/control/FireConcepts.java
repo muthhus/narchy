@@ -79,14 +79,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         final int[] count = {0};
 
         long now = nar.time();
-        for (PLink<Task> tasklink : tasklinks) {
-            for (PLink<Term> termlink : termlinks) {
-                Derivation d = premiser.premise(c, tasklink, termlink, now, nar, -1f, target);
+        for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
+            PLink<Task> tasklink = tasklinks.get(i);
+            for (int i1 = 0, termlinksSize = termlinks.size(); i1 < termlinksSize; i1++) {
+                Derivation d = premiser.premise(c, tasklink, termlinks.get(i1), now, nar, -1f, target);
                 if (d != null) {
-                    premiser.deriver.accept(d);
-                    count[0]++;
+                    if (premiser.deriver.test(d))
+                        count[0]++;
                 }
-
             }
         }
 

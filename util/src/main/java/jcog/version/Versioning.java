@@ -52,9 +52,7 @@ public class Versioning extends FasterList<Versioned> {
 
     /** reverts/undo to previous state */
     public final void revert(int when) {
-        int n = size - when;
-        if (n > 0)
-            pop(n);
+        pop(size - when );
     }
 
     public final void pop(int count) {

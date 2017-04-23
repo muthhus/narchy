@@ -1,14 +1,19 @@
 package nars.perf;
 
 import com.google.common.base.Joiner;
-import jcog.Util;
-import jcog.data.sorted.SortedArray;
+import jcog.Texts;
 import jcog.list.FasterList;
+import jcog.trie.Trie;
+import jcog.trie.TrieMatch;
+import jcog.trie.Tries;
 import joptsimple.OptionException;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -16,17 +21,15 @@ import org.openjdk.jmh.infra.BenchmarkParams;
 import org.openjdk.jmh.infra.IterationParams;
 import org.openjdk.jmh.profile.InternalProfiler;
 import org.openjdk.jmh.profile.ProfilerException;
-import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.*;
-import org.openjdk.jmh.util.HashMultiset;
-import org.openjdk.jmh.util.Multiset;
 
-import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /*
@@ -75,8 +78,7 @@ public class StackProfiler2 implements InternalProfiler {
     private final int stackLines;
     private final int topStacks;
     private final int periodMsec;
-    private final boolean sampleLine;
-    private final Set<String> excludePackageNames;
+    private final Trie<String, Boolean> excludePackageNames;
 
     public StackProfiler2() throws ProfilerException {
 //        OptionParser parser = new OptionParser();
@@ -116,19 +118,22 @@ public class StackProfiler2 implements InternalProfiler {
 
 
         try {
-            sampleLine = true; //set.valueOf(optDetailLine);
             periodMsec = 0; //set.valueOf(optSamplePeriod);
             topStacks = 10; //set.valueOf(optTopStacks);
             stackLines = 10; //set.valueOf(optStackLines);
 
             //boolean excludePackages = true; //set.valueOf(optExclude);
-            excludePackageNames =
-                    Sets.mutable.of("java.", "jdk.", "javax.", "sun.",
-                            "sunw.", "com.sun.", "org.openjdk.jmh.");
+            MutableSet<String> exc = Sets.mutable.of("java.", "jdk.", "javax.", "sun.",
+                    "sunw.", "com.sun.", "org.openjdk.jmh.", "com.intellij.rt.");
 
-                    /*excludePackages ?
-                    new HashSet<>(set.valuesOf(optExcludeClasses)) :
-                    Collections.<String>emptySet();*/
+            excludePackageNames = Tries.forStrings();
+            exc.forEach(e -> excludePackageNames.put(e, true));
+
+            //assertTrue( t.has( "wowza", TrieMatch.STARTS_WITH ) );
+
+                /*excludePackages ?
+                new HashSet<>(set.valuesOf(optExcludeClasses)) :
+                Collections.<String>emptySet();*/
         } catch (OptionException e) {
             throw new ProfilerException(e.getMessage());
         }
@@ -156,12 +161,12 @@ public class StackProfiler2 implements InternalProfiler {
     public class SamplingTask implements Runnable {
 
         private final Thread thread;
-        private final Map<Thread.State, Multiset<StackRecord>> stacks;
+        private final Map<Thread.State, HashBag<StackRecord>> stacks;
 
         public SamplingTask() {
             stacks = new EnumMap<>(Thread.State.class);
             for (Thread.State s : Thread.State.values()) {
-                stacks.put(s, new HashMultiset<StackRecord>());
+                stacks.put(s, new HashBag<StackRecord>());
             }
             thread = new Thread(this);
             thread.setName("Sampling Thread");
@@ -169,39 +174,42 @@ public class StackProfiler2 implements InternalProfiler {
 
         @Override
         public void run() {
-
             while (!Thread.interrupted()) {
-                ThreadInfo[] infos = ManagementFactory.getThreadMXBean().dumpAllThreads(false, false);
+                measure(ManagementFactory.getThreadMXBean().dumpAllThreads(false, false));
+                if (!pause(periodMsec))
+                    break;
+            }
+        }
 
-                info:
-                for (ThreadInfo info : infos) {
+        public void measure(ThreadInfo[] infos) {
 
-                    // filter out ignored threads TODO is lowercase compare necessary?
-                    switch (info.getThreadName()) {
-                        case "Finalizer":
-                        case "Signal Dispatcher":
-                        case "Reference Handler":
-                        case "main":
-                        case "Sampling Thread":
-                        case "Attach Listener":
-                            continue info; //ignore
+            StackRecord lines = new StackRecord();
 
-                    }
+            info:
+            for (ThreadInfo info : infos) {
+
+                // filter out ignored threads TODO is lowercase compare necessary?
+                switch (info.getThreadName()) {
+                    case "Finalizer":
+                    case "Signal Dispatcher":
+                    case "Reference Handler":
+                    case "main":
+                    case "Sampling Thread":
+                    case "Attach Listener":
+                        continue info; //ignore
+
+                }
 
 
-                    //   - Discard everything that matches excluded patterns from the top of the stack
-                    //   - Get the remaining number of stack lines and build the stack record
+                //   - Discard everything that matches excluded patterns from the top of the stack
+                //   - Get the remaining number of stack lines and build the stack record
 
 
-                    StackRecord lines = new StackRecord();
-                            Stream.of(info.getStackTrace())
-                                    .filter(f -> !isExcluded(f.getClassName()))
-                                    .limit(stackLines)
-                                    .forEach(l -> lines.add( Tuples.pair(
-                                            l.getClassName(),
-                                            PrimitiveTuples.pair(l.getLineNumber(), l.getMethodName()) )
-                                    ))
-                                    ;
+                Stream.of(info.getStackTrace())
+                        .filter(f -> !exclude(f.getClassName()))
+                        .limit(stackLines)
+                        .forEach(lines::add)
+                ;
 
 //                    for (StackTraceElement l : stack) {
 //                        String className = l.getClassName();
@@ -216,17 +224,10 @@ public class StackProfiler2 implements InternalProfiler {
 //                        }
 //                    }
 
-                    if (!lines.isEmpty()) {
-                        lines.commit();
-                        stacks.get(info.getThreadState()).add(lines);
-                    }
-                }
-
-
-                try {
-                    TimeUnit.MILLISECONDS.sleep(periodMsec);
-                } catch (InterruptedException e) {
-                    return;
+                if (!lines.isEmpty()) {
+                    lines.commit();
+                    stacks.get(info.getThreadState()).add(lines);
+                    lines = new StackRecord();
                 }
             }
         }
@@ -244,23 +245,32 @@ public class StackProfiler2 implements InternalProfiler {
             }
         }
 
-        private boolean isExcluded(String className) {
-            for (String p : excludePackageNames) {
-                if (className.startsWith(p)) {
-                    return true;
-                }
-            }
+    }
+
+    public boolean exclude(String className) {
+        if (excludePackageNames.has(className, TrieMatch.STARTS_WITH)) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean pause(int periodMsec) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(periodMsec);
+            return true;
+        } catch (InterruptedException e) {
             return false;
         }
     }
 
-    private static class StackRecord extends FasterList<Pair<String, IntObjectPair<String>>> {
+    public static class StackRecord extends FasterList<Pair<String, IntObjectPair<String>>> {
         private static final long serialVersionUID = -1829626661894754733L;
 
         private int hash;
 
         public StackRecord() {
-            super();
+            super(0);
         }
 
         public void commit() {
@@ -271,22 +281,31 @@ public class StackProfiler2 implements InternalProfiler {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass() || hash != o.hashCode()) return false;
-            return super.equals(((StackRecord) o));
+            return super.equals(o);
         }
 
         @Override
         public int hashCode() {
             return hash;
         }
+
+        public void add(StackTraceElement l) {
+            add(
+                    Tuples.pair(
+                            l.getClassName(),
+                            PrimitiveTuples.pair(l.getLineNumber(), l.getMethodName())
+                    )
+            );
+        }
     }
 
     public static class StackResult extends Result<StackResult> {
         private static final long serialVersionUID = 2609170863630346073L;
 
-        private final Map<Thread.State, Multiset<StackRecord>> stacks;
+        private final Map<Thread.State, HashBag<StackRecord>> stacks;
         private final int topStacks;
 
-        public StackResult(Map<Thread.State, Multiset<StackRecord>> stacks, int topStacks) {
+        public StackResult(Map<Thread.State, HashBag<StackRecord>> stacks, int topStacks) {
             super(ResultRole.SECONDARY, Defaults.PREFIX + "stack", of(Double.NaN), "---", AggregationPolicy.AVG);
             this.stacks = stacks;
             this.topStacks = topStacks;
@@ -312,29 +331,35 @@ public class StackProfiler2 implements InternalProfiler {
             return getStack(stacks);
         }
 
-        public String getStack(final Map<Thread.State, Multiset<StackRecord>> stacks) {
-            SortedArray<LongObjectPair<Pair<Thread.State, StackRecord>>> r = new SortedArray<>() {
+        public String getStack(final Map<Thread.State, HashBag<StackRecord>> stacks) {
 
-                @Override
-                protected LongObjectPair<Pair<Thread.State, StackRecord>>[] newArray(int oldSize) {
-                    return new LongObjectPair[grow(oldSize)];
-                }
-            };
+            int top = 32;
+//
+            StringBuilder sb = new StringBuilder(128*1024);
 
-            stacks.entrySet().forEach( e -> {
-                    e.getValue().entrySet().forEach(x -> {
-                        LongObjectPair<Pair<Thread.State, StackRecord>> i = PrimitiveTuples.pair(x.getValue(), Tuples.pair(e.getKey(), x.getKey()));
-                        r.add(i, z -> -z.getOne());
-                    });
+            stacks.entrySet().forEach(e -> {
+                HashBag<StackRecord> cc = e.getValue();
+                MutableList<ObjectIntPair<StackRecord>> dd = cc.topOccurrences(top);
+
+                Thread.State state = e.getKey();
+                float totalHundredths = cc.size()/100f;
+                sb.append(state).append(" (").append(totalHundredths + " recorded)\n");
+                dd.forEach(x -> {
+                    sb.append('\t').append( Texts.n4(x.getTwo()/totalHundredths) ).append("%\t").append(x.getOne()).append('\n');
+                });
+
+                sb.append("\n");
             });
 
-            return Joiner.on("\n").join(r);
+            String s = sb.toString();
+            System.out.println(s);
+            return s;
 
 //            List<Thread.State> sortedStates = new ArrayList<>(stacks.keySet());
 //            Collections.sort(sortedStates, new Comparator<Thread.State>() {
 //
 //                private long stateSize(Thread.State state) {
-//                    Multiset<StackRecord> set = stacks.get(state);
+//                    HashBag<StackRecord> set = stacks.get(state);
 //                    return (set == null) ? 0 : set.size();
 //                }
 //
@@ -359,12 +384,12 @@ public class StackProfiler2 implements InternalProfiler {
 //            builder.append("\n");
 //
 //            for (Thread.State state : sortedStates) {
-//                Multiset<StackRecord> stateStacks = stacks.get(state);
+//                HashBag<StackRecord> stateStacks = stacks.get(state);
 //                if (isSignificant(stateStacks.size(), totalSize)) {
 //                    builder.append(dottedLine("Thread state: " + state.toString()));
 //
 //                    int totalDisplayed = 0;
-//                    for (StackRecord s : Multisets.countHighest(stateStacks, topStacks)) {
+//                    for (StackRecord s : HashBags.countHighest(stateStacks, topStacks)) {
 //                        List<String> lines = s.lines;
 //                        if (!lines.isEmpty()) {
 //                            totalDisplayed += stateStacks.count(s);
@@ -393,54 +418,21 @@ public class StackProfiler2 implements InternalProfiler {
 //            return builder.toString();
         }
 
-        // returns true, if part is >0.1% of total
-        private boolean isSignificant(long part, long total) {
-            // returns true if part*100.0/total is greater or equals to 0.1
-            return part * 1000 >= total;
-        }
-
-        private long getTotalSize(Map<Thread.State, Multiset<StackRecord>> stacks) {
-            long sum = 0;
-            for (Multiset<StackRecord> set : stacks.values()) {
-                sum += set.size();
-            }
-            return sum;
-        }
-    }
-
-    static String dottedLine(String header) {
-        final int HEADER_WIDTH = 100;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("....");
-        if (header != null) {
-            header = "[" + header + "]";
-            sb.append(header);
-        } else {
-            header = "";
-        }
-
-        for (int c = 0; c < HEADER_WIDTH - 4 - header.length(); c++) {
-            sb.append(".");
-        }
-        sb.append("\n");
-        return sb.toString();
     }
 
     public static class StackResultAggregator implements Aggregator<StackResult> {
         @Override
         public StackResult aggregate(Collection<StackResult> results) {
             int topStacks = 0;
-            Map<Thread.State, Multiset<StackRecord>> sum = new EnumMap<>(Thread.State.class);
+            Map<Thread.State, HashBag<StackRecord>> sum = new EnumMap<>(Thread.State.class);
             for (StackResult r : results) {
-                for (Map.Entry<Thread.State, Multiset<StackRecord>> entry : r.stacks.entrySet()) {
+                for (Map.Entry<Thread.State, HashBag<StackRecord>> entry : r.stacks.entrySet()) {
                     if (!sum.containsKey(entry.getKey())) {
-                        sum.put(entry.getKey(), new HashMultiset<StackRecord>());
+                        sum.put(entry.getKey(), new HashBag<StackRecord>());
                     }
-                    Multiset<StackRecord> sumSet = sum.get(entry.getKey());
-                    for (StackRecord rec : entry.getValue().keys()) {
-                        sumSet.add(rec, entry.getValue().count(rec));
-                    }
+                    HashBag<StackRecord> sumSet = sum.get(entry.getKey());
+                    HashBag<StackRecord> b = entry.getValue();
+                    b.forEachWithOccurrences(sumSet::addOccurrences);
                 }
                 topStacks = r.topStacks;
             }

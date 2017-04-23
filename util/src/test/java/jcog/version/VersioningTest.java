@@ -22,7 +22,7 @@ public class VersioningTest {
     @Test
     public void test1() {
         Versioning w = new Versioning(10, 20);
-        VersionMap m = new VersionMap(w,10,10);
+        VersionMap<Object,Object> m = new VersionMap(w,10,10);
         m.tryPut("x", "a");
         assertEquals("{x=a}", m.toString());
         assertEquals(1, w.size());
@@ -30,7 +30,7 @@ public class VersioningTest {
 
         assertEquals("{x=b}", m.toString());
 
-        Versioned mvx = m.version("x");
+        Versioned mvx = m.map.get("x");
 
         assertEquals("(a, b)", mvx.toStackString());
         assertEquals(2, w.size());

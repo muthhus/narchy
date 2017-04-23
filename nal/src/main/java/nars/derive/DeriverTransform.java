@@ -32,7 +32,7 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
     }
 
     public TrieDeriver apply(TrieDeriver x) {
-        BoolPred[] y = instrument(x.roots.clone());
+        BoolPred[] y = instrument(x.roots().clone());
         return new TrieDeriver(y);
     }
 
@@ -47,7 +47,7 @@ public class DeriverTransform implements Function<TrieDeriver,TrieDeriver> {
 
         if (b instanceof Fork) {
             Fork f = (Fork)b;
-            return Fork.compile(instrument(f.termCache));
+            return Fork.compile(instrument(f.cached));
         } else if (b instanceof AndCondition) {
             AndCondition f = (AndCondition)b;
             return Fork.compile(instrument(f.termCache));
