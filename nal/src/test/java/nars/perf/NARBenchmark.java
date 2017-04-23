@@ -64,7 +64,7 @@ public class NARBenchmark {
     @Benchmark
     @BenchmarkMode(value = Mode.AverageTime)
     public void deductiveChainTest1() {
-        n.run(100);
+        n.run(10);
     }
 
 //    @Benchmark
@@ -93,7 +93,7 @@ public class NARBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARBenchmark.class, 2, 1);
+        perf(NARBenchmark.class, 1, 1);
     }
 
 }

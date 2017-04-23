@@ -504,8 +504,8 @@ public class NAL6Test extends AbstractNALTest {
         .believe("<0 --> n>", 1.0f, 0.9f)
         .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
         .ask("<(/,next,(/,next,0,_),_) --> n>")
-        .mustBelieve(cycles, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
-        .mustBelieve(cycles, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
+        .mustBelieve(cycles*2, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
+        .mustBelieve(cycles*2, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
     }
@@ -569,7 +569,7 @@ public class NAL6Test extends AbstractNALTest {
         //<patham9> this is the only rule which is needed in this example
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
-        long time =  500; //originally: 1200
+        long time =  700; //originally: 1200
 
         test()
                 .believe("num(0)", 1.0f, 0.9f)

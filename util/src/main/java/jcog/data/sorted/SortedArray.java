@@ -260,6 +260,7 @@ abstract public class SortedArray<E> implements Iterable<E> {
         list[index] = element;
     }
 
+    /** generally, uses grow(oldSize) (not oldSize directly!) to get the final constructed array length */
     abstract protected E[] newArray(int oldSize);
 
     protected static int grow(int oldSize) {

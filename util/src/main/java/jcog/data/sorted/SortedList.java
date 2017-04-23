@@ -18,7 +18,7 @@ public class SortedList<E extends Comparable> extends FasterList<E> {
 
     //private static final Comparator comparator = defaultComparator;
 
-    static final Comparator<Comparable> defaultComparator = Comparable::compareTo;
+    //static final Comparator<Comparable> defaultComparator = Comparable::compareTo;
 
 //    private boolean allowDuplicate;
 

@@ -246,11 +246,11 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         return scale;
     }
 
+
     final void termBidi(@NotNull Termed rcpt, float tlForward, float tlReverse) {
 
-        if (rcpt == this.origin) {
+        if (rcpt == this.origin)
             return;
-        }
 
         Term rcptTerm = rcpt.term();
 
