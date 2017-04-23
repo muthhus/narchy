@@ -23,7 +23,7 @@ import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
 
-abstract public class PremiseBuilder {
+public enum PremiseBuilder { ;
 
 
     /**
@@ -40,7 +40,7 @@ abstract public class PremiseBuilder {
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public Derivation premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
+    public static Premise premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
 
         Term beliefTerm = termLink.get();
         Task belief = null;
@@ -127,10 +127,10 @@ abstract public class PremiseBuilder {
 
         nar.concepts.commit(concept);
 
-        return newPremise(concept, task, beliefTerm, belief, pri, target, nar);
+        return new Premise(task, beliefTerm, belief, pri);
     }
 
-    void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {
+    static void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {
 
         @Nullable Task answered = question.get().onAnswered(match, nar);
 
@@ -167,9 +167,6 @@ abstract public class PremiseBuilder {
         }
     }
 
-
-
-    abstract protected Derivation newPremise(@NotNull Termed c, @NotNull Task task, @NotNull Term beliefTerm, @Nullable Task belief, float pri, @NotNull Consumer<DerivedTask> target, @NotNull NAR nar);
 
     /** unify any (and only) query variables
      * present in the 'a' term with any non-query terms in the 'q' term */

@@ -7,20 +7,21 @@ import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import nars.Focus;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.derive.Deriver;
 import nars.premise.Derivation;
-import nars.premise.MatrixPremiseBuilder;
+import nars.premise.DerivationBudgeting;
+import nars.premise.Premise;
+import nars.premise.PremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import static java.lang.System.nanoTime;
 
 
 /** controls an active focus of concepts */
@@ -29,7 +30,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
-    final MatrixPremiseBuilder premiser;
+    public final DerivationBudgeting budgeting;
+    public final Deriver deriver;
 
 
 
@@ -70,6 +72,11 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /** returns # of derivations processed */
     int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target) {
 
+        Derivation d = new Derivation(nar, this, budgeting,
+                Param.UnificationStackMax,
+                Param.UnificationTTL
+        );
+
         Concept c = pc.get();
         float cPri = pc.priSafe(0);
         int numLinksSqr = taskLinksFiredPerConcept.lerp(cPri); //TODO see if there is a sqr/sqrt relationship that can be made
@@ -82,9 +89,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
             PLink<Task> tasklink = tasklinks.get(i);
             for (int i1 = 0, termlinksSize = termlinks.size(); i1 < termlinksSize; i1++) {
-                Derivation d = premiser.premise(c, tasklink, termlinks.get(i1), now, nar, -1f, target);
-                if (d != null) {
-                    if (premiser.deriver.test(d))
+                Premise p = PremiseBuilder.premise(c, tasklink, termlinks.get(i1), now, nar, -1f, target);
+                if (p != null) {
+                    if (deriver.test(d.restart(p)))
                         count[0]++;
                 }
             }
@@ -101,12 +108,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsDirect extends FireConcepts {
 
-        public FireConceptsDirect(@NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
-            this(nar.focus(), premiseBuilder, nar);
+        public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
+            this(nar.focus(), deriver, budgeting, nar);
         }
 
-        public FireConceptsDirect(@NotNull Focus focus, @NotNull MatrixPremiseBuilder premiseBuilder, @NotNull NAR nar) {
-            super(focus, premiseBuilder, nar);
+        public FireConceptsDirect(Focus focus, Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
+            super(focus, deriver, budgeting, nar);
+
         }
 
         @Override public void fire() {
@@ -175,11 +183,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     }
 
-    public FireConcepts(@NotNull Focus source, MatrixPremiseBuilder premiseBuilder, NAR nar) {
+    public FireConcepts(@NotNull Focus source, Deriver dderiver, DerivationBudgeting bbudgeting, NAR nar) {
+
+        this.deriver = dderiver;
+        this.budgeting = bbudgeting;
 
         this.nar = nar;
         this.source = source;
-        this.premiser = premiseBuilder;
 
         this.on = nar.onCycle(this);
     }

@@ -30,27 +30,28 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Derivation extends Unify {
 
+    @NotNull public final Consumer<DerivedTask> target;
+    public final float truthResolution;
+    public final float confMin;
+    public final DerivationBudgeting budgeting;
+    @NotNull public final Versioned<TruthPuncEvidence> punct;
 
     /**
      * the current premise being evaluated in this context TODO make private again
      */
     @NotNull
-    public final Premise premise;
-
-    // cached for fast access during derivation:
-    public final float truthResolution;
-    public final float premiseEvidence;
-    public final float confMin;
+    public  Premise premise;
 
 
-    @NotNull
-    public final Versioned<TruthPuncEvidence> punct;
+    public  float premiseEvidence;
+
+
 
 
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
-    @NotNull
+    @Nullable
     private BoolPred forEachMatch;
 
 
@@ -58,79 +59,76 @@ public class Derivation extends Unify {
      * cached values
      */
     /** op ordinals: 0=task, 1=belief */
-    public final byte termSub0op;
-    public final byte termSub1op;
+    public  byte termSub0op;
+    public  byte termSub1op;
 
     /** op bits: 0=task, 1=belief */
-    public final int termSub0opBit;
-    public final int termSub1opBit;
+    public  int termSub0opBit;
+    public  int termSub1opBit;
 
     /** structs, 0=task, 1=belief */
-    public final int termSub0Struct;
-    public final int termSub1Struct;
+    public  int termSub0Struct;
+    public  int termSub1Struct;
 
 
     @Nullable
-    public final Truth taskTruth;
+    public  Truth taskTruth;
     @Nullable
-    public final Truth beliefTruth, beliefTruthRaw;
+    public  Truth beliefTruth, beliefTruthRaw;
 
     @NotNull
-    public final Compound taskTerm;
+    public  Compound taskTerm;
     @NotNull
-    public final Term beliefTerm;
+    public  Term beliefTerm;
     @NotNull
     public final NAR nar;
 
     @NotNull
-    public final Task task;
+    public  Task task;
     @Nullable
-    public final Task belief;
-    public final byte taskPunct;
+    public  Task belief;
+    public  byte taskPunct;
 
     /**
      * whether the premise involves temporality that must be calculated upon derivation
      */
-    public final boolean temporal;
+    public  boolean temporal;
 
     @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
-    @Nullable
-    public final Consumer<DerivedTask> target;
 
-    public final boolean cyclic, overlap;
+    public boolean cyclic, overlap;
     //public final float overlapAmount;
-    public final DerivationBudgeting budgeting;
 
 
-    public Derivation(@NotNull NAR nar, @NotNull Premise p, @NotNull Consumer<DerivedTask> c,
+
+    public Derivation(@NotNull NAR nar, @NotNull Consumer<DerivedTask> c,
                       DerivationBudgeting b,
                       int stack, int ttl) {
         super(nar.concepts, VAR_PATTERN, nar.random(), stack, ttl);
-
-        this.budgeting = b;
-
         this.nar = nar;
+        this.target = c;
+        this.budgeting = b;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-
-        //occDelta = new Versioned(this);
-        //tDelta = new Versioned(this);
         this.punct = new Versioned<>(versioning, 1);
 
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
-        //set(new substituteIfUnifiesForward(this));
         set(new substituteIfUnifiesDep(this));
-        //set(new substituteIfUnifiesIndep(this));
 
+    }
+
+    public Derivation restart(@NotNull Premise p) {
         this.premise = p;
 
         Task task;
         this.task = task = p.task;
         Compound tt = task.term();
         Term taskTerm = this.taskTerm = tt;
+        this.taskTruth = task.truth();
+        this.taskPunct = task.punc();
 
         Task belief;
         this.belief = belief = p.belief;
@@ -139,9 +137,6 @@ public class Derivation extends Unify {
             throw new RuntimeException("negated belief term");
         }
 
-        this.taskTruth = task.truth();
-        this.taskPunct = task.punc();
-
 
         int dur = nar.dur();
         if (belief == null) {
@@ -149,33 +144,12 @@ public class Derivation extends Unify {
         } else {
             Truth beliefTruth = this.beliefTruthRaw = belief.truth();
             long start = task.start();
-            if ((start==ETERNAL) || (belief.isEternal())) {
-                //??
-            } else {
-                //project
+            if ((start != ETERNAL) && (!belief.isEternal())) {
                 beliefTruth = belief.truth(start, dur, confMin); //project belief truth to task's time
             }
             this.beliefTruth = beliefTruth;
         }
 
-
-
-
-//        //normalize to positive truth
-//        if (taskTruth != null && Global.INVERT_NEGATIVE_PREMISE_TASK && taskTruth.isNegative()) {
-//            this.taskInverted = true;
-//            this.taskTruth = this.taskTruth.negated();
-//        } else {
-//            this.taskInverted = false;
-//        }
-//
-//        //normalize to positive truth
-//        if (beliefTruth!=null && Global.INVERT_NEGATIVE_PREMISE_TASK && beliefTruth.isNegative()) {
-//            this.beliefInverted = true;
-//            this.beliefTruth = this.beliefTruth.negated();
-//        } else {
-//            this.beliefInverted = false;
-//        }
 
         this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
         //NOT: this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
@@ -197,16 +171,13 @@ public class Derivation extends Unify {
 
         this.temporal = temporal(task, belief);
 
-        this.target = c;
-
         float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
         if (belief!=null)
             premiseEvidence = Math.max(premiseEvidence, belief.evi());
         this.premiseEvidence = premiseEvidence;
 
+        return this;
     }
-
-
 
 
     /**
@@ -214,17 +185,13 @@ public class Derivation extends Unify {
      */
     public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPred eachMatch) {
 
+        boolean finish = (this.forEachMatch = eachMatch)!=null;
 
-        this.forEachMatch = eachMatch;
-
-        boolean finish = eachMatch!=null;
         boolean result = unify(x, y, !finish, finish);
 
         this.forEachMatch = null;
 
         return result;
-
-
     }
 
     @Override public final boolean onMatch() {

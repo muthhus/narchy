@@ -435,7 +435,6 @@ public class KIFInput implements Runnable {
                //d.forEachTask(b -> {
                    miniDeriver.test(new Derivation(
                            e,
-                           new Premise( t, Terms.ZeroProduct, null, 1f),
                            //e::input,
                            x -> {
                                System.out.println(x);
@@ -443,7 +442,7 @@ public class KIFInput implements Runnable {
                            },
                            budgeting,
                            Param.UnificationStackMax, Param.UnificationTTL*1000
-                   ));
+                   ).restart(new Premise( t, Terms.ZeroProduct, null, 1f)));
                //});
            }
         });

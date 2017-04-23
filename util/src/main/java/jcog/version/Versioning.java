@@ -25,15 +25,7 @@ public class Versioning extends FasterList<Versioned> {
      *  @return null if capacity exceeded
      * */
     public final boolean nextChange(@Nullable Versioned v, @Nullable Object x) {
-        if (add(v)) {
-            if (v!=null) {
-                if (!v.add(x)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
+        return add(v) && !(v != null && !v.add(x));
     }
 
     public final boolean nextChange() {

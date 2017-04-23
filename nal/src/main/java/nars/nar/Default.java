@@ -15,7 +15,6 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.premise.MatrixPremiseBuilder;
 import nars.premise.PreferSimpleAndConfident;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -82,9 +81,7 @@ public class Default extends NAR {
         deriver = //exe.concurrent() ?
                 //new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
                 //:
-                new FireConcepts.FireConceptsDirect(newPremiseBuilder(), this);
-        ;
-
+                new FireConcepts.FireConceptsDirect(newDeriver(), derivationBudgeting, this);
 
         //used for both:
         deriver.taskLinksFiredPerConcept.set(1, termLinksPerConcept);
@@ -96,9 +93,6 @@ public class Default extends NAR {
         return defaultDeriver;
     }
 
-    public MatrixPremiseBuilder newPremiseBuilder() {
-        return new MatrixPremiseBuilder(newDeriver(), derivationBudgeting);
-    }
 
     public PreferSimpleAndConfident newDerivationBudgeting() {
         return new PreferSimpleAndConfident();
