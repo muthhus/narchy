@@ -139,7 +139,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             }
         }
 
-        ThreadLocal<Map<Task,Task>> buffer = ThreadLocal.withInitial(()->new HashMap<>());
+        final static ThreadLocal<Map<Task,Task>> buffer = ThreadLocal.withInitial(LinkedHashMap::new);
+
         public void fire(ConceptBagFocus csrc, int count) {
 //            final Map<Task,Task> in =
 //                    //new LinkedHashMap<>(count * 8 /* estimate */);

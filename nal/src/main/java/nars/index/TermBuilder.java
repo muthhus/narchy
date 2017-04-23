@@ -395,7 +395,7 @@ public abstract class TermBuilder {
      * NOTE: terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    protected Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
+    public Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
 
         int s = args.length;
         assert(s!=0);

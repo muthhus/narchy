@@ -21,12 +21,8 @@ public enum Main {
 
 	public static void perf(String include, int iterations, int batchSize) throws RunnerException {
 		Options opt = new OptionsBuilder()
-				// .include(".*" + YourClass.class.getSimpleName() + ".*")
-
 				.include(include)
-
-				 //.include(//c.getName())
-				//.include(".*" + c.getSimpleName() + ".*")
+				.shouldDoGC(true)
 				.warmupIterations(0)
 				.measurementIterations(iterations)
 				.measurementBatchSize(batchSize)
@@ -35,9 +31,15 @@ public enum Main {
 				.resultFormat(ResultFormatType.TEXT)
 				.verbosity(VerboseMode.NORMAL) //VERBOSE OUTPUT
 
-				//.addProfiler(StackProfiler.class)
+
+//			    .addProfiler(PausesProfiler.class, "period=10" /*uS */)
+//        		.addProfiler(SafepointsProfiler.class)
+
 				.addProfiler(StackProfiler.class,
-						"lines=7;top=20;period=1;detailLine=true")
+			 "lines=10;top=20;period=1;detailLine=true;excludePackages=true" +
+					";excludePackageNames=java., jdk., javax., sun., " +
+					 "sunw., com.sun., org.openjdk.jmh."
+				)
 				 //.addProfiler(GCProfiler.class)
 
 				//.addProfiler(HotspotRuntimeProfiler.class)
@@ -46,9 +48,11 @@ public enum Main {
 
 				//.addProfiler(HotspotCompilationProfiler.class)
 				// .addProfiler(HotspotClassloadingProfiler.class)
-				//.addProfiler(LinuxPerfProfiler.class) // sudo sysctl kernel.perf_event_paranoid=0
-				  .addProfiler(LinuxPerfAsmProfiler.class)
-				  .addProfiler(LinuxPerfNormProfiler.class)
+
+				// sudo sysctl kernel.perf_event_paranoid=0
+				.addProfiler(LinuxPerfProfiler.class)
+			    .addProfiler(LinuxPerfAsmProfiler.class)
+				.addProfiler(LinuxPerfNormProfiler.class)
 
 				//.addProfiler(CompilerProfiler.class)
 

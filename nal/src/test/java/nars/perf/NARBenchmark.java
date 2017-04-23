@@ -47,28 +47,22 @@ public class NARBenchmark {
 
     @Setup
     public void prepare() {
+
         n = new Default();
-    }
-
-
-
-    @Benchmark
-    @BenchmarkMode(value = Mode.All)
-    public void deductiveChainTest1() {
-
+        n.deriver.rate.setValue(0.05f);
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
-        n.deriver.rate.setValue(0.05f);
-
         new DeductiveMeshTest(n, new int[]{16, 16});
         new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
+    }
 
+
+    @Benchmark
+    @BenchmarkMode(value = Mode.AverageTime)
+    public void deductiveChainTest1() {
         n.run(100);
-
-        //System.err.println(n.concepts.summary());
-
     }
 
 //    @Benchmark
@@ -97,7 +91,7 @@ public class NARBenchmark {
 
 
     public static void main(String[] args) throws RunnerException {
-        perf(NARBenchmark.class, 1, 1);
+        perf(NARBenchmark.class, 2, 1);
     }
 
 }

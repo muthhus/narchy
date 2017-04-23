@@ -16,6 +16,7 @@ import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import com.google.common.collect.ImmutableList;
 import jcog.Texts;
+import jcog.bag.impl.hijack.HijackMemoize;
 import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.TermBuilder;
@@ -46,6 +47,7 @@ import java.util.function.Function;
 import static nars.$.newArrayList;
 import static nars.Op.*;
 import static nars.term.Term.falseIfNull;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * NARese, syntax and language for interacting with a NAR in NARS.
@@ -1050,28 +1052,16 @@ public class Narsese extends BaseParser<Object> {
         if (op == null)
             op = PROD;
 
-        //return $.compound(op, vectorterms);
-        Term x = termCache.get(Tuples.pair(op, ImmutableList.copyOf(vectorterms)), termBuilder);
-        if (x == NarseseNull)
-            return null;
-        return x;
+        return T.the(op, DTERNAL, vectorterms);
     }
 
-    final static Cache<Pair<Op, ImmutableList<Term>>, Term> termCache = Caffeine.newBuilder()
-            .weakValues()
-            //.maximumSize(1024 * 32)
-            .build();
 
     /**
      * place-holder for invalid term. this value should never leave this class
      */
     public final static AtomicSingleton NarseseNull = new AtomicSingleton("");
 
-    final Function<Pair<Op, ImmutableList<Term>>, Term> termBuilder = (k) -> {
-        ImmutableList<Term> args = k.getTwo();
-        Term x = T.the(k.getOne(), args.toArray(new Term[args.size()]));
-        return x == null ? NarseseNull : x;
-    };
+
 
 //    @Nullable
 //    public static final Function<Pair<Op, List>, Term> popTermFunction = (x) -> {
