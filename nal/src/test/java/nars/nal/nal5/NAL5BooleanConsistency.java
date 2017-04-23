@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
                     }
                 };
 
-                //d.log();
+                d.log();
 
                 String[] outcomes = {
                         "(x --> (0,0))",
@@ -50,7 +50,7 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(256);
+                d.run(16);
 
                 System.out.println(i + " " + j);
 

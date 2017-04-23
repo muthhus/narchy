@@ -1220,24 +1220,24 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    @Nullable
-    public Concept concept(@NotNull Termed termed) {
+    /** resolves a term or concept to its currrent Concept */
+    @Nullable public Concept concept(@NotNull Termed termed) {
         if (termed instanceof Concept) {
-            //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            return ((Concept) termed);
+            Concept ct = (Concept) termed;
+            if (!ct.isDeleted()) return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            //otherwise if it is deleted, continue
         }
 
         return concepts.concept(termed.term(), false);
     }
 
-    @Nullable
-    public Concept conceptualize(@NotNull Termed termed) {
+    /** resolves a term to its Concept; if it doesnt exist, its construction will be attempted */
+    @Nullable public Concept conceptualize(@NotNull Termed termed) {
 
         if (termed instanceof Concept) {
-            //HACK this assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            return ((Concept) termed);
+            Concept ct = (Concept) termed;
+            if (!ct.isDeleted()) return ct;
         }
-
 
         Term term = termed.term();
         boolean normalized = term.isNormalized();

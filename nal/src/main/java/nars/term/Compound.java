@@ -43,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -361,7 +362,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
     @Nullable
-    default Term subterm(@NotNull ByteList path) {
+    default Term sub(@NotNull ByteList path) {
         Term ptr = this;
         int s = path.size();
         for (int i = 0; i < s; i++)
@@ -375,7 +376,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * returns null if specified subterm does not exist
      */
     @Nullable
-    default Term subterm(@NotNull byte... path) {
+    default Term sub(@NotNull byte... path) {
         Term ptr = this;
         for (int i : path)
             if ((ptr = ptr.sub(i, null)) == null)
@@ -865,6 +866,40 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return this;
     }
+
+    @Nullable default Term commonParent(List<byte[]> subpaths) {
+        int subpathsSize = subpaths.size();
+        assert(subpathsSize > 0);
+
+        int c = 0;
+
+        int shortest = Integer.MAX_VALUE;
+        for (int i = 0, subpathsSize1 = subpaths.size(); i < subpathsSize1; i++) {
+            shortest = Math.min(shortest, subpaths.get(i).length);
+        }
+
+        //find longest common prefix
+        int i;
+        done: for (i = 0; i < shortest; i++) {
+            byte toMatch = 0;
+            for (int j = 0, subPathsSize; j < subpathsSize; j++) {
+                byte[] p = subpaths.get(j);
+                if (j == 0) {
+                    toMatch = p[i];
+                } else if (toMatch!=p[i]) {
+                    break done; //first mismatch, done
+                } //else: continue downwards
+            }
+            //all matched, proceed downward to the next layer
+        }
+        if (i == 0)
+            return this;
+        else {
+            return sub(Arrays.copyOfRange(subpaths.get(0), 0, i));
+        }
+
+    }
+
 
     //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();

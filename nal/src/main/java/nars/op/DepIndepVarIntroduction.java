@@ -12,6 +12,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.ToIntFunction;
 
@@ -45,24 +46,36 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         if (selected == Imdex)
             return null;
 
-        List<byte[]> pp = input.pathsTo(selected);
-        int pSize = pp.size();
+        Op inOp = input.op();
+        List<byte[]> paths = input.pathsTo(selected, inOp.statement ? 2 : 0);
+        int pSize = paths.size();
         if (pSize == 0)
             return null;
 
-        byte[][] paths = pp.toArray(new byte[pSize][]);
+        //byte[][] paths = pp.toArray(new byte[pSize][]);
 
 //        //detect an invalid top-level indep var substitution
-        Op inOp = input.op();
-        if (inOp.statement) {
-            for (byte[] r : paths)
-                if (r.length < 2)
-                    return null; //substitution would replace something at the top level of a statement}
-        }
+//        if (inOp.statement) {
+//            Iterator<byte[]> pp = paths.iterator();
+//            while (pp.hasNext()) {
+//                byte[] p = pp.next();
+//                if (p.length < 2)
+//                    pp.remove();;
+//                for (byte[] r : paths)
+//                    if (r.length < 2)
+//                        return null; //substitution would replace something at the top level of a statement}
+//            }
+//        }
+
+
+        //use the innermost common parent to decide the type of variable.
+        //in case there is no other common parent besides input itself, use that.
+        Term commonParent = input.commonParent(paths);
+        Op commonParentOp = commonParent.op();
 
         //decide what kind of variable can be introduced according to the input operator
         boolean depOrIndep;
-        switch (inOp) {
+        switch (commonParentOp) {
             case CONJ:
                 depOrIndep = true;
                 break;
@@ -78,7 +91,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
         for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            byte[] p = paths[occurrence];
+            byte[] p = paths.get(occurrence);
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {

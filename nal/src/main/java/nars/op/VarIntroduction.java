@@ -8,8 +8,10 @@ import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
@@ -19,6 +21,7 @@ import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
  */
 public abstract class VarIntroduction {
 
+    static final int maxSubstitutions = 1;
 
     public VarIntroduction() {
 
@@ -31,17 +34,35 @@ public abstract class VarIntroduction {
 
         Set<Term> selections = select(c);
         if (selections == null) return;
-        int ss = selections.size();
-        if (ss == 0) return;
+        int sels = selections.size();
+        if (sels == 0) return;
 
-        Map<Term,Term> substs = new UnifiedMap<>(ss);
+
+
+        if (maxSubstitutions >= sels) {
+            //
+        } else {
+            //choose randomly
+            assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
+            Term[] sa = selections.toArray(new Term[sels]);
+            selections = Collections.singleton(sa[ThreadLocalRandom.current().nextInt(sels)]);
+            sels = Math.min(sels, maxSubstitutions);
+        }
+
+
+        Map<Term,Term> substs = new UnifiedMap<>(sels);
         int o = 0;
+        boolean found = false;
         for (Term u : selections) {
             Term v = next(c, u, o++);
-            if (v == null)
-                return;
-            substs.put(u, v);
+            if (v != null) {
+                substs.put(u, v);
+                found = true;
+            }
         }
+        if (!found)
+            return; //nothing found to introduce a variable for
+
 
         Term newContent = index().replace(c, substs);
 

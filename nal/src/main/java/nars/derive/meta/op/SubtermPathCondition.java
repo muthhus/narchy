@@ -52,7 +52,7 @@ public abstract class SubtermPathCondition extends AtomicPred<Derivation> {
         if (aPath.length == 0)
             return ca;
         else {
-            return (ca instanceof Compound) ? ((Compound) ca).subterm(aPath) : null;
+            return (ca instanceof Compound) ? ((Compound) ca).sub(aPath) : null;
         }
     }
 
@@ -63,7 +63,7 @@ public abstract class SubtermPathCondition extends AtomicPred<Derivation> {
         //verify that the path does not select a subterm of a commutive term
 
         for (int i = 0; i < 1 + p.length; i++) {
-            Term s = ((Compound) term).subterm(ArrayUtils.subarray(p, 0, i));
+            Term s = ((Compound) term).sub(ArrayUtils.subarray(p, 0, i));
             if (s.isCommutative())
                 return null;
         }

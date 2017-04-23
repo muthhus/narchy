@@ -195,7 +195,7 @@ public class ArithmeticInduction {
 
 
                         //x is contained within range expression p
-                        Term xpp = x instanceof Compound ? ((Compound) x).subterm(pp) : x;
+                        Term xpp = x instanceof Compound ? ((Compound) x).sub(pp) : x;
 
                         boolean contained;
                         if (xpp instanceof IntTerm) {
@@ -403,7 +403,7 @@ public class ArithmeticInduction {
             for (int i = 1; i < ss; i++) {
                 Term y = subs.sub(i);
                 if (!p.isEmpty()) {
-                    if (!compareNonInteger(x, ((Compound) y).subterm(p)))
+                    if (!compareNonInteger(x, ((Compound) y).sub(p)))
                         return false;
                 }/* else {
                     if (!compareNonInteger(x, y))

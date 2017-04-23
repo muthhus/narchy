@@ -285,10 +285,15 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 
     @NotNull
     default List<byte[]> pathsTo(Term subterm) {
+        return pathsTo(subterm, 0);
+    }
+
+    @NotNull
+    default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         List<byte[]> list = $.newArrayList();
         pathsTo(
                 (x) -> x.equals(subterm) ? x : null,
-                (l, t) -> list.add(l.toArray())
+                (l, t) -> { if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray()); return true; }
         );
         return list;
     }

@@ -404,7 +404,7 @@ public class NAL6Test extends AbstractNALTest {
         //tester.log();
         tester.believe("(open($1,lock1) ==> key:$1)"); //en("if something opens lock1, it is a key");
         tester.believe("open(lock,lock1)");
-        tester.mustBelieve(cycles, "(open(lock,#1) && (open($2,#1) ==> key:$2))", 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+        tester.mustBelieve(cycles, "((open(lock,#1) && open($2,#1)) ==> key:$2)", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
         //tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
     }

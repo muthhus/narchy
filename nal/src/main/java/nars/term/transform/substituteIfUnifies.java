@@ -10,6 +10,8 @@ import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.False;
+
 /**
  * substituteIfUnifies....(term, varFrom, varTo)
  *
@@ -108,7 +110,7 @@ abstract public class substituteIfUnifies extends Functor {
                 (op!=null && (x.hasAny(op) || y.hasAny(op)));
 
         if (!hasAnyOp/* && mustSubstitute()*/) {
-            return term; //no change
+            return False; //no change
         }
 
         Term z = new SubUnify(parent, op).tryMatch(parent, term, x, y);
