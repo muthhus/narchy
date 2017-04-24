@@ -83,12 +83,12 @@ public interface NARBuilder {
         Default nar = new Default(activeConcepts,
                 3,
 
-//                new HijackTermIndex(cb, 1024 * 128, reprobes)
+                new HijackTermIndex(cb, 1024 * 128, reprobes)
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
-                    exe
-                    //null /* null = fork join common pool */
-                )
+//                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+//                    exe
+//                    //null /* null = fork join common pool */
+//                )
 //                new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {

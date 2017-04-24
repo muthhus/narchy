@@ -80,16 +80,16 @@ public class ImmutableTask extends Pri implements Task {
 
         if (stamp.length > 1) {
 
+            if (start!=ETERNAL) {
+                h = Util.hashCombine(
+                        Long.hashCode(start),
+                        Long.hashCode(end), h
+                );
+            }
+
             Truth t = truth();
-
-            h = Util.hashCombine(
-                    h,
-                    Long.hashCode(start),
-                    Long.hashCode(end)
-            );
-
             if (t != null)
-                h = Util.hashClojure(h, t.hashCode());
+                h = Util.hashCombine(t.hashCode(), h);
         }
 
         this.hash = h;

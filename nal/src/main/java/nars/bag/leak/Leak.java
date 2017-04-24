@@ -25,7 +25,7 @@ public class Leak<X, Y> {
      * since a previous call, and a given rate parameter.
      * if the rate * elapsed dt will not exceed the provided maxCost
      * value, which can be POSITIVE_INFINITY (by default).
-     *
+     * <p>
      * draining the input bag
      */
     public static abstract class DtLeak<X, Y> extends Leak<X, Y> {
@@ -34,12 +34,12 @@ public class Leak<X, Y> {
         @NotNull
         public final FloatParam rate /* items per dt */;
         @NotNull
-        public final FloatParam maxCost;
+        public final FloatParam minBudget;
 
         protected long lastLeak = ETERNAL;
 
         public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate) {
-            this(bag, rate, new FloatParam(Float.POSITIVE_INFINITY));
+            this(bag, rate, new FloatParam(1));
         }
 
         /**
@@ -47,17 +47,17 @@ public class Leak<X, Y> {
          *
          * @param bag
          * @param rate
-         * @param maxCost
+         * @param minBudget
          */
-        public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam maxCost) {
+        public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam minBudget) {
             super(bag);
             this.rate = rate;
-            this.maxCost = maxCost;
+            this.minBudget = minBudget;
         }
 
         private final AtomicBoolean busy = new AtomicBoolean(false);
 
-        public void commit(long now) {
+        public void commit(long now, int dur) {
 
             if (!busy.compareAndSet(false, true))
                 return;
@@ -71,29 +71,31 @@ public class Leak<X, Y> {
                     if (last == ETERNAL) {
                         this.lastLeak = last = now;
                     }
-                    long dt = now - last;
-                    if (dt > 0) {
 
-                        float budget = Math.min(rate.floatValue() * dt, maxCost.floatValue());
-                        if (budget >= 1f) {
+                    float dt = Math.max(0, (now - last) / ((float) dur));
 
-                            final float[] spent = {0};
-                            bag.sample((v) -> {
-                                float cost = onOut(v);
-                                float spe = spent[0] + cost;
-                                if (spe <= budget) {
-                                    spent[0] = spe;
-                                    return Bag.BagCursorAction.Remove; //continue
-                                } else {
-                                    return Bag.BagCursorAction.RemoveAndStop;
-                                }
-                            });
+                    float budget = rate.floatValue() * dt;
+                    float minBudget = this.minBudget.floatValue();
+                    if (budget >= minBudget) {
 
-                            if (spent[0] > 0) {
-                                this.lastLeak = now; //only set time if some cost was spent
+                        final float[] spent = {0};
+                        bag.sample((v) -> {
+                            float cost = onOut(v);
+                            assert(cost <= minBudget);
+                            float spe = spent[0] + cost;
+                            if (spe <= budget) {
+                                spent[0] = spe;
+                                return Bag.BagCursorAction.Remove; //continue
+                            } else {
+                                return Bag.BagCursorAction.RemoveAndStop;
                             }
+                        });
+
+                        if (spent[0] > 0) {
+                            this.lastLeak = now; //only set time if some cost was spent
                         }
                     }
+
                 }
             } finally {
                 busy.set(false);

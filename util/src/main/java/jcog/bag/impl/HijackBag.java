@@ -158,14 +158,17 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         boolean merged = false;
 
-        final int hash = hash(x);
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
             return null;
 
+        final int hash = hash(x);
         int iStart = i(c, hash);
+
+        if (add || remove)
+            active.start(hash);
 
         try {
 
@@ -280,11 +283,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             }
         } catch (Throwable t) {
             t.printStackTrace(); //should not happen
+        } finally {
+            if (add || remove) {
+                active.end(hash);
+            }
         }
-
-//        if (add) {
-//            Treadmill.end(ticket);
-//        }
 
         if (!merged) {
             if (found != null && (add || remove)) {
@@ -315,6 +318,50 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     }
 
+    public static class Treadmill extends AtomicIntegerArray {
+
+        public Treadmill() {
+            this(Runtime.getRuntime().availableProcessors());
+        }
+
+        public Treadmill(int concurrency) {
+            super(concurrency);
+        }
+
+        private void start(int hash) {
+            if (hash == 0) hash = 1; //reserve 0
+            int len = length();
+            restart: while (true) {
+                int best = -1;
+                for (int i = len-1; i >= 0; i--) {
+                    int v = getOpaque(i);
+                    if (v == hash) {
+                        continue restart; //collision
+                    } else if (v == 0) {
+                        best = i;
+                    }
+                }
+
+                if (best!=-1) {
+                    if (compareAndSet(best, 0, hash))
+                        return; //ready
+                }
+            }
+        }
+
+        private void end(int hash) {
+            int len = length();
+            for (int i = 0; i < len; i++) {
+                if (compareAndSet(i, hash, 0))
+                    return; //done
+            }
+            throw new RuntimeException("did not remove ticket");
+        }
+
+    }
+
+    private final Treadmill active = new Treadmill();
+
     protected int hash(Object x) {
 
         //return x.hashCode(); //default
@@ -322,8 +369,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         //identityComparisons ? System.identityHashCode(key)
 
         // "Applies a supplemental hash function to a given hashCode, which defends against poor quality hash functions."
-        return Util.hashWangJenkins(x.hashCode());
+        //return Util.hashWangJenkins(x.hashCode());
 
+        return x.hashCode();
     }
 
 
@@ -630,14 +678,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return Float.MIN_VALUE;
     }
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
+    //final AtomicBoolean busy = new AtomicBoolean(false);
 
     @NotNull
     @Override
     public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
 
-        if (!busy.compareAndSet(false, true))
-            return this;
+//        if (!busy.compareAndSet(false, true))
+//            return this;
 
         try {
             if (update != null) {
@@ -671,7 +719,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             this.mass = mass;
 
         } finally {
-            busy.set(false);
+         //   busy.set(false);
         }
 
         return this;
@@ -698,6 +746,39 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         return IntStream.range(0, a.length()).mapToObj(a::get).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
+//    /**
+//     * ID of this bag, for use in constructing keys for the global treadmill
+//     */
+//     private final int id = TreadmillMutex.newTarget();
+//
+//    /**
+//     * lock-free int -> int mapping used as a ticket barrier
+//     */
+//    static final class TreadmillMutex {
+//
+//        static final ConcurrentLongSet map = new ConcurrentLongSet(Util.MAX_CONCURRENCY * 2);
+//
+//        static final AtomicInteger ticket = new AtomicInteger(0);
+//
+//        public static int newTarget() {
+//            return ticket.incrementAndGet();
+//        }
+//
+//        public static long start(int target, int hash) {
+//
+//            long ticket = (((long) target) << 32) | hash;
+//
+//            map.putIfAbsentRetry(ticket);
+//
+//            return ticket;
+//        }
+//
+//        public static void end(long ticket) {
+//            map.remove(ticket);
+//        }
+//    }
+
+
     /*private static int i(int c, int hash, int r) {
         return (int) ((Integer.toUnsignedLong(hash) + r) % c);
     }*/
@@ -721,34 +802,3 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 //    }
 
 }
-///**
-// * ID of this bag, for use in constructing keys for the global treadmill
-// */
-// private final int id;
-
-//    /**
-//     * lock-free int -> int mapping used as a ticket barrier
-//     */
-//    static final class Treadmill {
-//
-//        static final ConcurrentLongSet map = new ConcurrentLongSet(Util.MAX_CONCURRENCY * 2);
-//
-//        static final AtomicInteger ticket = new AtomicInteger(0);
-//
-//        public static int newTarget() {
-//            return ticket.incrementAndGet();
-//        }
-//
-//        public static long start(int target, int hash) {
-//
-//            long ticket = (((long) target) << 32) | hash;
-//
-//            map.putIfAbsentRetry(ticket);
-//
-//            return ticket;
-//        }
-//
-//        public static void end(long ticket) {
-//            map.remove(ticket);
-//        }
-//    }

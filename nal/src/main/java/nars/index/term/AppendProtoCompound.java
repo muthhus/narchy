@@ -34,14 +34,13 @@ public class AppendProtoCompound implements ProtoCompound {
 
 
     public AppendProtoCompound(Op op, int dt, @NotNull Term[] u) {
+        this(op, dt, 0);
         this.subs = u;
         this.size = u.length;
-        this.op = op;
-        this.dt = dt;
         if (u.length > 0) {
             int hash = this.hash;
             for (Term x : u)
-                hash = Util.hashClojure(hash, x.hashCode());
+                hash = Util.hashCombine(x.hashCode(), hash);
             this.hash = hash;
         }
     }
@@ -50,11 +49,11 @@ public class AppendProtoCompound implements ProtoCompound {
      *  @param initial_capacity estimated size, but will grow if exceeded
      * */
     public AppendProtoCompound(Op op, int dt, int initial_capacity) {
-        this.subs = new Term[initial_capacity];
+        if (initial_capacity > 0)
+            this.subs = new Term[initial_capacity];
         this.op = op;
         this.dt = dt;
-
-        this.hash = Util.hashClojure(op.hashCode(), dt);
+        this.hash = Util.hashCombine(dt, 1 + op.bit);
     }
 
     @Override
@@ -109,7 +108,7 @@ public class AppendProtoCompound implements ProtoCompound {
         }
 
         subs[size++] = x;
-        hash = Util.hashClojure(hash, x.hashCode());
+        hash = Util.hashCombine(x.hashCode(), hash);
 
         return true;
     }

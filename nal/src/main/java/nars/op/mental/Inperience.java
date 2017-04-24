@@ -214,7 +214,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
         Task task = b.get();
 
-        try {
+        //try {
             Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.concepts);
             if (r != null) {
 
@@ -242,11 +242,11 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
                 nar.input(e);
                 return 1;
             }
-        } catch (ClassCastException ignored) {
-            //happens rarely, due to circularity while trying to create something like: want((x<->want),...
-
-            //System.err.println(task);
-        }
+//        } catch (ClassCastException ignored) {
+//            //happens rarely, due to circularity while trying to create something like: want((x<->want),...
+//
+//            //System.err.println(task);
+//        }
 
         return 0;
     }

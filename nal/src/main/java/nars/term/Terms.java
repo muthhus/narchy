@@ -57,11 +57,19 @@ public enum Terms { ;
      * computes the content hash while accumulating subterm metadata summary fields into int[] meta
      */
     public static int hashSubterms(@NotNull Term[] term, @NotNull int[] meta) {
-        int h = 1;
+
+        /*
+        int result = 1;
+        for (Object element : a)
+            result = 31 * result + (element == null ? 0 : element.hashCode());
+        return result;
+         */
+        int result = 1;
         for (Term t : term) {
-            h = 31 /*Util.PRIME1 */ * h + t.init(meta);
+            //result = 31 /*Util.PRIME1 */ * result + t.init(meta);
+            result = Util.hashCombine(t.init(meta), result);
         }
-        return h;
+        return result;
     }
 
     /**

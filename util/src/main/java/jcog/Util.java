@@ -122,13 +122,6 @@ public enum Util { ;
 //        return (int)x;
 //    }
 
-    public static int hash(Object a, Object b) {
-        return hashClojure(a.hashCode(), b.hashCode());
-    }
-
-    public static int hash(Object a, Object b, Object c) {
-        return hashCombine(a.hashCode(), b.hashCode(), c.hashCode());
-    }
 
 //    public final static int hash(Object a, Object b, Object c, Object d) {
 //        return hash(a.hashCode(), b.hashCode(), c.hashCode(), d.hashCode());
@@ -366,16 +359,24 @@ public enum Util { ;
         return h ^ (h >>> 16);
     }
 
-    /** from clojure.Util */
-    public static int hashClojure(int seed, int hash) {
-        return seed ^ ( hash + 0x9e3779b9 + (seed << 6) + (seed >> 2) );
+    /** from clojure.Util - not tested */
+    public static int hashClojure(int a, int b) {
+        return a ^ ( b + 0x9e3779b9 + (a << 6) + (a >> 2) );
+    }
+    public static int hashJava(int a, int b) {
+        return a * 31 + b;
+    }
+    public static int hashJavaX(int a, int b) {
+        return a * Util.PRIME2 + b;
+    }
 
-        //return seed * 31 + hash;
+    public static int hashCombine(int next, int current) {
+        return hashClojure(next, current);
     }
 
     public static int hashCombine(int a, int b, int c) {
 
-        return hashClojure(hashClojure(a, b), c); //TODO decide if this is efficient and hashes well
+        return hashCombine(a, hashCombine(b, c)); //TODO decide if this is efficient and hashes well
 
         //https://gist.github.com/badboy/6267743
 //        a=a-b;  a=a-c;  a=a^(c >>> 13);
@@ -389,17 +390,6 @@ public enum Util { ;
 //        c=c-a;  c=c-b;  c=c^(b >>> 15);
 //        return c;
     }
-
-    public static int hashClojure(Object[] t) {
-        if (t.length == 0)
-            return 0;
-        int x = t[0].hashCode();
-        for (int i = 1; i < t.length; i++) {
-            x = hashClojure(x, t[i].hashCode());
-        }
-        return x;
-    }
-
 
     public static int hashNonZeroELF(byte[] str, int seed) {
         int i  = (int) hashELF(str, seed);
@@ -443,6 +433,13 @@ public enum Util { ;
     }
 
 
+    /** http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
+    public static int hashROT(Object... x) {
+        long h = 2166136261L;
+        for (Object o : x)
+            h = (h << 4) ^ (h >> 28) ^ o.hashCode();
+        return (int) h;
+    }
 
     /**
      * returns the next index

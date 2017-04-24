@@ -65,9 +65,9 @@ public interface Termject<X> extends Term {
 
         private final String str;
 
-        public PrimTermject(@NotNull X val) {
-            this(val, '`' + val.toString() + '`'); //TODO escape any '`' which appear in the string
-        }
+//        public PrimTermject(@NotNull X val) {
+//            this(val, '`' + val.toString() + '`'); //TODO escape any '`' which appear in the string
+//        }
 
         public PrimTermject(@NotNull X val, String str) {
             this.val = val;

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static jcog.Util.lerp;
 import static nars.Op.NEG;
@@ -116,8 +117,7 @@ public class Revision {
 
         float aProp = aw / (aw + bw);
 
-        //HACK create a temorary RNG because pulling one up through the method calls would be a mess
-        Random rng = new XorShift128PlusRandom(Util.hashClojure(a.hashCode(), b.hashCode()) << 32 + Util.hashClojure((int) start, (int) now) * 31 + newTruth.hashCode());
+        Random rng = ThreadLocalRandom.current();
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
         Compound cc = normalizedOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms );

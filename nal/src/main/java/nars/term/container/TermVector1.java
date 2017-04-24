@@ -1,6 +1,7 @@
 package nars.term.container;
 
 import com.google.common.collect.Iterators;
+import jcog.Util;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -25,7 +26,7 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public int hashCode() {
-        return 31 + the.hashCode(); //HACK consistent with Terms.hash(..)
+        return Util.hashCombine(the.hashCode(), 1); //HACK consistent with Terms.hash(..)
     }
 
 

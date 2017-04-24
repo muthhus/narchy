@@ -21,6 +21,9 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.atom.Atomic;
+import nars.term.container.ArrayTermVector;
+import nars.term.container.TermVector;
+import nars.term.container.TermVector1;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -514,6 +517,22 @@ public class TermTest {
                 ta.hashCode(), tb.hashCode());
 
 
+    }
+
+    @Test public void testHashConsistent() {
+        Term x = $.the("z");
+        TermVector1 a = new TermVector1(x);
+        TermVector b = new ArrayTermVector(x);
+        assertEquals(a, b);
+        assertEquals(a.hashCode(), b.hashCode());
+        assertEquals(a.hashCodeSubTerms(), b.hashCodeSubTerms());
+        assertEquals(a.toString(), b.toString());
+    }
+
+    @Test public void testHashDistribution() {
+        int ah = new TermVector1($.the("x")).hashCode(); //one letter apart
+        int bh = new TermVector1($.the("y")).hashCode();
+        assertTrue(ah + " vs " + bh,  Math.abs(ah-bh) > 1 );
     }
 
     @Test

@@ -3,8 +3,10 @@ package nars.term;
 import nars.$;
 import nars.Narsese;
 import nars.term.atom.Atomic;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.container.TermVector1;
 import org.junit.Test;
 
 import static nars.task.RevisionTest.AB;
@@ -83,5 +85,7 @@ public class TermVectorTest {
         assertEquals(a, s);
         assertNotEquals(b, s);
     }
+
+
 
 }

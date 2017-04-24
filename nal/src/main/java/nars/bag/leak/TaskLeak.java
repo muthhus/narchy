@@ -27,7 +27,7 @@ public abstract class TaskLeak</* TODO: A, */X, V extends PLink<X>> extends Leak
         super(bag, rate);
         onTask = n.onTask(this);
         onReset = n.onReset((nn) -> clear());
-        onCycle = n.onCycle((nn) -> commit(nn.time()));
+        onCycle = n.onCycle((nn) -> commit(nn.time(), nn.dur()));
     }
     public void stop() {
         onTask.off();
