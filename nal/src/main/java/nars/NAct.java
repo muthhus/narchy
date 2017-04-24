@@ -83,8 +83,8 @@ public interface NAct {
 
         ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
-                    // 1f/6;
-                     1f/4;
+                     1f/6;
+                    // 1f/4;
             //1f/3f;
 
             int ii;
