@@ -26,13 +26,11 @@ public abstract class AbstractNALTest {
     protected TestNAR tester;
 
     protected AbstractNALTest(NAR nar) {
-        Param.DEBUG = true;
-        this.nar = () -> nar;
+        this(() -> nar);
     }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
         Param.DEBUG = true;
-        //this.the = nar.get();
         this.nar = nar;
     }
 
@@ -71,8 +69,8 @@ public abstract class AbstractNALTest {
                             new Default(768, 1);
 
                     d.nal(level);
-                    d.termVolumeMax.setValue(64);
-                    d.deriver.rate.setValue(0.025f);
+                    d.termVolumeMax.setValue(32);
+                    d.deriver.rate.setValue(0.05f);
                     return d;
                 }
         ));

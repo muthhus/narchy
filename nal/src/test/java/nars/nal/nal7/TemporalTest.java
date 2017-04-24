@@ -93,10 +93,10 @@ public class TemporalTest {
 
         assertTrue(((CompoundConcept) na).term(0) == ((CompoundConcept) nc).term(0));
 
-        System.out.println(b.concept(n));
-        System.out.println(c.concept(n));
+//        System.out.println(b.concept(n));
+//        System.out.println(c.concept(n));
 
-        assertTrue(((CompoundConcept) b.concept(n)).term(0).equals(((CompoundConcept) c.concept(n)).term(0)));
+        assertTrue(b.concept(n).term(0).equals(c.concept(n).term(0)));
 
     }
 
@@ -419,26 +419,22 @@ public class TemporalTest {
 
         String correctMerge = "((a ==>+4 b)-->[pill])";
 
-        Concept cc = (Concept) cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+        Concept cc = cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         //test belief match interpolated a result
-        {
-            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
-        }
+        assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
 
 
         //test merge after capacity shrink:
-        {
 
-            cc.beliefs().capacity(1, 1, n); //set to capacity=1 to force compression
+        cc.beliefs().capacity(1, 1, n); //set to capacity=1 to force compression
 
-            cc.print();
+        cc.print();
 
-            //n.forEachTask(System.out::println);
+        //n.forEachTask(System.out::println);
 
-            //INTERMPOLATION APPLIED AFTER REVECTION:
-            assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
-        }
+        //INTERMPOLATION APPLIED AFTER REVECTION:
+        assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
     }
 
     @Test
@@ -585,7 +581,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(x &&+1 y)")));
+        assertTrue(Terms.equalAtemporally($("(x && y)"), $.$("(x &&+1 y)")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -593,7 +589,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(y &&+1 x)")));
+        assertTrue(Terms.equalAtemporally($("(x && y)"), $.$("(y &&+1 x)")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -601,7 +597,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(x && y)"), $.<Term>$("(z &&+1 x)")));
+        assertFalse(Terms.equalAtemporally($("(x && y)"), $.$("(z &&+1 x)")));
 
         //        if (as == bs) {
 //            return true;
@@ -610,7 +606,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x ==> y)"), $.<Term>$("(x ==>+1 y)")));
+        assertTrue(Terms.equalAtemporally($("(x ==> y)"), $.$("(x ==>+1 y)")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -618,7 +614,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(x ==> y)"), $.<Term>$("(y ==>+1 x)")));
+        assertFalse(Terms.equalAtemporally($("(x ==> y)"), $.$("(y ==>+1 x)")));
     }
 
     @Test
@@ -630,7 +626,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (y ==> z))")));
+        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (y ==> z))")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -638,7 +634,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (y ==>+1 z))")));
+        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (y ==>+1 z))")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -646,7 +642,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.<Term>$("(x &&+1 (z ==>+1 w))")));
+        assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (z ==>+1 w))")));
     }
 
     @Test public void testAtemporalization1() throws Narsese.NarseseException {
@@ -666,7 +662,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.<Term>$("(a <-> (y ==>+1 z))")));
+        assertTrue(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.$("(a <-> (y ==>+1 z))")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -674,7 +670,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.<Term>$("(a <-> (w ==>+1 z))")));
+        assertFalse(Terms.equalAtemporally($("(a <-> (y ==> z))"), $.$("(a <-> (w ==>+1 z))")));
 
         //        if (as == bs) {
 //            return true;
@@ -683,7 +679,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("((a ==> b),(b ==> c))"), $.<Term>$("((a ==> b),(b ==>+1 c))")));
+        assertTrue(Terms.equalAtemporally($("((a ==> b),(b ==> c))"), $.$("((a ==> b),(b ==>+1 c))")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -691,7 +687,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("((a ==>+1 b),(b ==> c))"), $.<Term>$("((a ==> b),(b ==>+1 c))")));
+        assertTrue(Terms.equalAtemporally($("((a ==>+1 b),(b ==> c))"), $.$("((a ==> b),(b ==>+1 c))")));
     }
 
     @Test
@@ -704,7 +700,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(/, (a ==> b), c, _)"), $.<Term>$("(/, (a ==>+1 b), c, _)")));
+        assertTrue(Terms.equalAtemporally($("(/, (a ==> b), c, _)"), $.$("(/, (a ==>+1 b), c, _)")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -712,7 +708,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(/, a, b, _)"), $.<Term>$("(/, a, _, b)")));
+        assertFalse(Terms.equalAtemporally($("(/, a, b, _)"), $.$("(/, a, _, b)")));
     }
 
 //    @Test public void testRelationTaskNormalization() {

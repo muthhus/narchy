@@ -1222,23 +1222,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     /** resolves a term or concept to its currrent Concept */
     @Nullable public Concept concept(@NotNull Termed termed) {
-        if (termed instanceof Concept) {
-            Concept ct = (Concept) termed;
-            if (!ct.isDeleted()) return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
-            //otherwise if it is deleted, continue
-        }
-
-        return concepts.concept(termed.term(), false);
+        return concept(termed, false);
     }
 
     /** resolves a term to its Concept; if it doesnt exist, its construction will be attempted */
     @Nullable public Concept conceptualize(@NotNull Termed termed) {
+        return concept(termed, true);
+    }
+
+    @Nullable public Concept concept(@NotNull Termed termed, boolean createIfMissing) {
 
         if (termed instanceof Concept) {
             Concept ct = (Concept) termed;
-            if (!ct.isDeleted()) {
-                return ct;
-            }
+            if (!ct.isDeleted()) return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            //otherwise if it is deleted, continue
         }
 
         Term term = termed.term();
@@ -1299,7 +1296,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
 
-        Concept c = concepts.concept(term, true);
+        Concept c = concepts.concept(term, createIfMissing);
 //        if (c != null && createIfMissing && c.isDeleted()) {
 //            //try again
 //            concepts.remove(c.term());

@@ -9,7 +9,7 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static nars.perf.Main.perf;
+import static nars.perf.JmhBenchmark.perf;
 
 public class TestBenchmark1 {
 

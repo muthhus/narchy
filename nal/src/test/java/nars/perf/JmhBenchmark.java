@@ -15,7 +15,7 @@ import java.util.Collection;
 /**
  * Created by me on 12/11/15.
  */
-public enum Main {
+public enum JmhBenchmark {
 	;
 
 	public static void perf(Class c, int iterations, int batchSize) throws RunnerException {

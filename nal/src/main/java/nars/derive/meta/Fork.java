@@ -29,9 +29,17 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
     @Override
     public boolean test(@NotNull Derivation m) {
 
+//        int now = m.now();
+//        for (int i = 0, termCacheLength = cached.length; i < termCacheLength; i++) {
+//            cached[i].test(m);
+//            m.revert(now);
+//        }
+
+        int termCacheLength = cached.length;
+        int start = m.random.nextInt(termCacheLength);
         int now = m.now();
-        for (int i = 0, termCacheLength = cached.length; i < termCacheLength; i++) {
-            cached[i].test(m);
+        for (int i = 0; i < termCacheLength; i++) {
+            cached[(start++)%termCacheLength].test(m);
             m.revert(now);
         }
 

@@ -45,7 +45,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
         tester.mustBelieve(time, "likes(cat,[blue])",
                 1f,
-                0.21F);
+                0.16F);
 
     }
 

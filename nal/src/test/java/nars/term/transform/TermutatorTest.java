@@ -27,7 +27,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
-    final Unify f = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTTL) {
+    final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
+            Param.UnificationStackMax, Param.UnificationTTL*4) {
         @Override
         public boolean onMatch() {
 
@@ -85,7 +86,7 @@ public class TermutatorTest {
 
 
         assertTermutatorProducesUniqueResults(
-                new Choose2(f, e1,
+                new Choose2(unifier, e1,
                         p2p3,
                         p("a", "b").toSet()), 2);
     }
@@ -93,7 +94,7 @@ public class TermutatorTest {
     @Test public void testChoose2_3() {
 
         assertTermutatorProducesUniqueResults(
-                new Choose2(f, e1, p2p3,
+                new Choose2(unifier, e1, p2p3,
                         p("a", "b", "c").toSet()), 6);
     }
     @Test public void testChoose2_4() {
@@ -102,7 +103,7 @@ public class TermutatorTest {
         for (int i = 0; i < 5; i++) {
             series.add(
                     assertTermutatorProducesUniqueResults(
-                            new Choose2(f, e1,
+                            new Choose2(unifier, e1,
                                     p2p3,
                                     p("a", "b", "c", "d").toSet()), 12)
             );
@@ -143,7 +144,7 @@ public class TermutatorTest {
         //int blocked = 0;
         final int[] duplicates = {0};
 
-        t.mutate(f, Lists.newArrayList( t, new Termutator() {
+        t.mutate(unifier, Lists.newArrayList( t, new Termutator() {
 
             @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
                 if (s.add( f.xy.toString() )) {

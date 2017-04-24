@@ -2,14 +2,13 @@
 package nars.perf;
 
 import nars.$;
-import nars.derive.DefaultDeriver;
 import nars.nar.Default;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.RunnerException;
 
-import static nars.perf.Main.perf;
+import static nars.perf.JmhBenchmark.perf;
 
 @State(Scope.Benchmark)
 public class NARBenchmark {
