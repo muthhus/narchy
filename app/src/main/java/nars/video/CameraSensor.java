@@ -133,6 +133,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
                 PixelConcept sss = new PixelConcept(cell, brightnessToTruth, x, y);
 
+
                 l.add(sss);
 
                 matrix[x][y] = sss;

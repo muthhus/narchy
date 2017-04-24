@@ -83,7 +83,7 @@ public interface NARBuilder {
         Default nar = new Default(activeConcepts,
                 3,
 
-                new HijackTermIndex(cb, 1024 * 128, reprobes)
+                new HijackTermIndex(cb, 1024 * 256, reprobes)
                 //new NullTermIndex(cb)
 //                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
 //                    exe

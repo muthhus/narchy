@@ -78,7 +78,7 @@ public abstract class TermIndex extends TermBuilder {
     public abstract void set(@NotNull Term src, Termed target);
 
     public final void set(@NotNull Termed t) {
-        set(t.term(), t);
+        set(t instanceof Term ? (Term)t : t.term(), t);
     }
 
 
@@ -568,7 +568,7 @@ public abstract class TermIndex extends TermBuilder {
         if (value instanceof Concept) {
             if (value instanceof PermanentConcept) {
                 //refuse deletion
-                set(value.term(), value);
+                set(value);
             } else {
                 ((Concept) value).delete(nar);
             }

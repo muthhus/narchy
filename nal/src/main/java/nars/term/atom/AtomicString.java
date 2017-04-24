@@ -1,5 +1,7 @@
 package nars.term.atom;
 
+import jcog.Util;
+
 /**
  * Created by me on 1/1/16.
  */
@@ -28,7 +30,9 @@ public abstract class AtomicString implements Atomic {
 
     @Override
     public final int hashCode() {
-        return toString().hashCode();
+        //return toString().hashCode();
+        //return Util.hashCombine(toString().hashCode(), op().bit);
+        return Util.hashWangJenkins( toString().hashCode() );
     }
 
 }

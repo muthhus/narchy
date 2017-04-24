@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;
@@ -49,13 +50,15 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
             @Override
             protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, float scale) {
 
-//                if (existingPermanent && incomingPermanent) {
-//                    ...
-//                }
-
                 boolean existingPermanent = existing.get() instanceof PermanentConcept;
-                if (existingPermanent)
+
+                if (existingPermanent) {
+//                    if (incomingPermanent) {
+//                        //throw new RuntimeException("unresolvable hash collision between PermanentConcepts: " + incoming.get() + " , " + existing.get());
+//                        return false;
+//                    }
                     return false;
+                }
                 boolean incomingPermanent = incoming.get() instanceof PermanentConcept;
                 if (incomingPermanent)
                     return true;
@@ -112,8 +115,10 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     @Override
     public void set(@NotNull Term src, Termed target) {
         remove(src);
-        //permanent.put(src, target);
-        table.put(new RawPLink<>(target, 1f));
+        PLink<Termed> inserted = table.put(new RawPLink<>(target, 1f));
+        if (inserted == null && target instanceof PermanentConcept) {
+            throw new RuntimeException("unresolvable hash collision between PermanentConcepts: " + target);
+        }
     }
 
     @Override

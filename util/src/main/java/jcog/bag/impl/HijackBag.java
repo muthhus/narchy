@@ -154,7 +154,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         boolean remove = (!add && (scale == -1));
 
         V added = null,
-          found = null; //get: the found item,  remove: the hijacked item
+                found = null; //get: the found item,  remove: the hijacked item
 
         boolean merged = false;
 
@@ -172,115 +172,80 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         try {
 
-            V target = null;
-            for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/) {
 
-                int targetIndex = -1;
+            //for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/)
 
-                float targetPri = Float.POSITIVE_INFINITY;
-                int i = iStart; //dir ? iStart : (iStart + reprobes) - 1;
 
-                for (int probe = 0; probe < reprobes; probe++) {
+            int i = iStart; //dir ? iStart : (iStart + reprobes) - 1;
 
-//                    if (i >= c) i -= c;
-//                    else if (i < 0) i += c;
+            for (int probe = 0; probe < reprobes; probe++) {
 
-                    V current = map.get(i);
+                V current = map.get(i);
+                if (current != null) {
+                    K y = key(current);
+                    if (equals(y, x)) { //existing
 
-                    if (current == null) {
-                        if (add && targetPri != Float.NEGATIVE_INFINITY) {
-                            //empty, plan to take this if
-                            // another empty has not been planned
-                            // and only take it if the value has not been found elsewhere in the reprobe range, entirely scanned
-                            target = null;
-                            targetIndex = i;
-                            targetPri = Float.NEGATIVE_INFINITY;
-                        }
-                    } else {
-                        K y = key(current);
-                        if (equals(y, x)) { //existing
-
-                            if (!add) {
-
-                                if (remove) { //remove
-                                    if (map.compareAndSet(i, current, null)) {
-                                        found = current;
-                                    }
-                                } else {
-                                    found = current; //get
-                                }
-
-                            } else { //put
-                                if (current != adding) {
-                                    //float curPri = pri(current);
-                                    V next = merge(current, adding, scale);
-                                    if (next!= current) {
-                                        //replace
-                                        if (!map.compareAndSet(i, current, next)) {
-                                            //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
-                                        } else {
-                                            //replaced
-                                            //pressurize(-curPri); //discount original priority
-                                            targetIndex = -1;
-                                            added = next;
-                                            merged = true;
-                                            break;
-                                        }
-
+                        if (add) { //put
+                            if (current != adding) {
+                                //float curPri = pri(current);
+                                V next = merge(current, adding, scale);
+                                if (next != current) {
+                                    //replace
+                                    if (!map.compareAndSet(i, current, next)) {
+                                        //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
                                     } else {
-                                        //keep original
-                                        targetIndex = -1;
-                                        added = current;
+                                        //replaced
+                                        //pressurize(-curPri); //discount original priority
+                                        added = next;
                                         merged = true;
                                         break;
                                     }
+
+                                } else {
+                                    //keep original
+                                    added = current;
+                                    merged = true;
+                                    break;
                                 }
                             }
+                        } else {
 
-                            break; //continue below
-
-                        } else if (add) {
-                            float iiPri = priSafe(current, -1);
-                            if (targetPri > iiPri) {
-                                //select a better target
-                                target = current;
-                                targetIndex = i;
-                                targetPri = iiPri;
+                            if (remove) { //remove
+                                if (map.compareAndSet(i, current, null)) {
+                                    found = current;
+                                }
+                            } else {
+                                found = current; //get
                             }
-                            //continue probing; must try all
+
                         }
+
+                        break; //continue below
+
                     }
-
-                    //i = dir ? (i + 1) : (i - 1);
-                    i++; if (i == c) i = 0;
-
                 }
 
-                //add at target index
-                if (targetIndex != -1) {
+                if (add && !merged) {
 
-                    if (targetPri == Float.NEGATIVE_INFINITY) {
-
-                        //insert to empty
-                        if (map.compareAndSet(targetIndex, null, adding)) {
-                            added = merge(null, adding, scale);
-                        }
-
-                    } else {
-                        if (replace(adding, target, scale)) {
-                            if (map.compareAndSet(targetIndex, target, adding)) { //inserted
-                                found = target;
-                                added = merge(null, adding, scale);
-                            }
+                    if (current == null || replace(adding, current, scale)) {
+                        if (map.compareAndSet(i, current, adding)) { //inserted
+                            found = current;
+                            added = merge(current, adding, scale);
+                            break; //done
                         }
                     }
                 }
 
-                if (!add || (added != null))
-                    break;
+                //i = dir ? (i + 1) : (i - 1);
+                i++;
+                if (i == c) i = 0;
 
-                //else: try again
             }
+
+//                if (!add || (added != null))
+//                    break;
+            //else: try again
+
         } catch (Throwable t) {
             t.printStackTrace(); //should not happen
         } finally {
@@ -331,9 +296,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         private void start(int hash) {
             if (hash == 0) hash = 1; //reserve 0
             int len = length();
-            restart: while (true) {
+            restart:
+            while (true) {
                 int best = -1;
-                for (int i = len-1; i >= 0; i--) {
+                for (int i = len - 1; i >= 0; i--) {
                     int v = getOpaque(i);
                     if (v == hash) {
                         continue restart; //collision
@@ -342,7 +308,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                     }
                 }
 
-                if (best!=-1) {
+                if (best != -1) {
                     if (compareAndSet(best, 0, hash))
                         return; //ready
                 }
@@ -379,9 +345,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * if no existing value then existing will be null.
      * this should modify the existing value if it exists,
      * or the incoming value if none.
-     *
+     * <p>
      * if adding content, pressurize() appropriately
-     *
+     * <p>
      * <p>
      * NOTE:
      * this should usually equal the amount of priority increased by the
@@ -392,12 +358,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
      * second-order budgeting advantage of not contributing as much
      * to the presssure as new insertions.
      */
-    @NotNull protected abstract V merge(@Nullable V existing, @NotNull V incoming, float scale);
+    @NotNull
+    protected abstract V merge(@Nullable V existing, @NotNull V incoming, float scale);
 
     /**
      * can override in subclasses for custom replacement policy.
      * true allows the incoming to replace the existing.
-     *
+     * <p>
      * a potential eviction can be intercepted here
      */
     protected boolean replace(V incoming, V existing, float scale) {
@@ -446,7 +413,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
 
-
     @Override
     public @Nullable V get(@NotNull Object key) {
         return update(key, null, 0);
@@ -458,12 +424,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     @Override
-    @Deprecated public void forEachWhile(@NotNull Predicate<? super V> each, int n) {
+    @Deprecated
+    public void forEachWhile(@NotNull Predicate<? super V> each, int n) {
         throw new UnsupportedOperationException("yet");
     }
 
 
-    @NotNull public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
+    @NotNull
+    public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
 
         int s = size();
         if (s == 0)
@@ -649,9 +617,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int s = size();
 
         return commit(
-            ((s > 0) && (p > 0)) ?
-                Bag.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
-                null
+                ((s > 0) && (p > 0)) ?
+                        Bag.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
+                        null
         );
 
     }
@@ -719,7 +687,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             this.mass = mass;
 
         } finally {
-         //   busy.set(false);
+            //   busy.set(false);
         }
 
         return this;

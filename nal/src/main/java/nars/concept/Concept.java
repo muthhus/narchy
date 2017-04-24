@@ -150,14 +150,16 @@ public interface Concept extends Termed {
 
 
     static void delete(@NotNull Concept c, @NotNull NAR nar) {
+
+        if (c instanceof PermanentConcept)
+            throw new RuntimeException("permanent concept deleted: " + c);
+
         c.beliefs().clear();
         c.goals().clear();
         //c.questions().clear(); //TODO?
         //c.quests().clear();
 
         c.state(ConceptState.Inactive, nar);
-
-
 
         c.termlinks().clear();
         c.tasklinks().clear();
