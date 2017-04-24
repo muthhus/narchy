@@ -1,5 +1,6 @@
 package nars.derive.meta.op;
 
+import nars.$;
 import nars.Op;
 import nars.derive.meta.AtomicPred;
 import nars.premise.Derivation;
@@ -24,19 +25,19 @@ public final class SubTermStructure extends AtomicPred<Derivation> {
     public static List<SubTermStructure> get(int subterm, int bits) {
         int numBits = Integer.bitCount(bits);
         assert (numBits > 0);
-        //if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
+        if ((numBits == 1) || (numBits > SPLIT_THRESHOLD)) {
             return Collections.singletonList(new SubTermStructure(subterm, bits));
-//        } else {
-//            List<SubTermStructure> components = $.newArrayList(numBits);
-//            for (Op o : Op.values()) {
-//
-//                int b = o.bit;
-//                if ((bits & b) > 0) { //HACK
-//                    components.add(new SubTermStructure(subterm, b));
-//                }
-//            }
-//            return components;
-//        }
+        } else {
+            List<SubTermStructure> components = $.newArrayList(numBits);
+            for (Op o : Op.values()) {
+
+                int b = o.bit;
+                if ((bits & b) > 0) { //HACK
+                    components.add(new SubTermStructure(subterm, b));
+                }
+            }
+            return components;
+        }
     }
 
     private SubTermStructure(int subterm, int bits) {

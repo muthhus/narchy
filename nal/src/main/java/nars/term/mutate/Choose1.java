@@ -65,8 +65,6 @@ public class Choose1 extends Termutator.AbstractTermutator {
         Term xEllipsis = this.xEllipsis;
         for (Term x = this.x; l >=0; l--) {
 
-            if (!f.versioning.tick()) break;
-
             Term y = next(shuffle, l);
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
@@ -75,7 +73,8 @@ public class Choose1 extends Termutator.AbstractTermutator {
 
             }
 
-            f.revert(start);
+            if (!f.revert(start))
+                return false;
         }
 
         return true;

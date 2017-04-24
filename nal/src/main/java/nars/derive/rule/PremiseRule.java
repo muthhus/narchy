@@ -200,16 +200,17 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp0", rank--);
 
         put(TaskPunctuation.class, rank--);
-
-        put(events.class, rank--);
-
         put(SubTermStructure.class, rank--);
-
 
         put(MatchConstraint.class, rank--);
 
+        put(events.class, rank--);
 
         put(Solve.class, rank--);
+
+
+
+
 
 //        put(TermNotEquals.class, rank--);
 

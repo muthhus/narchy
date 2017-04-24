@@ -3,6 +3,7 @@ package nars.premise;
 import jcog.pri.PLink;
 import jcog.pri.Priority;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
@@ -192,7 +193,7 @@ public enum PremiseBuilder { ;
             } else {
                 return true; //keep trying
             }
-        }).unifyAll(a, q);
+        }, Param.BeliefMatchTTL ).unifyAll(a, q);
 
         return result[0];
 

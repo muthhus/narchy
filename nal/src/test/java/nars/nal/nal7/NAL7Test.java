@@ -579,7 +579,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.input("(on:({t002},#1) &&+0 at:(SELF,#1)). :|:");
         tester.inputAt(10, "((on:($1,#2) &&+0 at:(SELF,#2)) ==>+0 reachable:(SELF,$1)).");
 
-        tester.mustBelieve(cycles * 4, "reachable:(SELF,{t002})",
+        tester.mustBelieve(cycles, "reachable:(SELF,{t002})",
                 1.0f, 0.81f, 0);
 
     }

@@ -75,9 +75,9 @@ public class StackProfiler2 implements InternalProfiler {
             "Attach Listener"
     };
 
-    private final int stackLines;
-    private final int topStacks;
-    private final int periodMsec;
+    private final int stackLines = 20;
+    private final int topStacks = 10;
+    private final int periodMsec = 1;
     private final Trie<String, Boolean> excludePackageNames;
 
     public StackProfiler2() throws ProfilerException {
@@ -118,9 +118,6 @@ public class StackProfiler2 implements InternalProfiler {
 
 
         try {
-            periodMsec = 0; //set.valueOf(optSamplePeriod);
-            topStacks = 10; //set.valueOf(optTopStacks);
-            stackLines = 10; //set.valueOf(optStackLines);
 
             //boolean excludePackages = true; //set.valueOf(optExclude);
             MutableSet<String> exc = Sets.mutable.of("java.", "jdk.", "javax.", "sun.",
@@ -129,11 +126,6 @@ public class StackProfiler2 implements InternalProfiler {
             excludePackageNames = Tries.forStrings();
             exc.forEach(e -> excludePackageNames.put(e, true));
 
-            //assertTrue( t.has( "wowza", TrieMatch.STARTS_WITH ) );
-
-                /*excludePackages ?
-                new HashSet<>(set.valuesOf(optExcludeClasses)) :
-                Collections.<String>emptySet();*/
         } catch (OptionException e) {
             throw new ProfilerException(e.getMessage());
         }

@@ -24,18 +24,15 @@ public class Versioning extends FasterList<Versioned> {
     /** start a new version with a commit, returns true if add was successful or false if unsuccessful (capacity exceeded)
      *  @return null if capacity exceeded
      * */
-    public final boolean nextChange(@Nullable Versioned v, @Nullable Object x) {
-        return add(v) && !(v != null && !v.add(x));
-    }
-
-    public final boolean nextChange() {
-        return nextChange(null, null);
+    public final boolean nextChange(@NotNull Versioned v, @Nullable Object x) {
+        return add(v) && !v.add(x);
     }
 
 
     /** reverts/undo to previous state */
-    public final void revert(int when) {
+    public final boolean revert(int when) {
         pop(size - when );
+        return ttl >= 0; //<- maybe >
     }
 
     public final void pop(int count) {

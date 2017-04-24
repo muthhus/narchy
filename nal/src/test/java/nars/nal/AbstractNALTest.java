@@ -66,11 +66,11 @@ public abstract class AbstractNALTest {
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
                     Default d =
-                            new Default(768, 1);
+                            new Default(512, 1);
 
                     d.nal(level);
-                    d.termVolumeMax.setValue(32);
-                    d.deriver.rate.setValue(0.05f);
+                    d.termVolumeMax.setValue(28);
+                    d.deriver.rate.setValue(0.02f);
                     return d;
                 }
         ));

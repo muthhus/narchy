@@ -22,7 +22,7 @@ public class VersioningTest {
     @Test
     public void test1() {
         Versioning w = new Versioning(10, 20);
-        VersionMap<Object,Object> m = new VersionMap(w,10,10);
+        VersionMap<Object,Object> m = new VersionMap(w,10);
         m.tryPut("x", "a");
         assertEquals("{x=a}", m.toString());
         assertEquals(1, w.size());

@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 /** not thread safe, use 1 per thread (do not interrupt matchAll) */
 public class UnifySubst extends Unify {
 
-    static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
+    //static final Logger logger = LoggerFactory.getLogger(UnifySubst.class);
 
     @NotNull
     public final NAR nar;
@@ -26,8 +26,8 @@ public class UnifySubst extends Unify {
 
     int matches;
 
-    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target) {
-        super(n.concepts, varType, n.random(), Param.SubUnificationStackMax, Param.SubUnificationTTL);
+    public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int ttl) {
+        super(n.concepts, varType, n.random(), Param.SubUnificationStackMax, ttl);
 
         this.nar = n;
         this.target = target;
@@ -57,6 +57,9 @@ public class UnifySubst extends Unify {
         //TODO combine these two blocks to use the same sub-method
 
         //try {
+
+            versioning.tick();
+
             Term aa = resolve(a, xy);
             if (aa!=null && target.test(aa))
                 matches++;
@@ -90,8 +93,9 @@ public class UnifySubst extends Unify {
 
     @Nullable Term resolve(@NotNull Term t, @NotNull Map<Term,Term> subs) {
         //try {
-            return subs.isEmpty() ?
-                    t /* no change necessary */ :
+
+            return /*subs.isEmpty() ?
+                    t : *//* no change necessary */
                     nar.concepts.transform(t, new MapSubst(subs));
 //        } catch (InvalidTermException e) {
 //            return null;

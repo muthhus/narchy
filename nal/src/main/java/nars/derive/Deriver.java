@@ -14,6 +14,8 @@ import java.util.function.Consumer;
  * ( via the run() methods )
  * <p>
  * Created by patrick.hammer on 30.07.2015.
+ *
+ * TODO remove Deriver and just consider any BoolPred<Derivation> a deriver
  */
 public interface Deriver extends BoolPred<Derivation> {
 

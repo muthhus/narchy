@@ -60,8 +60,9 @@ public class Versioned<X> extends FasterList<X> {
      */
     @Nullable
     public Versioned<X> set(X nextValue) {
-        return context.nextChange(this, nextValue) ? this : null;
+        return context.add(this) && add(nextValue) ? this : null;
     }
+
 
 
     @Override
@@ -85,6 +86,5 @@ public class Versioned<X> extends FasterList<X> {
         return sb.append(')').toString();
 
     }
-
 
 }

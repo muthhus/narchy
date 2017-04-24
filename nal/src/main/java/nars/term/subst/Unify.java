@@ -80,12 +80,10 @@ public abstract class Unify implements Termutator, Subst {
 
         this.versioning = versioning;
 
-        xy = new ConstrainedVersionMap(versioning);
+        xy = new ConstrainedVersionMap(versioning, Param.MaxUnificationVariableStack);
 
-        yx = new VersionMap(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
+        yx = new VersionMap(versioning, Param.MaxUnificationVariableStack);
     }
-
-
 
 
     /**
@@ -96,7 +94,7 @@ public abstract class Unify implements Termutator, Subst {
     public abstract boolean onMatch();
 
     public final boolean mutate(List<Termutator> chain, int next) {
-        return chain.get(++next).mutate(this, chain, next);
+        return versioning.tick() && chain.get(++next).mutate(this, chain, next);
     }
 
     @Override
@@ -182,11 +180,10 @@ public abstract class Unify implements Termutator, Subst {
 
     @Override
     public final boolean mutate(Unify f, List<Termutator> n, int seq) {
-        return f.versioning.tick() &&
-               (seq == -2) ?
-                    f.mutate(n, -1) //start combinatorial recurse
-                    :
-                    f.onMatch(); //end combinatorial recurse
+        return  (seq == -2) ?
+                f.mutate(n, -1) //start combinatorial recurse
+                :
+                f.onMatch(); //end combinatorial recurse
     }
 
 
@@ -309,92 +306,62 @@ public abstract class Unify implements Termutator, Subst {
 
     final class ConstrainedVersionedTerm extends Versioned<Term> {
 
-        /** divide constraints into two classes: fast and slow,
-         * fast ieally are checked first */
-        Versioned<MatchConstraint> constraints = null;
-        Versioned<MatchConstraint> fastConstraints = null;
+
+        final Versioned<MatchConstraint> constraints = new Versioned(versioning, MaxMatchConstraintsPerVariable);
+
+//        /**
+//         * divide constraints into two classes: fast and slow,
+//         * fast ieally are checked first
+//         */
+//        Versioned<MatchConstraint> fastConstraints = null;
 
         ConstrainedVersionedTerm() {
-            super(versioning,  Param.MaxUnificationVariableStack);
+            super(versioning, Param.MaxUnificationVariableStack);
         }
 
         @Nullable
         @Override
         public Versioned<Term> set(@NotNull Term next) {
-
-            if (fastConstraints != null && !valid(next, fastConstraints))
-                return null;
-
-            if (constraints != null && !valid(next, constraints))
-                return null;
-
-            return super.set(next);
-        }
-
-        boolean valid(@NotNull Term next, Versioned<MatchConstraint> c) {
-            int s = c.size();
-            for (int i = 0; i < s; i++) {
-                if (c.get(i).invalid(next, Unify.this ))
-                    return false;
-            }
-            return true;
+            return (constraints.isEmpty() || Unify.this.valid(next, constraints)) ? super.set(next) : null;
         }
 
         public boolean addConstraint(MatchConstraint m) {
-            Versioned<MatchConstraint> cc;
-            if (isFast(m)) {
-                cc = fastConstraints!=null ? fastConstraints : (this.fastConstraints = newConstraints());
-            } else {
-                cc = constraints !=null ? constraints : (this.constraints = newConstraints());
-            }
-            return cc.set(m)!=null;
-        }
-
-        boolean isFast(MatchConstraint m) {
-            return !(m instanceof CommonalityConstraint);
-        }
-
-        Versioned newConstraints() {
-            return new Versioned(versioning,MaxMatchConstraintsPerVariable);
-        }
-    }
-
-    public boolean addConstraint(Term x, MatchConstraint m) {
-
-
-        //final boolean[] valid = {true};
-        Versioned<Term> v = xy.getOrCreateIfAbsent(x);
-        return ((ConstrainedVersionedTerm)v).addConstraint(m);
-
-//        xy.map.computeIfAbsent(x, (xx) -> return
-//            ConstrainedVersionedTerm cv;
-////            if (v instanceof ConstrainedVersionedTerm) {
-////                cv = (ConstrainedVersionedTerm)v;
-////            } else if (v!=null) {
-////                Term vv = v.get();
-////                assert(vv==null);
-//////                if (vv!=null && m.invalid(vv, Unify.this)) {
-//////                     //tried to put constraint on a variable with an existing invalid value
-//////                    valid[0] = false;
-//////                    return v;
-//////                }
-//////
-//////                //it will be valid; promote this to non-constrained versioned entry's values
-//////                cv = new ConstrainedVersionedTerm(v);
-////                cv = new ConstrainedVersionedTerm();
-//
-//            if (v == null) {
-//                v = new ConstrainedVersionedTerm();
+//            Versioned<MatchConstraint> cc;
+//            if (isFast(m)) {
+//                cc = fastConstraints != null ? fastConstraints : (this.fastConstraints = newConstraints());
 //            } else {
-//                System.out.println("what is it: " + v);
-//            }
+
+            //}
+            return constraints.set(m) != null;
+        }
 //
-//            return v;
-//        });
-//
-//        return valid[0];
+//        boolean isFast(MatchConstraint m) {
+//            return !(m instanceof CommonalityConstraint);
+//        }
+
+//        Versioned newConstraints() {
+//            return new Versioned(versioning, MaxMatchConstraintsPerVariable);
+//        }
     }
 
+    private boolean valid(@NotNull Term next, List<MatchConstraint> c) {
+        int s = c.size();
+        for (int i = 0; i < s; i++) {
+            if (c.get(i).invalid(next, this))
+                return false;
+        }
+        return true;
+    }
+
+
+    public boolean addConstraint(MatchConstraint... cc) {
+        for (MatchConstraint m : cc) {
+            Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
+            if (!((ConstrainedVersionedTerm) v).addConstraint(m))
+                return false;
+        }
+        return true;
+    }
 
     /**
      * returns true if the assignment was allowed, false otherwise
@@ -411,8 +378,8 @@ public abstract class Unify implements Termutator, Subst {
         return versioning.size();
     }
 
-    public final void revert(int then) {
-        versioning.revert(then);
+    public final boolean revert(int then) {
+        return versioning.revert(then);
     }
 
 //    public final void pop(int count) {
@@ -427,8 +394,8 @@ public abstract class Unify implements Termutator, Subst {
 
 
     private class ConstrainedVersionMap extends VersionMap {
-        public ConstrainedVersionMap(@NotNull Versioning versioning) {
-            super(versioning, Param.MaxUnificationVariables, Param.MaxUnificationVariableStack);
+        public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
+            super(versioning, maxVars);
         }
 
         @NotNull

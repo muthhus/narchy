@@ -5,7 +5,10 @@ import jcog.trie.TrieNode;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.*;
+import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
+import nars.derive.meta.op.MatchOneSubtermPrototype;
+import nars.derive.meta.op.MatchTerm;
 import nars.derive.meta.op.MatchTermPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -16,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -95,6 +99,7 @@ public class TrieDeriver extends Fork implements Deriver {
             roots[i] = c.build(roots[i]);
         }
 
+        assert(roots.length > 1);
         Fork y = (Fork) Fork.compile(roots);
 
         return new TrieDeriver(y.cached);
@@ -470,13 +475,53 @@ public class TrieDeriver extends Fork implements Deriver {
             ccc.addAll(cond);
             if (conseq != null)
                 ccc.add(conseq);
-            return AndCondition.the(ccc);
+            return AndCondition.the(compileAnd(ccc));
             //
             //        } else {
             //            /*if (conseq!=null)
             //                throw new RuntimeException();*/
             //            return conseq;
             //        }
+        }
+
+        /** combine certain types of items in an AND expression */
+        static List<BoolPred> compileAnd(List<BoolPred> ccc) {
+            if (ccc.size() == 1)
+                return ccc;
+
+            List<MatchConstraint> constraints = $.newArrayList();
+            Iterator<BoolPred> il = ccc.iterator();
+            while (il.hasNext()) {
+                BoolPred c = il.next();
+                if (c instanceof MatchConstraint) {
+                    constraints.add((MatchConstraint)c);
+                    il.remove();
+                }
+            }
+
+
+            if (!constraints.isEmpty()) {
+
+
+                int iMatchTerm = -1; //first index of a MatchTerm op, if any
+                for (int j = 0, cccSize = ccc.size(); j < cccSize; j++) {
+                    BoolPred c = ccc.get(j);
+                    if ((c instanceof MatchOneSubtermPrototype || c instanceof Fork) && iMatchTerm == -1) {
+                        iMatchTerm = j;
+                    }
+                }
+                if (iMatchTerm == -1)
+                    iMatchTerm = ccc.size();
+
+                //1. sort the constraints and add them at the end
+                int c = constraints.size();
+                if (c > 1)
+                    ccc.add(iMatchTerm, new MatchConstraint.CompoundConstraint(constraints.toArray(new MatchConstraint[c])));
+                else
+                    ccc.add(iMatchTerm, constraints.get(0)); //just add the singleton at the end
+            }
+
+            return ccc;
         }
 
         //    //TODO not complete

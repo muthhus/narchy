@@ -28,8 +28,8 @@ public class FZero extends NAgentX {
 
         this.fz =  new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 48, 32, (v) -> t(v, alpha()))
-                .setResolution(0.05f);
+        senseCamera("fz", ()->fz.image, 32, 24, (v) -> t(v, alpha()))
+                .setResolution(0.01f);
 
         actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
         actionTriState($.inh(Atomic.the("rot"), id ), (dh) -> {
@@ -201,10 +201,10 @@ public class FZero extends NAgentX {
         Default n = NARBuilder.newMultiThreadNAR(
                 2,
                 new RealTime.DSHalf(true)
-                        .durFPS(10f), true);
+                        .durFPS(20f), true);
 
         FZero a = new FZero(n);
-        a.runRT(10f);
+        a.runRT(5f);
 
         NAgentX.chart(a);
 

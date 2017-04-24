@@ -110,7 +110,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsDirect extends FireConcepts {
 
-        private MutableInteger maxInputTasksPerDerivation = new MutableInteger(4);
+        private MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
         public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
             this(nar.focus(), deriver, budgeting, nar);
@@ -171,8 +171,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             void commit(int derivations) {
                 if (!buffer.isEmpty()) {
-                    int max = maxInputTasksPerDerivation.intValue() * derivations;
-                    if (buffer.size() <= max) {
+                    int mPerDeriv = maxInputTasksPerDerivation.intValue();
+                    int max = mPerDeriv * derivations;
+                    if (mPerDeriv==-1 || buffer.size() <= max) {
                         nar.input(buffer.values());
                     } else {
                         nar.input(top(buffer, max));

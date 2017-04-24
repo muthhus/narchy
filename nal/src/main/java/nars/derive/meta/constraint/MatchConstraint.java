@@ -1,6 +1,7 @@
 package nars.derive.meta.constraint;
 
 import nars.$;
+import nars.derive.meta.AbstractPred;
 import nars.derive.meta.BoolPred;
 import nars.premise.Derivation;
 import nars.term.ProxyCompound;
@@ -21,9 +22,25 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
 
     @Override
     public boolean test(Derivation p) {
-        return p.addConstraint(target, this);
+        //this will not be called when it is part of a CompoundConstraint group
+        return p.addConstraint(this);
     }
 
+    public static class CompoundConstraint extends AbstractPred<Derivation> {
+
+
+        private final MatchConstraint[] cache;
+
+        public CompoundConstraint(MatchConstraint[] c) {
+            super($.func("constraints", $.p(c) ));
+            this.cache = c;
+        }
+
+        @Override
+        public boolean test(Derivation derivation) {
+            return derivation.addConstraint(cache);
+        }
+    }
 
     /**
      * @param targetVariable current value of the target variable (null if none is set)

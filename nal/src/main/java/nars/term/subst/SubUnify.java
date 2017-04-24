@@ -21,13 +21,12 @@ public class SubUnify extends Unify {
     @Nullable private Term result;
 
 
-    public SubUnify(TermIndex index, Op type, Random r) {
-        super(index, type, r,
-                Param.SubUnificationStackMax, Param.SubUnificationTTL);
+    public SubUnify(TermIndex index, Op type, Random r, int ttl) {
+        super(index, type, r, Param.SubUnificationStackMax, ttl);
     }
 
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
-        this(parent.index, type, parent.random);
+        super(parent.index, type, parent.random, parent.versioning);
     }
 
 
