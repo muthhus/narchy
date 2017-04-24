@@ -76,7 +76,7 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 512 * 1024;
+        int maxConcepts = 256 * 1024;
 
         int activeConcepts = 1024;
 
@@ -197,7 +197,7 @@ public interface NARBuilder {
         nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.5f);
+        nar.goalConfidence(0.9f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -221,7 +221,7 @@ public interface NARBuilder {
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.005f, 6);
+        new Inperience(nar, 0.25f, 6);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

@@ -39,7 +39,6 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K,PLink<K>> {
     }
 
 
-
     @Override
     protected Consumer<PLink<K>> forget(float avgToBeRemoved) {
         return new PForget(avgToBeRemoved);

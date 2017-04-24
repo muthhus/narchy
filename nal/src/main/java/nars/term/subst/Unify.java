@@ -51,7 +51,7 @@ public abstract class Unify implements Termutator, Subst {
     public final Op type;
 
     @Nullable
-    private List<Termutator> termutes;
+    protected final List<Termutator> termutes = $.newArrayList();
 
     @NotNull
     public final Versioning versioning;
@@ -167,7 +167,7 @@ public abstract class Unify implements Termutator, Subst {
 
         if (finish) {
             //revert(s); //else: allows the set constraints to continue
-            this.termutes = null;
+            this.termutes.clear();
         }
 
         return result;
@@ -260,9 +260,7 @@ public abstract class Unify implements Termutator, Subst {
 
     public boolean addTermutator(@NotNull Termutator x) {
         List<Termutator> t = this.termutes;
-        if (t == null) {
-            this.termutes = t = $.newArrayList(4);
-        } else if (t.contains(x)) {
+        if (t.contains(x)) {
             return true;
         }
 

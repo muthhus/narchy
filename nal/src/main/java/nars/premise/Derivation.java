@@ -28,9 +28,10 @@ import static nars.time.Tense.ETERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-public class Derivation extends Unify {
+abstract public class Derivation extends Unify {
 
-    @NotNull public final Consumer<DerivedTask> target;
+    @NotNull
+    public final NAR nar;
     public final float truthResolution;
     public final float confMin;
     public final DerivationBudgeting budgeting;
@@ -45,15 +46,11 @@ public class Derivation extends Unify {
 
     public  float premiseEvidence;
 
-
-
-
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
     @Nullable
     private BoolPred forEachMatch;
-
 
     /**
      * cached values
@@ -80,8 +77,6 @@ public class Derivation extends Unify {
     public  Compound taskTerm;
     @NotNull
     public  Term beliefTerm;
-    @NotNull
-    public final NAR nar;
 
     @NotNull
     public  Task task;
@@ -103,12 +98,11 @@ public class Derivation extends Unify {
 
 
 
-    public Derivation(@NotNull NAR nar, @NotNull Consumer<DerivedTask> c,
+    public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
                       int stack, int ttl) {
         super(nar.concepts, VAR_PATTERN, nar.random(), stack, ttl);
         this.nar = nar;
-        this.target = c;
         this.budgeting = b;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
@@ -120,7 +114,13 @@ public class Derivation extends Unify {
 
     }
 
-    public Derivation restart(@NotNull Premise p) {
+    public Derivation restart(@NotNull Premise p, int ttl) {
+
+        this.versioning.setTTL(ttl);
+        forEachMatch = null;
+        termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
+
+
         this.premise = p;
 
         Task task;
@@ -157,12 +157,11 @@ public class Derivation extends Unify {
         this.overlap = belief != null ? Stamp.overlapping(task, belief) : cyclic;
         //this.overlapAmount = belief!=null ? Stamp.overlapFraction(task.stamp(), belief.stamp()) : (cyclic? 1f : 0f);
 
-        this.termSub0Struct = taskTerm.structure();
 
         Op tOp = taskTerm.op();
         this.termSub0op = (byte) tOp.ordinal();
         this.termSub0opBit = tOp.bit;
-
+        this.termSub0Struct = taskTerm.structure();
         this.termSub1Struct = beliefTerm.structure();
 
         Op bOp = beliefTerm.op();
@@ -179,6 +178,8 @@ public class Derivation extends Unify {
         return this;
     }
 
+    /** called by conclusion */
+    abstract public void derive(Task t);
 
     /**
      * only one thread should be in here at a time

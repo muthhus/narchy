@@ -65,7 +65,7 @@ public class Leak<X, Y> {
             try {
                 bag.commit();
 
-                if (bag.size() >= minSizeForLeak()) {
+                if (bag.size() >= min()) {
 
                     long last = this.lastLeak;
                     if (last == ETERNAL) {
@@ -75,21 +75,23 @@ public class Leak<X, Y> {
                     if (dt > 0) {
 
                         float budget = Math.min(rate.floatValue() * dt, maxCost.floatValue());
+                        if (budget >= 1f) {
 
-                        final float[] spent = {0};
-                        bag.sample((v) -> {
-                            float cost = onOut(v);
-                            float spe = spent[0] + cost;
-                            if (spe <= budget) {
-                                spent[0] = spe;
-                                return Bag.BagCursorAction.Remove; //continue
-                            } else {
-                                return Bag.BagCursorAction.RemoveAndStop;
+                            final float[] spent = {0};
+                            bag.sample((v) -> {
+                                float cost = onOut(v);
+                                float spe = spent[0] + cost;
+                                if (spe <= budget) {
+                                    spent[0] = spe;
+                                    return Bag.BagCursorAction.Remove; //continue
+                                } else {
+                                    return Bag.BagCursorAction.RemoveAndStop;
+                                }
+                            });
+
+                            if (spent[0] > 0) {
+                                this.lastLeak = now; //only set time if some cost was spent
                             }
-                        });
-
-                        if (spent[0] > 0) {
-                            this.lastLeak = now; //only set time if some cost was spent
                         }
                     }
                 }
@@ -118,7 +120,7 @@ public class Leak<X, Y> {
     /**
      * minimum bag size allowed before leak
      */
-    public int minSizeForLeak() {
+    public int min() {
         return 1;
     }
 

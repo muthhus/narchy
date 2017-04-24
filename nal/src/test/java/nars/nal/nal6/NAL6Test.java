@@ -569,14 +569,13 @@ public class NAL6Test extends AbstractNALTest {
         //<patham9> this is the only rule which is needed in this example
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
-        long time =  700; //originally: 1200
 
         test()
                 .believe("num(0)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((0)))")
-                .mustBelieve(time, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
-                .mustBelieve(time, "num(((0)))", 1.0f, 1.0f, 0.29f /*0.66f*/, 1.0f)
+                .mustBelieve(cycles, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
+                .mustBelieve(cycles, "num(((0)))", 1.0f, 1.0f, 0.21f /*0.66f*/, 1.0f)
         //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')

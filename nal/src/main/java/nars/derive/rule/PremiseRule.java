@@ -205,11 +205,11 @@ public class PremiseRule extends GenericCompound {
 
         put(SubTermStructure.class, rank--);
 
-        put(Solve.class, rank--);
 
         put(MatchConstraint.class, rank--);
 
 
+        put(Solve.class, rank--);
 
 //        put(TermNotEquals.class, rank--);
 

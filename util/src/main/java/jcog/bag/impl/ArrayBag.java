@@ -331,10 +331,12 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         PLink<X> v = map.compute(key, (kk, existing) -> {
             PLink<X> res;
             float o;
-            if (existing != null && !existing.isDeleted()) {
+            if (existing != null) {
                 //merge
                 res = existing;
+
                 o = mergeFunction.merge(existing, b, scale);
+
             } else {
                 //new
                 PLink<X> n = new RawPLink<>(b.get(), 0);

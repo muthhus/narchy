@@ -181,6 +181,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             long inEnd = in.end();
 
             if (subActivation > minScale) {
+                float[] additionalPressure = { 0 };
                 tlinks.commit((b) -> {
                     float subSubActivation = subActivation;/// * b.qua();
 
@@ -210,11 +211,14 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                     }
 
                     if (subSubActivation >= minScale) {
-                        subSubActivation -= b.priAddOverflow(subSubActivation, tlinks); //activate the link
+                        subSubActivation -= b.priAddOverflow(subSubActivation, additionalPressure); //activate the link
                     }
 
                     //change[0] += (subActivation - subSubActivation);
                 });
+                if (additionalPressure[0] > 0) {
+                    tlinks.pressurize(additionalPressure[0]);
+                }
 
                 //recoup losses to the parent
                 //parentActivation += change[0];

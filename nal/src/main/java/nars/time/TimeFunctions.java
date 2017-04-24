@@ -192,7 +192,7 @@ public interface TimeFunctions {
             } else {
 
                 //HACK to handle commutive switching so that the dt is relative to the effective subject
-                if (derived.isCommutative()) {
+                if (dt!=DTERNAL && dt!=0 && derived.isCommutative()) {
 
                     Term bt = p.beliefTerm;
                     Term d0 = derived.sub(0);
@@ -437,8 +437,8 @@ public interface TimeFunctions {
                     //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
                     //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
                     //otherwise it is the conditional decompose
-                    if (d.goal.single())
-                        return null;
+//                    if (d.goal.single())
+//                        return null;
                 }
 
                 if (!task.isEternal()) {

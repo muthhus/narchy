@@ -1,14 +1,18 @@
 package nars.task;
 
 import nars.*;
+import nars.concept.TaskConcept;
 import nars.nar.Default;
+import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Arrays;
 
+import static nars.Op.BELIEF;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by me on 11/3/15.
@@ -16,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class TaskTest {
 
 
-
+    public static final Terminal tt = new Terminal();
 
     @Test public void testTruthHash16Plus16Bit() {
         //for TRUTH EPSILON 0.01:
@@ -124,4 +128,11 @@ public class TaskTest {
 
     }
 
+    @Test public void testValid() throws Narsese.NarseseException {
+        Task t = $.task("((&&,#1,(#1 &&+0 #3),(#2 &&+0 #3),(#2 &&+0 (toothbrush-->here))) ==>+0 lighter(I,toothbrush))", BELIEF, 1f, 0.9f).apply(tt);
+        assertNotNull(t);
+        TaskConcept c = t.concept(tt,true);
+        System.out.println(c);
+        assertNotNull(c);
+    }
 }

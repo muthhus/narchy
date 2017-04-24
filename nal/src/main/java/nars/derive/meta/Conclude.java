@@ -2,10 +2,7 @@ package nars.derive.meta;
 
 import com.google.common.base.Joiner;
 import jcog.pri.Priority;
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermIndex;
 import nars.premise.Derivation;
@@ -35,11 +32,10 @@ import static nars.time.Tense.XTERNAL;
  * <p>
  * Each rule corresponds to a unique instance of this
  */
-public final class Conclude extends AtomicStringConstant implements BoolPred<Derivation> {
+public final class Conclude extends AbstractPred<Derivation> {
 
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
-
 
     @NotNull
     public final PremiseRule rule;
@@ -60,16 +56,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPred<Der
     public Conclude(@NotNull PremiseRule rule, PostCondition p,
                     TruthOperator belief, TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super("Derive(" +
-                Joiner.on(',').join(
-                        p.pattern,
-                        "time" + Integer.toHexString(time.hashCode()) //HACK todo until names are given to unique classes
-
-                        //belief != null ? belief : "_",
-                        //goal != null ? goal : "_",
-                        //eternalize ? "Et" : "_") +
-                ) +
-                ')');
+        super($.func("derive", p.pattern, $.the("time" + time.toString() )));
 
         this.rule = rule;
 
@@ -160,13 +147,14 @@ public final class Conclude extends AtomicStringConstant implements BoolPred<Der
                             //                    );
                             //                }
 
-                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure" + (Param.DEBUG ? rule : ""), c1.toArray()
+                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
+                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
                             );
                         }
 
                         int tdt = temporalized.dt();
                         if (tdt == XTERNAL || tdt == -XTERNAL) {
-                            throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak", c1.toArray());
+                            throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
                         }
 
                         //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
@@ -248,7 +236,7 @@ public final class Conclude extends AtomicStringConstant implements BoolPred<Der
                                 if (Param.DEBUG)
                                     d.log(rule);
 
-                                m.target.accept(d);
+                                m.derive(d);
 
                             }
                         }

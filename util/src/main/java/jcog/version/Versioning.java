@@ -69,4 +69,7 @@ public class Versioning extends FasterList<Versioned> {
         return --ttl > 0;
     }
 
+    public void setTTL(int ttl) {
+        this.ttl = ttl;
+    }
 }

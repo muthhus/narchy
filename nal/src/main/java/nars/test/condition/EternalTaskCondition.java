@@ -290,7 +290,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     public void recordSimilar(@NotNull Task task) {
         final TreeMap<Float, Task> similar;
-        synchronized (similar = this.similar) {
+        //synchronized (similar = this.similar) {
+        similar = this.similar;
 
             //TODO add the levenshtein distance of other task components
             float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
@@ -334,7 +335,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (similar.size() > maxSimilars) {
                 similar.remove(similar.lastEntry().getKey());
             }
-        }
+        //}
     }
 
 

@@ -13,6 +13,8 @@ import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.False;
+
 
 public final class substitute extends Functor {
 
@@ -34,23 +36,26 @@ public final class substitute extends Functor {
 
         boolean hasYX = !parent.yx.map.isEmpty(); //optimize in case where yx is empty
         if (hasYX)
-            x = parent.yxResolve(xx.sub(1));
+            x = parent.yxResolve(x);
 
-        boolean strict = (xx.size() > 3) && xx.sub(3).equals(STRICT);
+        boolean strict = xx.subEquals(3, STRICT);
 
         if (strict && (!(input instanceof Compound) || !input.containsRecursively(x)))
-            return Op.False;
+            return False;
 
         Term y = xx.sub(2); //replacement term (y)
         if (hasYX)
-            y = parent.yxResolve(xx.sub(2));
+            y = parent.yxResolve(y);
 
+        if (x.equals(y)) {
+            return strict ? False : input;
+        }
         Term output = parent.transform(input,
             hasYX ?
                 new MapSubstWithOverride(parent.yx, x, y) :
                 new MapSubst1(x,y)  //optimized impl
         );
-        return (output != null) ? output : Op.False;
+        return (output != null) ? output : False;
     }
 
 }

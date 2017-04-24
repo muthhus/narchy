@@ -88,14 +88,14 @@ abstract public class substituteIfUnifies extends Functor {
 //            throw new UnsupportedOperationException();
 //        }
 
-        Term term = a.sub(0);
+        Term input = a.sub(0);
 
         Term x = a.sub(1);
         Term y = a.sub(2);
         boolean strict = a.subEquals(3, substitute.STRICT);
-        Term failureTerm = strict ? False : term;
+        Term failureTerm = strict ? False : input;
 
-        if (y.equals(term))
+        if (y.equals(input))
             return failureTerm;
         if (x.equals(y))
             return failureTerm; //unification would occurr but no changes would result
@@ -110,7 +110,7 @@ abstract public class substituteIfUnifies extends Functor {
             return failureTerm; //no change
         }
 
-        Term z = new SubUnify(parent, op).tryMatch(parent, term, x, y);
+        Term z = new SubUnify(parent, op).tryMatch(parent, input, x, y);
         return (z != null) ? z : failureTerm;
     }
 

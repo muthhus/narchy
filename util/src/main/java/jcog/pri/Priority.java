@@ -93,7 +93,7 @@ public interface Priority extends Prioritized {
 //        return priAddOverflow(toAdd, null);
 //    }
 
-    default float priAddOverflow(float toAdd, @Nullable Bag pressurized) {
+    default float priAddOverflow(float toAdd, float[] pressurized) {
         float before = priSafe(0);
         float next = before + toAdd;
         float change;
@@ -107,7 +107,7 @@ public interface Priority extends Prioritized {
         setPriority(next);
 
         if (pressurized!=null)
-            pressurized.pressurize(next - before);
+            pressurized[0] += Math.max(0, (next - before));
 
         return change;
     }

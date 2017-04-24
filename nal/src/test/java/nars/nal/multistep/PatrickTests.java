@@ -116,6 +116,8 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
         tt.nar.time.dur(25);
+        tt.nar.termVolumeMax.setValue(30);
+
         //tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
@@ -129,7 +131,7 @@ public class PatrickTests extends AbstractNALTest {
         );
         //tt.log();
 
-        tt.mustDesire(500, "lighter(I, toothbrush)", 1f,
+        tt.mustDesire(1000, "lighter(I, toothbrush)", 1f,
                 0.39f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 

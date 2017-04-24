@@ -2,26 +2,34 @@ package nars.index.term.map;
 
 import jcog.bag.impl.hijack.HijackMemoize;
 import nars.Op;
+import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
+import nars.derive.Deriver;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import static nars.Op.False;
 import static nars.term.Terms.compoundOrNull;
 
 /**
  * Index which is supported by Map/Cache-like operations
  */
 public abstract class MaplikeTermIndex extends TermIndex {
+
+    final static Logger logger = LoggerFactory.getLogger(MaplikeTermIndex.class);
 
     @NotNull protected final ConceptBuilder conceptBuilder;
 
@@ -47,7 +55,18 @@ public abstract class MaplikeTermIndex extends TermIndex {
 
     protected final HijackMemoize<ProtoCompound,Term> build = new HijackMemoize<>(
         64*1024, 3,
-        (C) -> super.the(C.op(), C.dt(), C.subterms())
+        (C) -> {
+            try {
+                return super.the(C.op(), C.dt(), C.subterms());
+            } catch ( InvalidTermException e) {
+                if (Param.DEBUG_EXTRA)
+                    logger.error("{}", e);
+                return False;
+            } catch (Throwable t) {
+                logger.error("{}", t);
+                return False;
+            }
+        }
     );
 //        @Override
 //        public float value(@NotNull ProtoCompound protoCompound) {

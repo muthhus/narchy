@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static jcog.Util.or;
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
@@ -40,7 +41,7 @@ public enum PremiseBuilder { ;
      * patham9 its using the result of higher confidence
      */
     @Nullable
-    public static Premise premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin, @NotNull Consumer<DerivedTask> target) {
+    public static Premise premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin) {
 
         Term beliefTerm = termLink.get();
         Task belief = null;
@@ -116,7 +117,8 @@ public enum PremiseBuilder { ;
 
         float pri = beliefPriority == null ? taskPri :
                 //Math.max
-                aveAri
+                //aveAri
+                or
                         (taskPri, beliefPriority.priSafe(0));
 
         if (pri < priMin)

@@ -1,11 +1,14 @@
 package jcog.bag;
 
+import com.google.common.base.Joiner;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +24,7 @@ import java.util.function.DoubleSupplier;
 import static jcog.Texts.n4;
 import static jcog.pri.PriMerge.max;
 import static jcog.pri.PriMerge.plus;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author me
@@ -297,6 +301,35 @@ public class BagTest {
         b.commit();
 
     }
+
+    @Test
+    public void test1() {
+        test(new PLinkHijackBag<String>(16, 4));
+    }
+
+    private void test(Bag<String,PLink<String>> b) {
+        //initial conditions
+        b.put(new RawPLink("a", 0.9f));
+        b.put(new RawPLink("b", 0.5f));
+        b.put(new RawPLink("c", 0.1f));
+
+        b.commit();
+        //b.print();
+
+        for (int n : new int[] { 50, 100, 1000 }) {
+            Frequency e = new Frequency();
+            b.sample(n, x -> {
+                e.addValue(x.get());
+                return true;
+            });
+            System.out.println(Joiner.on("\n").join(e.entrySetIterator()) + "\n");
+            assertEquals(3, e.getUniqueCount());
+            assertEquals(e.getPct("a")*(5/9f), e.getPct("b"), 0.1f);
+            assertEquals(e.getPct("a")*(1/9f), e.getPct("c"), 0.05f);
+        }
+
+    }
+
 
     //AutoBag does not apply to this test
 //    @Test public void testDistribution() {

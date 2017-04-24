@@ -19,12 +19,16 @@ import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 
-/** controls an active focus of concepts */
+/**
+ * controls an active focus of concepts
+ */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
@@ -32,7 +36,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     public final DerivationBudgeting budgeting;
     public final Deriver deriver;
-
 
 
     /**
@@ -47,7 +50,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     public final MutableIntRange taskLinksFiredPerConcept = new MutableIntRange(1, 1);
     public final MutableIntRange termLinksFiredPerTaskLink = new MutableIntRange(1, 1);
 
-//    public final MutableInteger derivationsInputPerCycle;
+    //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
     protected final NAR nar;
     private final On on;
@@ -69,13 +72,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //        }
 //    }
 
-    /** returns # of derivations processed */
-    int premiseVector(NAR nar, PLink<Concept> pc, Consumer<DerivedTask> target) {
-
-        Derivation d = new Derivation(nar, this, budgeting,
-                Param.UnificationStackMax,
-                Param.UnificationTTL
-        );
+    /**
+     * returns # of derivations processed
+     */
+    int premiseVector(PLink<Concept> pc, Derivation d) {
 
         Concept c = pc.get();
         float cPri = pc.priSafe(0);
@@ -89,9 +89,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
             PLink<Task> tasklink = tasklinks.get(i);
             for (int i1 = 0, termlinksSize = termlinks.size(); i1 < termlinksSize; i1++) {
-                Premise p = PremiseBuilder.premise(c, tasklink, termlinks.get(i1), now, nar, -1f, target);
+                Premise p = PremiseBuilder.premise(c, tasklink, termlinks.get(i1), now, nar, -1f);
                 if (p != null) {
-                    if (deriver.test(d.restart(p)))
+                    if (deriver.test(d.restart(p, Param.UnificationTTL)))
                         count[0]++;
                 }
             }
@@ -100,7 +100,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         return count[0];
 
     }
-
 
 
     /**
@@ -114,10 +113,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         public FireConceptsDirect(Focus focus, Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
             super(focus, deriver, budgeting, nar);
-
         }
 
-        @Override public void fire() {
+        @Override
+        public void fire() {
             ConceptBagFocus csrc = (ConceptBagFocus) source;
             int count = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() * csrc.active.capacity());
             if (count == 0)
@@ -127,17 +126,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 int remain = count;
                 float granularity = 8;
                 float batchDivisor = nar.exe.concurrency() * granularity;
-                int batchSize = (int)Math.ceil(remain/batchDivisor);
+                int batchSize = (int) Math.ceil(remain / batchDivisor);
                 while (remain > 0) {
                     int nextBatchSize = Math.min(remain, batchSize);
                     nar.runLater(() -> {
-                        //long start = nanoTime();
 
                         fire(csrc, nextBatchSize);
 
-                        //long end = nanoTime();
-                        //double dt = (end - start) / ((float)nextBatchSize);
-                        //rate.hitNano(dt);
                     });
                     remain -= nextBatchSize;
                 }
@@ -147,33 +142,47 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             }
         }
 
-        final static ThreadLocal<Map<Task,Task>> buffer = ThreadLocal.withInitial(LinkedHashMap::new);
+        private final ThreadLocal<MyDerivation> derivation = ThreadLocal.withInitial(() ->
+                new MyDerivation(budgeting, nar));
+
+        private class MyDerivation extends Derivation {
+            final Map<Task, Task> buffer = new LinkedHashMap();
+
+            public MyDerivation(DerivationBudgeting b, NAR nar) {
+                super(nar, b, Param.UnificationStackMax, 0);
+            }
+
+            @Override
+            public void derive(Task x) {
+                buffer.merge(x, x, (prev, next) -> {
+                    if (prev != null) {
+                        PriMerge.max.merge(prev, next);
+                        return prev;
+                    } else {
+                        return next;
+                    }
+                });
+            }
+
+            void commit() {
+                if (!buffer.isEmpty()) {
+                    nar.input(buffer.values());
+                    buffer.clear();
+                }
+            }
+        }
+
+        //long start = nanoTime();
+        //long end = nanoTime();
+        //double dt = (end - start) / ((float)nextBatchSize);
+        //rate.hitNano(dt);
 
         public void fire(ConceptBagFocus csrc, int count) {
-//            final Map<Task,Task> in =
-//                    //new LinkedHashMap<>(count * 8 /* estimate */);
-//                    new HashMap<>(count * 8 /* estimate */);
-            Map<Task, Task> in = buffer.get();
-            try {
-                //csrc.active.sample(count).forEach(
-                csrc.active.sample(count, p -> {
-                    int derivations = premiseVector(nar, p, (x) -> {
-                        in.merge(x, x, (prev, next) -> {
-                            if (prev != null) {
-                                PriMerge.max.merge(prev, next);
-                                return prev;
-                            } else {
-                                return next;
-                            }
-                        });
-                    });
-                });
-
-                nar.input(in.values());
-
-            } finally {
-                in.clear();
-            }
+            MyDerivation d = derivation.get();
+            csrc.active.sample(count, p -> {
+                int derivations = premiseVector(p, d);
+            });
+            d.commit();
         }
 
         @Override

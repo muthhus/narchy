@@ -603,24 +603,24 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    private boolean executable(Task input) {
-        if (input.isCommand())
-            return true;
-
-        Concept c = input.concept(this);
-        float be;
-        if (c == null)
-            be = 0;
-        else {
-            Truth b = c.belief(time(), time.dur());
-            if (b == null)
-                be = 0;
-            else
-                be = b.expectation();
-        }
-
-        return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
-    }
+//    private boolean executable(Task input) {
+//        if (input.isCommand())
+//            return true;
+//
+//        Concept c = input.concept(this);
+//        float be;
+//        if (c == null)
+//            be = 0;
+//        else {
+//            Truth b = c.belief(time(), time.dur());
+//            if (b == null)
+//                be = 0;
+//            else
+//                be = b.expectation();
+//        }
+//
+//        return input.expectation() - be >= Param.EXECUTION_THRESHOLD;
+//    }
 
 //    @Deprecated
 //    public @Nullable Task execute(Task cmd) {
@@ -1236,7 +1236,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         if (termed instanceof Concept) {
             Concept ct = (Concept) termed;
-            if (!ct.isDeleted()) return ct;
+            if (!ct.isDeleted()) {
+                return ct;
+            }
         }
 
         Term term = termed.term();
@@ -1279,6 +1281,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     Compound normalizedTerm = concepts.normalize((Compound) term);
                     if (normalizedTerm!=null && normalizedTerm.equals(term)) {
                         ((Compound) term).setNormalized(); //recognize as normalized
+                        if (term!=termed)
+                            ((Compound) term).setNormalized();
                     }
                 }
 

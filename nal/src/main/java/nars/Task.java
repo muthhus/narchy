@@ -332,19 +332,21 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     @Nullable
     default TaskConcept concept(@NotNull NAR n) {
-        Concept c = n.conceptualize(term());
-        if (c == null)
-            return null; //ex: volume limit exceeded
+        return concept(n, false);
+    }
 
-        if (!(c instanceof TaskConcept)) {
-            if (Param.DEBUG)
-                throw new RuntimeException
-                        //System.err.println
-                        ("should conceptualize to TaskConcept: " + c);
-            else
-                return null;
-        }
-        return (TaskConcept) c;
+    @Nullable
+    default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
+        Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
+        if (c instanceof TaskConcept)
+            return ((TaskConcept)c);
+        else
+            return null;
+//        if (!(c instanceof TaskConcept)) {
+//            throw new InvalidTaskException
+//                    //System.err.println
+//                    (this, "unconceptualized");
+//        }
     }
 
     /**
@@ -379,22 +381,27 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (Param.ANSWER_REPORTING && isInput()) {
-            ArrayBag<Task> answers = concept(nar).computeIfAbsent(Op.QUESTION, () ->
-                    new ArrayBag<>(PriMerge.max,
-                            new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
-            );
-            float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
+            TaskConcept concept = concept(nar);
+            if (concept != null) {
 
-            if (!answers.contains(answer)) {
+                ArrayBag<Task> answers = concept.computeIfAbsent(Op.QUESTION, () ->
+                        new ArrayBag<>(PriMerge.max,
+                                new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
+                );
+                float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
 
-                answers.commit();
-
-                PLink<Task> insertion = answers.put(new RawPLink<>(answer, confEffective * 1f));
-
-                if (insertion != null) {
-                    Command.log(nar, this.toString() + "  " + answer.toString());
+                RawPLink<Task> input = new RawPLink<>(answer, confEffective * 1f);
+                PLink<Task> insertion = answers.put(input);
+                if (insertion == input) {
+                    answers.commit();
+                } else {
+                    return this; //skip reporting, duplicate or otherwise uninsertionable
                 }
             }
+
+            //do even for unconceptualized questions:
+            Command.log(nar, this.toString() + "  " + answer.toString());
+
         }
 
         return answer;
@@ -943,11 +950,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 //            ((FrameTime) n.time).validate(this.stamp());
 //        }
 
-
-        TaskConcept c = concept(n);
-        if (c == null)
-            return; //unconceptualizable, which may happen due to resource constraints
-
+        TaskConcept c = concept(n, true);
+        if (c == null) {
+            delete();
+            return;
+        }
 
         Task accepted = c.process(this, n);
         if (accepted != null) {

@@ -195,7 +195,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                         }
                     } else {
                         K y = key(current);
-                        if (y == x || equals(y, x)) { //existing
+                        if (equals(y, x)) { //existing
 
                             if (!add) {
 
@@ -209,6 +209,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
                             } else { //put
                                 if (current != adding) {
+                                    //float curPri = pri(current);
                                     V next = merge(current, adding, scale);
                                     if (next!= current) {
                                         //replace
@@ -216,6 +217,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                                             //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
                                         } else {
                                             //replaced
+                                            //pressurize(-curPri); //discount original priority
                                             targetIndex = -1;
                                             added = next;
                                             merged = true;
@@ -606,14 +608,14 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     }
 
-    @Override
-    public float priMin() {
-        throw new UnsupportedOperationException();
-    }
-    @Override
-    public float priMax() {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public float priMin() {
+//        throw new UnsupportedOperationException();
+//    }
+//    @Override
+//    public float priMax() {
+//        throw new UnsupportedOperationException();
+//    }
 
     abstract protected Consumer<V> forget(float rate);
 

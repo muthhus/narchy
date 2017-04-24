@@ -240,6 +240,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
                 logger.info(" {}", e);
                 nar.input(e);
+                return 1;
             }
         } catch (ClassCastException ignored) {
             //happens rarely, due to circularity while trying to create something like: want((x<->want),...
@@ -247,7 +248,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
             //System.err.println(task);
         }
 
-        return 1;
+        return 0;
     }
 
 

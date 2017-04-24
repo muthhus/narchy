@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 8/16/16.
  */
-public class MultiThreadExecutor extends Executioner implements ExceptionHandler<MultiThreadExecutor.TaskEvent> {
+public class MultiThreadExecutor extends Executioner  {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
@@ -37,20 +37,20 @@ public class MultiThreadExecutor extends Executioner implements ExceptionHandler
     private long cursor;
     private boolean sync = true;
 
-    @Override
-    public void handleEventException(Throwable ex, long sequence, TaskEvent event) {
-        logger.error("work: {}", ex);
-    }
-
-    @Override
-    public void handleOnStartException(Throwable ex) {
-        logger.error("start: {}", ex);
-    }
-
-    @Override
-    public void handleOnShutdownException(Throwable ex) {
-        logger.error("stop: {}", ex);
-    }
+//    @Override
+//    public void handleEventException(Throwable ex, long sequence, TaskEvent event) {
+//
+//    }
+//
+//    @Override
+//    public void handleOnStartException(Throwable ex) {
+//        logger.error("start: {}", ex);
+//    }
+//
+//    @Override
+//    public void handleOnShutdownException(Throwable ex) {
+//        logger.error("stop: {}", ex);
+//    }
 
 
     enum EventType {
@@ -112,7 +112,7 @@ public class MultiThreadExecutor extends Executioner implements ExceptionHandler
         for (int i = 0; i < threads; i++)
             taskWorker[i] = new TaskEventWorkHandler();
         EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
-        disruptor.setDefaultExceptionHandler(this);
+
 
 
         barrier = workers.asSequenceBarrier();
@@ -242,12 +242,15 @@ public class MultiThreadExecutor extends Executioner implements ExceptionHandler
             Object val = te.val;
             te.val = null;
 
-            if (val instanceof Runnable) {
-                ((Runnable)val).run();
-            } else {
-                ((Consumer)val).accept(nar);
+            try {
+                if (val instanceof Runnable) {
+                    ((Runnable) val).run();
+                } else {
+                    ((Consumer) val).accept(nar);
+                }
+            } catch (Throwable t) {
+                logger.error("{}: {}", this, t);
             }
-
         }
 
 
