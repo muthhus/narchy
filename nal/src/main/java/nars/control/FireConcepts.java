@@ -2,9 +2,12 @@ package nars.control;
 
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
+import jcog.data.MutableInteger;
+import jcog.data.sorted.SortedArray;
 import jcog.event.On;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
+import jcog.pri.Prioritized;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;
@@ -107,6 +110,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsDirect extends FireConcepts {
 
+        private MutableInteger maxInputTasksPerDerivation = new MutableInteger(4);
+
         public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
             this(nar.focus(), deriver, budgeting, nar);
         }
@@ -164,12 +169,37 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 });
             }
 
-            void commit() {
+            void commit(int derivations) {
                 if (!buffer.isEmpty()) {
-                    nar.input(buffer.values());
+                    int max = maxInputTasksPerDerivation.intValue() * derivations;
+                    if (buffer.size() <= max) {
+                        nar.input(buffer.values());
+                    } else {
+                        nar.input(top(buffer, max));
+                    }
+
+
                     buffer.clear();
                 }
             }
+        }
+
+        static Iterable<Task> top(Map<Task, Task> m, int max) {
+            SortedArray<Task> sa = new SortedArray<>(new Task[max]);
+            m.values().forEach(x -> {
+                if (sa.size() >= max) {
+                    if (sa.last().pri() > x.pri()) {
+                        return; //too low priority
+                    } else {
+                        sa.removeLast(); //remove current last
+                    }
+                }
+                sa.add(x, z -> -z.pri());
+//                while (sa.size() > max)
+//                    sa.removeLast();
+            });
+            assert(sa.size() <= max);
+            return sa;
         }
 
         //long start = nanoTime();
@@ -179,10 +209,12 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         public void fire(ConceptBagFocus csrc, int count) {
             MyDerivation d = derivation.get();
+
+            final int[] derivations = {0};
             csrc.active.sample(count, p -> {
-                int derivations = premiseVector(p, d);
+                derivations[0] += premiseVector(p, d);
             });
-            d.commit();
+            d.commit(derivations[0]);
         }
 
         @Override

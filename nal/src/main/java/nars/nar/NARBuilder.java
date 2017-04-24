@@ -93,9 +93,9 @@ public interface NARBuilder {
                 ,time,
                 exe) {
 
-//            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
-//                return new PLinkHijackBag(initialCapacity, reprobes);
-//            }
+            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+                return new PLinkHijackBag(initialCapacity, reprobes);
+            }
 
 //            @Override
 //            public Deriver newDeriver() {

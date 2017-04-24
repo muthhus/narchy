@@ -107,7 +107,7 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
                 return i;
             }
 
-            displaced = items.removeWeakest(); //remove last
+            displaced = items.removeLast(); //remove last
         }
 
         items.add(i, this);

@@ -116,7 +116,7 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
         tt.nar.time.dur(25);
-        tt.nar.termVolumeMax.setValue(30);
+        tt.nar.termVolumeMax.setValue(40);
 
         //tt.log();
         tt.input(

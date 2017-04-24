@@ -15,6 +15,7 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.index.TermBuilder.imageUnwrap;
+import static nars.io.NarseseTest.assertInvalidTasks;
 import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.term.TermTest.*;
 import static org.junit.Assert.*;
@@ -603,19 +604,17 @@ public class TermReductionsTest {
         assertValid($("((--,(a)) <=>+1 (a))"));
 
         //due to the unpaired $3
-        assertInvalid("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz))))");
+        assertInvalidTasks("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz)))).");
     }
 
     @Test
     public void testEquivCommonSubterms() throws Narsese.NarseseException {
         //factor out the common sub-term
         assertEquals(
-                "((--,isIn($1,xyz))<=>(x:y))",
+                "(--,(isIn($1,xyz)<=>((y-->x))))", //involves an additional negation factoring out to top level
                 $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
 
-        //negated common subterm is invalid
-        assertInvalid(
-                "(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(x:y)))");
+
     }
 
     @Test public void testCoNegatedImplOK() throws Narsese.NarseseException {
@@ -833,9 +832,9 @@ public class TermReductionsTest {
 
     @Test public void reduceComplex() throws Narsese.NarseseException {
         String s = "(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&((x-->tetris)&&((rotate-->tetris)&&(x-->tetris))))))))";
-        System.out.println(s);
+
         Term t = $(s);
-        System.out.println(t);
+
         assertEquals("(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&(x-->tetris))))))", t.toString());
     }
 }

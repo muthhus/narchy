@@ -83,7 +83,7 @@ public class Leak<X, Y> {
                             float cost = onOut(v);
                             assert(cost <= minBudget);
                             float spe = spent[0] + cost;
-                            if (spe <= budget) {
+                            if (spe < budget) {
                                 spent[0] = spe;
                                 return Bag.BagCursorAction.Remove; //continue
                             } else {

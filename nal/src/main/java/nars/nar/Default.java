@@ -2,6 +2,7 @@ package nars.nar;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.random.XorShift128PlusRandom;
@@ -100,12 +101,12 @@ public class Default extends NAR {
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
 
-//        return new PLinkHijackBag(initialCapacity, 4);
-        return new CurveBag<>(initialCapacity, PriMerge.plus,
-                exe.concurrent() ?
-                    new ConcurrentHashMap<>(initialCapacity, 0.9f) :
-                    new HashMap<>(initialCapacity, 0.9f)
-        );
+        return new PLinkHijackBag(initialCapacity, 4);
+//        return new CurveBag<>(initialCapacity, PriMerge.plus,
+//                exe.concurrent() ?
+//                    new ConcurrentHashMap<>(initialCapacity, 0.9f) :
+//                    new HashMap<>(initialCapacity, 0.9f)
+//        );
 
     }
 

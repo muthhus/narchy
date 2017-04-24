@@ -6,6 +6,7 @@ import com.lmax.disruptor.dsl.EventHandlerGroup;
 import com.lmax.disruptor.dsl.ProducerType;
 import jcog.AffinityExecutor;
 import nars.NAR;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -249,7 +250,8 @@ public class MultiThreadExecutor extends Executioner  {
                     ((Consumer) val).accept(nar);
                 }
             } catch (Throwable t) {
-                logger.error("{}: {}", this, t);
+                if (Param.DEBUG)
+                    logger.error("{} {} ", val, t);
             }
         }
 

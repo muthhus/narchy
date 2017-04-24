@@ -45,7 +45,7 @@ import java.util.function.IntFunction;
  * @param <E>
  * @author Andreas Hollmann
  */
-abstract public class SortedArray<E> implements Iterable<E> {
+public class SortedArray<E> implements Iterable<E> {
 
 
     final static Object[] zeroList = new Object[0];
@@ -158,7 +158,11 @@ abstract public class SortedArray<E> implements Iterable<E> {
 
 
     public SortedArray() {
-        this.list = (E[]) zeroList; //builder.apply(initialCapacity);
+        this((E[]) zeroList); //builder.apply(initialCapacity);
+    }
+
+    public SortedArray(E[] array) {
+        this.list = array;
     }
 
 
@@ -263,13 +267,15 @@ abstract public class SortedArray<E> implements Iterable<E> {
     }
 
     /** generally, uses grow(oldSize) (not oldSize directly!) to get the final constructed array length */
-    abstract protected E[] newArray(int oldSize);
+    protected E[] newArray(int oldSize) {
+        throw new UnsupportedOperationException("impl in subclasses");
+    }
 
     protected static int grow(int oldSize) {
         return oldSize == 0 ? 4 : oldSize * 2;
     }
 
-    public E removeWeakest() {
+    public E removeLast() {
         //if (size > 0)
         return this.list[--size];
         //else

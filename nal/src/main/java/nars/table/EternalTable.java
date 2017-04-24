@@ -85,7 +85,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
                 //TODO can be accelerated by batch remove operation
                 while (c < s--) {
-                    Task r = removeWeakest();
+                    Task r = removeLast();
                     r.delete();
                 }
             }
@@ -266,7 +266,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             Task weakestPresent = weakest();
             if (weakestPresent != null) {
                 if (floatValueOf(weakestPresent) <= floatValueOf(incoming)) {
-                    displaced = removeWeakest();
+                    displaced = removeLast();
                 } else {
                     return incoming; //insufficient confidence
                 }

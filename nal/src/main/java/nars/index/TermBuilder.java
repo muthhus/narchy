@@ -24,6 +24,7 @@ import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.term.Terms.*;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 
 /**
@@ -321,7 +322,9 @@ public abstract class TermBuilder {
         return TermVector.the(s);
     }
 
-    /** directly constructs a new instance, applied at the end. */
+    /**
+     * directly constructs a new instance, applied at the end.
+     */
     protected Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
         return new GenericCompound(op, dt, subterms);
     }
@@ -398,7 +401,7 @@ public abstract class TermBuilder {
     public Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
 
         int s = args.length;
-        assert(s!=0);
+        assert (s != 0);
 
 
 //        if (s < op.minSize) {
@@ -477,7 +480,7 @@ public abstract class TermBuilder {
 
         Term y = compound(NEG, DTERNAL, x);
         if (y instanceof Compound && x.isNormalized()) {
-            ((Compound)y).setNormalized(); //share normalization state
+            ((Compound) y).setNormalized(); //share normalization state
         }
         return y;
     }
@@ -550,7 +553,7 @@ public abstract class TermBuilder {
         } else {
             //NON-COMMUTIVE
 
-            assert(n==2);
+            assert (n == 2);
 
             Term a = u[0];
             Term b = u[1];
@@ -564,7 +567,9 @@ public abstract class TermBuilder {
                 if (a.compareTo(b) > 0) {
                     //ensure lexicographic ordering
 
-                    Term x = u[0]; u[0] = u[1]; u[1] = x; //swap
+                    Term x = u[0];
+                    u[0] = u[1];
+                    u[1] = x; //swap
                     dt = -dt; //and invert time
                 }
             }
@@ -580,7 +585,7 @@ public abstract class TermBuilder {
      * flattening conjunction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
      */
     @NotNull
-    private Term junctionFlat( int dt, @NotNull Term... u) {
+    private Term junctionFlat(int dt, @NotNull Term... u) {
 
         if (u.length == 0)
             return False;
@@ -588,7 +593,7 @@ public abstract class TermBuilder {
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
 
-        Set<Term> s = new LinkedHashSet<>(u.length*2);
+        Set<Term> s = new LinkedHashSet<>(u.length * 2);
 
         flatten(CONJ, u, dt, s);
 
@@ -663,8 +668,8 @@ public abstract class TermBuilder {
                         break;
                 }
             }
-            if (toOuter!=null) {
-                if (outer == null) outer =  new UnifiedSet(2);
+            if (toOuter != null) {
+                if (outer == null) outer = new UnifiedSet(2);
                 outer.add(x);
             }
         }
@@ -697,6 +702,7 @@ public abstract class TermBuilder {
             flatten(op, dt, s, x);
         }
     }
+
     private static void flatten(@NotNull Op op, @NotNull TermContainer u, int dt, @NotNull Set<Term> s) {
         for (Term x : u) {
             flatten(op, dt, s, x);
@@ -711,7 +717,7 @@ public abstract class TermBuilder {
             if (!s.isEmpty()) {
                 if (s.remove(
                         $.neg(x) //construct on stack
-                    )) {
+                )) {
                     //co-negation detected, skip this term
                     return;
                 }
@@ -721,26 +727,15 @@ public abstract class TermBuilder {
     }
 
 
-
     @NotNull
     private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
 
-        statement:
         while (true) {
-
 
             while (true) {
 
-
-//                //if either the subject or pred are True/False, then they collapse ot True if they are equal or False otherwise
-//                if (subjTrue || isFalse(subject) || isTrueOrFalse(predicate)) {
-//                    return subject == predicate ? True : False;
-//                }
-
-                boolean mustNotEqual = true, mustNotContain = true;
-
-                Op sop = subject.op();
+                boolean mustNotEqual = true;
 
                 switch (op) {
 
@@ -780,13 +775,16 @@ public abstract class TermBuilder {
                             return compound(op, dt, subject, predicate);
                         }
 
-                        if ((dt != 0 && dt != DTERNAL)) {
+                        boolean equal = subject.equals(predicate);
+                        if (!commutive(dt)) {
                             mustNotEqual = false; //allow repeat
-                            if (dt < 0 && subject.equals(predicate)) {
+                            if (dt < 0 && equal) {
                                 dt = -dt; //use only the forward direction on a repeat
                             }
-                        } else if (subject.equals(predicate)) {
-                            return True;
+                        } else {
+                            if (equal) {
+                                return True;
+                            }
                         }
 
                         if (isTrue(subject)) return predicate;
@@ -799,39 +797,43 @@ public abstract class TermBuilder {
                         if (!validEquivalenceTerm(predicate))
                             throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
-                        {
-                            boolean subjNeg = sop == NEG;
-                            boolean predNeg = predicate.op() == NEG;
-                            if (subjNeg && predNeg) {
-                                subject = subject.unneg();
-                                predicate = predicate.unneg();
-                                continue statement;
-                            } else if (!subjNeg && predNeg) {
-                                return neg(statement(op, dt, subject, predicate.unneg()));
-                            } else if (subjNeg && !predNeg) {
-                                return neg(statement(op, dt, subject.unneg(), predicate));
-                            }
+
+                        boolean subjNeg = subject.op() == NEG;
+                        boolean predNeg = predicate.op() == NEG;
+                        if (subjNeg && predNeg) {
+                            subject = subject.unneg();
+                            predicate = predicate.unneg();
+                        } else if (!subjNeg && predNeg) {
+                            //factor out (--, ...)
+                            return neg(statement(op, dt, subject, predicate.unneg()));
+                        } else if (subjNeg && !predNeg) {
+                            //factor out (--, ...)
+                            return neg(statement(op, dt, subject.unneg(), predicate));
                         }
+
 
                         break;
                     }
 
                     case IMPL:
 
-
                         if ((dt != 0 && dt != DTERNAL)) {
                             mustNotEqual = false; //allow repeat
-                            mustNotContain = false;
+                            //mustNotContain = false;
                         } else if (subject.equals(predicate)) {
                             return True;
                         }
+                        if (dt == XTERNAL) {
+                            //create as-is
+                            return compound(op, dt, subject, predicate);
+                        }
 
                         //special case for implications: reduce to --predicate if the subject is False
-                        if (isTrue(subject))
+                        if (isTrue(subject /* antecdent */))
                             return predicate; //special case for implications: reduce to predicate if the subject is True
                         if (isFalse(subject))
                             return False;
-                        if (isTrueOrFalse(predicate))
+                        if (isTrueOrFalse(predicate /* consequence */))
                             return False;
 
                         if (predicate.op() == NEG) {
@@ -839,38 +841,7 @@ public abstract class TermBuilder {
                             return neg(the(op, dt, subject, predicate.unneg()));
                         }
 
-                        //filter (factor out) any common subterms iff commutive
-                        boolean subjNeg = sop == NEG;
-                        Term usub = subject.unneg();
-                        if ((usub.op() == CONJ) && (predicate.op() == CONJ)) {
-                            Compound csub = (Compound) usub;
-                            Compound cpred = (Compound) predicate;
-                            if (commutive(dt)) {
 
-                                TermContainer subjs = csub.subterms();
-                                TermContainer preds = cpred.subterms();
-
-                                MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                                if (common!=null) {
-                                    int commonSize = common.size();
-                                    if (commonSize > 0) {
-
-                                        if (commonSize == preds.size())
-                                            return False; //shortcut: predicate was entirely removed
-
-                                        subject = commonSize != subjs.size() ? the(csub, TermContainer.toSetExcept(subjs, common)) : False;
-                                        if (subjNeg)
-                                            subject = neg(subject); //reapply negation
-
-                                        if (isFalse(subject))
-                                            return False; //shortcut: subject is False, means this will reduce to False regardless
-
-                                        predicate = the(cpred, TermContainer.toSetExcept(preds, common));
-                                        continue;
-                                    }
-                                }
-                            }
-                        }
 
                         // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
                         if (predicate.op() == IMPL) {
@@ -883,14 +854,12 @@ public abstract class TermBuilder {
                             subject = conj(dt, subject, a);
                             predicate = pred(predicate);
                             dt = newDT;
-                            continue;
-
                         }
 
 
-                        if (subject.isAny(InvalidImplicationSubject))
+                        if (subject.opUnneg().in(InvalidImplicationSubject))
                             throw new InvalidTermException(op, dt, "Invalid implication subject", subject, predicate);
-                        if (predicate.isAny(InvalidImplicationPredicate))
+                        if (predicate.opUnneg().in(InvalidImplicationPredicate))
                             throw new InvalidTermException(op, dt, "Invalid implication predicate", subject, predicate);
 
                         break;
@@ -905,13 +874,69 @@ public abstract class TermBuilder {
                     }
                 }
 
-                if (mustNotContain) {
-                    if ((subject instanceof Compound && subject.varPattern() == 0 && subject.contains(predicate)) ||
-                            (predicate instanceof Compound && predicate.varPattern() == 0 && predicate.contains(subject))) {
-                        return False; //self-reference
+
+                //factor out any common subterms iff commutive
+                if (commutive(dt)) {
+                    if ((op == IMPL || op == EQUI)) {
+//                        boolean subjNeg = subject.op() == NEG;
+//                        Term usub = subjNeg ? subject.unneg() : subject;
+                        if ((subject.op() == CONJ && commutive(((Compound)subject).dt()) ) && (predicate.op() == CONJ && commutive(((Compound)predicate).dt()))) {
+                            final Compound csub = (Compound) subject;
+                            final Compound cpred = (Compound) predicate;
+
+
+                            TermContainer subjs = csub.subterms();
+                            TermContainer preds = cpred.subterms();
+
+                            MutableSet<Term> common = TermContainer.intersect(subjs, preds);
+                            if (common != null && !common.isEmpty()) {
+
+                                {
+                                    @NotNull Set<Term> sss = subjs.toSet();
+                                    if (sss.removeAll(common)) {
+                                        int s0 = sss.size();
+                                        switch (s0) {
+                                            case 0:
+                                                subject = True;
+                                                break;
+                                            case 1:
+                                                subject = sss.iterator().next();
+                                                break;
+                                            default:
+                                                subject = the(CONJ, csub.dt(), sss);
+                                                break;
+                                        }
+                                    }
+                                }
+
+                                {
+                                    @NotNull Set<Term> ppp = preds.toSet();
+                                    if (ppp.removeAll(common)) {
+                                        int s0 = ppp.size();
+                                        switch (s0) {
+                                            case 0:
+                                                predicate = True;
+                                                break;
+                                            case 1:
+                                                predicate = ppp.iterator().next();
+                                                break;
+                                            default:
+                                                predicate = the(CONJ, cpred.dt(), ppp);
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
+                if (op == INH || op == SIM || dt == 0 || dt == DTERNAL) {
+                    if ((subject instanceof Compound && subject.varPattern() == 0 && subject.containsRecursively(predicate)) ||
+                            (predicate instanceof Compound && predicate.varPattern() == 0 && predicate.containsRecursively(subject))) {
+                        return False; //self-reference
+                    }
+                }
 
                 if (op.commutative) {
 
@@ -1061,13 +1086,12 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s==null || s.isEmpty() ? False : (Compound) finalize(o, s);
+        return s == null || s.isEmpty() ? False : (Compound) finalize(o, s);
     }
 
 
     @NotNull
     public Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-
         if (a.equals(b))
             return a;
 
@@ -1193,9 +1217,8 @@ public abstract class TermBuilder {
                 throw new InvalidTermException("unable to atemporalize", c);
 
 
-
             //if (c.isNormalized())
-                //xx.setNormalized();
+            //xx.setNormalized();
 
             //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
             //if (exxist!=null)
