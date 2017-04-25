@@ -53,7 +53,7 @@ public class EllipsisTransformTest {
                 $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
         Object tt = ((Compound)u).sub(0);
 
-        assertEquals("(%1747846151..%2=_..+)", u.toString());
+        assertEquals("(%1074136071..%2=_..+)", u.toString());
 
         EllipsisTransform ttt = (EllipsisTransform) tt;
         assertEquals($.$("%2").toString(), ttt.from.toString());

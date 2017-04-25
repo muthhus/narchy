@@ -566,7 +566,7 @@ public interface TimeFunctions {
                                 if (derivedInBelief != DTERNAL) {
                                     int taskInBelief = rDecomposed.subtermTime(rOtherTerm);
                                     if (taskInBelief != DTERNAL) {
-                                        occ = occOther /* task occ */ + derivedInBelief - taskInBelief;
+                                        occ = occOther /* task occ */ + derivedInBelief - taskInBelief - derived.dtRange();
                                     }
                                 }
                             }
