@@ -8,12 +8,10 @@ import nars.term.Term;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
 import nars.term.transform.Functor;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.ToIntFunction;
 

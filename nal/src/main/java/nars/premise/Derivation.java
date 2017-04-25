@@ -1,13 +1,10 @@
 package nars.premise;
 
 import jcog.version.Versioned;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.derive.meta.BoolPred;
-import nars.derive.meta.constraint.MatchConstraint;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Subst;
@@ -17,8 +14,6 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;

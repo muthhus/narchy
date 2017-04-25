@@ -10,9 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -134,9 +132,11 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         if (n == 0)
             return Collections.emptyList();
 
-        List<V> l = new FasterList(n);
-        sample(n, (Predicate<? super V>) l::add);
-        return l;
+        Set<V> l = new HashSet(n);
+        sample(n, x -> {
+            l.add(x);
+        });
+        return new FasterList<>(l);
     }
 
 

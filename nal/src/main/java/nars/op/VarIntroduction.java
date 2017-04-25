@@ -6,11 +6,11 @@ import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.collections4.map.Flat3Map;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 

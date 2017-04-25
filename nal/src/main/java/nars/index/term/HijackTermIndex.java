@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.term.Term;

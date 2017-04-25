@@ -1,7 +1,5 @@
 package nars;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;
@@ -14,9 +12,7 @@ import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
-import com.google.common.collect.ImmutableList;
 import jcog.Texts;
-import jcog.bag.impl.hijack.HijackMemoize;
 import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.TermBuilder;
@@ -33,8 +29,6 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DefaultTruth;
 import nars.truth.Truth;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +36,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static nars.$.newArrayList;
 import static nars.Op.*;

@@ -1504,6 +1504,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         forEachTask(_x -> {
             total.increment();
             Task x = post(_x);
+            if (x.truth()!=null && x.conf() < confMin.floatValue())
+                return; //ignore task if it is below confMin
+
             x = each.apply(x);
             if (x != null) {
                 byte[] b = IO.taskToBytes(x);

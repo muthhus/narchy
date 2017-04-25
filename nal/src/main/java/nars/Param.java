@@ -139,7 +139,7 @@ public abstract class Param  {
      * truth confidence threshold necessary to form tasks
      */
     @NotNull
-    public final FloatParam confMin = new FloatParam(0.01f, TRUTH_EPSILON, 1f);
+    public final FloatParam confMin = new FloatParam(TRUTH_EPSILON, TRUTH_EPSILON, 1f);
 
 
     /**

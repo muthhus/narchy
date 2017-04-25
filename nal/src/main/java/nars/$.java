@@ -16,8 +16,6 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.LambdaPred;
-import nars.index.term.ProtoCompound;
-import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -528,14 +526,16 @@ public enum $ {
         logEncoder.setContext(loggerContext);
         //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
         logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setImmediateFlush(false);
+
         logEncoder.start();
+
 
 
         {
             ConsoleAppender c = new ConsoleAppender();
             c.setContext(loggerContext);
             c.setEncoder(logEncoder);
+            c.setImmediateFlush(false);
             //c.setWithJansi(true);
             c.start();
 

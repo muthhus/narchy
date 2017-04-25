@@ -5,7 +5,6 @@ import nars.Op;
 import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
-import nars.derive.Deriver;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;

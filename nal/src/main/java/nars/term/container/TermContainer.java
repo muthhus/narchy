@@ -868,16 +868,21 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      */
     @NotNull
     default public Term[] toArraySubRange(int from, int to) {
-        int s = to - from;
+        if (from == 0 && to == size()) {
+            return toArray();
+        } else {
 
-        Term[] l = new Term[to - from];
+            int s = to - from;
 
-        int x = 0, y = from;
-        for (int i = 0; i < s; i++) {
-            l[x++] = sub(y++);
+            Term[] l = new Term[to - from];
+
+            int x = 0, y = from;
+            for (int i = 0; i < s; i++) {
+                l[x++] = sub(y++);
+            }
+
+            return l;
         }
-
-        return l;
     }
 
 }

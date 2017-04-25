@@ -4,16 +4,14 @@ import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.concept.CompoundConcept;
 import nars.term.Compound;
-import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.*;
+import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 
 

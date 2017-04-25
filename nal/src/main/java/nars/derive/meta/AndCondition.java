@@ -47,8 +47,9 @@ public final class AndCondition extends GenericCompound implements BoolPred<Deri
 //            if (!b)
 //                System.out.println("fail: " + m.task + " " + m.beliefTerm + "\t" + x);
 
-            if (!b)
+            if (!b) {
                 return false;
+            }
         }
         return true;
     }

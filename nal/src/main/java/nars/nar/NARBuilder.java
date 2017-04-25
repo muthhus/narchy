@@ -1,32 +1,24 @@
 package nars.nar;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
-import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
 import java.util.Random;
-import java.util.function.BiFunction;
 
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;

@@ -5,7 +5,8 @@ import nars.term.Compound;
 import org.junit.Test;
 
 import static nars.$.$;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 2/19/17.

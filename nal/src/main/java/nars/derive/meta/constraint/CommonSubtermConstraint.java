@@ -14,11 +14,13 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
         super("neqAndCom", target, x);
     }
 
-    @NotNull
     @Override
     protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-        //return x.op().var || y.containsTermRecursively(x);
         return !TermContainer.commonSubtermsRecurse(x, y, true);
+    }
+    @Override protected boolean invalid(Term x, Compound y) {
+
+        return y.contains(x);
     }
 
 

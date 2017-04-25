@@ -58,7 +58,5 @@ public abstract class CommonalityConstraint extends MatchConstraint {
 
     @NotNull protected abstract boolean invalid(Compound x, Compound y);
 
-    @NotNull protected boolean invalid(Term x, Compound y) {
-        return y.contains(x);
-    }
+    @NotNull protected abstract boolean invalid(Term x, Compound y);
 }

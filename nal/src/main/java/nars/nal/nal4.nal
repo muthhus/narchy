@@ -20,8 +20,9 @@
 
 
 ////composition on both sides of a statement  TODO - quests handling of these
-    ((A..+) --> Y), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    (X --> (A..+)), (X --> Y), task("?") |- (substitute((A..+),X,Y,strict) --> (A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((A..+) --> Z), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+        //contains(A..+,X),
+    (Z --> (A..+)), (X --> Y), task("?") |- (substitute((A..+),X,Y,strict) --> (A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
     ((A..+) <-> Z), (X <-> Y), task("?") |- ((A..+) <-> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         //this one needs reviewed, it might need to be subIfUnified, and other problems

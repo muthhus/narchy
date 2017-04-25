@@ -10,6 +10,7 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -64,8 +65,9 @@ public class bAblTests extends AbstractNALTest {
                 .inputAt(0, "pick(john,football).") ////John picked up the football.
                 .inputAt(0, "isIn(bob,kitchen).") ////Bob went to the kitchen.
                 .inputAt(0, "isIn(football,#where)?") ////Where is the football?
-                .mustBelieve(2000, "isIn(football,playground)",
-                        1f, 0.40f, ETERNAL); ////A: playground
+                .mustOutput(0, 2000,
+                        "isIn(football,playground)",BELIEF,
+                        1f,1f, 0.1f, 0.40f, ETERNAL); ////A: playground
 
     }
 

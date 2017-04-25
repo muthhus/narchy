@@ -3,26 +3,23 @@ package nars.premise;
 import jcog.pri.PLink;
 import jcog.pri.Priority;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 import static jcog.Util.or;
 import static nars.Op.NEG;
+import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.aveAri;
 
 
 public enum PremiseBuilder { ;
@@ -179,7 +176,7 @@ public enum PremiseBuilder { ;
             return a; //fast-fail: no chance
 
         final Compound[] result = { a };
-        new UnifySubst(null /* all variables */, nar, (aa) -> {
+        new UnifySubst(VAR_QUERY, nar, (aa) -> {
             if (aa instanceof Compound) {
 
                 aa = aa.eval(nar.concepts);

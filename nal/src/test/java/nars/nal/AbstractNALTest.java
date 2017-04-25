@@ -38,6 +38,9 @@ public abstract class AbstractNALTest {
     public final TestNAR test() {
         return tester;
     }
+    public final TestNAR test(NAR n) {
+        return new TestNAR(n);
+    }
 
 
     public NAR nar() {

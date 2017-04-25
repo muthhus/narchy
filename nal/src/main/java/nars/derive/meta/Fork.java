@@ -17,9 +17,9 @@ import static nars.time.Tense.DTERNAL;
 public class Fork extends GenericCompound implements BoolPred<Derivation> {
 
     @NotNull
-    public final BoolPred[] cached;
+    public final BoolPred<Derivation>[] cached;
 
-    protected Fork(@NotNull BoolPred[] actions) {
+    public Fork(@NotNull BoolPred[] actions) {
         super(CONJ, TermContainer.the(CONJ, DTERNAL, (Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
@@ -50,7 +50,7 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
         return compile(t.toArray(new BoolPred[t.size()]));
     }
 
-    @Nullable public static BoolPred compile(@NotNull BoolPred<Derivation>[] n) {
+    @Nullable public static BoolPred<Derivation> compile(@NotNull BoolPred<Derivation>[] n) {
         switch (n.length) {
             case 0: return null;
             case 1: return n[0];

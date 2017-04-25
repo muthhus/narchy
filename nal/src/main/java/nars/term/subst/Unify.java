@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static nars.Op.SUBTERMS;
+import static nars.Op.VAR_PATTERN;
 import static nars.Param.MaxMatchConstraintsPerVariable;
 
 
@@ -202,7 +204,9 @@ public abstract class Unify implements Termutator, Subst {
 
     public final boolean matchType(@NotNull Op oy) {
         Op t = this.type;
-        return t == null ? oy.var : oy == t;
+        if (t == null) return oy.var; //any variable
+        else
+            return oy == t;
     }
 
     /**

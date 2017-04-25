@@ -2,7 +2,11 @@ package nars.nal.nal4;
 
 import nars.NAR;
 import nars.Narsese;
+import nars.derive.Deriver;
+import nars.derive.TrieDeriver;
+import nars.derive.rule.PremiseRuleSet;
 import nars.nal.AbstractNALTest;
+import nars.nar.Default;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.junit.Ignore;
@@ -237,11 +241,28 @@ public class NAL4Test extends AbstractNALTest {
 
     @Test public void testCompositionFromProductInh() throws nars.Narsese.NarseseException {
         //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+//        Default d = new Default() {
+//            @Override
+//            public Deriver newDeriver() {
+//                try {
+//                    return TrieDeriver.get(
+//                        new PremiseRuleSet(PremiseRuleSet.parse(
+//                            "((%A..+) --> %Z), (%X --> %Y), task(\"?\") |- ((%A..+) --> substitute((%A..+),%X,%Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)\n")));
+//                } catch (Narsese.NarseseException e) {
+//                    e.printStackTrace();
+//                    return null;
+//                }
+//            }
+//
+//        };
+//        tester = test(d)
         test()
+                .log()
                 .believe("(soda --> acid)",1.0f,0.9f)
                 .ask("((drink,soda) --> ?death)")
                 .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);
     }
+
     @Test public void testCompositionFromProductSim() throws nars.Narsese.NarseseException {
         test()
                 .believe("(soda <-> deadly)",1.0f,0.9f)

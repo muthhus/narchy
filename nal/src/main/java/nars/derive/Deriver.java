@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Implements a strategy for managing submitted derivation processes
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
  *
  * TODO remove Deriver and just consider any BoolPred<Derivation> a deriver
  */
-public interface Deriver extends BoolPred<Derivation> {
+public interface Deriver extends Predicate<Derivation> {
 
     //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
 

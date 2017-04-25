@@ -1,11 +1,9 @@
 package nars.term.subst;
 
 import nars.Op;
-import nars.Param;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.PatternTermIndex;
-import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
 import nars.premise.Derivation;
 import nars.term.Compound;

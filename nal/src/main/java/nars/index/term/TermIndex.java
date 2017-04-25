@@ -3,20 +3,15 @@ package nars.index.term;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
-import nars.Param;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
-import nars.derive.meta.match.EllipsisMatch;
 import nars.index.TermBuilder;
-import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
-import nars.term.subst.Subst;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -29,7 +24,6 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

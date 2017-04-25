@@ -1,7 +1,6 @@
 package nars.term.transform;
 
 import nars.$;
-import nars.Op;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;

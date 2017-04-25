@@ -1,10 +1,8 @@
 package nars.nar;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
@@ -25,7 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 

@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.trie.TrieNode;
 import nars.$;
 import nars.Op;
@@ -8,10 +9,10 @@ import nars.derive.meta.*;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.derive.meta.op.MatchOneSubtermPrototype;
-import nars.derive.meta.op.MatchTerm;
 import nars.derive.meta.op.MatchTermPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
+import nars.premise.Derivation;
 import nars.term.Term;
 import nars.util.TermTrie;
 import org.jetbrains.annotations.NotNull;
@@ -30,13 +31,10 @@ import java.util.stream.Collectors;
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
  */
-public class TrieDeriver extends Fork implements Deriver {
+public class TrieDeriver implements Deriver {
 
     public final PremiseRuleSet rules;
-
-    public BoolPred[] roots() {
-        return cached;
-    }
+    private BoolPred<Derivation> pred;
 
 
     /**
@@ -80,9 +78,14 @@ public class TrieDeriver extends Fork implements Deriver {
 //        this(new PremiseRuleSet(Lists.newArrayList(rule)));
 //    }
 
-    public TrieDeriver(BoolPred[] root) {
-        super(root);
+    public TrieDeriver(BoolPred... root) {
+        this.pred = Fork.compile(root);
         this.rules = null;
+    }
+
+    @Override
+    public boolean test(Derivation d) {
+        return pred.test(d);
     }
 
     public static TrieDeriver get(@NotNull PremiseRuleSet ruleset) {
@@ -99,10 +102,7 @@ public class TrieDeriver extends Fork implements Deriver {
             roots[i] = c.build(roots[i]);
         }
 
-        assert(roots.length > 1);
-        Fork y = (Fork) Fork.compile(roots);
-
-        return new TrieDeriver(y.cached);
+        return new TrieDeriver(Fork.compile(roots));
 
         /*
         for (ProcTerm<PremiseMatch> p : roots) {
@@ -116,52 +116,67 @@ public class TrieDeriver extends Fork implements Deriver {
         */
     }
 
-//    private enum Next {
-//        Pop, Push
+//    static class StackFrame {
+//        private final int i;
+//        int version;
+//        BoolPred<Derivation> op;
+//
+//        public StackFrame(BoolPred<Derivation> op, int now, int i) {
+//            this.version = now;
+//            this.op = op;
+//            this.i = i;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "StackFrame{" +
+//                    "i=" + i +
+//                    ", version=" + version +
+//                    ", op=" + op.getClass() +
+//                    '}';
+//        }
 //    }
 //
+//    /* one-method interpreter, doesnt recursive call but maintains its own stack */
 //    @Override
-//    public final void accept(@NotNull Derivation d) {
-//        FasterList<BoolPred<Derivation>> stack = $.newArrayList(16);
-//        BoolPred b = rootsForked;
+//    public boolean test(@NotNull Derivation m) {
+//
+//        FasterList<StackFrame> stack = new FasterList(16);
+//
+//        BoolPred<Derivation> cur = this;
+//        int i = 0;
+//        //StackFrame x = new StackFrame(this, m.now(), 0);
+//        BoolPred[] and = new BoolPred[]{this};
+//
+//        main:
 //        do {
-//            Next next = null;
-//            if (b instanceof Fork) {
 //
-//                int now = d.now();
-//                for (BoolPred bf : ((Fork)b).termCache) {
-//                    bf.test(d);
-//                    d.revert(now);
+//            System.out.println(stack);
+//
+//
+//            BoolPred y = and[i++];
+//            if (y instanceof Fork) {
+//                cur = y;
+//                Fork f = (Fork) cur;
+//                if (i == f.cached.length) {
+//                    StackFrame pop = stack.removeLast();
+//                    m.revert(pop.version);
+//                    cur = pop.op;
+//                    i = pop.i;
+//                    continue;
+//                } else if (i == 0) {
+//                    stack.add(new StackFrame(f, m.now(), i)); //save
 //                }
-//
-//            } else if (b instanceof AndCondition) {
-//
+//                cur = f.cached[i++];
 //            } else {
-//                if (!b.test(d))
-//                    next = Pop;
+//                if (!y.test(m))
+//                    break main;
 //            }
 //
-//            switch (next) {
-//                case Pop:
-//                    if (stack.isEmpty()) {
-//                        break;
-//                    } else {
-//                        b = stack.removeLast();
-//                    }
-//                    break;
+//        } while (!stack.isEmpty());
 //
-//            }
-//
-//
-//        } while (b!=null);
+//        return true;
 //    }
-
-
-//    /**
-//     * HACK warning: use of this singular matchParent tracker is not thread-safe. assumes branches will be processed in a linear, depth first order
-//     */
-//    @NotNull
-//    final transient AtomicReference<MatchTermPrototype> matchParent = new AtomicReference<>(null);
 
 
     public static void print(Object p, @NotNull PrintStream out, int indent) {
@@ -242,12 +257,14 @@ public class TrieDeriver extends Fork implements Deriver {
     }
 
     public void print(@NotNull PrintStream out) {
-        out.println("Fork {");
+        print(pred, out, 0);
 
-        for (BoolPred p : roots())
-            print(p, out, 2);
-
-        out.println("}");
+//        out.println("Fork {");
+//
+//        for (BoolPred p : roots())
+//            print(p, out, 2);
+//
+//        out.println("}");
     }
 
     static class Compiler {
@@ -484,7 +501,9 @@ public class TrieDeriver extends Fork implements Deriver {
             //        }
         }
 
-        /** combine certain types of items in an AND expression */
+        /**
+         * combine certain types of items in an AND expression
+         */
         static List<BoolPred> compileAnd(List<BoolPred> ccc) {
             if (ccc.size() == 1)
                 return ccc;
@@ -494,7 +513,7 @@ public class TrieDeriver extends Fork implements Deriver {
             while (il.hasNext()) {
                 BoolPred c = il.next();
                 if (c instanceof MatchConstraint) {
-                    constraints.add((MatchConstraint)c);
+                    constraints.add((MatchConstraint) c);
                     il.remove();
                 }
             }

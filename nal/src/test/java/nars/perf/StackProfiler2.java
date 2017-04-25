@@ -1,6 +1,5 @@
 package nars.perf;
 
-import com.google.common.base.Joiner;
 import jcog.Texts;
 import jcog.list.FasterList;
 import jcog.trie.Trie;
@@ -11,7 +10,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
-import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.eclipse.collections.impl.factory.Sets;

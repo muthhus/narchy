@@ -8,7 +8,6 @@ import jcog.data.sorted.SortedArray;
 import jcog.event.On;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
-import jcog.pri.Prioritized;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;
