@@ -342,7 +342,6 @@ public class StackProfiler2 implements InternalProfiler {
             });
 
             String s = sb.toString();
-            System.out.println(s);
             return s;
 
 //            List<Thread.State> sortedStates = new ArrayList<>(stacks.keySet());

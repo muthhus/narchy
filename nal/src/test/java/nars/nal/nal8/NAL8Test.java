@@ -93,9 +93,9 @@ public class NAL8Test extends AbstractNALTest {
                 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
-                //.mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal  // <-- the 2nd half should not be decomposed here
+                .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal  // <-- the 2nd half should not be decomposed here
                 .mustNotOutput(cycles, "open(t1)", GOAL,  ETERNAL, 5) //no eternal
-                .mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 5) //no eternal
+                //.mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 5) //no eternal
         ;
     }
 
@@ -235,10 +235,14 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void goal_deduction_equi_neg_posneg()  {
 
         test()
+                .log()
                 .input("--(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S <=> R)
-                .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0);
-
+                .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0 /* shifted to present */)
+                .mustNotOutput(cycles, "(S)", GOAL, 0f, 0.5f, 0f, 1f, 0)
+                .mustNotOutput(cycles, "(S)", GOAL, 0, 0.5f, 0f, 1f, -5)
+                .mustNotOutput(cycles, "(R)", GOAL, 0)
+        ;
     }
 
     @Test
@@ -691,7 +695,7 @@ public class NAL8Test extends AbstractNALTest {
         tester.input("(x:y <=>+0 c:d)."); //ETERNAL or Zero, for now dont allow time relation
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.mustBelieve(cycles, "(x:y &&+0 e:f)", 1.0f, 0.81f, 0);
-        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", BELIEF);
+        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", BELIEF, 0, ETERNAL);
     }
 
     @Test

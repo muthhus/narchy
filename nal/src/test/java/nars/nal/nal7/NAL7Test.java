@@ -74,7 +74,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0)
                 .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
                 .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
-                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF)
+                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF, 0, 10)
         ;
     }
 
@@ -573,14 +573,12 @@ public class NAL7Test extends AbstractNALTest {
     //    //TODO: investigate
     @Test
     public void variable_elimination_on_temporal_statements() {
-        TestNAR tester = test();
-
-
-        tester.input("(on:({t002},#1) &&+0 at:(SELF,#1)). :|:");
-        tester.inputAt(10, "((on:($1,#2) &&+0 at:(SELF,#2)) ==>+0 reachable:(SELF,$1)).");
-
-        tester.mustBelieve(cycles, "reachable:(SELF,{t002})",
-                1.0f, 0.81f, 0);
+        test()
+            .log()
+            .inputAt(0, "(on({t002},#1) &&+0 at(SELF,#1)). :|:")
+            .inputAt(10, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
+            .mustBelieve(cycles, "reachable(SELF,{t002})",
+                    1.0f, 0.81f, 0);
 
     }
 
@@ -961,9 +959,9 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(x ==>+2 a). :|:")
                 .input("(y ==>+3 a). :|:")
                 .mustBelieve(cycles, "((y &&+1 x) ==>+2 a)", 1.00f, 0.81f, 0) //correct conj sub-term DT
-                .mustNotOutput(cycles, "((x &&+1 y) ==>+2 a)", BELIEF)
-                .mustNotOutput(cycles, "((x && y) ==>+2 a)", BELIEF)
-                .mustNotOutput(cycles, "((x && y) ==>+3 a)", BELIEF);
+                .mustNotOutput(cycles, "((x &&+1 y) ==>+2 a)", BELIEF, 0, ETERNAL)
+                .mustNotOutput(cycles, "((x && y) ==>+2 a)", BELIEF, 0, ETERNAL)
+                .mustNotOutput(cycles, "((x && y) ==>+3 a)", BELIEF, 0, ETERNAL);
     }
 
     @Test

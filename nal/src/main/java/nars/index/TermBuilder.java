@@ -42,42 +42,6 @@ public abstract class TermBuilder {
     private static final int InvalidImplicationPredicate = or(EQUI, IMPL);
 
 
-    @NotNull
-    public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
-
-        if (a.equals(b))
-            return False; //empty set
-
-        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
-        if ((a.structure() & b.structure()) == 0) {
-            return a;
-        }
-
-        int size = a.size();
-        List<Term> terms = $.newArrayList(size);
-
-        for (int i = 0; i < size; i++) {
-            Term x = a.sub(i);
-            if (!b.contains(x)) {
-                terms.add(x);
-            }
-        }
-
-        int retained = terms.size();
-        if (retained == size) { //same as 'a'
-            return a;
-        } else if (retained == 0) {
-            return False; //empty set
-        } else {
-            return the(o, terms.toArray(new Term[retained]));
-        }
-
-    }
-
-    public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
-        int ss = sub.size();
-        return the(op, dt, sub.toArray(new Term[ss]));
-    }
 
     /**
      * main entry point for compound construction - creates an immutable result
@@ -1245,6 +1209,42 @@ public abstract class TermBuilder {
         } else {
             return c;
         }
+    }
+    @NotNull
+    public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
+
+        if (a.equals(b))
+            return False; //empty set
+
+        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
+        if ((a.structure() & b.structure()) == 0) {
+            return a;
+        }
+
+        int size = a.size();
+        List<Term> terms = $.newArrayList(size);
+
+        for (int i = 0; i < size; i++) {
+            Term x = a.sub(i);
+            if (!b.contains(x)) {
+                terms.add(x);
+            }
+        }
+
+        int retained = terms.size();
+        if (retained == size) { //same as 'a'
+            return a;
+        } else if (retained == 0) {
+            return False; //empty set
+        } else {
+            return the(o, terms.toArray(new Term[retained]));
+        }
+
+    }
+
+    public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
+        int ss = sub.size();
+        return the(op, dt, sub.toArray(new Term[ss]));
     }
 
 

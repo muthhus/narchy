@@ -51,11 +51,16 @@ public class GenericCompound implements Compound {
 
             int size = subterms.size();
 
-            if (op.image && ((dt < 0) || (dt > size)) && !(dt==DTERNAL && subterms.varPattern() > 0) )
-                throw new InvalidTermException(op, dt, "Invalid dt value for image " + op, subterms.toArray());
+            if (op.image) {
+                if (((dt < 0) || (dt > size)) && !(dt == DTERNAL && subterms.varPattern() > 0))
+                    throw new InvalidTermException(op, dt, "Invalid dt value for image", subterms.toArray());
+            } /*else {
+                if (subterms.containsRecursively(Op.Imdex))
+                    throw new InvalidTermException(op, dt, "Illegal Imdex in Subterms", subterms.toArray());
+            }*/
 
             if (op.temporal && (op != CONJ && size != 2))
-                throw new InvalidTermException(op, dt, "Invalid dt value for operator " + op, subterms.toArray());
+                throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
         }
 
         this.op = op;

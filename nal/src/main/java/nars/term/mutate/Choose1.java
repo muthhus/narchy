@@ -65,7 +65,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
         Term xEllipsis = this.xEllipsis;
         for (Term x = this.x; l >=0; l--) {
 
-            Term y = next(shuffle, l);
+            Term y = this.yy[(shuffle + l) % this.yy.length];
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y, m)))) {
                     f.mutate(chain, current);
@@ -80,10 +80,5 @@ public class Choose1 extends Termutator.AbstractTermutator {
         return true;
     }
 
-
-    private Term next(int shuffle, int permute) {
-        Term[] yy = this.yy;
-        return yy[(shuffle + permute) % yy.length];
-    }
 
 }

@@ -378,6 +378,7 @@ public class TestNAR {
      */
     @NotNull
     public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, byte punc, @NotNull long... occs) {
+        assert(occs.length > 0);
         for (long occ : occs)
             mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
         return this;

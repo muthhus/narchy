@@ -95,8 +95,8 @@ abstract public class substituteIfUnifies extends Functor {
         boolean strict = a.subEquals(3, substitute.STRICT);
         Term failureTerm = strict ? False : input;
 
-        if (y.equals(input))
-            return failureTerm;
+//        if (y.equals(input))
+//            return failureTerm;
         if (x.equals(y))
             return failureTerm; //unification would occurr but no changes would result
 
@@ -107,7 +107,7 @@ abstract public class substituteIfUnifies extends Functor {
                 (op!=null && x.hasAny(op));
 
         if (!hasAnyOp/* && mustSubstitute()*/) {
-            return failureTerm; //no change
+            return False; //no change
         }
 
         Term z = new SubUnify(parent, op).tryMatch(parent, input, x, y);

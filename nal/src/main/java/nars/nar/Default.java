@@ -81,8 +81,7 @@ public class Default extends NAR {
                 //:
                 new FireConcepts.FireConceptsDirect(newDeriver(), derivationBudgeting, this);
 
-        //used for both:
-        deriver.taskLinksFiredPerConcept.set(1, termLinksPerConcept);
+        deriver.taskLinksFiredPerConcept.set(1, 1);
         deriver.termLinksFiredPerTaskLink.set(1, termLinksPerConcept);
         deriver.rate.setValue(0.02f);
     }

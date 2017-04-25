@@ -82,7 +82,7 @@ public enum ImageMatch {
             } else {
                 //exclude any imdexes because the target is not an image
                 for (Term t : terms) {
-                    if (t!=Imdex) {
+                    if (!t.equals(Imdex)) {
                         target.add(t);
                     }
                 }

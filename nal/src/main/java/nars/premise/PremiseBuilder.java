@@ -176,7 +176,7 @@ public enum PremiseBuilder { ;
             return a; //fast-fail: no chance
 
         final Compound[] result = { a };
-        new UnifySubst(VAR_QUERY, nar, (aa) -> {
+        new UnifySubst(null, nar, (aa) -> {
             if (aa instanceof Compound) {
 
                 aa = aa.eval(nar.concepts);

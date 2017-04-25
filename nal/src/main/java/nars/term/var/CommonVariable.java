@@ -24,6 +24,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //            //System.out.println(v1 + " " + v2);
 //        }
 
+
         int a = A.id();
         int b = B.id();
 
@@ -32,7 +33,6 @@ public final class CommonVariable extends GenericNormalizedVariable {
         if (aCommon || bCommon) {
 
             if (aCommon && B instanceof AbstractVariable) {
-
                 //check to see if b is included in a
                 int a1 = multiVariable(a, true);
                 int a2 = multiVariable(a, false);

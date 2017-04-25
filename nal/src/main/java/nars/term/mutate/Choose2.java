@@ -75,8 +75,6 @@ public class Choose2 extends Termutator.AbstractTermutator {
         int[] c = null;
         while (ccc.hasNext() || !phase) {
 
-            if (!f.versioning.tick()) break;
-
             c = phase ? ccc.next() : c;
             phase = !phase;
 
@@ -98,8 +96,8 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
             }
 
-            f.revert(start);
-
+            if (!f.revert(start))
+                return false;
         }
 
         return true;

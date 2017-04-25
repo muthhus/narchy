@@ -47,7 +47,7 @@ public class SubUnify extends Unify {
                 s = this;
             }
 
-            result = s.transform(xterm, index);
+            result = transform(xterm, index);
         }
 
         return (result == null); //

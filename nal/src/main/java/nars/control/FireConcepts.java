@@ -82,10 +82,13 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         Concept c = pc.get();
         float cPri = pc.priSafe(0);
-        int numLinksSqr = taskLinksFiredPerConcept.lerp(cPri); //TODO see if there is a sqr/sqrt relationship that can be made
 
-        List<PLink<Task>> tasklinks = c.tasklinks().commit().sampleToList(numLinksSqr);
-        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(numLinksSqr);
+        List<PLink<Task>> tasklinks = c.tasklinks().commit().sampleToList(taskLinksFiredPerConcept.lerp(cPri));
+        if (tasklinks.isEmpty())
+            return 0;
+
+        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerTaskLink.lerp(cPri));
+
         final int[] count = {0};
 
         long now = nar.time();

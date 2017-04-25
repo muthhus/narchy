@@ -59,7 +59,7 @@ abstract public class Executioner implements Executor {
     abstract public void run(Runnable cmd);
 
 
-    /** a postive or negative value indicating the percentage difference from the
+    /** a positive or negative value indicating the percentage difference from the
      * currently configured CPU usage target to the actual measured CPU usage.
      *
      * tasks can use this value to determine runtime parameters.

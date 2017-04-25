@@ -15,6 +15,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 
 /**
  * K=key, V = item/value of type Item
@@ -132,11 +134,11 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         if (n == 0)
             return Collections.emptyList();
 
-        Set<V> l = new HashSet(n);
+        List<V> l = new FasterList(n);
         sample(n, x -> {
             l.add(x);
         });
-        return new FasterList<>(l);
+        return l;
     }
 
 

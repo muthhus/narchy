@@ -77,12 +77,12 @@ public final class DynTruth implements Truthed {
 
     @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, @Nullable Priority b, NAR nar) {
 
-        Priority priority = b != null ? b : budget();
-        if (priority == null || priority.isDeleted())
-            return null;
-
         Truth tr = truth();
         if (tr == null)
+            return null;
+
+        Priority priority = b != null ? b : budget();
+        if (priority == null || priority.isDeleted())
             return null;
 
         //HACK try to reconstruct the term because it may be invalid
