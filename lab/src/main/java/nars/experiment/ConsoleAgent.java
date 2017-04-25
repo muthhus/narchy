@@ -44,7 +44,7 @@ public abstract class ConsoleAgent extends NAgentX {
     final TestConsole R = new TestConsole(
             Atomic.the("it"),
             true,
-            2, 2);
+            4, 4);
     final TestConsole W;
 
 
@@ -288,11 +288,11 @@ public abstract class ConsoleAgent extends NAgentX {
             c[1] = Math.max(0, c[1]-1);
         }
         public void down() {
-            c[1] = Math.min(rows(), c[1]+1);
+            c[1] = Math.min(rows()-1, c[1]+1);
         }
 
         public int rows() {
-            return chars[0].length-1;
+            return chars[0].length;
         }
 
         public void right() {
@@ -371,19 +371,12 @@ public abstract class ConsoleAgent extends NAgentX {
         public Stream<Task> input() {
             nextStamp = nar.time.nextStamp();
             return IntStream.range(0, rows()*cols()).mapToObj(i -> {
-                int x = i / rows();
-                int y = i % cols();
+                int x = i % cols();
+                int y = (i - x) / cols();
                 return beliefs[x][y].get();
             }).filter(Objects::nonNull);
         }
 
-        public Stream<Term> terms() {
-            return IntStream.range(0, rows()*cols()).mapToObj(i -> {
-                int x = i / rows();
-                int y = i % cols();
-                return terms[x][y];
-            });
-        }
 
     }
 

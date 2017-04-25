@@ -45,7 +45,7 @@ public interface NARBuilder {
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
 
         if (threads == -1)
-            threads = 1;
+            threads = 2;
                     //(int) Math.ceil(Runtime.getRuntime().availableProcessors()-2);
 
         Executioner exe =

@@ -69,18 +69,18 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 16;
+    public static final int STAMP_CAPACITY = 12;
 
     public final static int UnificationStackMax = 64;
     public static final int MaxMatchConstraintsPerVariable = 8;
     public static final int MaxUnificationVariableStack = 1; //may be able to reduce to 1
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTL = 256;
-    public final static int UnificationTTLMin = 16;
+    public final static int UnificationTTL = 512;
+    public final static int UnificationTTLMin = 32;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
-    public final static int BeliefMatchTTL = 16;
+    public final static int BeliefMatchTTL = UnificationTTLMin;
 
     public static int DEFAULT_NAL_LEVEL = 8;
 

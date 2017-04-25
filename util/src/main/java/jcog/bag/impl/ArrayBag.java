@@ -478,15 +478,18 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         }
     }
 
-    protected static int sortSize(int s) {
-        //estimate, probably log2(size)
-        if (s < 128) {
+    static int sortSize(int s) {
+        //estimate, probably some ~log2(size) relationship
+        if (s < 16)
+            return 4;
+        if (s < 64)
+            return 6;
+        if (s < 128)
             return 8;
-        } else if (s < 2048) {
+        if (s < 2048)
             return 16;
-        } else {
-            return 32;
-        }
+
+        return 32;
     }
 
     /**

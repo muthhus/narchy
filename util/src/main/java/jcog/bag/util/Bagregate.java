@@ -36,28 +36,25 @@ public class Bagregate<X> extends ArrayBag<X> {
         if (!busy.compareAndSet(false, true))
             return;
 
-        //try {
+        try {
 
-        commit();
+            commit();
 
-        float scale = this.scale.floatValue();
+            float scale = this.scale.floatValue();
 
-        src.forEach(p -> {
-
-
-            X x = p.get();
-            float pri = p.pri();
-
-
-            if (x != null && include(x)) {
-                put(new RawPLink(x, pri), scale, null);
-            }
-        });
+            src.forEach(p -> {
+                X x = p.get();
+                if (x != null && include(x)) {
+                    float pri = p.pri();
+                    put(new RawPLink(x, pri), scale, null);
+                }
+            });
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
-        busy.set(false);
+        } finally {
+            busy.set(false);
+        }
     }
 
     /**

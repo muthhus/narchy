@@ -29,11 +29,11 @@ public class NARTestBenchmark {
     @BenchmarkMode(value = Mode.AverageTime)
     public void testNal6() throws InitializationError {
         RunNotifier n = new RunNotifier();
-        n.addListener(new RunListener() {
-            @Override  public void testRunFinished(Result result) throws Exception {
-                System.out.println("result: " + result);
-            }
-        });
+//        n.addListener(new RunListener() {
+//            @Override  public void testRunFinished(Result result) throws Exception {
+//                System.out.println("result: " + result);
+//            }
+//        });
         new BlockJUnit4ClassRunnerWithParametersFactory().createRunnerForTestWithParameters(new TestWithParameters(
             "nal6", new TestClass(NAL6Test.class), Lists.newArrayList( (Supplier)(()->new Default()) )
         )).run(n);
