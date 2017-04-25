@@ -42,7 +42,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     @Override
     protected Term next(@NotNull Compound input, @NotNull Term selected, int order) {
 
-        if (selected == Imdex)
+        if (selected.equals(Imdex))
             return null;
 
         Op inOp = input.op();

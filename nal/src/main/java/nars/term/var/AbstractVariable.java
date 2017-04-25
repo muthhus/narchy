@@ -61,13 +61,10 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
-        if (y instanceof GenericVariable)
-            return false; //pre-constructed image probably
-
         Op xo = op();
         if (y.op() == xo) {
             if (this instanceof CommonVariable) {
-                int[] mv = ((CommonVariable)this).multiVariables();
+                int[] mv = ((CommonVariable)this).unhashMultiVar();
                 if (mv[0] == y.hashCode() || mv[1] == y.hashCode())
                     return true; //already part of this common variable
             }

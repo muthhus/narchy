@@ -308,7 +308,9 @@ public abstract class TermBuilder {
         switch (t.length) {
             case 1:
                 Term t0 = t[0];
-                return t0 instanceof Ellipsislike ? finish(op, t0) : False;
+                return t0 instanceof Ellipsislike ?
+                        finish(op, t0) :
+                        False;
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if (et0.equals(et1))
@@ -456,6 +458,7 @@ public abstract class TermBuilder {
         boolean hasPatternVar = false;
         for (Term x : res) {
             if (x.equals(Imdex)) {
+                assert(index==DTERNAL);
                 index = j;
             } else if (!hasPatternVar && x.varPattern() > 0) {
                 hasPatternVar = true;
@@ -493,7 +496,9 @@ public abstract class TermBuilder {
             Term only = u[0];
 
             //preserve unitary ellipsis for patterns etc
-            return only instanceof Ellipsislike ? finish(CONJ, dt, only) : only;
+            return only instanceof Ellipsislike ?
+                    finish(CONJ, dt, only) :
+                    only;
 
         }
 
@@ -994,7 +999,9 @@ public abstract class TermBuilder {
             case 1:
 
                 Term single = t[0];
-                return single instanceof Ellipsislike ? finish(intersection, single) : single;
+                return single instanceof Ellipsislike ?
+                        finish(intersection, single) :
+                        single;
 
             case 2:
                 return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);

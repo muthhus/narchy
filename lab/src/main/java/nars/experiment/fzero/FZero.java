@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.GeometryUtils;
 
 import static nars.$.t;
+import static nars.Op.ImageBits;
 
 /**
  * Created by me on 3/21/17.

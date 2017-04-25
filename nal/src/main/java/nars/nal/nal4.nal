@@ -3,9 +3,9 @@
 
     (B --> (/, M, A.._=B..+)), M |- ((A.._=B..+) --> M), (Belief:Identity, Goal:Identity)
 
-    ((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity, Goal:Identity)
+    //((A..B=_..+) --> M), B |- (B --> (/, M, A..B=_..+)), (Belief:Identity, Goal:Identity)
 
-    (M --> (A..B=_..+)), B |- ((\, M, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
+    //(M --> (A..B=_..+)), B |- ((\, M, A..B=_..+) --> B), (Belief:Identity, Goal:Identity)
 
     ((\, M, A.._=B..+) --> B), M |- (M --> (A.._=B..+)), (Belief:Identity, Goal:Identity)
 

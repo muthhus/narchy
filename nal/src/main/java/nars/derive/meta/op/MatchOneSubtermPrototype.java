@@ -1,5 +1,6 @@
 package nars.derive.meta.op;
 
+import nars.$;
 import nars.Op;
 import nars.derive.meta.BoolPred;
 import nars.index.term.PatternTermIndex;
@@ -20,12 +21,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
     private final boolean finish;
 
     public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish, @NotNull PatternTermIndex index) {
-        super( (Compound)(
-                (subterm == 0 ?
-                        index.the(Op.PROD, id(x), Op.Imdex) :
-                        index.the(Op.PROD, Op.Imdex, id(x)))),
-                x
-        );
+        super( $.func(subterm==0 ? "task" : "belief", id(x)), x );
         this.subterm = subterm;
         this.finish = finish;
     }

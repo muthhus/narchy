@@ -17,8 +17,8 @@ public class EllipsisTransform extends EllipsisOneOrMore {
     public final Term to;
 
     public EllipsisTransform(@NotNull AbstractVariable name, @NotNull Term from, @NotNull Term to) {
-        super(name, multiVariable(name.hashCode(),
-                from.equals(Op.Imdex) ? to.hashCode() : from.hashCode(), //hashcode of the non-imdex term
+        super(name, multiVariable(name.id,
+                from.equals(Op.Imdex) ? ((AbstractVariable)to).id :  ((AbstractVariable)from).id, //hashcode of the non-imdex term
                 from.equals(Op.Imdex) //bit indicating which one it refers to
         ));
         this.from = from;

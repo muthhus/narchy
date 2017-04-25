@@ -8,7 +8,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
 
     CommonVariable(@NotNull Op type, int a, int b) {
-        super(type, multiVariable(a, b));
+        super(type, hashMultiVar(a, b));
     }
 
 
@@ -24,6 +24,9 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //            //System.out.println(v1 + " " + v2);
 //        }
 
+
+        if (A instanceof GenericVariable || B instanceof GenericVariable)
+            throw new RuntimeException("Generic Variable being made Common");
 
         int a = A.id();
         int b = B.id();
@@ -82,9 +85,6 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
     }
 
-    public int[] multiVariables() {
-        return new int[] { hash & 0xff, (hash >> 8) & 0xff };
-    }
 
 //    //TODO use a 2d array not an enum map, just flatten the 4 op types to 0,1,2,3
 //    /** variables x 10 (digits) x (1..10) (digits) cache;
