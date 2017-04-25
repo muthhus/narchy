@@ -107,7 +107,7 @@ public class TaskRule extends TaskMatch {
     @Override
     protected void accept(Task X, Map<Term, Term> xy) {
 
-        Compound y = compoundOrNull(nar.concepts.transform(output, new MapSubst(xy)));
+        Compound y = compoundOrNull(new MapSubst(xy).transform(output, nar.concepts));
         if (y==null) return;
 
         y = Task.content(y, nar);

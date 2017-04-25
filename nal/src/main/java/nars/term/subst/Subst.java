@@ -1,8 +1,20 @@
 package nars.term.subst;
 
+import nars.Op;
+import nars.Param;
+import nars.derive.meta.match.EllipsisMatch;
+import nars.index.term.AppendProtoCompound;
+import nars.index.term.PatternTermIndex;
+import nars.index.term.ProtoCompound;
+import nars.index.term.TermIndex;
+import nars.premise.Derivation;
+import nars.term.Compound;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
 
 public interface Subst  {
@@ -29,6 +41,87 @@ public interface Subst  {
      * @return whether all puts were successful
      * */
     boolean tryPut(@NotNull Unify copied);
+
+    @Nullable default Term transform(@NotNull Term src, TermIndex index) {
+        Term y = xy(src);
+        if (y != null) {
+            return y; //an assigned substitution, whether a variable or other type of term
+        }
+
+        Op op = src.op();
+        switch (op) {
+            case ATOM:
+            case INT:
+            case VAR_DEP:
+            case VAR_INDEP:
+            case VAR_QUERY:
+                return src; //unassigned literal atom or non-pattern var
+            case VAR_PATTERN:
+                return null; //unassigned pattern variable
+        }
+
+        //shortcut for premise evaluation matching:
+        //no variables that could be substituted, so return this constant
+        if (this instanceof Derivation && (src.vars() + src.varPattern() == 0))
+            return src;
+
+
+        boolean strict = !(index instanceof PatternTermIndex); //f instanceof Derivation;
+
+        Compound curr = (Compound) src;
+        TermContainer subs = curr.subterms();
+
+        int len = subs.size();
+
+
+        Op cop = curr.op();
+
+        AppendProtoCompound next = new AppendProtoCompound(cop, curr.dt(), len);
+
+        //early prefilter for True/False subterms
+        boolean filterTrueFalse = disallowTrueOrFalse(cop);
+
+
+        for (int i = 0; i < len; i++) {
+            Term t = subs.sub(i);
+            Term u = transform(t, index);
+
+            if (u instanceof EllipsisMatch) {
+
+                ((EllipsisMatch) u).expand(op, next);
+
+//                for (; volAt < subAt; volAt++) {
+//                    Term st = next.sub(volAt);
+//                    if (filterTrueFalse && Op.isTrueOrFalse(st)) return null;
+//                }
+
+            } else {
+
+                if (u == null) {
+
+                    if (strict) {
+                        return null;
+                    }
+
+                    u = t; //keep value
+
+                }
+
+                if (filterTrueFalse && Op.isTrueOrFalse(u))
+                    return null;
+
+                next.add(u);
+
+
+            }
+
+
+        }
+
+        return index.the(next);
+    }
+
+
 
 //    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
 //

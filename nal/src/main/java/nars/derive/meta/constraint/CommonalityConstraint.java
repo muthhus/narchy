@@ -22,7 +22,7 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @Override
     public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
-        Term x = f.xy(other);
+        Term x = f.resolve(other);
 
         if (x!=null) {
 

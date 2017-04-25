@@ -87,7 +87,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
         return build.apply(new AppendProtoCompound( op, dt, u ));
     }
 
-    @Override protected Term the(ProtoCompound c) {
+    @Override public Term the(ProtoCompound c) {
         if (c.size() < 2)
             return super.the(c);
 

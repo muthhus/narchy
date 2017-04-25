@@ -515,9 +515,9 @@ public class TrieDeriver extends Fork implements Deriver {
 
                 //1. sort the constraints and add them at the end
                 int c = constraints.size();
-                if (c > 1)
+                if (c > 1) {
                     ccc.add(iMatchTerm, new MatchConstraint.CompoundConstraint(constraints.toArray(new MatchConstraint[c])));
-                else
+                } else
                     ccc.add(iMatchTerm, constraints.get(0)); //just add the singleton at the end
             }
 

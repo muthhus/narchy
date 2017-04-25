@@ -365,11 +365,11 @@ public class KIFInput implements Runnable {
                             "_" + t.toString().substring(1)));
         });
 
-        conditionTerm = nar.concepts.transform(conditionTerm, new MapSubst(remap));
+        conditionTerm = new MapSubst(remap).transform(conditionTerm, nar.concepts);
         if (conditionTerm == null)
             return null;
 
-        actionTerm = nar.concepts.transform(actionTerm, new MapSubst(remap));
+        actionTerm = new MapSubst(remap).transform(actionTerm, nar.concepts);
         if (actionTerm == null)
             return null;
 

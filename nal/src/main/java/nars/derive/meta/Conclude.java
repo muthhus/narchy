@@ -1,6 +1,5 @@
 package nars.derive.meta;
 
-import com.google.common.base.Joiner;
 import jcog.pri.Priority;
 import nars.*;
 import nars.derive.rule.PremiseRule;
@@ -11,7 +10,6 @@ import nars.task.DerivedTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.AtomicStringConstant;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
@@ -98,10 +96,10 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             TermIndex index = m.index;
 
-            Compound c0 = compoundOrNull(index.transform(this.conclusionPattern, m));
+            Compound c0 = compoundOrNull(m.transform(this.conclusionPattern, index));
             if (c0 != null) {
 
-                final Compound c1 = index.eval(c0);
+                final Compound c1 = compoundOrNull(c0.eval(index));
                 if (c1 != null) {
 
                     TruthPuncEvidence ct = m.punct.get();
@@ -214,6 +212,9 @@ public final class Conclude extends AbstractPred<Derivation> {
                                 if (truth!=null)
                                     truth = truth.negated();
                             }
+
+                            c3 = index.normalize(c3);
+                            if (c3 == null)  return;
 
                             if (!Task.taskContentValid(c3, ct.punc, nar, true)) {
                                 return;

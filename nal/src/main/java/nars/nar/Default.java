@@ -51,7 +51,7 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(1024, 2);
+        this(1024, 1);
     }
 
     public Default(int activeConcepts, int termLinksPerConcept) {
@@ -87,7 +87,7 @@ public class Default extends NAR {
         //used for both:
         deriver.taskLinksFiredPerConcept.set(1, termLinksPerConcept);
         deriver.termLinksFiredPerTaskLink.set(1, termLinksPerConcept);
-        deriver.rate.setValue(0.05f);
+        deriver.rate.setValue(0.02f);
     }
 
     public Deriver newDeriver() {

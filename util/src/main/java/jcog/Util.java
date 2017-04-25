@@ -481,19 +481,19 @@ public enum Util { ;
      * targetfactor=0.5: average
      * targetFactor=0:   full current
      */
-    public static float lerp(float targetFactor, float target, float current) {
-        return current + (target-current) * unitize(targetFactor);
+    public static float lerp(float targetFactor, float max, float min) {
+        return min + (max-min) * unitize(targetFactor);
     }
-    public static double lerp(double targetFactor, double target, double current) {
-        return current + (target-current) * unitize(targetFactor);
-    }
-
-    public static long lerp(float factor, long target, long current) {
-        return current + Math.round((target-current) * ((double)unitize(factor)));
+    public static double lerp(double targetFactor, double max, double min) {
+        return min + (max-min) * unitize(targetFactor);
     }
 
-    public static int lerp(float factor, int target, int current) {
-        return current + Math.round((target-current) * unitize(factor));
+    public static long lerp(float factor, long max, long min) {
+        return min + Math.round((max-min) * ((double)unitize(factor)));
+    }
+
+    public static int lerp(float factor, int max, int min) {
+        return min + Math.round((max-min) * unitize(factor));
     }
 
     /**

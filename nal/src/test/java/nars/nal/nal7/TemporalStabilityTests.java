@@ -131,7 +131,7 @@ public class TemporalStabilityTests {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = new Default(1024, 3);
+        @NotNull NAR n = new Default(1024, 1);
         int time = 80;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);
         T1 b = new T1(linkedinh, 1, 2, 5, 10);

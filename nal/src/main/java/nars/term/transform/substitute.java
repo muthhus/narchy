@@ -50,11 +50,13 @@ public final class substitute extends Functor {
         if (x.equals(y)) {
             return strict ? False : input;
         }
-        Term output = parent.transform(input,
-            hasYX ?
-                new MapSubstWithOverride(parent.yx, x, y) :
-                new MapSubst1(x,y)  //optimized impl
-        );
+
+        Term output =
+                (hasYX ?
+                    new MapSubstWithOverride(parent.yx, x, y) :
+                    new MapSubst1(x,y)) //optimized case
+                        .transform(input, parent.index);
+
         return (output != null) ? output : False;
     }
 

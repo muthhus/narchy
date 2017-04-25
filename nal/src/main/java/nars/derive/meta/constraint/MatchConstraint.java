@@ -32,7 +32,7 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
         private final MatchConstraint[] cache;
 
         public CompoundConstraint(MatchConstraint[] c) {
-            super($.func("constraints", $.p(c) ));
+            super($.func("constraints", $.sete(c) ));
             this.cache = c;
         }
 

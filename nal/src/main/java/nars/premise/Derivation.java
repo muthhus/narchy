@@ -1,6 +1,7 @@
 package nars.premise;
 
 import jcog.version.Versioned;
+import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -9,6 +10,7 @@ import nars.derive.meta.constraint.MatchConstraint;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.truth.Stamp;
@@ -255,6 +257,10 @@ abstract public class Derivation extends Unify {
     }
 
 
+    @Nullable
+    public Term transform(@NotNull Term t, @NotNull Subst subst) {
+        return subst.transform(t, index);
+    }
 }
 
 

@@ -18,6 +18,8 @@ public final class MapSubstWithOverride extends MapSubst {
         if (Param.DEBUG && ox.equals(oy)) throw new RuntimeException("pointless substitution");
     }
 
+
+
     @Override
     public Term xy(@NotNull Term t) {
         return t.equals(ox) ? oy : super.xy(t);

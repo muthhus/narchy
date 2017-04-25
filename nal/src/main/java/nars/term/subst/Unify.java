@@ -6,7 +6,6 @@ import jcog.version.Versioning;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.derive.meta.constraint.CommonalityConstraint;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.TermIndex;
 import nars.term.Term;
@@ -244,14 +243,8 @@ public abstract class Unify implements Termutator, Subst {
 
 
     @Nullable
-    public final Term resolve(@NotNull Term x) {
-        return transform(x, this);
-    }
-
-
-    @Nullable
-    public final Term transform(@NotNull Term t, @NotNull Subst subst) {
-        return index.transform(t, subst);
+    public Term resolve(@NotNull Term x) {
+        return transform(x, index);
     }
 
 
@@ -304,7 +297,50 @@ public abstract class Unify implements Termutator, Subst {
         return yx.tryPut(y, x);
     }
 
-    final class ConstrainedVersionedTerm extends Versioned<Term> {
+
+    /**
+     * returns true if the assignment was allowed, false otherwise
+     */
+    public final boolean putXY(@NotNull Term xVar /* usually a Variable */, @NotNull Term y /* value */) {
+        return xy.tryPut(xVar, y);
+    }
+
+    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
+        return xy.tryPut(x, y);
+    }
+
+    public final int now() {
+        return versioning.size();
+    }
+
+    public final boolean revert(int then) {
+        return versioning.revert(then);
+    }
+
+//    public final void pop(int count) {
+//        versioning.pop(count);
+//    }
+
+    @NotNull
+    public final Term yxResolve(@NotNull Term t) {
+        Term u = yx.get(t);
+        return (u != null) ? u : t;
+    }
+
+
+    private class ConstrainedVersionMap extends VersionMap {
+        public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
+            super(versioning, maxVars);
+        }
+
+        @NotNull
+        @Override
+        public Versioned newEntry(Object keyIgnoredk) {
+            return new ConstrainedVersionedTerm();
+        }
+    }
+
+        final class ConstrainedVersionedTerm extends Versioned<Term> {
 
 
         final Versioned<MatchConstraint> constraints = new Versioned(versioning, MaxMatchConstraintsPerVariable);
@@ -363,47 +399,6 @@ public abstract class Unify implements Termutator, Subst {
         return true;
     }
 
-    /**
-     * returns true if the assignment was allowed, false otherwise
-     */
-    public final boolean putXY(@NotNull Term xVar /* usually a Variable */, @NotNull Term y /* value */) {
-        return xy.tryPut(xVar, y);
-    }
-
-    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
-        return xy.tryPut(x, y);
-    }
-
-    public final int now() {
-        return versioning.size();
-    }
-
-    public final boolean revert(int then) {
-        return versioning.revert(then);
-    }
-
-//    public final void pop(int count) {
-//        versioning.pop(count);
-//    }
-
-    @NotNull
-    public final Term yxResolve(@NotNull Term t) {
-        Term u = yx.get(t);
-        return (u != null) ? u : t;
-    }
-
-
-    private class ConstrainedVersionMap extends VersionMap {
-        public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
-            super(versioning, maxVars);
-        }
-
-        @NotNull
-        @Override
-        public Versioned newEntry(Object keyIgnoredk) {
-            return new ConstrainedVersionedTerm();
-        }
-    }
 }
 
 

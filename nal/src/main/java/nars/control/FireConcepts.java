@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -91,10 +92,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         long now = nar.time();
         for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
             PLink<Task> tasklink = tasklinks.get(i);
-            for (int i1 = 0, termlinksSize = termlinks.size(); i1 < termlinksSize; i1++) {
-                Premise p = PremiseBuilder.premise(c, tasklink, termlinks.get(i1), now, nar, -1f);
+            for (int j = 0, termlinksSize = termlinks.size(); j < termlinksSize; j++) {
+                PLink<Term> termlink = termlinks.get(j);
+                Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
                 if (p != null) {
-                    if (deriver.test(d.restart(p, Param.UnificationTTL)))
+
+                    float invest = Util.or(tasklink.pri(), termlink.pri());
+                    int ttl = Util.lerp(invest, Param.UnificationTTL, Param.UnificationTTLMin);
+
+                    if (deriver.test(d.restart(p, ttl)))
                         count[0]++;
                 }
             }

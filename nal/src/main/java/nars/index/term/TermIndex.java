@@ -151,116 +151,8 @@ public abstract class TermIndex extends TermBuilder {
 //    }
 
 
-    /**
-     * returns the resolved term according to the substitution
-     */
-    @Nullable
-    public Term transform(@NotNull Term src, @NotNull Subst f) {
 
-
-        Term y = f.xy(src);
-        if (y != null)
-            return y; //an assigned substitution, whether a variable or other type of term
-
-        Op op = src.op();
-        switch (op) {
-            case ATOM:
-            case INT:
-            case VAR_DEP:
-            case VAR_INDEP:
-            case VAR_QUERY:
-                return src; //unassigned literal atom or non-pattern var
-            case VAR_PATTERN:
-                return null; //unassigned pattern variable
-        }
-
-        //shortcut for premise evaluation matching:
-        //no variables that could be substituted, so return this constant
-        if (f instanceof Derivation && (src.vars() + src.varPattern() == 0))
-            return src;
-
-
-        boolean strict = !(this instanceof PatternTermIndex); //f instanceof Derivation;
-
-        Compound curr = (Compound) src;
-        TermContainer subs = curr.subterms();
-
-        int len = subs.size();
-
-
-        boolean changed = false;
-        Op cop = curr.op();
-
-        AppendProtoCompound next = new AppendProtoCompound(cop, curr.dt(), len);
-
-        //early prefilter for True/False subterms
-        boolean filterTrueFalse = disallowTrueOrFalse(cop);
-
-        //use COMPOUND_VOLUME_MAX instead of trying for the nar's to provide construction head-room that can allow terms
-        //to reduce and potentially meet the requirement
-        int volLimit = Param.COMPOUND_VOLUME_MAX - 1; /* -1 for the wrapping compound contribution of +1 volume if succesful */
-        int volSum = 0, volAt = 0, subAt = 0;
-        for (int i = 0; i < len; i++) {
-            Term t = subs.sub(i);
-            Term u = transform(t, f);
-
-
-            if (u instanceof EllipsisMatch) {
-
-                ((EllipsisMatch) u).expand(op, next);
-                subAt = next.size();
-
-                for (; volAt < subAt; volAt++) {
-                    Term st = next.sub(volAt);
-                    if (filterTrueFalse && Op.isTrueOrFalse(st)) return null;
-                    volSum += st.volume();
-                    if (volSum >= volLimit) {
-                        return null;
-                    } //HARD VOLUME LIMIT REACHED
-                }
-
-                changed = true;
-
-            } else {
-
-                if (u == null) {
-
-                    if (strict) {
-                        return null;
-                    }
-
-                    u = t; //keep value
-
-                } else {
-                    changed |= (u != t);
-                }
-
-                if (filterTrueFalse && Op.isTrueOrFalse(u))
-                    return null;
-                volSum += u.volume();
-                if (volSum >= volLimit) {
-                    return null;
-                } //HARD VOLUME LIMIT REACHED
-
-                next.add(u);
-
-                subAt++;
-
-            }
-
-
-        }
-
-        Term transformed;
-
-
-        if (changed)
-            return the(next);
-        else
-            return curr;
-    }
-
-    protected Term the(ProtoCompound t) {
+    public Term the(ProtoCompound t) {
         return the(t.op(), t.dt(), t.subterms());
     }
 
@@ -444,7 +336,7 @@ public abstract class TermIndex extends TermBuilder {
             return src;
     }
 
-    static boolean disallowTrueOrFalse(Op superOp) {
+    public static boolean disallowTrueOrFalse(Op superOp) {
 
         switch (superOp) {
             case EQUI:
@@ -541,13 +433,13 @@ public abstract class TermIndex extends TermBuilder {
 
 
     @Nullable
-    public Term replace(@NotNull Term src, Map<Term, Term> m) {
-        return transform(src, new MapSubst(m));
+    public final Term replace(@NotNull Term src, Map<Term, Term> m) {
+        return new MapSubst(m).transform(src, this);
     }
 
     @Nullable
-    public Term replace(@NotNull Term src, Term from, Term to) {
-        return transform(src, new MapSubst1(from, to));
+    public final Term replace(@NotNull Term src, Term from, Term to) {
+        return new MapSubst1(from, to).transform(src, this);
     }
 
 
@@ -573,13 +465,6 @@ public abstract class TermIndex extends TermBuilder {
                 ((Concept) value).delete(nar);
             }
         }
-    }
-
-    @Nullable
-    public Compound eval(Compound x) {
-        return normalizedOrNull(
-                x.eval(this),
-                this);
     }
 
     /**
