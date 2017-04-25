@@ -88,8 +88,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             return 0;
 
         List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerTaskLink.lerp(cPri));
+        if (termlinks.isEmpty())
+            return 0;
 
-        final int[] count = {0};
+        int count = 0;
 
         long now = nar.time();
         for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
@@ -103,12 +105,12 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     int ttl = Util.lerp(invest, Param.UnificationTTL, Param.UnificationTTLMin);
 
                     if (deriver.test(d.restart(p, ttl)))
-                        count[0]++;
+                        count++;
                 }
             }
         }
 
-        return count[0];
+        return count;
 
     }
 

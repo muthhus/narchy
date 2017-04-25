@@ -18,6 +18,7 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
@@ -37,7 +38,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    public GLWindow window;
+    public final AtomicReference<GLWindow> window = new AtomicReference<GLWindow>();
     protected GL2 gl;
 
     public final PeriodMeter frameTimeMS;
@@ -123,7 +124,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     @Override
     public final void init(GLAutoDrawable drawable) {
-        this.window = (GLWindow)drawable;
+        this.window.set((GLWindow) drawable);
 
         this.gl = drawable.getGL().getGL2();
         //printHardware();
@@ -183,11 +184,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     public final int getWidth() {
-        return window.getSurfaceWidth();
+        return window.get().getSurfaceWidth();
 
     }
     public final int getHeight() {
-        return window.getSurfaceHeight();
+        return window.get().getSurfaceHeight();
     }
 
 
@@ -251,34 +252,38 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return show("", w, h );
     }
 
-    public synchronized GLWindow show(String title, int w, int h, int x, int y) {
-        if (this.window!=null)
-            return this.window;
-        GLWindow g = window(this);
-        this.window = g;
-        g.setTitle(title);
-        g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
-        g.preserveGLStateAtDestroy(false);
-        g.setSurfaceSize(w, h);
-        g.setAutoSwapBufferMode(true);
-        if (x != Integer.MIN_VALUE ) {
-            g.setPosition(x, y);
-        }
-        g.setVisible(true);
-        return g;
+    public GLWindow show(String title, int w, int h, int x, int y) {
+        return this.window.getAndUpdate(win -> {
+            if (win != null)
+                return win;
+
+            GLWindow g = window(this);
+            g.setTitle(title);
+            g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
+            g.preserveGLStateAtDestroy(false);
+            g.setSurfaceSize(w, h);
+            g.setAutoSwapBufferMode(true);
+            if (x != Integer.MIN_VALUE ) {
+                g.setPosition(x, y);
+            }
+            g.setVisible(true);
+            return g;
+
+        });
     }
+
     public GLWindow show(String title, int w, int h) {
         return show(title, w, h, Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
     public void addMouseListener(MouseListener m) {
-        window.addMouseListener(m);
+        window.get().addMouseListener(m);
     }
     public void addWindowListener(WindowListener m) {
-        window.addWindowListener(m);
+        window.get().addWindowListener(m);
     }
     public void addKeyListener(KeyListener m) {
-        window.addKeyListener(m);
+        window.get().addKeyListener(m);
     }
 
     public GL2 gl() {

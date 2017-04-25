@@ -110,7 +110,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public SpaceGraph add(Ortho c) {
-        if (window == null) {
+        if (window.get() == null) {
             preAdd.add(c);
         } else {
             _add(c);

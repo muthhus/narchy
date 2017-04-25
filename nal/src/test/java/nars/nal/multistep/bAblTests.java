@@ -67,7 +67,7 @@ public class bAblTests extends AbstractNALTest {
                 .inputAt(0, "isIn(football,#where)?") ////Where is the football?
                 .mustOutput(0, 2000,
                         "isIn(football,playground)",BELIEF,
-                        1f,1f, 0.1f, 0.40f, ETERNAL); ////A: playground
+                        1f,1f, 0.1f, 0.99f, ETERNAL); ////A: playground
 
     }
 

@@ -668,22 +668,25 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            m.confMin.setValue(0.01f);
 //            m.goalConfidence(metaLearningRate);
 //            m.termVolumeMax.setValue(24);
-        MetaAgent metaT = new MetaAgent(a
-                //,m
 
-        );
-        metaT.init();
-        //metaT.trace = true;
-        a.onFrame((z)->metaT.cycle());
+
+
+//        MetaAgent metaT = new MetaAgent(a
+//                //,m
+//
+//        );
+//        metaT.init();
+//        //metaT.trace = true;
+//        a.onFrame((z)->metaT.cycle());
 
         //n.onCycle(metaT.nar::cycle);
 
-        try {
-            InterNAR i = new InterNAR(n, 8, 10421);
-            i.ping(10420);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            InterNAR i = new InterNAR(n, 8, 10421);
+//            i.ping(10420);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
 
 

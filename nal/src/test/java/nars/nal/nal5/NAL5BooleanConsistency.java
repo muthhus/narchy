@@ -3,10 +3,15 @@ package nars.nal.nal5;
 import nars.$;
 import nars.Narsese;
 import nars.Param;
+import nars.Task;
 import nars.derive.Deriver;
 import nars.nar.Default;
 import nars.term.Compound;
+import nars.truth.Truth;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * TODO
@@ -34,15 +39,15 @@ public class NAL5BooleanConsistency {
 
                 String[] outcomes = {
                         "(x-->(0,0))",
-                        "(x-->(1,0))",
                         "(x-->(0,1))",
+                        "(x-->(1,0))",
                         "(x-->(1,1))"};
                 String expected = "(x --> (" + i + "," + j + "))";
 
-                d.believe( "(" + outcomes[3]+ " ==> ((x-->i) && (x-->j)))");
                 d.believe( "(" + outcomes[0]+ " ==> (--(x-->i) && --(x-->j)))");
-                d.believe( "(" + outcomes[1]+ " ==> ((x-->i) && --(x-->j)))");
-                d.believe( "(" + outcomes[2]+ " ==> (--(x-->i) && (x-->j)))");
+                d.believe( "(" + outcomes[1]+ " ==> (--(x-->i) && (x-->j)))");
+                d.believe( "(" + outcomes[2]+ " ==> ((x-->i) && --(x-->j)))");
+                d.believe( "(" + outcomes[3]+ " ==> ((x-->i) && (x-->j)))");
 
                 Compound I = $.negIf($.$("(x-->i)"), i == 0);
                 Compound J = $.negIf($.$("(x-->j)"), j == 0);
@@ -58,8 +63,30 @@ public class NAL5BooleanConsistency {
                 d.run(16);
 
                 System.out.println(i + " " + j);
-                for (String s : outcomes) {
-                    System.out.println("\t" + s + "\t" + d.concept(s).belief(d.time(), d.dur()));
+                for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {
+                    String s = outcomes[k];
+                    @Nullable Task t = d.concept(s).beliefs().match(d.time(), d.dur());
+                    Truth b = t!=null ? t.truth() : null;
+
+                    System.out.println("\t" + s + "\t" + b);
+
+                    int ex = -1, ey = -1;
+                    switch (k) {
+                        case 0: ex = 0; ey = 0; break;
+                        case 1: ex = 0; ey = 1; break;
+                        case 2: ex = 1; ey = 0; break;
+                        case 3: ex = 1; ey = 1; break;
+                    }
+                    boolean thisone = ((ex == i) && (ey == j));
+                    if (thisone && b == null)
+                        assertTrue("unrecognized true case", false);
+
+                    if (thisone && b.isNegative())
+                        assertTrue("wrong true case", false);
+
+                    if (!thisone && b!=null && b.isPositive() && b.conf() > 0.5f /* estimate */)
+                        assertTrue("wrong false case:\n" + t.proof(), false);
+
                 }
 
                 System.out.println();

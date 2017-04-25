@@ -87,13 +87,13 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, (C ==> A), belief(positive), time(decomposeBeliefLate), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), time(decomposeBeliefLate), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
 //    B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
 //        B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 

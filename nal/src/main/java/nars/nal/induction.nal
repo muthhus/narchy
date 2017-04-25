@@ -1,15 +1,15 @@
 //General Induction and Temporal Induction
 //  When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, time(raw), time(dtEvents), neqRCom(A,B),                             notImplEqui(A), notEqui(B) |- (A ==>+- B), (Belief:Induction)
-    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),     notImplEqui(A), notEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
-        A, B, time(raw), time(dtEvents), neqRCom(A,B),                         notImplEqui(A), notEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
-        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B), notImplEqui(A), notEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
+    A, B, time(raw), time(dtEvents), neqRCom(A,B),                             notImplEqui(A), notImplEqui(B) |- (A ==>+- B), (Belief:Induction)
+    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
+        A, B, time(raw), time(dtEvents), neqRCom(A,B),                         notImplEqui(A), notImplEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
+        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                               notEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-    A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),       notEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-        A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                           notEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
-        A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),   notEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
+    A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                               notImplEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),       notImplEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                           notImplEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
+        A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),   notImplEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
     A, B, time(raw), time(dtEvents), neqRCom(A,B),                                 notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
     A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
