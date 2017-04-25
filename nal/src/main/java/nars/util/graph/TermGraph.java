@@ -43,8 +43,6 @@ public abstract class TermGraph {
             return t.op() == IMPL;
         }
 
-        ;
-
         public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }

@@ -86,6 +86,7 @@ public interface NARBuilder {
                 ,time,
                 exe) {
 
+            @Override
             public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
                 return new PLinkHijackBag(initialCapacity, reprobes);
             }
@@ -190,7 +191,7 @@ public interface NARBuilder {
         nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
+        nar.goalConfidence(0.5f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;

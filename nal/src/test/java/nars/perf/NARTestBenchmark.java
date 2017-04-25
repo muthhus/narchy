@@ -1,9 +1,7 @@
 package nars.perf;
 
 import com.google.common.collect.Lists;
-import nars.derive.DefaultDeriver;
 import nars.nal.nal1.NAL1Test;
-import nars.nal.nal6.NAL6Test;
 import nars.nar.Default;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;

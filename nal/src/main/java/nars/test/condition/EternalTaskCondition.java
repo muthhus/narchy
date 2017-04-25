@@ -230,10 +230,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!task.term().equals(term))
             return false;
 
-        if (task.punc() != punc)
-            return false;
-
-        return true;
+        return task.punc() == punc;
     }
 
     private boolean truthMatches(@NotNull Truthed task) {

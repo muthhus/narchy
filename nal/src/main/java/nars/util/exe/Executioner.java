@@ -18,7 +18,7 @@ abstract public class Executioner implements Executor {
         return nar!=null;
     }
 
-    public synchronized void start(NAR nar) {
+    public void start(NAR nar) {
         //if (this.nar == null) {
             this.nar = nar;
 //        } else {
@@ -27,7 +27,7 @@ abstract public class Executioner implements Executor {
     }
 
     /** needs to set nar to null */
-    public synchronized void stop() {
+    public void stop() {
         this.nar = null;
     }
 

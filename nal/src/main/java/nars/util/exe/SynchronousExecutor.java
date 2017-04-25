@@ -10,7 +10,7 @@ public class SynchronousExecutor extends Executioner {
 
     //final ArrayDeque<Runnable> pending = new ArrayDeque<>(128 );
 
-    boolean stopping = false;
+    boolean stopping;
 
     @Override
     public int concurrency() {

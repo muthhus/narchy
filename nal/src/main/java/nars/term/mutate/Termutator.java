@@ -24,33 +24,35 @@ public interface Termutator {
         /**
          * cached key
          */
-        private Object key = null;
+//        private final Object key;
 
-        @Override
-        public String toString() {
-            return key().toString();
-        }
+//        @Override
+//        public String toString() {
+//            return key().toString();
+//        }
 
         @Override
         public final boolean equals(@NotNull Object obj) {
-            return (this == obj) ||
-                    obj instanceof AbstractTermutator
-                        &&
-                    key().equals(((AbstractTermutator) obj).key());
+            throw new UnsupportedOperationException();
+//            return (this == obj) ||
+//                    obj instanceof AbstractTermutator
+//                        &&
+//                    key().equals(((AbstractTermutator) obj).key());
         }
 
         @Override
         public final int hashCode() {
-            return key().hashCode();
+            throw new UnsupportedOperationException();
+            //return key().hashCode();
         }
 
-        public Object key() {
-            Object k = this.key;
-            if (k == null) {
-                k = newKey();
-            }
-            return k;
-        }
+//        public Object key() {
+//            Object k = this.key;
+//            if (k == null) {
+//                k = newKey();
+//            }
+//            return k;
+//        }
 
         /**
          * lazily generate a key for identity comparison

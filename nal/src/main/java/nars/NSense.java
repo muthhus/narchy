@@ -191,7 +191,7 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v,  (Compound)prop(id, Atomic.the("hi")), (Compound)prop(id, Atomic.the("lo")));
+        return senseNumber(v, prop(id, Atomic.the("hi")), prop(id, Atomic.the("lo")));
     }
     @NotNull
     default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) throws Narsese.NarseseException {

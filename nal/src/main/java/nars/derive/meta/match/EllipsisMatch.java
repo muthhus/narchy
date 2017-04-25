@@ -13,8 +13,6 @@ import java.util.Collection;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
-import static nars.Op.Imdex;
-
 /**
  * Holds results of an ellipsis match and
  * implements a pre-filter before forming the

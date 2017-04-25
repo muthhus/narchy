@@ -82,7 +82,7 @@ public final class Emotion implements Serializable {
 
 
     /** new frame started */
-    public synchronized void cycle() {
+    public void cycle() {
 
         happy.clear();
         sad.clear();
@@ -117,7 +117,7 @@ public final class Emotion implements Serializable {
     }
 
     public float erring() {
-        return (float) (errrVol.getSum() / busyVol.getSum());
+        return errrVol.getSum() / busyVol.getSum();
     }
 
 
@@ -130,10 +130,10 @@ public final class Emotion implements Serializable {
 //    }
 
     public float happy() {
-        return (float) happy.getSum();
+        return happy.getSum();
     }
     public float sad() {
-        return (float) sad.getSum();
+        return sad.getSum();
     }
 
 //    public void print(@NotNull OutputStream output) {

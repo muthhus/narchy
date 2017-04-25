@@ -650,25 +650,6 @@ public enum $ {
     }
 
 
-    @NotNull
-    public static Atomic the(Number o) {
-
-        if (o instanceof Byte) return the(o.intValue());
-        if (o instanceof Short) return the(o.intValue());
-        if (o instanceof Integer) return the(o.intValue());
-
-        if (o instanceof Long) {
-            if (((int) o) == o.longValue())
-                return the(o.intValue()); //use the integer form since it will be IntTerm
-            else
-                return Atomic.the(Long.toString((long) o));
-        }
-
-        if ((o instanceof Float) || (o instanceof Double))
-            return the(o.floatValue());
-
-        return Atomic.the(o.toString());
-    }
 
     final static int MAX_CACHED_INTS = 16;
     private static final IntTerm[] digits = new IntTerm[MAX_CACHED_INTS];
@@ -710,6 +691,24 @@ public enum $ {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
+    }
+
+    public static Atomic the(Number o) {
+        if (o instanceof Byte) return the(o.intValue());
+        if (o instanceof Short) return the(o.intValue());
+        if (o instanceof Integer) return the(o.intValue());
+
+        if (o instanceof Long) {
+            if (((int) o) == o.longValue())
+                return the(o.intValue()); //use the integer form since it will be IntTerm
+            else
+                return Atomic.the(Long.toString((long) o));
+        }
+
+        if ((o instanceof Float) || (o instanceof Double))
+            return the(o.floatValue());
+
+        return Atomic.the(o.toString());
     }
 
     @NotNull

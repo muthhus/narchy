@@ -2,11 +2,7 @@ package nars.nal.nal4;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.derive.Deriver;
-import nars.derive.TrieDeriver;
-import nars.derive.rule.PremiseRuleSet;
 import nars.nal.AbstractNALTest;
-import nars.nar.Default;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.junit.Ignore;

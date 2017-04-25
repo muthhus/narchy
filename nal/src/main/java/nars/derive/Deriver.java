@@ -1,6 +1,5 @@
 package nars.derive;
 
-import nars.derive.meta.BoolPred;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;

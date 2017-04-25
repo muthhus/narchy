@@ -25,7 +25,7 @@ import java.util.function.Function;
  */
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
-    int count = 0;
+    int count;
 
     @NotNull
     public final Map<Variable /* Input Variable */, Variable /*Variable*/> map;

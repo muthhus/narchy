@@ -15,13 +15,16 @@ public interface Termlike extends Termed {
     /**
      * volume = total number of terms = complexity + # total variables
      */
+    @Override
     default int volume() { return 0; }
 
     /**
      * total number of leaf terms, excluding variables which have a complexity of zero
      */
+    @Override
     default int complexity() { return complexity(); }
 
+    @Override
     default int structure() { return 0; }
 
     /**
@@ -143,12 +146,16 @@ public interface Termlike extends Termed {
     }
 
     /** # of contained independent variables in subterms (1st layer only) */
+    @Override
     default int varIndep() { return 0; }
     /** # of contained dependent variables in subterms (1st layer only) */
+    @Override
     default int varDep() { return 0; }
     /** # of contained query variables in subterms (1st layer only) */
+    @Override
     default int varQuery() { return 0; }
     /** # of contained pattern variables in subterms (1st layer only) */
+    @Override
     default int varPattern() { return 0; }
 
 

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ProtoCompound extends TermContainer {
 
+    @Override
     Op op();
 
     int dt();
@@ -26,6 +27,7 @@ public interface ProtoCompound extends TermContainer {
     @NotNull Term[] subterms();
 
     /** number subterms */
+    @Override
     int size();
 
     @Override
@@ -34,6 +36,7 @@ public interface ProtoCompound extends TermContainer {
     @Override
     int hashCode();
 
+    @Override
     Term sub(int i);
 
     /** since it has potentially any structure... */

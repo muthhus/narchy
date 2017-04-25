@@ -48,10 +48,7 @@ public class TemporalTaskCondition extends EternalTaskCondition {
             return false;
 
         long e = task.end();
-        if ((e < occEndStart) || (e > occEndEnd))
-            return false;
-
-        return true;
+        return !((e < occEndStart) || (e > occEndEnd));
 
 //
 ////                    long at = relativeToCondition ? getCreationTime() : task.getCreationTime();

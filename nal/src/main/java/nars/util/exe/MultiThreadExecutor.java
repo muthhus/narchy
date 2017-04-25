@@ -33,7 +33,7 @@ public class MultiThreadExecutor extends Executioner  {
 
     //private CPUThrottle throttle;
 
-    private SequenceBarrier barrier;
+    private final SequenceBarrier barrier;
     private long cursor;
     private boolean sync = true;
 

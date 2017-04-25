@@ -734,11 +734,11 @@ public abstract class TermBuilder {
                     break;
 
 
-                case EQUI: {
+                case EQUI:
 
                     if (dt == XTERNAL) {
                         //create as-is
-                        return compound(op, dt, subject, predicate);
+                        return compound(op, XTERNAL, subject, predicate);
                     }
 
                     boolean equal = subject.equals(predicate);
@@ -779,7 +779,6 @@ public abstract class TermBuilder {
 
 
                     break;
-                }
 
                 case IMPL:
 
@@ -791,7 +790,7 @@ public abstract class TermBuilder {
                     }
                     if (dt == XTERNAL) {
                         //create as-is
-                        return compound(op, dt, subject, predicate);
+                        return compound(op, XTERNAL, subject, predicate);
                     }
 
                     //special case for implications: reduce to --predicate if the subject is False
@@ -875,39 +874,35 @@ public abstract class TermBuilder {
                         MutableSet<Term> common = TermContainer.intersect(subjs, preds);
                         if (common != null && !common.isEmpty()) {
 
-                            {
-                                @NotNull Set<Term> sss = subjs.toSet();
-                                if (sss.removeAll(common)) {
-                                    int s0 = sss.size();
-                                    switch (s0) {
-                                        case 0:
-                                            subject = False;
-                                            break;
-                                        case 1:
-                                            subject = sss.iterator().next();
-                                            break;
-                                        default:
-                                            subject = the(CONJ, csub.dt(), sss);
-                                            break;
-                                    }
+                            @NotNull Set<Term> sss = subjs.toSet();
+                            if (sss.removeAll(common)) {
+                                int s0 = sss.size();
+                                switch (s0) {
+                                    case 0:
+                                        subject = False;
+                                        break;
+                                    case 1:
+                                        subject = sss.iterator().next();
+                                        break;
+                                    default:
+                                        subject = the(CONJ, csub.dt(), sss);
+                                        break;
                                 }
                             }
 
-                            {
-                                @NotNull Set<Term> ppp = preds.toSet();
-                                if (ppp.removeAll(common)) {
-                                    int s0 = ppp.size();
-                                    switch (s0) {
-                                        case 0:
-                                            predicate = False;
-                                            break;
-                                        case 1:
-                                            predicate = ppp.iterator().next();
-                                            break;
-                                        default:
-                                            predicate = the(CONJ, cpred.dt(), ppp);
-                                            break;
-                                    }
+                            @NotNull Set<Term> ppp = preds.toSet();
+                            if (ppp.removeAll(common)) {
+                                int s0 = ppp.size();
+                                switch (s0) {
+                                    case 0:
+                                        predicate = False;
+                                        break;
+                                    case 1:
+                                        predicate = ppp.iterator().next();
+                                        break;
+                                    default:
+                                        predicate = the(CONJ, cpred.dt(), ppp);
+                                        break;
                                 }
                             }
 
@@ -1120,13 +1115,16 @@ public abstract class TermBuilder {
             return ((Term) o);
 
         if (o instanceof Number)
-            return $.the((Number) o);
+            return the((Number) o);
 
         //if (o instanceof String || o instanceof StringBuilder)
         return Atomic.the(o.toString());
 
         //return null;
     }
+
+
+
 
     @NotNull
     public Compound atemporalize(final @NotNull Compound c) {

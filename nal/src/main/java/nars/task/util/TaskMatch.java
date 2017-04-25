@@ -25,11 +25,11 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
 
     @NotNull protected final NAR nar;
     private final On on;
-    private BoolPred<Term> term = null;
-    private BoolPred<Truth> truth = null;
-    private BoolPred<Byte> punctuation = null;
-    private BoolPred<LongLongPair> time = null;
-    private BoolPred<Priority> budget = null;
+    private BoolPred<Term> term;
+    //private final BoolPred<Truth> truth = null;
+    private BoolPred<Byte> punctuation;
+    //private final BoolPred<LongLongPair> time = null;
+    //private final BoolPred<Priority> budget = null;
 
 
 
@@ -77,7 +77,8 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
     //HACK
     public Compound id() {
         return $.func(getClass().getSimpleName(),
-            $.nonNull(term), $.nonNull(punctuation), $.nonNull(truth), $.nonNull(time), $.nonNull(budget)
+            $.nonNull(term), $.nonNull(punctuation)
+                //, $.nonNull(truth), $.nonNull(time), $.nonNull(budget)
             );
     }
 
@@ -85,6 +86,7 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
         this.on.off();
     }
 
+    @Override
     public boolean test(Task t) {
         if (term!=null && !term.test(t.term())) return false;
         //..

@@ -987,7 +987,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     }
 
-    public final static ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal = ThreadLocal.withInitial(() ->
+    ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal = ThreadLocal.withInitial(() ->
             new ObjectFloatHashMap<>()
     );
 

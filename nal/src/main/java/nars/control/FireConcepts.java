@@ -96,12 +96,16 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         long now = nar.time();
         for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
             PLink<Task> tasklink = tasklinks.get(i);
+
+            float tlPri = tasklink.pri();
+
             for (int j = 0, termlinksSize = termlinks.size(); j < termlinksSize; j++) {
                 PLink<Term> termlink = termlinks.get(j);
+
                 Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
                 if (p != null) {
 
-                    float invest = Util.or(tasklink.pri(), termlink.pri());
+                    float invest = Util.or(tlPri, termlink.pri());
                     int ttl = Util.lerp(invest, Param.UnificationTTL, Param.UnificationTTLMin);
 
                     if (deriver.test(d.restart(p, ttl)))
@@ -119,8 +123,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * directly inptus each result upon derive, for single-thread
      */
     public static class FireConceptsDirect extends FireConcepts {
-
-        private MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
         public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
             this(nar.focus(), deriver, budgeting, nar);
@@ -160,8 +162,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         private final ThreadLocal<MyDerivation> derivation = ThreadLocal.withInitial(() ->
                 new MyDerivation(budgeting, nar));
 
-        private class MyDerivation extends Derivation {
+        private static class MyDerivation extends Derivation {
             final Map<Task, Task> buffer = new LinkedHashMap();
+
+            private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
             public MyDerivation(DerivationBudgeting b, NAR nar) {
                 super(nar, b, Param.UnificationStackMax, 0);

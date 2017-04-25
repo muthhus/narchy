@@ -1,7 +1,6 @@
 package nars.term.var;
 
 import nars.Op;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -30,10 +29,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
 
     /** extract multivariable component */
     public static int multiVariable(int x, boolean firstOrSecond) {
-        return firstOrSecond ?
-                ((x >> 8) & 0x000000ff)-1
-                :
-                ((x) & 0x000000ff)-1;
+        return ((firstOrSecond ? x >> 8 : x) & 0x000000ff)-1;
     }
 
 

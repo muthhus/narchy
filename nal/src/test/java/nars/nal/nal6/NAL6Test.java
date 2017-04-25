@@ -328,7 +328,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void multiple_variables_introduction()  {
         TestNAR tester = test();
-        //tester.log();
+        tester.log();
         tester.believe("<<$x --> key> ==> <{lock1} --> (/,open,$x,_)>>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");

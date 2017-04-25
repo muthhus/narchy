@@ -52,7 +52,7 @@ import static nars.Op.False;
 import static nars.time.Tense.DTERNAL;
 
 
-public interface Term extends Termed, Termlike, Comparable<Termlike> {
+public interface Term extends Termlike, Comparable<Termlike> {
 
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
@@ -323,7 +323,7 @@ public interface Term extends Termed, Termlike, Comparable<Termlike> {
 //        if (diff2 != 0)
 //            return diff2;
 
-        int d = this.op().compareTo( ((Term)y).op() );
+        int d = this.op().compareTo( y.op() );
         if (d != 0)
             return d;
 

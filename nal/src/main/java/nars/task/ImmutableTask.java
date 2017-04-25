@@ -34,7 +34,7 @@ public class ImmutableTask extends Pri implements Task {
     public final long[] stamp;
     final int hash;
 
-    public Map meta = null;
+    public Map meta;
 
 
     public ImmutableTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {

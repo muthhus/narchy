@@ -100,9 +100,9 @@ public interface Concept extends Termed {
         Map m = meta();
         if (m == null)
             return null;
-        synchronized (m) {
+        //synchronized (m) {
             return (C) m.remove(key);
-        }
+        //}
 
     }
 

@@ -3,7 +3,6 @@ package nars.premise;
 import jcog.pri.PLink;
 import jcog.pri.Priority;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.or;
 import static nars.Op.NEG;
-import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -117,7 +115,7 @@ public enum PremiseBuilder { ;
                 //Math.max
                 //aveAri
                 or
-                        (taskPri, beliefPriority.priSafe(0));
+                    (taskPri, beliefPriority.priSafe(0));
 
         if (pri < priMin)
             return null;

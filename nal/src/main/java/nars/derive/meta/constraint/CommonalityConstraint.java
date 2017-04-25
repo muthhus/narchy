@@ -22,6 +22,9 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @Override
     public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
+        if (y instanceof Variable)
+            return false;
+
         Term x = f.xy(other);
 
         if (x!=null) {
