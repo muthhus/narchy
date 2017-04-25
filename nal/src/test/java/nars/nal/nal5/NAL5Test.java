@@ -413,7 +413,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<R --> [f]>,<R --> [w]>) ==> <R --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<R --> [f]>,<R --> b>) ==> <R --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",0.90f,0.42f /*0.36f*/);
+        tester.mustBelieve(cycles*2,"<<R --> b> ==> <R --> [w]>>",1f,0.42f /*0.36f*/);
         tester.mustBelieve(cycles*2,"<<R --> [w]> ==> <R --> b>>",0.90f,0.45f);
     }
 
@@ -437,7 +437,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<r --> [f]>,<r --> [w]>) ==> <r --> [l]>>",0.9f,0.9f);
         tester.believe("<(&&,<r --> [f]>,<r --> b>) ==> <r --> [l]>>");
-        tester.mustBelieve(cycles*2,"<<r --> b> ==> <r --> [w]>>",0.90f,0.42f);
+        tester.mustBelieve(cycles*2,"<<r --> b> ==> <r --> [w]>>",1f,0.42f);
         tester.mustBelieve(cycles*2,"<<r --> [w]> ==> <r --> b>>",0.90f,0.45f);
     }
 
