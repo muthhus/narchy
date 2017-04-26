@@ -426,44 +426,46 @@ public interface TimeFunctions {
             //if (dt!=DTERNAL || dt!=XTERNAL || dt!=0) {
             //call "decomposeTask"
             //return decompose(derived, p, occReturn, true);
-
+            Term resolvedDerived = resolve(derived, p);
 
             Term resolvedTaskTerm = resolve(taskTerm, p);
-            int derivedInTask = resolvedTaskTerm.subtermTime(derived);
+            if (resolvedTaskTerm!=null) {
+                int derivedInTask = resolvedTaskTerm.subtermTime(resolvedDerived);
 
-            if (derivedInTask != DTERNAL) {
+                if (derivedInTask != DTERNAL) {
 
-                if (task.isGoal() && derivedInTask != 0) {
-                    //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
-                    //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
-                    //otherwise it is the conditional decompose
-//                    if (d.goal.single())
-//                        return null;
-                }
+                    if (task.isGoal() && derivedInTask != 0) {
+                        //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
+                        //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
+                        //otherwise it is the conditional decompose
+                        //                    if (d.goal.single())
+                        //                        return null;
+                    }
 
-                if (!task.isEternal()) {
-                    occReturn[0] = task.start() + derivedInTask;
-                    occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
-                } else if (belief != null && !belief.isEternal()) {
-                    int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p.beliefTerm, p));
-                    if (timeOfBeliefInTask == DTERNAL)
-                        timeOfBeliefInTask = 0;
-                    long taskOcc = belief.start() - timeOfBeliefInTask;
-                    occReturn[0] = taskOcc + derivedInTask;
-                    occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
+                    if (!task.isEternal()) {
+                        occReturn[0] = task.start() + derivedInTask;
+                        occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
+                    } else if (belief != null && !belief.isEternal()) {
+                        int timeOfBeliefInTask = resolvedTaskTerm.subtermTime(resolve(p.beliefTerm, p));
+                        if (timeOfBeliefInTask == DTERNAL)
+                            timeOfBeliefInTask = 0;
+                        long taskOcc = belief.start() - timeOfBeliefInTask;
+                        occReturn[0] = taskOcc + derivedInTask;
+                        occReturn[1] = occReturn[0] + (derived.op() == CONJ ? derived.dtRange() : 0);
+                    } else {
+                        //both eternal - no temporal basis
+                        return null;
+                    }
                 } else {
-                    //both eternal - no temporal basis
+                    //TODO offset dt could not be determined; this may occurr in tasks/derivations which consist entirely of variables
                     return null;
                 }
-            } else {
-                //TODO offset dt could not be determined; this may occurr in tasks/derivations which consist entirely of variables
-                return null;
             }
 
         } else {
 
             //3 or more
-            if (derived.op() == CONJ) {
+            //if (derived.op() == CONJ) {
                 int dt = task.dt(); //copy either the DTERNAL or 0 commutive timing
 
                 if (!task.isEternal()) {
@@ -479,10 +481,10 @@ public interface TimeFunctions {
                 occReturn[1] = occReturn[0] + derived.dtRange();
 
                 derived = deriveDT(derived, +0, dt, occReturn, p);
-            } else {
-                //TODO this should not happen
-                return null;
-            }
+            //} else {
+            //    //TODO this should not happen
+            //    return null;
+            //}
         }
 
         return lateIfGoal(p, occReturn, derived);
@@ -740,7 +742,7 @@ public interface TimeFunctions {
             y = x;
         }
 
-        return y;
+        return y!=null ? y : x;
 
     }
 
@@ -768,12 +770,14 @@ public interface TimeFunctions {
                 tOcc = b.start(); //use belief time when task is a question, or task is eternal
         }
 
-        if (!taskOrBelief && b != null) {
+        Term dtTermResolved = resolve(dtTerm, p);
+        Term derivedResolved = resolve(derived, p);
+        if (!taskOrBelief && b != null && dtTermResolved!=null && derivedResolved!=null) {
             //if (b.occurrence()!=ETERNAL) {
-            int derivedInT = dtTerm.subtermTime(derived);
-            if (derivedInT == DTERNAL && derived.op() == Op.IMPL) {
+            int derivedInT = dtTermResolved.subtermTime(derivedResolved);
+            if (derivedInT == DTERNAL && derivedResolved.op() == Op.IMPL) {
                 //try to find the subtermTime of the implication's subject
-                derivedInT = dtTerm.subtermTime(derived.sub(0));
+                derivedInT = dtTermResolved.subtermTime(((Compound)derivedResolved).sub(0));
             }
 
             if (derivedInT == DTERNAL) {

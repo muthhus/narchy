@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
@@ -26,6 +27,7 @@ public class NARio extends NAgentX {
         super("nario", nar);
 
         //Param.ANSWER_REPORTING = false;
+        //Param.DEBUG = true;
 
         //Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         mario = new MarioComponent(
@@ -71,7 +73,8 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
-        sc.setResolution(0.04f);
+        sc.setResolution(0.02f);
+        sc.pri(0.25f);
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);
 //        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);

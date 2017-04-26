@@ -379,7 +379,10 @@ public abstract class Unify implements Termutator, Subst {
     private boolean valid(@NotNull Term next, List<MatchConstraint> c) {
         int s = c.size();
         for (int i = 0; i < s; i++) {
-            if (c.get(i).invalid(next, this))
+            MatchConstraint cc = c.get(i);
+            if (cc==null) /* why null? */
+                break;
+            if (cc.invalid(next, this))
                 return false;
         }
         return true;

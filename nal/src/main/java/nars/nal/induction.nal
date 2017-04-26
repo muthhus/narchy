@@ -1,32 +1,32 @@
 //General Induction and Temporal Induction
 //  When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-    A, B, time(raw), time(dtEvents), neqRCom(A,B),                             notImplEqui(A), notImplEqui(B) |- (A ==>+- B), (Belief:Induction)
-    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
-        A, B, time(raw), time(dtEvents), neqRCom(A,B),                         notImplEqui(A), notImplEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
-        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
+    A, B, time(raw), time(dtEvents),                             notImplEqui(A), notImplEqui(B) |- (A ==>+- B), (Belief:Induction)
+    A, B, time(raw), time(dtEventsOrEternals), neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
+        A, B, time(raw), time(dtEvents),                          notImplEqui(A), notImplEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
+        A, B, time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                               notImplEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
-    A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),       notImplEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-        A, B, time(raw), time(dtEventsReverse), neqRCom(A,B),                           notImplEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
-        A, B, time(raw), time(dtEventsOrEternalsReverse), neqRCom(A,B),neqAndCom(A,B),   notImplEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
+    A, B, time(raw), time(dtEventsReverse),                                notImplEqui(A), notImplEqui(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, time(raw), time(dtEventsOrEternalsReverse), neqAndCom(A,B),       notImplEqui(A), notImplEqui(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, time(raw), time(dtEventsReverse),                            notImplEqui(A), notImplEqui(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
+        A, B, time(raw), time(dtEventsOrEternalsReverse), neqAndCom(A,B),   notImplEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
-    A, B, time(raw), time(dtEvents), neqRCom(A,B),                                 notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
-    A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
-        A, B, time(raw), time(dtEvents), neqRCom(A,B),                             notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
-        A, B, time(raw), time(dtEventsOrEternals), neqRCom(A,B), neqAndCom(A,B)    notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
+    A, B, time(raw), time(dtEvents),                                  notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
+    A, B, time(raw), time(dtEventsOrEternals), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
+        A, B, time(raw), time(dtEvents),                              notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
+        A, B, time(raw), time(dtEventsOrEternals), neqAndCom(A,B)    notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
 
-    A, B, task(positive), belief(positive), time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                     |- (A &&+- B), (Belief:Intersection)
-    A, B, task(positive), belief(positive), time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro((A &&+- B)), (Belief:Intersection)
+    A, B, task(positive), belief(positive), time(raw), time(dtEvents), notImplEqui(A), notImplEqui(B)                     |- (A &&+- B), (Belief:Intersection)
+    A, B, task(positive), belief(positive), time(raw), time(dtEventsOrEternals), neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro((A &&+- B)), (Belief:Intersection)
 
-    A, B, task(positive), belief(negative), time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                     |- (A &&+- (--,%B)), (Belief:IntersectionPN)
-    A, B, task(positive), belief(negative), time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
+    A, B, task(positive), belief(negative), time(raw), time(dtEvents), notImplEqui(A), notImplEqui(B)                     |- (A &&+- (--,%B)), (Belief:IntersectionPN)
+    A, B, task(positive), belief(negative), time(raw), time(dtEventsOrEternals), neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro((A &&+- (--,%B))), (Belief:IntersectionPN)
 
-    A, B, task(negative), belief(positive), time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                     |- ((--,%A) &&+- B), (Belief:IntersectionN)
-    A, B, task(negative), belief(positive), time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
+    A, B, task(negative), belief(positive), time(raw), time(dtEvents), notImplEqui(A), notImplEqui(B)                     |- ((--,%A) &&+- B), (Belief:IntersectionN)
+    A, B, task(negative), belief(positive), time(raw), time(dtEventsOrEternals), neqAndCom(A,B),notImplEqui(A), notImplEqui(B)     |- varIntro(((--,%A) &&+- B)), (Belief:IntersectionN)
 
-    A, B, task(negative), belief(negative), time(raw), time(dtEvents), neqRCom(A,B),notImplEqui(A), notImplEqui(B)                          |- ((--,%A) &&+- (--,%B)), (Belief:IntersectionNN)
-    A, B, task(negative), belief(negative), time(raw), time(dtEventsOrEternals), neqRCom(A,B),neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) &&+- (--,%B))), (Belief:IntersectionNN)
+    A, B, task(negative), belief(negative), time(raw), time(dtEvents), notImplEqui(A), notImplEqui(B)                          |- ((--,%A) &&+- (--,%B)), (Belief:IntersectionNN)
+    A, B, task(negative), belief(negative), time(raw), time(dtEventsOrEternals), neqAndCom(A,B),notImplEqui(A), notImplEqui(B) |- varIntro(((--,%A) &&+- (--,%B))), (Belief:IntersectionNN)
 
 
 

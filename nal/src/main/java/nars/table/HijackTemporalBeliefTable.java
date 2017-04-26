@@ -9,10 +9,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.ActionConcept;
-import nars.task.DerivedTask;
-import nars.task.Revision;
-import nars.task.SignalTask;
-import nars.task.TruthPolation;
+import nars.task.*;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -37,6 +34,14 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     public HijackTemporalBeliefTable(int initialCapacity) {
         super(4 /* reprobes */);
         setCapacity(initialCapacity);
+    }
+
+    @Override
+    public Task add(@NotNull Task t) {
+        if (t instanceof AnswerTask) {
+            return t; //dont store interpolations/answers/projections etc
+        }
+        return super.add(t);
     }
 
     @Override

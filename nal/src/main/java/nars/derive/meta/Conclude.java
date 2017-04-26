@@ -96,13 +96,17 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             TermIndex index = m.index;
 
+            TruthPuncEvidence ct = m.punct.get();
+            if (ct == null)
+                return;
+
             Compound c0 = compoundOrNull(m.transform(this.conclusionPattern, index));
             if (c0 != null) {
 
                 final Compound c1 = compoundOrNull(c0.eval(index));
                 if (c1 != null) {
 
-                    TruthPuncEvidence ct = m.punct.get();
+
                     Truth truth = ct.truth;
 
                     @NotNull final long[] occ;

@@ -314,8 +314,8 @@ abstract public class NAgent implements NSense, NAct {
         predictors.add(
                 goal(happiness,
                         t(1f, nar.confDefault(/*BELIEF*/ GOAL)),
-                        ETERNAL
-                        //now + dur/2
+                        //ETERNAL
+                        now + dur/2
                 )
         );
 
@@ -524,12 +524,12 @@ abstract public class NAgent implements NSense, NAct {
         for (ActionConcept a : actions) {
             a.goals().forEach(x -> {
                 if (!(x instanceof ActionConcept.CuriosityTask)) {
+                    //System.out.println(x.proof());
                     m[0] += x.evi(now, dur);
                 }
             });
         }
         float dex = w2c(m[0] / n);
-        System.err.println(dex);
         return dex;
     }
 

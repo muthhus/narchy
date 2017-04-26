@@ -27,7 +27,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private final NAR nar;
 
-    private static final int radix = 2;
+    private static final int radix = 4;
     private final List<PixelConcept> pixels;
     private final Mix.MixStream in;
 
@@ -172,6 +172,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         in.input(pixels.stream()/*filter(PixelConcept::update).*/
                 .map(c -> c.apply(nar)),
                 y -> nar.input((Stream)y));
+    }
+
+    public void pri(float v) {
+        in.setValue(v);
     }
 
 
