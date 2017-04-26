@@ -9,8 +9,10 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.derive.Deriver;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.time.Time;
@@ -76,24 +78,26 @@ public interface NARBuilder {
         Default nar = new Default(activeConcepts,
                 3,
 
-                new HijackTermIndex(cb, 1024 * 256, reprobes)
+//                new HijackTermIndex(cb, 1024 * 256, reprobes)
+
                 //new NullTermIndex(cb)
-//                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
-//                    exe
-//                    //null /* null = fork join common pool */
-//                )
-//                new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
+                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+                    exe
+                    //null /* null = fork join common pool */
+                )
+//              new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {
 
-            @Override
-            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
-                return new PLinkHijackBag(initialCapacity, reprobes);
-            }
+//            @Override
+//            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+//                return new PLinkHijackBag(initialCapacity, reprobes);
+//            }
 
 //            @Override
 //            public Deriver newDeriver() {
-//                return new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
+//                //return new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
+//                return Deriver.get("induction.nal", "nal6.nal");
 //            }
 
 
@@ -196,8 +200,8 @@ public interface NARBuilder {
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         //nar.stmLinkage.capacity.set(0);
 

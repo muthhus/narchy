@@ -5,7 +5,6 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
-import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.junit.Test;
 
 import java.util.Random;

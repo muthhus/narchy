@@ -72,8 +72,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         return
-            new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
-            //new HijackTemporalBeliefTable(tCap * 2, nar.random);
+            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
+            new HijackTemporalBeliefTable(tCap * 2, nar.random());
     }
 
     //    /** originating from this sensor, or a future prediction */

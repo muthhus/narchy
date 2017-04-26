@@ -50,10 +50,6 @@ public class Line1D {
 //                }
 //            });
 
-            n.termVolumeMax.setValue(32);
-            n.beliefConfidence(0.9f);
-            n.goalConfidence(0.9f);
-
 
             Line1DSimplest a = new Line1DSimplest(n);
 
@@ -76,7 +72,7 @@ public class Line1D {
 
             n.onCycle(() -> {
                 a.i.setValue(
-                        0.5f * (Math.sin(n.time() / 200f) + 1f)
+                        0.5f * (Math.sin(n.time() / 40f) + 1f)
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );

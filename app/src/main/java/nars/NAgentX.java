@@ -93,7 +93,6 @@ abstract public class NAgentX extends NAgent {
                 //CS(true)
                 .durSeconds(1f / fps);
         Default nar =
-                //new TaskNAR(32 * 1024, new MultiThreadExecutioner(4, 4 * 1024), clock);
                 NARBuilder.newMultiThreadNAR(-1, clock, true);
 
         //NAR nar = newNAR();

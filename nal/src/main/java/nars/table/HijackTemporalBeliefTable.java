@@ -36,6 +36,13 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(initialCapacity);
     }
 
+
+    @Override
+    public void onRemoved(@NotNull Task t) {
+        t.delete();
+    }
+
+
     @Override
     public void capacity(int c, NAR nar) {
         setCapacity(c);
@@ -260,17 +267,14 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     static private Function<Task, Float> temporalConfidence(long when, long now, int dur) {
-        return x -> rankTemporalByConfidence(x, when, now, dur);
+        return x -> rankTemporalByConfidence(x, when, dur);
     }
 
 //    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
 //        return x -> rankTemporalByConfidence(x, when, now, dur);
 //    }
 
-    static final float rankTemporalByConfidence(@Nullable Task t, long when, long now, int dur) {
-
-        if (t == null)
-            return Float.NEGATIVE_INFINITY;
+    static final float rankTemporalByConfidence(@NotNull Task t, long when,/* long now,*/ int dur) {
 
         float r = t.evi(when, dur);
         //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
@@ -346,7 +350,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         }
 
         //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now, now, dur) : Float.POSITIVE_INFINITY;
+        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
 
         Task a = l.minBy(temporalConfidence(now, now, dur));
 
@@ -354,7 +358,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             return null; // this probably shouldnt happen
         }
 
-        if (inputRank < rankTemporalByConfidence(a, now, now, dur)) {
+        if (inputRank < rankTemporalByConfidence(a, now, dur)) {
             //if weaker than everything else, attempt a merge of the input with another
 
             Task b = matchMerge(l, now, input, dur);

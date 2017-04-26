@@ -6,3 +6,4 @@ package jcog.pri;
 public interface PLink<X> extends Link<X>, Priority {
 
 }
+

@@ -23,7 +23,6 @@ import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
 import jcog.list.FasterList;
 import jcog.math.OneDHaar;
-import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;

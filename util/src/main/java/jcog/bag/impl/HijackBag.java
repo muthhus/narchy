@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -285,8 +284,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public static class Treadmill extends AtomicIntegerArray {
 
+        final static int procs = Runtime.getRuntime().availableProcessors();
+
         public Treadmill() {
-            this(Runtime.getRuntime().availableProcessors());
+            this(procs);
         }
 
         public Treadmill(int concurrency) {

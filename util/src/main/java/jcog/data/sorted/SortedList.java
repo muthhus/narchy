@@ -4,8 +4,6 @@ package jcog.data.sorted;
 
 import jcog.list.FasterList;
 
-import java.util.Comparator;
-
 /**
  * <p>
  * This class implements a sorted list. It is constructed with a comparator that

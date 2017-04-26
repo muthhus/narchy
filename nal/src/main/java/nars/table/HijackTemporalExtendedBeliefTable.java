@@ -96,21 +96,24 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
 
     @Override
     public void onRemoved(Task x) {
-        if (!save(x))
-            return;
+        if (save(x)) {
 
-        /** time + insignificant hash difference HACK */
-        double k = (x.mid() - 0.25) + (0.5 * (Math.abs(x.hashCode() / ((double) (Integer.MAX_VALUE)))));
+            /** time + insignificant hash difference HACK */
+            double k = (x.mid() - 0.25) + (0.5 * (Math.abs(x.hashCode() / ((double) (Integer.MAX_VALUE)))));
 
-        synchronized (history) {
-            int toRemove = history.size() + 1 - historicCapacity;
-            for (int i = 0; i < toRemove; i++) {
-                Task t = history.pollFirstEntry().getValue();
-                t.delete();
+            synchronized (history) {
+                int toRemove = history.size() + 1 - historicCapacity;
+                for (int i = 0; i < toRemove; i++) {
+                    Task t = history.pollFirstEntry().getValue();
+                    super.onRemoved(t);
+                }
+
+
+                history.put( k , x);
             }
 
-
-            history.put( k , x);
+        } else {
+            super.onRemoved(x);
         }
     }
 
