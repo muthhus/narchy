@@ -76,15 +76,15 @@ public interface NARBuilder {
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
-                3,
+                2,
 
-//                new HijackTermIndex(cb, 1024 * 256, reprobes)
+                new HijackTermIndex(cb, 1024 * 256, reprobes)
 
                 //new NullTermIndex(cb)
-                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
-                    exe
-                    //null /* null = fork join common pool */
-                )
+//                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
+//                    exe
+//                    //null /* null = fork join common pool */
+//                )
 //              new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {
@@ -207,12 +207,12 @@ public interface NARBuilder {
 
         //nar.activationRate.setValue(0.5f);
         nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.03f);
+        nar.truthResolution.setValue(0.01f);
 
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 5, true, 32);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 32);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

@@ -88,10 +88,12 @@ abstract public class NAgentX extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
 
+        int durFrames = 2;
+
         Time clock = new RealTime.
                 DSHalf(true)
                 //CS(true)
-                .durSeconds(1f / fps);
+                .durSeconds((durFrames) / fps);
         Default nar =
                 NARBuilder.newMultiThreadNAR(-1, clock, true);
 

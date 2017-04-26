@@ -315,7 +315,7 @@ abstract public class NAgent implements NSense, NAct {
                 goal(happiness,
                         t(1f, nar.confDefault(/*BELIEF*/ GOAL)),
                         //ETERNAL
-                        now + dur/2
+                        now// + dur/2
                 )
         );
 
