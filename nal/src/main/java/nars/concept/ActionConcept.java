@@ -1,7 +1,9 @@
 package nars.concept;
 
+import jcog.pri.PLink;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
@@ -66,14 +68,14 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     }
 
 
-    @Override
-    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
-
-//        return
-//                new HijackTemporalBeliefTable(
-//                        tCap * 2, nar.random);
-    }
+//    @Override
+//    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+//        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
+//
+////        return
+////                new HijackTemporalBeliefTable(
+////                        tCap * 2, nar.random);
+//    }
 
     @Override
     public EternalTable newEternalTable(int eCap) {
@@ -109,17 +111,17 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     protected class MyListTemporalBeliefTable extends HijackTemporalExtendedBeliefTable {
 
-        public MyListTemporalBeliefTable(int tCap, int historicCap, Random r) {
-            super(tCap, historicCap, r);
+        public MyListTemporalBeliefTable(int tCap, int historicCap) {
+            super(tCap, historicCap);
         }
 
-        @Override
-        public float pri(@NotNull Task t) {
-            float mult = 1f;
-            if (t.start() > now)
-                mult = 4f;
-            return mult *  super.pri(t);
-        }
+//        @Override
+//        public float pri(@NotNull Task t) {
+//            float mult = 1f;
+//            if (t.start() > now)
+//                mult = 4f;
+//            return mult *  super.pri(t);
+//        }
 
         @Override
         protected boolean save(Task t) {

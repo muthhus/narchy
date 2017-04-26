@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import nars.term.atom.Atom;
 import nars.truth.DefaultTruth;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -261,14 +262,14 @@ public abstract class Param  {
      * sets the default input goal confidence
      */
     public void goalConfidence(float theDefaultValue) {
-        defaultGoalTruth = new DefaultTruth(1.0f, theDefaultValue);
+        defaultGoalTruth = new PreciseTruth(1.0f, theDefaultValue);
     }
 
     /**
      * sets the default input belief confidence
      */
     public void beliefConfidence(float theDefaultValue) {
-        defaultBeliefTruth = new DefaultTruth(1.0f, theDefaultValue);
+        defaultBeliefTruth = new PreciseTruth(1.0f, theDefaultValue);
     }
 
 

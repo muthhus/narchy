@@ -139,8 +139,8 @@ abstract public class NAgent implements NSense, NAct {
             }
         };
 
-        curiosityConf = new FloatParam( nar.confMin.floatValue() * 10f);
-        curiosityProb = new FloatParam( 1/2f);
+        curiosityConf = new FloatParam( 0.05f);
+        curiosityProb = new FloatParam( 0.1f);
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
@@ -518,27 +518,19 @@ abstract public class NAgent implements NSense, NAct {
      * see: http://www.dictionary.com/browse/dexterity?s=t
      */
     public float dexterity() {
-        float m = 0;
+        final float[] m = {0};
         int n = actions.size();
         int dur = nar.dur();
-        List<Task> nonCuriosityTasks = $.newArrayList();
         for (ActionConcept a : actions) {
-
             a.goals().forEach(x -> {
                 if (!(x instanceof ActionConcept.CuriosityTask)) {
-                    nonCuriosityTasks.add(x);
+                    m[0] += x.evi(now, dur);
                 }
             });
-
-            if (!nonCuriosityTasks.isEmpty()) {
-                Truth d = TruthPolation.truth(null, now, dur, nonCuriosityTasks);
-                if (d != null)
-                    m += d.evi();
-
-                nonCuriosityTasks.clear();
-            }
         }
-        return w2c(m / n);
+        float dex = w2c(m[0] / n);
+        System.err.println(dex);
+        return dex;
     }
 
 

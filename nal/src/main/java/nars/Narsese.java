@@ -1228,7 +1228,7 @@ public class Narsese extends BaseParser<Object> {
 
             Truth t = (Truth) x[3];
             if (t != null && !Float.isFinite(t.conf()))
-                t = t.withConf(m.confDefault(punct));
+                t = $.t(t.freq(), m.confDefault(punct));
 
             @Nullable Truth t1 = t;
 

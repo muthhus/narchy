@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Comparator;
 
 import static jcog.Util.*;
-import static nars.truth.TruthFunctions.w2c;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -115,47 +114,6 @@ public interface Truth extends Truthed {
     }
 
 
-    /**
-     * The hash code of a TruthValue, perfectly condensed,
-     * into the two 16-bit words of a 32-bit integer.
-     *
-     * Since the same epsilon used in other truth
-     * resolution here (Truth components do not necessarily utilize the full
-     * resolution of a floating point value, and also do not necessarily
-     * need the full resolution of a 16bit number when discretized)
-     * the hash value can be used for equality comparisons
-     * as well as non-naturally ordered / non-lexicographic
-     * but deterministic compareTo() ordering.
-     */
-
-    static int hash(float freq, float conf) {
-        return truthToInt(freq, conf);
-    }
-
-
-
-    /** truth component resolution of a 16-bit encoding */
-    int hashDiscreteness16 = Short.MAX_VALUE-1;
-
-    /** correct behavior of this requires epsilon
-     * large enough such that: 0 <= h < 2^15: */
-    static int truthToInt(float freq, float conf) {
-
-        int freqHash = Util.hashFloat(freq, hashDiscreteness16) & 0x0000ffff;
-        int confHash = Util.hashFloat(conf, hashDiscreteness16) & 0x0000ffff;
-
-        return (freqHash << 16) | confHash;
-    }
-
-    @Nullable
-    static Truth intToTruth(int h) {
-        return $.t(
-                Util.unhashFloat( (h>>16) /* & 0xffff*/, hashDiscreteness16),
-                Util.unhashFloat(h & 0xffff, hashDiscreteness16)
-        );
-    }
-
-
     @NotNull
     default StringBuilder appendString(@NotNull StringBuilder sb) {
         return appendString(sb, 2);
@@ -196,14 +154,6 @@ public interface Truth extends Truthed {
     }
 
 
-
-    default Truth eviMult(float f, int dur) {
-        return (f == 1f) ? this : withConf(w2c(evi() * f));
-    }
-
-    @Nullable Truth withConf(float f);
-
-
 //    @NotNull
 //    default Truth interpolate(@NotNull Truthed y) {
 //        float xc = confWeight();
@@ -220,10 +170,12 @@ public interface Truth extends Truthed {
 //    }
 
     /** the negated (1 - freq) of this truth value */
-    @NotNull Truth negated();
+    default Truth negated() {
+        return new PreciseTruth(1f - freq(), conf());
+    }
 
     default boolean equals(@NotNull Truth x, float tolerance) {
-        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
+        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(evi(), x.evi(), tolerance);
     }
 
     @NotNull
@@ -261,7 +213,7 @@ public interface Truth extends Truthed {
         float c = conf(conf(), res);
         if (c < confMin)
             return null;
-        return $.t(freq(freq(), res), c);
+        return new DefaultTruth(freq(freq(), res), c);
     }
 
     default float eternalizedEvi() {

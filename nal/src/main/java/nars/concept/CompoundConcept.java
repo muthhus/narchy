@@ -41,7 +41,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    protected transient ConceptState state = ConceptState.Inactive;
+    protected transient ConceptState state = ConceptState.Deleted;
 
 
     /**
@@ -58,7 +58,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         this.taskLinks = taskLinks;
 
 
-        this.state = ConceptState.Inactive;
+        this.state = ConceptState.Deleted;
     }
 
 

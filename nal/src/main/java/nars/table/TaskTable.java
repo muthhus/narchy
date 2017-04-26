@@ -63,6 +63,7 @@ public interface TaskTable  {
     /** returns true if the task was removed */
     boolean removeTask(Task x);
 
+    void clear();
 
 
     //boolean contains(Task t);

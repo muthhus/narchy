@@ -2,6 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,7 +70,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Truth truth(long when, int dur, EternalTable eternal) {
+        public PreciseTruth truth(long when, int dur, EternalTable eternal) {
             return null;
         }
 

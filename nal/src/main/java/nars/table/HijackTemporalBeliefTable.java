@@ -8,9 +8,12 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
+import nars.concept.ActionConcept;
+import nars.task.DerivedTask;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.TruthPolation;
+import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.Function;
@@ -31,21 +34,30 @@ import static jcog.math.Interval.intersectLength;
 public class HijackTemporalBeliefTable extends TaskHijackBag implements TemporalBeliefTable {
 
 
-    public HijackTemporalBeliefTable(int initialCapacity, Random random) {
+    public HijackTemporalBeliefTable(int initialCapacity) {
         super(4 /* reprobes */);
         setCapacity(initialCapacity);
     }
 
-
     @Override
-    public void onRemoved(@NotNull Task t) {
-        t.delete();
+    protected Consumer<Task> forget(float avgToBeRemoved) {
+        return null; //temporal forgetting applied elsewhere
     }
-
 
     @Override
     public void capacity(int c, NAR nar) {
         setCapacity(c);
+    }
+
+    @Override
+    protected boolean replace(Task incoming, Task existing, float scale) {
+        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
+            return true;
+        if (existing instanceof ActionConcept.CuriosityTask)
+            return true;
+
+
+        return super.replace(incoming, existing, scale);
     }
 
 //    @Override
@@ -112,33 +124,26 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    }
 
 
-    @Override
-    protected boolean replace(Task incoming, Task existing, float scale) {
-        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
-            return true;
 
-        return super.replace(incoming, existing, scale);
-    }
+//    @Override
+//    protected Consumer<Task> forget(float avgToBeRemoved) {
+//        return new PForget<Task>(avgToBeRemoved) {
+//            @Override public void accept( @NotNull Task b) {
+//                b.priSub(avgToBeRemoved * (1f - b.conf()));
+//            }
+//        };
+//    }
 
-    @Override
-    protected Consumer<Task> forget(float avgToBeRemoved) {
-        return new PForget<Task>(avgToBeRemoved) {
-            @Override public void accept( @NotNull Task b) {
-                b.priSub(avgToBeRemoved * (1f - b.conf()));
-            }
-        };
-    }
-
-    @Override
-    public float pri(@NotNull Task t) {
-        return t.pri();
-//        //return (1f + t.priSafe(0)) * (1f + t.conf());
-//        float p = t.priSafe(-1);
-//        if (p >= 0)
-//            return Util.or((1f + p), (1f + t.conf()));
-//        else
-//            return -1;
-    }
+//    @Override
+//    public float pri(@NotNull Task t) {
+//        return t.pri();
+////        //return (1f + t.priSafe(0)) * (1f + t.conf());
+////        float p = t.priSafe(-1);
+////        if (p >= 0)
+////            return Util.or((1f + p), (1f + t.conf()));
+////        else
+////            return -1;
+//    }
 
 
 //    /**

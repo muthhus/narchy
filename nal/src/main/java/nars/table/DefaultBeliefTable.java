@@ -135,30 +135,30 @@ public class DefaultBeliefTable implements BeliefTable {
         if (input.isEternal()) {
 
             if (eternal == EternalTable.EMPTY) {
-                synchronized (concept) {
-                    if (eternal == EternalTable.EMPTY) {
+                //synchronized (concept) {
+                    /*if (eternal == EternalTable.EMPTY)*/ {
                         int cap = concept.state().beliefCap(concept, input.isBelief(), true);
                         if (cap > 0)
                             eternal = concept.newEternalTable(cap); //allocate
                         else
                             return null;
                     }
-                }
+                //}
             }
 
             return eternal.add(input, concept, nar);
 
         } else {
             if (temporal == TemporalBeliefTable.EMPTY) {
-                synchronized (concept) {
-                    if (temporal == TemporalBeliefTable.EMPTY) { //HACK double boiler
+                //synchronized (concept) {
+                    /*if (temporal == TemporalBeliefTable.EMPTY)*/ { //HACK double boiler
                         int cap = concept.state().beliefCap(concept, input.isBelief(), false);
                         if (cap > 0)
                             temporal = concept.newTemporalTable(cap, nar); //allocate
                         else
                             return null;
                     }
-                }
+                //}
             }
 
             return temporal.add(input);

@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
+import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -29,7 +30,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
-        if (input instanceof DynamicBeliefTask) {
+        if (input instanceof AnswerTask) {
             return input; //dont insert its own dynamic belief task, causing a feedback loop
         }
 

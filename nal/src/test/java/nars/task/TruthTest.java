@@ -17,16 +17,16 @@ public class TruthTest {
 
     @Test
     public void testFreqEquality() {
-        Truth a = t(1.0f, 0.9f);
-        Truth aCopy = t(1.0f, 0.9f);
+        Truth a = new DefaultTruth(1.0f, 0.9f);
+        Truth aCopy = new DefaultTruth(1.0f, 0.9f);
         assertEquals(a, aCopy);
 
-        Truth aEqualWithinThresh = t(
+        Truth aEqualWithinThresh = new DefaultTruth(
                 1.0f - Param.TRUTH_EPSILON / 2.1f /* slightly less than half */, 0.9f);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = t(1.0f - Param.TRUTH_EPSILON * 1.0f, 0.9f);
+        Truth aNotWithinThresh = new DefaultTruth( 1.0f - Param.TRUTH_EPSILON * 1.0f, 0.9f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
 
@@ -34,13 +34,13 @@ public class TruthTest {
 
     @Test
     public void testConfEquality() {
-        Truth a = t(1.0f, 0.5f);
+        Truth a = new DefaultTruth(1.0f, 0.5f);
 
-        Truth aEqualWithinThresh = t(1.0f, 0.5f - Param.TRUTH_EPSILON / 2.1f /* slightly less than half the epsilon */);
+        Truth aEqualWithinThresh = new DefaultTruth(1.0f, 0.5f - Param.TRUTH_EPSILON / 2.1f /* slightly less than half the epsilon */);
         assertEquals(a, aEqualWithinThresh);
         assertEquals(a.hashCode(), aEqualWithinThresh.hashCode());
 
-        Truth aNotWithinThresh = t(1.0f, 0.5f - Param.TRUTH_EPSILON * 1.0f);
+        Truth aNotWithinThresh = new DefaultTruth(1.0f, 0.5f - Param.TRUTH_EPSILON * 1.0f);
         assertNotEquals(a, aNotWithinThresh);
         assertNotEquals(a.hashCode(), aNotWithinThresh.hashCode());
     }
@@ -49,26 +49,26 @@ public class TruthTest {
 //    @Test public void testEpsilon() {
 //        float e = 0.1f;
 //
-//        Truth a = BasicTruth.get(1.0f, 0.9f, e);
+//        Truth a = BasicTruth.genew DefaultTruth(1.0f, 0.9f, e);
 //        assertEquals(a.getEpsilon(), e, 0.0001);
 //
-//        Truth aCopy = BasicTruth.get(1.0f, 0.9f, e);
+//        Truth aCopy = BasicTruth.genew DefaultTruth(1.0f, 0.9f, e);
 //        assertEquals(a, aCopy);
 //
-//        Truth aEqualWithinThresh = BasicTruth.get(1.0f - a.getEpsilon() / 2, 0.9f, e);
+//        Truth aEqualWithinThresh = BasicTruth.genew DefaultTruth(1.0f - a.getEpsilon() / 2, 0.9f, e);
 //        assertEquals(a, aEqualWithinThresh);
 //
-//        Truth aNotWithinThresh = BasicTruth.get(1.0f - a.getEpsilon(), 0.9f, e);
+//        Truth aNotWithinThresh = BasicTruth.genew DefaultTruth(1.0f - a.getEpsilon(), 0.9f, e);
 //        assertNotEquals(a, aNotWithinThresh);
 //    }
 
     @Test public void testTruthHash() {
-        assertEquals( t(0.5f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
-        assertNotEquals( t(1.0f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
-        assertNotEquals( t(0.51f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
-        assertNotEquals( t(0.506f, 0.5f).hashCode(), t(0.5f, 0.5f).hashCode() );
+        assertEquals( new DefaultTruth(0.5f, 0.5f).hashCode(), new DefaultTruth(0.5f, 0.5f).hashCode() );
+        assertNotEquals( new DefaultTruth(1.0f, 0.5f).hashCode(), new DefaultTruth(0.5f, 0.5f).hashCode() );
+        assertNotEquals( new DefaultTruth(0.51f, 0.5f).hashCode(), new DefaultTruth(0.5f, 0.5f).hashCode() );
+        assertNotEquals( new DefaultTruth(0.506f, 0.5f).hashCode(), new DefaultTruth(0.5f, 0.5f).hashCode() );
 
-        assertEquals( t(0, 0.01f).hashCode(), t(0, 0.01f).hashCode() );
+        assertEquals( new DefaultTruth(0, 0.01f).hashCode(), new DefaultTruth(0, 0.01f).hashCode() );
 
         //0.01 granularity
         assertEquals( new DefaultTruth(0.504f, 0.5f, 0.01f).hashCode(), new DefaultTruth(0.5f, 0.5f, 0.01f).hashCode() );
@@ -85,58 +85,58 @@ public class TruthTest {
     }
 
     static void hashUnhash(float f, float c) {
-        Truth t = $.t(f, c);
+        Truth t = new DefaultTruth(f, c);
         if (t == null)
             return;
-        Truth u = Truth.intToTruth(t.hashCode());
+        Truth u = DefaultTruth.intToTruth(t.hashCode());
         assertNotNull(t +  " unhased to null via hashCode " + t.hashCode(), u);
         assertEquals(t, u);
     }
 
 //    @Test public void testInterpolate() {
 //        {
-//            Truth a = t(0.75f, 0.5f);
-//            Truth b = t(0.5f, 0.25f);
-//            assertEquals(t(0.67f, 0.41f), a.interpolate(b));
+//            Truth a = new DefaultTruth(0.75f, 0.5f);
+//            Truth b = new DefaultTruth(0.5f, 0.25f);
+//            assertEquals(new DefaultTruth(0.67f, 0.41f), a.interpolate(b));
 //        }
 //
 //        {
-//            Truth a = t(0.75f, 0.25f);
-//            Truth b = t(0.5f, 0.5f);
-//            assertEquals(t(0.58f, 0.41f), a.interpolate(b));
+//            Truth a = new DefaultTruth(0.75f, 0.25f);
+//            Truth b = new DefaultTruth(0.5f, 0.5f);
+//            assertEquals(new DefaultTruth(0.58f, 0.41f), a.interpolate(b));
 //        }
 //
 //        {
-//            Truth a = t(0.55f, 0.25f);
-//            Truth b = t(0.5f, 0.5f);
-//            assertEquals(t(0.52f, 0.48f), a.interpolate(b));
+//            Truth a = new DefaultTruth(0.55f, 0.25f);
+//            Truth b = new DefaultTruth(0.5f, 0.5f);
+//            assertEquals(new DefaultTruth(0.52f, 0.48f), a.interpolate(b));
 //        }
-//        Truth a = t(0.95f, 0.5f);
-//        Truth b = t(0.5f, 0.01f);
-//        assertEquals(t(0.94f, 0.28f), a.interpolate(b));
+//        Truth a = new DefaultTruth(0.95f, 0.5f);
+//        Truth b = new DefaultTruth(0.5f, 0.01f);
+//        assertEquals(new DefaultTruth(0.94f, 0.28f), a.interpolate(b));
 //    }
 
     @Test
     public void testExpectation() {
-        assertEquals(0.75f, t(1f, 0.5f).expectation(), 0.01f);
-        assertEquals(0.95f, t(1f, 0.9f).expectation(), 0.01f);
-        assertEquals(0.05f, t(0f, 0.9f).expectation(), 0.01f);
+        assertEquals(0.75f, new DefaultTruth(1f, 0.5f).expectation(), 0.01f);
+        assertEquals(0.95f, new DefaultTruth(1f, 0.9f).expectation(), 0.01f);
+        assertEquals(0.05f, new DefaultTruth(0f, 0.9f).expectation(), 0.01f);
     }
 
     @Test public void testTruthRevision() {
-        Truth d = Revision.revise(t(1f, 0.1f), t(1f, 0.1f));
+        Truth d = Revision.revise(new DefaultTruth(1f, 0.1f), new DefaultTruth(1f, 0.1f));
         assertEquals(1f, d.freq(), 0.01f);
         assertEquals(0.18f, d.conf(), 0.01f);
 
-        Truth a = Revision.revise(t(1f, 0.3f), t(1f, 0.3f));
+        Truth a = Revision.revise(new DefaultTruth(1f, 0.3f), new DefaultTruth(1f, 0.3f));
         assertEquals(1f, a.freq(), 0.01f);
         assertEquals(0.46f, a.conf(), 0.01f);
 
-        Truth b = Revision.revise(t(0f, 0.3f), t(1f, 0.3f));
+        Truth b = Revision.revise(new DefaultTruth(0f, 0.3f), new DefaultTruth(1f, 0.3f));
         assertEquals(0.5f, b.freq(), 0.01f);
         assertEquals(0.46f, b.conf(), 0.01f);
 
-        Truth c = Revision.revise(t(1f, 0.9f), t(1f, 0.9f));
+        Truth c = Revision.revise(new DefaultTruth(1f, 0.9f), new DefaultTruth(1f, 0.9f));
         assertEquals(1f, c.freq(), 0.01f);
         assertEquals(0.95f, c.conf(), 0.01f);
     }
@@ -174,8 +174,8 @@ public class TruthTest {
         float c = 0.9f;
         for (float f1 = 0f; f1 <= 1.001f; f1+=0.1f) {
             for (float f2 = 0f; f2 <= 1.001f; f2+=0.1f) {
-                Truth t1 = t(f1, c);
-                Truth t2 = t(f2, c);
+                Truth t1 = new DefaultTruth(f1, c);
+                Truth t2 = new DefaultTruth(f2, c);
                 System.out.println(t1 + " " + t2 + ":\t" +
                         TruthFunctions.comparison(t1, t2, TRUTH_EPSILON));
             }

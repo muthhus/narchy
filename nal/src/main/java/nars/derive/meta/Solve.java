@@ -4,11 +4,13 @@ import nars.Op;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
 import nars.term.Compound;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Evaluates the truth of a premise
@@ -63,7 +65,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 float eFactor = m.nar.derivedEvidenceGain.asFloat();
                 if (eFactor != 1) {
-                    if ((t = t.eviMult(eFactor, m.nar.dur()))==null)
+                    if ((t = new PreciseTruth(t.freq(), w2c(t.evi() * eFactor)))==null)
                         return false;
                 }
 

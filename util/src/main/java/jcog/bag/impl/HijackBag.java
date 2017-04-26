@@ -577,6 +577,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public int size() {
+        commit(null);
         return size;
     }
 

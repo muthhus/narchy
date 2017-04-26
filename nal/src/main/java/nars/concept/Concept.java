@@ -156,13 +156,14 @@ public interface Concept extends Termed {
 
         c.beliefs().clear();
         c.goals().clear();
-        //c.questions().clear(); //TODO?
-        //c.quests().clear();
-
-        c.state(ConceptState.Inactive, nar);
+        c.questions().clear();
+        c.quests().clear();
 
         c.termlinks().clear();
         c.tasklinks().clear();
+
+        c.state(ConceptState.Deleted, nar);
+
     }
 
 
@@ -183,7 +184,7 @@ public interface Concept extends Termed {
 
 
     default boolean isDeleted() {
-        return state() == ConceptState.Inactive;
+        return state() == ConceptState.Deleted;
     }
 
 
@@ -209,15 +210,15 @@ public interface Concept extends Termed {
         return goals().truth(now, dur);
     }
 
-    @Nullable
-    default float goalConf(long now, int dur, float ifMissing) {
-        Truth t = goals().truth(now, dur);
-        return (t != null) ? t.conf() : ifMissing;
-    }
+//    @Nullable
+//    default float goalConf(long now, int dur, float ifMissing) {
+//        Truth t = goals().truth(now, dur);
+//        return (t != null) ? t.conf() : ifMissing;
+//    }
 
 
     @Nullable
-    default TaskTable tableFor(byte punc) {
+    default TaskTable table(byte punc) {
         switch (punc) {
             case BELIEF:
                 return beliefs();

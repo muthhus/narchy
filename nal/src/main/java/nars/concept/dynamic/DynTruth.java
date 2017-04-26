@@ -4,6 +4,7 @@ import jcog.pri.Priority;
 import nars.*;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
+import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -65,8 +66,8 @@ public final class DynTruth implements Truthed {
 
     @Override
     @Nullable
-    public Truth truth() {
-        return conf <= 0 ? null : $.t(freq, conf);
+    public PreciseTruth truth() {
+        return conf <= 0 ? null : new PreciseTruth(freq, conf);
     }
 
 

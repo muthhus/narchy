@@ -20,10 +20,9 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         super(reprobes);
     }
 
-
     @Override
-    public float pri(@NotNull Task key) {
-        return key.priSafe(0);
+    public void onRemoved(@NotNull Task t) {
+        t.delete();
     }
 
     @Override
@@ -77,7 +76,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
     @Override
     public boolean removeTask(Task x) {
         if (remove(x)!=null) {
-            commit();
             return true;
         }
         return false;
@@ -85,11 +83,9 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     public Task add(@NotNull Task t) {
 
+        commit();
+
         Task x = put(t);
-
-        if (x == t)
-            commit();
-
         return x;
     }
 

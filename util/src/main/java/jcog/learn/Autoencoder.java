@@ -234,7 +234,7 @@ public class Autoencoder {
 
 		int outs = y.length;
 
-		float errorSq = 0, error = 0;
+		float error = 0;
 
 		float[] zz = z;
 
@@ -247,7 +247,7 @@ public class Autoencoder {
 
 			L_vbias[i] = lv;
 
-			errorSq += lv * lv; // square of difference
+			//errorSq += lv * lv; // square of difference
 
 			vbias[i] += learningRate * lv;
 		}

@@ -1,14 +1,52 @@
 package nars.truth;
 
+import jcog.Util;
+import nars.$;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.truth.TruthFunctions.w2c;
 
+
+/** truth rounded to a fixed size precision
+ *  to support hashing and equality testing */
 public class DefaultTruth implements Truth {
+
+    /** truth component resolution of a 16-bit encoding */
+    static final int hashDiscreteness16 = Short.MAX_VALUE-1;
 
     public final float freq, conf;
     private final int hash;
+
+    /**
+     * The hash code of a TruthValue, perfectly condensed,
+     * into the two 16-bit words of a 32-bit integer.
+     *
+     * Since the same epsilon used in other truth
+     * resolution here (Truth components do not necessarily utilize the full
+     * resolution of a floating point value, and also do not necessarily
+     * need the full resolution of a 16bit number when discretized)
+     * the hash value can be used for equality comparisons
+     * as well as non-naturally ordered / non-lexicographic
+     * but deterministic compareTo() ordering.
+     * correct behavior of this requires epsilon
+     * large enough such that: 0 <= h < 2^15: */
+    public static int truthToInt(float freq, float conf) {
+
+        int freqHash = Util.hashFloat(freq, hashDiscreteness16) & 0x0000ffff;
+        int confHash = Util.hashFloat(conf, hashDiscreteness16) & 0x0000ffff;
+
+        return (freqHash << 16) | confHash;
+    }
+
+    @Nullable
+    public static Truth intToTruth(int h) {
+        return new DefaultTruth(
+                Util.unhashFloat( (h>>16) /* & 0xffff*/, hashDiscreteness16),
+                Util.unhashFloat(h & 0xffff, hashDiscreteness16)
+        );
+    }
 
     @Override
     public final float freq() {
@@ -25,18 +63,12 @@ public class DefaultTruth implements Truth {
     }
 
     public DefaultTruth(float f, float c, float epsilon) {
-        this.hash = Truth.truthToInt(
+        this.hash = truthToInt(
             this.freq = Truth.freq(f, epsilon),
             this.conf = Truth.conf(c, epsilon)
         );
     }
 
-
-    @Nullable
-    @Override
-    public final Truth withConf(float newConf) {
-        return new DefaultTruth(freq, newConf);
-    }
 
     @NotNull
     @Override
@@ -45,12 +77,16 @@ public class DefaultTruth implements Truth {
 
         //1 + 6 + 1 + 6 + 1
         return appendString(new StringBuilder(7)).toString();
+    }
 
+    public Truth eviMult(float f, int dur) {
+        return (f == 1f) ? this : new PreciseTruth(freq, (w2c(evi() * f)));
     }
 
     @Override
     public final boolean equals(Object that) {
-        return (that instanceof Truth) && (hash == that.hashCode());
+        return (that instanceof DefaultTruth) ? (hash == that.hashCode()) :
+            equals( (Truth)that, Param.TRUTH_EPSILON );
     }
 
     @Override
@@ -58,16 +94,16 @@ public class DefaultTruth implements Truth {
         return hash;
     }
 
-    @NotNull
-    @Override
-    public final DefaultTruth negated() {
-        //float fPos = freq;
-
-        //if = 0.5, negating will produce same result
-        //return Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON) ? this :
-
-        return new DefaultTruth(1.0f - freq, conf);
-    }
+//    @NotNull
+//    @Override
+//    public final DefaultTruth negated() {
+//        //float fPos = freq;
+//
+//        //if = 0.5, negating will produce same result
+//        //return Util.equals(fPos, 0.5f, Global.TRUTH_EPSILON) ? this :
+//
+//        return new DefaultTruth(1.0f - freq, conf);
+//    }
 
 //    protected boolean equalsFrequency(@NotNull Truth t) {
 //        return (Util.equals(freq, t.freq(), Param.TRUTH_EPSILON));

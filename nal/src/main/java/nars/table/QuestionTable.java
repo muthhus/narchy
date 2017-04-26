@@ -51,6 +51,11 @@ public interface QuestionTable extends TaskTable {
 
 
         @Override
+        public void clear() {
+
+        }
+
+        @Override
         public boolean removeTask(Task x) {
             return false;
         }

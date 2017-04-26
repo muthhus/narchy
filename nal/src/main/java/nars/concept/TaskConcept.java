@@ -104,7 +104,7 @@ public class TaskConcept extends CompoundConcept {
     }
 
     public HijackTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        return new HijackTemporalBeliefTable(tCap, nar.random());
+        return new HijackTemporalBeliefTable(tCap);
     }
 
     public EternalTable newEternalTable(int eCap) {

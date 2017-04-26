@@ -4,6 +4,7 @@ import nars.*;
 import nars.concept.TaskConcept;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.truth.DefaultTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -23,9 +24,9 @@ public class TaskTest {
     @Test public void testTruthHash16Plus16Bit() {
         //for TRUTH EPSILON 0.01:
 
-        assertEquals(3276, $.t(0, 0.1f).hashCode());
+        assertEquals(3276, new DefaultTruth(0, 0.1f).hashCode());
 
-        assertEquals(2147385014, $.t(1, 1.0f).hashCode());
+        assertEquals(2147385014, new DefaultTruth(1, 1.0f).hashCode());
     }
 
 //    /** tests the ordering of tasks that differ by truth values,

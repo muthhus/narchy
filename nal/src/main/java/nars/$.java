@@ -31,6 +31,7 @@ import nars.term.var.GenericVariable;
 import nars.term.var.VarPattern;
 import nars.term.var.Variable;
 import nars.truth.DefaultTruth;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
@@ -821,14 +822,14 @@ public enum $ {
 
     @Nullable
     public static Truth t(float f, float c) {
-        return t(f, c, Param.TRUTH_EPSILON);
+        return t(f, c, 0);
     }
 
     @Nullable
     public static Truth t(float f, float c, float minConf) {
         return (f != f || c != c || c < minConf) ?
                 null :
-                new DefaultTruth(f, c);
+                new PreciseTruth(f, c);
     }
 
     public static Priority b(float p) {

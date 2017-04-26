@@ -1,10 +1,9 @@
 package nars.task;
 
 import com.google.common.collect.Lists;
-import nars.$;
 import nars.Task;
 import nars.concept.dynamic.DynamicBeliefTask;
-import nars.truth.Truth;
+import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,17 +12,21 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  * see:
- *  https://en.wikipedia.org/wiki/Category:Intertemporal_economics
- *  https://en.wikipedia.org/wiki/Discounted_utility
+ * https://en.wikipedia.org/wiki/Category:Intertemporal_economics
+ * https://en.wikipedia.org/wiki/Discounted_utility
  */
-public enum TruthPolation  {
+public enum TruthPolation {
     ;
 
-    /** dt > 0 */
+
+    /**
+     * dt > 0
+     */
     public static float evidenceDecay(float evi, int dur, long dt) {
 
         //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
-        return evi / ( 1 + (((float)dt)/dur) ); //inverse linear
+        return evi / (1 + (((float) dt) / dur)); //inverse linear
+        //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 
@@ -35,40 +38,55 @@ public enum TruthPolation  {
     }
 
     @Nullable
-    public static Truth truth(long when, int dur, @NotNull Task... tasks) {
+    public static PreciseTruth truth(long when, int dur, @NotNull Task... tasks) {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
+
+    /**
+     * returns (freq, evid) pair
+     */
     @Nullable
-    public static Truth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
+    public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
         float[] illWei = new float[2];
+
+
         // Contribution of each sample point to the illumination of the
         // microsphere's facets.
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
         tasks.forEach(t -> {
-            if (t instanceof DynamicBeliefTask)
-                return; //ignore dynamic belief tasks
 
             float tw = t.evi(when, dur);
+
             if (tw > 0) {
                 illWei[0] += tw;
                 illWei[1] += tw * t.freq();
             }
+
+
+            float cost = 0.01f;
+            float utilized = tw / t.evi();
+            //System.out.println(when + "," + dur + "@ " + t  + " utilized " + utilized);
+            t.priMult((1f - cost * (1f - utilized)));
+
         });
-        float illumination = illWei[0];
-        float weightedValue = illWei[1];
+        float evidence = illWei[0];
+        if (evidence > 0) {
 
-        if (topEternal!=null) {
-            float ew = topEternal.evi();
-            illumination += ew;
-            weightedValue += ew * topEternal.freq();
+            float freqEvi = illWei[1];
+
+            if (topEternal != null) {
+                float ew = topEternal.evi();
+                evidence += ew;
+                freqEvi += ew * topEternal.freq();
+            }
+
+            float f = freqEvi / evidence;
+            return new PreciseTruth(f, w2c(evidence));
+        } else {
+            return null;
         }
-
-        float f = weightedValue / illumination;
-        float c = w2c(illumination);
-
-        return $.t(f, c);
     }
 
 }

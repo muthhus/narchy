@@ -5,6 +5,7 @@ import nars.NAgent;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.term.Compound;
+import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 
@@ -123,7 +124,7 @@ public class Outputs {
 //                        } else {
                             //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        return d!=null ? d.eviMult(goalInfluence, a.nar.dur()) : null;
+                        return d!=null ? ((DefaultTruth)d).eviMult(goalInfluence, a.nar.dur()) : null;
                     });
                 }
 //                        a.sense(namer.apply(i), () -> {

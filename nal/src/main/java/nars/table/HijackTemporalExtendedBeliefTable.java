@@ -6,7 +6,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 /**
@@ -19,8 +18,8 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
     final TreeMap<Double, Task> history;
     private final int historicCapacity;
 
-    public HijackTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity, Random r) {
-        super(initialCapacity, r);
+    public HijackTemporalExtendedBeliefTable(int initialCapacity, int historicCapacity) {
+        super(initialCapacity);
         this.historicCapacity = historicCapacity;
         this.history = new TreeMap<>();
     }
