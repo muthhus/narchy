@@ -82,7 +82,7 @@ public class NAL5BooleanConsistency {
                         assertTrue("unrecognized true case", false);
 
                     if (thisone && b.isNegative())
-                        assertTrue("wrong true case", false);
+                        assertTrue("wrong true case:\n" + t.proof(), false);
 
                     if (!thisone && b!=null && b.isPositive() && b.conf() > 0.5f /* estimate */)
                         assertTrue("wrong false case:\n" + t.proof(), false);

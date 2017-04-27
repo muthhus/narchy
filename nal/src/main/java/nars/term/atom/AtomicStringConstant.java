@@ -48,7 +48,7 @@ public abstract class AtomicStringConstant extends AtomicString {
     public final int init(@NotNull int[] meta) {
 
         meta[4] ++; //volume
-        meta[5] |= structure();
+        meta[5] |= op().bit; //structure();
 
         return hashCode();
     }

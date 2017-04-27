@@ -15,13 +15,15 @@ public abstract class AtomicString implements Atomic {
         return  (this == u)
                 ||
                 (
+                        u instanceof Atomic &&
                         hashCode() == u.hashCode() &&
-                        (u instanceof Atomic && op() == ((Atomic) u).op())) &&
-                        (toString().equals(u.toString())
+                        op() == ((Atomic) u).op()) &&
+                        toString().equals(u.toString()
                 );
 
     }
 
+    @Override abstract public String toString();
 
     @Override
     public int complexity() {

@@ -8,38 +8,10 @@ import org.jetbrains.annotations.NotNull;
 
 /** default Atom implementation: wraps a String instance as closely as possible.
  * ideally this string is stored encoded in UTF8 byte[]'s */
-public class Atom extends AtomicString {
-
-    private final String id;
+public class Atom extends AtomicStringConstant {
 
     public Atom(@NotNull String id) {
-
-        this.id = (validateAtomID(id));
-    }
-
-    @Override
-    public final String toString() {
-        return id;
-    }
-
-    @Override
-    public final int varIndep() {
-        return 0;
-    }
-
-    @Override
-    public final int varDep() {
-        return 0;
-    }
-
-    @Override
-    public final int varQuery() {
-        return 0;
-    }
-
-    @Override
-    public final int varPattern() {
-        return 0;
+        super(validateAtomID(id));
     }
 
     @NotNull
