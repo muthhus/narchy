@@ -29,7 +29,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public final DoubleAdder pressure = new DoubleAdder();
 
-    int size;
+    public final AtomicInteger size = new AtomicInteger(0);
     float mass;
 
     public HijackBag(int initialCapacity, int reprobes) {
@@ -255,11 +255,11 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         if (!merged) {
             if (found != null && (add || remove)) {
-                onRemoved(found);
+                _onRemoved(found);
             }
 
             if (added != null) {
-                onAdded(added);
+                _onAdded(added);
             } else if (add) {
                 //rejected: add but not added and not merged
             }
@@ -449,14 +449,13 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         BagCursorAction next = BagCursorAction.Next;
         boolean modified = false;
         while (!next.stop) {
+            if (++i == c) i = 0; //modulo c
             V v = map.get(i);
             if (v != null && (next = each.next(v)).remove) {
-                if (map.weakCompareAndSetVolatile(i, v, null)) {
+                if (map.compareAndSet(i, v, null)) {
                     modified = true;
                 }
             }
-
-            if (++i == c) i = 0; //modulo c
         }
 
         if (modified)
@@ -577,8 +576,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public int size() {
-        commit(null);
-        return size;
+        return size.get();
     }
 
     @Override
@@ -673,19 +671,18 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 if (f == null)
                     continue;
 
-                float p = priSafe(f, -1);
-                if (p >= 0) {
-                    count++;
+                float p = pri(f);
+                if (p == p) {
                     mass += p;
+                    count++;
                 } else {
                     if (a.compareAndSet(i, f, null)) {
-                        onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
+                        _onRemoved(f); //TODO this may call onRemoved unnecessarily if the map has changed (ex: resize)
                     }
                 }
             }
 
-            this.size = count;
-
+            assert(size() == count);
             this.mass = mass;
 
         } finally {
@@ -693,6 +690,15 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         }
 
         return this;
+    }
+
+    private void _onAdded(V x) {
+        size.incrementAndGet();
+        onAdded(x);
+    }
+    private void _onRemoved(V x) {
+        size.decrementAndGet();
+        onRemoved(x);
     }
 
     @NotNull

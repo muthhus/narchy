@@ -18,7 +18,7 @@ import static nars.Op.*;
  */
 public class PreferSimpleAndConfident implements DerivationBudgeting {
 
-
+    public final FloatParam polarityFactor = new FloatParam(0.1f, 0f, 1f);
     public final FloatParam belief = new FloatParam(1f, 0f, 1f);
     public final FloatParam goal = new FloatParam(1f, 0f, 1f);
     public final FloatParam question = new FloatParam(1f, 0f, 1f);
@@ -63,9 +63,12 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 
         float p = d.premise.pri();
 
+
+
         if (truth!=null) { //belief and goal:
-            p *= 0.75f + 0.25f * BudgetFunctions.truthToQuality(truth);
-                    //confidencePreservationFactor(truth, d);
+            float polarityFactor = this.polarityFactor.floatValue();
+            p *= (1f-polarityFactor) + polarityFactor * (BudgetFunctions.truthToQuality(truth) - 0.5f)*2f;
+            //confidencePreservationFactor(truth, d);
         } else {
             p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
         }
@@ -135,7 +138,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             1f -
                 //(float)Math.sqrt(
                     Util.unitize(
-                    ((float)parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
+                        ((float)derivedComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
                 //)
                     //Math.max(0, (float)(derivedComplexity - parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity))
                     //((float) parentComplexity) / (parentComplexity + derivedComplexity)

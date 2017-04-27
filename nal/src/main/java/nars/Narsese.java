@@ -134,9 +134,6 @@ public class Narsese extends BaseParser<Object> {
         return parsers.get();
     }
 
-    public static float quality(NAR nar, byte p, @Nullable Truth t) {
-        return t != null ? BudgetFunctions.truthToQuality(t) : nar.qualityDefault(p);
-    }
 
     public static boolean isPunctuation(char c) {
         switch (c) {

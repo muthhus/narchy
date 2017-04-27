@@ -1,11 +1,14 @@
 package nars.nar;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
+import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
@@ -15,12 +18,16 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
+import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.function.BiFunction;
 
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
@@ -54,20 +61,20 @@ public interface NARBuilder {
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
                 new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
-                new DefaultConceptState("awake", 16, 16, 4, 32, 24)
+                new DefaultConceptState("awake", 32, 32, 4, 32, 24)
         ) {
-//            @Override
-//            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
-//                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-//                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-//                return f.apply(termlink, tasklink);
-//            }
-//
-//            @NotNull
-//            @Deprecated @Override
-//            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-//                return new DefaultHijackBag<>(blend, reprobes);
-//            }
+            @Override
+            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
+                Bag<Term, PLink<Term>> termlink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+                return f.apply(termlink, tasklink);
+            }
+
+            @NotNull
+            @Deprecated @Override
+            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+                return new DefaultHijackBag<>(blend, reprobes);
+            }
         };
 
 
