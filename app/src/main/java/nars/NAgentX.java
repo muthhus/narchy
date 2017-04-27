@@ -88,7 +88,7 @@ abstract public class NAgentX extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
 
-        int durFrames = 2;
+        int durFrames = 1;
 
         Time clock = new RealTime.
                 DSHalf(true)
