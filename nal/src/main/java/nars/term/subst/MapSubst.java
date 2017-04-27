@@ -47,7 +47,7 @@ public class MapSubst implements Subst {
 //    }
 
     @Override
-    public boolean tryPut(@NotNull Unify copied) {
+    public boolean put(@NotNull Unify copied) {
         throw new UnsupportedOperationException("TODO");
     }
 

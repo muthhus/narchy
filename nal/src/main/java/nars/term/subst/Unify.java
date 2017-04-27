@@ -172,9 +172,8 @@ public abstract class Unify implements Termutator, Subst {
     }
 
 
-    @Override
-    public boolean tryPut(@NotNull Unify m) {
-        return m.xy.forEachVersioned(this::replaceXY);
+    @Override public boolean put(@NotNull Unify m) {
+        return m.xy.forEachVersioned(this::putXY);
     }
 
     @Override
@@ -299,10 +298,6 @@ public abstract class Unify implements Termutator, Subst {
      */
     public final boolean putXY(@NotNull Term xVar /* usually a Variable */, @NotNull Term y /* value */) {
         return xy.tryPut(xVar, y);
-    }
-
-    public final boolean replaceXY(Term x /* usually a Variable */, @NotNull Term y) {
-        return xy.tryPut(x, y);
     }
 
     public final int now() {

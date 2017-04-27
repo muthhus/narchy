@@ -39,7 +39,7 @@ public class SubUnify extends Unify {
         if (xterm != null) {
             final Subst s;
             if (target != null) {
-                if (!target.tryPut(this)) {
+                if (!target.put(this)) {
                     return true; //try again
                 }
                 s = target;

@@ -38,7 +38,7 @@ public interface Subst  {
     /** copy in
      * @return whether all puts were successful
      * */
-    boolean tryPut(@NotNull Unify copied);
+    boolean put(@NotNull Unify copied);
 
     @Nullable default Term transform(@NotNull Term src, TermIndex index) {
         Term y = xy(src);

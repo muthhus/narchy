@@ -119,7 +119,8 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
 
     @Override
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        throw new UnsupportedOperationException();
+        return false;
+        //throw new UnsupportedOperationException();
     }
 
     @Override

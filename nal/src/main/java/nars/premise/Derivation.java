@@ -118,6 +118,8 @@ abstract public class Derivation extends Unify {
         forEachMatch = null;
         termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
 
+        evidenceDouble = evidenceSingle = null;
+        temporal = cyclic = overlap = false;
 
         this.premise = p;
 

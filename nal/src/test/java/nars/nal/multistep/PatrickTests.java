@@ -58,7 +58,7 @@ public class PatrickTests extends AbstractNALTest {
 //.askAt(1250,"REPRESENT:((eats,cat),?what)")
                 .askAt(550, "REPRESENT:((cat,eats),(?x, ?y))")
 
-                .mustBelieve(2500, "REPRESENT:((eats,cat),(EATING, ANIMAL))", 1f, 0.73f);
+                .mustBelieve(2500, "REPRESENT:((eats,cat),(EATING, ANIMAL))", 1f, 0.32f);
         //.mustBelieve(2500, "REPRESENT:((eats, cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }
@@ -116,7 +116,7 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test();
         tt.nar.time.dur(25);
-        tt.nar.termVolumeMax.setValue(40);
+        tt.nar.termVolumeMax.setValue(32);
 
         tt.log();
         tt.input(
@@ -131,8 +131,8 @@ public class PatrickTests extends AbstractNALTest {
         );
         //tt.log();
 
-        tt.mustDesire(300, "lighter(I, toothbrush)", 1f,
-                0.42f,
+        tt.mustDesire(1000, "lighter(I, toothbrush)", 1f,
+                0.39f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
 

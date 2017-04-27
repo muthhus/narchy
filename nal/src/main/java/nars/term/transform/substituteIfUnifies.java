@@ -92,23 +92,25 @@ abstract public class substituteIfUnifies extends Functor {
 
         Term x = a.sub(1);
         Term y = a.sub(2);
+
+        if (x.equals(y))
+            return input; //unification would occurr but no changes would result
+
         boolean strict = a.subEquals(3, substitute.STRICT);
         Term failureTerm = strict ? False : input;
 
 //        if (y.equals(input))
 //            return failureTerm;
-        if (x.equals(y))
-            return failureTerm; //unification would occurr but no changes would result
 
         @Nullable Op op = unifying();
-        boolean hasAnyOp =
-                (op==null && (x.vars() + x.varPattern()  > 0))
-                ||
-                (op!=null && x.hasAny(op));
-
-        if (!hasAnyOp/* && mustSubstitute()*/) {
-            return False; //no change
-        }
+//        boolean hasAnyOp =
+//                (op==null && (x.vars() + x.varPattern()  > 0))
+//                ||
+//                (op!=null && x.hasAny(op));
+//
+//        if (!hasAnyOp/* && mustSubstitute()*/) {
+//            return False; //no change
+//        }
 
         Term z = new SubUnify(parent, op).tryMatch(parent, input, x, y);
         return (z != null) ? z : failureTerm;
