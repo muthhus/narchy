@@ -3,14 +3,14 @@ package nars.conceptualize.state;
 import nars.Op;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.atom.AtomicStringConstant;
+import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 
 /** interface for a management model responsible for concept resource allocation:
  *      --budget (time)
  *      --memory (space)
  */
-public abstract class ConceptState extends AtomicStringConstant {
+public abstract class ConceptState extends AtomicString {
 
     protected ConceptState(@NotNull String id) {
         super(id);

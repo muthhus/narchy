@@ -10,7 +10,7 @@ import nars.Op;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicString;
+import nars.term.atom.ToStringAtomic;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public interface Termject<X> extends Term {
 //    }
 
 
-    abstract class PrimTermject<X> extends AtomicString implements Termject<X> {
+    abstract class PrimTermject<X> extends ToStringAtomic implements Termject<X> {
 
         @NotNull
         public final X val;

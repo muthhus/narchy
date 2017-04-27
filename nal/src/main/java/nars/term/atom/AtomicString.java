@@ -1,40 +1,66 @@
 package nars.term.atom;
 
-import jcog.Util;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by me on 1/1/16.
+ * Atomic impl which relies on a String instance
  */
-public abstract class AtomicString implements Atomic {
+public abstract class AtomicString extends ToStringAtomic {
 
-    /** Assumes that the op()
-     *  is encoded within its string such that additional op()
-     *  comparison would be redundant. */
-    @Override public boolean equals(Object u) {
+    @NotNull public final String id;
 
-        return  (this == u)
-                ||
-                (
-                        u instanceof Atomic &&
-                        hashCode() == u.hashCode() &&
-                        op() == ((Atomic) u).op()) &&
-                        toString().equals(u.toString()
-                );
+    /** (cached for speed) */
+    final int hash;
 
+    protected AtomicString(@NotNull String id) {
+        this.id = id;
+        this.hash = super.hashCode();
     }
 
-    @Override abstract public String toString();
+    @NotNull
+    @Override public final String toString() {
+        return id;
+    }
 
     @Override
-    public int complexity() {
-        return 1;
+    public final int varIndep() {
+        return 0;
     }
+
+    @Override
+    public final int varDep() {
+        return 0;
+    }
+
+    @Override
+    public final int varQuery() {
+        return 0;
+    }
+
+    @Override
+    public final int varPattern() {
+        return 0;
+    }
+
+    @Override
+    public final int vars() {
+        return 0;
+    }
+
 
     @Override
     public final int hashCode() {
-        //return toString().hashCode();
-        //return Util.hashCombine(toString().hashCode(), op().bit);
-        return Util.hashWangJenkins( toString().hashCode() );
+        return hash;
     }
+
+    @Override
+    public final int init(@NotNull int[] meta) {
+
+        meta[4] ++; //volume
+        meta[5] |= op().bit; //structure();
+
+        return hash;
+    }
+
 
 }

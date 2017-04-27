@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 /** default Atom implementation: wraps a String instance as closely as possible.
  * ideally this string is stored encoded in UTF8 byte[]'s */
-public class Atom extends AtomicStringConstant {
+public class Atom extends AtomicString {
 
     public Atom(@NotNull String id) {
         super(validateAtomID(id));

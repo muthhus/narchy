@@ -1,7 +1,7 @@
 package nars.derive.meta;
 
 import nars.Op;
-import nars.term.atom.AtomicString;
+import nars.term.atom.ToStringAtomic;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * this will be better than expecting each implementation's toString() method to remain
  * constant
  */
-public abstract class AtomicPred<X> extends AtomicString implements BoolPred<X> {
+@Deprecated public abstract class AtomicPred<X> extends ToStringAtomic implements BoolPred<X> {
 
     @NotNull
     public abstract String toString();

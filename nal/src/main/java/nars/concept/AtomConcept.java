@@ -11,14 +11,14 @@ import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicStringConstant;
+import nars.term.atom.AtomicString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 
-public class AtomConcept extends AtomicStringConstant implements Concept {
+public class AtomConcept extends AtomicString implements Concept {
 
     private final Bag<Term,PLink<Term>> termLinks;
     private final Bag<Task,PLink<Task>> taskLinks;

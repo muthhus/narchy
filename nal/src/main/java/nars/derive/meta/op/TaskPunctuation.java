@@ -1,55 +1,44 @@
 package nars.derive.meta.op;
 
 import nars.Op;
+import nars.derive.meta.AbstractPred;
 import nars.derive.meta.AtomicPred;
+import nars.derive.meta.BoolPred;
 import nars.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 8/27/15.
  */
-final public class TaskPunctuation extends AtomicPred<Derivation> {
+final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     public final byte punc;
-    public final String id;
-
 
     public static final TaskPunctuation Belief = new TaskPunctuation('.');
     public static final TaskPunctuation Goal = new TaskPunctuation('!');
 
-    public static final AtomicPred<Derivation> QuestionOrQuest = new AtomicPred<>() {
+    public static final AbstractPred<Derivation> QuestionOrQuest = new AbstractPred<Derivation>("task:\"?@\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             byte c = o.taskPunct;
             return c == Op.QUESTION || c == Op.QUEST;
         }
-
-        @Override
-        public String toString() {
-            return "task:\"?@\"";
-        }
     };
-    public static final AtomicPred<Derivation> Question = new AtomicPred<>() {
+
+    public static final AbstractPred<Derivation> Question = new AbstractPred<Derivation>("task:\"?\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUESTION;
         }
 
-        @Override
-        public String toString() {
-            return "task:\"?\"";
-        }
     };
-    public static final AtomicPred<Derivation> Quest = new AtomicPred<>() {
+
+    public static final AbstractPred<Derivation> Quest = new AbstractPred<Derivation>("task:\"@\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUEST;
         }
 
-        @Override
-        public String toString() {
-            return "task:\"@\"";
-        }
     };
 
     //    /** only belief, not goal or question */
@@ -84,15 +73,10 @@ final public class TaskPunctuation extends AtomicPred<Derivation> {
     }
 
     TaskPunctuation(char p, String id) {
+        super(id);
         this.punc = (byte) p;
-        this.id = id;
     }
 
-    @NotNull
-    @Override
-    public final String toString() {
-        return id;
-    }
 
     @Override
     public final boolean test(@NotNull Derivation m) {

@@ -2,13 +2,13 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
-import nars.term.atom.AtomicString;
+import nars.term.atom.ToStringAtomic;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Unnormalized, labeled variable
  */
-public class GenericVariable extends AtomicString implements Variable {
+public class GenericVariable extends ToStringAtomic implements Variable {
 
     @NotNull
     public final Op type;

@@ -1,5 +1,6 @@
 package nars.derive.meta;
 
+import nars.$;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 
@@ -8,6 +9,9 @@ import nars.term.ProxyCompound;
  */
 public abstract class AbstractPred<X> extends ProxyCompound implements BoolPred<X> {
 
+    public AbstractPred(String x) {
+        this($.$safe(x));
+    }
 
     public AbstractPred(Compound term) {
         super(term);

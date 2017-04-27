@@ -81,6 +81,14 @@ public enum $ {
         return terms.term(term);
     }
 
+    public static <T extends Term> T $safe(@NotNull String term)  {
+        try {
+            return $(term);
+        } catch (Narsese.NarseseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 //    public static @NotNull <O> ObjRef<O> ref(String term, O instance) {
 //        return new ObjRef(term, instance);
 //    }
