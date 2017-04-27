@@ -124,7 +124,8 @@ public class Outputs {
 //                        } else {
                             //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        return d!=null ? ((DefaultTruth)d).eviMult(goalInfluence, a.nar.dur()) : null;
+                        return d;
+                        //return d!=null ? new PreciseTruth(d.freq(), d.conf()goalInfluence.d.eviMult(goalInfluence, a.nar.dur()) : null;
                     });
                 }
 //                        a.sense(namer.apply(i), () -> {

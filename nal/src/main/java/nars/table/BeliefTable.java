@@ -155,11 +155,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     @Nullable Task add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
 
-    default @Nullable Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap) {
+    @Nullable default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap) {
         return match(when, now, dur, against, null, noOverlap);
     }
 
-    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap);
+    @Nullable Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap);
 
     @Nullable default Task match(long when, long now, int dur) {
         return match(when, now, dur, null, true);
@@ -250,7 +250,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (when == ETERNAL)
                 when = now;
 
-            Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
+            Truth aProj = answer.truth(when, dur, 0 /* nar.confMin.floatValue() */);
             if (aProj == null)
                 return null;
 

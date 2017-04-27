@@ -133,10 +133,10 @@
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
-    S, (&&,S,A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
-        S, (||,S,A..+), time(dtBeliefExact) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    S, (&&,(--,%S),A..+), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
-        S, (||,(--,%S),A..+), time(dtBeliefExact) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
+    S, (&&,S,A..+), task("."), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+        //S, (||,S,A..+), time(dtBeliefExact) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+    S, (&&,(--,%S),A..+), task("."), time(decomposeBelief) |- (&&,A..+), (Belief:DecomposeNegativeNegativeNegative)
+        //S, (||,(--,%S),A..+), time(dtBeliefExact) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
 //conditional abduction TODO this needs to be 'dt' sensitive
