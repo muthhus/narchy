@@ -47,7 +47,7 @@
 // original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
-    ( (--,%S) ==> P), ( (--,%S) ==> P), time(dtTaskExact) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)
+    ( (--,%S) ==> P), ( (--,%S) ==> P), task("."), time(dtTaskExact) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////

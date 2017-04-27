@@ -6,12 +6,10 @@ import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import jcog.list.FasterList;
 import jcog.pri.Priority;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Task;
+import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
+import nars.nar.Default;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -21,6 +19,7 @@ import nars.truth.TruthAccumulator;
 import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -35,10 +34,13 @@ import static nars.truth.TruthFunctions.w2c;
 public class Line1D {
 
     public static void main(String[] args) {
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
 
-        NAR nar = runRT((NAR n) -> {
+        NAR n = new Default();
+        n.time.dur(10);
+
+        //NAR nar = runRT((NAR n) -> {
 
             //n.setControl(new InteractiveFirer(n));
 
@@ -55,14 +57,14 @@ public class Line1D {
 
             //n.log();
 
-            implAccelerator(n, a);
+            //implAccelerator(n, a);
 
-            n.onTask(x -> {
-                if (x.isGoal() && x instanceof DerivedTask) {
-                    // && x.term().equals(a.o)
-                    System.out.println(x.proof());
-                }
-            });
+//            n.onTask(x -> {
+//                if (x.isGoal() && x instanceof DerivedTask) {
+//                    // && x.term().equals(a.o)
+//                    System.out.println(x.proof());
+//                }
+//            });
 
 
             //TEST CHEAT:
@@ -80,9 +82,27 @@ public class Line1D {
 
             //a.curiosityProb.setValue(0f);
 
-            return a;
+            //return a;
 
-        }, 20);
+        //}, 20);
+
+        n.onTask(t -> {
+            if (t instanceof DerivedTask) {
+                System.out.println(t.proof());
+                try {
+                    System.in.read();
+                } catch (IOException e) {
+                }
+            }
+        });
+
+        //n.log();
+
+        NAgentX.chart(a);
+
+        a.runCycles(5000);
+
+
 
     }
 
