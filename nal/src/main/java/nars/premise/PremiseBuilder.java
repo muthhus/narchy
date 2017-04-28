@@ -123,7 +123,7 @@ public enum PremiseBuilder { ;
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
-        nar.concepts.commit(concept);
+
 
         return new Premise(task, beliefTerm, belief, pri);
     }
@@ -182,12 +182,11 @@ public enum PremiseBuilder { ;
                 if (!aa.equals(result[0])) {
                     result[0] = ((Compound) aa);
                     return false; //only this match
-                } else {
-                    return true; //keep trying
                 }
-            } else {
-                return true; //keep trying
             }
+
+            return true; //keep trying
+
         }, Param.BeliefMatchTTL ).unifyAll(a, q);
 
         return result[0];

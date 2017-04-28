@@ -15,7 +15,6 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.ImmutableTask;
-import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -231,10 +230,10 @@ abstract public class NAgent implements NSense, NAct {
         ambition.input(predict(now), nar::input);
         ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
 
-        motor.input(actionStream().map(a -> a.apply(nar)), nar::input);
+        motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
         motor.input(curious(next), nar::input);
 
-        sense.input(nextInput(nar, next), nar::input);
+        sense.input(sense(nar, next), nar::input);
 
         eventFrame.emit(this);
 
@@ -242,18 +241,11 @@ abstract public class NAgent implements NSense, NAct {
             logger.info(summary());
     }
 
-    protected Stream<Task> nextInput(NAR nar, long when) {
+    /** provides the stream of the environment's next sensory percept tasks */
+    protected Stream<Task> sense(NAR nar, long when) {
         return sensors.stream().map(s -> s.apply(nar));
     }
 
-
-    protected Stream<ActionConcept> actionStream() {
-        return actions.stream();
-    }
-
-    protected Stream<SensorConcept> sensorStream() {
-        return sensors.stream();
-    }
 
     protected Stream<Task> curious(long next) {
         float conf = curiosityConf.floatValue();
@@ -262,7 +254,7 @@ abstract public class NAgent implements NSense, NAct {
             return Stream.empty();
 
         float curiPerMotor = curiosityProb.floatValue() / actions.size();
-        return actionStream().map(action -> {
+        return actions.stream().map(action -> {
 
             if (nar.random().nextFloat() < curiPerMotor) {
                 return action.curiosity(conf, next, nar);

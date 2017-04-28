@@ -271,7 +271,10 @@ In keeping with a design preference for unity and balanced spectral continuity, 
   natural way, and enhanced with the added expressiveness of shades of NAL truth and budget. 
 
 
- _Many other changes remain to be documented._
+### Deep Variable Introduction
+See VarIntroduction.java and subclasses, and which rules apply them.
+
+### _Many other changes remain to be documented._
  
 
 ## Contents

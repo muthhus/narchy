@@ -112,7 +112,7 @@ abstract public class Derivation extends Unify {
 
     }
 
-    public Derivation restart(@NotNull Premise p, int ttl) {
+    @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         this.versioning.setTTL(ttl);
         forEachMatch = null;

@@ -21,6 +21,7 @@ import nars.premise.PremiseBuilder;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,6 +80,60 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * returns # of derivations processed
      */
     int premiseVector(PLink<Concept> pc, Derivation d) {
+
+        Concept c = pc.get();
+        float cPri = pc.priSafe(0);
+        int ttl = Util.lerp(cPri, Param.UnificationTTL, Param.UnificationTTLMin);
+        c.tasklinks().commit();
+        c.termlinks().commit();
+        nar.concepts.commit(c);
+
+        long now = nar.time();
+        int count = 0;
+
+        int premiseCost = Param.BeliefMatchTTL;
+        int linkSampleCost = 1;
+
+        @Nullable PLink<Task> tasklink = null;
+        @Nullable PLink<Term> termlink = null;
+        while (ttl > 0) {
+            if (tasklink == null || nar.random().nextFloat() > tasklink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
+                tasklink = c.tasklinks().sample();
+                if (tasklink == null)
+                    break;
+                ttl -= linkSampleCost;
+            }
+
+
+            if (termlink == null || nar.random().nextFloat() > termlink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
+                termlink = c.termlinks().sample();
+                if (termlink == null)
+                    break;
+                ttl -= linkSampleCost;
+            }
+
+            Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
+            ttl -= premiseCost;
+
+            if (p != null) {
+
+                int start = ttl;
+                if (deriver.test(d.restart(p, ttl)))
+                    count++;
+                int consumed = (start - d.versioning.ttl);
+                ttl -= consumed;
+            }
+
+        }
+
+
+        return count;
+    }
+
+    /**
+     * returns # of derivations processed
+     */
+    int premiseVector0(PLink<Concept> pc, Derivation d) {
 
         Concept c = pc.get();
         float cPri = pc.priSafe(0);

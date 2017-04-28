@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public class Versioning extends FasterList<Versioned> {
 
 
-    private int ttl;
+    public int ttl;
 
     public Versioning(int capacity, int ttl) {
         super(0, new Versioned[capacity]);
