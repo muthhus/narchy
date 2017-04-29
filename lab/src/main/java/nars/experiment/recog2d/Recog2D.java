@@ -310,7 +310,6 @@ public class Recog2D extends NAgentX {
                 3,
                 new RealTime.DSHalf(true).durFPS(durFPS)));
 
-        new RLAccel(a, new HaiQAgent());
 
         NAgentX.chart(a);
         a.runRT(30);

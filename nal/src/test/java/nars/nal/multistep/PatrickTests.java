@@ -118,7 +118,7 @@ public class PatrickTests extends AbstractNALTest {
         tt.nar.time.dur(25);
         tt.nar.termVolumeMax.setValue(32);
 
-        tt.log();
+        //tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &&+0 lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
@@ -132,7 +132,7 @@ public class PatrickTests extends AbstractNALTest {
         //tt.log();
 
         tt.mustDesire(1000, "lighter(I, toothbrush)", 1f,
-                0.39f,
+                0.21f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 
 

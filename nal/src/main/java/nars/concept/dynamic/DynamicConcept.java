@@ -20,10 +20,12 @@ public class DynamicConcept extends TaskConcept {
                 beliefModel!=null ?
                         new DynamicBeliefTable(this, beliefModel, true) :
                         super.newBeliefTable(nar, true);
-        this.goals =
-                goalModel != null ?
-                        new DynamicBeliefTable(this, goalModel, false) :
-                        super.newBeliefTable(nar, false);
+
+// commented to disable dynamic belief table for goals
+//        this.goals =
+//                goalModel != null ?
+//                        new DynamicBeliefTable(this, goalModel, false) :
+//                        super.newBeliefTable(nar, false);
     }
 
 

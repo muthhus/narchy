@@ -120,8 +120,8 @@ public interface NAct {
             return
                     //d!=null ?
                     $.t(f,
-                            d!=null ? d.conf() : nar().confMin.floatValue()
-                            //nar().confDefault(BELIEF)
+                            //d!=null ? d.conf() : nar().confMin.floatValue()
+                            nar().confDefault(BELIEF)
                     )
                     //: null
                     ;
@@ -295,12 +295,13 @@ public interface NAct {
     default ActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d != null) {
+                float conf = nar().confDefault(BELIEF); //d.conf()
                 float f = d.freq();
                 if (update.accept(f)) {
-                    return $.t(f, d.conf());
+                    return $.t(f, conf);
                 } else {
-                    //return $.t(0.5f, alpha); //neutral on failure
-                    return null;
+                    return $.t(0.5f, conf); //neutral on failure
+                    //return null;
                 }
             }
             return null;

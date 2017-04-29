@@ -3,10 +3,12 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.experiment.RLAccel;
 import nars.gui.Vis;
 import nars.term.Compound;
 import nars.term.Term;
@@ -47,6 +49,7 @@ public class Arkancide extends NAgentX {
 
             try {
                 a = new Arkancide(n, cam, numeric);
+
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }
