@@ -138,8 +138,8 @@ abstract public class NAgent implements NSense, NAct {
             }
         };
 
-        curiosityConf = new FloatParam( nar.confMin.floatValue() * 4f);
-        curiosityProb = new FloatParam( 0.5f);
+        curiosityConf = new FloatParam( 0.10f);
+        curiosityProb = new FloatParam( 0.20f);
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");

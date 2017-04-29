@@ -22,19 +22,13 @@ import java.util.function.Function;
 
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
 
-    @NotNull
-    @Deprecated
-    public final NAR nar;
-
     final TruthAccumulator
             beliefIntegrated = new TruthAccumulator(),
             goalIntegrated = new TruthAccumulator();
     private long now;
 
-
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
-        this.nar = n;
         n.onCycle(this);
     }
 
@@ -47,7 +41,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
         long now = nar.time();
-        long when = now;// + nar.dur();
+        long when = now + nar.dur();
         CuriosityTask t = new CuriosityTask(term, punc,
                 $.t(nar.random().nextFloat(), conf),
                 now,

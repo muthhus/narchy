@@ -24,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 public abstract class WiredConcept extends TaskConcept implements PermanentConcept {
 
 
-
     public interface Prioritizable {
         void pri(FloatSupplier v);
     }

@@ -171,6 +171,11 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return sensor.apply(nar);
     }
 
+    public SensorConcept resolution(float r) {
+        resolution.setValue(r);
+        return this;
+    }
+
 
     protected class MyListTemporalBeliefTable extends HijackTemporalExtendedBeliefTable {
 

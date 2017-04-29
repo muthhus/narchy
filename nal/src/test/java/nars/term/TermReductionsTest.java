@@ -512,7 +512,11 @@ public class TermReductionsTest {
     }
 
     @Test public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {
-        assertInvalidTerms("(#1 && --(#1&&(robin-->swimmer)))");
+        //(x && not(x&&y)) |- x && not(y)
+        assertEquals(
+                "(#1&&(--,(robin-->swimmer)))",
+                $("(#1 && --(#1&&(robin-->swimmer)))").toString()
+        );
     }
 
     @Test
@@ -820,9 +824,8 @@ public class TermReductionsTest {
 
     @Test public void testConjDisjNeg() throws Narsese.NarseseException {
         assertEquals(
-                False,
-                $("((--,(out))&&(||,(happy),(out)))"));
-
+                "((--,(out))&&(happy))",
+                $("((--,(out))&&(||,(happy),(out)))").toString());
     }
 
     @Test public void taskWithFlattenedConunctions() {
@@ -836,10 +839,29 @@ public class TermReductionsTest {
 
         Term t = $(s);
 
-        assertEquals("(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&(x-->tetris))))))", t.toString());
+        assertEquals(
+                //"(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&(x-->tetris))))))",
+                "(--,(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 (rotate-->tetris)))", //TODO check this reduction
+                t.toString());
     }
 
-    @Test public void testCoNegatedConjunctionX() throws Narsese.NarseseException {
+    @Test public void testPromoteEternalToParallel() throws Narsese.NarseseException {
+        String s = "(a &&+0 (b && c))";
+        assertEquals(
+                "( &&+0 ,a,b,c)",
+                $(s).toString()
+        );
+    }
+    @Test public void testPromoteEternalToParallelDont() throws Narsese.NarseseException {
+        String s = "(a && (b &&+0 c))";
+        assertEquals(
+                "(a&&(b &&+0 c))",
+                $(s).toString()
+        );
+    }
+
+    @Test public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
+        //mix of parallel and eternal
         String s = "((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))";
         assertEquals(
                 False,

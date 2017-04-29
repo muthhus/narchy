@@ -8,7 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static nars.truth.TruthFunctions.w2c;
 
-/** thread-safe truth accumulator/integrator */
+/** thread-safe truth accumulator/integrator
+ *  TODO implement with PreciseTruth
+ * */
 public class TruthAccumulator extends AtomicReference<double[]> {
 
     public TruthAccumulator() {

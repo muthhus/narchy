@@ -108,9 +108,9 @@ public class Arkancide extends NAgentX {
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         }
         if (numeric) {
-            SensorConcept a = senseNumber("paddle:x", (() -> noid.paddle.x/ noid.getWidth()));//.resolution(resX);
-            SensorConcept b = senseNumber("ball:x", (() -> (noid.ball.x / noid.getWidth())));
-            SensorConcept c = senseNumber("ball:y", (() -> 1f - (noid.ball.y / noid.getHeight())));
+            SensorConcept a = senseNumber("paddle:x", (() -> noid.paddle.x/ noid.getWidth())).resolution(resX);
+            SensorConcept b = senseNumber("ball:x", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            SensorConcept c = senseNumber("ball:y", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             SensorConcept d = senseNumber("ball:vx", new FloatPolarNormalized(() -> noid.ball.velocityX));
             SensorConcept e = senseNumber("ball:vy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
@@ -135,15 +135,15 @@ public class Arkancide extends NAgentX {
             return true;
         });
 
-        Param.DEBUG = true;
-        nar.onTask(x -> {
-            if (x.isGoal()
-                    && !x.isInput() && (!(x instanceof ActionConcept.CuriosityTask))
-                    //&& x.term().equals(paddleControl)
-            ) {
-                System.err.println(x.proof());
-            }
-        });
+//        Param.DEBUG = true;
+//        nar.onTask(x -> {
+//            if (x.isGoal()
+//                    && !x.isInput() && (!(x instanceof ActionConcept.CuriosityTask))
+//                    //&& x.term().equals(paddleControl)
+//            ) {
+//                System.err.println(x.proof());
+//            }
+//        });
 
 
 //        actionUnipolar($.inh(Atomic.the("paddle"), Atomic.the("nx") ), (v) -> {

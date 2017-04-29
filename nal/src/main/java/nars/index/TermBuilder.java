@@ -16,7 +16,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -552,31 +551,55 @@ public abstract class TermBuilder {
 
     /**
      * flattening conjunction builder, for (commutive) multi-arg conjunction and disjunction (dt == 0 ar DTERNAL)
+     * see: https://en.wikipedia.org/wiki/Boolean_algebra#Monotone_laws
      */
-    @NotNull
-    private Term junctionFlat(int dt, @NotNull Term... u) {
+    @NotNull private Term junctionFlat(int dt, @NotNull Term... u) {
 
-        if (u.length == 0)
-            return False;
+        //TODO if there are no negations in u then an accelerated construction is possible
 
-        assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
-
+        assert (u.length > 0 && dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
         ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
-        if (!flatten(CONJ, u, dt, s) || s.isEmpty()) {
-            return False;
+        if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
+            Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
+            if (!cs.isEmpty()) {
+
+
+                //annihilate common terms inside and outside of disjunction
+                //      ex:
+                //          -X &&  ( X ||  Y)
+                //          -X && -(-X && -Y)  |-   -X && Y
+                Iterator<Term> csi = cs.iterator();
+                List<Term> csa = null;
+                while (csi.hasNext()) {
+                    Term x = csi.next();
+
+                    if ( x.op() == NEG && x.subOpIs(0, CONJ)) { //DISJUNCTION
+                        Compound disj = (Compound) x.unneg();
+                        Set<Term> disjSubs = disj.toSet();
+                        //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
+                        if (disjSubs.removeAll(cs)) {
+                            //reconstruct disj if changed
+                            csi.remove();
+
+                            if (!disjSubs.isEmpty()) {
+                                Term y = neg(the(CONJ, disj.dt(), disjSubs));
+                                if (csa==null)
+                                    csa = $.newArrayList(1);
+                                csa.add(y);
+                            }
+                        }
+                    }
+                }
+                if (csa!=null)
+                    cs.addAll(csa);
+
+                return finalize(CONJ, dt, cs);
+            }
         }
 
-        Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
-        if (!cs.isEmpty()) {
-            Set<Term> ts = conjTrueFalseFilter(cs);
-            if (ts == cs || !ts.isEmpty())
-                return finalize(CONJ, dt, ts);
-        }
         return False;
-
-
     }
 
 
@@ -680,9 +703,17 @@ public abstract class TermBuilder {
         return true;
     }
 
+    private static boolean flattenMatchDT(int candidate, int target) {
+        if (candidate == target) return true;
+        if (target == 0 && candidate == DTERNAL)
+            return true; //promote to parallel
+        return false;
+    }
+
     private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
         Op xo = x.op();
-        if ((xo == op) && (((Compound) x).dt() == dt)) {
+
+        if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
             return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
         } else {
             byte polarity;

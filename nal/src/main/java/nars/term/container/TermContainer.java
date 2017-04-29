@@ -141,13 +141,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /** @return a Mutable Set, unless empty */
     default @NotNull Set<Term> toSet() {
         int s = size();
-        switch (s) {
-            case 0:
-                return Collections.emptySet();
-            default:
-                UnifiedSet u = new UnifiedSet(s);
-                forEach(u::add);
-                return u;
+        if (s > 0) {
+            UnifiedSet u = new UnifiedSet(s);
+            forEach(u::add);
+            return u;
+        } else {
+            return Collections.emptySet();
         }
 //        return new DirectArrayUnenforcedSet<Term>(Terms.sorted(toArray())) {
 //            @Override
