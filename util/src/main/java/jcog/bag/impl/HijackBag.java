@@ -116,7 +116,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
                 commit(null);
 
-                removed.forEach(this::onRemoved);
+                removed.forEach(this::_onRemoved);
             }
 
 
@@ -130,7 +130,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public void clear() {
         AtomicReferenceArray<V> x = reset();
         if (x != null) {
-            forEachActive(this, x, this::onRemoved);
+            forEachActive(this, x, this::_onRemoved);
         }
     }
 
@@ -682,7 +682,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 }
             }
 
-            assert(size() == count);
+            size.set(count); //assert(size() == count);
             this.mass = mass;
 
         } finally {

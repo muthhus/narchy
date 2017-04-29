@@ -790,10 +790,12 @@ public abstract class TermBuilder {
                         }
                     }
 
-                    if (isTrue(subject)) return predicate;
-                    if (isFalse(subject)) return neg(predicate);
-                    if (isTrue(predicate)) return subject;
-                    if (isFalse(predicate)) return neg(subject);
+                    //if (isTrue(subject)) return predicate;
+                    //if (isTrue(predicate)) return subject;
+                    //if (isFalse(subject)) return neg(predicate);
+                    //if (isFalse(predicate)) return neg(subject);
+                    if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
+                        return False;
 
                     if (!validEquivalenceTerm(subject))
                         throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);

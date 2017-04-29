@@ -269,7 +269,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         if (l.remove(x)) {
             if (delete)
                 x.delete();
-            onRemoved(x);
+            remove(x);
             return true;
         }
         return false;
@@ -486,7 +486,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     final boolean clean(MutableList<Task> l) {
         return l.removeIf(x -> {
             if (x.isDeleted()) {
-                onRemoved(x);
+                remove(x);
                 return true;
             }
             return false;

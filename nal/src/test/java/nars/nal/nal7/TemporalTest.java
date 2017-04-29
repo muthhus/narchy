@@ -107,10 +107,16 @@ public class TemporalTest {
 
     @Test
     public void testParseOperationInFunctionalForm2() throws Narsese.NarseseException {
-        assertEquals("(do(that) &&+0 ((a)&&(b)))", n.term("(do(that) &&+0 ((a)&&(b)))").toString());
+        assertEquals(
+                //"(do(that) &&+0 ((a)&&(b)))",
+                "( &&+0 ,do(that),(a),(b))",
+                n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 
         Termed<Term> nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
-        assertEquals("(do(that) &&+0 ((a)&&(b)))", nt.toString());
+        assertEquals(
+                //"(do(that) &&+0 ((a)&&(b)))",
+                "( &&+0 ,do(that),(a),(b))",
+                nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
         assertEquals("(do(that)&&((a)&&(b)))", n.conceptualize(nt).toString());

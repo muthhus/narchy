@@ -74,9 +74,9 @@
         (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegativeN)
         //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), C, time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
+    //(M ==> C), C, time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), C, time(dtTaskExact) |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
+    //(C ==> M), C, time(dtTaskExact) |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
         //((&&,(--,%S),A..+) ==> M), M, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////

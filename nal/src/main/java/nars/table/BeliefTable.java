@@ -175,7 +175,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     default void print(@NotNull PrintStream out) {
-        this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.stamp())));
+        this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.stamp()))); //TODO print Stamp using same methods Task uses
     }
 
     default void print() {
