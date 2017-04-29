@@ -14,6 +14,8 @@ import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,7 +42,6 @@ public abstract class TermBuilder {
 
     private static final int InvalidImplicationSubject = or(EQUI, IMPL);
     private static final int InvalidImplicationPredicate = or(EQUI, IMPL);
-
 
 
     /**
@@ -458,7 +459,7 @@ public abstract class TermBuilder {
         boolean hasPatternVar = false;
         for (Term x : res) {
             if (x.equals(Imdex)) {
-                assert(index==DTERNAL);
+                assert (index == DTERNAL);
                 index = j;
             } else if (!hasPatternVar && x.varPattern() > 0) {
                 hasPatternVar = true;
@@ -561,25 +562,20 @@ public abstract class TermBuilder {
         assert (dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
 
-        Set<Term> s = new LinkedHashSet<>(u.length * 2);
+        ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
-        flatten(CONJ, u, dt, s);
-
-        int n = s.size();
-        switch (n) {
-            case 0:
-                return False; //empty condition
-            case 1:
-                return s.iterator().next();
-            default:
-                Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
-                if (!cs.isEmpty()) {
-                    Set<Term> ts = conjTrueFalseFilter(cs);
-                    if (ts == cs || !ts.isEmpty())
-                        return finalize(CONJ, dt, ts);
-                }
-                return False;
+        if (!flatten(CONJ, u, dt, s) || s.isEmpty()) {
+            return False;
         }
+
+        Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
+        if (!cs.isEmpty()) {
+            Set<Term> ts = conjTrueFalseFilter(cs);
+            if (ts == cs || !ts.isEmpty())
+                return finalize(CONJ, dt, ts);
+        }
+        return False;
+
 
     }
 
@@ -592,71 +588,73 @@ public abstract class TermBuilder {
      *
      * @param innerDT will either 0 or DTERNAL (commutive relation)
      */
-    private @NotNull Set<Term> junctionGroupNonDTSubterms(@NotNull Set<Term> s, int innerDT) {
+    private @NotNull Set<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteHashMap<Term> s, int innerDT) {
 
-        Set<Term> outer = null;
+        Set<Term> outer = new HashSet(s.size());
 
-        Iterator<Term> ss = s.iterator();
+        Iterator<ObjectBytePair<Term>> ss = s.keyValuesView().iterator();
 
         while (ss.hasNext()) {
-            Term toOuter = null;
-
-            Term x = ss.next();
-            if (isTrue(x)) {
-                ss.remove();
-            } else if (isFalse(x)) {
-                return Collections.emptySet();
-            } else {
-                switch (x.op()) {
-                    case CONJ:
-                        // dt will be something other than 'innerDT' having just been flattened
-                        toOuter = x;
-                        ss.remove();
-                        break;
-                    case NEG:
-                        Compound n = (Compound) x;
-                        Term nn = n.sub(0);
-                        if (nn.op() == CONJ) {
-                            Compound cnn = ((Compound) nn);
-                            int dt = cnn.dt();
-                            if (dt == innerDT) {
-                                //negating unwrap each subterm of the negated conjunction to the outer level of compatible 'dt'
-                                int cnns = cnn.size();
-                                for (int i = 0; i < cnns; i++) {
-                                    Term cnt = cnn.sub(i);
-                                    if (s.contains(cnt)) {
-                                        //co-negation detected
-                                        return Collections.emptySet();
-                                    }
-                                    toOuter = neg(cnt);
-                                }
-                                ss.remove();
-                            }
-                        }
-                        break;
-                }
-            }
-            if (toOuter != null) {
-                if (outer == null) outer = new UnifiedSet(2);
-                outer.add(x);
-            }
+            ObjectBytePair<Term> xn = ss.next();
+            Term x = xn.getOne();
+            outer.add((xn.getTwo() < 0) ? $.neg(x) : x);
         }
+        return outer;
 
-        if (outer != null) { //something changed
-            int sts = s.size();
-            if (sts > 0) {
-                Term[] sa = s.toArray(new Term[sts]);
-
-                Term next = (sa.length == 1) ? sa[0] : the(CONJ, innerDT, sa);
-                if (next == null)
-                    return Collections.emptySet();
-
-                outer.add(next);
-            }
-            return outer;
-        } else {
-            return s;
-        }
+//            if (isTrue(x)) {
+//                ss.remove();
+//            } else if (isFalse(x)) {
+//                return Collections.emptySet();
+//            } else {
+//                switch (x.op()) {
+//                    case CONJ:
+//                        // dt will be something other than 'innerDT' having just been flattened
+//                        toOuter = x;
+//                        ss.remove();
+//                        break;
+//                    case NEG:
+//                        Compound n = (Compound) x;
+//                        Term nn = n.sub(0);
+//                        if (nn.op() == CONJ) {
+//                            Compound cnn = ((Compound) nn);
+//                            int dt = cnn.dt();
+//                            if (dt == innerDT) {
+//                                //negating unwrap each subterm of the negated conjunction to the outer level of compatible 'dt'
+//                                int cnns = cnn.size();
+//                                for (int i = 0; i < cnns; i++) {
+//                                    Term cnt = cnn.sub(i);
+//                                    if (s.contains(cnt)) {
+//                                        //co-negation detected
+//                                        return Collections.emptySet();
+//                                    }
+//                                    toOuter = neg(cnt);
+//                                }
+//                                ss.remove();
+//                            }
+//                        }
+//                        break;
+//                }
+//            }
+//            if (toOuter != null) {
+//                if (outer == null) outer = new UnifiedSet(2);
+//                outer.add(x);
+//            }
+//
+//        if (outer != null) { //something changed
+//            int sts = s.size();
+//            if (sts > 0) {
+//                Term[] sa = s.toArray(new Term[sts]);
+//
+//                Term next = (sa.length == 1) ? sa[0] : the(CONJ, innerDT, sa);
+//                if (next == null)
+//                    return Collections.emptySet();
+//
+//                outer.add(next);
+//            }
+//            return outer;
+//        } else {
+//            return s;
+//        }
 
     }
 
@@ -665,33 +663,41 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private static void flatten(@NotNull Op op, @NotNull Term[] u, int dt, @NotNull Set<Term> s) {
+    private static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
         for (Term x : u) {
-            flatten(op, dt, s, x);
+            if (!flatten(op, dt, x, s))
+                return false;
         }
+        return true;
     }
 
-    private static void flatten(@NotNull Op op, @NotNull TermContainer u, int dt, @NotNull Set<Term> s) {
-        for (Term x : u) {
-            flatten(op, dt, s, x);
+    private static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
+        int l = u.size();
+        for (int i = 0; i < l; i++) {
+            if (!flatten(op, dt, u.sub(i), s))
+                return false;
         }
+        return true;
     }
 
-    private static void flatten(@NotNull Op op, int dt, @NotNull Set<Term> s, Term x) {
+    private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
         Op xo = x.op();
         if ((xo == op) && (((Compound) x).dt() == dt)) {
-            flatten(op, ((Compound) x).subterms(), dt, s); //recurse
+            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
         } else {
-            if (!s.isEmpty()) {
-                if (s.remove(
-                        $.neg(x) //construct on stack
-                )) {
-                    //co-negation detected, skip this term
-                    return;
-                }
+            byte polarity;
+            Term t;
+            if (xo == NEG) {
+                polarity = -1;
+                t = x.unneg();
+            } else {
+                polarity = +1;
+                t = x;
             }
-            s.add(x);
+            if (s.getIfAbsentPut(t, polarity) != polarity)
+                return false; //CoNegation
         }
+        return true;
     }
 
 
@@ -1124,8 +1130,6 @@ public abstract class TermBuilder {
     }
 
 
-
-
     @NotNull
     public Compound atemporalize(final @NotNull Compound c) {
 
@@ -1215,6 +1219,7 @@ public abstract class TermBuilder {
             return c;
         }
     }
+
     @NotNull
     public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 

@@ -477,7 +477,7 @@ public class TermReductionsTest {
 
     @Test public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
         assertEquals(False, $("(#1 && (--,#1))"));
-        assertEquals($("(x)"), $("(&&, #1, (--,#1), (x))"));
+        assertEquals(False, $("(&&, #1, (--,#1), (x))"));
 
         assertTrue( $("(#1 &&+1 (--,#1))") instanceof Compound);
         assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
@@ -538,26 +538,26 @@ public class TermReductionsTest {
     public void testCoNegatedJunction() throws Narsese.NarseseException {
         //the conegation cancels out conflicting terms
 
-        assertEquals($("x"), $("(&&,x,a:b,(--,a:b))"));
+        assertEquals(False, $("(&&,x,a:b,(--,a:b))"));
 
-        assertEquals($("(b)"), $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
-        assertEquals($("((b) && (c))"), $("(&&, (a), (--,(a)), (b), (c))"));
+        assertEquals(False, $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
+        assertEquals(False, $("(&&, (a), (--,(a)), (b), (c))"));
 
 
-        assertEquals($("(x && y)"), $("(&&,x,y,a:b,(--,a:b))"));
+        assertEquals(False, $("(&&,x,y,a:b,(--,a:b))"));
     }
 
 
     @Test
     public void testCoNegatedDisjunction() throws Narsese.NarseseException {
 
-        assertEquals($("x"),
+        assertEquals(True,
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals($("(||,x,y)"),
+        assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals($("x"), $.parallel($.varDep(0), $.neg($.varDep(0)), Atomic.the("x")));
+        assertEquals(False, $.parallel($.varDep(0), $.neg($.varDep(0)), Atomic.the("x")));
     }
 
     @Test
@@ -716,7 +716,8 @@ public class TermReductionsTest {
     public void testGroupNonDTemporalParallelComponents() throws Narsese.NarseseException {
         //$.76;.45;.70$ ( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right))). :3537: %.64;.15%
         //$.39;.44;.70$ (((--,(ball_left)) &&-233 (ball_right)) &&-1 ((ball_left) &&+0 (ball_right))). :3243: %.53;.23%
-        assertEquals("(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))",
+        assertEquals(
+                "( &&+0 ,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
