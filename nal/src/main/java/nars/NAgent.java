@@ -138,8 +138,8 @@ abstract public class NAgent implements NSense, NAct {
             }
         };
 
-        curiosityConf = new FloatParam( 0.05f);
-        curiosityProb = new FloatParam( 0.1f);
+        curiosityConf = new FloatParam( nar.confMin.floatValue() * 4f);
+        curiosityProb = new FloatParam( 0.5f);
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
@@ -242,7 +242,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     /** provides the stream of the environment's next sensory percept tasks */
-    protected Stream<Task> sense(NAR nar, long when) {
+    public Stream<Task> sense(NAR nar, long when) {
         return sensors.stream().map(s -> s.apply(nar));
     }
 
@@ -345,9 +345,9 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()),
-                            now),
-                            //ETERNAL)
+//                    quest((Compound) (action.term()),
+//                            now),
+//                            //ETERNAL)
 
                     //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
                     //,quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)

@@ -23,6 +23,7 @@ import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
 import jcog.list.FasterList;
 import jcog.math.OneDHaar;
+import jcog.pri.PLink;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -56,7 +57,8 @@ import static java.util.Arrays.stream;
  *
  *
  */
-public enum Util { ;
+public enum Util {
+    ;
 
     public static final int PRIME3 = 524287;
     public static final int PRIME2 = 92821;
@@ -64,7 +66,6 @@ public enum Util { ;
     public static final float[] EmptyFloatArray = new float[0]; //TODO find what class this is elsewhere something like ArrayUtils
 
     public static final int MAX_CONCURRENCY = Runtime.getRuntime().availableProcessors();
-
 
 
     /**
@@ -305,9 +306,6 @@ public enum Util { ;
     */
 
 
-
-
-
     public static long hashPJW(String str) {
         long BitsInUnsignedInt = (4 * 8);
         long ThreeQuarters = (BitsInUnsignedInt * 3) / 4;
@@ -346,7 +344,9 @@ public enum Util { ;
     }
 
 
-    /** from: ConcurrentReferenceHashMap.java found in Hazelcast */
+    /**
+     * from: ConcurrentReferenceHashMap.java found in Hazelcast
+     */
     public static int hashWangJenkins(int h) {
         // Spread bits to regularize both segment and index locations,
         // using variant of single-word Wang/Jenkins hash.
@@ -358,13 +358,17 @@ public enum Util { ;
         return h ^ (h >>> 16);
     }
 
-    /** from clojure.Util - not tested */
+    /**
+     * from clojure.Util - not tested
+     */
     public static int hashClojure(int a, int b) {
-        return a ^ ( b + 0x9e3779b9 + (a << 6) + (a >> 2) );
+        return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
     }
+
     public static int hashJava(int a, int b) {
         return a * 31 + b;
     }
+
     public static int hashJavaX(int a, int b) {
         return a * Util.PRIME2 + b;
     }
@@ -391,7 +395,7 @@ public enum Util { ;
     }
 
     public static int hashNonZeroELF(byte[] str, int seed) {
-        int i  = (int) hashELF(str, seed);
+        int i = (int) hashELF(str, seed);
         if (i == 0) i = 1;
         return i;
     }
@@ -414,6 +418,7 @@ public enum Util { ;
 
         return hash;
     }
+
     public static long hashELF(byte[] str, long seed, int start, int end) {
 
         long hash = seed;
@@ -432,7 +437,9 @@ public enum Util { ;
     }
 
 
-    /** http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx */
+    /**
+     * http://www.eternallyconfuzzled.com/tuts/algorithms/jsw_tut_hashing.aspx
+     */
     public static int hashROT(Object... x) {
         long h = 2166136261L;
         for (Object o : x)
@@ -481,18 +488,19 @@ public enum Util { ;
      * targetFactor=0:   full current
      */
     public static float lerp(float targetFactor, float max, float min) {
-        return min + (max-min) * unitize(targetFactor);
+        return min + (max - min) * unitize(targetFactor);
     }
+
     public static double lerp(double targetFactor, double max, double min) {
-        return min + (max-min) * unitize(targetFactor);
+        return min + (max - min) * unitize(targetFactor);
     }
 
     public static long lerp(float factor, long max, long min) {
-        return min + Math.round((max-min) * ((double)unitize(factor)));
+        return min + Math.round((max - min) * ((double) unitize(factor)));
     }
 
     public static int lerp(float factor, int max, int min) {
-        return min + Math.round((max-min) * unitize(factor));
+        return min + Math.round((max - min) * unitize(factor));
     }
 
     /**
@@ -548,7 +556,7 @@ public enum Util { ;
 
     public static void run(Deque<Runnable> tasks, int maxTasksToRun, Consumer<Runnable> runner) {
         while (!tasks.isEmpty() && maxTasksToRun-- > 0) {
-            runner.accept( tasks.removeFirst() );
+            runner.accept(tasks.removeFirst());
         }
     }
 
@@ -587,6 +595,7 @@ public enum Util { ;
             p = 0.0f;
         return p;
     }
+
     /**
      * clamps a value to 0..1 range
      */
@@ -597,7 +606,7 @@ public enum Util { ;
             p = 0.0;
         return p;
     }
-    
+
     /**
      * clamps a value to -1..1 range
      */
@@ -619,14 +628,15 @@ public enum Util { ;
     }
 
     public static float clampround(float value, float epsilon) {
-        return unitize(round(value, epsilon ));
+        return unitize(round(value, epsilon));
     }
 
     public static int hashFloat(float f, int discretness) {
-        return (int)(f * discretness);
+        return (int) (f * discretness);
     }
+
     public static float unhashFloat(int i, int discretness) {
-        return ((float)i) / discretness;
+        return ((float) i) / discretness;
     }
 
     public static boolean equals(double a, double b) {
@@ -661,17 +671,17 @@ public enum Util { ;
     }
 
 
-
     private final static Object waitLock = new Object();
 
     public static long pauseWaitUntil(long untilTargetTime) {
         long now = System.currentTimeMillis();
-        long dt = untilTargetTime-now;
+        long dt = untilTargetTime - now;
         if (dt > 0) {
-            synchronized(waitLock) {
+            synchronized (waitLock) {
                 try {
                     waitLock.wait(dt);
-                } catch (InterruptedException e) { }
+                } catch (InterruptedException e) {
+                }
             }
 
             now = System.currentTimeMillis();
@@ -693,7 +703,8 @@ public enum Util { ;
 //        return now;
 //    }
 
-    /** applies a quick, non-lexicographic ordering compare
+    /**
+     * applies a quick, non-lexicographic ordering compare
      * by first testing their lengths
      */
     public static int compare(long[] x, long[] y) {
@@ -708,7 +719,7 @@ public enum Util { ;
 
             for (int i = 0; i < xlen; i++) {
                 int c = Long.compare(x[i], y[i]);
-                if (c!=0)
+                if (c != 0)
                     return c; //first different chra
             }
 
@@ -720,17 +731,14 @@ public enum Util { ;
 
         if (index < 36) {
             byte x = base36(index);
-            return new byte[] {  x};
-        }
-        else if (index < (36*36)){
-            byte x1 = base36(index%36);
-            byte x2 = base36(index/36);
-            return new byte[] { x2, x1};
-        }
-        else {
+            return new byte[]{x};
+        } else if (index < (36 * 36)) {
+            byte x1 = base36(index % 36);
+            byte x2 = base36(index / 36);
+            return new byte[]{x2, x1};
+        } else {
             throw new RuntimeException("variable index out of range for this method");
         }
-
 
 
 //        int digits = (index >= 256 ? 3 : ((index >= 16) ? 2 : 1));
@@ -745,18 +753,22 @@ public enum Util { ;
     public static int bin(float x, int bins) {
         int b = (int) Math.floor((x + (0.5f / bins)) * bins);
         if (b >= bins)
-            b = bins-1; //???
+            b = bins - 1; //???
         return b;
     }
 
-    /** bins a priority value to an integer */
+    /**
+     * bins a priority value to an integer
+     */
     public static int decimalize(float v) {
-        return bin(v,10);
+        return bin(v, 10);
     }
 
-    /** finds the mean value of a given bin */
+    /**
+     * finds the mean value of a given bin
+     */
     public static float unbinCenter(int b, int bins) {
-        return ((float)b)/bins;
+        return ((float) b) / bins;
     }
 
     public static <D> D runProbability(Random rng, float[] probs, D[] choices) {
@@ -768,7 +780,10 @@ public enum Util { ;
         int c = 0;
         for (int i = 0; i < probs.length; i++) {
             s -= probs[i];
-            if (s <= 0) { c = i; break; }
+            if (s <= 0) {
+                c = i;
+                break;
+            }
         }
         return choices[c];
     }
@@ -792,6 +807,7 @@ public enum Util { ;
     public static <F> MethodHandle mh(String name, Class<? extends F> type, F fun) {
         return mhRef(type, name).bindTo(fun);
     }
+
     public static <F> MethodHandle mh(String name, F... fun) {
         F fun0 = fun[0];
         MethodHandle m = mh(name, fun0.getClass(), fun0);
@@ -811,9 +827,11 @@ public enum Util { ;
             throw new RuntimeException("out of bounds");
     }
 
-    /** clamps output to 0..+1.  y=0.5 at x=0 */
+    /**
+     * clamps output to 0..+1.  y=0.5 at x=0
+     */
     public static float sigmoid(float v) {
-        return 1f / (1f + (float)Math.exp(-v));
+        return 1f / (1f + (float) Math.exp(-v));
     }
 
     public static float sigmoidDiff(float a, float b) {
@@ -849,15 +867,18 @@ public enum Util { ;
         Closeables.closeQuietly(is);
         return x;
     }
+
     public static String inputToString(InputStream is) throws IOException {
         String s = CharStreams.toString(new InputStreamReader(is, Charsets.UTF_8));
         Closeables.closeQuietly(is);
         return s;
     }
 
-    /** modifies the input array */
+    /**
+     * modifies the input array
+     */
     public static <X> X[] reverse(X[] array) {
-        if(array != null) {
+        if (array != null) {
             ArrayUtils.reverse(array, 0, array.length);
         }
         return array;
@@ -865,22 +886,30 @@ public enum Util { ;
 
     public static int[] reverse(IntArrayList l) {
         switch (l.size()) {
-            case 0: throw new UnsupportedOperationException(); //should never happen
-            case 1: return new int[] {l.get(0)};
-            case 2: return new int[] {l.get(1), l.get(0)};
-            case 3: return new int[] {l.get(2), l.get(1), l.get(0)};
+            case 0:
+                throw new UnsupportedOperationException(); //should never happen
+            case 1:
+                return new int[]{l.get(0)};
+            case 2:
+                return new int[]{l.get(1), l.get(0)};
+            case 3:
+                return new int[]{l.get(2), l.get(1), l.get(0)};
             default:
                 //reverse the array since it has been constructed in reverse
                 //TODO use more efficient array reversal
                 return l.asReversed().toArray();//toReversed().toArray();
         }
     }
+
     public static byte[] reverse(ByteArrayList l) {
         int s = l.size();
         switch (s) {
-            case 0: return ArrayUtils.EMPTY_BYTE_ARRAY;
-            case 1: return new byte[] {l.get(0)};
-            case 2: return new byte[] {l.get(1), l.get(0)};
+            case 0:
+                return ArrayUtils.EMPTY_BYTE_ARRAY;
+            case 1:
+                return new byte[]{l.get(0)};
+            case 2:
+                return new byte[]{l.get(1), l.get(0)};
             default:
                 byte[] b = new byte[s];
                 for (int i = 0; i < s; i++)
@@ -890,28 +919,30 @@ public enum Util { ;
     }
 
     public static String s(String s, int maxLen) {
-        if (s.length() < maxLen) return  s;
-        return s.substring(0,maxLen-2) + "..";
+        if (s.length() < maxLen) return s;
+        return s.substring(0, maxLen - 2) + "..";
     }
 
-    public static void writeBits(int x, int numBits, float[] y,  int offset) {
+    public static void writeBits(int x, int numBits, float[] y, int offset) {
 
-        for (int i= 0, j =offset; i < numBits; i++, j++) {
+        for (int i = 0, j = offset; i < numBits; i++, j++) {
             int mask = 1 << i;
-            y[j] = ((x & mask) == 1) ? 1f :0f;
+            y[j] = ((x & mask) == 1) ? 1f : 0f;
         }
 
     }
 
-    /** a and b must be instances of input, and output must be of size input.length-2 */
+    /**
+     * a and b must be instances of input, and output must be of size input.length-2
+     */
     public static <X> X[] except(X[] input, X a, X b, X[] output) {
         int targetLen = input.length - 2;
-        if (output.length!= targetLen) {
+        if (output.length != targetLen) {
             throw new RuntimeException("wrong size");
         }
         int j = 0;
         for (X x : input) {
-            if ((x!=a) && (x!=b))
+            if ((x != a) && (x != b))
                 output[j++] = x;
         }
 
@@ -920,15 +951,20 @@ public enum Util { ;
 
 
     public static double normalize(double x, double min, double max) {
+        if (equals(min, max, PLink.EPSILON_DEFAULT))
+            return min;
         return (x - min) / (max - min);
     }
+
     public static float normalize(float x, float min, float max) {
+        if (equals(min, max, PLink.EPSILON_DEFAULT))
+            return min;
         return (x - min) / (max - min);
     }
 
     public static int lastNonNull(Object... x) {
         int j = -1;
-        if (x!=null) {
+        if (x != null) {
             int k = x.length;
             for (int i = 0; i < k; i++) {
                 if (x[i] != null)
@@ -938,37 +974,38 @@ public enum Util { ;
         return j;
     }
 
-    public static float variance(float[] population){
+    public static float variance(float[] population) {
         float average = 0.0f;
-        for(float p: population){
+        for (float p : population) {
             average += p;
         }
         int n = population.length;
         average /= n;
 
         float variance = 0.0f;
-        for(float p: population){
+        for (float p : population) {
             float d = p - average;
             variance += d * d;
         }
         return variance / n;
     }
-    public static double[] avgvar(double[] population){
+
+    public static double[] avgvar(double[] population) {
         double average = 0.0;
-        for(double p: population){
+        for (double p : population) {
             average += p;
         }
         int n = population.length;
         average /= n;
 
         double variance = 0.0;
-        for(double p: population){
+        for (double p : population) {
             double d = p - average;
             variance += d * d;
         }
         variance /= n;
 
-        return new double[] { average, variance };
+        return new double[]{average, variance};
     }
 
     public static double[] variance(DoubleStream s) {
@@ -988,7 +1025,7 @@ public enum Util { ;
         }
         variance /= n;
 
-        return new double[] { avg, variance };
+        return new double[]{avg, variance};
     }
 
     public static String className(Object p) {
@@ -1002,9 +1039,10 @@ public enum Util { ;
         int l = d.length;
         float[] f = new float[l];
         for (int i = 0; i < l; i++)
-            f[i] = (float)d[i];
+            f[i] = (float) d[i];
         return f;
     }
+
     public static double[] toDouble(float[] d) {
         int l = d.length;
         double[] f = new double[l];
@@ -1022,7 +1060,7 @@ public enum Util { ;
             if (y < min) min = y;
             if (y > max) max = y;
         }
-        return new float[] { min, max/*, sum */};
+        return new float[]{min, max/*, sum */};
     }
 
     public static void time(Logger logger, String procName, Runnable procedure) {
@@ -1067,26 +1105,26 @@ public enum Util { ;
 //    }
 
     public static <X> Stream<X> fileCache(URL u, String baseName, Supplier<Stream<X>> o,
-                                          BiConsumer<X,DataOutput> encoder,
-                                          Function<DataInput,X> decoder,
+                                          BiConsumer<X, DataOutput> encoder,
+                                          Function<DataInput, X> decoder,
                                           Logger logger
     ) throws IOException, URISyntaxException {
         return fileCache(new File(u.toURI()), baseName, o, encoder, decoder, logger);
     }
 
     public static <X> Stream<X> fileCache(Path p, String baseName, Supplier<Stream<X>> o,
-                                          BiConsumer<X,DataOutput> encoder,
-                                          Function<DataInput,X> decoder,
+                                          BiConsumer<X, DataOutput> encoder,
+                                          Function<DataInput, X> decoder,
                                           Logger logger
     ) throws IOException {
         return fileCache(p.toFile(), baseName, o, encoder, decoder, logger);
     }
 
     public static <X> Stream<X> fileCache(File f, String baseName, Supplier<Stream<X>> o,
-                                          BiConsumer<X,DataOutput> encoder,
-                                          Function<DataInput,X> decoder,
+                                          BiConsumer<X, DataOutput> encoder,
+                                          Function<DataInput, X> decoder,
                                           Logger logger
-                                          ) throws IOException {
+    ) throws IOException {
 
         long lastModified = f.lastModified();
         long size = f.length();
@@ -1122,7 +1160,7 @@ public enum Util { ;
 
         Stream<X> instanced = o.get();
 
-        DataOutputStream dout = new DataOutputStream( new BufferedOutputStream( new FileOutputStream(cached.getAbsolutePath()) ) );
+        DataOutputStream dout = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(cached.getAbsolutePath())));
         instanced.forEach(c -> {
             buffer.add(c);
             encoder.accept(c, dout);
@@ -1146,6 +1184,7 @@ public enum Util { ;
         }
         return y;
     }
+
     public static float sumAbs(float... x) {
         float y = 0;
         for (float f : x) {
@@ -1161,7 +1200,7 @@ public enum Util { ;
         int l = vec.length;
         for (int i = 0; i < l; i++) {
             final double v = vec[i];
-            if (v > max)  {
+            if (v > max) {
                 max = v;
                 result = i;
             }
@@ -1171,8 +1210,7 @@ public enum Util { ;
 
     // Implementing Fisher–Yates shuffle
     public static void shuffle(Object[] ar, Random rnd) {
-        for (int i = ar.length - 1; i > 0; i--)
-        {
+        for (int i = ar.length - 1; i > 0; i--) {
             int index = rnd.nextInt(i + 1);
             // Simple swap
             Object a = ar[index];
@@ -1190,7 +1228,7 @@ public enum Util { ;
         for (int i = 0; i < l; i++) {
             int ii = (i + start) % l;
             final float v = vec[ii];
-            if (v > max)  {
+            if (v > max) {
                 max = v;
                 result = ii;
             }
@@ -1201,14 +1239,18 @@ public enum Util { ;
     public static Pair tuple(Object a, Object b) {
         return Tuples.pair(a, b);
     }
+
     public static Pair tuple(Object a, Object b, Object c) {
         return tuple(tuple(a, b), c);
     }
+
     public static Pair tuple(Object a, Object b, Object c, Object d) {
         return tuple(tuple(a, b, c), d);
     }
 
-    /** min is inclusive, max is exclusive: [min, max) */
+    /**
+     * min is inclusive, max is exclusive: [min, max)
+     */
     public static int unitize(int x, int min, int max) {
         if (x < min) x = min;
         else if (x > --max) x = max;
@@ -1222,21 +1264,23 @@ public enum Util { ;
     public static int selectRoulette(int count, IntToFloatFunction weight, Random rng) {
         // calculate the total weight
         float weight_sum = 0;
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             weight_sum += weight.valueOf(i);
         }
         return selectRoulette(count, weight, weight_sum, rng);
 
     }
 
-    /** faster if the sum is already known */
+    /**
+     * faster if the sum is already known
+     */
     public static int selectRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
         // get a random value
         float value = rng.nextFloat() * weight_sum;
         // locate the random value based on the weights
-        for(int i=0; i<count; i++) {
+        for (int i = 0; i < count; i++) {
             value -= weight.valueOf(i);
-            if(value <= 0) return i;
+            if (value <= 0) return i;
         }
         // only when rounding errors occur
         return count - 1;
@@ -1260,7 +1304,9 @@ public enum Util { ;
         return i;
     }
 
-    /** range [a, b) */
+    /**
+     * range [a, b)
+     */
     public static int[] intSequence(int a, int b) {
         int ba = b - a;
         int[] x = new int[ba];
@@ -1272,8 +1318,9 @@ public enum Util { ;
 
 
     public static double sqr(long l) {
-        return l*l;
+        return l * l;
     }
+
     public static float sqr(float f) {
         return f * f;
     }
@@ -1287,6 +1334,7 @@ public enum Util { ;
         BinTxt.append(sb, b);
         return sb.toString();
     }
+
     public static CharSequence uuid64() {
         UUID u = UUID.randomUUID();
         long a = u.getLeastSignificantBits();
@@ -1295,18 +1343,20 @@ public enum Util { ;
         return BinTxt.toString(c);
     }
 
-    /** http://www.qat.com/using-waitnotify-instead-thread-sleep-java/ */
+    /**
+     * http://www.qat.com/using-waitnotify-instead-thread-sleep-java/
+     */
     public static void pause(long milli) {
         if (milli <= 0) return;
 
         Thread t = Thread.currentThread();
         long start = System.currentTimeMillis();
         long now;
-        while((now=System.currentTimeMillis()) - start < milli) {
-            synchronized(t) {
+        while ((now = System.currentTimeMillis()) - start < milli) {
+            synchronized (t) {
                 try {
                     long ignore = milli - (now - start);
-                    if(ignore > 0L) {
+                    if (ignore > 0L) {
                         t.wait(ignore);
                     }
                 } catch (InterruptedException var9) {
@@ -1328,15 +1378,14 @@ public enum Util { ;
     }
 
     public static int largestPowerOf2NoGreaterThan(int i) {
-        if ( isPowerOf2(i) )
+        if (isPowerOf2(i))
             return i;
         else {
-            int curr = i-1;
-            while ( curr > 0 ) {
-                if ( isPowerOf2(curr) ) {
+            int curr = i - 1;
+            while (curr > 0) {
+                if (isPowerOf2(curr)) {
                     return curr;
-                }
-                else {
+                } else {
                     --curr;
                 }
             }
@@ -1353,14 +1402,12 @@ public enum Util { ;
         }
     }
 
-    public static void shallowCopy(Object source, Object dest, final boolean publicOnly)
-    {
+    public static void shallowCopy(Object source, Object dest, final boolean publicOnly) {
         if (!source.getClass().isInstance(dest))
             throw new IllegalArgumentException();
 
         for (Field f : Util.getAllDeclaredFields(source, publicOnly)) {
-            try
-            {
+            try {
 
                 final int mods = f.getModifiers();
                 if (Modifier.isStatic(mods) || Modifier.isFinal(mods))
@@ -1370,35 +1417,30 @@ public enum Util { ;
 
                 Object sourceValue = f.get(source);
                 f.set(dest, sourceValue);
-            }
-            catch (IllegalArgumentException e)
-            {
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
-            }
-            catch (IllegalAccessException e)
-            {
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    /** 'publicOnly' just gets public fields (Class.getFields vs. Class.getDeclaredFields) so we can work with reduced
-     *  functionality in a sandboxed environment (ie. applets)
+    /**
+     * 'publicOnly' just gets public fields (Class.getFields vs. Class.getDeclaredFields) so we can work with reduced
+     * functionality in a sandboxed environment (ie. applets)
      */
-    public static Collection<Field> getAllDeclaredFields(Object object, final boolean publicOnly)
-    {
+    public static Collection<Field> getAllDeclaredFields(Object object, final boolean publicOnly) {
         Set<Field> result = new HashSet<Field>();
 
         Class<?> clazz = object.getClass();
-        while (clazz != null)
-        {
+        while (clazz != null) {
             Field[] fields;
             if (publicOnly)
                 fields = clazz.getFields();
             else
                 fields = clazz.getDeclaredFields();
 
-            for (int i=0; i<fields.length; i++)
+            for (int i = 0; i < fields.length; i++)
                 result.add(fields[i]);
 
             clazz = clazz.getSuperclass();
@@ -1411,8 +1453,7 @@ public enum Util { ;
      * http://www.java-gaming.org/topics/utils-essentials/22144/30/view.html
      * calculate height on a uniform grid, by splitting a quad into two triangles:
      */
-    public static final float lerp2d(float x, float z, float nw, float ne, float se, float sw)
-    {
+    public static final float lerp2d(float x, float z, float nw, float ne, float se, float sw) {
         // n -= n % dim -> n = 0..dim (local offset)
         x = x - (int) x;
         z = z - (int) z;
@@ -1443,10 +1484,14 @@ public enum Util { ;
             return secondStr(s);
         else {
             switch (decimals) {
-                case 0: return Texts.n2(s) + "s";
-                case 3: return Texts.n2(s * 1000) + "ms";
-                case 6: return Texts.n2(s * 1.0E6) + "us";
-                default: throw new UnsupportedOperationException("TODO");
+                case 0:
+                    return Texts.n2(s) + "s";
+                case 3:
+                    return Texts.n2(s * 1000) + "ms";
+                case 6:
+                    return Texts.n2(s * 1.0E6) + "us";
+                default:
+                    throw new UnsupportedOperationException("TODO");
             }
         }
     }
@@ -1456,13 +1501,13 @@ public enum Util { ;
         Arrays.sort(arg);
         for (int i = 0; i < len - 1; i++) {
             int dups = 0;
-            while (arg[i].equals(arg[i+1])) {
+            while (arg[i].equals(arg[i + 1])) {
                 dups++;
-                if (++i == len-1)
+                if (++i == len - 1)
                     break;
             }
             if (dups > 0) {
-                System.arraycopy(arg, i, arg, i-dups, len-i);
+                System.arraycopy(arg, i, arg, i - dups, len - i);
                 len -= dups;
             }
         }
@@ -1476,6 +1521,7 @@ public enum Util { ;
 
     /**
      * A function where the output is disjunctively determined by the inputs
+     *
      * @param arr The inputs, each in [0, 1]
      * @return The output that is no smaller than each input
      */
@@ -1486,13 +1532,12 @@ public enum Util { ;
 //        }
 //        return 1.0f - product;
 //    }
-
     public static float or(float a, float b) {
         return 1.0f - ((1.0f - a) * (1.0f - b));
     }
 
     public static float or(float a, float b, float c) {
-        return 1.0f -((1.0f - a) * (1.0f - b) * (1.0f - c));
+        return 1.0f - ((1.0f - a) * (1.0f - b) * (1.0f - c));
     }
 
 }

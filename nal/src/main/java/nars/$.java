@@ -1,10 +1,10 @@
 package nars;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.core.ConsoleAppender;
+//import ch.qos.logback.classic.Level;
+//import ch.qos.logback.classic.Logger;
+//import ch.qos.logback.classic.LoggerContext;
+//import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+//import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -38,6 +38,7 @@ import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
@@ -517,70 +518,68 @@ public enum $ {
     }
 
 
-    @NotNull
-    public static final Logger LOG;
-
-
-    static {
-        Thread.currentThread().setName("$");
-
-        //http://logback.qos.ch/manual/layouts.html
-
-        LOG = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        LoggerContext loggerContext = LOG.getLoggerContext();
-        // we are not interested in auto-configuration
-        loggerContext.reset();
-
-        PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
-        logEncoder.setContext(loggerContext);
-        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-
-        logEncoder.start();
-
-
-
-        {
-            ConsoleAppender c = new ConsoleAppender();
-            c.setContext(loggerContext);
-            c.setEncoder(logEncoder);
-            c.setImmediateFlush(false);
-            //c.setWithJansi(true);
-            c.start();
-
-            LOG.addAppender(c);
-        }
-
-//            SyslogAppender syslog = new SyslogAppender();
-//            syslog.setPort(5000);
-//            syslog.setFacility("LOCAL6");
-//            syslog.setContext(loggerContext);
-//            syslog.setCharset(Charset.forName("UTF8"));
-//            syslog.start();
-//            LOG.addAppender(syslog);
-
-//            SocketAppender sa = new SocketAppender();
-//            sa.setName("socketlog");
-//            sa.setContext(loggerContext);
-//            sa.setQueueSize(1);
-//            sa.setEventDelayLimit(Duration.buildByMilliseconds(100));
-//            sa.setRemoteHost("localhost");
-//            sa.setPort(4560);
-//            sa.setIncludeCallerData(true);
-//            sa.setReconnectionDelay(Duration.buildByMilliseconds(200));
-//            sa.start();
-//            LOG.addAppender(sa);
-
-//        logRoot.debug("Message 1");
-//        logRoot.info("Message 1");
-//        logRoot.warn("Message 2");
-//        logRoot.error("Message 2");
-
-
-//        } catch (Throwable t) {
-//            System.err.println("Logging Disabled: " + t);
+//    @NotNull
+//    public static final Logger LOG;
+//    static {
+//        Thread.currentThread().setName("$");
+//
+//        //http://logback.qos.ch/manual/layouts.html
+//
+//        LOG = (Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+//        LoggerContext loggerContext = LOG.getLoggerContext();
+//        // we are not interested in auto-configuration
+//        loggerContext.reset();
+//
+//        PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
+//        logEncoder.setContext(loggerContext);
+//        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+//        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
+//
+//        logEncoder.start();
+//
+//
+//
+//        {
+//            ConsoleAppender c = new ConsoleAppender();
+//            c.setContext(loggerContext);
+//            c.setEncoder(logEncoder);
+//            c.setImmediateFlush(false);
+//            //c.setWithJansi(true);
+//            c.start();
+//
+//            LOG.addAppender(c);
 //        }
-    }
+//
+////            SyslogAppender syslog = new SyslogAppender();
+////            syslog.setPort(5000);
+////            syslog.setFacility("LOCAL6");
+////            syslog.setContext(loggerContext);
+////            syslog.setCharset(Charset.forName("UTF8"));
+////            syslog.start();
+////            LOG.addAppender(syslog);
+//
+////            SocketAppender sa = new SocketAppender();
+////            sa.setName("socketlog");
+////            sa.setContext(loggerContext);
+////            sa.setQueueSize(1);
+////            sa.setEventDelayLimit(Duration.buildByMilliseconds(100));
+////            sa.setRemoteHost("localhost");
+////            sa.setPort(4560);
+////            sa.setIncludeCallerData(true);
+////            sa.setReconnectionDelay(Duration.buildByMilliseconds(200));
+////            sa.start();
+////            LOG.addAppender(sa);
+//
+////        logRoot.debug("Message 1");
+////        logRoot.info("Message 1");
+////        logRoot.warn("Message 2");
+////        logRoot.error("Message 2");
+//
+//
+////        } catch (Throwable t) {
+////            System.err.println("Logging Disabled: " + t);
+////        }
+//    }
 
 
     @Nullable
@@ -1064,9 +1063,9 @@ public enum $ {
         return nextInner;
     }
 
-    public static void logLevel(Class logClass, Level l) {
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logClass)).setLevel(l);
-    }
+//    public static void logLevel(Class logClass, Level l) {
+//        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logClass)).setLevel(l);
+//    }
 
     @NotNull
     public static TaskBuilder command(@NotNull Compound op) {

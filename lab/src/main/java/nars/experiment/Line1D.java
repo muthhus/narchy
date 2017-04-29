@@ -38,7 +38,7 @@ public class Line1D {
 
 
         NAR n = new Default();
-        n.time.dur(10);
+        n.time.dur(4);
 
         //NAR nar = runRT((NAR n) -> {
 
@@ -72,9 +72,9 @@ public class Line1D {
             //n.believe((Compound) $.impl($.inh($.diffe($.the("o"), $.the("i")), a.id), 1, a.out.term()), 0f, 0.99f);
 
 
-            n.onCycle(() -> {
+            a.onFrame((z) -> {
                 a.i.setValue(
-                        0.5f * (Math.sin(n.time() / 40f) + 1f)
+                        0.5f * (Math.sin(n.time() / 200f) + 1f)
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
@@ -86,21 +86,21 @@ public class Line1D {
 
         //}, 20);
 
-        n.onTask(t -> {
-            if (t instanceof DerivedTask) {
-                System.out.println(t.proof());
-                try {
-                    System.in.read();
-                } catch (IOException e) {
-                }
-            }
-        });
+//        n.onTask(t -> {
+//            if (t instanceof DerivedTask) {
+//                System.out.println(t.proof());
+//                try {
+//                    System.in.read();
+//                } catch (IOException e) {
+//                }
+//            }
+//        });
 
         //n.log();
 
         NAgentX.chart(a);
 
-        a.runCycles(5000);
+        a.runCycles(50000);
 
 
 

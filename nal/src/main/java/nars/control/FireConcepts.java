@@ -99,17 +99,17 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         while (ttl > 0) {
             if (tasklink == null || nar.random().nextFloat() > tasklink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
-                if (tasklink == null)
-                    break;
                 ttl -= linkSampleCost;
+                if (tasklink == null)
+                    continue;
             }
 
 
             if (termlink == null || nar.random().nextFloat() > termlink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = c.termlinks().sample();
-                if (termlink == null)
-                    break;
                 ttl -= linkSampleCost;
+                if (termlink == null)
+                    continue;
             }
 
             Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);

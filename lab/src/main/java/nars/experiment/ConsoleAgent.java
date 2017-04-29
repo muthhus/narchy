@@ -56,7 +56,7 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    protected Stream<Task> sense(NAR nar, long when) {
+    public Stream<Task> sense(NAR nar, long when) {
         List<Task> q = $.newArrayList(queue.size());
         Iterator<Task> qq = queue.iterator();
         while (qq.hasNext()) {

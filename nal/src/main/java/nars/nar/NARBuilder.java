@@ -220,13 +220,13 @@ public interface NARBuilder {
         //NARTune tune = new NARTune(nar);
 
         MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 32);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
+        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,
 //                0.02f, 32);
 
-        new Inperience(nar, 0.25f, 6);
+        //new Inperience(nar, 0.25f, 6);
 
 //        //causal accelerator
 //        nar.onTask(t -> {

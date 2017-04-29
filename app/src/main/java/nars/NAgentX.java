@@ -272,7 +272,7 @@ abstract public class NAgentX extends NAgent {
         return senseCamera(id, pb, pixelTruth);
     }
 
-    protected Sensor2D<WaveletBag> senesCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
+    protected Sensor2D<WaveletBag> senseCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
         WaveletBag pb = new WaveletBag(w, pw, ph);
         return senseCamera(id, pb, pixelTruth);
     }

@@ -157,6 +157,10 @@ public class Interval {
 		return max(x2, y2) - min(x1, y1);
 	}
 
+	public long mid() {
+		return (a+b)/2;
+	}
+
 //static Interval[] cache = new Interval[INTERVAL_POOL_MAX_VALUE+1];
 //	public static final long INTERVAL_POOL_MAX_VALUE = 1000;
 //	public static long creates = 0;

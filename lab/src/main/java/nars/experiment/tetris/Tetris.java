@@ -1,9 +1,12 @@
 package nars.experiment.tetris;
 
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.experiment.Line1DDQN;
+import nars.experiment.RLAccel;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.NARBuilder;
 import nars.task.util.TaskStatistics;
@@ -509,9 +512,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new FrameTime();
+        Time clock = new FrameTime().dur(2);
         NAR n =
-                NARBuilder.newMultiThreadNAR(3, clock);
+                NARBuilder.newMultiThreadNAR(1, clock);
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 //        n.onTask((t)->{
@@ -658,6 +661,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         Tetris a = new MyTetris(n);
         a.trace = true;
+
+
         NAgentX.chart(a);
 //
 //            Default m = new Default(512, 16, 2, n.random,

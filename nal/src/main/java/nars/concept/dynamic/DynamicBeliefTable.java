@@ -4,10 +4,12 @@ import jcog.Util;
 import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.task.AnswerTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -140,7 +142,15 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         Task y = generate(template, when);
 
-        Task x = super.match(when, now, dur, target, template, noOverlap);
+        Task x;
+        //try {
+            x = super.match(when, now, dur, target, template, noOverlap);
+//        } catch (InvalidTaskException e) {
+//            if (Param.DEBUG_EXTRA) {
+//                System.err.println(e);
+//            }
+//            x = null;
+//        }
 
         if (x == null) return y;
         if (y == null) return x;
@@ -161,6 +171,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one
-        return (x.originality() > y.originality()) ? x : y;
+        return (x.originality() >= y.originality()) ? x : y;
     }
 }

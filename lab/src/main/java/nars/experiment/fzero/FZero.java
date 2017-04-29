@@ -1,20 +1,19 @@
 package nars.experiment.fzero;
 
-import georegression.metric.UtilAngle;
 import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
+import nars.experiment.RLAccel;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
-import org.joml.GeometryUtils;
 
 import static nars.$.t;
-import static nars.Op.ImageBits;
 
 /**
  * Created by me on 3/21/17.
@@ -200,12 +199,13 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         Default n = NARBuilder.newMultiThreadNAR(
-                2,
+                4,
                 new RealTime.DSHalf(true)
-                        .durFPS(20f), true);
+                        .durFPS(40f), true);
 
         FZero a = new FZero(n);
-        a.runRT(5f);
+        a.runRT(20f);
+
 
         NAgentX.chart(a);
 

@@ -51,10 +51,11 @@ public class NARio extends NAgentX {
         mario.start();
 
 
-        PixelBag cc = PixelBag.of(() -> mario.image, 40, 40);
-        cc.setClarity(0.75f, 1f);
+        PixelBag cc = PixelBag.of(() -> mario.image, 64, 64);
+        cc.setClarity(0.5f, 1f);
 
-        nar.onCycle(() -> {
+        onFrame((z)->{
+        //nar.onCycle(() -> {
 
             Scene scene1 = mario.scene;
 
@@ -197,7 +198,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 15);
+        }, 30);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

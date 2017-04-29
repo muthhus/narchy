@@ -1252,12 +1252,12 @@ public interface TimeFunctions {
 
     static long occInterpolate(@NotNull Task t, @Nullable Task b) {
 
-        long to = t.start();
+        long to = t.mid();
         if (b == null) {
             return to;
         }
 
-        long bo = b.start();
+        long bo = b.mid();
         if (t.isQuestOrQuestion() || to == ETERNAL)
             return bo; //use belief time when task is a question, or task is eternal
 
@@ -1266,9 +1266,16 @@ public interface TimeFunctions {
 
         //if (to != ETERNAL && bo != ETERNAL) {
 
+        @Nullable Interval intersection = Interval.intersect(t.start(), t.end(), b.start(), b.end());
+        if (intersection != null ) {
+            return intersection.mid(); //?
+        }
+
         float tw = t.evi();
         float bw = b.evi();
         return Util.lerp((tw) / (bw + tw), to, bo);
+
+
 //        } else {
 //            return bo != ETERNAL ? bo : to;
 //        }

@@ -161,102 +161,102 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
 
 
-    /**
-     * apply derivation feedback and update NAR emotion state
-     */
-    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
-
-        //update emotion happy/sad
-        Truth before = delta.before;
-        Truth after = delta.after;
-
-        float deltaSatisfaction, deltaConf, deltaFreq;
-
-
-        if (before != null && after != null) {
-
-            deltaFreq = after.freq() - before.freq();
-            deltaConf = after.conf() - before.conf();
-
-        } else {
-            if (before == null && after != null) {
-                deltaConf = after.conf();
-                deltaFreq = after.freq();
-            } else if (before!=null) {
-                deltaConf = -before.conf();
-                deltaFreq = -before.freq();
-            } else {
-                deltaConf = 0;
-                deltaFreq = 0;
-            }
-        }
-
-        Truth other;
-        int polarity = 0;
-
-        Time time = nar.time;
-        int dur = time.dur();
-        long now = time.time();
-        if (input.isBelief()) {
-            //compare against the current goal state
-            other = concept.goals().truth(now, dur);
-            if (other != null)
-                polarity = +1;
-        } else if (input.isGoal()) {
-            //compare against the current belief state
-            other = concept.beliefs().truth(now, dur);
-            if (other != null)
-                polarity = -1;
-        } else {
-            other = null;
-        }
-
-
-        if (other != null) {
-
-            float otherFreq = other.freq();
-
-            if (polarity==0) {
-
-                //ambivalence: no change
-                deltaSatisfaction = 0;
-
-            } else {
-
-//                if (otherFreq > 0.5f) {
-//                    //measure how much the freq increased since goal is positive
-//                    deltaSatisfaction = +polarity * deltaFreq / (2f * (otherFreq - 0.5f));
+//    /**
+//     * apply derivation feedback and update NAR emotion state
+//     */
+//    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull CompoundConcept concept, @NotNull NAR nar) {
+//
+//        //update emotion happy/sad
+//        Truth before = delta.before;
+//        Truth after = delta.after;
+//
+//        float deltaSatisfaction, deltaConf, deltaFreq;
+//
+//
+//        if (before != null && after != null) {
+//
+//            deltaFreq = after.freq() - before.freq();
+//            deltaConf = after.conf() - before.conf();
+//
+//        } else {
+//            if (before == null && after != null) {
+//                deltaConf = after.conf();
+//                deltaFreq = after.freq();
+//            } else if (before!=null) {
+//                deltaConf = -before.conf();
+//                deltaFreq = -before.freq();
+//            } else {
+//                deltaConf = 0;
+//                deltaFreq = 0;
+//            }
+//        }
+//
+//        Truth other;
+//        int polarity = 0;
+//
+//        Time time = nar.time;
+//        int dur = time.dur();
+//        long now = time.time();
+//        if (input.isBelief()) {
+//            //compare against the current goal state
+//            other = concept.goals().truth(now, dur);
+//            if (other != null)
+//                polarity = +1;
+//        } else if (input.isGoal()) {
+//            //compare against the current belief state
+//            other = concept.beliefs().truth(now, dur);
+//            if (other != null)
+//                polarity = -1;
+//        } else {
+//            other = null;
+//        }
+//
+//
+//        if (other != null) {
+//
+//            float otherFreq = other.freq();
+//
+//            if (polarity==0) {
+//
+//                //ambivalence: no change
+//                deltaSatisfaction = 0;
+//
+//            } else {
+//
+////                if (otherFreq > 0.5f) {
+////                    //measure how much the freq increased since goal is positive
+////                    deltaSatisfaction = +polarity * deltaFreq / (2f * (otherFreq - 0.5f));
+////                } else {
+////                    //measure how much the freq decreased since goal is negative
+////                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
+////                }
+//
+//                if (after!=null) {
+//                    deltaSatisfaction = /*Math.abs(deltaFreq) * */ (2f * (1f - Math.abs(after.freq() - otherFreq)) - 1f);
+//
+//                    deltaSatisfaction *= (after.conf() * other.conf());
+//
+//                    nar.emotion.happy(deltaSatisfaction);
 //                } else {
-//                    //measure how much the freq decreased since goal is negative
-//                    deltaSatisfaction = -polarity * deltaFreq / (2f * (0.5f - otherFreq));
+//                    deltaSatisfaction = 0;
 //                }
-
-                if (after!=null) {
-                    deltaSatisfaction = /*Math.abs(deltaFreq) * */ (2f * (1f - Math.abs(after.freq() - otherFreq)) - 1f);
-
-                    deltaSatisfaction *= (after.conf() * other.conf());
-
-                    nar.emotion.happy(deltaSatisfaction);
-                } else {
-                    deltaSatisfaction = 0;
-                }
-            }
-
-
-        } else {
-            deltaSatisfaction = 0;
-        }
-
-        feedback(input, delta, nar, deltaSatisfaction, deltaConf);
-
-    }
-
-    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull NAR nar, float deltaSatisfaction, float deltaConf) {
-        if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
-            nar.emotion.confident(deltaConf, input.term());
-
-        input.feedback(delta, deltaConf, deltaSatisfaction, nar);
-    }
+//            }
+//
+//
+//        } else {
+//            deltaSatisfaction = 0;
+//        }
+//
+//        feedback(input, delta, nar, deltaSatisfaction, deltaConf);
+//
+//    }
+//
+//    protected void feedback(@NotNull Task input, @NotNull TruthDelta delta, @NotNull NAR nar, float deltaSatisfaction, float deltaConf) {
+//        if (!Util.equals(deltaConf, 0f, TRUTH_EPSILON))
+//            nar.emotion.confident(deltaConf, input.term());
+//
+//        input.feedback(delta, deltaConf, deltaSatisfaction, nar);
+//    }
 
 //    private void checkConsistency() {
 //        synchronized (tasks) {

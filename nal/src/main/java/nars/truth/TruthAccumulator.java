@@ -41,9 +41,6 @@ public class TruthAccumulator extends AtomicReference<double[]> {
 
         double e = fc[1];
         float c = w2c((sumOrAverage) ? ((float)e) : ((float)e)/n);
-        if (c <= Param.TRUTH_EPSILON)
-            return null;
-
         return $.t((float)(fc[0]/e), c);
     }
 

@@ -8,6 +8,7 @@ import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineManager;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 
 /**
  * Created by me on 5/27/16.
@@ -24,8 +25,12 @@ public abstract class ReinforceJSAgent implements Agent {
     @Override public void start(int inputs, int actions)  {
         try {
 
+            System.out.println(ReinforceJSAgent.class.getResource("."));
+
             NashornScriptEngine JS = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-            JS.eval(new FileReader("/home/me/opennars/logic/src/main/java/nars/learn/ql/rl.js"));
+            JS.eval(
+                new InputStreamReader(ReinforceJSAgent.class.getResourceAsStream("rl.js"))
+            );
 
 
 

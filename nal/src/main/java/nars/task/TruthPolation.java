@@ -7,6 +7,7 @@ import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -24,8 +25,8 @@ public enum TruthPolation {
      */
     public static float evidenceDecay(float evi, int dur, long dt) {
 
-        //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
         return evi / (1 + (((float) dt) / dur)); //inverse linear
+        //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
         //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
@@ -66,7 +67,8 @@ public enum TruthPolation {
 
 
             float cost = 0.01f;
-            float utilized = tw / t.evi();
+            float twa = t.evi();
+            float utilized = (tw > 0 && twa > 0) ? tw / twa : 0;
             //System.out.println(when + "," + dur + "@ " + t  + " utilized " + utilized);
             t.priMult((1f - cost * (1f - utilized)));
 

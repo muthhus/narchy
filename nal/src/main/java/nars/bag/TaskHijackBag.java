@@ -22,7 +22,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     @Override
     public void onRemoved(@NotNull Task t) {
-        t.delete();
+        //t.delete();
     }
 
     @Override

@@ -22,7 +22,8 @@ public class NAL5BooleanConsistency {
     public void testSAT2() throws Narsese.NarseseException {
 
         Param.DEBUG = true;
-        //Param.HORIZON = 10;
+
+        float confthresh = 0.1f;
 
         final Deriver e = Deriver.get("induction.nal", "nal6.nal", "misc.nal");
 
@@ -35,7 +36,7 @@ public class NAL5BooleanConsistency {
                     }
                 };
 
-                d.log();
+                //d.log();
 
                 String[] outcomes = {
                         "(x-->(0,0))",
@@ -44,23 +45,23 @@ public class NAL5BooleanConsistency {
                         "(x-->(1,1))"};
                 String expected = "(x --> (" + i + "," + j + "))";
 
-                d.believe( "(" + outcomes[0]+ " ==> (--(x-->i) && --(x-->j)))");
-                d.believe( "(" + outcomes[1]+ " ==> (--(x-->i) && (x-->j)))");
-                d.believe( "(" + outcomes[2]+ " ==> ((x-->i) && --(x-->j)))");
-                d.believe( "(" + outcomes[3]+ " ==> ((x-->i) && (x-->j)))");
+                d.believe( "( (--(x-->i) && --(x-->j)) ==> " + outcomes[0] + ")");
+                d.believe( "( (--(x-->i) && (x-->j)) ==> " + outcomes[1] + ")");
+                d.believe( "( ((x-->i) && --(x-->j)) ==> " + outcomes[2] + ")");
+                d.believe( "( ((x-->i) && (x-->j)) ==> " + outcomes[3] + ")");
 
                 Compound I = $.negIf($.$("(x-->i)"), i == 0);
                 Compound J = $.negIf($.$("(x-->j)"), j == 0);
-//                d.believe(I);
-//                d.believe(J);
 
-                d.believe($.conj(I,J));
+                d.believe(I);
+                d.believe(J);
+//                d.believe($.conj(I,J));
 
 //                for (String s : outcomes) {
 //                    d.ask(s);
 //                }
 
-                d.run(16);
+                d.run(256);
 
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {
@@ -81,10 +82,11 @@ public class NAL5BooleanConsistency {
                     if (thisone && b == null)
                         assertTrue("unrecognized true case", false);
 
-                    if (thisone && b.isNegative())
+
+                    if (thisone && b!=null && b.isNegative() && b.conf() > confthresh)
                         assertTrue("wrong true case:\n" + t.proof(), false);
 
-                    if (!thisone && b!=null && b.isPositive() && b.conf() > 0.5f /* estimate */)
+                    if (!thisone && b!=null && b.isPositive() && b.conf() > confthresh)
                         assertTrue("wrong false case:\n" + t.proof(), false);
 
                 }

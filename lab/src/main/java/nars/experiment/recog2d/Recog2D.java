@@ -5,9 +5,11 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.learn.MLP;
+import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.experiment.RLAccel;
 import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
@@ -307,6 +309,9 @@ public class Recog2D extends NAgentX {
         Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
                 3,
                 new RealTime.DSHalf(true).durFPS(durFPS)));
+
+        new RLAccel(a, new HaiQAgent());
+
         NAgentX.chart(a);
         a.runRT(30);
     }

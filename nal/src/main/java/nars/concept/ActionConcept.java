@@ -23,7 +23,8 @@ import java.util.function.Function;
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
 
     @NotNull
-    @Deprecated protected final NAR nar;
+    @Deprecated
+    public final NAR nar;
 
     final TruthAccumulator
             beliefIntegrated = new TruthAccumulator(),

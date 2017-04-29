@@ -124,11 +124,11 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:Deduction)
-    Y, ((&&,(--,%X),A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:DeductionN)
+    Y, ((&&,X,A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:Deduction)
+    Y, ((&&,(--,%X),A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:DeductionN)
 
-    Y, (B ==> (&&,X,A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:Deduction)
-    Y, (B ==> (&&,(--,%X),A..+)), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:DeductionN)
+    Y, (B ==> (&&,X,A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:Deduction)
+    Y, (B ==> (&&,(--,%X),A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:DeductionN)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
