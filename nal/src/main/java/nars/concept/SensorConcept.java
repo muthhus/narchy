@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
 import java.util.function.Function;
 import java.util.function.LongSupplier;
 
@@ -72,8 +71,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Override
     public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         return
-            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
-            new HijackTemporalBeliefTable(tCap * 2);
+            new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
+            //new HijackTemporalBeliefTable(tCap * 2);
     }
 
     //    /** originating from this sensor, or a future prediction */

@@ -103,7 +103,7 @@ public class TaskConcept extends CompoundConcept {
         return new DefaultBeliefTable();
     }
 
-    public HijackTemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
+    public TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         return new HijackTemporalBeliefTable(tCap);
     }
 

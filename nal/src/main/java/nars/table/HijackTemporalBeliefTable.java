@@ -3,14 +3,15 @@ package nars.table;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
-import jcog.pri.PForget;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.ActionConcept;
-import nars.task.*;
-import nars.truth.PreciseTruth;
+import nars.task.AnswerTask;
+import nars.task.Revision;
+import nars.task.SignalTask;
+import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.Function;
@@ -19,7 +20,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 import static java.lang.Math.abs;

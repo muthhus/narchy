@@ -79,7 +79,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     long end();
 
     /**
-     * amount of evidence aka evidence weight
+     * amount of evidence measured at a given time with a given duration window
      *
      * @param when time
      * @param dur  duration period across which evidence can decay before and after its defined start/stop time

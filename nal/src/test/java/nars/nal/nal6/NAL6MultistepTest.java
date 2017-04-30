@@ -63,7 +63,7 @@ public class NAL6MultistepTest {
 
         //result from Probcog:  earthquake=23%, burglary=99%
         assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0).freq(), 0.4f /* approximate */);
-        assertEquals(0.21f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
+        assertEquals(0.31f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
     }
 
 

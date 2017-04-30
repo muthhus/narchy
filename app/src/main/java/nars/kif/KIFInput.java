@@ -23,7 +23,7 @@ import nars.derive.rule.PremiseRuleSet;
 import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.premise.Derivation;
-import nars.premise.PreferSimpleAndConfident;
+import nars.premise.PreferSimpleAndPolarized;
 import nars.premise.Premise;
 import nars.term.Compound;
 import nars.term.Term;
@@ -428,7 +428,7 @@ public class KIFInput implements Runnable {
         //d.clear();
         e.log();
 
-        PreferSimpleAndConfident budgeting = new PreferSimpleAndConfident();
+        PreferSimpleAndPolarized budgeting = new PreferSimpleAndPolarized();
 
         e.onTask(t -> {
            if (t.isInput()) {

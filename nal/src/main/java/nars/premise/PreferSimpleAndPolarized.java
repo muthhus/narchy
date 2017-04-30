@@ -5,7 +5,6 @@ import jcog.data.FloatParam;
 import jcog.pri.Priority;
 import nars.$;
 import nars.Task;
-import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -14,17 +13,18 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.*;
 
 /**
- * prioritizes derivations exhibiting confidence increase, relative to the premise's evidence
+ * prioritizes derivations exhibiting polarization (confident and discerning)
+ * and low complexity
  */
-public class PreferSimpleAndConfident implements DerivationBudgeting {
+public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
-    public final FloatParam polarityFactor = new FloatParam(0.05f, 0f, 1f);
-    public final FloatParam belief = new FloatParam(1f, 0f, 1f);
-    public final FloatParam goal = new FloatParam(1f, 0f, 1f);
-    public final FloatParam question = new FloatParam(1f, 0f, 1f);
-    public final FloatParam quest = new FloatParam(1f, 0f, 1f);
+    public final FloatParam polarityFactor = new FloatParam(0.25f, 0f, 1f);
+    public final FloatParam belief = new FloatParam(1f, 0f, 2f);
+    public final FloatParam goal = new FloatParam(1f, 0f, 2f);
+    public final FloatParam question = new FloatParam(1f, 0f, 2f);
+    public final FloatParam quest = new FloatParam(1f, 0f, 2f);
 
-    public final FloatParam puncFactor(byte punc) {
+    final FloatParam puncFactor(byte punc) {
         switch (punc) {
             case BELIEF: return belief;
             case GOAL: return goal;
@@ -39,7 +39,7 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
     public final FloatParam structural = new FloatParam(1f, 0f, 1f);
     public final FloatParam causal = new FloatParam(1f, 0f, 1f);
 
-    public final FloatParam opFactor(Compound c) {
+    final FloatParam opFactor(Compound c) {
         switch (c.op()) {
 
             case IMPL:
@@ -51,9 +51,6 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
             case SIM:
             default:
                 return structural;
-
-
-
         }
     }
 
@@ -67,19 +64,17 @@ public class PreferSimpleAndConfident implements DerivationBudgeting {
 
         if (truth!=null) { //belief and goal:
             float polarityFactor = this.polarityFactor.floatValue();
-            p *= (1f-polarityFactor) + polarityFactor * (BudgetFunctions.truthToQuality(truth) - 0.5f)*2f;
-            //confidencePreservationFactor(truth, d);
-        } else {
+            p *= (1f-polarityFactor) + polarityFactor * truth.polarization();
+        } /*else {
             p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-        }
+        }*/
 
         p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
 
 
         p *= puncFactor(punc).floatValue();
 
-        FloatParam off = opFactor(conclusion);
-        p *= off.floatValue();
+        p *= opFactor(conclusion).floatValue();
 
         return $.b(p);
     }

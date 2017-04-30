@@ -1,7 +1,6 @@
 package nars.truth;
 
 import nars.$;
-import nars.Param;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReference;

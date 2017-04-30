@@ -36,30 +36,6 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 	/* ----------------------- Belief evaluation ----------------------- */
 
-    /**
-     * Determine the quality of a judgment by its truth value alone
-     * <p>
-     *
-     * @param t The truth value of a judgment
-     * @return The quality of the judgment, according to truth value only
-     */
-    public static float truthToQuality(@NotNull Truthed t) {
-        //float exp = t.expectation();
-
-        //promote polarity
-        float exp = t.expectation();
-        if (exp < 0.5f) {
-            exp = 1f - exp;
-        }
-        return exp;
-
-        //ORIGINAL: Mainly decided by confidence, though binary judgment is also preferred
-        //return Math.max(exp, (1.0f - exp) * 0.75f);
-
-        //return Math.max(exp, (1.0f - exp)); //balanced, allows negative frequency equal opportunity
-
-        //return t.conf();
-    }
 
     // /**
     // * Update a belief

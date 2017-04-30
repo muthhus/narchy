@@ -2,21 +2,16 @@ package nars.nar;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.derive.Deriver;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
@@ -32,7 +27,6 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 
 /**
  * Created by me on 12/27/16.

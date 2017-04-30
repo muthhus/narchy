@@ -1,7 +1,10 @@
 package nars.concept.dynamic;
 
 import jcog.pri.Priority;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.PreciseTruth;

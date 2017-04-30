@@ -29,7 +29,7 @@ public interface Atomic extends Term {
                 return Op.Imdex;
         }
 
-        if ($.quoteNecessary(id))
+        if ($.isQuoteNecessary(id))
             return $.quote(id);
 
         //try to parse int

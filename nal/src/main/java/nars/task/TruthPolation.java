@@ -2,12 +2,10 @@ package nars.task;
 
 import com.google.common.collect.Lists;
 import nars.Task;
-import nars.concept.dynamic.DynamicBeliefTask;
 import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

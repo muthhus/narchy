@@ -39,7 +39,8 @@ public class FZeroGame extends JFrame implements Runnable {
   boolean[] K = new boolean[65535]; // pressed keys
   public double power = 0;
   public int rank = 0;
-  public int frameDelayMS = 30;
+  public int frameDelayMS = 50;
+  double rotVel = 0.03;
 
   public FZeroGame() {
     new Thread(this).start();
@@ -315,9 +316,9 @@ public class FZeroGame extends JFrame implements Runnable {
           // process player input
           if (playing) {
             if (left || K[KeyEvent.VK_LEFT]) {
-              playerAngle += 0.075;
+              playerAngle += rotVel;
             } else if (right || K[KeyEvent.VK_RIGHT]) {
-              playerAngle -= 0.075;
+              playerAngle -= rotVel;
             }
           }
           cos = Math.cos(playerAngle);

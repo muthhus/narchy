@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import nars.term.atom.Atom;
-import nars.truth.DefaultTruth;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

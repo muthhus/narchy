@@ -1,7 +1,6 @@
 package nars.truth;
 
 import jcog.Util;
-import nars.$;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

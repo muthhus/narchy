@@ -22,7 +22,6 @@ package nars.truth;
 
 import jcog.Texts;
 import jcog.Util;
-import nars.$;
 import nars.Op;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -111,6 +110,18 @@ public interface Truth extends Truthed {
      */
     default boolean isPositive() {
         return freq() > 0.5f;
+    }
+
+    /**
+     * how polarized (expectation distance from 0.5) a given truth value is:
+     *      expectation=0.5        -> polarization=0
+     *      expectation=0 or 1     -> polarization=1
+     */
+    default float polarization() {
+        float exp = expectation();
+        if (exp < 0.5f)
+            exp = 1f - exp;
+        return (exp - 0.5f) * 2f;
     }
 
 

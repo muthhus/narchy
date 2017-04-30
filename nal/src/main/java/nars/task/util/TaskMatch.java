@@ -1,7 +1,6 @@
 package nars.task.util;
 
 import jcog.event.On;
-import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -10,9 +9,7 @@ import nars.derive.meta.AtomicPred;
 import nars.derive.meta.BoolPred;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.truth.Truth;
 import nars.util.SoftException;
-import org.eclipse.collections.api.tuple.primitive.LongLongPair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

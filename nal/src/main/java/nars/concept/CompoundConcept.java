@@ -1,6 +1,5 @@
 package nars.concept;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import nars.NAR;
@@ -14,16 +13,11 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
-import nars.time.Time;
-import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.function.Predicate;
-
-import static nars.Param.TRUTH_EPSILON;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Compound, Termlike {

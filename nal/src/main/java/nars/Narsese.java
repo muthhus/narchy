@@ -13,7 +13,6 @@ import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import jcog.Texts;
-import nars.budget.BudgetFunctions;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.TermBuilder;
 import nars.index.term.TermIndex;

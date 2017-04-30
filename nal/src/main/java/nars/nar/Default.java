@@ -14,7 +14,7 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.premise.PreferSimpleAndConfident;
+import nars.premise.PreferSimpleAndPolarized;
 import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -37,7 +37,7 @@ public class Default extends NAR {
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
 
-    public final PreferSimpleAndConfident derivationBudgeting;
+    public final PreferSimpleAndPolarized derivationBudgeting;
 
     public final ConceptBagFocus focus;
 
@@ -91,8 +91,8 @@ public class Default extends NAR {
     }
 
 
-    public PreferSimpleAndConfident newDerivationBudgeting() {
-        return new PreferSimpleAndConfident();
+    public PreferSimpleAndPolarized newDerivationBudgeting() {
+        return new PreferSimpleAndPolarized();
     }
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {

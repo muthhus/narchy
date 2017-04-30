@@ -8,7 +8,6 @@ import nars.truth.Truth;
 import nars.truth.TruthFunctions;
 import org.junit.Test;
 
-import static nars.$.t;
 import static nars.Param.TRUTH_EPSILON;
 import static org.junit.Assert.*;
 
@@ -182,4 +181,10 @@ public class TruthTest {
         }
     }
 
+    @Test public void testTruthPolarity() {
+        assertEquals(0f, $.t(0.5f, 0.9f).polarization(), 0.01f);
+        assertEquals(0.9f, $.t(0f, 0.9f).polarization(), 0.01f);
+        assertEquals(0.9f, $.t(1f, 0.9f).polarization(), 0.01f);
+        assertEquals(0.5f, $.t(1f, 0.5f).polarization(), 0.01f);
+    }
 }

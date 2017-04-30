@@ -1,13 +1,12 @@
 package nars.concept;
 
-import jcog.pri.PLink;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable;
+import nars.table.TemporalBeliefTable;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -15,7 +14,6 @@ import nars.truth.TruthAccumulator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -63,14 +61,14 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     }
 
 
-//    @Override
-//    public HijackTemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-//        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4, nar.random());
-//
-////        return
-////                new HijackTemporalBeliefTable(
-////                        tCap * 2, nar.random);
-//    }
+    @Override
+    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
+
+//        return
+//                new HijackTemporalBeliefTable(
+//                        tCap * 2);
+    }
 
     @Override
     public EternalTable newEternalTable(int eCap) {
