@@ -6,7 +6,7 @@ import nars.Param;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.table.BeliefTable;
 import nars.test.analyze.BeliefAnalysis;
-import nars.truth.DefaultTruth;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +59,7 @@ public class BeliefTableTest  {
     @Test
     public void testExpectation() throws Narsese.NarseseException {
 
-        assertEquals(0.859f, new DefaultTruth(0.9f,0.9f).expectation(), 0.001f);
+        assertEquals(0.859f, new DiscreteTruth(0.9f,0.9f).expectation(), 0.001f);
 
 
 

@@ -1,10 +1,13 @@
 package nars.video;
 
 import com.jogamp.opengl.GL2;
+import jcog.event.On;
 import nars.NAR;
+import nars.NAgent;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.truth.Truth;
+import spacegraph.Surface;
 import spacegraph.widget.meter.MatrixView;
 
 import java.util.function.Consumer;
@@ -13,25 +16,32 @@ import java.util.function.Consumer;
  * displays a CameraSensor pixel data as perceived through its concepts (belief/goal state)
  * monochrome
  */
-public class CameraSensorView extends MatrixView implements MatrixView.ViewFunction2D, Consumer<NAR> {
+public class CameraSensorView extends MatrixView implements MatrixView.ViewFunction2D, Consumer<NAgent> {
 
     private final Sensor2D cam;
     private final NAR nar;
+    private final On<NAgent> on;
     private float maxConceptPriority;
     private long now;
     int dur;
 
-    public CameraSensorView(Sensor2D cam, NAR nar) {
+    public CameraSensorView(Sensor2D cam, NAgent a) {
         super(cam.width, cam.height);
         this.cam = cam;
-        this.nar = nar;
-        nar.onCycleWeak(this);
+        this.nar = a.nar;
+        on = a.onFrame(this);
     }
 
     @Override
-    public void accept(NAR nn) {
-        now = nn.time();
-        dur = nn.dur();
+    public Surface hide() {
+        on.off();
+        return this;
+    }
+
+    @Override
+    public void accept(NAgent nn) {
+        now = nar.time();
+        dur = nar.dur();
         maxConceptPriority = 1;
 //            nar instanceof Default ?
 //                ((Default) nar).focus.active.priMax() :

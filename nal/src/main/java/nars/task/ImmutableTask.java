@@ -8,7 +8,7 @@ import nars.Param;
 import nars.Task;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.truth.DefaultTruth;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.apache.commons.collections4.map.Flat3Map;
@@ -29,7 +29,7 @@ import static nars.time.Tense.ETERNAL;
 public class ImmutableTask extends Pri implements Task {
 
     public final Compound term;
-    public final DefaultTruth truth;
+    public final DiscreteTruth truth;
     public final byte punc;
     private final long creation, start, end;
     public final long[] stamp;
@@ -62,9 +62,9 @@ public class ImmutableTask extends Pri implements Task {
 
         this.truth =
             truth==null ? null :
-                truth instanceof DefaultTruth ?
-                    ((DefaultTruth)truth) :
-                    new DefaultTruth(truth.freq(), truth.conf());
+                truth instanceof DiscreteTruth ?
+                    ((DiscreteTruth)truth) :
+                    new DiscreteTruth(truth.freq(), truth.conf());
 
         this.punc = punc;
 

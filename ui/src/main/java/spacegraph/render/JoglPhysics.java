@@ -195,7 +195,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     @Override
     protected void init(GL2 gl2) {
 
-        window.get().addKeyListener(this);
+        window.addKeyListener(this);
 
         initLighting();
 

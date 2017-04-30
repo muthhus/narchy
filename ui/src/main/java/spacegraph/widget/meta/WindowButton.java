@@ -54,7 +54,7 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
                     int sy = Finger.pointer.getY();
                     int nx = sx - width/2;
                     int ny = sy - height/2;
-                    space.window.get().setPosition(nx, ny);
+                    space.window.setPosition(nx, ny);
 
                     //space.show(this.toString(), width,height, nx, ny);
                     //space.window.setTitle(label.value());
@@ -63,7 +63,7 @@ public class WindowButton extends CheckBox implements ToggleButton.ToggleAction,
                 }
             } else {
                 if (space!=null) {
-                    GLWindow win = this.space.window.get();
+                    GLWindow win = this.space.window;
                     this.space = null;
                     if (win != null && win.getWindowHandle() != 0)
                         win.destroy();

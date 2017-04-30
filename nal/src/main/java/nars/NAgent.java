@@ -604,7 +604,7 @@ abstract public class NAgent implements NSense, NAct {
 
     private final Topic<NAgent> eventFrame = new ArrayTopic();
 
-    public On onFrame(Consumer<NAgent> each) {
+    public On<NAgent> onFrame(Consumer<NAgent> each) {
         return eventFrame.on(each);
     }
 

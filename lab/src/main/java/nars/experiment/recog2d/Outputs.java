@@ -3,9 +3,7 @@ package nars.experiment.recog2d;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.CompoundConcept;
-import nars.concept.Concept;
 import nars.term.Compound;
-import nars.truth.DefaultTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 

@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.event.On;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -9,6 +10,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthWave;
+import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.widget.Label;
 import spacegraph.widget.Widget;
@@ -32,6 +34,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     final TruthWave goalProj;
 
     final AtomicBoolean redraw;
+    private final On on;
 
 
     Concept cc = null; //cached concept
@@ -88,13 +91,18 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
         //setAutoSwapBufferMode(true);
 
-        n.onCycleWeak(this);
+        on = n.onCycle(this);
 
         redraw.set(true);
 
     }
 
 
+    @Override
+    public Surface hide() {
+        on.off();
+        return this;
+    }
 
     public void update(NAR nar) {
 

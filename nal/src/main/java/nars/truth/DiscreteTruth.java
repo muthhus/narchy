@@ -10,13 +10,24 @@ import static nars.truth.TruthFunctions.w2c;
 
 /** truth rounded to a fixed size precision
  *  to support hashing and equality testing */
-public class DefaultTruth implements Truth {
+public class DiscreteTruth implements Truth {
 
     /** truth component resolution of a 16-bit encoding */
     static final int hashDiscreteness16 = Short.MAX_VALUE-1;
 
     public final float freq, conf;
     private final int hash;
+
+    public DiscreteTruth(float f, float c) {
+        this(f, c, Param.TRUTH_EPSILON);
+    }
+
+    public DiscreteTruth(float f, float c, float epsilon) {
+        this.hash = truthToInt(
+            this.freq = Truth.freq(f, epsilon),
+            this.conf = Truth.conf(c, epsilon)
+        );
+    }
 
     /**
      * The hash code of a TruthValue, perfectly condensed,
@@ -41,7 +52,7 @@ public class DefaultTruth implements Truth {
 
     @Nullable
     public static Truth intToTruth(int h) {
-        return new DefaultTruth(
+        return new DiscreteTruth(
                 Util.unhashFloat( (h>>16) /* & 0xffff*/, hashDiscreteness16),
                 Util.unhashFloat(h & 0xffff, hashDiscreteness16)
         );
@@ -57,16 +68,7 @@ public class DefaultTruth implements Truth {
         return conf;
     }
 
-    public DefaultTruth(float f, float c) {
-        this(f, c, Param.TRUTH_EPSILON);
-    }
 
-    public DefaultTruth(float f, float c, float epsilon) {
-        this.hash = truthToInt(
-            this.freq = Truth.freq(f, epsilon),
-            this.conf = Truth.conf(c, epsilon)
-        );
-    }
 
 
     @NotNull
@@ -84,7 +86,7 @@ public class DefaultTruth implements Truth {
 
     @Override
     public final boolean equals(Object that) {
-        return (that instanceof DefaultTruth) ? (hash == that.hashCode()) :
+        return (that instanceof DiscreteTruth) ? (hash == that.hashCode()) :
             equals( (Truth)that, Param.TRUTH_EPSILON );
     }
 

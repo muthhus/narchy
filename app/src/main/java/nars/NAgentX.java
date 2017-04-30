@@ -169,7 +169,7 @@ abstract public class NAgentX extends NAgent {
                         //"agentPredict",
 
                     new WindowButton( "vision", () -> grid(a.cam.values().stream().map(cs ->
-                                        new CameraSensorView(cs, nar).align(Surface.Align.Center, cs.width, cs.height))
+                                        new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
                                         .toArray(Surface[]::new))
                                 )
                 ),

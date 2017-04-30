@@ -17,7 +17,7 @@ import nars.term.obj.IntTerm;
 import nars.term.util.InvalidTermException;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
-import nars.truth.DefaultTruth;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +92,7 @@ public class IO {
 
     @NotNull
     public static Truth readTruth(@NotNull DataInput in) throws IOException {
-        return DefaultTruth.intToTruth(in.readInt());
+        return DiscreteTruth.intToTruth(in.readInt());
     }
 
 
@@ -174,7 +174,7 @@ public class IO {
 
     public static void writeTruth(@NotNull DataOutput out, @NotNull Truthed t) throws IOException {
         Truth tt = t.truth();
-        out.writeInt(DefaultTruth.truthToInt(tt.freq(), tt.conf()));
+        out.writeInt(DiscreteTruth.truthToInt(tt.freq(), tt.conf()));
     }
 
 

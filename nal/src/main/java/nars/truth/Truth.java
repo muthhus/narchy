@@ -224,7 +224,7 @@ public interface Truth extends Truthed {
         float c = conf(conf(), res);
         if (c < confMin)
             return null;
-        return new DefaultTruth(freq(freq(), res), c);
+        return new DiscreteTruth(freq(freq(), res), c);
     }
 
     default float eternalizedEvi() {

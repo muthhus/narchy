@@ -108,7 +108,7 @@ public class Finger {
                 if (r.window != null) {
                     rw = r.window;
                     if (rw != null) {
-                        GLWindow rww = rw.window.get();
+                        GLWindow rww = rw.window;
                         if (rww != null) {
                             Point p = rww.getLocationOnScreen(new Point());
                             pointer.set(p.getX() + e.getX() , p.getY() + e.getY() );

@@ -7,7 +7,7 @@ package nars.truth;
  */
 public class TruthDelta {
 
-    public final static TruthDelta zero = new TruthDelta(new DefaultTruth(0.5f, 0.5f), new DefaultTruth(0.5f, 0.5f));
+    public final static TruthDelta zero = new TruthDelta(new DiscreteTruth(0.5f, 0.5f), new DiscreteTruth(0.5f, 0.5f));
 
     public final Truth before, after;
 

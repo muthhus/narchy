@@ -18,7 +18,6 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
@@ -28,7 +27,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     final static int FPS_IDEAL = 30;
     public static final int FPS_MIN = 20; //min acceptable FPS
 
-    protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL );
+    protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
+
     static {
         a.start();
     }
@@ -38,12 +38,12 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    public final AtomicReference<GLWindow> window = new AtomicReference<GLWindow>();
+    public GLWindow window = null;
     protected GL2 gl;
 
     public final PeriodMeter frameTimeMS;
 
-    static final ConcurrentHashMap<JoglSpace,JoglSpace> meters = new ConcurrentHashMap();
+    static final ConcurrentHashMap<JoglSpace, JoglSpace> meters = new ConcurrentHashMap();
 
 
     public JoglSpace() {
@@ -58,6 +58,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     static final GLAutoDrawable sharedDrawable;
+
     static {
         GLCapabilitiesImmutable cfg = newDefaultConfig();
         sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
@@ -80,7 +81,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         return w;
     }
 
-    public static final Set<GLWindow> windows = Collections.newSetFromMap(  new ConcurrentHashMap<>() );
+    public static final Set<GLWindow> windows = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     public static final Logger logger = LoggerFactory.getLogger(JoglSpace.class);
 
@@ -123,8 +124,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
     @Override
-    public final void init(GLAutoDrawable drawable) {
-        this.window.set((GLWindow) drawable);
+    public final synchronized void init(GLAutoDrawable drawable) {
+        this.window = ((GLWindow) drawable);
 
         this.gl = drawable.getGL().getGL2();
         //printHardware();
@@ -184,13 +185,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     public final int getWidth() {
-        return window.get().getSurfaceWidth();
+        return window.getSurfaceWidth();
 
     }
+
     public final int getHeight() {
-        return window.get().getSurfaceHeight();
+        return window.getSurfaceHeight();
     }
-
 
 
     @Override
@@ -233,6 +234,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
     abstract protected void update();
+
     abstract protected void render();
 
     @Override
@@ -249,27 +251,26 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
 
     public GLWindow show(int w, int h) {
-        return show("", w, h );
+        return show("", w, h);
     }
 
-    public GLWindow show(String title, int w, int h, int x, int y) {
-        return this.window.getAndUpdate(win -> {
-            if (win != null)
-                return win;
+    public synchronized GLWindow show(String title, int w, int h, int x, int y) {
 
-            GLWindow g = window(this);
-            g.setTitle(title);
-            g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
-            g.preserveGLStateAtDestroy(false);
-            g.setSurfaceSize(w, h);
-            g.setAutoSwapBufferMode(true);
-            if (x != Integer.MIN_VALUE ) {
-                g.setPosition(x, y);
-            }
-            g.setVisible(true);
-            return g;
+        if (window != null)
+            return window;
 
-        });
+        GLWindow g = window(this);
+        g.setTitle(title);
+        g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
+        g.preserveGLStateAtDestroy(false);
+        g.setSurfaceSize(w, h);
+        g.setAutoSwapBufferMode(true);
+        if (x != Integer.MIN_VALUE) {
+            g.setPosition(x, y);
+        }
+        g.setVisible(true);
+        return this.window = g;
+
     }
 
     public GLWindow show(String title, int w, int h) {
@@ -277,20 +278,20 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
     public void addMouseListener(MouseListener m) {
-        window.get().addMouseListener(m);
+        window.addMouseListener(m);
     }
+
     public void addWindowListener(WindowListener m) {
-        window.get().addWindowListener(m);
+        window.addWindowListener(m);
     }
+
     public void addKeyListener(KeyListener m) {
-        window.get().addKeyListener(m);
+        window.addKeyListener(m);
     }
 
     public GL2 gl() {
         return gl;
     }
-
-
 
 
     private static class MyFPSAnimator extends FPSAnimator {
@@ -314,10 +315,11 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 }
 
                 long lastUpdate;
+
                 @Override
                 public void flush() {
                     long l = getLastFPSUpdateTime();
-                    if (lastUpdate==l)
+                    if (lastUpdate == l)
                         return;
                     updateFPS();
                     lastUpdate = l;
@@ -335,12 +337,12 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             float lastFPS = getLastFPS();
             float lag = currentFPS - lastFPS;
 
-            float error = lag/currentFPS;
+            float error = lag / currentFPS;
 
             float nextFPS = Float.NaN;
 
             if (error > lagTolerancePercentFPS) {
-                if (currentFPS > minFPS)  {
+                if (currentFPS > minFPS) {
                     //decrease fps
                     nextFPS = Util.lerp(0.1f, minFPS, currentFPS);
                 }
@@ -352,7 +354,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             }
 
             int inextFPS = Math.max(1, Math.round(nextFPS));
-            if (nextFPS==nextFPS && inextFPS!=currentFPS) {
+            if (nextFPS == nextFPS && inextFPS != currentFPS) {
                 //stop();
                 logger.debug("animator rate change from {} to {} fps because currentFPS={} and lastFPS={} ", currentFPS, inextFPS, currentFPS, lastFPS);
 
