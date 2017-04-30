@@ -722,7 +722,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            }
 
 
-        a.runCycles(100000);
+        a.runCycles(1000);
 
 
 //        NARController meta = new NARController(nar, loop, t);

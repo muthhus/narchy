@@ -40,7 +40,7 @@ public class Pacman extends NAgentX {
                 senseCamera("(G,c" + cm.name() + ")",
                         camScale.filter(cm),
                         (v) -> t(v, alpha()))
-                        .setResolution(0.1f);
+                        .setResolution(0.5f);
             }
 
         actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
@@ -92,12 +92,12 @@ public class Pacman extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         Default n = NARBuilder.newMultiThreadNAR(
-                4,
+                2,
                 new RealTime.DSHalf(true)
-                        .durFPS(20f), true);
+                        .durFPS(5f), true);
 
         Pacman a = new Pacman(n);
-        a.runRT(20f);
+        a.runRT(5f);
 
 
         NAgentX.chart(a);
