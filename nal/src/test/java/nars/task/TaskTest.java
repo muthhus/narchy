@@ -109,7 +109,7 @@ public class TaskTest {
     @Test
     public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
-        Default d = new Default(100, 3);
+        Default d = new Default(100);
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");
 

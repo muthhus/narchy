@@ -143,7 +143,7 @@ public class QuestionTest {
         DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
 
         IntFunction<NAR> narProvider = (seed) -> {
-            NAR d = new Default(512, 1);
+            NAR d = new Default(512);
             d.random().setSeed(seed);
             d.nal(4);
             return d;
@@ -234,7 +234,7 @@ public class QuestionTest {
     }
     @Test
     public void testDeriveQuestOrdinary() throws Narsese.NarseseException {
-        new TestNAR(new Default(1024, 3))
+        new TestNAR(new Default(1024))
                 .log()
                 .quest("((S | P) --> M)")
                 .believe("(S --> M)")

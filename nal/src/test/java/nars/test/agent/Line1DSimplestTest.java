@@ -30,7 +30,7 @@ public class Line1DSimplestTest {
 
         float c = 0.9f;
 
-        NAR n = new Default(1024, 3);
+        NAR n = new Default(1024);
         n.termVolumeMax.setValue(8);
 
         int BETWEEN = 32;
@@ -204,9 +204,9 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        Default n = new Default(1024, 3);
+        Default n = new Default(1024);
 
-        n.stmLinkage.capacity.setValue(2);
+
 
         final int changePeriod = 8;
 
@@ -314,7 +314,7 @@ public class Line1DSimplestTest {
     @Test public void testSequenceLearning() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        Default n = new Default(1024, 3);
+        Default n = new Default(1024);
         n.on("say", (Command) (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
                 try {

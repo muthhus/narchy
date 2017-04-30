@@ -188,7 +188,7 @@ public class TermIndexTest {
     @Ignore
     @Test
     public void testRuleTermsAddedToMemoryTermIndex() {
-        NAR d = new Default(100, 1);
+        NAR d = new Default(100);
         Set<Term> t = new TreeSet();
         d.concepts.forEach(x -> t.add(x.term()));
 

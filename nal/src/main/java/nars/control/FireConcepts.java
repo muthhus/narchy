@@ -46,13 +46,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      *
      */
     public final @NotNull FloatParam rate = new FloatParam(1f);
-    /**
-     * size of each sampled concept batch that adds up to conceptsFiredPerCycle.
-     * reducing this value should provide finer-grained / higher-precision concept selection
-     * since results between batches can affect the next one.
-     */
-    public final MutableIntRange taskLinksFiredPerConcept = new MutableIntRange(1, 1);
-    public final MutableIntRange termLinksFiredPerTaskLink = new MutableIntRange(1, 1);
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -133,7 +126,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * returns # of derivations processed
      */
-    int premiseVector0(PLink<Concept> pc, Derivation d) {
+    int premiseVector0(PLink<Concept> pc, Derivation d, MutableIntRange taskLinksFiredPerConcept, MutableIntRange termLinksFiredPerConcept) {
 
         Concept c = pc.get();
         float cPri = pc.priSafe(0);
@@ -142,7 +135,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         if (tasklinks.isEmpty())
             return 0;
 
-        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerTaskLink.lerp(cPri));
+        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerConcept.lerp(cPri));
         if (termlinks.isEmpty())
             return 0;
 

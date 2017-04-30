@@ -112,7 +112,7 @@ public class TestAggregator extends RunListener {
 
     }
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default da = new Default(128, 3);
+        Default da = new Default(128);
         //da.memory.realTime();
         NAR nar = da;
 

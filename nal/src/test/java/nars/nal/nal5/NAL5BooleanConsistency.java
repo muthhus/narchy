@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
-                Default d = new Default(1024, 3) {
+                Default d = new Default(1024) {
                     @Override
                     public Deriver newDeriver() {
                         return e;

@@ -9,7 +9,7 @@ import nars.nar.Default;
 public class SATStream {
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default d = new Default(1000, 3);
+        Default d = new Default(1000);
 
         //d.inputActivation.setValue(0.2f);
 

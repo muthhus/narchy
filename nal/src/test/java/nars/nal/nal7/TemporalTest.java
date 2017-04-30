@@ -119,7 +119,7 @@ public class TemporalTest {
                 nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("(do(that)&&((a)&&(b)))", n.conceptualize(nt).toString());
+        assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 

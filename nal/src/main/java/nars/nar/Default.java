@@ -14,6 +14,7 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
+import nars.op.stm.STMTemporalLinkage2;
 import nars.premise.PreferSimpleAndPolarized;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -35,7 +36,7 @@ public class Default extends NAR {
 
     public final FireConcepts deriver;
 
-    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+
 
     public final PreferSimpleAndPolarized derivationBudgeting;
 
@@ -43,18 +44,18 @@ public class Default extends NAR {
 
     static final Deriver defaultDeriver = DefaultDeriver.the;
 
-    //private final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 16, 1, 2);
+    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+    //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
 
     @Deprecated
     public Default() {
-        this(1024, 1);
+        this(1024);
     }
 
-    public Default(int activeConcepts, int termLinksPerConcept) {
+    public Default(int activeConcepts) {
         this(activeConcepts,
-                termLinksPerConcept,
-            ()->new XorShift128PlusRandom(1),
+                ()->new XorShift128PlusRandom(1),
             new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new FrameTime(),
             new SynchronousExecutor());
@@ -63,11 +64,11 @@ public class Default extends NAR {
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
 
 
-    public Default(int activeConcepts, int termLinksPerConcept, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
-        this(activeConcepts, termLinksPerConcept, ThreadLocalRandom::current, concepts, time, exe);
+    public Default(int activeConcepts, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+        this(activeConcepts, ThreadLocalRandom::current, concepts, time, exe);
     }
 
-    public Default(int activeConcepts, int termLinksPerConcept, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+    public Default(int activeConcepts, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
         ConceptBagFocus f = new ConceptBagFocus(this, newConceptBag(activeConcepts));
@@ -81,8 +82,7 @@ public class Default extends NAR {
                 //:
                 new FireConcepts.FireConceptsDirect(newDeriver(), derivationBudgeting, this);
 
-        deriver.taskLinksFiredPerConcept.set(1, 1);
-        deriver.termLinksFiredPerTaskLink.set(1, termLinksPerConcept);
+
         deriver.rate.setValue(0.02f);
     }
 

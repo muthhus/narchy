@@ -17,7 +17,7 @@ public class TestEinsteinsRiddle {
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR n = new Default(1024, 5) {
+        NAR n = new Default(1024) {
 //            @Override
 //            public Deriver newDeriver() {
 //                return new DeriverTransform(b -> new DeriverTransform.TracedBoolPredicate(b))

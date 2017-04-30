@@ -24,7 +24,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
     private final @NotNull Iterable<PLink<X>> input;
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default d = new Default(1024, 2);
+        Default d = new Default(1024);
         d.input("(a --> b). (b --> c).  (c --> d).  (d-->e)! :|: ");
 
         BagChart<Concept> tc = new Vis.ConceptBagChart(d.focus(), 1024, d);

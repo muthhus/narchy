@@ -36,7 +36,7 @@ public class LinkageTest extends AbstractNALTest {
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
-            Default d = new Default(1000, 1);
+            Default d = new Default(1000);
             d.nal(6);
             return d;
         });
@@ -420,7 +420,7 @@ public class LinkageTest extends AbstractNALTest {
 
     @Test
     public void Variable_Normalization_1() throws Exception {
-        Default tester = new Default(100, 1);
+        Default tester = new Default(100);
         String nonsense = "<(&&,<#1 --> M>,<#2 --> M>) ==> <#1 --> nonsense>>";
         tester.believe(nonsense); //.en("If robin is a type of bird then robin can fly.");
         tester.run(1);

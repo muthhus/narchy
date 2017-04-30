@@ -454,6 +454,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             if (v != null && (next = each.next(v)).remove) {
                 if (map.compareAndSet(i, v, null)) {
                     modified = true;
+                    _onRemoved(v);
+                    if (size() == 0)
+                        break;
                 }
             }
         }
