@@ -9,6 +9,8 @@ import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
+import nars.video.BufferedImageBitmap2D;
+import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,8 +28,17 @@ public class Gradius extends NAgentX {
 
         this.g =  new Gradius4K();
 
-        senseCamera("G", ()-> g.image, 64, 48, (v) -> t(v, alpha()))
-                .setResolution(0.01f);
+        Scale camScale = new Scale(() -> g.image, 24, 24);
+        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
+                BufferedImageBitmap2D.ColorMode.R,
+                BufferedImageBitmap2D.ColorMode.B,
+                BufferedImageBitmap2D.ColorMode.G
+        }) {
+            senseCamera("(G,c" + cm.name() + ")",
+                    camScale.filter(cm),
+                    (v) -> t(v, alpha()))
+                    .setResolution(0.1f);
+        }
 
         actionToggle($.inh(Atomic.the("fire"),id),
                 (b)-> g.keys[Gradius4K.VK_SHOOT] = b );
@@ -75,12 +86,12 @@ public class Gradius extends NAgentX {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         Default n = NARBuilder.newMultiThreadNAR(
-                4,
-                new RealTime.DSHalf(true)
-                        .durFPS(20f), true);
+                3,
+                new RealTime.CS(true)
+                        .durFPS(10f), true);
 
         Gradius a = new Gradius(n);
-        a.runRT(20f);
+        a.runRT(10f);
 
 
         NAgentX.chart(a);

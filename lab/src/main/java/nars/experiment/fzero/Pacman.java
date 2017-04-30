@@ -11,6 +11,9 @@ import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
+import nars.video.BufferedImageBitmap2D;
+import nars.video.Scale;
+import nars.video.SwingBitmap2D;
 
 import static nars.$.t;
 
@@ -26,9 +29,19 @@ public class Pacman extends NAgentX {
 
         this.g = new PacMan();
 
-        senseCamera("G", g.view, 64, 64, (v) -> t(v, alpha()))
-                .setResolution(0.01f);
-
+//        senseCamera("G", g.view, 64, 64, (v) -> t(v, alpha()))
+//                .setResolution(0.01f);
+         Scale camScale = new Scale( new SwingBitmap2D(g.view), 64, 64);
+            for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
+                    BufferedImageBitmap2D.ColorMode.R,
+                    BufferedImageBitmap2D.ColorMode.G,
+                    BufferedImageBitmap2D.ColorMode.B
+            }) {
+                senseCamera("(G,c" + cm.name() + ")",
+                        camScale.filter(cm),
+                        (v) -> t(v, alpha()))
+                        .setResolution(0.1f);
+            }
 
         actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
             g.keys[0 /* left */] = false;

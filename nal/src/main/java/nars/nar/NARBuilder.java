@@ -195,7 +195,7 @@ public interface NARBuilder {
         nar.termVolumeMax.setValue(64);
 
         nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.5f);
+        nar.goalConfidence(0.75f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -212,7 +212,7 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 32);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 4, false, 32);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

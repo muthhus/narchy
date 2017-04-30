@@ -10,8 +10,40 @@ import static nars.video.Bitmap2D.*;
  */
 public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> {
 
+    public BufferedImageBitmap2D() {
+
+    }
+
+    public BufferedImageBitmap2D(Supplier<BufferedImage> delegate) {
+        this.source = delegate;
+        this.out = source.get();
+    }
+
+    public enum ColorMode {
+        R, G, B, RGB
+    }
+
+    ColorMode mode = ColorMode.RGB;
     Supplier<BufferedImage> source;
     public BufferedImage out;
+
+    public BufferedImageBitmap2D filter(ColorMode c) {
+        return new BufferedImageBitmap2D(this){
+            @Override
+            public int width() {
+                return BufferedImageBitmap2D.this.width(); //HACK
+            }
+            @Override
+            public int height() {
+                return BufferedImageBitmap2D.this.height(); //HACK
+            }
+        }.mode(c);
+    }
+
+    public BufferedImageBitmap2D mode(ColorMode c) {
+        this.mode = c;
+        return this;
+    }
 
     @Override
     public int width() {
@@ -30,24 +62,30 @@ public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> 
             out = source.get();
     }
 
-    public void see(EachPixelRGB p) {
-        final BufferedImage b = this.out;
-        if (b == null)
-            return;
-
-        int height = height();
-        int width = width();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                p.pixel(x, y, b.getRGB(x, y));
-            }
-        }
-    }
+//    public void see(EachPixelRGB p) {
+//        final BufferedImage b = this.out;
+//        if (b == null)
+//            return;
+//
+//        int height = height();
+//        int width = width();
+//        for (int y = 0; y < height; y++) {
+//            for (int x = 0; x < width; x++) {
+//                p.pixel(x, y, b.getRGB(x, y));
+//            }
+//        }
+//    }
 
     @Override public float brightness(int xx, int yy) {
         if (out!=null) {
             int rgb = out.getRGB(xx, yy);
-            return (decodeRed(rgb) + decodeGreen(rgb) + decodeBlue(rgb)) / 3f;
+            switch (mode) {
+                case R: return decodeRed(rgb);
+                case G: return decodeGreen(rgb);
+                case B: return decodeBlue(rgb);
+                case RGB:
+                    return (decodeRed(rgb) + decodeGreen(rgb) + decodeBlue(rgb)) / 3f;
+            }
         }
         return Float.NaN;
     }

@@ -1,5 +1,7 @@
 package jcog.bag.impl.hijack;
 
+import jcog.Texts;
+import jcog.bag.impl.HijackBag;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
@@ -38,22 +40,42 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
         this.func = f;
     }
 
-    public void statReset(ObjectLongProcedure<String> eachStat) {
+    public float statReset(ObjectLongProcedure<String> eachStat) {
         //eachStat.accept("S" /* size */, size() );
-        eachStat.accept("H" /* hit */, hit.sumThenReset() );
-        eachStat.accept("M" /* miss */, miss.sumThenReset() );
-        eachStat.accept("R" /* reject */, reject.sumThenReset() );
-        eachStat.accept("E" /* evict */, evict.sumThenReset() );
+        long H, M, R, E;
+        eachStat.accept("H" /* hit */, H = hit.sumThenReset() );
+        eachStat.accept("M" /* miss */, M = miss.sumThenReset() );
+        eachStat.accept("R" /* reject */, R = reject.sumThenReset() );
+        eachStat.accept("E" /* evict */, E = evict.sumThenReset() );
+        return (H/((float)(H+M+R+E)));
+    }
+
+    /** estimates the value of computing the input.
+     * easier items will introduce lower priority, allowing
+     * harder items to sustain longer
+     * */
+    public float value(@NotNull K k) {
+        return 0.5f;
+        //return reprobes * 2 * CACHE_HIT_BOOST;
     }
 
     @Override
     public boolean setCapacity(int i) {
         if (super.setCapacity(i)) {
-            this.CACHE_HIT_BOOST = i > 0 ? reprobes / (float)Math.sqrt(i) : 0;
-            this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST;
+            this.CACHE_HIT_BOOST = i > 0 ?
+                    (0.5f/((1+reprobes) * (1+reprobes))) : 0;
+                    //reprobes / (float)Math.sqrt(i) : 0;
+            this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST/reprobes;
             return true;
         }
         return false;
+    }
+
+    @NotNull
+    @Override
+    public HijackBag<K, PLink<Pair<K, V>>> commit(@Nullable Consumer<PLink<Pair<K, V>>> update) {
+        //nothing
+        return this;
     }
 
     @Override
@@ -74,13 +96,7 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
         }
     }
 
-    /** quickly estimates the value of computing the input.
-     * easier items will introduce lower priority, allowing
-     * harder items to sustain longer
-     * */
-    public float value(@NotNull K k) {
-        return reprobes * 2 * CACHE_HIT_BOOST;
-    }
+
 
     @Override
     protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing, float scale) {
@@ -112,10 +128,11 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
     /** clears the statistics */
     public String summary() {
         StringBuilder sb = new StringBuilder(32);
-        statReset((k,v) -> {
+        float rate = statReset((k,v) -> {
             sb.append(k).append('=').append(v).append(' ');
         });
         sb.setLength(sb.length()-1); //remove last ' '
+        sb.insert(0, Texts.n2(100f * rate) + "% ");
         return sb.toString();
     }
 }

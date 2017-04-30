@@ -12,7 +12,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.*;
 
 public class PacMan {
-	
+
+	int periodMS = 30;
+
 	static final boolean running = true;
 	public final PacComponent view;
 	Maze maze;
@@ -80,7 +82,7 @@ public class PacMan {
 
 					view.repaint();
 
-					Util.sleep(5);
+				Util.sleep(periodMS);
 				//} while (System.currentTimeMillis() - time < 10);
 
 				//time = System.currentTimeMillis();
@@ -92,10 +94,10 @@ public class PacMan {
 
 	public void resetGhosts() {
 
-		ghosts = new Ghost[]{ new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 3, Color.cyan),
-				new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 2, Color.magenta),
+		ghosts = new Ghost[]{ new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 3, Color.red),
+				new Ghost(maze, maze.playerStart().x, maze.playerStart().y - 2, Color.red),
 				new Ghost(maze, maze.playerStart().x + 1, maze.playerStart().y - 2, Color.red),
-				new Ghost(maze, maze.playerStart().x - 1, maze.playerStart().y - 2, Color.orange.darker())};
+				new Ghost(maze, maze.playerStart().x - 1, maze.playerStart().y - 2, Color.red)};
 
 	}
 
