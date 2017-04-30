@@ -715,7 +715,6 @@ public class UnificationTest {
 
     @Test
     public void ellipsisCommutiveRepeat2_b() {
-        //no X which can match exactly in both
         test(Op.VAR_PATTERN,
                 "{{a, %X..+, %B}, {z, %X..+, %A}}",
                 "{{a, b, c, d}, {z, b, c, d}}", true);
@@ -723,7 +722,6 @@ public class UnificationTest {
 
     @Test
     public void ellipsisCommutiveRepeat2_bb() {
-        //no X which can match exactly in both
         test(Op.VAR_PATTERN,
                 "({a, %X..+, %B}, {z, %X..+, %A})",
                 "({a, b, c, d}, {z, b, c, d})", true);

@@ -1,5 +1,6 @@
 package java4k;
 
+import java4k.gradius4k.Gradius4K;
 import java4k.rainbowroad.ap;
 
 import javax.imageio.ImageIO;
@@ -17,7 +18,7 @@ public class Launcher {
 
 	private static final Class[] GAME_CLASSES = { java4k.apohockey4k.W.class, java4k.apoone4k.A.class, java4k.boing4k.a.class, java4k.boxbot4k.B.class, java4k.castlevania4k.a.class,
 			java4k.crackattack4k.a.class, java4k.demonattack4k.a.class, java4k.di4klo.A.class, java4k.diez.Z.class, java4k.dord.a.class, java4k.doubledragon4k.a.class, java4k.flap4kanabalt.V.class,
-			java4k.fzero4k.M.class, java4k.gradius4k.a.class, java4k.greenballs.G.class, java4k.i4kopter.I4Kopter.class, java4k.inthedark4k.A.class, java4k.jackal4k.a.class,
+			java4k.fzero4k.M.class, Gradius4K.class, java4k.greenballs.G.class, java4k.i4kopter.I4Kopter.class, java4k.inthedark4k.A.class, java4k.jackal4k.a.class,
 			java4k.junglehunt4k.a.class, java4k.keystonekapers4k.a.class, java4k.laserpinball.a.class, java4k.legendofzelda4k.a.class, java4k.magewars4k.M.class, java4k.mcjob.a.class,
 			java4k.myprecious.R.class, java4k.mysterymash.M.class, java4k.on.O.class, java4k.outrun4k.a.class, java4k.pinball4k.a.class, java4k.pitfall4k.a.class, java4k.porta4k.P.class,
 			ap.class, java4k.s23.A.class, java4k.scramble.G.class, java4k.spacedevastation.A.class, java4k.supermarioland4k.a.class, java4k.thebattleforhoth4k.a.class,

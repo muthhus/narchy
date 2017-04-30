@@ -435,7 +435,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
 
         int s = size();
-        if (s == 0)
+        if (s <= 0)
             return this;
 
         AtomicReferenceArray<V> map = this.map.get();
@@ -448,16 +448,21 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         BagCursorAction next = BagCursorAction.Next;
         boolean modified = false;
-        while (!next.stop) {
+        int nulls = 0; //emergency null counter
+        while (!next.stop && nulls < c) {
             if (++i == c) i = 0; //modulo c
             V v = map.get(i);
-            if (v != null && (next = each.next(v)).remove) {
-                if (map.compareAndSet(i, v, null)) {
-                    modified = true;
-                    _onRemoved(v);
-                    if (size() == 0)
-                        break;
+            if (v != null) {
+                if ((next = each.next(v)).remove) {
+                    if (map.compareAndSet(i, v, null)) {
+                        modified = true;
+                        if (_onRemoved(v) <= 0)
+                            break;
+                    }
                 }
+                nulls = 0;
+            } else {
+                nulls++;
             }
         }
 
@@ -685,7 +690,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 }
             }
 
-            size.set(count); //assert(size() == count);
+            size.set(count); assert(size() == count);
             this.mass = mass;
 
         } finally {
@@ -699,9 +704,10 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         size.incrementAndGet();
         onAdded(x);
     }
-    private void _onRemoved(V x) {
-        size.decrementAndGet();
+    private int _onRemoved(V x) {
+        int s = size.decrementAndGet();
         onRemoved(x);
+        return s;
     }
 
     @NotNull

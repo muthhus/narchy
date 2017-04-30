@@ -5,7 +5,6 @@ import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.experiment.Line1DDQN;
 import nars.experiment.RLAccel;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.NARBuilder;
