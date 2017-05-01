@@ -3,6 +3,7 @@ package nars.nar;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
+import jcog.random.XORShiftRandom;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
@@ -47,6 +48,7 @@ public class Default extends NAR {
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
+    final Random rng = new XorShift128PlusRandom(1);
 
     @Deprecated
     public Default() {
@@ -55,7 +57,6 @@ public class Default extends NAR {
 
     public Default(int activeConcepts) {
         this(activeConcepts,
-                ()->new XorShift128PlusRandom(1),
             new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new FrameTime(),
             new SynchronousExecutor());
@@ -65,10 +66,10 @@ public class Default extends NAR {
 
 
     public Default(int activeConcepts, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
-        this(activeConcepts, ThreadLocalRandom::current, concepts, time, exe);
+        this(activeConcepts, new XorShift128PlusRandom(1), concepts, time, exe);
     }
 
-    public Default(int activeConcepts, @NotNull Supplier<Random> random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
+    public Default(int activeConcepts, @NotNull Random random, @NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
         super(time, concepts, random, exe);
 
         ConceptBagFocus f = new ConceptBagFocus(this, newConceptBag(activeConcepts));

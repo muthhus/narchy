@@ -84,8 +84,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     static final String VERSION = "NARchy v?.?";
 
     public final Executioner exe;
-    @NotNull
-    private final Supplier<Random> random;
+    private final @NotNull Random random;
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
@@ -181,7 +180,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Supplier<Random> rng, @NotNull Executioner exe) {
+    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
 
         this.random = rng;
 
@@ -837,7 +836,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     /** provides a Random number generator */
     public Random random() {
-        return random.get();
+        return random;
     }
 
     static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {

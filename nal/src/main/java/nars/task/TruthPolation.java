@@ -67,8 +67,8 @@ public enum TruthPolation {
             float cost = 0.01f;
             float twa = t.evi();
             float utilized = (tw > 0 && twa > 0) ? tw / twa : 0;
-            //System.out.println(when + "," + dur + "@ " + t  + " utilized " + utilized);
             t.priMult((1f - cost * (1f - utilized)));
+            //System.out.println(when + "," + dur + "@ " + t  + " utilized " + utilized);
 
         });
         float evidence = illWei[0];

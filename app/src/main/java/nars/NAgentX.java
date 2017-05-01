@@ -87,6 +87,10 @@ abstract public class NAgentX extends NAgent {
 
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps) {
+        return runRT(init, fps, -1);
+    }
+
+    public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
         int durFrames = 1;
 
@@ -108,8 +112,11 @@ abstract public class NAgentX extends NAgent {
         else
             chart(a);
 
-        a.runRT(fps);
-        //a.runRT(0, endTime).join();
+        if (endTime > 0)
+            a.runRT(fps);
+        else {
+            a.runRT(0, endTime).join();
+        }
 
         return nar;
 

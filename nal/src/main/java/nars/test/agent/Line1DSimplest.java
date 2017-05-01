@@ -15,13 +15,13 @@ import nars.term.atom.Atomic;
  */
 public class Line1DSimplest extends NAgent {
 
-    public static final float resolution = 0.04f;
     //public final SensorConcept in;
 
     /**
      * the target value
      */
     public final FloatParam i = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam speed = new FloatParam(0.1f, 0f, 0.5f);
 
     public final ActionConcept out;
     /**
@@ -51,11 +51,10 @@ public class Line1DSimplest extends NAgent {
 
         //out = null;
         out = actionTriState($.inh(Atomic.the("o"), id), (d) -> {
-            float speed = 0.1f;
             switch (d) {
                 case -1:
                 case +1:
-                    o.setValue(Math.max(0f, Math.min(1f, o.floatValue() + d * speed)));
+                    o.setValue(Math.max(0f, Math.min(1f, o.floatValue() + d * speed.floatValue())));
                     break;
             }
         });
@@ -97,9 +96,15 @@ public class Line1DSimplest extends NAgent {
         float dist = Math.abs(i.floatValue() - o.floatValue());
 
         //return (1f - dist); //unipolar, 0..1.0
-        //return (((1f - dist)-0.5f) * 2f); //bipolar, normalized to -1..+1
-        return ((Util.sqr(1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
+        return (((1f - dist)-0.5f) * 2f); //bipolar, normalized to -1..+1
+        //return ((Util.sqr(1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
     }
 
 
+    public float target() {
+        return i.asFloat();
+    }
+    public void target(float v) {
+        i.setValue(v);
+    }
 }

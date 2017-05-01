@@ -3,12 +3,9 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
-import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.experiment.RLAccel;
 import nars.gui.Vis;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,8 +15,8 @@ import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
 
-    static boolean numeric = false;
-    static boolean cam = true;
+    static boolean numeric = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     public final FloatParam paddleSpeed = new FloatParam(1f, 0.1f, 3f);
@@ -49,6 +46,7 @@ public class Arkancide extends NAgentX {
 
             try {
                 a = new Arkancide(n, cam, numeric);
+                //a.nar.log();
 
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -59,7 +57,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 5);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {

@@ -101,7 +101,7 @@ public final class DynTruth implements Truthed {
         if (null == (c = Task.content(c, nar)))
             return null;
 
-        if (null == (c = nar.concepts.normalize(c)))
+        if (null == (c = nar.concepts.retemporalize(c)))
             return null;
 
         // then if the term is valid, see if it is valid for a task

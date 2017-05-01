@@ -128,8 +128,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public @Nullable Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap) {
-        if (template == null)
-            template = dynamicConcept.nar.concepts.retemporalize( dynamicConcept.term() ); //TODO move this somewhere else where it can use the NAR's index
+        if (template == null) {
+            Compound dct = dynamicConcept.term();
+            template = dynamicConcept.nar.concepts.retemporalize(dct); //TODO move this somewhere else where it can use the NAR's index
+        }
 
 //        Compound template =
 //                //use the provided target task as a temporal template if it matches with this

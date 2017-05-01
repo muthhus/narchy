@@ -26,7 +26,7 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(time, new Default.DefaultTermTermIndex(capacity), ()->random, new SynchronousExecutor());
+        super(time, new Default.DefaultTermTermIndex(capacity), random, new SynchronousExecutor());
     }
 
 }

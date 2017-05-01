@@ -98,7 +98,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * range: -1..+1, mapped directly to the 0..1.0 frequency range
      */
-    public float rewardValue;
+    public float reward;
 
     public NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -118,7 +118,7 @@ abstract public class NAgent implements NSense, NAct {
         this.happy = new SensorConcept(
                 id == null ? p("happy") : $.inh( Atomic.the("happy"), id),
                 nar,
-                new FloatPolarNormalized(() -> rewardValue),
+                new FloatPolarNormalized(() -> reward),
 
                 (x) -> t(x, alpha())
 
@@ -139,7 +139,7 @@ abstract public class NAgent implements NSense, NAct {
         };
 
         curiosityConf = new FloatParam( 0.10f);
-        curiosityProb = new FloatParam( 0.20f);
+        curiosityProb = new FloatParam( 0.10f);
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
@@ -210,7 +210,7 @@ abstract public class NAgent implements NSense, NAct {
         this.now = nar.time();
 
 
-        float r = rewardValue = act();
+        float r = reward = act();
         if (r == r) {
             rewardSum += r;
         }
@@ -273,7 +273,7 @@ abstract public class NAgent implements NSense, NAct {
 
         //sendInfluxDB("localhost", 8089);
 
-        return id + " rwrd=" + n2(rewardValue) +
+        return id + " rwrd=" + n2(reward) +
                 " motv=" + n4(dexterity()) +
                 " var=" + n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
                 nar.emotion.summary();
@@ -455,7 +455,7 @@ abstract public class NAgent implements NSense, NAct {
      * synchronous execution which runs a NAR directly at a given framerate
      */
     @NotNull
-    public Loop runRT(float fps, int stopTime) {
+    public Loop runRT(float fps, long stopTime) {
 
         init();
 

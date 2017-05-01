@@ -1,11 +1,9 @@
 package nars.experiment.tetris;
 
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.experiment.RLAccel;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.nar.NARBuilder;
 import nars.task.util.TaskStatistics;

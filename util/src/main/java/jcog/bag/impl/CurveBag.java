@@ -24,11 +24,11 @@ public class CurveBag<X> extends ArrayBag<X> {
     /** optimized point sample impl */
     @Nullable
     @Override public PLink<X> sample() {
-        PLink<X>[] i = items.array();
+        Object[] i = items.array();
         if (i.length == 0)
             return null;
 
-        return i[ThreadLocalRandom.current().nextInt(i.length)];
+        return (PLink<X>) i[ThreadLocalRandom.current().nextInt(i.length)];
     }
 
     @NotNull

@@ -1,11 +1,9 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
-import nars.experiment.RLAccel;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;

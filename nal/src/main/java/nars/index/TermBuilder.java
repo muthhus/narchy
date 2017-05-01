@@ -620,7 +620,7 @@ public abstract class TermBuilder {
         while (ss.hasNext()) {
             ObjectBytePair<Term> xn = ss.next();
             Term x = xn.getOne();
-            outer.add((xn.getTwo() < 0) ? $.neg(x) : x);
+            outer.add((xn.getTwo() < 0) ? neg(x) : x);
         }
         return outer;
 

@@ -107,7 +107,7 @@ public class Line1DSimplestTest {
 
         n.run(1);
 
-        assertEquals(1f, a.rewardValue, 0.01f);
+        assertEquals(1f, a.reward, 0.01f);
 
         n.run(1);
 
@@ -118,7 +118,7 @@ public class Line1DSimplestTest {
         a.i.setValue(1f);
         n.run(1);
 
-        assertEquals(-1f, a.rewardValue, 0.01f);
+        assertEquals(-1f, a.reward, 0.01f);
         assertEquals( 0.0f, n.emotion.happy(), 0.1f);
         assertEquals( 0.81f, n.emotion.sad(), 0.4f); //this will be weakened by what caused the happiness in the previous cycle due to evidence decay's lingering effect
 
@@ -152,7 +152,7 @@ public class Line1DSimplestTest {
         List<Float> motv = new ArrayList(8*1024);
 
         n.onCycle(()->{
-            rewards.add(a.rewardValue);
+            rewards.add(a.reward);
             motv.add(a.dexterity());
         });
 
@@ -281,7 +281,7 @@ public class Line1DSimplestTest {
                 n.run(1);
 
                 //in.add(a.in.asFloat());
-                hapy.add(a.rewardValue);
+                hapy.add(a.reward);
                 motv.add(a.dexterity());
             }
 

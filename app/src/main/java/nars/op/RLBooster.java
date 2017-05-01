@@ -1,4 +1,4 @@
-package nars.experiment;
+package nars.op;
 
 import jcog.learn.Agent;
 import nars.$;
@@ -16,9 +16,9 @@ import java.util.function.Consumer;
 /**
  * NAgent Reinforcement Learning Algorithm Accelerator
  */
-public class RLAccel implements Consumer<NAgent> {
+public class RLBooster implements Consumer<NAgent> {
 
-    public static final Logger logger = LoggerFactory.getLogger(RLAccel.class);
+    public static final Logger logger = LoggerFactory.getLogger(RLBooster.class);
 
     public final NAgent env;
     public final Agent rl;
@@ -27,7 +27,7 @@ public class RLAccel implements Consumer<NAgent> {
     final int inD, outD;
     private final List<SensorConcept> in;
 
-    public RLAccel(NAgent env, Agent rl) {
+    public RLBooster(NAgent env, Agent rl) {
         this.env = env;
         this.rl = rl;
 
@@ -89,7 +89,7 @@ public class RLAccel implements Consumer<NAgent> {
     @Override
     public void accept(NAgent ignored) {
 
-        int o = rl.act(env.rewardValue, input());
+        int o = rl.act(env.reward, input());
         //System.out.println(now + " "  + o + " " + a.o.floatValue() + " " + " " + a.rewardValue);
 
         output[o].run();

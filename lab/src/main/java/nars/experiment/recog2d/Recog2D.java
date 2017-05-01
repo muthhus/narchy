@@ -5,11 +5,9 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.learn.MLP;
-import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.experiment.RLAccel;
 import nars.gui.BeliefTableChart;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
@@ -147,7 +145,7 @@ public class Recog2D extends NAgentX {
                 row(beliefTableCharts(nar, out.keySet(), 1024)),
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
-                    rewardValue
+                                reward
                     //tv.errorSum()
                 )),
                 //row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),

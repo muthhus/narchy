@@ -30,7 +30,6 @@ public class ConsoleTerminal extends ConsoleSurface implements Appendable {
         this.term = t;
     }
 
-
     @Override
     public Appendable append(CharSequence c) {
         int l = c.length();

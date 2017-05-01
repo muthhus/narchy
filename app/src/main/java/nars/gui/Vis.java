@@ -512,7 +512,7 @@ public class Vis {
             plot1.add("Dex", a::dexterity, 0f, 1f);
 
             //plot4.add("Hapy", a.happy, 0f, 1f);
-            plot4.add("Hapy", ()->a.rewardValue, -1f, 1f);
+            plot4.add("Hapy", ()->a.reward, -1f, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);
 //            plot4.add("Sad", nar.emotion.sad::getSum);
