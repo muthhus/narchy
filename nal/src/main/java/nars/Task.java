@@ -23,10 +23,7 @@ import nars.term.Termed;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
-import nars.truth.Stamp;
-import nars.truth.Truth;
-import nars.truth.TruthDelta;
-import nars.truth.Truthed;
+import nars.truth.*;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -731,7 +728,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (b.isDeleted())
             return null;
 
-        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
+        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), (DiscreteTruth)x.truth(), created, start, end, x.stamp());
         y.setPriority(b);
         //        if (srcCopy == null) {
 //            delete();
@@ -760,7 +757,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         }
 
         ImmutableTask y = new ImmutableTask(newContent, x.punc(),
-                x.isBeliefOrGoal() ? x.truth().negIf(negated) : null,
+                x.isBeliefOrGoal() ? (DiscreteTruth) x.truth().negIf(negated) : null,
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());

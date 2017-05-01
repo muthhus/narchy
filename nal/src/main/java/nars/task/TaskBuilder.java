@@ -9,6 +9,7 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -222,7 +223,16 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
 //        }
 
 
-        ImmutableTask i = new ImmutableTask(term, punc, truth, creation, start, end, evidence);
+        DiscreteTruth tFinal;
+        if (truth!=null) {
+            tFinal = new DiscreteTruth(truth.freq(), truth.conf());
+            if (tFinal == null)
+                throw new InvalidTaskException(this, "Insufficient evidence");
+        } else {
+            tFinal = null;
+        }
+
+        ImmutableTask i = new ImmutableTask(term, punc, tFinal, creation, start, end, evidence);
         i.setPriority(this);
         //        if (srcCopy == null) {
 //            delete();

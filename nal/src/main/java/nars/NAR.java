@@ -31,6 +31,7 @@ import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.data.Mix;
@@ -514,7 +515,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             throw new NullPointerException("null task term");
         }
 
-        Truth tr = t(freq, conf, confMin.floatValue());
+        DiscreteTruth tr = new DiscreteTruth(freq, conf, confMin.floatValue());
         if (tr == null) {
             throw new InvalidTaskException(term, "insufficient confidence");
         }

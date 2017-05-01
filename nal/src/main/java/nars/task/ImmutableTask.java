@@ -217,19 +217,19 @@ public class ImmutableTask extends Pri implements Task {
         return null;
     }
 
-    @Nullable
-    public Task project(long newStart, int dur, float confMin) {
-        float newConf = conf(newStart, dur);
-        if (newConf < confMin)
-            return null;
-
-
-        ImmutableTask t = new ImmutableTask(term, punc, $.t(freq(), newConf), creation, newStart, newStart, stamp);
-        t.setPriority(this);
-        //t.meta
-        //t.log("Projected")
-        return t;
-    }
+//    @Nullable
+//    public Task project(long newStart, int dur, float confMin) {
+//        float newConf = conf(newStart, dur);
+//        if (newConf < confMin)
+//            return null;
+//
+//
+//        ImmutableTask t = new ImmutableTask(term, punc, $.t(freq(), newConf), creation, newStart, newStart, stamp);
+//        t.setPriority(this);
+//        //t.meta
+//        //t.log("Projected")
+//        return t;
+//    }
 
     public Task clone(Compound x) {
         ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start(), end(), stamp);

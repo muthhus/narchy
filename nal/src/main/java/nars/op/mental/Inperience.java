@@ -13,6 +13,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -231,7 +232,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
                 ImmutableTask e = new ImmutableTask(
                         r,
                         BELIEF,
-                        $.t(1, nar.confDefault(BELIEF)),
+                        new DiscreteTruth(1, nar.confDefault(BELIEF)),
                         now, start, end,
                         task.stamp()
                 );

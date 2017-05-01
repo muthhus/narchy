@@ -22,8 +22,6 @@ public class PreciseTruth implements Truth {
         assert ((freq == freq) && (freq >= 0) && (freq <= 1));
         this.f = freq;
         float e = xIsConfOrEvidence ? c2w(x) : x;
-        if (!((e == e) && (e > 0)))
-            throw new RuntimeException();
         assert ((e == e) && (e > 0));
         this.e = e;
     }

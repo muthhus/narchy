@@ -15,9 +15,11 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.ImmutableTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.data.Mix;
@@ -592,9 +594,18 @@ abstract public class NAgent implements NSense, NAct {
         if (truth == null && !(punct == QUESTION || punct == QUEST))
             return null; //0 conf or something
 
+        DiscreteTruth tFinal;
+        if (truth!=null) {
+            tFinal = new DiscreteTruth(truth.freq(), truth.conf());
+            if (tFinal == null)
+                return null;
+        } else {
+            tFinal = null;
+        }
+
         term = nar.concepts.normalize(term);
 
-        return new ImmutableTask(term, punct, truth, nar.time(), start, end, new long[]{nar.time.nextStamp()});
+        return new ImmutableTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
     }
 
     public final float alpha() {

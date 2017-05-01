@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Task;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
+import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +45,7 @@ public class BeliefActionConcept extends ActionConcept {
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
-            Truth t = $.t(goal.freq(), goal.conf() * rate);
+            DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
                 long now = nar.time();
                 return new ImmutableTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});

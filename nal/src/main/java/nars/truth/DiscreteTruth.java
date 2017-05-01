@@ -55,6 +55,11 @@ public class DiscreteTruth implements Truth {
         return (freqHash << 16) | confHash;
     }
 
+    @Override
+    public DiscreteTruth negated() {
+        return new DiscreteTruth(1f - freq(), conf());
+    }
+
     @Nullable
     public static Truth intToTruth(int h) {
         return new DiscreteTruth(
