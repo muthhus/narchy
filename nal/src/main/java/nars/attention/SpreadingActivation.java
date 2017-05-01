@@ -145,7 +145,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         if ((target instanceof Variable)) {
             if (target.op()==VAR_QUERY)
-                return; //dont create termlinks for query variables
+                return; //dont create termlinks to query variable subterms
         } else {
             @Nullable PLink<Concept> termConcept = nar.activate(target, inPri * scale);
             if (termConcept != null)

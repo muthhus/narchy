@@ -1268,9 +1268,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     //atemporalizing can reset normalization state of the result instance
                     //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-                    term = concepts.normalize((Compound) term);
-                    if (term == null)
-                        return null;
+                    Compound nterm = concepts.normalize((Compound) term);
+//                    if (nterm == null) {
+//                        concepts.normalize((Compound)term);
+//                        return null;
+//                    }
+                    term = nterm;
 
                 }
 
