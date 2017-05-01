@@ -155,22 +155,22 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         if (x == null) return y;
         if (y == null) return x;
 
-        //choose the non-overlapping one
-        if (noOverlap && target != null) {
-            if (Stamp.overlapping(y, target))
-                return x;
-            if (Stamp.overlapping(x, target))
-                return y;
-        }
+//        //choose the non-overlapping one
+//        if (noOverlap && target != null) {
+//            if (Stamp.overlapping(y, target))
+//                return x;
+//            if (Stamp.overlapping(x, target))
+//                return y;
+//        }
 
         //choose higher confidence
-        float xc = x.conf(when, dur);
-        float yc = y.conf(when, dur);
-        if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
-            return xc > yc ? x : y;
-        }
-
-        //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one
-        return (x.originality() >= y.originality()) ? x : y;
+        float xc = x.evi(when, dur);
+        float yc = y.evi(when, dur);
+        //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
+            return xc >= yc ? x : y;
+        //}
+//
+//        //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one
+//        return (x.originality() >= y.originality()) ? x : y;
     }
 }

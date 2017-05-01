@@ -121,7 +121,7 @@ public class DynamicBeliefTableTest {
 
             DynTruth xt = xtable.truth(0, template, true);
             assertNotNull(xt);
-            assertTrue($.t(1f, 0.83f).equals(xt.truth(), 0.05f));
+            assertTrue(xt.truth().toString(), $.t(1f, 0.83f).equals(xt.truth(), 0.05f));
 
 //            for (int i = -4; i <= n.time() + 4; i++) {
 //                System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));
@@ -134,8 +134,8 @@ public class DynamicBeliefTableTest {
 //            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
 //        }
 
-        assertEquals(0.83f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
-        assertEquals(0.74f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
+        assertEquals(0.85f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
+        assertEquals(0.73f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
         assertEquals(0.64f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
 
 

@@ -112,9 +112,9 @@ abstract public class NAgentX extends NAgent {
         else
             chart(a);
 
-        if (endTime > 0)
+        if (endTime <= 0) {
             a.runRT(fps);
-        else {
+        } else {
             a.runRT(0, endTime).join();
         }
 

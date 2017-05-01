@@ -65,7 +65,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 float eFactor = m.nar.derivedEvidenceGain.asFloat();
                 if (eFactor != 1) {
-                    if ((t = new PreciseTruth(t.freq(), w2c(t.evi() * eFactor)))==null)
+                    if ((t = new PreciseTruth(t.freq(), (t.evi() * eFactor), false))==null)
                         return false;
                 }
 

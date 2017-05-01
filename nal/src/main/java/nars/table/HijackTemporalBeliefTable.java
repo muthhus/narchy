@@ -37,17 +37,13 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
     @Override
-    public Task add(@NotNull Task t) {
-        if (t instanceof AnswerTask) {
-            return t; //dont store interpolations/answers/projections etc
+    public Task add(@NotNull Task x) {
+        if (x instanceof AnswerTask) {
+            return x; //dont store interpolations/answers/projections etc
         }
-        return super.add(t);
+        return super.add(x);
     }
 
-    @Override
-    protected Consumer<Task> forget(float avgToBeRemoved) {
-        return null; //temporal forgetting applied elsewhere
-    }
 
     @Override
     public void capacity(int c, NAR nar) {

@@ -46,6 +46,7 @@ public class Arkancide extends NAgentX {
 
             try {
                 a = new Arkancide(n, cam, numeric);
+                a.trace = true;
                 //a.nar.log();
 
             } catch (Narsese.NarseseException e) {

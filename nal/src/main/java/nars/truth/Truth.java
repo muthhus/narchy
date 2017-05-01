@@ -27,8 +27,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Comparator;
-
 import static jcog.Util.*;
 
 
@@ -41,18 +39,18 @@ public interface Truth extends Truthed {
 //    Term Truth_MAYBE = $.the("MAYBE");
 //    Term Truth_CERTAIN = $.the("CERTAIN");
 //    Term Truth_UNCERTAIN = $.the("UNCERTAIN");
-
-    Comparator<Truthed> compareConfidence = (o1, o2) -> {
-        if (o1.equals(o2))
-            return 0;
-
-        float b = o2.conf();
-        float a = o1.conf();
-        if (b < a)
-            return -1;
-        else
-            return +1;
-    };
+//
+//    Comparator<Truthed> compareConfidence = (o1, o2) -> {
+//        if (o1.equals(o2))
+//            return 0;
+//
+//        float b = o2.conf();
+//        float a = o1.conf();
+//        if (b < a)
+//            return -1;
+//        else
+//            return +1;
+//    };
 
 
     /**
@@ -186,7 +184,7 @@ public interface Truth extends Truthed {
     }
 
     default boolean equals(@NotNull Truth x, float tolerance) {
-        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(evi(), x.evi(), tolerance);
+        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 
     @NotNull
@@ -247,7 +245,7 @@ public interface Truth extends Truthed {
         Frequency, Confidence, Expectation
     }
     
-    default float getComponent(@NotNull TruthComponent c) {
+    default float component(@NotNull TruthComponent c) {
         switch (c) {
             case Frequency: return freq();
             case Confidence: return conf();
@@ -263,7 +261,7 @@ public interface Truth extends Truthed {
         for (Truthed x : t) {
             Truth v = x.truth();
             if (v!=null)
-                d.addValue(v.getComponent(component));
+                d.addValue(v.component(component));
         }
         return d;
     }

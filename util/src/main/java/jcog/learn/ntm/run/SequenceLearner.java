@@ -25,7 +25,7 @@ abstract public class SequenceLearner {
     protected double[] times = new double[statisticsWindow];
     protected int i;
     final int seed = 1;
-    protected Random rand = new XorShift128PlusRandom(seed);
+    protected final Random rand = new XorShift128PlusRandom(seed);
 
     public SequenceLearner(int vectorSize, int memoryWidth, int memoryHeight, int numHeads, int controllerSize) {
 

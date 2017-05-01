@@ -8,12 +8,16 @@ import org.jetbrains.annotations.Nullable;
 import static nars.truth.TruthFunctions.w2c;
 
 
-/** truth rounded to a fixed size precision
- *  to support hashing and equality testing */
+/**
+ * truth rounded to a fixed size precision
+ * to support hashing and equality testing
+ */
 public class DiscreteTruth implements Truth {
 
-    /** truth component resolution of a 16-bit encoding */
-    static final int hashDiscreteness16 = Short.MAX_VALUE-1;
+    /**
+     * truth component resolution of a 16-bit encoding
+     */
+    static final int hashDiscreteness16 = Short.MAX_VALUE - 1;
 
     public final float freq, conf;
     private final int hash;
@@ -24,15 +28,15 @@ public class DiscreteTruth implements Truth {
 
     public DiscreteTruth(float f, float c, float epsilon) {
         this.hash = truthToInt(
-            this.freq = Truth.freq(f, epsilon),
-            this.conf = Truth.conf(c, epsilon)
+                this.freq = Truth.freq(f, epsilon),
+                this.conf = Truth.conf(c, epsilon)
         );
     }
 
     /**
      * The hash code of a TruthValue, perfectly condensed,
      * into the two 16-bit words of a 32-bit integer.
-     *
+     * <p>
      * Since the same epsilon used in other truth
      * resolution here (Truth components do not necessarily utilize the full
      * resolution of a floating point value, and also do not necessarily
@@ -41,7 +45,8 @@ public class DiscreteTruth implements Truth {
      * as well as non-naturally ordered / non-lexicographic
      * but deterministic compareTo() ordering.
      * correct behavior of this requires epsilon
-     * large enough such that: 0 <= h < 2^15: */
+     * large enough such that: 0 <= h < 2^15:
+     */
     public static int truthToInt(float freq, float conf) {
 
         int freqHash = Util.hashFloat(freq, hashDiscreteness16) & 0x0000ffff;
@@ -53,7 +58,7 @@ public class DiscreteTruth implements Truth {
     @Nullable
     public static Truth intToTruth(int h) {
         return new DiscreteTruth(
-                Util.unhashFloat( (h>>16) /* & 0xffff*/, hashDiscreteness16),
+                Util.unhashFloat((h >> 16) /* & 0xffff*/, hashDiscreteness16),
                 Util.unhashFloat(h & 0xffff, hashDiscreteness16)
         );
     }
@@ -69,8 +74,6 @@ public class DiscreteTruth implements Truth {
     }
 
 
-
-
     @NotNull
     @Override
     public String toString() {
@@ -80,14 +83,13 @@ public class DiscreteTruth implements Truth {
         return appendString(new StringBuilder(7)).toString();
     }
 
-    public Truth eviMult(float f, int dur) {
-        return (f == 1f) ? this : new PreciseTruth(freq, (w2c(evi() * f)));
-    }
-
     @Override
     public final boolean equals(Object that) {
-        return (that instanceof DiscreteTruth) ? (hash == that.hashCode()) :
-            equals( (Truth)that, Param.TRUTH_EPSILON );
+        return
+            (this == that)
+                    ||
+            ((that instanceof DiscreteTruth) ? (hash == that.hashCode()) :
+                    equals((Truth) that, Param.TRUTH_EPSILON));
     }
 
     @Override

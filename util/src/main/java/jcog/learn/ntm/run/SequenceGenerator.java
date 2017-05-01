@@ -1,11 +1,13 @@
 package jcog.learn.ntm.run;
 
 
+import jcog.random.XorShift128PlusRandom;
+
 import java.util.Random;
 
 public class SequenceGenerator
 {
-    public static final Random Rand = new Random(8L);
+    public static final Random rng = new XorShift128PlusRandom(8L);
 
     public static TrainingSequence generateSequenceSawtooth(int length, int vectorSize) {
         length = length*2+2; //to be consistent with the WTF sequence below
@@ -13,10 +15,10 @@ public class SequenceGenerator
         double[][] input = new double[length][vectorSize];
         double[][] output = new double[length][vectorSize];
 
-        boolean direction = Math.random() < 0.5;
+        boolean direction = rng.nextFloat() < 0.5;
 
 
-        int j = (int)(Math.random() * 100);
+        int j = (int)(rng.nextFloat() * 100);
         for (int i = 0;i < length;i++) {
             int index = j % vectorSize;
             int reflected = (vectorSize-1) - index;
@@ -34,18 +36,18 @@ public class SequenceGenerator
         return new TrainingSequence(input, output);
     }
 
-    public static TrainingSequence generateSequenceXOR(int length, int vectorSize) {
+    public static TrainingSequence generateSequenceXOR(int vectorSize) {
         //length = length*1+2; //to be consistent with the WTF sequence below
 
-        length = (int)(vectorSize * (1.0 + Math.random()));
+        int length = (int) (vectorSize * (1.0 + rng.nextFloat()));
 
         double[][] input = new double[length][vectorSize];
         double[][] output = new double[length][vectorSize];
 
 
-        int j = (int)(Math.random() * 153) % (vectorSize/2) + vectorSize/2;
+        int j = (int)(rng.nextFloat() * 153) % (vectorSize/2) + vectorSize/2;
 
-        for (int i = 0;i < length;i++) {
+        for (int i = 0; i < length; i++) {
             int index = ((j)^(i)) % vectorSize;
             //int reflected = (vectorSize-1) - index;
 
@@ -67,7 +69,7 @@ public class SequenceGenerator
 
             for (int j = 0;j < inputVectorSize;j++)
             {
-                data[i][j] = Rand.nextInt(2);
+                data[i][j] = rng.nextInt(2);
             }
         }
         int sequenceLength = (length * 2) + 2;

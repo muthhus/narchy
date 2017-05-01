@@ -28,7 +28,7 @@ import java.util.function.LongSupplier;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, WiredConcept.Prioritizable, Function<NAR,Task> {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR,Task> {
 
     @NotNull
     public final ScalarSignal sensor;
@@ -128,7 +128,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this.currentValue = signal.asFloat();
     }
 
-    @Override @NotNull public final void pri(FloatSupplier v) {
+    @NotNull public final void pri(FloatSupplier v) {
         sensor.pri(v);
     }
 

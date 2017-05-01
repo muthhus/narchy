@@ -63,13 +63,6 @@ public enum TruthPolation {
                 illWei[1] += tw * t.freq();
             }
 
-
-            float cost = 0.01f;
-            float twa = t.evi();
-            float utilized = (tw > 0 && twa > 0) ? tw / twa : 0;
-            t.priMult((1f - cost * (1f - utilized)));
-            //System.out.println(when + "," + dur + "@ " + t  + " utilized " + utilized);
-
         });
         float evidence = illWei[0];
         if (evidence > 0) {
@@ -83,7 +76,7 @@ public enum TruthPolation {
             }
 
             float f = freqEvi / evidence;
-            return new PreciseTruth(f, w2c(evidence));
+            return new PreciseTruth(f, w2c(evidence), false);
         } else {
             return null;
         }

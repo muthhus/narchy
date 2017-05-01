@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,13 +25,18 @@ import org.jetbrains.annotations.NotNull;
 public abstract class WiredConcept extends TaskConcept implements PermanentConcept {
 
 
-    public interface Prioritizable {
-        void pri(FloatSupplier v);
-    }
+
 
     public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         n.on(this);
+    }
+
+
+    @NotNull
+    @Override
+    public final Compound term() {
+        return this;
     }
 
 

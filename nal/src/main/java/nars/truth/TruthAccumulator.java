@@ -38,9 +38,11 @@ public class TruthAccumulator extends AtomicReference<double[]> {
     protected static Truth truth(double[] fc, boolean sumOrAverage) {
         if (fc == null)
             return null;
-        int n = (int)fc[2];
-
         double e = fc[1];
+        if (e <= 0)
+            return null;
+
+        int n = (int)fc[2];
         float c = w2c((sumOrAverage) ? ((float)e) : ((float)e)/n);
         return $.t((float)(fc[0]/e), c);
     }

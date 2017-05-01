@@ -26,6 +26,7 @@ import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 
 import static jcog.Util.clamp;
@@ -474,7 +475,8 @@ public final class TruthFunctions  {
      * @return The corresponding weight of evidence, a non-negative real number
      */
     private static float c2w(float c, float horizon) {
-        c = clamp(c, 0, MAX_CONF);
+        if (c!=c || (c > MAX_CONF) || (c < 0))
+            throw new InvalidParameterException();
         return horizon * c / (1f - c);
     }
 
@@ -488,6 +490,8 @@ public final class TruthFunctions  {
     }
 
     private static float w2c(float w, float horizon) {
+        if ((w != w) || (w < 0))
+            throw new InvalidParameterException();
         return clamp(w / (w + horizon), 0, MAX_CONF);
     }
 

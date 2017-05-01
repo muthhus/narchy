@@ -81,12 +81,12 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         return false;
     }
 
-    public Task add(@NotNull Task t) {
+    public Task add(@NotNull Task x) {
 
         commit();
 
-        Task x = put(t);
-        return x;
+        Task y = put(x);
+        return y;
     }
 
 

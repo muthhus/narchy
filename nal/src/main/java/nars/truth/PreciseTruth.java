@@ -15,13 +15,26 @@ public class PreciseTruth implements Truth {
     final float f, e;
 
     public PreciseTruth(float freq, float conf) {
+        this(freq, conf, true);
+    }
+
+    public PreciseTruth(float freq, float x, boolean xIsConfOrEvidence) {
+        assert ((freq == freq) && (freq >= 0) && (freq <= 1));
         this.f = freq;
-        this.e = c2w(conf);
+        float e = xIsConfOrEvidence ? c2w(x) : x;
+        assert ((e == e) && (e > 0));
+        this.e = e;
+    }
+
+    @Override
+    public Truth negated() {
+        return new PreciseTruth(1f - f, e);
     }
 
     @Override
     public boolean equals(Object that) {
-        return equals( (Truth)that, Param.TRUTH_EPSILON );
+        return this == that;
+        //return equals( (Truth)that, Param.TRUTH_EPSILON );
         //throw new UnsupportedOperationException();
     }
 

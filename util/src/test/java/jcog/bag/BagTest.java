@@ -201,46 +201,46 @@ public class BagTest {
     }
 
 
-    @NotNull
-    public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
-        DoubleArrayList f = new DoubleArrayList(n);
-        if (!b.isEmpty()) {
-            b.sample(n, x -> {
-                f.add(x.pri());
-            });
+//    @NotNull
+//    public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
+//        DoubleArrayList f = new DoubleArrayList(n);
+//        if (!b.isEmpty()) {
+//            b.sample(n, x -> {
+//                f.add(x.pri());
+//            });
+//
+//        }
+//        EmpiricalDistribution e = new EmpiricalDistribution(bins);
+//        e.load(f.toArray());
+//        return e;
+//    }
 
-        }
-        EmpiricalDistribution e = new EmpiricalDistribution(bins);
-        e.load(f.toArray());
-        return e;
-    }
 
-
-    @Test
-    public void testNormalization() {
-        int n = 64;
-        int bins = 5;
-        int samples = n * 32;
-
-        CurveBag fullDynamicRange = populated(n, Math::random);
-        EmpiricalDistribution unifDistr = getSamplingPriorityDistribution(fullDynamicRange, samples, bins);
-        printDist(unifDistr);
-
-        float ratioUniform = maxMinRatio(unifDistr);
-
-        //smaller dynamic range should be lesser probabailty difference from low to high
-        CurveBag smallDynamicRange = populated(n, () -> 0.1f * Math.random());
-        EmpiricalDistribution flatDistr = getSamplingPriorityDistribution(smallDynamicRange, samples, bins);
-        printDist(flatDistr);
-
-        float ratioFlat = maxMinRatio(flatDistr);
-
-        System.out.println(ratioUniform + " " + ratioFlat);
-
-        Assert.assertTrue(ratioUniform > 7f); //should be ideally ~10
-        Assert.assertTrue(ratioFlat < 7f); //should be ideally ~1
-
-    }
+//    @Test
+//    public void testNormalization() {
+//        int n = 64;
+//        int bins = 5;
+//        int samples = n * 32;
+//
+//        CurveBag fullDynamicRange = populated(n, Math::random);
+//        EmpiricalDistribution unifDistr = getSamplingPriorityDistribution(fullDynamicRange, samples, bins);
+//        printDist(unifDistr);
+//
+//        float ratioUniform = maxMinRatio(unifDistr);
+//
+//        //smaller dynamic range should be lesser probabailty difference from low to high
+//        CurveBag smallDynamicRange = populated(n, () -> 0.1f * Math.random());
+//        EmpiricalDistribution flatDistr = getSamplingPriorityDistribution(smallDynamicRange, samples, bins);
+//        printDist(flatDistr);
+//
+//        float ratioFlat = maxMinRatio(flatDistr);
+//
+//        System.out.println(ratioUniform + " " + ratioFlat);
+//
+//        Assert.assertTrue(ratioUniform > 7f); //should be ideally ~10
+//        Assert.assertTrue(ratioFlat < 7f); //should be ideally ~1
+//
+//    }
 
     private float maxMinRatio(@NotNull EmpiricalDistribution d) {
         List<SummaryStatistics> bins = d.getBinStats();
@@ -302,33 +302,7 @@ public class BagTest {
 
     }
 
-    @Test
-    public void test1() {
-        test(new PLinkHijackBag<String>(16, 4));
-    }
 
-    private void test(Bag<String,PLink<String>> b) {
-        //initial conditions
-        b.put(new RawPLink("a", 0.9f));
-        b.put(new RawPLink("b", 0.5f));
-        b.put(new RawPLink("c", 0.1f));
-
-        b.commit();
-        //b.print();
-
-        for (int n : new int[] { 50, 100, 1000 }) {
-            Frequency e = new Frequency();
-            b.sample(n, x -> {
-                e.addValue(x.get());
-                return true;
-            });
-            System.out.println(Joiner.on("\n").join(e.entrySetIterator()) + "\n");
-            assertEquals(3, e.getUniqueCount());
-            assertEquals(e.getPct("a")*(5/9f), e.getPct("b"), 0.1f);
-            assertEquals(e.getPct("a")*(1/9f), e.getPct("c"), 0.05f);
-        }
-
-    }
 
 
     //AutoBag does not apply to this test

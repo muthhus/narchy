@@ -1,5 +1,6 @@
 package nars.experiment;
 
+import jcog.Util;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Param;
@@ -37,14 +38,18 @@ public class Line1D {
             this.lastReward = a.reward;
 
             NAR n = a.nar;
-            a.speed.setValue(0.01f);
+            a.speed.setValue(0.05f);
             a.target(0.5f); //start
 
-            this.worsenThreshold = a.speed.floatValue() * 2;
+            float speed = a.speed.floatValue();
+            this.worsenThreshold = speed * 2;
             this.completionThreshold = n.dur();
 
             n.onTask(x -> {
-                if (step > trainingRounds && x.isGoal() && !x.isInput() && !(x instanceof ActionConcept.CuriosityTask)) {
+                if (step > trainingRounds && x.isGoal() && !x.isInput()
+                        && !(x instanceof ActionConcept.CuriosityTask)
+                        && x.term().equals(a.out.term())
+                ) {
                     current.add(x);
                 }
             });
@@ -54,18 +59,21 @@ public class Line1D {
 
 
                 //System.out.println(a.reward);
-                rewardSum += a.reward;
+                rewardSum +=
+                        //a.reward
+                        Math.abs(a.reward);
 
                 if (rewardSum > completionThreshold) {
                     int lagCorrected = lag - perfect;
                     System.out.println(lagCorrected);
-                    rewardSum = 0;
-                    lag = 0;
-                    float next = n.random().nextFloat();
-                    perfect = (int) Math.floor((next - a.target()) / (a.speed.floatValue()));
+
+                    float next = Util.round(n.random().nextFloat(), speed);
+                    perfect = (int) Math.floor((next - a.target()) / speed);
                     a.target(next);
 
                     step++;
+                    rewardSum = 0;
+                    lag = 0;
 
                     if (step < trainingRounds) {
                         completionThreshold += n.dur(); //increase completion threshold
@@ -75,15 +83,20 @@ public class Line1D {
                         a.curiosityProb.setValue(0f); //disable curiosity
                     }
                 } else {
+
+                    if (lag > 1) { //skip the step after a new target has been selected which can make it seem worse
+
+                        float worsening = lastReward - a.reward;
+                        if (step > trainingRounds && worsening > worsenThreshold) {
+                            //print tasks suspected of faulty logic
+                            current.forEach(x -> {
+                                System.err.println(worsening + "\t" + x.proof());
+                            });
+                        }
+                    }
+
                     lag++;
 
-                    float worsening = lastReward - a.reward;
-                    if (step > trainingRounds && worsening > worsenThreshold) {
-                        //print tasks suspected of faulty logic
-                        current.forEach(x -> {
-                            System.err.println(worsening + "\t" + x.proof());
-                        });
-                    }
                 }
 
                 lastReward = a.reward;
