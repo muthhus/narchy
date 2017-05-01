@@ -862,10 +862,15 @@ public class TermReductionsTest {
 
     @Test public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
-        String s = "((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))";
-        assertEquals(
-                False,
-                $(s)
+        assertEquals(False,
+            $("((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }
+
+    @Test public void testCoNegatedImplication() throws Narsese.NarseseException {
+        assertEquals(False,
+            $("((--,$1) ==>+0 (((--,$1) &&+0 (--,#2)) &&+16 #2))")
+        );
+    }
+
 }

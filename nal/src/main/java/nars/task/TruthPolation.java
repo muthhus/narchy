@@ -76,7 +76,7 @@ public enum TruthPolation {
             }
 
             float f = freqEvi / evidence;
-            return new PreciseTruth(f, w2c(evidence), false);
+            return new PreciseTruth(f, evidence, false);
         } else {
             return null;
         }

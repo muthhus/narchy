@@ -233,7 +233,6 @@ public class RevectionTest {
 
         long at = 5;
 
-        int dur = n.dur();
         float outConf = w2c( c2w(inConf)*repeats);
 
         BeliefAnalysis b = null;

@@ -22,19 +22,20 @@ public class PreciseTruth implements Truth {
         assert ((freq == freq) && (freq >= 0) && (freq <= 1));
         this.f = freq;
         float e = xIsConfOrEvidence ? c2w(x) : x;
+        if (!((e == e) && (e > 0)))
+            throw new RuntimeException();
         assert ((e == e) && (e > 0));
         this.e = e;
     }
 
     @Override
     public Truth negated() {
-        return new PreciseTruth(1f - f, e);
+        return new PreciseTruth(1f - f, e, false);
     }
 
     @Override
     public boolean equals(Object that) {
-        return this == that;
-        //return equals( (Truth)that, Param.TRUTH_EPSILON );
+        return equals( (Truth)that, Param.TRUTH_EPSILON );
         //throw new UnsupportedOperationException();
     }
 

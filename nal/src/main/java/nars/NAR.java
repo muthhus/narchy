@@ -1238,7 +1238,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
 
         Term term = termed.term();
-        boolean normalized = term.isNormalized();
 
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
@@ -1269,18 +1268,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     //atemporalizing can reset normalization state of the result instance
                     //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
+                    term = concepts.normalize((Compound) term);
+                    if (term == null)
+                        return null;
 
                 }
 
-                //see if, when normalized, it doesnt change. otherwise keep the non-normalized form
-                if (!term.isNormalized()) {
-                    Compound normalizedTerm = concepts.normalize((Compound) term);
-                    if (normalizedTerm!=null && normalizedTerm.equals(term)) {
-                        ((Compound) term).setNormalized(); //recognize as normalized
-                        if (term!=termed)
-                            ((Compound) term).setNormalized();
-                    }
-                }
+
+
+
 
                 /*
                 if (term instanceof Compound) {
