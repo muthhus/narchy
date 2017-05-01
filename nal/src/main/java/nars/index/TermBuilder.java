@@ -868,9 +868,14 @@ public abstract class TermBuilder {
         }
 
 
+
         //factor out any common subterms iff commutive
         if (commutive(dt)) {
-            if ((op == IMPL || op == EQUI)) {
+
+            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
+                return False; //cyclic
+
+            if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
 
 
                 boolean subjConj = subject.op() == CONJ && commutive(((Compound) subject).dt());
