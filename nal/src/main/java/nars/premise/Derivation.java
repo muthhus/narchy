@@ -151,11 +151,12 @@ abstract public class Derivation extends Unify {
         }
 
 
-        this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
-        //NOT: this.cyclic = task.cyclic() || (belief != null && belief.cyclic());
-
-        this.overlap = belief != null ? Stamp.overlapping(task, belief) : cyclic;
-        //this.overlapAmount = belief!=null ? Stamp.overlapFraction(task.stamp(), belief.stamp()) : (cyclic? 1f : 0f);
+        this.overlap = this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
+        if (belief!=null) {
+            cyclic |= belief.cyclic();
+            if (!overlap)
+                overlap |= Stamp.overlapping(task, belief);
+        }
 
 
         Op tOp = taskTerm.op();

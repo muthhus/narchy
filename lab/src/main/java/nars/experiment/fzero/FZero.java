@@ -202,7 +202,7 @@ public class FZero extends NAgentX {
                         .durFPS(10f), true);
 
         FZero a = new FZero(n);
-        a.runRT(20f);
+        a.runRT(10f);
 
 
         NAgentX.chart(a);

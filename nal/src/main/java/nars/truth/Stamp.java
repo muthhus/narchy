@@ -62,8 +62,11 @@ public interface Stamp {
     static long[] zip(@NotNull long[] a, @NotNull long[] b, float aToB, int maxLen, boolean newToOld) {
 
         int aLen = a.length, bLen = b.length;
-        if (isCyclic(a)) aLen--; //cyclic flag is not propagated
-        if (isCyclic(b)) bLen--; //cyclic flag is not propagated
+
+        //if (isCyclic(a)) aLen--; //cyclic flag is not propagated
+        //if (isCyclic(b)) bLen--; //cyclic flag is not propagated
+        if (isCyclic(a) && isCyclic(b)) bLen--; //only inherit one cyclic
+
         int baseLength = Math.min(aLen + bLen, maxLen);
 
         //how many items to exclude from each due to weighting

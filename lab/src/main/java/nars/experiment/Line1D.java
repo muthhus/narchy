@@ -20,9 +20,9 @@ public class Line1D {
 
         public static final int trainingRounds = 20;
         private float lastReward;
-        float rewardSum = 0;
+        int consecutiveCorrect = 0;
         int lag = 0;
-        int perfect = 0;
+        //int perfect = 0;
         int step = 0;
 
 
@@ -30,7 +30,10 @@ public class Line1D {
                 current = new LinkedHashSet();
 
         private final Line1DSimplest a;
-        float completionThreshold;
+
+        //how long the correct state must be held before it advances to next step
+        int completionThreshold;
+
         float worsenThreshold;
 
         public Line1DTrainer(Line1DSimplest a) {
@@ -38,17 +41,18 @@ public class Line1D {
             this.lastReward = a.reward;
 
             NAR n = a.nar;
-            a.speed.setValue(0.05f);
+            a.speed.setValue(0.02f);
             a.target(0.5f); //start
 
             float speed = a.speed.floatValue();
-            this.worsenThreshold = speed * 2;
-            this.completionThreshold = n.dur();
+            this.worsenThreshold = speed / 2f;
+            this.completionThreshold = n.dur() * 256;
+            float rewardThresh = 0.75f; //reward to be considered correct in this frame
 
             n.onTask(x -> {
                 if (step > trainingRounds && x.isGoal() && !x.isInput()
                         && !(x instanceof ActionConcept.CuriosityTask)
-                        && x.term().equals(a.out.term())
+                        //&& x.term().equals(a.out.term())
                 ) {
                     current.add(x);
                 }
@@ -59,28 +63,30 @@ public class Line1D {
 
 
                 //System.out.println(a.reward);
-                rewardSum +=
-                        //a.reward
-                        Math.abs(a.reward);
+                if (a.reward > rewardThresh)
+                    consecutiveCorrect++;
+                else
+                    consecutiveCorrect = 0; //start over
 
-                if (rewardSum > completionThreshold) {
-                    int lagCorrected = lag - perfect;
-                    System.out.println(lagCorrected);
+                if (consecutiveCorrect > completionThreshold) {
+                    //int lagCorrected = lag - perfect;
+                    System.out.println(lag);
 
                     float next = Util.round(n.random().nextFloat(), speed);
-                    perfect = (int) Math.floor((next - a.target()) / speed);
+                    //perfect = (int) Math.floor((next - a.target()) / speed);
                     a.target(next);
 
                     step++;
-                    rewardSum = 0;
+                    consecutiveCorrect = 0;
                     lag = 0;
 
                     if (step < trainingRounds) {
-                        completionThreshold += n.dur(); //increase completion threshold
+                        //completionThreshold += n.dur(); //increase completion threshold
                     } else {
                         if (a.curiosityProb.floatValue() > 0)
                             System.err.println("TRAINING FINISHED - DISABLING CURIOSITY");
                         a.curiosityProb.setValue(0f); //disable curiosity
+                        a.curiosityConf.setValue(0f);
                     }
                 } else {
 
@@ -119,6 +125,7 @@ public class Line1D {
 
         NAR n = new Default();
         //n.time.dur(4);
+        n.termVolumeMax.setValue(16);
 
 
         Line1DSimplest a = new Line1DSimplest(n);

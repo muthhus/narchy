@@ -6,8 +6,6 @@ import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.truth.TruthFunctions.w2c;
-
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  * see:
@@ -48,33 +46,31 @@ public enum TruthPolation {
     @Nullable
     public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
-        float[] illWei = new float[2];
+        float[] fe = new float[2];
 
 
-        // Contribution of each sample point to the illumination of the
-        // microsphere's facets.
+        // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
         tasks.forEach(t -> {
 
             float tw = t.evi(when, dur);
 
             if (tw > 0) {
-                illWei[0] += tw;
-                illWei[1] += tw * t.freq();
+                fe[0] += tw;
+                fe[1] += tw * t.freq();
             }
 
         });
-        float evidence = illWei[0];
+        float evidence = fe[0];
+        float freqEvi = fe[1];
+
+        if (topEternal != null) {
+            float ew = topEternal.evi();
+            evidence += ew;
+            freqEvi += ew * topEternal.freq();
+        }
+
         if (evidence > 0) {
-
-            float freqEvi = illWei[1];
-
-            if (topEternal != null) {
-                float ew = topEternal.evi();
-                evidence += ew;
-                freqEvi += ew * topEternal.freq();
-            }
-
             float f = freqEvi / evidence;
             return new PreciseTruth(f, evidence, false);
         } else {
