@@ -51,8 +51,9 @@ public class NARio extends NAgentX {
         mario.start();
 
 
-        PixelBag cc = PixelBag.of(() -> mario.image, 64, 64);
+        PixelBag cc = PixelBag.of(() -> mario.image, 32, 24);
         cc.setClarity(0.5f, 1f);
+
 
         onFrame((z)->{
         //nar.onCycle(() -> {

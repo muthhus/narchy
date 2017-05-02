@@ -276,7 +276,7 @@ abstract public class NAgent implements NSense, NAct {
         //sendInfluxDB("localhost", 8089);
 
         return id + " rwrd=" + n2(reward) +
-                " motv=" + n4(dexterity()) +
+                " dex=" + n4(dexterity()) +
                 " var=" + n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
                 nar.emotion.summary();
     }
@@ -291,9 +291,10 @@ abstract public class NAgent implements NSense, NAct {
         if (initialized)
             return;
 
+        initialized = true;
+
         now = nar.time();
 
-        initialized = true;
 
         //this.curiosityAttention = reinforcementAttention / actions.size();
 

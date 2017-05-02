@@ -134,9 +134,9 @@ public class DynamicBeliefTableTest {
 //            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
 //        }
 
-        assertEquals(0.85f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
-        assertEquals(0.73f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
-        assertEquals(0.64f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
+        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0).conf(), 0.01f); //best match to the input
+        assertEquals(0.68f, xtable.generate($("((x) &&+2 (y))"), 0).conf(), 0.01f);
+        assertEquals(0.58f, xtable.generate($("((x) &&+0 (y))"), 0).conf(), 0.01f);
 
 
     }

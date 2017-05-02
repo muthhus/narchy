@@ -7,6 +7,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -18,7 +19,7 @@ public class Arkancide extends NAgentX {
     static boolean numeric = true;
     static boolean cam = false;
 
-    public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
+    public final FloatParam ballSpeed = new FloatParam(3f, 0.1f, 6f);
     public final FloatParam paddleSpeed = new FloatParam(1f, 0.1f, 3f);
 
 
@@ -94,14 +95,14 @@ public class Arkancide extends NAgentX {
 
 //        Param.DEBUG = true;
 //        nar.onTask(t -> {
-//            if (t instanceof DerivedTask && t.isEternal())
+//            if (t instanceof DerivedTask && t.isGoal())
 //                System.err.println(t.proof());
 //        });
 
         maxPaddleSpeed = 30 * noid.BALL_VELOCITY;
 
-        float resX = Math.max(0.01f, 1f / visW); //dont need more resolution than 1/pixel_width
-        float resY = Math.max(0.01f, 1f / visH); //dont need more resolution than 1/pixel_width
+        float resX = Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
             CameraSensor cc = senseCamera("noid", noid, visW, visH);
@@ -110,14 +111,25 @@ public class Arkancide extends NAgentX {
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         }
         if (numeric) {
-            SensorConcept a = senseNumber("paddle:x", (() -> noid.paddle.x/ noid.getWidth())).resolution(resX);
+            SensorConcept a = senseNumber("paddle:x", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
             SensorConcept b = senseNumber("ball:x", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("ball:y", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             SensorConcept d = senseNumber("ball:vx", new FloatPolarNormalized(() -> noid.ball.velocityX));
             SensorConcept e = senseNumber("ball:vy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
+            //experimental cheat
+//            nar.input("--(paddle-ball):x! :|:",
+//                      "--(ball-paddle):x! :|:"
+//            );
+
             SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{ a, b, c, d, e }),
+                    Lists.newArrayList(new Term[]{a, b, c, d, e}),
+                    nar), 600, 600);
+            SpaceGraph.window(Vis.beliefCharts(200,
+                    Lists.newArrayList(new Term[]{
+                            $.$("(paddle-ball):x"),
+                            $.$("(ball-paddle):x")
+                    }),
                     nar), 600, 600);
         }
 

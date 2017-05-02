@@ -54,6 +54,11 @@ public class Builtin {
             Functor.f2("equal", (x, y) ->
                     x.equals(y) ? True : ((x instanceof Variable) || (y instanceof Variable) ? null : False)),
 
+            //TODO for binding equal values
+//            Functor.f2("equality", (x, y) ->
+//                    x.equals(y) ? True : ((x instanceof Variable) || (y instanceof Variable) ? null :
+//                    --(x diff y) && --(y diff x) )),
+
             Functor.f2Int("add", (x, y) -> x + y),
             Functor.f2Int("sub", (x, y) -> x - y),
 

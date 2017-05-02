@@ -52,8 +52,8 @@ abstract public class DynamicTruthModel {
 
         for (int i = 0; i < inputs.length; i++) {
             @NotNull Term subterm = inputs[i];
-            if (subterm == null)
-                throw new NullPointerException();
+//            if (subterm == null)
+//                throw new NullPointerException();
 
             boolean negated = subterm.op() == Op.NEG;
             if (negated)
@@ -67,12 +67,12 @@ abstract public class DynamicTruthModel {
                     return null;
 
                 int dt = superterm.subtermTime(subterm);
-                if (dt == DTERNAL) dt = 0;
+                if (dt == DTERNAL) dt = 0; //TODO maybe this should never happen, and if it does there is an error
                 boolean evi = d.e != null;
 
 
                 Truth nt;
-                if (tableDynamic && subterm instanceof Compound) {
+                if (tableDynamic /*&& subterm instanceof Compound*/) {
                     DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt != null) {
                         Truth ntt = ndt.truth();
@@ -87,20 +87,22 @@ abstract public class DynamicTruthModel {
                         return null;
                     }
                 } else {
-                    nt = table.truth(when + dt, now, dur);
-                    if (nt != null && add(i, d, nt.negIf(negated), confMin)) {
-                        if (evi) {
-                            //HACK this is a crude approximation
-                            Task bt = table.match(when + dt, now, dur);
-                            if (bt == null) {
-                                return null; //missing
-                            }
+                    if (evi) {
+                        Task bt = table.match(when + dt, now, dur);
+                        if (bt == null)
+                            return null;
 
-                            d.e.add(bt);
-                        }
+                        d.e.add(bt);
+                        nt = bt.truth(when+dt, dur); //TODO project to target time if task isnt at it
+
                     } else {
+                        nt = table.truth(when + dt, now, dur); //truth only
+                    }
+
+                    if (nt == null || !add(i, d, nt.negIf(negated), confMin)) {
                         return null;
                     }
+
                 }
 
             } else {

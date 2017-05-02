@@ -43,3 +43,7 @@
     //((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     //(S --> (B - G)), G |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
+
+//experiment
+//     (M --> (S - P)), (M --> S), task("!") |- (M --> P), (Goal:DecomposePositiveNegativeNegative)
+//     (M --> (S - P)), (M --> P), task("!") |- (M --> S), (Goal:DecomposeNegativeNegativeNegative)

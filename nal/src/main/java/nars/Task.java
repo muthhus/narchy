@@ -995,4 +995,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return new SpreadingActivation(this, c, n, scale, activationMapThreadLocal.get());
     }
 
+    /** projected truth value */
+    default Truth truth(long when, int dur) {
+        float e = evi(when, dur);
+        Truth rawTruth = truth();
+        if (e!=rawTruth.evi()) {
+            return new PreciseTruth(rawTruth.freq(), e, false);
+        }
+        return rawTruth;
+    }
+
 }
