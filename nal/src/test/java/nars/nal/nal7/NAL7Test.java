@@ -560,11 +560,11 @@ public class NAL7Test extends AbstractNALTest {
                         0.1f, 0.37f,
                         0)
                 .mustBelieve(cycles,
-                        "(a:x <=>+10 b:x)", 0.1f, 0.37f, // and here, as a result of the comparison truth function's asymmetry
+                        "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
                         0)
                 .mustBelieve(cycles,
                         "(($1 --> a) <=>+10 ($1 -->b))",
-                        0.1f, 0.37f,
+                        0.27f, 0.41f,
                         0)
         ;
 

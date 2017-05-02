@@ -386,6 +386,12 @@ public abstract class Unify implements Termutator, Subst {
 
     public boolean addConstraint(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
+
+//            Term existing = xy(m.target);
+//            if (existing!=null) {
+//                if (m.invalid(existing, this))
+//                    return false;
+//            }
             Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
             if (!((ConstrainedVersionedTerm) v).addConstraint(m))
                 return false;

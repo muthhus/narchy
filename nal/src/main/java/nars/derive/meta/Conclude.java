@@ -96,7 +96,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             TermIndex index = m.index;
 
-            TruthPuncEvidence ct = m.punct.get();
+            TruthPuncEvidence ct = m.punct;
             if (ct == null)
                 return;
 
@@ -217,8 +217,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                                     truth = truth.negated();
                             }
 
-                            c3 = index.normalize(c3);
-                            if (c3 == null)  return;
+//                            c3 = index.normalize(c3);
+//                            if (c3 == null)  return;
 
                             if (!Task.taskContentValid(c3, ct.punc, nar, true)) {
                                 return;

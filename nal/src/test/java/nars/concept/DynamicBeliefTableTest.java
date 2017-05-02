@@ -57,8 +57,9 @@ public class DynamicBeliefTableTest {
         assertEquals($.t(1f,0.81f), n.conceptualize($("(b --> (x|z))")).belief(now, dur));
         assertEquals($.t(0f,0.81f), n.conceptualize($("(b --> (x&z))")).belief(now, dur));
 
-        assertTrue(n.conceptualize($("((x|(--,y))-->a)")) instanceof DynamicConcept);
-        assertEquals($.t(0f,0.81f), n.conceptualize($("((x|(--,y))-->a)")).belief(now, dur));
+        Concept xIntNegY = n.conceptualize($("((x|(--,y))-->a)"));
+        assertTrue(xIntNegY instanceof DynamicConcept);
+        assertEquals($.t(0f,0.81f), xIntNegY.belief(now, dur));
         assertEquals($.t(1f,0.81f), n.conceptualize($("((x|(--,z))-->a)")).belief(now, dur));
     }
 

@@ -32,7 +32,7 @@ public class PreciseTruth implements Truth {
     }
 
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@NotNull Object that) {
         return equals( (Truth)that, Param.TRUTH_EPSILON );
         //throw new UnsupportedOperationException();
     }

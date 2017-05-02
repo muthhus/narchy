@@ -215,12 +215,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return !impossibleSubTerm(t) && OR(t::equals);
     }
 
-    default boolean containsRecursively(@NotNull Term b) {
-        if (!impossibleSubTerm(b)) {
+    default boolean containsRecursively(@NotNull Term y) {
+        if (!impossibleSubTerm(y)) {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(b) || ((x instanceof Compound) && (((Compound) x).containsRecursively(b)))) {
+                if (x.equals(y) || ((x instanceof Compound) && (((Compound) x).containsRecursively(y)))) {
                     return true;
                 }
             }

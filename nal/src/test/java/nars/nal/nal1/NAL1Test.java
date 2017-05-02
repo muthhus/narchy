@@ -77,15 +77,13 @@ public class NAL1Test extends AbstractNALTest {
                 .de("bird ist eine art des animal.");*/
                 .believe("<robin --> bird>")
                         //.en("robin is a type of bird.");
-                .mustBelieve(250, "<robin --> animal>", 0.81f);
+                .mustBelieve(CYCLES, "<robin --> animal>", 0.81f);
     }
 
     @Test
     public void abduction()  {
 
-        int time = CYCLES;
-
-//                .believe("<sport --> competition>")
+        //                .believe("<sport --> competition>")
 //                .believe("<chess --> competition>", 0.90f, Global.DEFAULT_JUDGMENT_CONFIDENCE)
 //                 mustBelieve(time, "<sport --> chess>", 1.0f, 0.42f)
 //                .mustBelieve(time, "<chess --> sport>", 0.90f, 0.45f)
@@ -95,8 +93,8 @@ public class NAL1Test extends AbstractNALTest {
                 
                 .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
-                .mustBelieve(time, "<chess --> sport>", 1f, 0.42f)
-                .mustBelieve(time, "<sport --> chess>", 0.9f, 0.45f);
+                .mustBelieve(CYCLES, "<chess --> sport>", 1f, 0.42f)
+                .mustBelieve(CYCLES, "<sport --> chess>", 0.9f, 0.45f);
 
                 //.en("I guess chess is a type of sport");
     }
@@ -167,6 +165,17 @@ public class NAL1Test extends AbstractNALTest {
                 .mustOutput(CYCLES, "<bird --> ?1>?") //.en("What is the type of bird?");
         ;
     }
+//   @Test
+//    public void analogyNeg() throws nars.Narsese.NarseseException {
+//
+//       TestNAR t = test();
+//       t.nar.nal(8); //necessary why
+//       t.log()
+//            .believe("(bird --> swimmer)")
+//            .believe("--(rock <-> swimmer)")
+//            .mustBelieve(CYCLES, "<bird --> rock>", 0, 0.81f)
+//       ;
+//    }
 
 
 }

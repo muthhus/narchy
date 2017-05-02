@@ -40,7 +40,11 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
         int now = m.now();
         for (int i = 0; i < termCacheLength; i++) {
             cached[(start++)%termCacheLength].test(m);
+
             m.revert(now);
+
+            if (m.versioning.ttl <= 0)
+                return false;
         }
 
         return true;

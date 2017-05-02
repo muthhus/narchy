@@ -36,8 +36,10 @@ import java.util.function.BiFunction;
 
 import static jcog.pri.PriMerge.plus;
 import static nars.Op.DIFFe;
+import static nars.Op.INH;
 import static nars.Op.PROD;
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.DTERNAL;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -82,7 +84,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     private NAR nar;
 
 
-    //private static volatile int serial = 0;
 
 //    final Function<Variable, VariableConcept> varBuilder =
 //            (Variable v) -> new VariableConcept(v);
@@ -109,18 +110,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return null;
         }
 
-        boolean validForTask = Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true);
-
         @NotNull Compound tt = t;
         return withBags(tt, (termbag, taskbag) -> {
-
+            boolean validForTask = Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true);
             if (!validForTask) {
-
-                return newStatic(tt, termbag, taskbag);
-
+                return newCompound(tt, termbag, taskbag);
             } else {
-
-                return newDynamic(tt, termbag, taskbag);
+                return newTask(tt, termbag, taskbag);
             }
         });
     }
@@ -128,23 +124,19 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     /** for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private CompoundConcept newStatic(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+    private CompoundConcept newCompound(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
         return new CompoundConcept(t, termbag, taskbag, nar);
     }
 
-    private CompoundConcept newDynamic(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+    private TaskConcept newTask(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {
 
             case INH:
-                //                if (Op.isOperation(t))
-                //                    return new OperationConcept(t, termbag, taskbag, nar);
-
 
                 Term subj = t.sub(0);
                 Term pred = t.sub(1);
-
 
                 Op so = subj.op();
                 Op po = pred.op();
@@ -160,7 +152,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = $.inh(csubj.sub(i), pred)) == null) {
+                                if ((x[i] = nar.concepts.the(INH, DTERNAL, csubj.sub(i), pred)) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -192,7 +184,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.sub(j++);
                         }
-                        Compound b = compoundOrNull($.inh($.p(ee), img.sub(0)));
+                        Compound b = compoundOrNull(nar.concepts.the(INH, DTERNAL, $.p(ee), img.sub(0)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }
@@ -210,7 +202,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = $.inh(subj, cpred.sub(i))) == null) {
+                                if ((x[i] = nar.concepts.the(INH, DTERNAL, subj, cpred.sub(i))) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -242,7 +234,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.sub(j++);
                         }
-                        Compound b = compoundOrNull($.inh(img.sub(0), $.p(ee)));
+                        Compound b = compoundOrNull(nar.concepts.the(INH, DTERNAL, img.sub(0), $.p(ee)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }

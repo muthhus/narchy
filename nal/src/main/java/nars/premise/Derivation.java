@@ -33,7 +33,7 @@ abstract public class Derivation extends Unify {
     public final float truthResolution;
     public final float confMin;
     public final DerivationBudgeting budgeting;
-    @NotNull public final Versioned<TruthPuncEvidence> punct;
+    @NotNull public TruthPuncEvidence punct;
 
     /**
      * the current premise being evaluated in this context TODO make private again
@@ -104,7 +104,6 @@ abstract public class Derivation extends Unify {
         this.budgeting = b;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-        this.punct = new Versioned<>(versioning, 1);
 
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
@@ -115,6 +114,8 @@ abstract public class Derivation extends Unify {
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         this.versioning.setTTL(ttl);
+
+        this.punct = null;
         forEachMatch = null;
         termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
 

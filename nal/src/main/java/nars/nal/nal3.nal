@@ -37,11 +37,11 @@
 
 //NAL3 single premise decompose
 
-    //((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    //(M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ((|,X,A..+) --> M), X |- ((|,A..+) --> M), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (M --> (&,X,A..+)), X |- (M --> (&,A..+)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-    //((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    //(S --> (B - G)), G |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    ((B ~ G) --> S), G |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (S --> (B - G)), G |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
 //experiment

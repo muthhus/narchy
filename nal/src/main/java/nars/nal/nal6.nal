@@ -67,11 +67,11 @@
 
 
     (S ==> M), ((&&,S,A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
-        (S ==> M), ((&&,(--,%S),A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
+        //(S ==> M), ((&&,(--,%S),A..+) ==> M), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
         //(%S ==> %M), ((||,%S,A..+) ==> M), time(dtCombine) |- ((||,A..+) ==>+- %M), (Belief:DecomposePositiveNegativeNegative)
 
     (M ==> S), (M ==> (&&,S,A..+)), time(dtCombine) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-        (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- ((&&,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegativeN)
+        (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     //(M ==> C), C, time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)

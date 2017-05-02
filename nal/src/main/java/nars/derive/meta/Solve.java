@@ -99,9 +99,10 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 throw new Op.InvalidPunctuationException(punct);
         }
 
-        return m.punct.set(new TruthPuncEvidence(t, punct,
+        m.punct = (new TruthPuncEvidence(t, punct,
                 single ? m.evidenceSingle() : m.evidenceDouble()
-        ))!=null;
+        ));
+        return true;
     }
 
 

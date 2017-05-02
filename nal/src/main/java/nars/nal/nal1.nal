@@ -25,10 +25,13 @@
     // the second neqRCom() is to handle the backwards cases until a proper variable transform is implemented for those auto-generated rules
 
     (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong)
+        (B --> C), (A --> B), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong)
     (A --> B), (A --> C), neqRCom(B,C)   |- (C --> B), (Belief:Abduction, Goal:Weak)
+        (A --> B), (A --> C), neqRCom(B,C)   |- (B --> C), (Belief:Abduction, Goal:Weak)
     (A --> C), (B --> C), neqRCom(A,B)   |- (A --> B), (Belief:Induction, Goal:Weak)
         (A --> C), (B --> C), neqRCom(A,B)   |- (B --> A), (Belief:Induction, Goal:Weak)
     (A --> B), (B --> C), neqRCom(A,C)   |- (C --> A), (Belief:Exemplification, Goal:Weak)
+        (B --> C), (A --> B), neqRCom(A,C)   |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
@@ -41,4 +44,6 @@
 
     (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
     (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
+        //(M --> P), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(S --> P)), (Belief:AnalogyPN, Goal:StrongPN)
+        //(P --> M), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(P --> S)), (Belief:AnalogyPN, Goal:StrongPN)
     (M <-> P), (S <-> M), neqRCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)

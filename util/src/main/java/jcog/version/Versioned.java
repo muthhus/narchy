@@ -60,6 +60,10 @@ public class Versioned<X> extends FasterList<X> {
      */
     @Nullable
     public Versioned<X> set(X nextValue) {
+//        if (context.add(this) && add(nextValue)) {
+//            System.out.println("set: " + nextValue);
+//            return this;
+//        } else return null;
         return context.add(this) && add(nextValue) ? this : null;
     }
 

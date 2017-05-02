@@ -44,7 +44,8 @@ abstract public class DynamicTruthModel {
 
         Term[] inputs = components(superterm);
 
-        DynTruth d = eval(superterm, when, stamp, n);
+        DynTruth d = new DynTruth(stamp ? $.newArrayList(0) : null);
+        d.freq = d.conf = 1f;
 
         final float confMin = 0; //n.confMin.floatValue();
 
@@ -125,14 +126,6 @@ abstract public class DynamicTruthModel {
     abstract public @NotNull Term[] components(Compound superterm);
 
     //protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
-
-    protected DynTruth eval(Compound template, long when, boolean stamp, NAR n) {
-
-        DynTruth d = new DynTruth(stamp ? $.newArrayList(0) : null);
-        d.freq = d.conf = 1f;
-        return d;
-
-    }
 
     protected abstract boolean add(int subterm, DynTruth d, Truth t, float confMin);
 
@@ -295,8 +288,8 @@ abstract public class DynamicTruthModel {
                 tx = t;
             else {
                 ty = t;
-                if (t.conf() * tx.conf() < confMin) //early termination check
-                    return false;
+//                if (t.conf() * tx.conf() < confMin) //early termination check
+//                    return false;
             }
 
             return true;
