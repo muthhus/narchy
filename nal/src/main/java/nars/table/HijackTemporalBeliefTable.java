@@ -51,17 +51,25 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
     @Override
-    protected boolean replace(Task incoming, Task existing, float scale) {
+    protected boolean replace(Task incoming, Task existing, float scaleIgnored) {
+        assert(scaleIgnored==1f);
+
         if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;
         if (existing instanceof ActionConcept.CuriosityTask)
             return true;
 
-
-        return super.replace(incoming, existing, scale);
+        return replace(priConf(incoming) , priConf(existing));
+        //return super.replace(incoming, existing, scale);
     }
 
-//    @Override
+    public float priConf(@NotNull Task key) {
+        return (1f + key.pri()) * (1f + key.conf()) * (1f + (key.end()-key.start()));
+    }
+
+
+
+    //    @Override
 //    public float pri(@NotNull Task key) {
 //        long dt = key.mid() - lastCommitTime;
 //
