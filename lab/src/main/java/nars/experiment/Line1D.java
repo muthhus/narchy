@@ -1,12 +1,14 @@
 package nars.experiment;
 
 import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Param;
 import nars.Task;
 import nars.concept.ActionConcept;
 import nars.nar.Default;
+import nars.op.RLBooster;
 import nars.test.agent.Line1DSimplest;
 
 import java.util.LinkedHashSet;
@@ -46,7 +48,7 @@ public class Line1D {
 
             float speed = a.speed.floatValue();
             this.worsenThreshold = speed / 2f;
-            this.completionThreshold = n.dur() * 256;
+            this.completionThreshold = n.dur() * 32;
             float rewardThresh = 0.75f; //reward to be considered correct in this frame
 
             n.onTask(x -> {
@@ -131,8 +133,9 @@ public class Line1D {
         Line1DSimplest a = new Line1DSimplest(n);
         Line1DTrainer trainer = new Line1DTrainer(a);
 
-        //new RLAccel(a, new HaiQAgent());
-        //ImplicationBooster.implAccelerator(a);
+        //new RLBooster(a, new HaiQAgent());
+
+//ImplicationBooster.implAccelerator(a);
 //        a.onFrame((z) -> {
 //            a.target(
 //                    0.5f * (Math.sin(n.time() / 200f) + 1f)

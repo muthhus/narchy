@@ -1,8 +1,9 @@
 package il.technion.tinytable.hash;
 
-import il.technion.tinytable.hash.MurmurHash.ModifiedMurmurHash;
 
 import java.util.function.Function;
+
+import static il.technion.tinytable.hash.MurmurHash.hash64;
 
 
 public class GreenHasher {
@@ -36,7 +37,7 @@ public class GreenHasher {
     }
 
     public FingerPrint hash(byte[] data) {
-        long hash = ModifiedMurmurHash.hash64(data, data.length);
+        long hash = hash64(data, data.length);
 //		long hash = item.hashCode()^0xe17a1465;
 //		hash ^= (hash >>> 20) ^ (hash >>> 12);
 //		 hash ^= (hash >>> 7) ^ (hash >>> 4);

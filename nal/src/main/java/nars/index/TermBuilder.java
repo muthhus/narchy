@@ -12,6 +12,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
@@ -872,7 +873,12 @@ public abstract class TermBuilder {
         //factor out any common subterms iff commutive
         if (commutive(dt)) {
 
-            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
+//            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
+//                return False; //cyclic
+
+            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
+                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
+                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
                 return False; //cyclic
 
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should

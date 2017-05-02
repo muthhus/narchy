@@ -3,10 +3,12 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
+import nars.op.RLBooster;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -54,12 +56,12 @@ public class Arkancide extends NAgentX {
                 e.printStackTrace();
             }
 
-            //new RLAccel(a, new HaiQAgent());
+            //new RLBooster(a, new HaiQAgent());
 
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {

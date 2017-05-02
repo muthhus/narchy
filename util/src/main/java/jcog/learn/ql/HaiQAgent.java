@@ -12,16 +12,16 @@ import java.util.function.BiFunction;
 public class HaiQAgent extends HaiQ {
 
     //Hsom...
-    final static float perceptionAlpha = 0.05f;
+    final static float perceptionAlpha = 0.01f;
     @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
-    float perceptionNoise = 0.02f;
-    float perceptionCorruption = 0.01f;
+    float perceptionNoise = 0.01f;
+    float perceptionCorruption = 0.0f;
 
 
     public HaiQAgent() {
         this((inputs, outputs) ->
-                (int) Math.ceil(/*Math.sqrt*/((1+inputs)*(1+outputs))));
+                (int) Math.ceil(/*Math.sqrt*/((1+inputs*2)*(1+outputs))));
     }
 
     public HaiQAgent(BiFunction<Integer,Integer,Integer> numStates) {
