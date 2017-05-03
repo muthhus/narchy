@@ -153,18 +153,17 @@ public class UDPeer extends UDP {
 
             byte[] bytes = o.array();
 
-            int max = them.size();
 
 
-            final int[] count = {0};
+
+            final int[] remain = {them.size()};
             them.sample((to) -> {
-                int i = count[0]++;
-                if (o.id() != to.id && rng.nextFloat() <= pri) {
+                if (o.id() != to.id && (pri >= 1 || rng.nextFloat() <= pri)) {
                     outBytes(bytes, to.addr);
                 }
-                return i <= max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+                return ((remain[0]--) > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });
-            return count[0];
+            return remain[0];
 
         }
     }
@@ -336,7 +335,7 @@ public class UDPeer extends UDP {
 
     protected void sendPong(InetSocketAddress from, Msg ping) {
         Msg p = //ping.clone(PONG.id,null);
-                new Msg(PONG.id, (byte) 1, me, ping.origin(),
+                new Msg(PONG.id, (byte) 1, me, from,
                         ArrayUtils.addAll(
                                 Longs.toByteArray(ping.dataLong(0)), //sent time (local to pinger)
                                 Ints.toByteArray(ping.id()) //pinger ID
@@ -722,9 +721,9 @@ public class UDPeer extends UDP {
         public void update(HashMapTagSet h) {
             switch (h.id()) {
                 case "C":
-                    can = h;
+                    can = h; break;
                 case "N":
-                    need = h;
+                    need = h; break;
             }
         }
 
