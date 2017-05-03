@@ -11,6 +11,7 @@ import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.net.attn.HashMapTagSet;
 import jcog.pri.RawPLink;
+import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.*;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -27,13 +29,13 @@ import static jcog.net.UDPeer.Command.*;
 
 /**
  * UDP peer - self-contained generic p2p/mesh network node
- *
+ * <p>
  * see:
- *   Gnutella
- *   WASTE
- *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/p2p/P2pMessageCodes.java
- *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/shh/WhisperImpl.java
- *   https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/MessageQueue.java
+ * Gnutella
+ * WASTE
+ * https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/p2p/P2pMessageCodes.java
+ * https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/shh/WhisperImpl.java
+ * https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/MessageQueue.java
  */
 public class UDPeer extends UDP {
 
@@ -47,12 +49,13 @@ public class UDPeer extends UDP {
     public final HashMapTagSet can = new HashMapTagSet("C");
     public final HashMapTagSet need = new HashMapTagSet("N");
 
-    public final Bag<InetSocketAddress, UDProfile> them;
+    public final Bag<Integer, UDProfile> them;
     public final PLinkHijackBag<Msg> seen;
 
 
     //TODO use a 128+ bit identifier. ethereumj uses 512bits
-    public final int id = ThreadLocalRandom.current().nextInt();
+    public final int me;
+    static final int UNKNOWN_ID = Integer.MIN_VALUE;
 
 
     private static final byte DEFAULT_PING_TTL = 2;
@@ -67,7 +70,7 @@ public class UDPeer extends UDP {
      * message memory
      */
     final static int SEEN_CAPACITY = 4096;
-
+    private final Random rng;
 
 
     public UDPeer(int port) throws SocketException {
@@ -80,8 +83,13 @@ public class UDPeer extends UDP {
                 port);*/
         //this.meBytes = bytes(me);
 
+        this.rng = new XorShift128PlusRandom(ThreadLocalRandom.current().nextLong());
 
-        them = new HijackBag<InetSocketAddress, UDProfile>(4) {
+        int me;
+        while ((me = ThreadLocalRandom.current().nextInt()) == UNKNOWN_ID) ;
+        this.me = me;
+
+        them = new HijackBag<Integer, UDProfile>(4) {
 
             @Override
             public void onAdded(UDProfile p) {
@@ -97,7 +105,7 @@ public class UDPeer extends UDP {
 
             @Override
             protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
-                return (existing!=null ? existing : incoming);
+                return (existing != null ? existing : incoming);
             }
 
             @Override
@@ -112,8 +120,8 @@ public class UDPeer extends UDP {
 
             @NotNull
             @Override
-            public InetSocketAddress key(UDProfile value) {
-                return value.addr;
+            public Integer key(UDProfile value) {
+                return value.id;
             }
 
         };
@@ -135,7 +143,7 @@ public class UDPeer extends UDP {
      */
     public int say(Msg o, float pri, boolean onlyIfNotSeen) {
 
-        if (them.isEmpty()) {
+        if (them.isEmpty() || pri <= 0) {
             //System.err.println(this + " without any peers to broadcast");
             return 0;
         } else {
@@ -145,22 +153,28 @@ public class UDPeer extends UDP {
 
             byte[] bytes = o.array();
 
+            int max = them.size();
+
+
             final int[] count = {0};
-            int max = (int) Math.ceil(pri * them.size());
             them.sample((to) -> {
-                if (!o.originEquals(to.addrBytes)) {
+                int i = count[0]++;
+                if (o.id() != to.id && rng.nextFloat() <= pri) {
                     outBytes(bytes, to.addr);
-                    return (count[0]++) < max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
-                } else {
-                    return Bag.BagCursorAction.Next;
                 }
+                return i <= max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
             });
             return count[0];
+
         }
     }
 
     public boolean seen(Msg o, float pri) {
         RawPLink p = new RawPLink(o, pri);
+
+        //TODO throttle:
+        seen.commit();
+
         return seen.put(p) != p; //what about if it returns null
     }
 
@@ -173,7 +187,7 @@ public class UDPeer extends UDP {
     }
 
     public int believe(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return say(new Msg(BELIEVE.id, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
+        return say(new Msg(BELIEVE.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
     }
 
     /**
@@ -188,7 +202,7 @@ public class UDPeer extends UDP {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + BinTxt.toString(id) + ')';
+        return getClass().getSimpleName() + '(' + BinTxt.toString(me) + ')';
     }
 
     @Override
@@ -197,35 +211,38 @@ public class UDPeer extends UDP {
         if (m == null)
             return;
 
-        float pri = 1;
-        boolean seen = seen(m, pri);
-        if (seen)
+        if (m.id() == me)
             return;
 
         byte cmdByte = m.cmd();
+        Command cmd = Command.get(cmdByte);
+        if (cmd == null)
+            return; //bad packet
+
         if (m.port() == 0) {
             //rewrite origin with the actual packet origin
             m = m.clone(cmdByte, bytes(new InetSocketAddress(p.getAddress(), p.getPort())));
         }
 
+
+        float pri = 1;
+        boolean seen = seen(m, pri);
+        if (seen)
+            return;
+
+
+
         boolean continues = m.live();
 
+        @Nullable UDProfile connected = them.get(m.id());
+
+
         long now = System.currentTimeMillis();
-
-        @Nullable UDProfile connected = them.get(p.getSocketAddress());
-
-        Command cmd = Command.get(cmdByte);
-        if (cmd == null)
-            return; //bad packet
-
         if (cmd == PONG) {
-            connected = recvPong(p, m, connected, now);
+            connected = onPong(p, m, connected, now);
             return;
         }
 
-        if (m.id() == id) {
-            return;
-        }
 
         InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
 
@@ -241,10 +258,10 @@ public class UDPeer extends UDP {
                 receive(connected, m);
                 break;
             case ATTN:
-                if (connected!=null) {
+                if (connected != null) {
                     //update profile
                     HashMapTagSet h = HashMapTagSet.fromBytes(m.data());
-                    if (h!=null)
+                    if (h != null)
                         connected.update(h);
                 }
                 break;
@@ -263,11 +280,10 @@ public class UDPeer extends UDP {
         }
 
 
-        //direct bounce:
-            //if (continues) {
-            //    if (!seen)
-            //        send(m, pri, false /* did a test locally already */);
-            //}
+        if (continues) {
+            //if (!seen)
+            say(m, pri, false /* did a test locally already */);
+        }
     }
 
     protected void receive(@Nullable UDProfile connected, @NotNull Msg m) {
@@ -285,23 +301,6 @@ public class UDPeer extends UDP {
         return in + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ")";
     }
 
-    public @Nullable UDProfile recvPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
-
-        long latency = pingTime(m, now); //TODO should be Long
-        if (connected != null) {
-            connected.onPing(latency);
-        } else {
-            if (id == m.id())
-                connected = them.put(new UDProfile(-1, (InetSocketAddress) p.getSocketAddress(), latency));
-        }
-        return connected;
-    }
-
-    private long pingTime(Msg m, long now) {
-        long sent = m.dataLong(); //TODO dont store the sent time in the message where it can be spoofed. instead store a pending ping table that a pong will lookup by the iniating ping's message hash
-        return now - sent;
-    }
-
     /**
      * ping same host, different port
      */
@@ -314,12 +313,34 @@ public class UDPeer extends UDP {
     }
 
     public void ping(@Nullable InetSocketAddress to) {
-        send(new Msg(PING.id, DEFAULT_PING_TTL, id, null, System.currentTimeMillis()), to);
+        send(new Msg(PING.id, DEFAULT_PING_TTL, me, null, System.currentTimeMillis()), to);
     }
 
 
+    public @Nullable UDProfile onPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
+
+        long sent = m.dataLong(0); //TODO dont store the sent time in the message where it can be spoofed. instead store a pending ping table that a pong will lookup by the iniating ping's message hash
+        long latency = now - sent; //TODO should be Long
+        if (connected != null) {
+            connected.onPing(latency);
+        } else {
+            int pinger = m.dataInt(8, UNKNOWN_ID);
+            if (pinger == me) {
+                connected = them.put(
+                        new UDProfile(m.id(), (InetSocketAddress) p.getSocketAddress(), latency)
+                );
+            }
+        }
+        return connected;
+    }
+
     protected void sendPong(InetSocketAddress from, Msg ping) {
-        Msg p = ping.clone(PONG.id,null);
+        Msg p = //ping.clone(PONG.id,null);
+                new Msg(PONG.id, (byte) 1, me, ping.origin(),
+                        ArrayUtils.addAll(
+                                Longs.toByteArray(ping.dataLong(0)), //sent time (local to pinger)
+                                Ints.toByteArray(ping.id()) //pinger ID
+                        ));
 
         //logger.debug("({} =/> {})", p, from);
 
@@ -330,7 +351,7 @@ public class UDPeer extends UDP {
         if (which.pri(tag, pri)) {
             //TODO handle oversized message
             //TODO throttle at below a max frequency
-            say(new Msg(ATTN.id, DEFAULT_PING_TTL, id, null,
+            say(new Msg(ATTN.id, DEFAULT_PING_TTL, me, null,
                     which.toBytes()), 1f, false);
         }
     }
@@ -345,36 +366,51 @@ public class UDPeer extends UDP {
 
     public enum Command {
 
-        /** measure connectivity */
+        /**
+         * measure connectivity
+         */
         PING('P'),
 
-        /** answer a ping */
+        /**
+         * answer a ping
+         */
         PONG('p'),
 
-        /** ping / report known peers? */
+        /**
+         * ping / report known peers?
+         */
         WHO('w'),
 
-        /** share my attention */
+        /**
+         * share my attention
+         */
         ATTN('a'),
 
-        /** share a belief claim */
-        BELIEVE('b'),
-        ;
+        /**
+         * share a belief claim
+         */
+        BELIEVE('b'),;
 
         public final byte id;
 
 
         Command(char id) {
-            this.id = (byte)id;
+            this.id = (byte) id;
         }
 
-        @Nullable public static Command get(byte cmdByte) {
+        @Nullable
+        public static Command get(byte cmdByte) {
             switch (cmdByte) { //HACK generate this from the commands
-                case 'P': return PING;
-                case 'p': return PONG;
-                case 'w': return WHO;
-                case 's': return BELIEVE;
-                case 'a': return ATTN;
+                case 'P':
+                    return PING;
+                case 'p':
+                    return PONG;
+                case 'w':
+                    return WHO;
+                case 'b':
+                    return BELIEVE;
+                case 'a':
+                    return ATTN;
             }
             return null;
         }
@@ -400,7 +436,7 @@ public class UDPeer extends UDP {
             hash = hash();
         }
 
-        private void init(byte cmd, byte ttl, int id, InetSocketAddress origin) {
+        private void init(byte cmd, byte ttl, int id, @Nullable InetSocketAddress origin) {
             writeByte(ttl);
             writeByte(cmd);
             writeInt(id);
@@ -488,12 +524,11 @@ public class UDPeer extends UDP {
         public String toString() {
 
             return BinTxt.toString(id()).toString() + ' ' +
-                    ((char)cmd()) + '+' + ttl() +
+                    ((char) cmd()) + '+' + ttl() +
                     '[' + dataLength() + ']';
 
-                    //origin() + ":" + ((char) cmd());
+            //origin() + ":" + ((char) cmd());
         }
-
 
 
         /**
@@ -553,12 +588,21 @@ public class UDPeer extends UDP {
         /**
          * the payload as a long
          */
-        public long dataLong() {
-            if (dataLength() != 8)
+        public long dataLong(int offset) {
+            if (dataLength() < (offset + 8))
                 throw new RuntimeException("unexpected payload");
 
-            return Longs.fromByteArray(data(0, 8));
+            return Longs.fromByteArray(data(offset, offset + 8));
         }
+
+
+        public int dataInt(int offset, int ifMissing) {
+            if (dataLength() < (offset + 4))
+                return ifMissing;
+
+            return Ints.fromByteArray(data(offset, offset + 4));
+        }
+
 
         public boolean originEquals(byte[] addrBytes) {
             int addrLen = addrBytes.length;
@@ -569,7 +613,7 @@ public class UDPeer extends UDP {
             return new String(data(0, dataLength()));
         }
 
-        final static int ADDRESS_BYTES = 16 /* ipv6 */ +2 /* port */;
+        final static int ADDRESS_BYTES = 16 /* ipv6 */ + 2 /* port */;
 
         public void dataAddresses(Consumer<InetSocketAddress> a) {
             int d = dataLength();
@@ -618,38 +662,39 @@ public class UDPeer extends UDP {
 
         final static int PING_WINDOW = 8;
 
+        public final int id;
+
+        long lastMessage = Long.MIN_VALUE;
+        public byte[] addrBytes;
+
         /**
          * ping time, in ms
          * TODO find a lock-free sort of statistics class
          */
         final SynchronizedDescriptiveStatistics pingTime = new SynchronizedDescriptiveStatistics(PING_WINDOW);
-        //private final int id;
-
-        long lastMessage = Long.MIN_VALUE;
-        public byte[] addrBytes;
         private long latency;
+
 
         HashMapTagSet
                 can = HashMapTagSet.EMPTY,
                 need = HashMapTagSet.EMPTY;
 
         public UDProfile(int id, InetSocketAddress addr, long initialPingTime) {
-            //this.id = id;
+            this.id = id;
             this.addr = addr;
             this.addrBytes = bytes(addr);
             onPing(initialPingTime);
         }
 
-
-
         @Override
         public int hashCode() {
-            return addr.hashCode();
+            return id;
         }
 
         @Override
         public boolean equals(Object obj) {
-            return addr.equals(((UDProfile) obj).addr);
+            return id == ((UDProfile) obj).id;
+            //return addr.equals(((UDProfile) obj).addr);
         }
 
         public void onPing(long time) {
@@ -668,7 +713,7 @@ public class UDPeer extends UDP {
         public String toString() {
             return "UDProfile{" +
                     "addr=" + addr +
-                    ", pingTime=" + pingTime +
+                    ", ping=" + latency +
                     ", can=" + can +
                     ", need=" + need +
                     '}';
@@ -676,8 +721,10 @@ public class UDPeer extends UDP {
 
         public void update(HashMapTagSet h) {
             switch (h.id()) {
-                case "C": can = h;
-                case "N": need = h;
+                case "C":
+                    can = h;
+                case "N":
+                    need = h;
             }
         }
 
@@ -705,7 +752,6 @@ public class UDPeer extends UDP {
             return address;
         }
     }
-
 
 
 }

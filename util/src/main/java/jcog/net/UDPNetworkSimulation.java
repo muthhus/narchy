@@ -1,6 +1,8 @@
 package jcog.net;
 
 import jcog.Util;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -30,12 +32,13 @@ public abstract class UDPNetworkSimulation {
 
             for (int i = 0; i < size; i++) {
                 peers[i].ping(peers[ (i + 1) % size ].port());
-                //peers[i].ping(peers[ (i + 2) % size ].me());
+                //peers[i].ping(peers[ (i + 2) % size ].port());
+                //peers[i].ping(peers[ (i + 3) % size ].port());
             }
 
         ///}
 
-        Util.sleep(5000);
+        Util.sleep(2000);
 
         peers[0].believe("hi", (byte)4);
 
@@ -46,7 +49,7 @@ public abstract class UDPNetworkSimulation {
     }
 
     public static void main(String[] args) throws SocketException, UnknownHostException {
-        new UDPNetworkSimulation(4) {
+        new UDPNetworkSimulation(5) {
             @Override
             long delay(InetSocketAddress from, InetSocketAddress to, int length) {
                 return 25 + Math.abs(from.getPort() - to.getPort()) * 50;
@@ -71,6 +74,11 @@ public abstract class UDPNetworkSimulation {
                     actuallySend(o, to);
                 }
             }, delay((InetSocketAddress) in.getLocalSocketAddress(), to, o.length()));
+        }
+
+        @Override
+        protected void receive(@Nullable UDPeer.UDProfile connected, @NotNull UDPeer.Msg m) {
+            System.out.println(me + " receive: " + m);
         }
     }
 
