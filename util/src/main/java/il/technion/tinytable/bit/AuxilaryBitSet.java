@@ -1,8 +1,11 @@
 package il.technion.tinytable.bit;
 
 
-public class AuxilaryBitSet {
-    public long[] words;
+import java.io.Serializable;
+
+public class AuxilaryBitSet implements Serializable {
+
+    public final long[] words;
 
     public AuxilaryBitSet(final int l) {
 

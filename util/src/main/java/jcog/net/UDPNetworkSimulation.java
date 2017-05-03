@@ -37,7 +37,7 @@ public abstract class UDPNetworkSimulation {
 
         Util.sleep(5000);
 
-        peers[0].say("hi", (byte)4);
+        peers[0].believe("hi", (byte)4);
 
 
         Util.sleep(10000);

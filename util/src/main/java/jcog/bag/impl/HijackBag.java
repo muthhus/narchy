@@ -17,7 +17,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Created by me on 2/17/17.
+ * TODO use the Treadmill's AtomicIntegerArray to store
+ * additional values either at the end or beginning:
+ *   capacity, size
+ * so that these dont need to be additional AtomicInteger fields, saving memory
  */
 public abstract class HijackBag<K, V> implements Bag<K, V> {
 

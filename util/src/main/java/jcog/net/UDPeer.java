@@ -9,8 +9,8 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.byt.DynByteSeq;
 import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.net.attn.HashMapTagSet;
 import jcog.pri.RawPLink;
-import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +23,10 @@ import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import static jcog.net.UDPeer.Command.*;
+
 /**
- * UDP peer
+ * UDP peer - self-contained generic p2p/mesh network node
  *
  * see:
  *   Gnutella
@@ -41,17 +43,19 @@ public class UDPeer extends UDP {
 
     private static final Logger logger = LoggerFactory.getLogger(UDPeer.class);
 
-    //TODO create a Command enum with interface for all stages of message handling
-    public static final byte PING = (byte) 'P';
-    public static final byte PONG = (byte) 'p';
-    public static final byte WHO = (byte) 'w';
-    public static final byte TELL = (byte) 's';
 
-    private static final byte DEFAULT_PING_TTL = 2;
+    public final HashMapTagSet can = new HashMapTagSet("C");
+    public final HashMapTagSet need = new HashMapTagSet("N");
+
+    public final Bag<InetSocketAddress, UDProfile> them;
+    public final PLinkHijackBag<Msg> seen;
+
 
     //TODO use a 128+ bit identifier. ethereumj uses 512bits
     public final int id = ThreadLocalRandom.current().nextInt();
 
+
+    private static final byte DEFAULT_PING_TTL = 2;
 
     /**
      * max # of active links
@@ -63,6 +67,318 @@ public class UDPeer extends UDP {
      * message memory
      */
     final static int SEEN_CAPACITY = 4096;
+
+
+
+    public UDPeer(int port) throws SocketException {
+        super(port);
+        //super( InetAddress.getLocalHost().getCanonicalHostName(), port);
+
+        //this.me =  new InetSocketAddress( in.getInetAddress(), port );
+        /*this.me = new InetSocketAddress(
+                InetAddress.getByName("[0:0:0:0:0:0:0:0]"),
+                port);*/
+        //this.meBytes = bytes(me);
+
+
+        them = new HijackBag<InetSocketAddress, UDProfile>(4) {
+
+            @Override
+            public void onAdded(UDProfile p) {
+                logger.debug("{} connect {}", UDPeer.this, p);
+                UDPeer.this.onAddRemove(p, true);
+            }
+
+            @Override
+            public void onRemoved(@NotNull UDPeer.UDProfile p) {
+                logger.debug("{} disconnect {}", UDPeer.this, p);
+                UDPeer.this.onAddRemove(p, false);
+            }
+
+            @Override
+            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
+                return (existing!=null ? existing : incoming);
+            }
+
+            @Override
+            protected Consumer<UDProfile> forget(float rate) {
+                return null;
+            }
+
+            @Override
+            public float pri(@NotNull UDPeer.UDProfile key) {
+                return 1f / (1f + key.latency() / 20f);
+            }
+
+            @NotNull
+            @Override
+            public InetSocketAddress key(UDProfile value) {
+                return value.addr;
+            }
+
+        };
+
+        them.setCapacity(PEERS_CAPACITY);
+
+        seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4);
+    }
+
+    protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
+
+    }
+
+
+    /**
+     * broadcast
+     *
+     * @return how many sent
+     */
+    public int say(Msg o, float pri, boolean onlyIfNotSeen) {
+
+        if (them.isEmpty()) {
+            //System.err.println(this + " without any peers to broadcast");
+            return 0;
+        } else {
+
+            if (onlyIfNotSeen && seen(o, pri))
+                return 0;
+
+            byte[] bytes = o.array();
+
+            final int[] count = {0};
+            int max = (int) Math.ceil(pri * them.size());
+            them.sample((to) -> {
+                if (!o.originEquals(to.addrBytes)) {
+                    outBytes(bytes, to.addr);
+                    return (count[0]++) < max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+                } else {
+                    return Bag.BagCursorAction.Next;
+                }
+            });
+            return count[0];
+        }
+    }
+
+    public boolean seen(Msg o, float pri) {
+        RawPLink p = new RawPLink(o, pri);
+        return seen.put(p) != p; //what about if it returns null
+    }
+
+    public void believe(String msg, int ttl) {
+        believe(msg.getBytes(UTF8), ttl);
+    }
+
+    public void believe(byte[] msg, int ttl) {
+        believe(msg, ttl, false);
+    }
+
+    public int believe(byte[] msg, int ttl, boolean onlyIfNotSeen) {
+        return say(new Msg(BELIEVE.id, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
+    }
+
+    /**
+     * send to a specific known recipient
+     */
+    public void send(Msg o, InetSocketAddress to) {
+//        InetSocketAddress a = o.origin();
+//        if (a != null && a.equals(to))
+//            return;
+        outBytes(o.array(), to);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + '(' + BinTxt.toString(id) + ')';
+    }
+
+    @Override
+    protected void in(DatagramPacket p, byte[] data) {
+        Msg m = Msg.get(data);
+        if (m == null)
+            return;
+
+        float pri = 1;
+        boolean seen = seen(m, pri);
+        if (seen)
+            return;
+
+        byte cmdByte = m.cmd();
+        if (m.port() == 0) {
+            //rewrite origin with the actual packet origin
+            m = m.clone(cmdByte, bytes(new InetSocketAddress(p.getAddress(), p.getPort())));
+        }
+
+        boolean continues = m.live();
+
+        long now = System.currentTimeMillis();
+
+        @Nullable UDProfile connected = them.get(p.getSocketAddress());
+
+        Command cmd = Command.get(cmdByte);
+        if (cmd == null)
+            return; //bad packet
+
+        if (cmd == PONG) {
+            connected = recvPong(p, m, connected, now);
+            return;
+        }
+
+        if (m.id() == id) {
+            return;
+        }
+
+        InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
+
+        switch (cmd) {
+            case PING:
+                sendPong(remote, m); //continue below
+                break;
+            case WHO:
+                m.dataAddresses(this::ping);
+                break;
+            case BELIEVE:
+                //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
+                receive(connected, m);
+                break;
+            case ATTN:
+                if (connected!=null) {
+                    //update profile
+                    HashMapTagSet h = HashMapTagSet.fromBytes(m.data());
+                    if (h!=null)
+                        connected.update(h);
+                }
+                break;
+            default:
+                return;
+        }
+
+
+        if (connected == null) {
+            if (them.size() < them.capacity()) {
+                //ping them to consider adding as peer
+                ping(remote);
+            }
+        } else {
+            connected.lastMessage = now;
+        }
+
+
+        //direct bounce:
+            //if (continues) {
+            //    if (!seen)
+            //        send(m, pri, false /* did a test locally already */);
+            //}
+    }
+
+    protected void receive(@Nullable UDProfile connected, @NotNull Msg m) {
+
+    }
+
+
+    public long latencyAvg() {
+        RecycledSummaryStatistics r = new RecycledSummaryStatistics();
+        them.forEach(x -> r.accept(x.latency));
+        return Math.round(r.getMean());
+    }
+
+    public String summary() {
+        return in + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ")";
+    }
+
+    public @Nullable UDProfile recvPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
+
+        long latency = pingTime(m, now); //TODO should be Long
+        if (connected != null) {
+            connected.onPing(latency);
+        } else {
+            if (id == m.id())
+                connected = them.put(new UDProfile(-1, (InetSocketAddress) p.getSocketAddress(), latency));
+        }
+        return connected;
+    }
+
+    private long pingTime(Msg m, long now) {
+        long sent = m.dataLong(); //TODO dont store the sent time in the message where it can be spoofed. instead store a pending ping table that a pong will lookup by the iniating ping's message hash
+        return now - sent;
+    }
+
+    /**
+     * ping same host, different port
+     */
+    public void ping(int port) {
+        ping(new InetSocketAddress(port));
+    }
+
+    public void ping(String host, int port) {
+        ping(new InetSocketAddress(host, port));
+    }
+
+    public void ping(@Nullable InetSocketAddress to) {
+        send(new Msg(PING.id, DEFAULT_PING_TTL, id, null, System.currentTimeMillis()), to);
+    }
+
+
+    protected void sendPong(InetSocketAddress from, Msg ping) {
+        Msg p = ping.clone(PONG.id,null);
+
+        //logger.debug("({} =/> {})", p, from);
+
+        send(p, from);
+    }
+
+    private void tag(String tag, float pri, HashMapTagSet which) {
+        if (which.pri(tag, pri)) {
+            //TODO handle oversized message
+            //TODO throttle at below a max frequency
+            say(new Msg(ATTN.id, DEFAULT_PING_TTL, id, null,
+                    which.toBytes()), 1f, false);
+        }
+    }
+
+    public void can(String tag, float pri) {
+        tag(tag, pri, can);
+    }
+
+    public void need(String tag, float pri) {
+        tag(tag, pri, need);
+    }
+
+    public enum Command {
+
+        /** measure connectivity */
+        PING('P'),
+
+        /** answer a ping */
+        PONG('p'),
+
+        /** ping / report known peers? */
+        WHO('w'),
+
+        /** share my attention */
+        ATTN('a'),
+
+        /** share a belief claim */
+        BELIEVE('b'),
+        ;
+
+        public final byte id;
+
+
+        Command(char id) {
+            this.id = (byte)id;
+        }
+
+        @Nullable public static Command get(byte cmdByte) {
+            switch (cmdByte) { //HACK generate this from the commands
+                case 'P': return PING;
+                case 'p': return PONG;
+                case 'w': return WHO;
+                case 's': return BELIEVE;
+                case 'a': return ATTN;
+            }
+            return null;
+        }
+    }
 
 
     public static class Msg extends DynByteSeq {
@@ -297,13 +613,14 @@ public class UDPeer extends UDP {
     /**
      * profile of another peer
      */
-    static class UDProfile {
+    public static class UDProfile {
         public final InetSocketAddress addr;
 
         final static int PING_WINDOW = 8;
 
         /**
          * ping time, in ms
+         * TODO find a lock-free sort of statistics class
          */
         final SynchronizedDescriptiveStatistics pingTime = new SynchronizedDescriptiveStatistics(PING_WINDOW);
         //private final int id;
@@ -312,6 +629,9 @@ public class UDPeer extends UDP {
         public byte[] addrBytes;
         private long latency;
 
+        HashMapTagSet
+                can = HashMapTagSet.EMPTY,
+                need = HashMapTagSet.EMPTY;
 
         public UDProfile(int id, InetSocketAddress addr, long initialPingTime) {
             //this.id = id;
@@ -319,6 +639,8 @@ public class UDPeer extends UDP {
             this.addrBytes = bytes(addr);
             onPing(initialPingTime);
         }
+
+
 
         @Override
         public int hashCode() {
@@ -344,9 +666,23 @@ public class UDPeer extends UDP {
 
         @Override
         public String toString() {
-            return addr + " (latency=" + latency() + ")";
+            return "UDProfile{" +
+                    "addr=" + addr +
+                    ", pingTime=" + pingTime +
+                    ", can=" + can +
+                    ", need=" + need +
+                    '}';
         }
+
+        public void update(HashMapTagSet h) {
+            switch (h.id()) {
+                case "C": can = h;
+                case "N": need = h;
+            }
+        }
+
     }
+
 
     public static byte[] bytes(InetSocketAddress addr) {
 
@@ -371,255 +707,5 @@ public class UDPeer extends UDP {
     }
 
 
-    public final Bag<InetSocketAddress, UDProfile> them;
-    public final PLinkHijackBag<Msg> seen;
-
-    public UDPeer(int port) throws SocketException {
-        super(port);
-        //super( InetAddress.getLocalHost().getCanonicalHostName(), port);
-
-        //this.me =  new InetSocketAddress( in.getInetAddress(), port );
-        /*this.me = new InetSocketAddress(
-                InetAddress.getByName("[0:0:0:0:0:0:0:0]"),
-                port);*/
-        //this.meBytes = bytes(me);
-
-        XorShift128PlusRandom rng = new XorShift128PlusRandom(System.currentTimeMillis());
-
-        them = new HijackBag<InetSocketAddress, UDProfile>(4) {
-
-            @Override
-            public void onAdded(UDProfile p) {
-                logger.debug("{} connect {}", UDPeer.this, p);
-                UDPeer.this.onAddRemove(p, true);
-            }
-
-            @Override
-            public void onRemoved(@NotNull UDPeer.UDProfile p) {
-                logger.debug("{} disconnect {}", UDPeer.this, p);
-                UDPeer.this.onAddRemove(p, false);
-            }
-
-            @Override
-            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
-                return (existing!=null ? existing : incoming);
-            }
-
-            @Override
-            protected Consumer<UDProfile> forget(float rate) {
-                return null;
-            }
-
-            @Override
-            public float pri(@NotNull UDPeer.UDProfile key) {
-                return 1f / (1f + key.latency() / 20f);
-            }
-
-            @NotNull
-            @Override
-            public InetSocketAddress key(UDProfile value) {
-                return value.addr;
-            }
-
-        };
-
-        them.setCapacity(PEERS_CAPACITY);
-
-        seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4);
-    }
-
-    protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
-
-    }
-
-
-    /**
-     * broadcast
-     *
-     * @return how many sent
-     */
-    public int say(Msg o, float pri, boolean onlyIfNotSeen) {
-
-        if (them.isEmpty()) {
-            //System.err.println(this + " without any peers to broadcast");
-            return 0;
-        } else {
-
-            if (onlyIfNotSeen && seen(o, pri))
-                return 0;
-
-            byte[] bytes = o.array();
-
-            final int[] count = {0};
-            int max = (int) Math.ceil(pri * them.size());
-            them.sample((to) -> {
-                if (!o.originEquals(to.addrBytes)) {
-                    outBytes(bytes, to.addr);
-                    return (count[0]++) < max ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
-                } else {
-                    return Bag.BagCursorAction.Next;
-                }
-            });
-            return count[0];
-        }
-    }
-
-    public boolean seen(Msg o, float pri) {
-        RawPLink p = new RawPLink(o, pri);
-        return seen.put(p) != p; //what about if it returns null
-    }
-
-    public void say(String msg, int ttl) {
-        say(msg.getBytes(UTF8), ttl);
-    }
-
-    public void say(byte[] msg, int ttl) {
-        say(msg, ttl, false);
-    }
-
-    public int say(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return say(new Msg(TELL, (byte) ttl, id, null, msg), 1f, onlyIfNotSeen);
-    }
-
-    /**
-     * send to a specific known recipient
-     */
-    public void send(Msg o, InetSocketAddress to) {
-//        InetSocketAddress a = o.origin();
-//        if (a != null && a.equals(to))
-//            return;
-        outBytes(o.array(), to);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + '(' + BinTxt.toString(id) + ')';
-    }
-
-    @Override
-    protected void in(DatagramPacket p, byte[] data) {
-        Msg m = Msg.get(data);
-        if (m == null)
-            return;
-
-        float pri = 1;
-        boolean seen = seen(m, pri);
-        if (seen)
-            return;
-
-        byte cmd = m.cmd();
-        if (m.port() == 0) {
-            //rewrite origin with the actual packet origin
-            m = m.clone(cmd, bytes(new InetSocketAddress(p.getAddress(), p.getPort())));
-        }
-
-        boolean continues = m.live();
-
-        long now = System.currentTimeMillis();
-
-        @Nullable UDProfile connected = them.get(p.getSocketAddress());
-
-        switch (cmd) {
-            case PONG:
-                connected = recvPong(p, m, connected, now);
-                return;
-                //continues = false;
-                //break;
-        }
-
-        if (m.id() == id) {
-            return;
-        }
-
-        InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
-
-        switch (cmd) {
-            case PING:
-                sendPong(remote, m); //continue below
-                break;
-            case WHO:
-                m.dataAddresses(this::ping);
-                break;
-            case TELL:
-                //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
-                receive(m);
-                break;
-            default:
-                return;
-        }
-
-
-        if (connected == null) {
-            if (them.size() < them.capacity()) {
-                //ping them to consider adding as peer
-                ping(remote);
-            }
-        } else {
-            connected.lastMessage = now;
-        }
-
-
-        //direct bounce:
-            //if (continues) {
-            //    if (!seen)
-            //        send(m, pri, false /* did a test locally already */);
-            //}
-    }
-
-    protected void receive(Msg m) {
-
-    }
-
-
-    public long latencyAvg() {
-        RecycledSummaryStatistics r = new RecycledSummaryStatistics();
-        them.forEach(x -> r.accept(x.latency));
-        return Math.round(r.getMean());
-    }
-
-    public String summary() {
-        return in + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ")";
-    }
-
-    public @Nullable UDProfile recvPong(DatagramPacket p, Msg m, @Nullable UDProfile connected, long now) {
-
-        long latency = pingTime(m, now); //TODO should be Long
-        if (connected != null) {
-            connected.onPing(latency);
-        } else {
-            if (id == m.id())
-                connected = them.put(new UDProfile(-1, (InetSocketAddress) p.getSocketAddress(), latency));
-        }
-        return connected;
-    }
-
-    private long pingTime(Msg m, long now) {
-        long sent = m.dataLong(); //TODO dont store the sent time in the message where it can be spoofed. instead store a pending ping table that a pong will lookup by the iniating ping's message hash
-        return now - sent;
-    }
-
-    /**
-     * ping same host, different port
-     */
-    public void ping(int port) {
-        ping(new InetSocketAddress(port));
-    }
-
-    public void ping(String host, int port) {
-        ping(new InetSocketAddress(host, port));
-    }
-
-    public void ping(@Nullable InetSocketAddress to) {
-        send(new Msg(PING, DEFAULT_PING_TTL, id, null, System.currentTimeMillis()), to);
-    }
-
-
-    protected void sendPong(InetSocketAddress from, Msg ping) {
-        Msg p = ping.clone(PONG,null);
-
-        //logger.debug("({} =/> {})", p, from);
-
-        send(p, from);
-    }
 
 }

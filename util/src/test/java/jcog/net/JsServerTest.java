@@ -2,6 +2,7 @@ package jcog.net;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.net.js.JsUDPServer;
 import org.eclipse.collections.impl.factory.Maps;
 import org.junit.Test;
 

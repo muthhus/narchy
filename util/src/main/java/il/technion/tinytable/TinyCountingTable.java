@@ -7,6 +7,7 @@ import il.technion.tinytable.hash.RankIndexing;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.list.primitive.LongList;
 
+import java.io.Serializable;
 import java.util.function.Function;
 
 /**
@@ -19,7 +20,7 @@ import java.util.function.Function;
  *
  * @author gilga
  */
-public class TinyCountingTable extends TinyTable {
+public class TinyCountingTable extends TinyTable implements Serializable {
 
     public TinyCountingTable(int itemsize, int bucketcapacity, int nrBuckets) {
         super(itemsize, bucketcapacity, nrBuckets);

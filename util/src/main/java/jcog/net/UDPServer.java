@@ -16,10 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
-/**
- * javascript UDP context
- */
-public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implements RemovalListener<InetSocketAddress,UDPServer.Session<S>> {
+
+@Deprecated public abstract class UDPServer<S extends Consumer<byte[]>> extends UDP implements RemovalListener<InetSocketAddress,UDPServer.Session<S>> {
 
     final static int MAX_SESSIONS = 32;
 

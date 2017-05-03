@@ -82,6 +82,12 @@
             <version>1.14</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.msgpack/jackson-dataformat-msgpack -->
+        <dependency>
+            <groupId>org.msgpack</groupId>
+            <artifactId>jackson-dataformat-msgpack</artifactId>
+            <version>0.8.12</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>

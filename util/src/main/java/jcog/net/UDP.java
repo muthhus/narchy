@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 /**
- * Created by me on 2/15/17.
+ * generic UDP server & utilities
  */
 public class UDP  {
 

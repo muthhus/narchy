@@ -1,16 +1,12 @@
 package jcog.bag;
 
-import com.google.common.base.Joiner;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
-import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,7 +20,6 @@ import java.util.function.DoubleSupplier;
 import static jcog.Texts.n4;
 import static jcog.pri.PriMerge.max;
 import static jcog.pri.PriMerge.plus;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author me

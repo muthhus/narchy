@@ -14,6 +14,8 @@
  */
 package jcog;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -32,6 +34,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -1540,4 +1543,21 @@ public enum Util {
         return 1.0f - ((1.0f - a) * (1.0f - b) * (1.0f - c));
     }
 
+
+    public final static ObjectMapper msgPackMapper =
+            new ObjectMapper(new MessagePackFactory());//.enableDefaultTyping();
+
+    /** msgpack serialization */
+    public static byte[] toBytes(Object x) throws JsonProcessingException {
+        return msgPackMapper./*writerFor(c).*/writeValueAsBytes(x);
+    }
+
+//    public static byte[] pack(Object x, Class c) throws JsonProcessingException {
+//        return msgPackMapper./*writerFor(c).*/writeValueAsBytes(x);
+//    }
+
+    /** msgpack deserialization */
+    public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException {
+        return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
+    }
 }

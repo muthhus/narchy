@@ -7,7 +7,6 @@ import javax.script.CompiledScript;
 import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngineManager;
-import java.io.FileReader;
 import java.io.InputStreamReader;
 
 /**

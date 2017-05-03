@@ -8,27 +8,34 @@ import il.technion.tinytable.hash.GreenHasher;
 import il.technion.tinytable.hash.RankIndexing;
 import org.eclipse.collections.api.list.primitive.IntList;
 
+import java.io.Serializable;
 import java.util.function.Function;
 
-public class TinyTable extends BitwiseArray {
+public class TinyTable extends BitwiseArray implements Serializable {
 
-    // used as an object pool for the rank indexing technique. In order to prevent dynamic memory allocation.
-    private final byte[] offsets;
-    private final byte[] chain;
-    // base index array.
-    public long I0[];
-    // IStar array.
-    public long[] IStar;
-    // anchor distance array.
-    public short[] A;
+    /** used as an object pool for the rank indexing technique. In order to prevent dynamic memory allocation. */
+    public final byte[] offsets;
+    public final byte[] chain;
+
+    /** base index array. */
+    public final long[] I0;
+    /** IStar array. */
+    public final long[] IStar;
+
+    /** anchor distance array. */
+    public final short[] A;
+
+    private static final int maxAdditionalSize = 0;
+
+
     // used for debug - counts how many items in the table.
     //protected int nrItems;
 
-    GreenHasher hash;
+    final transient GreenHasher hash;
 
     public TinyTable(int itemsize, int bucketcapacity, int nrBuckets) {
         super(bucketcapacity * nrBuckets, itemsize, bucketcapacity);
-        this.maxAdditionalSize = 0;
+        //this.maxAdditionalSize = 0;
         //this.nrItems = 0;
         I0 = new long[nrBuckets];
         IStar = new long[nrBuckets];

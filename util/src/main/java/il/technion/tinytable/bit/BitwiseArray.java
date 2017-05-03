@@ -1,12 +1,13 @@
 package il.technion.tinytable.bit;
 
 
-public class BitwiseArray extends AuxilaryBitSet {
+import java.io.Serializable;
+
+public class BitwiseArray extends AuxilaryBitSet implements Serializable {
 
     public final int bucketCapacity;
-    protected int itemSize;
-    protected int bucketBitSize;
-    protected int maxAdditionalSize = 15;
+    public final int itemSize;
+    public final int bucketBitSize;
 
     /**
      * Represent an array with bit elements. Implemented over the AuxilaryBitSet, its job is to calculate the appropriate bit offsets in order

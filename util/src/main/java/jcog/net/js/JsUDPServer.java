@@ -1,5 +1,7 @@
-package jcog.net;
+package jcog.net.js;
 
+import jcog.net.UDP;
+import jcog.net.UDPServer;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
