@@ -92,7 +92,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 //        }
 
     @Override
-    protected void receive(UDPeer.UDProfile connected, Msg m) {
+    protected void onBelief(UDPeer.UDProfile connected, Msg m) {
 
         Task x = IO.taskFromBytes(m.data(), nar.concepts);
         if (x!=null) {

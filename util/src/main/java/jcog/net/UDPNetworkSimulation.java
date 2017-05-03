@@ -77,7 +77,7 @@ public abstract class UDPNetworkSimulation {
         }
 
         @Override
-        protected void receive(@Nullable UDPeer.UDProfile connected, @NotNull UDPeer.Msg m) {
+        protected void onBelief(@Nullable UDPeer.UDProfile connected, @NotNull UDPeer.Msg m) {
             System.out.println(me + " receive: " + m);
         }
     }

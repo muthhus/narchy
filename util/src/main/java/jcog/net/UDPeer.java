@@ -43,7 +43,7 @@ public class UDPeer extends UDP {
         System.setProperty("java.net.preferIPv6Addresses", "true");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(UDPeer.class);
+    private final Logger logger;
 
 
     public final HashMapTagSet can = new HashMapTagSet("C");
@@ -88,6 +88,8 @@ public class UDPeer extends UDP {
         int me;
         while ((me = ThreadLocalRandom.current().nextInt()) == UNKNOWN_ID) ;
         this.me = me;
+
+        this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + "." + me);
 
         them = new HijackBag<Integer, UDProfile>(4) {
 
@@ -192,7 +194,7 @@ public class UDPeer extends UDP {
     /**
      * send to a specific known recipient
      */
-    public void send(Msg o, InetSocketAddress to) {
+    protected void send(Msg o, InetSocketAddress to) {
 //        InetSocketAddress a = o.origin();
 //        if (a != null && a.equals(to))
 //            return;
@@ -207,54 +209,48 @@ public class UDPeer extends UDP {
     @Override
     protected void in(DatagramPacket p, byte[] data) {
         Msg m = Msg.get(data);
-        if (m == null)
+        if (m == null || m.id()==me)
             return;
 
-        if (m.id() == me)
-            return;
-
-        byte cmdByte = m.cmd();
-        Command cmd = Command.get(cmdByte);
+        Command cmd = Command.get(m.cmd());
         if (cmd == null)
             return; //bad packet
 
+        InetSocketAddress msgOrigin = (InetSocketAddress) p.getSocketAddress();
+
         if (m.port() == 0) {
-            //rewrite origin with the actual packet origin
-            m = m.clone(cmdByte, bytes(new InetSocketAddress(p.getAddress(), p.getPort())));
+            //rewrite origin with the actual packet origin as seen by this host
+            byte[] msgOriginBytes = bytes(msgOrigin);
+            if (!m.originEquals(msgOriginBytes)) {
+                m = m.clone(cmd.id, msgOriginBytes);
+            }
         }
 
-
         float pri = 1;
+
         boolean seen = seen(m, pri);
         if (seen)
             return;
 
-
-
-        boolean continues = m.live();
+        boolean survives = m.live();
 
         @Nullable UDProfile connected = them.get(m.id());
 
-
         long now = System.currentTimeMillis();
-        if (cmd == PONG) {
-            connected = onPong(p, m, connected, now);
-            return;
-        }
-
-
-        InetSocketAddress remote = (InetSocketAddress) p.getSocketAddress();
 
         switch (cmd) {
+            case PONG:
+                connected = onPong(p, m, connected, now);
+                break;
             case PING:
-                sendPong(remote, m); //continue below
+                sendPong(msgOrigin, m); //continue below
                 break;
             case WHO:
                 m.dataAddresses(this::ping);
                 break;
             case BELIEVE:
                 //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
-                receive(connected, m);
+                onBelief(connected, m);
                 break;
             case ATTN:
                 if (connected != null) {
@@ -272,20 +268,19 @@ public class UDPeer extends UDP {
         if (connected == null) {
             if (them.size() < them.capacity()) {
                 //ping them to consider adding as peer
-                ping(remote);
+                ping(msgOrigin);
             }
         } else {
             connected.lastMessage = now;
         }
 
 
-        if (continues) {
-            //if (!seen)
+        if (survives) {
             say(m, pri, false /* did a test locally already */);
         }
     }
 
-    protected void receive(@Nullable UDProfile connected, @NotNull Msg m) {
+    protected void onBelief(@Nullable UDProfile connected, @NotNull Msg m) {
 
     }
 
@@ -656,7 +651,7 @@ public class UDPeer extends UDP {
     /**
      * profile of another peer
      */
-    public static class UDProfile {
+    public class UDProfile {
         public final InetSocketAddress addr;
 
         final static int PING_WINDOW = 8;
@@ -710,7 +705,7 @@ public class UDPeer extends UDP {
 
         @Override
         public String toString() {
-            return "UDProfile{" +
+            return id + "{" +
                     "addr=" + addr +
                     ", ping=" + latency +
                     ", can=" + can +
@@ -724,7 +719,9 @@ public class UDPeer extends UDP {
                     can = h; break;
                 case "N":
                     need = h; break;
+                default: return;
             }
+            logger.info("{} attn {}", this.id, h);
         }
 
     }
