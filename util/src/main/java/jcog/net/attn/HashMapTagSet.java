@@ -2,13 +2,14 @@ package jcog.net.attn;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jcog.Util;
-import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static jcog.pri.Priority.EPSILON_DEFAULT;
 
 /**
  * Created by me on 5/2/17.
@@ -48,7 +49,8 @@ public class HashMapTagSet implements TagSet, Serializable {
     }
 
     @NotNull
-    @Override public String id() {
+    @Override
+    public String id() {
         return id;
     }
 
@@ -73,12 +75,40 @@ public class HashMapTagSet implements TagSet, Serializable {
     @Override
     public boolean pri(String tag, float pri) {
         pri = Util.unitize(pri);
-        if (Util.equals(pri, 0f, PLink.EPSILON_DEFAULT))
-            return data.remove(tag)!=null;
+        if (Util.equals(pri, 0f, EPSILON_DEFAULT))
+            return data.remove(tag) != null;
         else {
             Float existing = data.put(tag, pri);
-            return existing == null || !Util.equals(existing, PLink.EPSILON_DEFAULT);
+            return existing == null || !Util.equals(existing, EPSILON_DEFAULT);
         }
+    }
+
+    public boolean add(String tag, float pri) {
+        if (pri <= EPSILON_DEFAULT)
+            return false;
+
+        final boolean[] mod = {true};
+        data.merge(tag, pri, (existing, added) -> {
+            float next = Util.unitize(existing + added );
+            mod[0] = !Util.equals(existing,next, EPSILON_DEFAULT);
+            return next;
+        });
+
+        return mod[0];
+    }
+
+    /**
+     * mix another tagset in
+     */
+    public boolean add(HashMapTagSet tag, float pri) {
+        float p = Util.unitize(pri);
+
+        final boolean[] modified = {false};
+        tag.data.forEach((k, v) -> {
+            modified[0] |= add(k, v * p);
+        });
+
+        return modified[0];
     }
 
     @Override

@@ -32,8 +32,8 @@ public abstract class UDPNetworkSimulation {
 
             for (int i = 0; i < size; i++) {
                 peers[i].ping(peers[ (i + 1) % size ].port());
-                peers[i].ping(peers[ (i + 2) % size ].port());
-                peers[i].ping(peers[ (i + 3) % size ].port());
+                //peers[i].ping(peers[ (i + 2) % size ].port());
+                //peers[i].ping(peers[ (i + 3) % size ].port());
             }
 
         ///}

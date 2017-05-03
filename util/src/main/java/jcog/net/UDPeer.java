@@ -3,10 +3,12 @@ package jcog.net;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
+import il.technion.tinytable.TinyCountingTable;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.byt.DynByteSeq;
+import jcog.data.FloatParam;
 import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.net.attn.HashMapTagSet;
@@ -23,6 +25,7 @@ import java.net.*;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static jcog.net.UDPeer.Command.*;
@@ -38,6 +41,8 @@ import static jcog.net.UDPeer.Command.*;
  * https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/net/MessageQueue.java
  */
 public class UDPeer extends UDP {
+
+
 
     static {
         System.setProperty("java.net.preferIPv6Addresses", "true");
@@ -57,8 +62,10 @@ public class UDPeer extends UDP {
     public final int me;
     static final int UNKNOWN_ID = Integer.MIN_VALUE;
 
+    private static final FloatParam SHARE_PEER_NEEDS = new FloatParam(0.5f);
 
     private static final byte DEFAULT_PING_TTL = 2;
+    private static final byte DEFAULT_ATTN_TTL = DEFAULT_PING_TTL;
 
     /**
      * max # of active links
@@ -71,6 +78,10 @@ public class UDPeer extends UDP {
      */
     final static int SEEN_CAPACITY = 4096;
     private final Random rng;
+
+    private AtomicBoolean
+            needChanged = new AtomicBoolean(false),
+            canChanged = new AtomicBoolean(false);
 
 
     public UDPeer(int port) throws SocketException {
@@ -140,7 +151,7 @@ public class UDPeer extends UDP {
 
     /**
      * broadcast
-     *
+     * TODO handle oversized message
      * @return how many sent
      */
     public int say(Msg o, float pri, boolean onlyIfNotSeen) {
@@ -173,8 +184,7 @@ public class UDPeer extends UDP {
     public boolean seen(Msg o, float pri) {
         RawPLink p = new RawPLink(o, pri);
 
-        //TODO throttle:
-        seen.commit();
+
 
         return seen.put(p) != p; //what about if it returns null
     }
@@ -199,6 +209,29 @@ public class UDPeer extends UDP {
 //        if (a != null && a.equals(to))
 //            return;
         outBytes(o.array(), to);
+    }
+
+    @Override
+    protected void update() {
+
+        seen.commit();
+
+        boolean updateNeed, updateCan;
+        if (needChanged.compareAndSet(true, false)) {
+            updateNeed = true;
+            say(need);
+        }
+
+        if (canChanged.compareAndSet(true, false)) {
+            updateCan = true;
+            say(can);
+        }
+
+    }
+
+    protected void say(HashMapTagSet set) {
+        say(new Msg(ATTN.id, DEFAULT_ATTN_TTL, me, null,
+                set.toBytes()), 1f, false);
     }
 
     @Override
@@ -234,13 +267,13 @@ public class UDPeer extends UDP {
 
         boolean survives = m.live();
 
-        @Nullable UDProfile connected = them.get(m.id());
+        @Nullable UDProfile you = them.get(m.id());
 
         long now = System.currentTimeMillis();
 
         switch (cmd) {
             case PONG:
-                connected = onPong(p, m, connected, now);
+                you = onPong(p, m, you, now);
                 break;
             case PING:
                 sendPong(msgOrigin, m); //continue below
@@ -250,14 +283,27 @@ public class UDPeer extends UDP {
                 break;
             case BELIEVE:
                 //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
-                onBelief(connected, m);
+                onBelief(you, m);
                 break;
             case ATTN:
-                if (connected != null) {
-                    //update profile
+                if (you != null) {
                     HashMapTagSet h = HashMapTagSet.fromBytes(m.data());
-                    if (h != null)
-                        connected.update(h);
+                    if (h != null) {
+
+                        switch (h.id()) {
+                            case "C":
+                                you.can = h;
+                                //check intersection of our needs and their cans to form a query
+                                break;
+                            case "N":
+                                you.need = h;
+                                need(h, SHARE_PEER_NEEDS.floatValue());
+                                break;
+                            default:
+                                return;
+                        }
+                        logger.info("{} attn {}", you.id, h);
+                    }
                 }
                 break;
             default:
@@ -265,13 +311,13 @@ public class UDPeer extends UDP {
         }
 
 
-        if (connected == null) {
+        if (you == null) {
             if (them.size() < them.capacity()) {
                 //ping them to consider adding as peer
                 ping(msgOrigin);
             }
         } else {
-            connected.lastMessage = now;
+            you.lastMessage = now;
         }
 
 
@@ -341,21 +387,21 @@ public class UDPeer extends UDP {
         send(p, from);
     }
 
-    private void tag(String tag, float pri, HashMapTagSet which) {
-        if (which.pri(tag, pri)) {
-            //TODO handle oversized message
-            //TODO throttle at below a max frequency
-            say(new Msg(ATTN.id, DEFAULT_PING_TTL, me, null,
-                    which.toBytes()), 1f, false);
-        }
-    }
+
 
     public void can(String tag, float pri) {
-        tag(tag, pri, can);
+        if (can.add(tag, pri))
+            canChanged.set(true);
     }
 
     public void need(String tag, float pri) {
-        tag(tag, pri, need);
+        if (need.add(tag, pri))
+            needChanged.set(true);
+    }
+
+    public void need(HashMapTagSet tag, float pri) {
+        if (need.add(tag, pri))
+            needChanged.set(true);
     }
 
     public enum Command {
@@ -713,16 +759,6 @@ public class UDPeer extends UDP {
                     '}';
         }
 
-        public void update(HashMapTagSet h) {
-            switch (h.id()) {
-                case "C":
-                    can = h; break;
-                case "N":
-                    need = h; break;
-                default: return;
-            }
-            logger.info("{} attn {}", this.id, h);
-        }
 
     }
 

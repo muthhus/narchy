@@ -38,6 +38,7 @@ public class UDP  {
 
     private final int port;
 
+    private int updatePeriodMS = 250;
 
     public UDP(String host, int port) throws SocketException, UnknownHostException {
         this(InetAddress.getByName(host), port);
@@ -84,15 +85,35 @@ public class UDP  {
 
         onStart();
 
+        try {
+            in.setSoTimeout(updatePeriodMS);
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+
+        DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
+
         while (running) {
             try {
-                DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
-                in.receive(p);
-                in(p, Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()));
+
+                try {
+                    in.receive(p);
+                    in(p, Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()));
+                } catch (SocketTimeoutException e) {
+                    //this is expected
+                }
+
+                update();
+
             } catch (Exception e) {
                 logger.error("{}", e);
             }
         }
+    }
+
+    /** implementation's synchronous updates */
+    protected void update() {
+
     }
 
     protected void onStart() {
