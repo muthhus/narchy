@@ -21,28 +21,53 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
+    public static void main(String[] args) throws Narsese.NarseseException {
+        Default n = NARBuilder.newMultiThreadNAR(
+                4,
+                new RealTime.DSHalf(true)
+                        .durFPS(10f), true);
+
+        FZero a = new FZero(n);
+        a.runRT(10f);
+
+
+        NAgentX.chart(a);
+
+    }
+
     public FZero(NAR nar) throws Narsese.NarseseException {
         super("fz", nar);
 
-        this.fz =  new FZeroGame();
+        this.fz = new FZeroGame();
 
-        senseCamera("fz", ()->fz.image, 32, 24, (v) -> t(v, alpha()))
+        senseCamera("fz", () -> fz.image, 32, 24, (v) -> t(v, alpha()))
                 .setResolution(0.01f);
 
-        actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
-        actionTriState($.inh(Atomic.the("rot"), id ), (dh) -> {
-            switch (dh) {
-                case +1: fz.left = false; fz.right = true; break;
-                case 0: fz.left = fz.right = false; break;
-                case -1: fz.left = true; fz.right = false; break;
-            }
+
+        actionBipolar($.inh(Atomic.the("fwd"), id), (t) -> {
+            fz.vehicleMetrics[0][6] += t * 1f;
+            return true;
+        });
+        actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
+            fz.playerAngle += r * 0.1f;
+            return true;
         });
 
+        //keyboard-ish controls:
+//actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
+//        actionTriState($.inh(Atomic.the("rot"), id ), (dh) -> {
+//            switch (dh) {
+//                case +1: fz.left = false; fz.right = true; break;
+//                case 0: fz.left = fz.right = false; break;
+//                case -1: fz.left = true; fz.right = false; break;
+//            }
+//        });
+
         senseNumberDifference($.inh(Atomic.the("joy"), id), happy);
-        SensorConcept sensorConcept1 = senseNumberDifference($.inh(Atomic.the("angVel"), id), ()->(float)fz.playerAngle);
-        SensorConcept sensorConcept = senseNumberDifference($.inh(Atomic.the("accel"), id), ()->(float)fz.vehicleMetrics[0][6]);
+        SensorConcept sensorConcept1 = senseNumberDifference($.inh(Atomic.the("angVel"), id), () -> (float) fz.playerAngle);
+        SensorConcept sensorConcept = senseNumberDifference($.inh(Atomic.the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]);
         senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() ->
-            (float)(MathUtils.normalizeAngle(fz.playerAngle%(2*3.14f), 0 )/Math.PI)
+                (float) (MathUtils.normalizeAngle(fz.playerAngle % (2 * 3.14f), 0) / Math.PI)
         ));
 
         //nar.mix.stream("Derive").setValue(1);
@@ -129,7 +154,6 @@ public class FZero extends NAgentX {
 //        }
 
 
-
 //        action( new BeliefActionConcept($.inh($.the("fwd"), $.the("fz")), nar, (b) -> {
 //            if (b!=null) {
 //                float f = b.freq();
@@ -184,28 +208,15 @@ public class FZero extends NAgentX {
         lastDistance = distance;
 
         //lifesupport
-        fz.power = Math.max(FZeroGame.FULL_POWER*0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.15f));
+        fz.power = Math.max(FZeroGame.FULL_POWER * 0.5f, Math.min(FZeroGame.FULL_POWER, fz.power * 1.15f));
 
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
 
-
-        return Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float)fz.power))/FZeroGame.FULL_POWER +
-                        //((float)fz.vehicleMetrics[0][6]/100f)+
-                        deltaDistance), -1f, +1f);
+        return Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
+                //((float)fz.vehicleMetrics[0][6]/100f)+
+                deltaDistance), -1f, +1f);
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(
-                4,
-                new RealTime.DSHalf(true)
-                        .durFPS(10f), true);
 
-        FZero a = new FZero(n);
-        a.runRT(10f);
-
-
-        NAgentX.chart(a);
-
-    }
 }

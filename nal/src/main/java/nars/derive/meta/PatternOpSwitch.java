@@ -28,7 +28,7 @@ public final class PatternOpSwitch extends Atom /* TODO represent as some Generi
     public boolean test(@NotNull Derivation m) {
         BoolPred p = proc[m.subOp(subterm)];
         if (p!=null) {
-            p.test(m);
+            return p.test(m);
         }
         return true;
     }

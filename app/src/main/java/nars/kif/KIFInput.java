@@ -436,7 +436,7 @@ public class KIFInput implements Runnable {
                    miniDeriver.test(new Derivation(
                            e,
                            budgeting,
-                           Param.UnificationStackMax, 0
+                           Param.UnificationStackMax
                    ) {
                        @Override
                        public void derive(Task x) {

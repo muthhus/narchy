@@ -216,7 +216,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
             public MyDerivation(DerivationBudgeting b, NAR nar) {
-                super(nar, b, Param.UnificationStackMax, 0);
+                super(nar, b, Param.UnificationStackMax);
             }
 
             @Override

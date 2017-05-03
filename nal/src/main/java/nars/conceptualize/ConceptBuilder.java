@@ -23,11 +23,8 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     void start(NAR nar);
 
 
-    ConceptBuilder Null = new NullConceptBuilder();
-
-
     /** passes through terms without creating any concept anything */
-    final class NullConceptBuilder implements ConceptBuilder {
+    ConceptBuilder Null = new ConceptBuilder() {
 
         @Override
         public Termed apply(Term term) {
@@ -54,5 +51,5 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
         }
 
-    }
+    };
 }

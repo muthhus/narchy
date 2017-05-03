@@ -74,7 +74,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = 0; j < c; j++) {
-            Y v = map.getOpaque(j);
+            Y v = map.get(j);
             if (v != null && accept.test(v)) {
                 e.accept(v);
             }
@@ -83,7 +83,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     public static <Y> void forEach(AtomicReferenceArray<Y> map, @NotNull Consumer<? super Y> e) {
         for (int c = map.length(), j = -1; ++j < c; ) {
-            Y v = map.getOpaque(j);
+            Y v = map.get(j);
             if (v != null) {
                 e.accept(v);
             }
@@ -304,7 +304,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             while (true) {
                 int best = -1;
                 for (int i = len - 1; i >= 0; i--) {
-                    int v = getOpaque(i);
+                    int v = get(i);
                     if (v == hash) {
                         continue restart; //collision
                     } else if (v == 0) {
@@ -678,7 +678,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             AtomicReferenceArray<V> a = map.get();
             int len = a.length();
             for (int i = 0; i < len; i++) {
-                V f = a.getOpaque(i);
+                V f = a.get(i);
                 if (f == null)
                     continue;
 

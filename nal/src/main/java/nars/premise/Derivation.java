@@ -28,12 +28,11 @@ import static nars.time.Tense.ETERNAL;
  */
 abstract public class Derivation extends Unify {
 
-    @NotNull
-    public final NAR nar;
-    public final float truthResolution;
-    public final float confMin;
-    public final DerivationBudgeting budgeting;
-    @NotNull public TruthPuncEvidence punct;
+    @NotNull public final NAR nar;
+    @NotNull public final DerivationBudgeting budgeting;
+    @Nullable public TruthPuncEvidence punct;
+    public float truthResolution;
+    public float confMin;
 
     /**
      * the current premise being evaluated in this context TODO make private again
@@ -98,12 +97,10 @@ abstract public class Derivation extends Unify {
 
     public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
-                      int stack, int ttl) {
-        super(nar.concepts, VAR_PATTERN, nar.random(), stack, ttl);
+                      int stack) {
+        super(nar.concepts, VAR_PATTERN, nar.random(), stack, 0);
         this.nar = nar;
         this.budgeting = b;
-        this.truthResolution = nar.truthResolution.floatValue();
-        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
@@ -114,6 +111,9 @@ abstract public class Derivation extends Unify {
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         this.versioning.setTTL(ttl);
+
+        this.truthResolution = nar.truthResolution.floatValue();
+        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
         this.punct = null;
         forEachMatch = null;

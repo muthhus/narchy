@@ -7,9 +7,6 @@ import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Terms;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.Set;
@@ -24,13 +21,6 @@ public class PremiseRuleTest {
 
 
     static final Narsese p = Narsese.the();
-
-    /**
-     * for printing complex terms as a recursive tree
-     */
-    public static void printRecursive(@NotNull Term x) {
-        Terms.printRecursive(System.out, x);
-    }
 
 
     @Test
@@ -52,7 +42,7 @@ public class PremiseRuleTest {
         assertEquals(1, p.term("<%A --> %B>").complexity());
 
         {
-            PremiseRule x = rule("A, A |- A, (Belief:Revision, Goal:Weak)");
+            PremiseRule x = PremiseRule.rule("A, A |- A, (Belief:Revision, Goal:Weak)");
             assertNotNull(x);
             //assertEquals("((A,A),(A,((Revision-->Belief),(Weak-->Desire))))", x.toString());
             // assertEquals(12, x.getVolume());
@@ -61,21 +51,21 @@ public class PremiseRuleTest {
 
         int vv = 19;
         {
-            PremiseRule x = rule("<A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)");
-            x = rule(x);
+            PremiseRule x = PremiseRule.rule("<A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)");
+            x = PremiseRule.rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
         {
-            PremiseRule x = rule("<A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)");
-            x = rule(x);
+            PremiseRule x = PremiseRule.rule("<A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)");
+            x = PremiseRule.rule(x);
             assertEquals(vv, x.volume()); //same volume as previous block
             //assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
         }
         {
-            PremiseRule x = rule(" <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Belief)");
-            x = rule(x);
+            PremiseRule x = PremiseRule.rule(" <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Belief)");
+            x = PremiseRule.rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
         }
@@ -88,23 +78,11 @@ public class PremiseRuleTest {
 //        }
 
         //and the first complete rule:
-        PremiseRule x = rule("(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)");
-        x = rule(x);
+        PremiseRule x = PremiseRule.rule("(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)");
+        x = PremiseRule.rule(x);
         //assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
         assertEquals(vv, x.volume());
 
-    }
-
-    @NotNull static PremiseRule rule(PremiseRule onlyRule) {
-        return new PremiseRuleSet(onlyRule).rules.get(0);
-    }
-
-    @NotNull static PremiseRule rule(@NotNull String onlyRule) throws Narsese.NarseseException {
-        return parse(onlyRule);
-//        PremiseRule r = (PremiseRule) p.term(onlyRule);
-//        return rule(
-//                r
-//        );
     }
 
     @Test
@@ -133,7 +111,7 @@ public class PremiseRuleTest {
 
 
 
-        Compound y = rule("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)");
+        Compound y = PremiseRule.rule("(S --> P), (--,%S) |- (P --> S), (Belief:Conversion)");
         assertTrue(y.hasAny(Op.NEG));
 
         assertNotNull(y);
@@ -141,7 +119,7 @@ public class PremiseRuleTest {
         PatternTermIndex i = new PatternTermIndex();
         y = ((PremiseRule) y).normalizeRule(i);
         assertNotNull(y);
-        printRecursive(y);
+        PremiseRule.printRecursive(y);
 
         //assertEquals("(((%1-->%2),(--,%1)),((%2-->%1),((Conversion-->Belief))))", y.toString());
         assertEquals(10, y.complexity());
@@ -151,8 +129,8 @@ public class PremiseRuleTest {
 
     @Test
     public void printTermRecursive() throws Narsese.NarseseException {
-        Compound y = rule("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)");
-        printRecursive(y);
+        Compound y = PremiseRule.rule("(S --> P), --%S |- (P --> S), (Belief:Conversion, Info:SeldomUseful)");
+        PremiseRule.printRecursive(y);
     }
 
 
@@ -181,7 +159,7 @@ public class PremiseRuleTest {
     public void testBackwardPermutations() throws Narsese.NarseseException {
 
         Set<PremiseRule> s = permuter.permute(
-                    rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
+                    PremiseRule.rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
             );
             assertNotNull(s);
             //System.out.println(Joiner.on('\n').join(s));
@@ -204,7 +182,7 @@ public class PremiseRuleTest {
     }
 
     @Test public void testSubstIfUnifies() throws Narsese.NarseseException {
-        PremiseRule r = rule("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
+        PremiseRule r = PremiseRule.rule("(Y --> L), ((Y --> S) ==> R), neq(L,S) |- substitute(((&&,(#X --> L),(#X --> S)) ==> R),Y,#X), (Belief:Induction, Goal:Induction)");
         System.out.println(r);
         System.out.println(r.source);
         Set<PremiseRule> s = permuter.permute(r);

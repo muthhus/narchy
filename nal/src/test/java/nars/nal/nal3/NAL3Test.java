@@ -257,14 +257,6 @@ public class NAL3Test extends AbstractNALTest {
         tester.mustBelieve(cycles, "bird:(swan ~ dinosaur)", 0.27f ,0.81f); //.en("Boys are strong.");
         tester.mustBelieve(cycles, "bird:(dinosaur ~ swan)", 0.07f ,0.81f); //.en("Boys are strong.");
     }
-    
-    @Test public void testNoCommonSubterm1() {
-        test()
-            .believe("a:b")
-            .believe("b:c")
-            .mustNotOutput(200, "(((a~c)~c)-->b)", BELIEF, ETERNAL);
-
-    }
 
     @Test public void testArity1_Decomposition_IntersectExt() {
         //(M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)

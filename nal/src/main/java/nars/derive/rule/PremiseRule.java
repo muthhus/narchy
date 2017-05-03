@@ -3,6 +3,7 @@ package nars.derive.rule;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.derive.meta.*;
 import nars.derive.meta.constraint.*;
@@ -13,6 +14,7 @@ import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
@@ -36,6 +38,7 @@ import java.util.function.BiConsumer;
 import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
+import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
 
 /**
@@ -89,6 +92,27 @@ public class PremiseRule extends GenericCompound {
             return Atomic.the(func.toString() + 'X');
         }
     };
+
+    /**
+     * for printing complex terms as a recursive tree
+     */
+    public static void printRecursive(@NotNull Term x) {
+        Terms.printRecursive(System.out, x);
+    }
+
+    @NotNull
+    public static PremiseRule rule(PremiseRule onlyRule) {
+        return new PremiseRuleSet(onlyRule).rules.get(0);
+    }
+
+    @NotNull
+    public static PremiseRule rule(@NotNull String onlyRule) throws Narsese.NarseseException {
+        return parse(onlyRule);
+//        PremiseRule r = (PremiseRule) p.term(onlyRule);
+//        return rule(
+//                r
+//        );
+    }
 //    @Nullable
 //    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform(true, true) {
 //        @Override

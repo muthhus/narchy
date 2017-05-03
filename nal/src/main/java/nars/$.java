@@ -20,6 +20,7 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.LambdaPred;
+import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -1127,11 +1128,11 @@ public enum $ {
     }
 
     /** note: has an internal cache by extending the MaplikeTermIndex */
-    public static final class StaticTermBuilder extends MaplikeTermIndex {
+    public static final class StaticTermBuilder extends /*Maplike*/TermIndex {
 
-        public StaticTermBuilder() {
-            super(new ConceptBuilder.NullConceptBuilder());
-        }
+//        public StaticTermBuilder() {
+//            super(new ConceptBuilder.NullConceptBuilder());
+//        }
 
 //        @Override
 //        protected Term the(ProtoCompound c) {
@@ -1139,6 +1140,12 @@ public enum $ {
 ////                System.out.println(build.summary());
 //            return super.the(c);
 //        }
+
+
+        @Override
+        public @NotNull ConceptBuilder conceptBuilder() {
+            return ConceptBuilder.Null;
+        }
 
         @Override
         public

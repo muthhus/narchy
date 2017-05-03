@@ -1,8 +1,10 @@
 package nars.derive;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.derive.meta.*;
 import nars.derive.meta.constraint.MatchConstraint;
@@ -73,9 +75,9 @@ public class TrieDeriver implements Deriver {
     }
 
 
-//    public TrieDeriver(String... rule) {
-//        this(new PremiseRuleSet(Lists.newArrayList(rule)));
-//    }
+    public static TrieDeriver get(String rule) throws Narsese.NarseseException {
+        return get(new PremiseRuleSet(PremiseRule.rule(rule)));
+    }
 
     public TrieDeriver(BoolPred... root) {
         this.pred = Fork.compile(root);
@@ -84,7 +86,12 @@ public class TrieDeriver implements Deriver {
 
     @Override
     public boolean test(Derivation d) {
-        return pred.test(d);
+        try {
+            return pred.test(d);
+        } catch (Throwable t) {
+            logger.error("{}", t);
+            return false;
+        }
     }
 
     public static TrieDeriver get(@NotNull PremiseRuleSet ruleset) {

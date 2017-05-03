@@ -71,7 +71,7 @@ public class FZeroGame extends JFrame implements Runnable {
     // 7 = vx, 8 = vy
     final int[] powerOvalY = new int[2];
     boolean onPowerBar = false;
-    boolean playing = false;
+    final boolean playing = true;
 
     final BufferedImage[] vehicleSprites = new BufferedImage[10];
     final int[] vehicleSpriteData = new int[64*32];
@@ -292,7 +292,7 @@ public class FZeroGame extends JFrame implements Runnable {
             power = FULL_POWER;
             playerAngle = hitWallCount = 0;
             imageGraphics.setFont(getFont().deriveFont(32f));
-            onPowerBar = playing = false;
+            onPowerBar = false;
           }
         } else if (vehicleMetrics[0][1] < 81984 && power > 0) {
 
@@ -326,7 +326,7 @@ public class FZeroGame extends JFrame implements Runnable {
           vehicleMetrics[0][4] = 0;
           vehicleMetrics[0][5] = 0;
           if (thrust || K[KeyEvent.VK_D]) {
-            playing = true;
+
             if (vehicleMetrics[0][6] < MAX_VEL) {
               vehicleMetrics[0][6] += 0.2;
             }

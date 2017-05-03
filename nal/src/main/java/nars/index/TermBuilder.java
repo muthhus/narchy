@@ -315,7 +315,7 @@ public abstract class TermBuilder {
                         False;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1))
+                if (et0.equals(et1) || et0.containsRecursively(et1) || et1.containsRecursively(et0))
                     return False;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
@@ -873,13 +873,13 @@ public abstract class TermBuilder {
         //factor out any common subterms iff commutive
         if (commutive(dt)) {
 
-//            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
-//                return False; //cyclic
-
-            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
-                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
-                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
                 return False; //cyclic
+
+//            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
+//                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
+//                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+//                return False; //cyclic
 
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
 
