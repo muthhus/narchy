@@ -220,12 +220,17 @@ public class UDPeer extends UDP {
         if (needChanged.compareAndSet(true, false)) {
             updateNeed = true;
             say(need);
+            onUpdateNeed();
         }
 
         if (canChanged.compareAndSet(true, false)) {
             updateCan = true;
             say(can);
         }
+
+    }
+
+    protected void onUpdateNeed() {
 
     }
 
