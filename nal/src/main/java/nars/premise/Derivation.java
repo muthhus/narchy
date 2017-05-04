@@ -11,6 +11,7 @@ import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.transform.substituteIfUnifies;
+import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -133,6 +134,14 @@ abstract public class Derivation extends Unify {
             init();
             //throw new RuntimeException("not cleared");
         }
+
+        //remove common variable entries because they will just consume memory if retained as empty
+        xy.map.entrySet().removeIf(e -> {
+            if (e.getKey() instanceof CommonVariable)
+                return true;
+            else
+                return false;
+        });
 
         punct = null;
         forEachMatch = null;

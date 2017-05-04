@@ -228,7 +228,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
         private static class MyDerivation extends Derivation {
-            final Map<Task, Task> buffer = new HashMap(512);
+            final Map<Task, Task> buffer = new LinkedHashMap();
 
             private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 

@@ -335,7 +335,17 @@ public class PremiseRuleSet {
     }
 
     protected static void add(@NotNull PremiseRule preNorm, String src, @NotNull Collection<PremiseRule> ur, @NotNull PatternTermIndex index, @NotNull Consumer<PremiseRule> each) {
-        PremiseRule pos = add(preNorm.positive(index), src, ur, index);
+
+//        Term[] pp = getPremise().terms().clone();
+//        pp = ArrayUtils.add(pp, TaskPositive.proto);
+//        Compound newPremise = (Compound) $.the(getPremise().op(), pp);
+//
+//        PremiseRule r = new PremiseRule(newPremise, getConclusion());
+//        @NotNull PremiseRule pos = normalize(r, index);
+//
+//        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
+
+        PremiseRule pos = add(preNorm, src, ur, index);
         if (pos != null)
             each.accept(pos);
 

@@ -10,10 +10,6 @@ public final class StructureExclusionConstraint extends MatchConstraint {
 
     private final int structure;
 
-//    public OpNotContainedConstraint(@NotNull Op o) {
-//        this(o.bit);
-//    }
-
     public StructureExclusionConstraint(Term target, int opVector) {
         super("StructExcl", target, $.the(Integer.toHexString(opVector)));
         this.structure = opVector;
