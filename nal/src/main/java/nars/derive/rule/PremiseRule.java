@@ -38,6 +38,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
+import static nars.Op.CONJ;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
@@ -241,16 +242,9 @@ public class PremiseRule extends GenericCompound {
         put(MatchConstraint.class, rank--);
 
 
-
-
-
-
-
 //        put(TermNotEquals.class, rank--);
 
 //        put(PatternOpNot.class, rank--);
-
-
 
 
 //        put(SubTermOp.class, 10);
@@ -336,8 +330,8 @@ public class PremiseRule extends GenericCompound {
                 $.the(beliefLabel),
                 $.the(goalLabel)
         );
-        if (puncOverride!=0)
-            args.add($.the("conc" + ((char) puncOverride) ));
+        if (puncOverride != 0)
+            args.add($.the("conc" + ((char) puncOverride)));
 
         if (!beliefProjected)
             args.add($.the("unproj"));
@@ -494,13 +488,14 @@ public class PremiseRule extends GenericCompound {
             String predicateNameStr = predicate_name.toString();
 
             Term[] args;
-            Term X, Y;
+            Term X, Y, Z;
 
             //if (predicate.getSubject() instanceof SetExt) {
             //decode precondition predicate arguments
             args = ((Compound) (predicate.sub(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
+            Z = (args.length > 2) ? args[2] : null;
             //..
 
             /*} else {
@@ -594,14 +589,17 @@ public class PremiseRule extends GenericCompound {
                             timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                                 long occ = p.task.start();
                                 occReturn[0] = occ;
-                                if (occ!=ETERNAL) {
+                                if (occ != ETERNAL) {
                                     @Nullable Term yr = p.resolve(Y).eval(p.index);
                                     if (yr == null)
                                         return null;
                                     int occShift = p.task.term().subtermTime(yr);
-                                    if (occShift!=DTERNAL)
+                                    if (occShift != DTERNAL)
                                         occReturn[0] += occShift;
                                 }
+
+                                shiftIfImmediate(p, occReturn, derived);
+
                                 return derived;
                             };
                             break;
@@ -611,7 +609,16 @@ public class PremiseRule extends GenericCompound {
                                 if (!p.task.isEternal()) {
                                     //task determines occurrence if non-eternal
                                     occ = p.task.start();
-                                    //TODO if belief occurrs in task, then there is an additional shift
+                                    if (Z != null) {
+                                        //TODO if belief occurrs in task, then there is an additional shift
+                                        @Nullable Term zr = p.resolve(Z).eval(p.index);
+                                        if (zr == null)
+                                            return null;
+                                        int relOccShift = p.beliefTerm.subtermTime(zr);
+                                        if (relOccShift != DTERNAL)
+                                            occ -= relOccShift;
+                                    }
+
                                 } else {
                                     occ = p.belief.start();
                                 }
@@ -621,9 +628,12 @@ public class PremiseRule extends GenericCompound {
                                     if (yr == null)
                                         return null;
                                     int occShift = p.beliefTerm.subtermTime(yr);
-                                    if (occShift!=DTERNAL)
-                                        occReturn[0]+= occShift;
+                                    if (occShift != DTERNAL)
+                                        occReturn[0] += occShift;
                                 }
+
+                                shiftIfImmediate(p, occReturn, derived);
+
                                 return derived;
                             };
                             break;
@@ -977,6 +987,36 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
+    public static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
+
+        if (derived.op() == CONJ && occReturn[0] != ETERNAL)
+            occReturn[1] = occReturn[0] + derived.dtRange();
+
+        if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0];
+
+        if (p.task.isGoal()) {
+            long taskStart = p.task.start();
+
+
+            //dont derive a past-tense goal (before the task)
+            if (taskStart != ETERNAL) {
+                long now = p.nar.time();
+
+                assert (occReturn[1] != ETERNAL);
+
+                //occReturn[1] = occReturn[0]; //HACK
+
+                if (taskStart > occReturn[0]) {
+
+                    long range = occReturn[1] - occReturn[0];
+
+                    occReturn[0] = taskStart;
+                    occReturn[1] = taskStart + range;
+                }
+            }
+        }
+    }
+
     public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 //        boolean prefiltered = false;
@@ -989,7 +1029,7 @@ public class PremiseRule extends GenericCompound {
 //        }
 //
 //        if (!prefiltered)
-            constraints.add(new OpExclusionConstraint(t, structure));
+        constraints.add(new OpExclusionConstraint(t, structure));
     }
 
 
@@ -1007,7 +1047,7 @@ public class PremiseRule extends GenericCompound {
 //        }
 
         //if (!prefiltered)
-            constraints.add(new StructureExclusionConstraint(t, structure));
+        constraints.add(new StructureExclusionConstraint(t, structure));
     }
 
     public void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {

@@ -87,20 +87,20 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), time(belief, C), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), time(belief, C), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), belief(positive), time(belief, C), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), time(belief, C), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), belief(positive), time(belief, C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), time(belief, C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, (C ==> A), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AbductionPN, Goal:DeductionPN)
 //    B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
 //        B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
-    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Belief:Analogy, Goal:Deduction)
-    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyPN, Goal:DeductionPN)
-    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(belief, C) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyN, Goal:DeductionN)
-    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Belief:AnalogyNN, Goal:DeductionNN)
+    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyPN, Goal:DeductionPN)
+    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyN, Goal:DeductionN)
+    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Belief:AnalogyNN, Goal:DeductionNN)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
@@ -114,8 +114,8 @@
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z,strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
-    B, (C && (--,%A)), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
+    B, (C && A), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
+    B, (C && (--,%A)), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
         //B, (C && A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
         //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
