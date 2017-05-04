@@ -38,7 +38,6 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
-import static nars.Op.CONJ;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
@@ -598,7 +597,7 @@ public class PremiseRule extends GenericCompound {
                                         occReturn[0] += occShift;
                                 }
 
-                                shiftIfImmediate(p, occReturn, derived);
+                                TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                                 return derived;
                             };
@@ -632,7 +631,7 @@ public class PremiseRule extends GenericCompound {
                                         occReturn[0] += occShift;
                                 }
 
-                                shiftIfImmediate(p, occReturn, derived);
+                                TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                                 return derived;
                             };
@@ -985,36 +984,6 @@ public class PremiseRule extends GenericCompound {
 //            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
 
         return this;
-    }
-
-    public static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
-
-        if (derived.op() == CONJ && occReturn[0] != ETERNAL)
-            occReturn[1] = occReturn[0] + derived.dtRange();
-
-        if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0];
-
-        if (p.task.isGoal()) {
-            long taskStart = p.task.start();
-
-
-            //dont derive a past-tense goal (before the task)
-            if (taskStart != ETERNAL) {
-                long now = p.nar.time();
-
-                assert (occReturn[1] != ETERNAL);
-
-                //occReturn[1] = occReturn[0]; //HACK
-
-                if (taskStart > occReturn[0]) {
-
-                    long range = occReturn[1] - occReturn[0];
-
-                    occReturn[0] = taskStart;
-                    occReturn[1] = taskStart + range;
-                }
-            }
-        }
     }
 
     public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {

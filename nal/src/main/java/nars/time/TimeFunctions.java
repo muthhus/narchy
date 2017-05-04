@@ -34,6 +34,36 @@ import static nars.time.TimeFunctions.occInterpolate;
 @FunctionalInterface
 public interface TimeFunctions {
 
+    static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
+
+        if (derived.op() == CONJ && occReturn[0] != ETERNAL)
+            occReturn[1] = occReturn[0] + derived.dtRange();
+
+        if (occReturn[1] == ETERNAL) occReturn[1] = occReturn[0];
+
+        if (p.task.isGoal()) {
+            long taskStart = p.task.start();
+
+
+            //dont derive a past-tense goal (before the task)
+            if (taskStart != ETERNAL) {
+                long now = p.nar.time();
+
+                assert (occReturn[1] != ETERNAL);
+
+                //occReturn[1] = occReturn[0]; //HACK
+
+                if (taskStart > occReturn[0]) {
+
+                    long range = occReturn[1] - occReturn[0];
+
+                    occReturn[0] = taskStart;
+                    occReturn[1] = taskStart + range;
+                }
+            }
+        }
+    }
+
     /**
      * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
      * @param p         current match context

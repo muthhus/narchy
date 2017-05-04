@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.premise.Derivation;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -112,7 +113,7 @@ abstract public class substituteIfUnifies extends Functor {
 //            return False; //no change
 //        }
 
-        Term z = new SubUnify(parent, op).tryMatch(parent, input, x, y);
+        Term z = new SubUnify(parent, op).tryMatch(input, x, y);
         return (z != null) ? z : failureTerm;
     }
 

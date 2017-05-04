@@ -28,14 +28,30 @@ public class Versioning extends FasterList<Versioned> {
     public final boolean revert(int when) {
         assert(size >= when);
 
-        pop(size - when );
+        //pop(size - when );
 
+        while (size > when) {
+        //for (int i = 0; i < count; i++) {
+            Versioned versioned = removeLast();
+            if (versioned == null) {
+                throw new NullPointerException();
+            }
+
+            //if (!versioned.isEmpty()) { //HACK wtf would it be empty
+                Object removed = versioned.removeLast();
+                if (removed == null) {
+                    throw new NullPointerException();
+                }
+            //}
+            //assert(removed!=null);
+            //TODO removeLastFast where we dont need the returned value
+        }
         return live();
     }
 
 
 
-    public final void pop(int count) {
+    @Deprecated public final void pop(int count) {
         for (int i = 0; i < count; i++) {
             Versioned versioned = removeLast();
             if (versioned == null) {
@@ -58,6 +74,9 @@ public class Versioning extends FasterList<Versioned> {
 
     @Override
     public final boolean add(@NotNull Versioned newItem) {
+//        if (newItem == null)
+//            throw new NullPointerException();
+
         Versioned[] ii = this.items;
         if (ii.length == this.size) {
             return false;

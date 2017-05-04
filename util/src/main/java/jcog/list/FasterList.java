@@ -78,6 +78,7 @@ public class FasterList<X> extends FastList<X> {
     }
 
     public X removeLast() {
+        //assert(size > 0);
         if (size == 0)
             throw new ArrayIndexOutOfBoundsException();
         X[] ii = this.items;

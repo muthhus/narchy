@@ -36,6 +36,7 @@ import java.util.function.Consumer;
  */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
+    //private static final ThreadLocal<FireConceptsDirect.MyDerivation> derivation = new ThreadLocal();
 
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
@@ -220,8 +221,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             }
         }
 
-        private final ThreadLocal<MyDerivation> derivation = ThreadLocal.withInitial(() ->
-                new MyDerivation(budgeting, nar));
 
         private static class MyDerivation extends Derivation {
             final Map<Task, Task> buffer = new LinkedHashMap();
@@ -284,11 +283,16 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         //rate.hitNano(dt);
 
         public void fire(ConceptBagFocus csrc, int count) {
-            MyDerivation d = derivation.get();
-
+            //MyDerivation d = derivation.get();
+//            if (d == null) {
+//                d = new MyDerivation(budgeting, nar);
+//                derivation.set(d);
+//            }
+            MyDerivation d = new MyDerivation(budgeting, nar);
             final int[] derivations = {0};
+            MyDerivation dd = d;
             csrc.active.sample(count, p -> {
-                derivations[0] += premiseVector(p, d);
+                derivations[0] += premiseVector(p, dd);
             });
             d.commit(derivations[0]);
         }

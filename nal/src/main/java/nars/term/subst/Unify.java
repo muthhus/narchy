@@ -363,6 +363,7 @@ public abstract class Unify implements Termutator, Subst {
                 MatchConstraint cc = constraints.get(i);
                 if (cc == null) /* why null? */
                     throw new NullPointerException();
+                    //break;
                 if (cc.invalid(next, Unify.this))
                     return false;
             }

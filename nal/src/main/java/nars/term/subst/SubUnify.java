@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import jcog.version.Versioning;
 import nars.Op;
 import nars.Param;
 import nars.index.term.TermIndex;
@@ -16,7 +17,6 @@ import java.util.Random;
 public class SubUnify extends Unify {
 
     private @Nullable Term xterm;
-    private @Nullable Derivation target;
 
     @Nullable private Term result;
 
@@ -95,15 +95,13 @@ public class SubUnify extends Unify {
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {
         this.xterm = null;
-        this.target = null;
         this.result = null;
         unify(x, y, true, true);
     }
 
     @Nullable
-    public Term tryMatch(@Nullable Derivation target, @Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
+    public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.xterm = xterm;
-        this.target = target;
         this.result = null;
         unify(x, y, true, true);
         return result;
