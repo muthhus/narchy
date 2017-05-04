@@ -29,6 +29,30 @@ public class SubUnify extends Unify {
         super(parent.index, type, parent.random, parent.versioning);
     }
 
+//    @Override
+//    public @Nullable Term resolve(@NotNull Term x) {
+//
+//        assert(target!=null);
+//
+//        Term thisResolved = super.resolve(x);
+//        if (thisResolved == null)
+//            return target.resolve(x);
+//        else
+//            return thisResolved;
+//    }
+//
+//    @Override
+//    public @Nullable Term xy(@NotNull Term x) {
+//
+//        return resolve(x);//new MapSubst(xy).transform(x, index);
+////        assert(target!=null);
+////
+////        Term thisResolved = super.xy(x);
+////        if (thisResolved == null)
+////            return target.xy(x);
+////        else
+////            return thisResolved;
+//    }
 
     /**
      * terminates after the first match
@@ -36,34 +60,37 @@ public class SubUnify extends Unify {
     @Override
     public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-        int start = target!=null ? target.now() : -1;
+        //int start = target!=null ? target.now() : -1;
 
-        boolean fail = false;
-        final Unify s = target!=null ? target : this;
+//        boolean fail = false;
         if (xterm != null) {
 
-            if (target != null) {
-                if (!target.put(this)) {
-                    fail = true;
-                }
-            }
+//            if (target != null) {
+//                if (!target.put(this)) {
+//                    fail = true;
+//                }
+//            }
 
-            if (!fail) {
-                result = s.transform(xterm, index);
-                if (result == null)
-                    fail = true;
-            }
+
+                result = transform(xterm, index);
+//                if (result == null)
+//                    fail = true;
+
         } else {
-            return false; //??
+            //return false; //??
         }
 
 
-        if (fail) {
-            s.revert(start);
-            return s.live(); //try again if ttl > 0
-        } else {
-            return false; //success, done
-        }
+//        if (fail) {
+//            //s.revert(start);
+//            //return s.live(); //try again if ttl > 0
+//        } else {
+//            //return false; //success, done
+//
+//            return true; //HACK done after once, but TODO try multiple
+//        }
+
+        return false;
     }
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {

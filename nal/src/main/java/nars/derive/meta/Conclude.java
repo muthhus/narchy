@@ -16,6 +16,7 @@ import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,12 +137,12 @@ public final class Conclude extends AbstractPred<Derivation> {
                         long[] occReturn = {ETERNAL, ETERNAL};
                         float[] confScale = {1f};
 
-                        temporalized = this.time.compute(temporalized,
+                        @Nullable Compound temporalized2 = this.time.compute(temporalized,
                                 m, this, occReturn, confScale
                         );
 
                         //temporalization failure, could not determine temporal attributes. seems this can happen normally
-                        if ((temporalized == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+                        if ((temporalized2 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
                             //                 {
                             //                    //FOR DEBUGGING, re-run it
                             //                    Compound temporalized2 = this.time.compute(content,
@@ -149,9 +150,12 @@ public final class Conclude extends AbstractPred<Derivation> {
                             //                    );
                             //                }
 
-                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
-                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
-                            );
+//                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
+//                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
+//                            );
+
+                        } else {
+                            temporalized = temporalized2;
                         }
 
                         int tdt = temporalized.dt();

@@ -91,7 +91,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         @Nullable PLink<Task> tasklink = null;
         @Nullable PLink<Term> termlink = null;
         while (ttl > 0) {
-            if (tasklink == null || nar.random().nextFloat() > tasklink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
+            if (tasklink == null || nar.random().nextFloat() > tasklink.priSafe(0)) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
                 ttl -= linkSampleCost;
                 if (tasklink == null)
@@ -99,7 +99,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             }
 
 
-            if (termlink == null || nar.random().nextFloat() > termlink.priSafe(0) ) { //sample a new link inversely probabalistically in proportion to priority
+            if (termlink == null || nar.random().nextFloat() > termlink.priSafe(0)) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = c.termlinks().sample();
                 ttl -= linkSampleCost;
                 if (termlink == null)
@@ -111,21 +111,23 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
 
-            ttl -= p.beliefTerm() instanceof Compound ?
-                    premiseCost : //TODO get actual amount consumed which may be less than premiseCost
-                    1;  //atomic belief term means belief was null and there was no belief to even search for
-
             if (p != null) {
+
+                ttl -= p.beliefTerm() instanceof Compound ?
+                        premiseCost : //TODO get actual amount consumed which may be less than premiseCost
+                        1;  //atomic belief term means belief was null and there was no belief to even search for
 
                 int start = ttl;
 
                 int ttlRemain = deriver.run(d, p, ttl);
 
-                assert(start >= ttlRemain);
+                assert (start >= ttlRemain);
 
                 count++;
 
                 ttl -= (start - ttlRemain);
+            } else {
+                ttl -= premiseCost; //failure of premise generation still causes cost
             }
 
         }
@@ -246,7 +248,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 if (!buffer.isEmpty()) {
                     int mPerDeriv = maxInputTasksPerDerivation.intValue();
                     int max = mPerDeriv * derivations;
-                    if (mPerDeriv==-1 || buffer.size() <= max) {
+                    if (mPerDeriv == -1 || buffer.size() <= max) {
                         nar.input(buffer.values());
                     } else {
                         nar.input(top(buffer, max));
@@ -272,7 +274,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //                while (sa.size() > max)
 //                    sa.removeLast();
             });
-            assert(sa.size() <= max);
+            assert (sa.size() <= max);
             return sa;
         }
 

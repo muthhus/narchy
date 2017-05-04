@@ -12,6 +12,7 @@ import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.*;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
+import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -40,6 +41,8 @@ import static nars.$.*;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * A rule which matches a Premise and produces a Task
@@ -498,6 +501,8 @@ public class PremiseRule extends GenericCompound {
             args = ((Compound) (predicate.sub(0))).toArray();
             X = (args.length > 0) ? args[0] : null;
             Y = (args.length > 1) ? args[1] : null;
+            //..
+
             /*} else {
                 throw new RuntimeException("invalid arguments");*/
                 /*args = null;
@@ -585,6 +590,44 @@ public class PremiseRule extends GenericCompound {
 
                 case "time":
                     switch (XString) {
+                        case "task":
+                            timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                                long occ = p.task.start();
+                                occReturn[0] = occ;
+                                if (occ!=ETERNAL) {
+                                    @Nullable Term yr = p.resolve(Y).eval(p.index);
+                                    if (yr == null)
+                                        return null;
+                                    int occShift = p.task.term().subtermTime(yr);
+                                    if (occShift!=DTERNAL)
+                                        occReturn[0] += occShift;
+                                }
+                                return derived;
+                            };
+                            break;
+                        case "belief":
+                            timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                                long occ;
+                                if (!p.task.isEternal()) {
+                                    //task determines occurrence if non-eternal
+                                    occ = p.task.start();
+                                    //TODO if belief occurrs in task, then there is an additional shift
+                                } else {
+                                    occ = p.belief.start();
+                                }
+                                if (occ != ETERNAL) {
+                                    occReturn[0] = occ;
+                                    @Nullable Term yr = p.resolve(Y).eval(p.index);
+                                    if (yr == null)
+                                        return null;
+                                    int occShift = p.beliefTerm.subtermTime(yr);
+                                    if (occShift!=DTERNAL)
+                                        occReturn[0]+= occShift;
+                                }
+                                return derived;
+                            };
+                            break;
+
 //                        case "after":
 //                            pres.add(events.after);
 //                            break;

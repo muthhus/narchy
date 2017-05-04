@@ -108,7 +108,7 @@ public abstract class Unify implements Termutator, Subst {
 
     @Nullable
     @Override
-    public final Term xy(@NotNull Term t) {
+    public Term xy(@NotNull Term t) {
         return xy.get(t);
     }
 

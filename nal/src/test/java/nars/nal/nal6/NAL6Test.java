@@ -438,14 +438,16 @@ public class NAL6Test extends AbstractNALTest {
             .mustBelieve(cycles*2, "lock:lock1", 1.00f, 0.45f) //en("lock1 is a lock");
         ;
     }
-    @Test
+
+    @Test /** TODO verify */
     public void abduction_with_variable_elimination_negated()  {
         test()
+                .log()
                 .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
                 .believe("(((--,(#1 --> lock)) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is NOT a lock with the property that when opened by something, this something is a key");
-                .mustBelieve(cycles, "lock:lock1", 0.00f, 0.45f) //en("lock1 is NOT a lock")
-                .mustNotOutput(cycles, "lock:lock1", BELIEF, 0.5f,1f,0,1f,ETERNAL)
+                .mustBelieve(cycles*2, "lock:lock1", 0.00f, 0.45f) //en("lock1 is NOT a lock")
+                .mustNotOutput(cycles*2, "lock:lock1", BELIEF, 0.5f,1f,0,1f,ETERNAL)
         ;
     }
 

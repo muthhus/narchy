@@ -3,6 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.pri.PLink;
 import nars.concept.Concept;
+import nars.derive.meta.match.EllipsisMatch;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.data.*;
@@ -59,8 +60,22 @@ public class Builtin {
 //                    x.equals(y) ? True : ((x instanceof Variable) || (y instanceof Variable) ? null :
 //                    --(x diff y) && --(y diff x) )),
 
+            Functor.f2("subterm", (Term x, Term index) -> {
+                if (x instanceof Compound && index instanceof IntTerm) {
+                    return ((Compound)x).sub(((IntTerm)index).val);
+                }
+                return x;
+            }),
+            /** subterm, but specifically inside an ellipsis. otherwise pass through */
+            Functor.f2("esubterm", (Term x, Term index) -> {
+                if (x instanceof EllipsisMatch && index instanceof IntTerm) {
+                    return ((EllipsisMatch)x).sub(((IntTerm)index).val);
+                }
+                return x;
+            }),
+
             Functor.f2Int("add", (x, y) -> x + y),
-            Functor.f2Int("sub", (x, y) -> x - y),
+            //Functor.f2Int("sub", (x, y) -> x - y),
 
 
 

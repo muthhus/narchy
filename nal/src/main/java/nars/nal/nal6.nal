@@ -87,20 +87,20 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), belief(positive), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), time(decomposeBeliefLate), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), time(belief, C), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), belief(negative), time(belief, C), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), belief(positive), time(belief, C), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), belief(negative), time(belief, C), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), belief(positive), time(decomposeBeliefLate), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), time(decomposeBeliefLate), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, (C ==> A), belief(positive), time(belief, C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), time(belief, C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AbductionPN, Goal:DeductionPN)
 //    B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
 //        B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
-    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B,strict), (Belief:Analogy, Goal:Deduction)
-    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyPN, Goal:DeductionPN)
-    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyN, Goal:DeductionN)
-    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B,strict), (Belief:AnalogyNN, Goal:DeductionNN)
+    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyPN, Goal:DeductionPN)
+    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(belief, C) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyN, Goal:DeductionN)
+    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Belief:AnalogyNN, Goal:DeductionNN)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
@@ -114,8 +114,8 @@
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z,strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
-    B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
+    B, (C && A), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
+    B, (C && (--,%A)), time(belief, C) |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
         //B, (C && A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
         //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
@@ -141,7 +141,7 @@
 
 //conditional abduction TODO this needs to be 'dt' sensitive
 
-    ((&&,M,X,A..*) ==> C), (Y ==> C), time(decomposeTask) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    ((&&,M,X,A..*) ==> C), (Y ==> C), time(task, M) |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), time(decomposeTask) |- M, (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
@@ -152,10 +152,10 @@
 //Can be derived by NAL7 rules so this won't be necessary there (Order:ForAllSame left out here)
 
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
-    ((&&,A..+) ==> C), M, time(dtTaskExact), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    //((&&,A..+) ==> C), M, time(dtTaskExact), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,B), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    //((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,B), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    //((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
     //((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqRCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 
