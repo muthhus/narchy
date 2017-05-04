@@ -19,6 +19,7 @@ import nars.premise.DerivationBudgeting;
 import nars.premise.Premise;
 import nars.premise.PremiseBuilder;
 import nars.task.DerivedTask;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,16 +106,26 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     continue;
             }
 
+            if (ttl <= premiseCost)
+                break; //not enough remaining to create premise
+
             Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
-            ttl -= premiseCost;
+
+            ttl -= p.beliefTerm() instanceof Compound ?
+                    premiseCost : //TODO get actual amount consumed which may be less than premiseCost
+                    1;  //atomic belief term means belief was null and there was no belief to even search for
 
             if (p != null) {
 
                 int start = ttl;
-                if (deriver.run(d, p, ttl))
-                    count++;
-                int consumed = (start - d.versioning.ttl);
-                ttl -= consumed;
+
+                int ttlRemain = deriver.run(d, p, ttl);
+
+                assert(start >= ttlRemain);
+
+                count++;
+
+                ttl -= (start - ttlRemain);
             }
 
         }

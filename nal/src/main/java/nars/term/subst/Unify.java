@@ -385,7 +385,7 @@ public abstract class Unify implements Termutator, Subst {
 
             Term existing = xy(m.target);
             if (existing != null) {
-                throw new RuntimeException("value already set before constrain applied");
+                throw new RuntimeException("value already set before constraint applied");
 //                if (m.invalid(existing, this))
 //                    return false;
             }

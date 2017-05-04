@@ -4,6 +4,8 @@ import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 /** versioning context that holds versioned instances */
 public class Versioning extends FasterList<Versioned> {
 
@@ -31,20 +33,20 @@ public class Versioning extends FasterList<Versioned> {
         return live();
     }
 
-    public final boolean live() {
-        return ttl > 0;
-    }
+
 
     public final void pop(int count) {
         for (int i = 0; i < count; i++) {
             Versioned versioned = removeLast();
             if (versioned == null) {
-                throw new NullPointerException();
+                throw new NullPointerException("size=" + size + " @ i=" + i + "/" + count + " " + Arrays.toString(items));
             }
 
             Object removed = versioned.removeLast();
-
-            assert(removed!=null);
+            if (removed == null) {
+                throw new NullPointerException("size=" + size + " @ i=" + i + "/" + count);
+            }
+            //assert(removed!=null);
             //TODO removeLastFast where we dont need the returned value
         }
     }
@@ -63,16 +65,26 @@ public class Versioning extends FasterList<Versioned> {
             if (!tick())
                 return false;
 
+            assert(this.size <= ii.length);
             ii[this.size++] = newItem;
             return true;
         }
     }
 
-    public boolean tick() {
-        return --ttl > 0;
+    public final boolean tick() {
+        if (ttl <= 0)
+            return false;
+        else {
+            --ttl;
+            return true;
+        }
     }
 
-    public void setTTL(int ttl) {
+    public final boolean live() {
+        return ttl > 0;
+    }
+
+    public final void setTTL(int ttl) {
         this.ttl = ttl;
     }
 }

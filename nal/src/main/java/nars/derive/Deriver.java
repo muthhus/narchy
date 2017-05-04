@@ -1,5 +1,6 @@
 package nars.derive;
 
+import nars.Param;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import nars.premise.Premise;
@@ -35,23 +36,25 @@ public interface Deriver extends Predicate<Derivation> {
         return TrieDeriver.get(PremiseRuleSet.rules(true, path));
     }
 
-    default boolean run(Derivation d, Premise p, int ttl) {
+    /** returns ttl remaining */
+    default int run(Derivation d, Premise p, int ttl) {
 
-        boolean result;
         try {
             d.restart(p, ttl);
-            result = test(d);
+            test(d);
         } catch (Throwable t) {
-            logger.error("{}", t);
-            result = false;
-        }
-        try {
-            d.end();
-        } catch (Throwable t) {
-            System.exit(1);
+            if (Param.DEBUG)
+                logger.error("{}", t);
         }
 
-        return result;
+        try {
+            return d.end();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            System.exit(1);
+            return -1;
+        }
+
     }
 
     //    @NotNull

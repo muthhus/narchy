@@ -114,7 +114,11 @@ abstract public class Derivation extends Unify {
     }
 
 
-    @NotNull public void end() {
+
+    @NotNull public int end() {
+        int ttl = versioning.ttl;
+        assert(ttl >= 0);
+
 //        if (now()!=0)
 //            throw new RuntimeException("not cleared");
 
@@ -142,7 +146,7 @@ abstract public class Derivation extends Unify {
         taskTruth = null;
         beliefTruth = beliefTruthRaw = null;
 
-
+        return ttl;
     }
 
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {

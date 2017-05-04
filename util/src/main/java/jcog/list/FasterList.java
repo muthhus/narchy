@@ -66,6 +66,12 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
+    @Override
+    public int size() {
+        assert(size >= 0);
+        return size;
+    }
+
     public void clearHard() {
         this.size = 0;
         this.items = (X[]) ZERO_SIZED_ARRAY;
@@ -96,15 +102,15 @@ public class FasterList<X> extends FastList<X> {
 
 
 
-    public final boolean addIfCapacity(X newItem) {
-        X[] ii = this.items;
-        int s;
-        if (ii.length <= (s = this.size++)) {
-            return false;
-        }
-        ii[s] = newItem;
-        return true;
-    }
+//    public final boolean addIfCapacity(X newItem) {
+//        X[] ii = this.items;
+//        int s;
+//        if (ii.length <= (s = this.size++)) {
+//            return false;
+//        }
+//        ii[s] = newItem;
+//        return true;
+//    }
 
 
     /**
@@ -276,15 +282,15 @@ public class FasterList<X> extends FastList<X> {
     }
 
 
-    public void clearFast() {
-        popTo(-1);
-    }
+//    public void clearFast() {
+//        popTo(-1);
+//    }
 
 
-    public final void clear0() {
-        this.items = (X[]) ZERO_SIZED_ARRAY;
-        this.size = 0;
-    }
+//    public final void clear0() {
+//        this.items = (X[]) ZERO_SIZED_ARRAY;
+//        this.size = 0;
+//    }
 
     /**
      * remove, but with Map.remove semantics
