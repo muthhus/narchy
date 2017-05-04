@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.*;
+import static nars.truth.TruthFunctions.w2c;
 
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
@@ -218,11 +219,11 @@ public interface Truth extends Truthed {
     }
 
 
-    @Nullable default Truth dither(float res, float confMin) {
-        float c = conf(conf(), res);
+    @Nullable default Truth dither(float res, float confMin, float eviGain) {
+        float c = conf(w2c(evi() * eviGain), res);
         if (c < confMin)
             return null;
-        return new DiscreteTruth(freq(freq(), res), c);
+        return new PreciseTruth(freq(freq(), res), c);
     }
 
     default float eternalizedEvi() {
