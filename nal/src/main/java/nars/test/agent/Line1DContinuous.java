@@ -47,8 +47,8 @@ public class Line1DContinuous extends NAgent {
         ins = new float[size*2];
         this.targetFunc = target;
 
-        yEst = size/2; //NAR estimate of Y
-        yHidden = size/2; //actual best Y used by loss function
+        yEst = size/2f; //NAR estimate of Y
+        yHidden = size/2f; //actual best Y used by loss function
 
 
         for (int i = 0; i < size; i++) {

@@ -72,7 +72,6 @@ abstract public class DynamicTruthModel {
                 boolean evi = d.e != null;
 
 
-                Truth nt;
                 if (tableDynamic /*&& subterm instanceof Compound*/) {
                     DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
                     if (ndt != null) {
@@ -88,6 +87,7 @@ abstract public class DynamicTruthModel {
                         return null;
                     }
                 } else {
+                    Truth nt;
                     if (evi) {
                         Task bt = table.match(when + dt, now, dur);
                         if (bt == null)

@@ -139,7 +139,7 @@ public class PremiseRuleSet {
         for (PremiseRule p : rules) {
             try {
                 this.rules.add(normalize(p, patterns));
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.error(" {}", e);
             }
         }
@@ -298,7 +298,7 @@ public class PremiseRuleSet {
             try {
                 PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
                 permute(preNorm, src, index, ur);
-            } catch (Exception ex) {
+            } catch (RuntimeException ex) {
                 throw new RuntimeException("Invalid TaskRule: " + src, ex);
             }
 

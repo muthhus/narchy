@@ -139,7 +139,4 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
-    protected boolean cacheable(ProtoCompound c) {
-        return false; //HACK
-    }
 }

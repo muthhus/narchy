@@ -50,7 +50,7 @@ public class LambdaQuestionTask extends ImmutableTask {
         //answer = super.onAnswered(answer, nar);
 
         boolean novel = !answers.contains(answer);
-        answers.put(new DependentBLink<Task>(answer));
+        answers.put(new DependentBLink<>(answer));
         if (novel) {
             eachAnswer.accept(this, answer);
         }

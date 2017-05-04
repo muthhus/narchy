@@ -87,7 +87,7 @@ public interface TruthOperator {
         }
 
         @NotNull @Override public final String toString() {
-            return o.toString() + "N";
+            return o.toString() + 'N';
         }
 
         @Override public boolean allowOverlap() { return o.allowOverlap(); }

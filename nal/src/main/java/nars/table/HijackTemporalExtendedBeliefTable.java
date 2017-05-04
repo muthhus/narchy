@@ -63,10 +63,10 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
 
     //TODO use a better method:
     Task matchHistory(long when) {
-        Double dwhen = Double.valueOf(when);
 
         Task c, f;
         synchronized (history) {
+            double dwhen = (double) when;
             Map.Entry<Double, Task> ceil = history.ceilingEntry(dwhen);
             Map.Entry<Double, Task> floor = history.floorEntry(dwhen);
             c = ceil != null ? ceil.getValue() : null;

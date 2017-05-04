@@ -28,7 +28,6 @@ public class MultiThreadExecutor extends Executioner  {
     private final int threads;
     private final RingBuffer<TaskEvent> ring;
     @NotNull
-    private final Executor exe;
     private final int cap;
 
     //private CPUThrottle throttle;
@@ -80,8 +79,6 @@ public class MultiThreadExecutor extends Executioner  {
     public MultiThreadExecutor(int threads, int ringSize, Executor exe) {
 
         this.threads = threads;
-
-        this.exe = exe;
 
         this.cap = ringSize;
 
@@ -189,7 +186,7 @@ public class MultiThreadExecutor extends Executioner  {
     }
 
     @Override
-    public synchronized void start(@NotNull NAR nar) {
+    public void start(@NotNull NAR nar) {
         synchronized (disruptor) {
             super.start(nar);
             disruptor.start();

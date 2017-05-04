@@ -21,8 +21,8 @@ public interface Termlike extends Termed {
     /**
      * total number of leaf terms, excluding variables which have a complexity of zero
      */
-    @Override
-    default int complexity() { return complexity(); }
+//    @Override
+//    default int complexity() { return term().complexity(); }
 
     @Override
     default int structure() { return 0; }

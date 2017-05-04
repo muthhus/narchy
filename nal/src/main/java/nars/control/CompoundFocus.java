@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CompoundFocus implements Focus {
 
-    final List<Focus> sub = new SynchronizedArrayList<Focus>(Focus.class);
+    final List<Focus> sub = new SynchronizedArrayList<>(Focus.class);
 
     public CompoundFocus(Focus... c) {
         sub.addAll(Arrays.asList(c));

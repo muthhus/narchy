@@ -66,7 +66,7 @@ public class ArrayTermVector extends TermVector {
 
     @Override
     public final Iterator<Term> iterator() {
-        return new ArrayIterator<Term>(terms);
+        return new ArrayIterator<>(terms);
     }
 
     @Override

@@ -2,7 +2,9 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
+import nars.NAR;
 import nars.Op;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -30,7 +32,18 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     /** sum by complexity if passes include filter */
     private static final ToIntFunction<Term> depIndepFilter = t ->
             t.hasAny(DepOrIndepBits | Op.NEG.bit) ? 0 : 1;
-            //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
+    private final NAR nar;
+
+    public DepIndepVarIntroduction(NAR nar) {
+        this.nar = nar;
+    }
+
+    @Override
+    protected TermIndex index() {
+        return nar.concepts;
+    }
+
+    //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
 
     @Nullable
     @Override
@@ -134,10 +147,12 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         @NotNull
         final DepIndepVarIntroduction introducer;
 
-        public VarIntro() {
+        public VarIntro(NAR nar) {
             super("varIntro");
-            this.introducer = new DepIndepVarIntroduction();
+            this.introducer = new DepIndepVarIntroduction(nar);
         }
+
+
 
         @Override
         public @NotNull Term apply(@NotNull TermContainer args) {

@@ -79,7 +79,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
     );
 
     @Override
-    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term[] u)  {
+    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u)  {
         if (u.length < 2)
             return super.the(op, dt, u);
 

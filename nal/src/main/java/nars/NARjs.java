@@ -65,7 +65,9 @@ public class NARjs {
 				if (ret != null) {
 					System.out.println(ret);
 				}
-			} catch (Exception e) {
+			} catch (ScriptException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
 				System.out.println(e.getClass().getName() + " in parsing: "
 						+ e.getMessage());
 			} finally {

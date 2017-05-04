@@ -323,7 +323,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     @Nullable
-    default Appendable toString(NAR memory, boolean showStamp) throws IOException {
+    default Appendable toString(NAR memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
@@ -698,8 +698,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         char sep = '\t'; //','
 
         a
-                .append(term().toString()).append(sep)
-                .append("\"" + punc() + "\"").append(sep)
+                .append(term().toString()).append(sep).append("\"").append(String.valueOf(punc())).append("\"").append(sep)
                 .append(truth() != null ? Texts.n2(truth().freq()) : " ").append(sep)
                 .append(truth() != null ? Texts.n2(truth().conf()) : " ").append(sep)
                 .append(!isEternal() ? Long.toString(start()) : " ").append(sep)
@@ -728,7 +727,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (b.isDeleted())
             return null;
 
-        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), (DiscreteTruth)x.truth(), created, start, end, x.stamp());
+        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
         y.setPriority(b);
         //        if (srcCopy == null) {
 //            delete();
@@ -984,9 +983,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     }
 
-    ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal = ThreadLocal.withInitial(() ->
-            new ObjectFloatHashMap<>()
-    );
+    ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
+            ThreadLocal.withInitial(ObjectFloatHashMap::new );
 
     default Activation activate(@NotNull NAR n, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());

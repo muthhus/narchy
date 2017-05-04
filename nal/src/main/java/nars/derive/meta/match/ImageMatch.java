@@ -39,8 +39,8 @@ public enum ImageMatch {
         int ydt = y.dt();
         if (dt == -1) {
             //insert the relation term
-            int yOff = ydt - yOffset; //where to expect _ in t
             t2 = new Term[l + 1];
+            int yOff = ydt - yOffset; //where to expect _ in t
             for (Term x : t) {
                 if (j == yOff)
                     t2[j++] = relationTerm;

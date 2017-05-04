@@ -20,10 +20,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         super(reprobes);
     }
 
-    @Override
-    public void onRemoved(@NotNull Task t) {
-        //t.delete();
-    }
 
     @Override
     protected Task merge(@Nullable Task existing, @NotNull Task incoming, float scaleIgnored) {

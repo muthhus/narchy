@@ -203,7 +203,7 @@ public interface NSense {
         return senseNumber(compoundOrNull($(id)), ()->(float)v.getAsDouble());
     }
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {
-        return senseNumber(compoundOrNull($(id)), v::asFloat);
+        return senseNumber(compoundOrNull($(id)), v);
     }
 
     /**

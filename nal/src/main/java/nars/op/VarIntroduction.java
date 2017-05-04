@@ -43,7 +43,7 @@ public abstract class VarIntroduction {
             //
         } else {
             //choose randomly
-            assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
+            //assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
             selections = $.newArrayList(
                     selections.get(ThreadLocalRandom.current().nextInt(sels))
             );

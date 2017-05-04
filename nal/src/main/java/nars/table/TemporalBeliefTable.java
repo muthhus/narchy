@@ -25,6 +25,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     void capacity(int c, NAR nar);
 
+    @Override
     void clear();
 
     @Override

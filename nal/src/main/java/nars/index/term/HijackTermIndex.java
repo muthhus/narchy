@@ -45,7 +45,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 100;
 
-        this.table = new PLinkHijackBag<Termed>(capacity, reprobes) {
+        this.table = new PLinkHijackBag<>(capacity, reprobes) {
             @Override
             protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing, float scale) {
 

@@ -105,8 +105,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         int taskCompl = task.complexity();
         if (belief != null) // && parentBelief.complexity() > parentComplexity)
         {
-            int beliefCompl;
-            beliefCompl = belief.complexity();
+            int beliefCompl = belief.complexity();
             parentComplexity =
                     //(int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
                     Math.max(taskCompl, beliefCompl);

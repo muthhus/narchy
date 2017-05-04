@@ -40,8 +40,8 @@ public class Revision {
         return c < minConf ?
                 null :
                 $.t(
-                    (w1 * a.freq() + w2 * b.freq()) / w,
-                    c
+                        (w1 * a.freq() + w2 * b.freq()) / w,
+                        c
                 );
     }
 
@@ -60,21 +60,21 @@ public class Revision {
         float c = w2c(w);
         return c < minConf ? null :
                 $.t(
-                  (f) / w,
-                    c
+                        (f) / w,
+                        c
                 );
     }
 
     public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
         float w1 = a.evi();
         float w2 = b.evi();
-        float w = (w1+w2) * evidenceFactor;
+        float w = (w1 + w2) * evidenceFactor;
 
         if (w2c(w) >= minConf) {
             //find the right balance of frequency
             float w1f = aFrequencyBalance * w1;
-            float w2f = (1f-aFrequencyBalance) * w2;
-            float p = w1f/(w1f+w2f);
+            float w2f = (1f - aFrequencyBalance) * w2;
+            float p = w1f / (w1f + w2f);
 
             float af = a.freq();
             float bf = b.freq();
@@ -98,16 +98,13 @@ public class Revision {
     }
 
 
-
-
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
         return revise(a, b, 1f, 0f);
     }
 
 
-
-
-    @Nullable public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
+    @Nullable
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -115,13 +112,13 @@ public class Revision {
 
         float aProp = aw / (aw + bw);
 
-        Random rng = ThreadLocalRandom.current();
+        Random rng = ThreadLocalRandom.current(); //DEPRECATED TODO pass rng as parameter up through methods
 
         MutableFloat accumulatedDifference = new MutableFloat(0);
-        Compound cc = normalizedOrNull( intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms );
+        Compound cc = normalizedOrNull(intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms);
         if (cc == null)
             return null;
-        if (cc.op()==NEG) {
+        if (cc.op() == NEG) {
             cc = compoundOrNull(cc.unneg());
             if (cc == null)
                 return null;
@@ -159,7 +156,7 @@ public class Revision {
                 Compound ca = (Compound) a;
                 Compound cb = (Compound) b;
                 if (a.op().temporal && len == 2) {
-                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
+                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                 } else {
                     //assert(ca.dt()== cb.dt());
 
@@ -167,7 +164,7 @@ public class Revision {
 
                     Term[] x = new Term[len];
                     for (int i = 0; i < len; i++) {
-                        x[i] = intermpolate(ca.sub(i), cb.sub(i), aProp, accumulatedDifference, curDepth/2f, rng, mergeOrChoose);
+                        x[i] = intermpolate(ca.sub(i), cb.sub(i), aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                     }
 
                     return $.the(
@@ -186,21 +183,12 @@ public class Revision {
     @NotNull
     private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng, boolean mergeOrChoose) {
 
-        Term a0, a1, b0, b1;
         int adt = a.dt();
-        if ((adt >= 0) || (adt == DTERNAL)) {
-            a0 = a.sub(0); a1 = a.sub(1);
-        } else {
-            a0 = a.sub(1); a1 = a.sub(0); adt = -adt;
-        }
-        int bdt = b.dt();
-        if ((bdt >= 0) || (bdt == DTERNAL)) {
-            b0 = b.sub(0); b1 = b.sub(1);
-        } else {
-            b0 = b.sub(1); b1 = b.sub(0); bdt = -bdt;
-        }
 
-        depth/=2f;
+        int bdt = b.dt();
+
+
+        depth /= 2f;
 
         int dt;
         if (adt == DTERNAL)
@@ -213,7 +201,23 @@ public class Revision {
                     ((choose(a, b, aProp, rng) == a) ? adt : bdt);
         }
 
-
+        Term a0, a1, b0, b1;
+        if ((adt >= 0) || (adt == DTERNAL)) {
+            a0 = a.sub(0);
+            a1 = a.sub(1);
+        } else {
+            a0 = a.sub(1);
+            a1 = a.sub(0);
+            adt = -adt;
+        }
+        if ((bdt >= 0) || (bdt == DTERNAL)) {
+            b0 = b.sub(0);
+            b1 = b.sub(1);
+        } else {
+            b0 = b.sub(1);
+            b1 = b.sub(0);
+            bdt = -bdt;
+        }
         return $.the(a.op(), dt,
                 intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
                 intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
@@ -223,6 +227,7 @@ public class Revision {
     public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
     }
+
     @NotNull
     public static Term[] choose(@NotNull Term[] a, Term[] b, float aBalance, @NotNull Random rng) {
         int l = a.length;
@@ -242,10 +247,10 @@ public class Revision {
         return
 
 
-                        //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
+                //!(t.op().isConjunctive() && t.hasVarDep()) &&  // t.hasVarDep());
 
-                        //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
-                        !Stamp.overlapping(newBelief, oldBelief);
+                //!newBelief.equals(oldBelief) &&  //if it overlaps it will be equal, so just do overlap test
+                !Stamp.overlapping(newBelief, oldBelief);
     }
 
 
@@ -260,12 +265,12 @@ public class Revision {
         float bw = b.evi();
 
         //randomize choice by confidence
-        return p.random.nextFloat() < tw/(tw+bw) ? t : b;
+        return p.random.nextFloat() < tw / (tw + bw) ? t : b;
 
     }
 
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
-        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(),1,rng,mergeOrChoose);
+        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(), 1, rng, mergeOrChoose);
     }
 
 //    /** get the task which occurrs nearest to the target time */

@@ -469,6 +469,8 @@ public class TestNAR {
     public TestNAR askAt(int i, String term) {
         try {
             nar.inputAt(i, term + "?");
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -480,6 +482,8 @@ public class TestNAR {
     @NotNull public TestNAR believe(@NotNull String termString) {
         try {
             nar.believe(termString);
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
@@ -490,6 +494,8 @@ public class TestNAR {
     public TestNAR believe(@NotNull String termString, float freq, float conf) {
         try {
             nar.believe(termString, freq, conf);
+        } catch (Narsese.NarseseException e) {
+            e.printStackTrace();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }

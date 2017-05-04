@@ -175,7 +175,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             //initially start with a fair budget assuming each link receives a full share
             float subActivation = ((1f - parentRetention) * scale) / (n);
             //final float[] change = {0};
-            float parentActivation = (parentRetention * scale);
 
             long inStart = in.start();
             long inEnd = in.end();
@@ -222,6 +221,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
                 //recoup losses to the parent
                 //parentActivation += change[0];
+                float parentActivation = (parentRetention * scale);
                 return parentActivation;
 
             }
@@ -239,10 +239,10 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         if (n > 0) {
             float childScale = ((1f - parentRetention) * scale) / (n);
             if (childScale >= minScale) {
-                float parentActivation = scale * parentRetention;
                 for (int i = 0; i < n; i++) {
                     link(targetSubs.sub(i).unneg(), childScale, nextDepth); //link and recurse to the concept
                 }
+                float parentActivation = scale * parentRetention;
                 return parentActivation;
             }
         }

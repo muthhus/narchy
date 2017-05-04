@@ -184,7 +184,7 @@ public class IO {
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException, UnsupportedEncodingException {
 
         switch (o) {
 
@@ -386,7 +386,7 @@ public class IO {
         }
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -401,7 +401,7 @@ public class IO {
         });
     }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -826,84 +826,84 @@ public class IO {
 //        //return $.quote(vv);
 //    }
 
-    /**
-     * Writes a string to the specified DataOutput using
-     * <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
-     * encoding in a machine-independent manner.
-     * <p>
-     * First, two bytes are written to out as if by the <code>writeShort</code>
-     * method giving the number of bytes to follow. This value is the number of
-     * bytes actually written out, not the length of the string. Following the
-     * length, each character of the string is output, in sequence, using the
-     * modified UTF-8 encoding for the character. If no exception is thrown, the
-     * counter <code>written</code> is incremented by the total number of
-     * bytes written to the output stream. This will be at least two
-     * plus the length of <code>str</code>, and at most two plus
-     * thrice the length of <code>str</code>.
-     *
-     * @param out destination to write to
-     * @param str a string to be written.
-     * @return The number of bytes written out.
-     * @throws IOException if an I/O error occurs.
-     */
-    public static void writeUTFWithoutLength(@NotNull DataOutput out, @NotNull String str) throws IOException {
-
-
-        //int c, count = 0;
-
-//        /* use charAt instead of copying String to char array */
-//        for (int i = 0; i < strlen; i++) {
+//    /**
+//     * Writes a string to the specified DataOutput using
+//     * <a href="DataInput.html#modified-utf-8">modified UTF-8</a>
+//     * encoding in a machine-independent manner.
+//     * <p>
+//     * First, two bytes are written to out as if by the <code>writeShort</code>
+//     * method giving the number of bytes to follow. This value is the number of
+//     * bytes actually written out, not the length of the string. Following the
+//     * length, each character of the string is output, in sequence, using the
+//     * modified UTF-8 encoding for the character. If no exception is thrown, the
+//     * counter <code>written</code> is incremented by the total number of
+//     * bytes written to the output stream. This will be at least two
+//     * plus the length of <code>str</code>, and at most two plus
+//     * thrice the length of <code>str</code>.
+//     *
+//     * @param out destination to write to
+//     * @param str a string to be written.
+//     * @return The number of bytes written out.
+//     * @throws IOException if an I/O error occurs.
+//     */
+//    public static void writeUTFWithoutLength(@NotNull DataOutput out, @NotNull String str) throws IOException {
+//
+//
+//        //int c, count = 0;
+//
+////        /* use charAt instead of copying String to char array */
+////        for (int i = 0; i < strlen; i++) {
+////            c = str.charAt(i);
+////            if ((c >= 0x0001) && (c <= 0x007F)) {
+////                utflen++;
+////            } else if (c > 0x07FF) {
+////                utflen += 3;
+////            } else {
+////                utflen += 2;
+////            }
+////        }
+////
+////        if (utflen > 65535)
+////            throw new UTFDataFormatException(
+////                    "encoded string too long: " + utflen + " bytes");
+//
+//        //byte[] bytearr = null;
+////        if (out instanceof DataOutputStream) {
+////            DataOutputStream dos = (DataOutputStream)out;
+////            if(dos.bytearr == null || (dos.bytearr.length < (utflen+2)))
+////                dos.bytearr = new byte[(utflen*2) + 2];
+////            bytearr = dos.bytearr;
+////        } else {
+//        //bytearr = new byte[utflen];
+////        }
+//
+//        //Length information, not written
+//        //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
+//        //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
+//
+//        int strlen = str.length();
+//        int i, c;
+//        for (i = 0; i < strlen; i++) {
 //            c = str.charAt(i);
-//            if ((c >= 0x0001) && (c <= 0x007F)) {
-//                utflen++;
-//            } else if (c > 0x07FF) {
-//                utflen += 3;
-//            } else {
-//                utflen += 2;
-//            }
+//            if (!((c >= 0x0001) && (c <= 0x007F))) break;
+//            out.writeByte((byte) c);
 //        }
 //
-//        if (utflen > 65535)
-//            throw new UTFDataFormatException(
-//                    "encoded string too long: " + utflen + " bytes");
-
-        //byte[] bytearr = null;
-//        if (out instanceof DataOutputStream) {
-//            DataOutputStream dos = (DataOutputStream)out;
-//            if(dos.bytearr == null || (dos.bytearr.length < (utflen+2)))
-//                dos.bytearr = new byte[(utflen*2) + 2];
-//            bytearr = dos.bytearr;
-//        } else {
-        //bytearr = new byte[utflen];
+//        for (; i < strlen; i++) {
+//            c = str.charAt(i);
+//            if ((c >= 0x0001) && (c <= 0x007F)) {
+//                out.writeByte((byte) c);
+//
+//            } else if (c > 0x07FF) {
+//                out.writeByte((byte) (0xE0 | ((c >> 12) & 0x0F)));
+//                out.writeByte((byte) (0x80 | ((c >> 6) & 0x3F)));
+//                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
+//            } else {
+//                out.writeByte((byte) (0xC0 | ((c >> 6) & 0x1F)));
+//                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
+//            }
 //        }
-
-        //Length information, not written
-        //bytearr[count++] = (byte) ((utflen >>> 8) & 0xFF);
-        //bytearr[count++] = (byte) ((utflen >>> 0) & 0xFF);
-
-        int strlen = str.length();
-        int i, c;
-        for (i = 0; i < strlen; i++) {
-            c = str.charAt(i);
-            if (!((c >= 0x0001) && (c <= 0x007F))) break;
-            out.writeByte((byte) c);
-        }
-
-        for (; i < strlen; i++) {
-            c = str.charAt(i);
-            if ((c >= 0x0001) && (c <= 0x007F)) {
-                out.writeByte((byte) c);
-
-            } else if (c > 0x07FF) {
-                out.writeByte((byte) (0xE0 | ((c >> 12) & 0x0F)));
-                out.writeByte((byte) (0x80 | ((c >> 6) & 0x3F)));
-                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
-            } else {
-                out.writeByte((byte) (0xC0 | ((c >> 6) & 0x1F)));
-                out.writeByte((byte) (0x80 | ((c >> 0) & 0x3F)));
-            }
-        }
-    }
+//    }
 
     /**
      * visits each subterm of a compound and stores a tuple of integers for it

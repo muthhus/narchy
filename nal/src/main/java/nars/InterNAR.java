@@ -52,7 +52,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                                 }
                             }
                         }
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         e.printStackTrace();
                     }
                 }
@@ -123,7 +123,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                         send(aa, q.origin());
                 }
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 

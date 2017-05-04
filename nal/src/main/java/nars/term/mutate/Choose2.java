@@ -21,8 +21,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
     @NotNull
     final Combinations comb;
-    @NotNull
-    private final Term[] yFree;
+    //@NotNull private final Term[] yFree;
     @NotNull
     private final Term[] x;
     @NotNull
@@ -44,8 +43,8 @@ public class Choose2 extends Termutator.AbstractTermutator {
         this.x = x.toArray(new Term[x.size()]);
 
         int yFreeSize = yFreeSet.size();
-        this.yFree = yFreeSet.toArray(new Term[yFreeSize]);
-        this.yy = new ShuffledSubterms(f.random, this.yFree);
+        Term[] yFree = yFreeSet.toArray(new Term[yFreeSize]);
+        this.yy = new ShuffledSubterms(f.random, yFree);
 
         this.comb = new Combinations(yFreeSize, 2);
     }

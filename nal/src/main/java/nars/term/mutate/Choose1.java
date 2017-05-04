@@ -16,8 +16,8 @@ import java.util.Set;
  */
 public class Choose1 extends Termutator.AbstractTermutator {
 
-    @NotNull
-    private final Set<Term> yFree;
+    //@NotNull
+    //private final Set<Term> yFree;
     private final Term x;
     private final Term xEllipsis;
     @NotNull
@@ -36,7 +36,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
             throw new RuntimeException(yFree + " offers no choice");
         }
         yy = yFree.toArray(new Term[ysize]);
-        this.yFree = yFree;
+        //this.yFree = yFree;
 
 
         this.xEllipsis = xEllipsis;

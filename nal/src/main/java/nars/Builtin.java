@@ -36,7 +36,6 @@ public class Builtin {
             new intersect(),
             new differ(),
             new union(),
-            new DepIndepVarIntroduction.VarIntro(),
 
             //Functor.f0("date", () -> quote(new Date().toString())),
 
@@ -135,7 +134,7 @@ public class Builtin {
      * generate all NAR-contextualized functors
      */
     public static void load(NAR nar) {
-        //TODO these should be command-only operators, not functors
+        nar.on(new DepIndepVarIntroduction.VarIntro(nar));
 
         /** remove an element at random and try re-creating
          * the compound. wont work in all situations.

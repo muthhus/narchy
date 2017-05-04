@@ -614,10 +614,7 @@ public abstract class TermBuilder {
 
         Set<Term> outer = new HashSet(s.size());
 
-        Iterator<ObjectBytePair<Term>> ss = s.keyValuesView().iterator();
-
-        while (ss.hasNext()) {
-            ObjectBytePair<Term> xn = ss.next();
+        for (ObjectBytePair<Term> xn : s.keyValuesView()) {
             Term x = xn.getOne();
             outer.add((xn.getTwo() < 0) ? neg(x) : x);
         }
@@ -1156,6 +1153,24 @@ public abstract class TermBuilder {
         return Atomic.the(o.toString());
 
         //return null;
+    }
+
+    public Atomic the(Number o) {
+        if (o instanceof Byte) return the(o.intValue());
+        if (o instanceof Short) return the(o.intValue());
+        if (o instanceof Integer) return the(o.intValue());
+
+        if (o instanceof Long) {
+            if (((int) o) == o.longValue())
+                return the(o.intValue()); //use the integer form since it will be IntTerm
+            else
+                return Atomic.the(Long.toString((long) o));
+        }
+
+        if ((o instanceof Float) || (o instanceof Double))
+            return the(o.floatValue());
+
+        return Atomic.the(o.toString());
     }
 
 

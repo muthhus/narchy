@@ -138,9 +138,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         Task y = generate(template, when);
 
-        Task x;
         //try {
-            x = super.match(when, now, dur, target, template, noOverlap);
+        Task x = super.match(when, now, dur, target, template, noOverlap);
 //        } catch (InvalidTaskException e) {
 //            if (Param.DEBUG_EXTRA) {
 //                System.err.println(e);
