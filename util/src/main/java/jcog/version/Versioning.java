@@ -1,13 +1,17 @@
 package jcog.version;
 
 import jcog.list.FasterList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
 /** versioning context that holds versioned instances */
-public class Versioning extends FasterList<Versioned> {
+public class Versioning extends
+        FastList<Versioned> {
+        //FasterList<Versioned> {
+
 
 
     public int ttl;
@@ -31,11 +35,14 @@ public class Versioning extends FasterList<Versioned> {
         //pop(size - when );
 
         while (size > when) {
-        //for (int i = 0; i < count; i++) {
-            Versioned versioned = removeLast();
+
+            Versioned versioned =
+                    //removeLast();
+                    remove(size-1);
+
             if (versioned == null) {
-                //throw new NullPointerException();
-                continue;
+                throw new NullPointerException();
+                //continue;
             }
 
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
@@ -52,44 +59,30 @@ public class Versioning extends FasterList<Versioned> {
 
 
 
-    @Deprecated public final void pop(int count) {
-        for (int i = 0; i < count; i++) {
-            Versioned versioned = removeLast();
-            if (versioned == null) {
-                throw new NullPointerException("size=" + size + " @ i=" + i + "/" + count + " " + Arrays.toString(items));
-            }
-
-            Object removed = versioned.removeLast();
-            if (removed == null) {
-                throw new NullPointerException("size=" + size + " @ i=" + i + "/" + count);
-            }
-            //assert(removed!=null);
-            //TODO removeLastFast where we dont need the returned value
-        }
-    }
-
     @Override
     public void clear() {
         revert(0);
     }
 
     @Override
-    public final boolean add(@NotNull Versioned newItem) {
-//        if (newItem == null)
-//            throw new NullPointerException();
-
-        Versioned[] ii = this.items;
-        if (ii.length == this.size) {
-            return false;
-        } else {
-            if (!tick())
-                return false;
-
-            assert(this.size <= ii.length);
-            ii[this.size++] = newItem;
-            return true;
-        }
+    public boolean add(@NotNull Versioned newItem) {
+        return tick() && super.add(newItem);
     }
+
+    //    @Override
+//    public final boolean add(@NotNull Versioned newItem) {
+//        Versioned[] ii = this.items;
+//        if (ii.length == this.size) {
+//            return false;
+//        } else {
+//            if (!tick())
+//                return false;
+//
+//            assert(this.size <= ii.length);
+//            ii[this.size++] = newItem;
+//            return true;
+//        }
+//    }
 
     public final boolean tick() {
         if (ttl <= 0)

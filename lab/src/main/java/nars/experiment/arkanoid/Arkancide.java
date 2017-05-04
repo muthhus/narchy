@@ -82,7 +82,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super(Atomic.the("noid"), nar);
+        super($.seti(Atomic.the("noid")), nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 
@@ -107,17 +107,17 @@ public class Arkancide extends NAgentX {
         float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
-            CameraSensor cc = senseCamera("noid", noid, visW, visH);
+            CameraSensor cc = senseCamera("[noid]", noid, visW, visH);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         }
         if (numeric) {
-            SensorConcept a = senseNumber("paddle:x", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept b = senseNumber("ball:x", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            SensorConcept c = senseNumber("ball:y", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
-            SensorConcept d = senseNumber("ball:vx", new FloatPolarNormalized(() -> noid.ball.velocityX));
-            SensorConcept e = senseNumber("ball:vy", new FloatPolarNormalized(() -> noid.ball.velocityY));
+            SensorConcept a = senseNumber("[noid]:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            SensorConcept b = senseNumber("[noid]:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            SensorConcept c = senseNumber("[noid]:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            SensorConcept d = senseNumber("[noid]:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
+            SensorConcept e = senseNumber("[noid]:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
             //experimental cheat
 //            nar.input("--(paddle-ball):x! :|:",
@@ -127,12 +127,7 @@ public class Arkancide extends NAgentX {
             SpaceGraph.window(Vis.beliefCharts(200,
                     Lists.newArrayList(new Term[]{a, b, c, d, e}),
                     nar), 600, 600);
-            SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{
-                            $.$("(paddle-ball):x"),
-                            $.$("(ball-paddle):x")
-                    }),
-                    nar), 600, 600);
+
         }
 
         /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
@@ -141,7 +136,7 @@ public class Arkancide extends NAgentX {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        Compound paddleControl = $.inh(Atomic.the("nx"), Atomic.the("paddle"));
+        Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
         actionBipolar(paddleControl, (v) -> {
 
             float dx = paddleSpeed.floatValue() * maxPaddleSpeed * v;
