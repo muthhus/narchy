@@ -23,7 +23,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 300;
+    final int cycles = 50;
 
     @Test public void revision(){
         test()
@@ -352,7 +352,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<robin --> [chirping]>,<robin --> [flying]>,<robin --> [withWings]>) ==> <robin --> bird>>"); //.en("If robin can fly, has wings, and chirps, then robin is a bird");
         tester.believe("<robin --> [flying]>"); //.en("robin can fly.");
-        tester.mustBelieve(cycles*8," <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>",1.00f,0.81f); //.en("If robin has wings and chirps then robin is a bird.");
+        tester.mustBelieve(cycles*2," <(&&,<robin --> [chirping]>,<robin --> [withWings]>) ==> <robin --> bird>>",1.00f,0.81f); //.en("If robin has wings and chirps then robin is a bird.");
 
     }
 
@@ -362,7 +362,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<(&&,<robin --> bird>,<robin --> [living]>) ==> <robin --> animal>>"); //.en("If robin is a bird and it's living, then robin is an animal");
         tester.believe("<<robin --> [flying]> ==> <robin --> bird>>"); //.en("If robin can fly, then robin is a bird");
-        tester.mustBelieve(cycles*6," <(&&,<robin --> [flying]>,<robin --> [living]>) ==> <robin --> animal>>",1.00f,0.81f); //.en("If robin is living and it can fly, then robin is an animal.");
+        tester.mustBelieve(cycles*2," <(&&,<robin --> [flying]>,<robin --> [living]>) ==> <robin --> animal>>",1.00f,0.81f); //.en("If robin is living and it can fly, then robin is an animal.");
 
     }
 

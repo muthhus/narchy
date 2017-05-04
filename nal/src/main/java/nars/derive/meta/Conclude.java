@@ -79,9 +79,9 @@ public final class Conclude extends AbstractPred<Derivation> {
     @Override
     public final boolean test(@NotNull Derivation m) {
 
-        int start = m.now();
+        //int start = m.now();
         accept(m);
-        m.revert(start);
+        //m.revert(start);
 
         return true;
     }

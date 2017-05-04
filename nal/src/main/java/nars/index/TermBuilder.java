@@ -490,7 +490,7 @@ public abstract class TermBuilder {
 
         Term[] u = conjTrueFalseFilter(uu);
 
-        int n = u.length;
+        final int n = u.length;
         if (n == 0)
             return False;
 

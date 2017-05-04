@@ -41,7 +41,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 */
 public abstract class Unify implements Termutator, Subst {
 
-    final static Logger logger = LoggerFactory.getLogger(Unify.class);
+    public final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     @NotNull
     public final Random random;
@@ -383,13 +383,6 @@ public abstract class Unify implements Termutator, Subst {
 
     public boolean addConstraint(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
-
-            Term existing = xy(m.target);
-            if (existing != null) {
-                throw new RuntimeException("value already set before constraint applied");
-//                if (m.invalid(existing, this))
-//                    return false;
-            }
             Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
             if (((ConstrainedVersionedTerm) v).constraints.set(m) == null)
                 return false;

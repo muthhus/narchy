@@ -24,6 +24,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,6 @@ import java.util.function.Consumer;
  */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
-    //private static final ThreadLocal<FireConceptsDirect.MyDerivation> derivation = new ThreadLocal();
 
     public final AtomicBoolean clear = new AtomicBoolean(false);
 
@@ -186,6 +186,11 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     public static class FireConceptsDirect extends FireConcepts {
 
+        private final ThreadLocal<FireConceptsDirect.MyDerivation> derivation =
+                ThreadLocal.withInitial(()->
+                    new MyDerivation(budgeting, nar)
+                );
+
         public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
             this(nar.focus(), deriver, budgeting, nar);
         }
@@ -223,7 +228,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
         private static class MyDerivation extends Derivation {
-            final Map<Task, Task> buffer = new LinkedHashMap();
+            final Map<Task, Task> buffer = new HashMap(512);
 
             private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
@@ -234,12 +239,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             @Override
             public void derive(Task x) {
                 buffer.merge(x, x, (prev, next) -> {
-                    if (prev != null) {
-                        PriMerge.max.merge(prev, next);
-                        return prev;
-                    } else {
-                        return next;
-                    }
+                    PriMerge.max.merge(prev, next);
+                    return prev;
                 });
             }
 
@@ -283,12 +284,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         //rate.hitNano(dt);
 
         public void fire(ConceptBagFocus csrc, int count) {
-            //MyDerivation d = derivation.get();
-//            if (d == null) {
-//                d = new MyDerivation(budgeting, nar);
-//                derivation.set(d);
-//            }
-            MyDerivation d = new MyDerivation(budgeting, nar);
+            MyDerivation d = derivation.get();
+
             final int[] derivations = {0};
             MyDerivation dd = d;
             csrc.active.sample(count, p -> {

@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
@@ -62,14 +63,16 @@ public class Builtin {
 
             Functor.f2("subterm", (Term x, Term index) -> {
                 if (x instanceof Compound && index instanceof IntTerm) {
-                    return ((Compound)x).sub(((IntTerm)index).val);
+                    return ((Compound) x).sub(((IntTerm) index).val);
                 }
                 return x;
             }),
             /** subterm, but specifically inside an ellipsis. otherwise pass through */
             Functor.f2("esubterm", (Term x, Term index) -> {
-                if (x instanceof EllipsisMatch && index instanceof IntTerm) {
-                    return ((EllipsisMatch)x).sub(((IntTerm)index).val);
+                if (!(index instanceof IntTerm))
+                    throw new RuntimeException("why not int: " + index);
+                if (x instanceof EllipsisMatch) {
+                    return ((EllipsisMatch) x).sub(((IntTerm) index).val);
                 }
                 return x;
             }),
@@ -78,13 +81,12 @@ public class Builtin {
             //Functor.f2Int("sub", (x, y) -> x - y),
 
 
-
             Functor.f1("quote", x -> x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
 
             /** slice(<compound>,<selector>)
-                  selector :-
-                      a specific integer value index, from 0 to compound size
-                      (a,b) pair of integers, a range of indices */
+            selector :-
+            a specific integer value index, from 0 to compound size
+            (a,b) pair of integers, a range of indices */
             Functor.f("slice", (args) -> {
                 if (args.size() == 2) {
                     Compound x = compoundOrNull(args.sub(0));
@@ -140,9 +142,9 @@ public class Builtin {
          * the compound. wont work in all situations.
          * TODO move the type restriction to another functor to wrap this
          */
-        nar.on(Functor.f1((Atom)$.the("dropAnyConj"), (Term t) -> {
+        nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
             Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
-            if (c == null || c.op()!=CONJ || !commutive(c.dt()))
+            if (c == null || c.op() != CONJ || !commutive(c.dt()))
                 return False;
 
             //if (c.op().statement) return False;
@@ -154,7 +156,7 @@ public class Builtin {
                 int n = nar.random().nextInt(2);
                 return Term.falseIfNull(compoundOrNull(x[n]));
             } else {
-                Term[] y = ArrayUtils.remove(x, nar.random().nextInt( size ));
+                Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
                 return Term.falseIfNull(nar.concepts.the(c.op(), c.dt(), y));
             }
         }));
@@ -186,15 +188,15 @@ public class Builtin {
 
 
         nar.on("memstat", (Command) (op, a, nn) ->
-            Command.log(nn, quote(nn.concepts.summary()))
+                Command.log(nn, quote(nn.concepts.summary()))
         );
 
         nar.on("emotion", (Command) (op, a, nn) ->
-            Command.log(nn, quote(nn.emotion.summary()))
+                Command.log(nn, quote(nn.emotion.summary()))
         );
 
         nar.on("reset", (Command) (op, args1, nn) ->
-            nn.runLater(NAR::reset)
+                nn.runLater(NAR::reset)
         );
 
         nar.on("clear", (Command) (op, args, n) -> {

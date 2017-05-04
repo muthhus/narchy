@@ -167,10 +167,11 @@ public class PremiseRule extends GenericCompound {
 
             s.addAll(match.pre);
 
-            s.addAll(match.constraints);
         }
 
         List<Term> l = sort(new FasterList(s));
+
+        l.addAll(match.constraints);
 
         //SUFFIX (order already determined for matching)
         {
@@ -229,17 +230,13 @@ public class PremiseRule extends GenericCompound {
         put(TaskPunctuation.class, rank--);
 
         put(events.class, rank--);
+        put(SubTermStructure.class, rank--);
 
         put(TaskPositive.class, rank--); //includes both positive or negative
         put(BeliefPositive.class, rank--); //includes both positive or negative
 
-        put(SubTermStructure.class, rank--);
 
         put(Solve.class, rank--);
-
-
-        put(MatchConstraint.class, rank--);
-
 
 //        put(TermNotEquals.class, rank--);
 
@@ -260,7 +257,6 @@ public class PremiseRule extends GenericCompound {
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
         if ((b == BeliefPositive.thePos) || (b == BeliefPositive.theNeg)) return BeliefPositive.class;
 
-        if (b instanceof MatchConstraint) return MatchConstraint.class;
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
@@ -275,9 +271,12 @@ public class PremiseRule extends GenericCompound {
         if (b == events.eventsOrEternals) return events.class;
         if (b == events.beliefDTSimultaneous) return events.class;
 
+        if (b instanceof SubTermStructure) return SubTermStructure.class;
+
         if (b instanceof Solve) return Solve.class;
 
-        return b.getClass();
+        throw new UnsupportedOperationException("unranked precondition: " + b);
+        //return b.getClass();
     }
 
     /**

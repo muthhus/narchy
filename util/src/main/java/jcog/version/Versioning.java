@@ -34,7 +34,8 @@ public class Versioning extends FasterList<Versioned> {
         //for (int i = 0; i < count; i++) {
             Versioned versioned = removeLast();
             if (versioned == null) {
-                throw new NullPointerException();
+                //throw new NullPointerException();
+                continue;
             }
 
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
