@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static nars.Op.VAR_PATTERN;
 import static nars.Param.MaxMatchConstraintsPerVariable;
 
 
@@ -46,7 +47,7 @@ public abstract class Unify implements Termutator, Subst {
     @NotNull
     public final Random random;
 
-    @Nullable
+    @NotNull
     public final Op type;
 
     @Nullable
@@ -69,13 +70,14 @@ public abstract class Unify implements Termutator, Subst {
         this(index, type, random, new Versioning(stackMax, ttl));
     }
 
+    /** TODO make type not @Nullable */
     protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
         super();
 
         this.index = index;
 
         this.random = random;
-        this.type = type;
+        this.type = type!=null ? type : VAR_PATTERN;
 
         this.versioning = versioning;
 
@@ -202,21 +204,11 @@ public abstract class Unify implements Termutator, Subst {
 
     public final boolean matchType(@NotNull Op oy) {
         Op t = this.type;
-        if (t == null) return oy.var; //any variable
-        else
-            return oy == t;
+        return t == VAR_PATTERN ?
+                oy.var : //any variable
+                oy == t; //the specified type
     }
 
-    /**
-     * x's and y's ops already determined inequal
-     */
-    public final boolean matchVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-        Term x2 = xy(x);
-        return (x2 != null) ?
-                unify(x2, y) :
-                putVarX(/* (Variable) */ x, y);
-
-    }
 
 
     /**
@@ -228,6 +220,8 @@ public abstract class Unify implements Termutator, Subst {
         if (y2 != null) {
             return unify(x, y2);
         } else {
+
+            //SUSPICIOUS:
 
             //return putYX(x, y);
             if (putYX((Variable) y, x)) {
@@ -254,31 +248,12 @@ public abstract class Unify implements Termutator, Subst {
         return this.termutes.add(x);
     }
 
-    public boolean putVarX(@NotNull Term /* var */ x, @NotNull Term y) {
-
-        if (putXY(x, y)) {
-            if (x instanceof CommonVariable) {
-                if (!putYX(x, y)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        return false;
-    }
-
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
         @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
-        if (putXY(x, common)) {
-            if (!putYX(y, common)) {
-                return false;
-            }
-            return true;
-        } else {
-            return false;
-        }
+        return (putXY(x, common) //&& putXY(y, common)
+                && putYX(y, common) //&& putYX(x,common)
+        );
     }
 
     @Override
@@ -287,7 +262,7 @@ public abstract class Unify implements Termutator, Subst {
     }
 
     /**
-     * returns true if the assignment was allowed, false otherwise
+     * the order here is the same as what would go in putXY, but it is inserted into yx in reverse
      */
     final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
         return yx.tryPut(y, x);
@@ -297,8 +272,13 @@ public abstract class Unify implements Termutator, Subst {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putXY(@NotNull Term xVar /* usually a Variable */, @NotNull Term y /* value */) {
-        return xy.tryPut(xVar, y);
+    public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y /* value */) {
+        Term x2 = xy(x);
+        if (x2 != null) {
+            return unify(x2, y);
+        } else {
+            return xy.tryPut(x, y);
+        }
     }
 
     public final int now() {
@@ -357,14 +337,14 @@ public abstract class Unify implements Termutator, Subst {
             return valid(next) ? super.set(next) : null;
         }
 
-        private boolean valid(@NotNull Term next) {
+        private boolean valid(@NotNull Term x) {
             int s = constraints.size();
             for (int i = 0; i < s; i++) {
                 MatchConstraint cc = constraints.get(i);
                 if (cc == null) /* why null? */
                     throw new NullPointerException();
                     //break;
-                if (cc.invalid(next, Unify.this))
+                if (cc.invalid(x, Unify.this))
                     return false;
             }
             return true;

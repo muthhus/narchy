@@ -41,9 +41,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
         ShuffledSubterms p = new ShuffledSubterms(f.random,  x);
         //p.reset(f.random); //why is this needed when its called in SHuffledSubterms constructor
 
-        while (p.hasNext()) {
-
-            p.next();
+        while (p.hasNextThenNext()) {
 
             if (p.unifyLinear(y, f)) {
                 f.mutate(chain, current);

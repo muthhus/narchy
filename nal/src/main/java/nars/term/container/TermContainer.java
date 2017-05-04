@@ -807,32 +807,37 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 case 2: {
 
                     Term x0 = sub(0);
-                    Term x1 = sub(1);
                     Term y0 = Y.sub(0);
-                    Term y1 = Y.sub(1);
 
-                    boolean match0 = subst.matchType(x0) || subst.matchType(y0);
-                    boolean match1 = subst.matchType(x1) || subst.matchType(y1);
-
-                    //match the target variable first, if exists:
-                    boolean  reverse;
-                    if (!match0 && !match1) {
-                        reverse = subst.random.nextBoolean(); //neither has any priority for matching a unification target, so choose randomly
-                    } else if (match0) {
-                        reverse = true;
+                    //decide if it can match non-target variable first,
+                    //   because it will eliminate possibilities more quickly
+                    boolean v0 = subst.matchType(x0) || subst.matchType(y0);
+                    if (!v0) {
+                        //compare subterm 0 first
+                        return subst.unify(x0, y0) && subst.unify(sub(1), Y.sub(1));
                     } else {
-                        reverse = false;
+                        Term x1 = sub(1);
+                        Term y1 = Y.sub(1);
+                        boolean v1 = subst.matchType(x1) || subst.matchType(y1);
+                        boolean dir;
+                        if (!v1) {
+                            dir = false; //compare subterm 1 first
+                        } else {
+                            dir = subst.random.nextBoolean(); //both involve unifiable variables, so choose randomly
+                        }
+
+                        if (dir) {
+                            return subst.unify(x0, y0) && subst.unify(x1, y1);
+                        } else {
+                            return subst.unify(x1, y1) && subst.unify(x0, y0);
+                        }
                     }
 
-                    if (reverse) {
-                        return subst.unify(x0, y0) && subst.unify(x1, y1);
-                    } else {
-                        return subst.unify(x1, y1) && subst.unify(x0, y0);
-                    }
                 }
 
+
                 default: {
-                    //begin at random offset to shuffle the matching order
+                    //begin at random offset to shuffle the order of the match sequence
                     int j = subst.random.nextInt() % s;
                     if (j < 0) j = -j;
                     for (int i = 0; i < s; i++) {

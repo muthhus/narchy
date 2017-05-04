@@ -43,18 +43,11 @@ public interface Deriver extends Predicate<Derivation> {
             d.restart(p, ttl);
             test(d);
         } catch (Throwable t) {
-            if (Param.DEBUG)
+            //if (Param.DEBUG)
                 logger.error("{}", t);
         }
 
-        try {
-            return d.end();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            System.exit(1);
-            return -1;
-        }
-
+        return d.versioning.ttl;
     }
 
     //    @NotNull

@@ -115,8 +115,9 @@ abstract public class Derivation extends Unify {
 
 
 
-    @NotNull public int end() {
-        int ttl = versioning.ttl;
+
+    @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
+
         assert(ttl >= 0);
 
 //        if (now()!=0)
@@ -146,10 +147,6 @@ abstract public class Derivation extends Unify {
         taskTruth = null;
         beliefTruth = beliefTruthRaw = null;
 
-        return ttl;
-    }
-
-    @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         this.versioning.setTTL(ttl);
 
