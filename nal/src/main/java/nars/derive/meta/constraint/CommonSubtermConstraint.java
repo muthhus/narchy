@@ -3,6 +3,7 @@ package nars.derive.meta.constraint;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,12 +21,16 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
     }
 
     @Override
+    protected @NotNull boolean invalid(Term x, Term y) {
+        return true;
+    }
+
+    @Override
     protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
-        return !TermContainer.commonSubtermsRecurse(x, y, true);
+        return !TermContainer.hasCommonSubtermsRecursive(x, y, true);
     }
     @Override protected boolean invalid(Term x, Compound y) {
-
-        return y.contains(x);
+        return x instanceof Variable || !y.contains(x);
     }
 
 

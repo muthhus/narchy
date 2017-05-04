@@ -7,14 +7,13 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by me on 10/16/16.
+ * note: if the two terms are equal, it is automatically invalid ("neq")
  */
 public abstract class CommonalityConstraint extends MatchConstraint {
 
     private final Term other;
 
     public CommonalityConstraint(String func, Term target, Term other) {
-
         super(func, target, other);
         this.other = other;
     }
@@ -22,44 +21,35 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @Override
     public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
-        if (y instanceof Variable)
-            return false;
+        Term x = f.resolve(other);
+        if (x == null)
+            return false; //not invalid until both are present to be compared
 
-        Term x = f.xy(other);
+        boolean result;
 
-        if (x!=null) {
-
-            boolean result;
-
-            if (x.equals(y))
-                result = true; //match
-            else if (x instanceof Variable)
-                result = false; //only if x!=y
-            else {
-
-                boolean bCompound = x instanceof Compound;
-                if (!(y instanceof Compound)) {
-                    result = bCompound && x.contains(y); //B.equals(y);
-                } else {
-
-                    Compound C = (Compound) y;
-
-                    result = bCompound ?
-                            invalid((Compound) x, C)
-                            :
-                            invalid(/*(Term)*/x, C);
-
-                }
+        if (x.equals(y)) {
+            result = true;
+        } else {
+            if (y instanceof Compound) {
+                Compound C = (Compound) y;
+                result = x instanceof Compound ?
+                        invalid((Compound) x, C)
+                        :
+                        invalid(/*(Term)*/x, C);
+            } else {
+                result = invalid((Term)x, (Term)y);
             }
-
-
-            return result;
         }
+        return result;
 
-        return false;
     }
 
+    /** equality will have already been tested prior to calling this */
+    @NotNull protected abstract boolean invalid(Term x, Term y);
+
+    /** equality will have already been tested prior to calling this */
     @NotNull protected abstract boolean invalid(Compound x, Compound y);
 
+    /** equality will have already been tested prior to calling this */
     @NotNull protected abstract boolean invalid(Term x, Compound y);
 }

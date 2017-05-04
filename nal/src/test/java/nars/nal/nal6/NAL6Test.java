@@ -334,9 +334,9 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<$x --> key> ==> open($x,{lock1})>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
-        //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.45f); //en("There is a lock that can be opened by every key.");
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> <$2 --> (/,open,$1,_)>>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
-        tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> open($1,$2)>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
+        //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> open($1,$2)>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
     }
 
 
@@ -419,7 +419,8 @@ public class NAL6Test extends AbstractNALTest {
         //tester.log();
         tester.believe("(open($1,lock1) ==> key:$1)"); //en("if something opens lock1, it is a key");
         tester.believe("open(lock,lock1)");
-        tester.mustBelieve(cycles, "((open(lock,#1) && open($2,#1)) ==> key:$2)", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
+        tester.mustBelieve(cycles, "((open(lock,#1) && open($2,#1)) ==> key:$2)",
+                1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
         //tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
     }

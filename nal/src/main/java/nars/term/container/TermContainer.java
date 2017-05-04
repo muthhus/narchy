@@ -176,7 +176,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * recursively
      */
     @NotNull
-    static boolean commonSubtermsRecurse(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
+    static boolean hasCommonSubtermsRecursive(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -196,11 +196,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
             return false;
 
-        if (recurse)
-            return (a instanceof Compound && ((Compound)a).containsRecursively(b) ||
-                    (b instanceof Compound && ((Compound)b).containsRecursively(a)));
-        else
-            return a.contains(b) || b.contains(a);
+        return recurse ?
+                a.containsRecursively(b) || b.containsRecursively(a) :
+                a.contains(b) || b.contains(a);
     }
 
 
