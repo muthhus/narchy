@@ -33,9 +33,13 @@ public final class substitute extends Functor {
         final Term input = xx.sub(0); //term to possibly transform
         Term x = xx.sub(1); //original term (x)
 
-        boolean hasYX = !parent.yx.map.isEmpty(); //optimize in case where yx is empty
-        if (hasYX)
-            x = parent.yxResolve(x);
+//        boolean hasYX = !parent.yx.map.isEmpty(); //optimize in case where yx is empty
+//        if (hasYX) {
+//            @NotNull Term x2 = parent.yxResolve(x);
+//            if (x2!=x)
+//                System.out.println(x + " "+ x2);
+//            x = x2;
+//        }
 
         boolean strict = xx.subEquals(3, STRICT);
 
@@ -43,17 +47,21 @@ public final class substitute extends Functor {
             return False;
 
         Term y = xx.sub(2); //replacement term (y)
-        if (hasYX)
-            y = parent.yxResolve(y);
+//        if (hasYX) {
+//            @NotNull Term y2 = parent.yxResolve(y);
+//            if (y2!=y)
+//                System.out.println(y + " "+ y2);
+//            y = y2;
+//        }
 
         if (x.equals(y)) {
             return strict ? False : input;
         }
 
         Term output =
-                (hasYX ?
-                    new MapSubstWithOverride(parent.yx, x, y) :
-                    new MapSubst1(x,y)) //optimized case
+//                (hasYX ?
+//                    new MapSubstWithOverride(parent.yx, x, y) :
+                    new MapSubst1(x,y) //optimized case
                         .transform(input, parent.index);
 
         return (output != null) ? output : False;
