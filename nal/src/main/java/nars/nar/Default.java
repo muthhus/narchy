@@ -3,7 +3,6 @@ package nars.nar;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
-import jcog.random.XORShiftRandom;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.concept.Concept;
@@ -15,7 +14,6 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.op.stm.STMTemporalLinkage2;
 import nars.premise.PreferSimpleAndPolarized;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -25,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Supplier;
 
 /**
  * Various extensions enabled

@@ -1,6 +1,5 @@
 package nars.test.agent;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;

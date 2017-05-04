@@ -1,6 +1,5 @@
 package nars.derive;
 
-import nars.Param;
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
 import nars.premise.Premise;

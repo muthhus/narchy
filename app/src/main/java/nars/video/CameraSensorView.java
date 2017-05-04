@@ -5,7 +5,6 @@ import jcog.event.On;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.Concept;
-import nars.nar.Default;
 import nars.truth.Truth;
 import spacegraph.Surface;
 import spacegraph.widget.meter.MatrixView;

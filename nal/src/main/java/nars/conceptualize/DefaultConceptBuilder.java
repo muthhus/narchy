@@ -35,9 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
 import static jcog.pri.PriMerge.plus;
-import static nars.Op.DIFFe;
-import static nars.Op.INH;
-import static nars.Op.PROD;
+import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 

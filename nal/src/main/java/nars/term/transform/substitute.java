@@ -8,7 +8,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst1;
-import nars.term.subst.MapSubstWithOverride;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

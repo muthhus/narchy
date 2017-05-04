@@ -3,7 +3,6 @@ package nars.derive.meta.constraint;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -5,8 +5,6 @@ import nars.Param;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.truth.TruthFunctions.w2c;
-
 
 /**
  * truth rounded to a fixed size precision

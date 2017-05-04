@@ -15,7 +15,6 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.ImmutableTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

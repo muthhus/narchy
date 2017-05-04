@@ -1,11 +1,5 @@
 package nars;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.core.ConsoleAppender;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
@@ -21,7 +15,6 @@ import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.LambdaPred;
 import nars.index.term.TermIndex;
-import nars.index.term.map.MaplikeTermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -39,7 +32,6 @@ import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;

@@ -20,8 +20,6 @@ import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
 

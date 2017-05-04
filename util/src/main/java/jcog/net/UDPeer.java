@@ -3,7 +3,6 @@ package jcog.net;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.Shorts;
-import il.technion.tinytable.TinyCountingTable;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;

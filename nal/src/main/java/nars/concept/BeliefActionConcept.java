@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.task.ImmutableTask;

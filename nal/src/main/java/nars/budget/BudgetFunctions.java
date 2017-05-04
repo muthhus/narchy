@@ -23,7 +23,6 @@ package nars.budget;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import nars.Task;
-import nars.truth.Truthed;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 

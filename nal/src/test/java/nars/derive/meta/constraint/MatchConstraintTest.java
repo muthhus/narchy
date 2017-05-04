@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.*;
 
 /**
  * Created by me on 5/3/17.

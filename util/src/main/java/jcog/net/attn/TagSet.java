@@ -1,7 +1,5 @@
 package jcog.net.attn;
 
-import java.util.HashMap;
-
 /**
  * Created by me on 5/2/17.
  */

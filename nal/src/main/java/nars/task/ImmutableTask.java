@@ -2,7 +2,6 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

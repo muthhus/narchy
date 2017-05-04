@@ -11,7 +11,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;

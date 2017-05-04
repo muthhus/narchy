@@ -4,13 +4,11 @@ import nars.Op;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
 import nars.term.Compound;
-import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.*;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Evaluates the truth of a premise

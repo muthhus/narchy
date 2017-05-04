@@ -4,7 +4,6 @@ import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;
 import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.render.Draw;
 
 import java.util.Collection;
 import java.util.List;

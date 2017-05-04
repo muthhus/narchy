@@ -1,6 +1,5 @@
 package nars.premise;
 
-import jcog.version.Versioned;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -10,7 +9,6 @@ import nars.term.Term;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
-import nars.term.transform.substituteIfUnifies;
 import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;

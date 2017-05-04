@@ -1,6 +1,5 @@
 package nars.concept.dynamic;
 
-import jcog.Util;
 import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
@@ -9,12 +8,9 @@ import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.task.AnswerTask;
 import nars.term.Compound;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.Param.TRUTH_EPSILON;
 
 /**
  * Created by me on 12/4/16.
