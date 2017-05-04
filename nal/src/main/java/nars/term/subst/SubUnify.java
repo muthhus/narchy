@@ -36,21 +36,34 @@ public class SubUnify extends Unify {
     @Override
     public boolean onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
+        int start = target!=null ? target.now() : -1;
+
+        boolean fail = false;
+        final Unify s = target!=null ? target : this;
         if (xterm != null) {
-            final Subst s;
+
             if (target != null) {
                 if (!target.put(this)) {
-                    return true; //try again
+                    fail = true;
                 }
-                s = target;
-            } else {
-                s = this;
             }
 
-            result = s.transform(xterm, index);
+            if (!fail) {
+                result = s.transform(xterm, index);
+                if (result == null)
+                    fail = true;
+            }
+        } else {
+            return false; //??
         }
 
-        return (result == null); //
+
+        if (fail) {
+            s.revert(start);
+            return s.live(); //try again if ttl > 0
+        } else {
+            return false; //success, done
+        }
     }
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {

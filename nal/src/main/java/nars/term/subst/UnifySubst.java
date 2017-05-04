@@ -56,7 +56,6 @@ public class UnifySubst extends Unify {
 
         //try {
 
-            versioning.tick();
 
             Term aa = resolve(a, xy);
             if (aa!=null && target.test(aa))

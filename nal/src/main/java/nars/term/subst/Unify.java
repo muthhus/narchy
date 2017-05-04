@@ -93,7 +93,7 @@ public abstract class Unify implements Termutator, Subst {
     public abstract boolean onMatch();
 
     public final boolean mutate(List<Termutator> chain, int next) {
-        return versioning.tick() && chain.get(++next).mutate(this, chain, next);
+        return chain.get(++next).mutate(this, chain, next);
     }
 
     @Override
@@ -117,7 +117,7 @@ public abstract class Unify implements Termutator, Subst {
         return this;
     }
 
-    public final void set(@NotNull Term t) {
+    protected final void set(@NotNull Term t) {
         xy.putConstant(t, t);
     }
 
@@ -172,13 +172,14 @@ public abstract class Unify implements Termutator, Subst {
     }
 
 
-    @Override public boolean put(@NotNull Unify m) {
+    @Override
+    public boolean put(@NotNull Unify m) {
         return m.xy.forEachVersioned(this::putXY);
     }
 
     @Override
     public final boolean mutate(Unify f, List<Termutator> n, int seq) {
-        return  (seq == -2) ?
+        return (seq == -2) ?
                 f.mutate(n, -1) //start combinatorial recurse
                 :
                 f.onMatch(); //end combinatorial recurse
@@ -318,6 +319,10 @@ public abstract class Unify implements Termutator, Subst {
         return (u != null) ? u : t;
     }
 
+    public final boolean live() {
+        return versioning.live();
+    }
+
 
     private class ConstrainedVersionMap extends VersionMap {
         public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
@@ -326,12 +331,12 @@ public abstract class Unify implements Termutator, Subst {
 
         @NotNull
         @Override
-        public Versioned newEntry(Object keyIgnoredk) {
+        public Versioned newEntry(Object keyIgnored) {
             return new ConstrainedVersionedTerm();
         }
     }
 
-        final class ConstrainedVersionedTerm extends Versioned<Term> {
+    final class ConstrainedVersionedTerm extends Versioned<Term> {
 
 
         final Versioned<MatchConstraint> constraints = new Versioned(versioning, MaxMatchConstraintsPerVariable);
@@ -349,18 +354,21 @@ public abstract class Unify implements Termutator, Subst {
         @Nullable
         @Override
         public Versioned<Term> set(@NotNull Term next) {
-            return (constraints.isEmpty() || Unify.this.valid(next, constraints)) ? super.set(next) : null;
+            return valid(next) ? super.set(next) : null;
         }
 
-        public boolean addConstraint(MatchConstraint m) {
-//            Versioned<MatchConstraint> cc;
-//            if (isFast(m)) {
-//                cc = fastConstraints != null ? fastConstraints : (this.fastConstraints = newConstraints());
-//            } else {
-
-            //}
-            return constraints.set(m) != null;
+        private boolean valid(@NotNull Term next) {
+            int s = constraints.size();
+            for (int i = 0; i < s; i++) {
+                MatchConstraint cc = constraints.get(i);
+                if (cc == null) /* why null? */
+                    throw new NullPointerException();
+                if (cc.invalid(next, Unify.this))
+                    return false;
+            }
+            return true;
         }
+
 //
 //        boolean isFast(MatchConstraint m) {
 //            return !(m instanceof CommonalityConstraint);
@@ -371,29 +379,18 @@ public abstract class Unify implements Termutator, Subst {
 //        }
     }
 
-    private boolean valid(@NotNull Term next, List<MatchConstraint> c) {
-        int s = c.size();
-        for (int i = 0; i < s; i++) {
-            MatchConstraint cc = c.get(i);
-            if (cc==null) /* why null? */
-                break;
-            if (cc.invalid(next, this))
-                return false;
-        }
-        return true;
-    }
-
 
     public boolean addConstraint(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
 
-//            Term existing = xy(m.target);
-//            if (existing!=null) {
+            Term existing = xy(m.target);
+            if (existing != null) {
+                throw new RuntimeException("value already set before constrain applied");
 //                if (m.invalid(existing, this))
 //                    return false;
-//            }
+            }
             Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
-            if (!((ConstrainedVersionedTerm) v).addConstraint(m))
+            if (((ConstrainedVersionedTerm) v).constraints.set(m) == null)
                 return false;
         }
         return true;

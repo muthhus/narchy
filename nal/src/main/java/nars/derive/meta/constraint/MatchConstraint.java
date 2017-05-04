@@ -20,6 +20,11 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
         this.target = target;
     }
 
+    /** cost of testing this, for sorting. higher value will be tested later than lower */
+    public int cost() {
+        return 0;
+    }
+
     @Override
     public boolean test(Derivation p) {
         //this will not be called when it is part of a CompoundConstraint group
@@ -32,7 +37,7 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
         private final MatchConstraint[] cache;
 
         public CompoundConstraint(MatchConstraint[] c) {
-            super($.func("constraints", $.sete(c) ));
+            super($.func("MatchConstraint", c ));
             this.cache = c;
         }
 

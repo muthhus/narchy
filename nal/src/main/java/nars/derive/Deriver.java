@@ -2,6 +2,7 @@ package nars.derive;
 
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
+import nars.premise.Premise;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,25 @@ public interface Deriver extends Predicate<Derivation> {
     @NotNull
     static Deriver get(String... path) {
         return TrieDeriver.get(PremiseRuleSet.rules(true, path));
+    }
+
+    default boolean run(Derivation d, Premise p, int ttl) {
+
+        boolean result;
+        try {
+            d.restart(p, ttl);
+            result = test(d);
+        } catch (Throwable t) {
+            logger.error("{}", t);
+            result = false;
+        }
+        try {
+            d.end();
+        } catch (Throwable t) {
+            System.exit(1);
+        }
+
+        return result;
     }
 
     //    @NotNull

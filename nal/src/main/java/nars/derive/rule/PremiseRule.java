@@ -224,12 +224,19 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp0", rank--);
 
         put(TaskPunctuation.class, rank--);
-        put(Solve.class, rank--);
+
+        put(events.class, rank--);
+
+        put(TaskPositive.class, rank--); //includes both positive or negative
+        put(BeliefPositive.class, rank--); //includes both positive or negative
+
         put(SubTermStructure.class, rank--);
+
+        put(Solve.class, rank--);
+
 
         put(MatchConstraint.class, rank--);
 
-        put(events.class, rank--);
 
 
 
@@ -241,8 +248,6 @@ public class PremiseRule extends GenericCompound {
 //        put(PatternOpNot.class, rank--);
 
 
-        put(TaskPositive.class, rank--); //includes both positive or negative
-        put(BeliefPositive.class, rank--); //includes both positive or negative
 
 
 //        put(SubTermOp.class, 10);

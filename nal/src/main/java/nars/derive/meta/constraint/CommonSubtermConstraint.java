@@ -15,6 +15,11 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
     }
 
     @Override
+    public int cost() {
+        return 10;
+    }
+
+    @Override
     protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {
         return !TermContainer.commonSubtermsRecurse(x, y, true);
     }

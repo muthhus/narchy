@@ -21,25 +21,31 @@ public class Versioning extends FasterList<Versioned> {
         return size() + ":" + super.toString();
     }
 
-    /** start a new version with a commit, returns true if add was successful or false if unsuccessful (capacity exceeded)
-     *  @return null if capacity exceeded
-     * */
-    public final boolean nextChange(@NotNull Versioned v, @Nullable Object x) {
-        return add(v) && !v.add(x);
-    }
-
 
     /** reverts/undo to previous state */
     public final boolean revert(int when) {
+        assert(size >= when);
+
         pop(size - when );
-        return ttl >= 0; //<- maybe >
+
+        return live();
+    }
+
+    public final boolean live() {
+        return ttl > 0;
     }
 
     public final void pop(int count) {
         for (int i = 0; i < count; i++) {
             Versioned versioned = removeLast();
-            if (versioned!=null)
-                versioned.removeLast();
+            if (versioned == null) {
+                throw new NullPointerException();
+            }
+
+            Object removed = versioned.removeLast();
+
+            assert(removed!=null);
+            //TODO removeLastFast where we dont need the returned value
         }
     }
 
@@ -49,14 +55,14 @@ public class Versioning extends FasterList<Versioned> {
     }
 
     @Override
-    public final boolean add(@Nullable Versioned newItem) {
-        if (!tick())
-            return false;
-
+    public final boolean add(@NotNull Versioned newItem) {
         Versioned[] ii = this.items;
         if (ii.length == this.size) {
             return false;
         } else {
+            if (!tick())
+                return false;
+
             ii[this.size++] = newItem;
             return true;
         }

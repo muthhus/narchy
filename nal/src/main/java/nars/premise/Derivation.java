@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
+import nars.term.transform.substituteIfUnifies;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -102,9 +103,45 @@ abstract public class Derivation extends Unify {
         this.nar = nar;
         this.budgeting = b;
 
+        init();
+
+    }
+
+    private void init() {
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
         set(new substituteIfUnifiesDep(this));
+    }
+
+
+    @NotNull public void end() {
+//        if (now()!=0)
+//            throw new RuntimeException("not cleared");
+
+//        if (xy.size()!=3)
+//            System.err.println("WTF");
+
+        revert(0);
+//
+        if (xy.size()!=3) { //HACK TODO fix
+            xy.map.clear();
+            init();
+            //throw new RuntimeException("not cleared");
+        }
+
+        punct = null;
+        forEachMatch = null;
+        termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
+
+        evidenceDouble = evidenceSingle = null;
+        temporal = cyclic = overlap = false;
+
+        taskTerm = null;
+        beliefTerm = null;
+        belief = task = null;
+        taskTruth = null;
+        beliefTruth = beliefTruthRaw = null;
+
 
     }
 
@@ -115,12 +152,7 @@ abstract public class Derivation extends Unify {
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
-        this.punct = null;
-        forEachMatch = null;
-        termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
 
-        evidenceDouble = evidenceSingle = null;
-        temporal = cyclic = overlap = false;
 
         this.premise = p;
 

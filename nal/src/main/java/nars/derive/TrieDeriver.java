@@ -20,10 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -85,13 +82,8 @@ public class TrieDeriver implements Deriver {
     }
 
     @Override
-    public boolean test(Derivation d) {
-        try {
-            return pred.test(d);
-        } catch (Throwable t) {
-            logger.error("{}", t);
-            return false;
-        }
+    public final boolean test(Derivation d) {
+        return pred.test(d);
     }
 
     public static TrieDeriver get(@NotNull PremiseRuleSet ruleset) {
@@ -514,7 +506,11 @@ public class TrieDeriver implements Deriver {
             if (ccc.size() == 1)
                 return ccc;
 
-            List<MatchConstraint> constraints = $.newArrayList();
+            SortedSet<MatchConstraint> constraints = new TreeSet<MatchConstraint>((a,b) -> {
+                if (a.equals(b)) return 0;
+                int i = Integer.compare(a.cost(), b.cost());
+                return i == 0 ? a.compareTo(b) : i;
+            });
             Iterator<BoolPred> il = ccc.iterator();
             while (il.hasNext()) {
                 BoolPred c = il.next();
@@ -543,7 +539,7 @@ public class TrieDeriver implements Deriver {
                 if (c > 1) {
                     ccc.add(iMatchTerm, new MatchConstraint.CompoundConstraint(constraints.toArray(new MatchConstraint[c])));
                 } else
-                    ccc.add(iMatchTerm, constraints.get(0)); //just add the singleton at the end
+                    ccc.add(iMatchTerm, constraints.iterator().next()); //just add the singleton at the end
             }
 
             return ccc;

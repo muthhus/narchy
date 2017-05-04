@@ -39,7 +39,7 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
         int start = m.random.nextInt(termCacheLength);
         int now = m.now();
         for (int i = 0; i < termCacheLength; i++) {
-            cached[(start++)%termCacheLength].test(m);
+            cached[(start+i)%termCacheLength].test(m);
 
             if (!m.revert(now))
                 return false;

@@ -22,6 +22,11 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         this.recurse = recurse;
     }
 
+    @Override
+    public int cost() {
+        return recurse ? 10 : 5;
+    }
+
     /** comparison between two compounds */
     @Override
     @NotNull protected boolean invalid(@NotNull Compound x, @NotNull Compound y) {

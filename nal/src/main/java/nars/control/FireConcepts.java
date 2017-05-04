@@ -111,7 +111,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             if (p != null) {
 
                 int start = ttl;
-                if (deriver.test(d.restart(p, ttl)))
+                if (deriver.run(d, p, ttl))
                     count++;
                 int consumed = (start - d.versioning.ttl);
                 ttl -= consumed;
