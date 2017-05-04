@@ -13,7 +13,6 @@ public class TruthAccumulatorTest {
 
     @Test
     public void test1() {
-        int dur = 1;
         TruthAccumulator a = new TruthAccumulator();
         assertNull(a.commitAverage());
         a.add($.t(0, 0.5f));

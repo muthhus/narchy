@@ -17,22 +17,24 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * TODO use the Treadmill's AtomicIntegerArray to store
- * additional values either at the end or beginning:
- *   capacity, size
- * so that these dont need to be additional AtomicInteger fields, saving memory
+ * the superclass's treadmill's extra data slots are used for storing:
+ *      0=size
+ *      1=capacity
+ * this saves the space otherwise necessary for 2 additional AtomicInteger instances
  */
-public abstract class HijackBag<K, V> implements Bag<K, V> {
+public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
+
+    /** value index in the additional slots of the superclass Treadmill */
+    final static int tSIZE = 0;
+    final static int tCAPACITY = 1;
 
     public static final AtomicReferenceArray EMPTY_ARRAY = new AtomicReferenceArray(0);
 
     public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
-    final AtomicInteger capacity = new AtomicInteger(0);
 
     public final DoubleAdder pressure = new DoubleAdder();
 
-    public final AtomicInteger size = new AtomicInteger(0);
     float mass;
 
     public HijackBag(int initialCapacity, int reprobes) {
@@ -41,6 +43,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     public HijackBag(int reprobes) {
+        super(concurrency, 2 /* size, capacity */);
         this.reprobes = reprobes;
         this.map = new AtomicReference<>(EMPTY_ARRAY);
     }
@@ -95,7 +98,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         int newCapacity = Math.max(_newCapacity, reprobes);
 
-        if (capacity.getAndSet(newCapacity) != newCapacity) {
+        if (xGetAndSet(tCAPACITY, newCapacity) != newCapacity) {
 
             final AtomicReferenceArray<V>[] prev = new AtomicReferenceArray[1];
 
@@ -128,6 +131,8 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
         return false;
     }
+
+
 
     @Override
     public void clear() {
@@ -170,7 +175,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
         int iStart = i(c, hash);
 
         if (add || remove)
-            active.start(hash);
+            start(hash);
 
         try {
 
@@ -252,7 +257,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
             t.printStackTrace(); //should not happen
         } finally {
             if (add || remove) {
-                active.end(hash);
+                end(hash);
             }
         }
 
@@ -285,52 +290,6 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     }
 
-    public static class Treadmill extends AtomicIntegerArray {
-
-        final static int procs = Runtime.getRuntime().availableProcessors();
-
-        public Treadmill() {
-            this(procs);
-        }
-
-        public Treadmill(int concurrency) {
-            super(concurrency);
-        }
-
-        private void start(int hash) {
-            if (hash == 0) hash = 1; //reserve 0
-            int len = length();
-            restart:
-            while (true) {
-                int best = -1;
-                for (int i = len - 1; i >= 0; i--) {
-                    int v = get(i);
-                    if (v == hash) {
-                        continue restart; //collision
-                    } else if (v == 0) {
-                        best = i;
-                    }
-                }
-
-                if (best != -1) {
-                    if (compareAndSet(best, 0, hash))
-                        return; //ready
-                }
-            }
-        }
-
-        private void end(int hash) {
-            int len = length();
-            for (int i = 0; i < len; i++) {
-                if (compareAndSet(i, hash, 0))
-                    return; //done
-            }
-            throw new RuntimeException("did not remove ticket");
-        }
-
-    }
-
-    private final Treadmill active = new Treadmill();
 
     protected int hash(Object x) {
 
@@ -424,7 +383,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public int capacity() {
-        return capacity.get();
+        return xGet(tCAPACITY);
     }
 
     @Override
@@ -587,7 +546,7 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
 
     @Override
     public int size() {
-        return size.get();
+        return xGet(tSIZE);
     }
 
     @Override
@@ -693,7 +652,9 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
                 }
             }
 
-            size.set(count); assert(size() == count);
+            //assert(size() == count);
+            xSet(tSIZE, count);
+
             this.mass = mass;
 
         } finally {
@@ -704,14 +665,17 @@ public abstract class HijackBag<K, V> implements Bag<K, V> {
     }
 
     private void _onAdded(V x) {
-        size.incrementAndGet();
+        xIncrementAndGet(tSIZE);
         onAdded(x);
     }
+
     private int _onRemoved(V x) {
-        int s = size.decrementAndGet();
+        int s = xDecrementAndGet(tSIZE);
         onRemoved(x);
         return s;
     }
+
+
 
     @NotNull
     protected HijackBag<K, V> update(@Nullable Consumer<V> each) {
