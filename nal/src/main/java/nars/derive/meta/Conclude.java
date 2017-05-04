@@ -105,8 +105,21 @@ public final class Conclude extends AbstractPred<Derivation> {
             if (ct == null)
                 return;
 
-            Compound c0 = compoundOrNull(m.transform(this.conclusionPattern, index));
-            if (c0 != null) {
+            Term b0 = this.conclusionPattern;
+
+            for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
+                Term bp = b0;
+                b0 = compoundOrNull(m.transform(b0, index));
+                if (b0 == null)
+                    return;
+                if (b0 == conclusionPattern)
+                    return;
+                if (b0 == bp)
+                    break; //no change
+            }
+
+            Compound c0 = (Compound) b0;
+            {
 
                 final Compound c1 = compoundOrNull(c0.eval(index));
                 if (c1 != null) {

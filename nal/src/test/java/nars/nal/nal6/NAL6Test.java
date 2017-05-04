@@ -17,7 +17,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 80;
+    final int cycles = 180;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -84,6 +84,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_unification5()  {
         TestNAR tester = test();
+        tester.log();
         tester.believe("<(&&,<$x --> flyer>,<$x --> [chirping]>) ==> <$x --> bird>>"); //en("If something can fly and chirp, then it is a bird.");
         tester.believe("<<$y --> [withWings]> ==> <$y --> flyer>>"); //en("If something has wings, then it can fly.");
         tester.mustBelieve(cycles, "<(&&,<$1 --> [chirping]>,<$1 --> [withWings]>) ==> <$1 --> bird>>", 1.00f, 0.81f); //en("If something can chirp and has wings, then it is a bird.");
@@ -330,7 +331,7 @@ public class NAL6Test extends AbstractNALTest {
     public void multiple_variables_introduction()  {
         TestNAR tester = test();
         tester.log();
-        tester.believe("<<$x --> key> ==> <{lock1} --> (/,open,$x,_)>>"); //en("Lock-1 can be opened by every key.");
+        tester.believe("<<$x --> key> ==> open($x,{lock1})>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.45f); //en("There is a lock that can be opened by every key.");

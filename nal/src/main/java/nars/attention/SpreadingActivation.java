@@ -103,7 +103,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                 return 1;
 
             case SIM:
-                return 2;
+                return 3;
 
             case INH:
                 return 3;

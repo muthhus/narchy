@@ -25,7 +25,9 @@ public class NAL5BooleanConsistency {
 
         float confthresh = 0.1f;
 
-        final Deriver e = Deriver.get("induction.nal", "nal6.nal", "misc.nal");
+        final Deriver e = Deriver.get(
+                "induction.nal", "nal6.nal"
+        );
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
@@ -53,9 +55,9 @@ public class NAL5BooleanConsistency {
                 Compound I = $.negIf($.$("(x-->i)"), i == 0);
                 Compound J = $.negIf($.$("(x-->j)"), j == 0);
 
-                d.believe(I);
-                d.believe(J);
-//                d.believe($.conj(I,J));
+//                d.believe(I);
+//                d.believe(J);
+                d.believe($.conj(I,J));
 
 //                for (String s : outcomes) {
 //                    d.ask(s);

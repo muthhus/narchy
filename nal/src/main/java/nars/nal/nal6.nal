@@ -154,8 +154,8 @@
 //the first rule does not have Order:ForAllSame because it would be invalid, see: https://groups.google.com/forum/#!topic/open-nars/r5UJo64Qhrk
     //((&&,A..+) ==> C), M, time(dtTaskExact), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
-    //((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,B), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
-    //((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
+    ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,B), notImplEqui(M)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+    ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
     //((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqRCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 

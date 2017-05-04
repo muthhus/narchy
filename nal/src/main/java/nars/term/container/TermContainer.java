@@ -837,6 +837,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
                 default: {
+                    //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
+
                     //begin at random offset to shuffle the order of the match sequence
                     int j = subst.random.nextInt() % s;
                     if (j < 0) j = -j;

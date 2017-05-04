@@ -37,7 +37,8 @@ public abstract class TermBuilder {
     private static final TermContainer InvalidSubterms = TermVector.the(False);
 
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    private static final int InvalidImplicationTerm = or(EQUI, IMPL);
+    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
+    private static final int InvalidImplicationPred = or(EQUI);
 
 
     /**
@@ -253,10 +254,6 @@ public abstract class TermBuilder {
         return y;
     }
 
-
-    private static boolean validImplicationTerm(@NotNull Term t) {
-        return !t.hasAny(InvalidImplicationTerm);
-    }
 
     private static boolean validEquivalenceTerm(@NotNull Term t) {
         //return !t.opUnneg().in(InvalidEquivalenceTerm);
@@ -829,9 +826,9 @@ public abstract class TermBuilder {
                     return False;
                 if (isTrueOrFalse(predicate /* consequence */))
                     return False;
-                if (!validImplicationTerm(subject))
+                if (subject.hasAny(InvalidImplicationSubj))
                     return False; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                if (!validImplicationTerm(predicate))
+                if (predicate.hasAny(InvalidImplicationPred))
                     return False; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
 
@@ -852,17 +849,17 @@ public abstract class TermBuilder {
 
 
                 // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-//                    if (predicate.op() == IMPL) {
-//                        Term a = subj(predicate);
-//
-//                        int newDT = ((Compound) predicate).dt();
-//                        if (dt == XTERNAL) //HACK XTERNAL handling, corrected later in Temporal calculations
-//                            dt = DTERNAL;
-//
-//                        subject = conj(dt, subject, a);
-//                        predicate = pred(predicate);
-//                        dt = newDT;
-//                    }
+                    if (dt!=XTERNAL && predicate.op() == IMPL) {
+                        Compound cpr = (Compound)predicate;
+                        int cprDT = cpr.dt();
+                        if (cprDT != XTERNAL) {
+                            Term a = cpr.sub(0);
+
+                            subject = conj(dt, subject, a);
+                            predicate = cpr.sub(1);
+                            return statement(IMPL, cprDT, subject, predicate);
+                        }
+                    }
 
 
                 break;

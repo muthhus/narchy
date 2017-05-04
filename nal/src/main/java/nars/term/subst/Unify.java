@@ -251,7 +251,7 @@ public abstract class Unify implements Termutator, Subst {
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
         @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
-        return (putXY(x, common) //&& putXY(y, common)
+        return (putXY(x, common) && putXY(y, common)
                 && putYX(y, common) //&& putYX(x,common)
         );
     }
