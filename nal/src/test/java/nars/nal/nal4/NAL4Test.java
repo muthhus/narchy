@@ -39,14 +39,14 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void structural_transformation1()  {
+    @Ignore public void structural_transformation1()  {
         TestNAR t = test();
         t.believe("<(acid,base) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,base)>", 1.0f, 0.9f); //en("Acid can react with base.");
         t.mustBelieve(CYCLES, "<base --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
     }
     @Test
-    public void structural_transformation1_DepVar()  {
+    @Ignore public void structural_transformation1_DepVar()  {
         TestNAR t = test();
         t.believe("reaction(acid,#1)",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -55,7 +55,7 @@ public class NAL4Test extends AbstractNALTest {
 
 
     @Test
-     public void structural_transformation2()  {
+     @Ignore public void structural_transformation2()  {
         TestNAR tester = test();
         tester.believe("<acid --> (/,reaction,_,base)>",1.0f,0.9f); //en("Acid can react with base.");
         tester.mustBelieve(CYCLES, "<(acid,base) --> reaction>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -63,7 +63,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void structural_transformation3()  {
+    @Ignore public void structural_transformation3()  {
         TestNAR tester = test();
         tester.believe("<base --> (/,reaction,acid,_)>",1.0f,0.9f); //en("A base is something that has a reaction with an acid.");
         tester.mustBelieve(CYCLES*2, "<(acid,base) --> reaction>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -71,7 +71,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void structural_transformation4()  {
+    @Ignore public void structural_transformation4()  {
         TestNAR tester = test();
         tester.believe("<neutralization --> (acid,base)>",1.0f,0.9f); //en("Neutralization is a relation between an acid and a base. ");
         tester.mustBelieve(CYCLES, "<(\\,neutralization,_,base) --> acid>", 1.0f, 0.9f); //en("Something that can neutralize a base is an acid.");
@@ -80,7 +80,7 @@ public class NAL4Test extends AbstractNALTest {
 
     //PROBABLY NOT CORRECT
 //    @Test
-//    public void structural_transformation4_extended()  {
+//    @Ignore public void structural_transformation4_extended()  {
 //        TestNAR tester = test();
 //        tester.believe("<neutralization --> (substance,acid,base)>",1.0f,0.9f);
 //        tester.mustBelieve(CYCLES, "<(\\,neutralization,_,acid,base) --> substance>.", 1.0f, 0.9f);
@@ -90,7 +90,7 @@ public class NAL4Test extends AbstractNALTest {
 
 
     @Test
-    public void structural_transformation5()  {
+    @Ignore public void structural_transformation5()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,_,base) --> acid>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Neutralization is a relation between an acid and a base.");
@@ -98,20 +98,20 @@ public class NAL4Test extends AbstractNALTest {
 
     //PROBABLY NOT CORRECT
     @Test
-    public void structural_transformation5_extended()  {
+    @Ignore public void structural_transformation5_extended()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,_,base) --> acid>",1.0f,0.9f);
         tester.mustBelieve(CYCLES*2, "<neutralization --> (substance,acid,base)>", 1.0f, 0.9f);
     }
 
     @Test
-    public void structural_transformation5_extended2c() {
+    @Ignore public void structural_transformation5_extended2c() {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,_,acid,base,reaction) --> substance>", 1.0f, 0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
     @Test
-    public void structural_transformation5_extended2a()  {
+    @Ignore public void structural_transformation5_extended2a()  {
         TestNAR tester = test();
         //tester.log();
         tester.believe("<(\\,neutralization,substance,_,base,reaction) --> acid>",1.0f,0.9f);
@@ -119,21 +119,21 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    public void structural_transformation5_extended2b()  {
+    @Ignore public void structural_transformation5_extended2b()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,_,reaction) --> base>",1.0f,0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test
-    public void structural_transformation5_extended2d()  {
+    @Ignore public void structural_transformation5_extended2d()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,base,_) --> reaction>",1.0f,0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test
-    public void structural_transformation6()  {
+    @Ignore public void structural_transformation6()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,acid,_) --> base>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Something that can be neutralized by an acid is a base.");

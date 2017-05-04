@@ -129,11 +129,6 @@ abstract public class Derivation extends Unify {
 
         revert(0);
 //
-        if (xy.size()!=3) { //HACK TODO fix
-            xy.map.clear();
-            init();
-            //throw new RuntimeException("not cleared");
-        }
 
         //remove common variable entries because they will just consume memory if retained as empty
         xy.map.entrySet().removeIf(e -> {
@@ -142,6 +137,11 @@ abstract public class Derivation extends Unify {
             else
                 return false;
         });
+        if (xy.size()!=3) { //HACK TODO fix
+            xy.map.clear();
+            init();
+            //throw new RuntimeException("not cleared");
+        }
 
         punct = null;
         forEachMatch = null;

@@ -770,7 +770,9 @@ public class PremiseRule extends GenericCompound {
                 timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ = p.task.start();
                     occReturn[0] = occ;
+                    boolean temporal = false;
                     if (occ != ETERNAL) {
+                        temporal = true;
                         @Nullable Term yr = p.resolve(y).eval(p.index);
                         if (yr == null)
                             return null;
@@ -778,6 +780,7 @@ public class PremiseRule extends GenericCompound {
                         if (occShift != DTERNAL)
                             occReturn[0] += occShift;
                     } else if (p.belief != null && p.belief.start() != ETERNAL) {
+                        temporal = true;
                         occReturn[0] = p.belief.start();
                         if (z != null) {
                             //if Z occurrs in belief, then there is an additional shift
@@ -797,6 +800,10 @@ public class PremiseRule extends GenericCompound {
                         }
                     }
 
+                    if (temporal && occReturn[0] == ETERNAL) {
+                        return null; //uncomputable temporal basis
+                    }
+
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                     return derived;
@@ -805,7 +812,9 @@ public class PremiseRule extends GenericCompound {
             case "belief":
                 timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ;
+                    boolean temporal = false;
                     if (!p.task.isEternal()) {
+                        temporal = true;
                         //task determines occurrence if non-eternal
                         occ = p.task.start();
                         if (z != null) {
@@ -817,10 +826,15 @@ public class PremiseRule extends GenericCompound {
                             if (relOccShift != DTERNAL)
                                 occ -= relOccShift;
                         }
-
                     } else {
-                        occ = p.belief.start();
+                        if (p.belief!=null) {
+                            if ((occ = p.belief.start()) != ETERNAL)
+                                temporal = true;
+                        } else {
+                            occ = ETERNAL;
+                        }
                     }
+
                     if (occ != ETERNAL) {
                         occReturn[0] = occ;
                         @Nullable Term yr = p.resolve(y).eval(p.index);
@@ -829,6 +843,10 @@ public class PremiseRule extends GenericCompound {
                         int occShift = p.beliefTerm.subtermTime(yr);
                         if (occShift != DTERNAL)
                             occReturn[0] += occShift;
+                    } else {
+                        if (!temporal) {
+                            return null; //uncomputable temporal basis
+                        }
                     }
 
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
