@@ -62,8 +62,6 @@ public abstract class Unify implements Termutator, Subst {
     @NotNull
     public final VersionMap<Term, Term> xy;
 
-    @NotNull
-    public final VersionMap<Term, Term> yx;
 
 
     protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int ttl) {
@@ -83,7 +81,6 @@ public abstract class Unify implements Termutator, Subst {
 
         xy = new ConstrainedVersionMap(versioning, Param.MaxUnificationVariableStack);
 
-        yx = new VersionMap(versioning, Param.MaxUnificationVariableStack);
     }
 
 
@@ -193,8 +190,6 @@ public abstract class Unify implements Termutator, Subst {
         return x.equals(y)
                 ||
                 x.unify(y, this)
-                ||
-                (matchType(y) && matchVarY(x, y))
                 ;
     }
 
@@ -211,31 +206,7 @@ public abstract class Unify implements Termutator, Subst {
 
 
 
-    /**
-     * x's and y's ops already determined inequal
-     */
-    public final boolean matchVarY(@NotNull Term x, @NotNull Term /* var */ y) {
 
-        Term y2 = yx.get(y);
-        if (y2 != null) {
-            return unify(x, y2);
-        } else {
-
-            //SUSPICIOUS:
-
-            //return putYX(x, y);
-            if (putYX((Variable) y, x)) {
-                if (y instanceof CommonVariable) {
-                    if (!putXY((Variable) y, x)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-        return false;
-
-    }
 
 
     @Nullable
@@ -252,7 +223,7 @@ public abstract class Unify implements Termutator, Subst {
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
         @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
         return (putXY(x, common) && putXY(y, common)
-                && putYX(y, common) //&& putYX(x,common)
+                //&& putYX(y, common) //&& putYX(x,common)
         );
     }
 
@@ -261,12 +232,7 @@ public abstract class Unify implements Termutator, Subst {
         throw new UnsupportedOperationException("slow");
     }
 
-    /**
-     * the order here is the same as what would go in putXY, but it is inserted into yx in reverse
-     */
-    final boolean putYX(@NotNull Term x /* usually a Variable */, @NotNull Term y) {
-        return yx.tryPut(y, x);
-    }
+
 
 
     /**
@@ -289,15 +255,6 @@ public abstract class Unify implements Termutator, Subst {
         return versioning.revert(then);
     }
 
-//    public final void pop(int count) {
-//        versioning.pop(count);
-//    }
-
-    @NotNull
-    public final Term yxResolve(@NotNull Term t) {
-        Term u = yx.get(t);
-        return (u != null) ? u : t;
-    }
 
     public final boolean live() {
         return versioning.live();

@@ -98,12 +98,12 @@ public class UnificationTest {
                         });
 
                         if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
-                            if (((n2) <= (yx.size())) &&
-                                    ((n1) <= (xy.size()))) {
+                            if (/*((n2) <= (yx.size())*/
+                                    (n1) <= (xy.size())) {
                                 subbed.set(true);
 
                             } else {
-                                System.out.println("incomplete:\n\t" + xy + "\n\t" + yx);
+                                System.out.println("incomplete:\n\t" + xy);
                             }
                         } else {
                             subbed.set(true);
