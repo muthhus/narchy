@@ -69,7 +69,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictTime = new FloatParam(5, 0, 32);
+    public final FloatParam predictAheadDurs = new FloatParam(1, 1, 32);
 
 
     public final FloatParam predictorProbability = new FloatParam(1f);
@@ -222,13 +222,12 @@ abstract public class NAgent implements NSense, NAct {
 //        if (load < 1) {
 
 
-        long next = now
-                //+dur
+        long next = now + nar.dur()
                 //+(dur * 3 / 2);
                 ;
 
 
-        ambition.input(predict(now), nar::input);
+        ambition.input(predict(next), nar::input);
         ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
 
         motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
@@ -309,7 +308,13 @@ abstract public class NAgent implements NSense, NAct {
                 goal(happiness,
                         t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
                         //ETERNAL
-                        now// + dur/2
+                        now + dur
+                )
+        );
+        predictors.add(
+                goal(happiness,
+                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
+                        ETERNAL
                 )
         );
 
@@ -357,8 +362,8 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-                    question(impl(action, 0, happiness), ETERNAL),
-                    question(impl(neg(action), 0, happiness), ETERNAL)
+                    question(impl(action, dur, happiness), ETERNAL),
+                    question(impl(neg(action), dur, happiness), ETERNAL)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -482,10 +487,11 @@ abstract public class NAgent implements NSense, NAct {
     protected Stream<Task> predict(long next) {
 
 
-        int horizon = Math.round(this.predictTime.floatValue());
+        int dur = nar.dur();
+        int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
 
         //long frameDelta = now-prev;
-        int dur = nar.dur();
+
         int num = predictors.size();
 
         float pp = predictorProbability.floatValue();
@@ -496,7 +502,7 @@ abstract public class NAgent implements NSense, NAct {
 
             Task x = predictors.get(i);
             if (x != null) {
-                Task y = predict(x, next, horizon * dur);
+                Task y = predict(x, next, horizon);
 //                if (x != y && x!=null) {
 //                    x.budget().priMult(0.5f);
 //                }

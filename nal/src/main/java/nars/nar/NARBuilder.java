@@ -203,7 +203,7 @@ public interface NARBuilder {
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.focus.activationRate.setValue(1f/activeConcepts);
+        nar.focus.activationRate.setValue(1f/Math.sqrt(activeConcepts));
 
         //nar.stmLinkage.capacity.set(0);
 
