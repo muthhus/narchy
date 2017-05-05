@@ -102,7 +102,7 @@ public class Arkancide extends NAgentX {
 //                System.err.println(t.proof());
 //        });
 
-        maxPaddleSpeed = 30 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 10 * noid.BALL_VELOCITY;
 
         float resX = Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
