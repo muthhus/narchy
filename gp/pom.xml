@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>narchy</groupId>
     <artifactId>gp</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <inceptionYear>2016</inceptionYear>
     <packaging>jar</packaging>
     <parent>
         <groupId>narchy</groupId>
         <artifactId>narchy</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <description>Fork of OakGP: a tree-based genetic programming framework.</description>
     <url>http://oakgp.org/</url>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>narchy</groupId>
             <artifactId>util</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
 

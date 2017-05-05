@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>narchy</groupId>
     <artifactId>web</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <inceptionYear>2016</inceptionYear>
     <packaging>jar</packaging>
     <parent>
         <groupId>narchy</groupId>
         <artifactId>narchy</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
     <licenses>
         <license>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>narchy</groupId>
             <artifactId>app</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
 
 

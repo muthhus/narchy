@@ -29,6 +29,6 @@ To use the latest *development* version of OakGP specify the following instead:
 <dependency>
   <groupId>org.oakgp</groupId>
   <artifactId>oakgp</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0</version>
 </dependency>
 ```
