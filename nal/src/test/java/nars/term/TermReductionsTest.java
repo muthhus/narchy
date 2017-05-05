@@ -219,6 +219,13 @@ public class TermReductionsTest {
         assertEquals(pp, disj(pp, pp));
     }
 
+    @Test public void testRepeatConjunctionTaskReduction() throws Narsese.NarseseException {
+        //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
+        assertEquals(
+                "$.50 (x). 0⋈10 %1.0;.90%",
+                t.task("((x) &&+10 (x)). :|:").toString());
+    }
+
     @Test
     public void testConjunctionEqual() throws Narsese.NarseseException {
         assertEquals(p, $.conj(p, p));

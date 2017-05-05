@@ -126,7 +126,7 @@ public class Line1D {
 
 
         NAR n = new Default();
-        //n.time.dur(4);
+        n.time.dur(32);
         n.termVolumeMax.setValue(16);
 
 

@@ -48,7 +48,11 @@ public class Signal {
 
     public Task set(Compound term, Truth nextTruth, LongSupplier stamper, NAR nar) {
 
-        long now = nar.time();
+
+        int halfDur = Math.max(1, nar.dur() / 2);
+
+        long now = nar.time() + halfDur; //allow the current percept to extend 1/2 duration into the future
+
         if (current != null) {
             current.setEnd(now);
         }
@@ -72,8 +76,9 @@ public class Signal {
         }
 
 
+        long last = nar.time() - halfDur;
         SignalTask t = task(term, nextTruth,
-                now, now,
+                last, now,
                 this.current, stamper.getAsLong(), nar);
         if (t == null) {
             this.current = null; //signal dropped

@@ -347,8 +347,8 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) predictors).addAll(
 
-//                    quest((Compound) (action.term()),
-//                            now),
+                    quest((Compound) (action.term()),
+                            now),
 //                            //ETERNAL)
 
                     //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)

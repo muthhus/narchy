@@ -260,7 +260,7 @@ public class Revision {
         if ((b == null) || !b.isBeliefOrGoal())
             return t;
 
-        int dur = p.nar.dur();
+        //int dur = p.nar.dur();
         float tw = t.evi();
         float bw = b.evi();
 
