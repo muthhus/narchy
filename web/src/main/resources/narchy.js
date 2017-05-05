@@ -126,7 +126,6 @@ function decodeTasks(e, m) {
             case '@':
             case ';': {
                 const pri = d.getFloat32(j); j += 4;
-                const qua = d.getFloat32(j); j += 4;
 
                 const startLow = d.getInt32(j); j += 4;
                 const startHigh = d.getInt32(j); j += 4;
@@ -151,7 +150,6 @@ function decodeTasks(e, m) {
                     term: term,
                     punc: punct,
                     pri: pri,
-                    qua: qua,
                     when: [start,end],
                     freq: freq,
                     conf: conf
@@ -230,7 +228,6 @@ function graphConcepts(tgt) {
 
         if (p >= 0) {
             x.pri = p;
-            x.qua = d.getFloat32(j); j+=4;
 
             const termStrLen = d.getInt16(j); j += 2;
             if (termStrLen > 0) {
@@ -408,7 +405,7 @@ function taskFeed(socket) {
                 d.className = 'command';
                 break;
         }
-        d.style.opacity = 0.5 + 0.5 * x.qua;
+        d.style.opacity = 1f;
         d.style.fontSize = fontSize;
         d.innerText = label;
         return d;
@@ -712,16 +709,13 @@ function TopTable(s) {
 
     function row(c) {
         const pri = c.pri; //c[1] / 1000.0;
-        const qua = c.qua; //c[2] / 1000.0;
 
         const e = document.createElement('span');
 
         e.className = 'ConceptRow';
         e.style.fontSize = parseInt(70.0 + 2 * 100.0*pri) + '%';
-        e.style.color = 'rgb(' +
-            parseInt(128 + 128 * pri) + ',' +
-            parseInt(64 + 192 * qua) +
-            ')';
+        const pp = parseInt(128 + 128 * pri);
+        e.style.color = 'rgb(' + pp + ',' + pp + ',' + pp + ')';
         e.innerText = c.term;//[0];
 
         return e;

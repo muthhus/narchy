@@ -136,8 +136,8 @@ public class Builtin {
     public static void load(NAR nar) {
         nar.on(new DepIndepVarIntroduction.VarIntro(nar));
 
-        /** remove an element at random and try re-creating
-         * the compound. wont work in all situations.
+        /** remove an element from a commutive conjunction, at random, and try re-creating
+         * the compound. wont necessarily work in all situations.
          * TODO move the type restriction to another functor to wrap this
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
@@ -145,14 +145,12 @@ public class Builtin {
             if (c == null || c.op() != CONJ || !commutive(c.dt()))
                 return False;
 
-            //if (c.op().statement) return False;
             int size = c.size();
-            if (size < 2) return False;
 
             Term[] x = c.toArray();
             if (size == 2) {
                 int n = nar.random().nextInt(2);
-                return Term.falseIfNull(compoundOrNull(x[n]));
+                return Term.falseIfNull(x[n]);
             } else {
                 Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
                 return Term.falseIfNull(nar.concepts.the(c.op(), c.dt(), y));

@@ -419,7 +419,8 @@ public class NAL6Test extends AbstractNALTest {
         //tester.log();
         tester.believe("(open($1,lock1) ==> key:$1)"); //en("if something opens lock1, it is a key");
         tester.believe("open(lock,lock1)");
-        tester.mustBelieve(cycles, "((open(lock,#1) && open($2,#1)) ==> key:$2)",
+        tester.mustBelieve(cycles,
+                "((open(lock,#1) && open($2,#1)) ==> key:$2)",
                 1.00f, 0.81f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
         //tester.mustBelieve(cycles, "<(<$1 --> lock> && open($2,$1)) ==> <$2 --> key>>", 1.00f, 0.45f); //en("there is a lock with the property that when opened by something, this something is a key (induction)");
 
@@ -496,7 +497,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.log();
         tester.believe("<(&&,<($a,is,cat) --> test>,<($a,is,$b) --> sentence>) ==> <$a --> $b>>");
         tester.believe("<(tim,is,cat) --> test>");
-        tester.mustBelieve(cycles, "<<(tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles*2, "<<(tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 
     }
 
@@ -528,6 +529,7 @@ public class NAL6Test extends AbstractNALTest {
         //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
         ;
     }
+
     @Test public void testDecomposeImplPred() {
         test()
             .believe("( (a,#b) ==> (&&, (x,#b), y, z ) )")
@@ -536,6 +538,7 @@ public class NAL6Test extends AbstractNALTest {
             .mustBelieve(cycles, "( (a,#b) ==> z )", 1f, 0.73f)
         ;
     }
+
     @Test public void testEquivSpecificPP() {
         test().believe("(y)").believe("(($x) <=> ($x,y))")
             .mustBelieve(cycles, "(y,y)", 1f, 0.81f) ; //B, (A <=> C), ...
