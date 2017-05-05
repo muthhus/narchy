@@ -227,7 +227,7 @@ public class UnificationTest {
     public void pattern_trySubs_Var_2_product_and_common_depvar_bidirectional() {
         Unify sub = test(Op.VAR_DEP,
                 "(<(#1,x) --> on>,<(SELF,x) --> at>)",
-                "(<({t002},x) --> on>,<#1 --> at>)",
+                "(<(SELF,x) --> on>,<(#1,x) --> at>)",
                 true);
 
         //THESE NEED TO BE TESTED WITHIN THE SUBSTITUTION BECAUSE XY AND YX WILL HAVE BEEN CLEARED BY NOW

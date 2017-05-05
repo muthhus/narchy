@@ -192,9 +192,9 @@ public interface NARBuilder {
 
         nar.deriver.rate.setValue(0.05f);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(48);
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.75f);
         nar.goalConfidence(0.5f);
 
         float p = 0.5f;

@@ -2,6 +2,7 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
@@ -139,7 +140,7 @@ public class Arkancide extends NAgentX {
         Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
         actionBipolar(paddleControl, (v) -> {
 
-            float dx = paddleSpeed.floatValue() * maxPaddleSpeed * v;
+            float dx = paddleSpeed.floatValue() * maxPaddleSpeed * Util.sigmoidSymmetric(v, 6);
 
             noid.paddle.move(dx);
             //System.out.println(v + " "  + dx + " -> " + noid.paddle.x);
