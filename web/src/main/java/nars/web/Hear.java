@@ -85,10 +85,10 @@ public class Hear extends Loop {
     }
 
     @Override
-    public void next() {
+    public boolean next() {
         if (token >= tokens.size()) {
             stop();
-            return;
+            return true;
         }
 
 //        if (token > 0) {
@@ -96,6 +96,7 @@ public class Hear extends Loop {
 //        }
 
         hear(token > 0 ? tokens.get(token-1) : START, tokens.get(token++)); //word ON
+        return true;
     }
 
     private void hear(Term prev, Term next) {

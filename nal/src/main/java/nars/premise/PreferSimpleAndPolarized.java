@@ -55,8 +55,8 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
     }
 
 
-    @Nullable @Override
-    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc) {
+    @Override
+    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
 
         float p = d.premise.pri();
 

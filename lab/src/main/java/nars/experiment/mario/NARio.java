@@ -75,8 +75,8 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
-        sc.setResolution(0.02f);
-        sc.pri(0.25f);
+        sc.setResolution(0.01f);
+        sc.pri(0.2f);
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);
 //        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
@@ -167,7 +167,15 @@ public class NARio extends NAgentX {
     public static void main(String[] args) {
 
 
+        Param.DEBUG = true;
+
         NAR nar = runRT((NAR n) -> {
+
+            n.onTask(t -> {
+                if (t.isEternal() && !t.isInput()) {
+                    System.err.println(t.proof());
+                }
+            });
 
             NAgentX x = null;
             try {
@@ -199,7 +207,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 15);
+        }, 10);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

@@ -200,14 +200,16 @@ public interface Concept extends Termed {
         return goals().truth(when, now, dur);
     }
 
-    @Nullable
-    default Truth belief(long now, int dur) {
-        return beliefs().truth(now, dur);
+    /** use NAR.beliefTruth(Term|String, when) */
+    @Deprecated @Nullable
+    default Truth belief(long when, int dur) {
+        return beliefs().truth(when, dur);
     }
 
-    @Nullable
-    default Truth goal(long now, int dur) {
-        return goals().truth(now, dur);
+    /** use NAR.goalTruth(Term|String, when) */
+    @Deprecated @Nullable
+    default Truth goal(long when, int dur) {
+        return goals().truth(when, dur);
     }
 
 //    @Nullable
@@ -437,33 +439,6 @@ public interface Concept extends Termed {
      * returns the previous state
      */
     @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
-
-
-    default float beliefFreq(long time, int dur) {
-        return beliefFreq(time, dur, Float.NaN);
-    }
-
-    default float beliefFreq(long time, int dur, float valueIfNonExistent) {
-        return freq(time, dur, beliefs(), valueIfNonExistent);
-    }
-
-    default float goalFreq(long time, int dur) {
-        return goalFreq(time, dur, Float.NaN);
-    }
-
-    default float goalFreq(long time, int dur, float valueIfNonExistent) {
-        return freq(time, dur, goals(), valueIfNonExistent);
-    }
-
-    static float freq(long time, int dur, @NotNull BeliefTable table) {
-        return freq(time, dur, table, Float.NaN);
-    }
-
-    static float freq(long time, int dur, @NotNull BeliefTable table, float valueIfNonExistent) {
-        Truth t = table.truth(time, dur);
-        return t != null ? t.freq() : valueIfNonExistent;
-    }
-
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

@@ -70,7 +70,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictAheadDurs = new FloatParam(1, 1, 32);
+    public final FloatParam predictAheadDurs = new FloatParam(2, 1, 32);
 
 
     public final FloatParam predictorProbability = new FloatParam(1f);
@@ -375,8 +375,8 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-                    question(impl(action, dur, happiness), ETERNAL),
-                    question(impl(neg(action), dur, happiness), ETERNAL)
+                    question(impl(action, dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
@@ -440,26 +440,32 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
+    public NAgent runCycles(final int totalCycles) {
+        return runCycles(nar.dur(), totalCycles);
+    }
+
     /**
      * synchronous execution managed by existing NAR's
      */
-    public NAgent runCycles(final int cycles) {
+    public NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
 
         init();
 
+        final int[] frameRemain = {totalFrames};
         nar.onCycle((n) -> {
 
             long lastNow = this.now;
             long now = nar.time();
-            int dur = nar.dur();
-            if (now - lastNow < dur) {
+            if (now - lastNow < cyclesPerFrame) {
                 return; //only execute at most one agent frame per duration
             }
 
             cycle();
-
+            if (frameRemain[0]-- == 0)
+                stop();
         });
-        nar.run(cycles);
+
+        nar.loop().join();
 
         return this;
     }

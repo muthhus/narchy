@@ -223,10 +223,8 @@ public class MySTMClustered extends STMClustered {
                         if (conj == null)
                             return null;
 
-                        long t = Math.round(startDim[0]);
-
                         Task m = new GeneratedTask(conj, punc,
-                                $.t(finalFreq, conf), start[0], end[0], t, evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                                $.t(finalFreq, conf), now, start[0], end[0], evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
 //                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
 //                        float priAvg = ((float)(priTotal / uu.size()));

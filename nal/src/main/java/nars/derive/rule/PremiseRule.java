@@ -826,7 +826,7 @@ public class PremiseRule extends GenericCompound {
                                 derived = compoundOrNull(p.index.the(CONJ, b-a, A, B));
                                 break;
                             default:
-                                assert(derived.dt()==0);
+                                assert(derived.dt()==DTERNAL);
                                 derived = compoundOrNull(p.index.the(derived, 0));
                                 break;
                         }

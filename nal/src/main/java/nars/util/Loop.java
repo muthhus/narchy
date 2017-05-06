@@ -88,18 +88,19 @@ abstract public class Loop implements Runnable {
 
             long beforeTime = System.currentTimeMillis();
 
-            try {
+            //try {
 
-                next();
-
-            } catch (Throwable e) {
-                logger.error("{}", e);
-                /*nar.eventError.emit(e);
-                if (Param.DEBUG) {
-                    stop();
+                if (!next())
                     break;
-                }*/
-            }
+
+//            } catch (Throwable e) {
+//                logger.error("{}", e);
+//                /*nar.eventError.emit(e);
+//                if (Param.DEBUG) {
+//                    stop();
+//                    break;
+//                }*/
+//            }
 
 
             //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
@@ -125,7 +126,7 @@ abstract public class Loop implements Runnable {
     }
 
 
-    abstract public void next();
+    abstract public boolean next();
 
     public void join() {
         try {
@@ -136,6 +137,7 @@ abstract public class Loop implements Runnable {
     }
 
     public final void setPeriodMS(int period) {
+
         this.periodMS = period;
 //        int prevPeriod = periodMS;
 //

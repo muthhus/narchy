@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -130,8 +131,14 @@ public class MultiThreadExecutor extends Executioner  {
 
         synchronized (disruptor) {
 
-            disruptor.shutdown();
+            sync = false;
             disruptor.halt();
+
+            try {
+                disruptor.shutdown(1, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
 
             super.stop();
         }

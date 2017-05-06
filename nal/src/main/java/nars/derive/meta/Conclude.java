@@ -244,10 +244,13 @@ public final class Conclude extends AbstractPred<Derivation> {
                             return;
                         }
 
+                        long start = occ[0];
+                        long end = occ[1];
+
                         //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                         // also confidence should not be changed after this budgeting
                         byte punc = ct.punc;
-                        Priority priority = m.budgeting.budget(m, c3, truth, punc);
+                        Priority priority = m.budgeting.budget(m, c3, truth, punc, start, end);
 
                         if (priority != null) {
 

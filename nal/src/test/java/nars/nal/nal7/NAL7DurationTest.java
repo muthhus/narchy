@@ -21,6 +21,25 @@ import static org.junit.Assert.*;
 public class NAL7DurationTest {
 
     @Test
+    public void testLinearTruthpolation() throws Narsese.NarseseException {
+        Terminal n = new Terminal();
+        n.time.dur(5);
+        n.inputAt(10, "(x). :|:");
+        n.run(10);
+        //with duration = 5, the evidence surrounding a point
+        // belief/goal will decay in the +/- 2.5 radius of time surrounding it.
+
+        assertNull( n.beliefTruth("(x)", 7) );
+        assertEquals(0.64f, n.beliefTruth("(x)",  8).conf(), 0.01f );
+        assertEquals(0.84f, n.beliefTruth("(x)",  9).conf(), 0.01f );
+        assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.01f );
+        assertEquals(0.84f, n.beliefTruth("(x)", 11).conf(), 0.01f );
+        assertEquals(0.64f, n.beliefTruth("(x)", 12).conf(), 0.01f );
+        assertNull( n.beliefTruth("(x)", 13) );
+
+    }
+
+    @Test
     public void testDurationDithering() throws Narsese.NarseseException {
         Terminal n = new Terminal();
         n.time.dur(5);

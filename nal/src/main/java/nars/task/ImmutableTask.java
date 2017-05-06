@@ -67,7 +67,10 @@ public class ImmutableTask extends Pri implements Task {
 
         this.punc = punc;
 
-        assert((start==ETERNAL&&end==ETERNAL) || (start <= end) );
+        if (!((start==ETERNAL && end==ETERNAL) || (start <= end) )) {
+            throw new RuntimeException("invalid task occurrence time: " + start + ".." + end);
+        }
+
         this.start = start;
         this.end = end;
 

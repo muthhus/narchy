@@ -5,6 +5,7 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
+import jcog.pri.Priority;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -13,12 +14,17 @@ import nars.conceptualize.state.DefaultConceptState;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.op.stm.MySTMClustered;
+import nars.premise.Derivation;
+import nars.premise.PreferSimpleAndPolarized;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Time;
+import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
@@ -27,6 +33,7 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/27/16.
@@ -99,6 +106,20 @@ public interface NARBuilder {
 //                //return new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
 //                return Deriver.get("induction.nal", "nal6.nal");
 //            }
+
+            @Override
+            public PreferSimpleAndPolarized newDerivationBudgeting() {
+                return new PreferSimpleAndPolarized() {
+                    @Override
+                    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
+                        Priority p = super.budget(d, conclusion, truth, punc, start, end);
+                        if (start!=ETERNAL && start >= dur() + time()) {
+                            p.priMult(2);
+                        }
+                        return p;
+                    }
+                };
+            }
 
 
             //            @Override

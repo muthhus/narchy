@@ -347,7 +347,7 @@ public class Recog2D extends NAgentX {
             if (i == null || i.length!= s)
                 i = new float[s];
             for (int j = 0, insSize = ins.size(); j < insSize; j++) {
-                float b = ins.get(j).beliefFreq(when, nar.dur(), 0.5f);
+                float b = nar.beliefTruth(ins.get(j), when).freq();
                 if (b!=b) //dont input NaN
                     b = 0.5f;
                 i[j] = b;

@@ -49,11 +49,13 @@ public class NARLoop extends Loop {
 
 
     @Override
-    public final void next() {
-
-        //if (!nar.running.get()) {
-
-        nar.run(framesPerLoop);
+    public final boolean next() {
+        if (nar.exe.isRunning()) {
+            nar.run(framesPerLoop);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

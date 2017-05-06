@@ -509,9 +509,26 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new FrameTime().dur(2);
+        Time clock = new FrameTime().dur(5);
         NAR n =
-                NARBuilder.newMultiThreadNAR(1, clock);
+                NARBuilder.newMultiThreadNAR(2, clock);
+
+        Tetris a = new MyTetris(n);
+        a.trace = true;
+
+
+        NAgentX.chart(a);
+        a.runCycles(20, 5);
+
+        //nar.index.print(System.out);
+        n.forEachTask(System.out::println);
+
+        //NAR.printActiveTasks(nar, true);
+        //NAR.printActiveTasks(nar, false);
+        n.printConceptStatistics();
+        new TaskStatistics().add(n).print();
+
+
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
 
 //        n.onTask((t)->{
@@ -656,11 +673,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
         //new VariableCompressor(nar);
 
 
-        Tetris a = new MyTetris(n);
-        a.trace = true;
-
-
-        NAgentX.chart(a);
 //
 //            Default m = new Default(512, 16, 2, n.random,
 //                    new CaffeineIndex(new DefaultConceptBuilder(), 4096, false, n.exe),
@@ -720,8 +732,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            }
 
 
-        a.runCycles(100000);
-
 
 //        NARController meta = new NARController(nar, loop, t);
 //
@@ -732,15 +742,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        ));
 
 
-        //nar.stop();
 
-        //nar.index.print(System.out);
-        n.forEachTask(System.out::println);
-
-        //NAR.printActiveTasks(nar, true);
-        //NAR.printActiveTasks(nar, false);
-        n.printConceptStatistics();
-        new TaskStatistics().add(n).print();
 
 
         //NAR.printTasks(meta.nar, true);

@@ -2,7 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import jcog.bag.Bag;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -11,13 +10,13 @@ import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
-import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.concept.PermanentConcept;
+import nars.concept.PermanentAtomConcept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.op.Operator;
+import nars.table.BeliefTable;
 import nars.task.ImmutableTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -32,6 +31,7 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.DiscreteTruth;
+import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.data.Mix;
 import nars.util.exe.Executioner;
@@ -817,8 +817,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final void on(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
         PermanentAtomConcept c = builder.withBags(a,
-                (termlink, tasklink) ->
-                        new PermanentAtomConcept(a, termlink, tasklink)
+                (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
         );
         c.put(Operator.class, o);
         concepts.set(c);
@@ -837,15 +836,55 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return time.dur();
     }
 
-    /** provides a Random number generator */
+    /**
+     * provides a Random number generator
+     */
     public Random random() {
         return random;
     }
 
-    static class PermanentAtomConcept extends AtomConcept implements PermanentConcept {
-        public PermanentAtomConcept(@NotNull Atomic atom, Bag<Term, PLink<Term>> termLinks, Bag<Task, PLink<Task>> taskLinks) {
-            super(atom, termLinks, taskLinks);
+    /**
+     * returns concept belief/goal truth evaluated at a given time
+     */
+    @Nullable public Truth truth(@Nullable Termed concept, byte punc, long when) {
+        if (concept != null) {
+            @Nullable Concept c = concept(concept);
+            if (c != null) {
+                BeliefTable table;
+                switch (punc) {
+                    case BELIEF:
+                        table = c.beliefs();
+                        break;
+                    case GOAL:
+                        table = c.goals();
+                        break;
+                    default:
+                        throw new UnsupportedOperationException();
+                }
+                return table.truth(when, dur());
+            }
         }
+        return null;
+    }
+
+    @Nullable
+    public Truth beliefTruth(String concept, long when) throws NarseseException {
+        return truth(concept(concept), BELIEF, when);
+    }
+
+    @Nullable
+    public Truth goalTruth(String concept, long when) throws NarseseException {
+        return truth(concept(concept), GOAL, when);
+    }
+
+    @Nullable
+    public Truth beliefTruth(Termed concept, long when) {
+        return truth(concept, BELIEF, when);
+    }
+
+    @Nullable
+    public Truth goalTruth(Termed concept, long when) {
+        return truth(concept, GOAL, when);
     }
 
 
@@ -1222,21 +1261,29 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    /** resolves a term or concept to its currrent Concept */
-    @Nullable public Concept concept(@NotNull Termed termed) {
+    /**
+     * resolves a term or concept to its currrent Concept
+     */
+    @Nullable
+    public Concept concept(@NotNull Termed termed) {
         return concept(termed, false);
     }
 
-    /** resolves a term to its Concept; if it doesnt exist, its construction will be attempted */
-    @Nullable public Concept conceptualize(@NotNull Termed termed) {
+    /**
+     * resolves a term to its Concept; if it doesnt exist, its construction will be attempted
+     */
+    @Nullable
+    public Concept conceptualize(@NotNull Termed termed) {
         return concept(termed, true);
     }
 
-    @Nullable public Concept concept(@NotNull Termed termed, boolean createIfMissing) {
+    @Nullable
+    public Concept concept(@NotNull Termed termed, boolean createIfMissing) {
 
         if (termed instanceof Concept) {
             Concept ct = (Concept) termed;
-            if (!ct.isDeleted()) return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
+            if (!ct.isDeleted())
+                return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
         }
 
@@ -1401,7 +1448,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return this == obj;
     }
 
-    @Nullable public PLink<Concept> activate(Termed c, float priToAdd) {
+    @Nullable
+    public PLink<Concept> activate(Termed c, float priToAdd) {
         @Nullable Concept cc = conceptualize(c);
         return (cc != null) ? focus.activate(cc, priToAdd) : null;
     }
@@ -1505,7 +1553,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         forEachTask(_x -> {
             total.increment();
             Task x = post(_x);
-            if (x.truth()!=null && x.conf() < confMin.floatValue())
+            if (x.truth() != null && x.conf() < confMin.floatValue())
                 return; //ignore task if it is below confMin
 
             x = each.apply(x);

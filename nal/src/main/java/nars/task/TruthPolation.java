@@ -22,7 +22,7 @@ public enum TruthPolation {
     public static float evidenceDecay(float evi, int dur, long dt) {
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
-        float scale = dt / dur;
+        float scale = ((float)dt) / dur;
         if (scale > 0.5f) return 0;
         else return evi * (1f - scale*2f);
 
