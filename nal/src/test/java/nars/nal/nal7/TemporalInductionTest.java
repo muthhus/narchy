@@ -40,6 +40,7 @@ public class TemporalInductionTest {
     @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
         NAR n = new Terminal();
+        n.time.dur(6);
 
         //TextOutput.out(n);
 

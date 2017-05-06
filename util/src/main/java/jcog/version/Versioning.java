@@ -42,7 +42,7 @@ public class Versioning extends
             }
 
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
-                Object removed = versioned.removeLast();
+                Object removed = versioned.remove(versioned.size()-1); //removeLast();
                 if (removed == null) {
                     throw new NullPointerException();
                 }
@@ -61,7 +61,9 @@ public class Versioning extends
     }
 
     @Override
-    public boolean add(@NotNull Versioned newItem) {
+    public boolean add(/*@NotNull */Versioned newItem) {
+        if (newItem == null)
+            throw new NullPointerException();
         return tick() && super.add(newItem);
     }
 

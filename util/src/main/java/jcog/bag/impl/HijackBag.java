@@ -173,7 +173,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (c == 0)
             return null;
 
-        final int hash = hash(x);
+        final int hash = x.hashCode(); /*hash(x)*/;
         int iStart = i(c, hash);
 
         if (add || remove)
@@ -293,17 +293,17 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
 
-    protected int hash(Object x) {
-
-        //return x.hashCode(); //default
-
-        //identityComparisons ? System.identityHashCode(key)
-
-        // "Applies a supplemental hash function to a given hashCode, which defends against poor quality hash functions."
-        //return Util.hashWangJenkins(x.hashCode());
-
-        return x.hashCode();
-    }
+//    protected int hash(Object x) {
+//
+//        //return x.hashCode(); //default
+//
+//        //identityComparisons ? System.identityHashCode(key)
+//
+//        // "Applies a supplemental hash function to a given hashCode, which defends against poor quality hash functions."
+//        //return Util.hashWangJenkins(x.hashCode());
+//
+//        return x.hashCode();
+//    }
 
 
     /**

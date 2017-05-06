@@ -12,6 +12,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
+import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
@@ -511,7 +512,7 @@ public abstract class TermBuilder {
             return finish(CONJ, XTERNAL, u);
         }
 
-        boolean commutive = commutive(dt);
+        boolean commutive = concurrent(dt);
         if (commutive) {
 
             return junctionFlat(dt, u);
@@ -795,7 +796,7 @@ public abstract class TermBuilder {
                     return compound(op, XTERNAL, subject, predicate);
                 } else {
                     boolean equal = subject.equals(predicate);
-                    if (commutive(dt)) {
+                    if (concurrent(dt)) {
                         if (equal) {
                             return True;
                         }
@@ -812,7 +813,7 @@ public abstract class TermBuilder {
 
                 //special case for implications: reduce to --predicate if the subject is False
                 if (isTrue(subject /* antecedent */)) {
-                    if (commutive(dt) || dt == XTERNAL)
+                    if (concurrent(dt) || dt == XTERNAL)
                         return predicate; //special case for implications: reduce to predicate if the subject is True
                     else {
                         return False; //no temporal basis
@@ -837,7 +838,7 @@ public abstract class TermBuilder {
                     //create as-is
                     return compound(op, XTERNAL, subject, predicate);
                 } else {
-                    if (commutive(dt)) {
+                    if (concurrent(dt)) {
                         if (subject.equals(predicate))
                             return True;
                     } //else: allow repeat
@@ -863,22 +864,22 @@ public abstract class TermBuilder {
 
 
 
-        //factor out any common subterms iff commutive
-        if (commutive(dt)) {
+        //factor out any common subterms iff concurrent
+        if (concurrent(dt)) {
 
-            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
-                return False; //cyclic
-
-//            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
-//                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
-//                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+//            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
 //                return False; //cyclic
+
+            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
+                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
+                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+                return False; //cyclic
 
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
 
 
-                boolean subjConj = subject.op() == CONJ && commutive(((Compound) subject).dt());
-                boolean predConj = predicate.op() == CONJ && commutive(((Compound) predicate).dt());
+                boolean subjConj = subject.op() == CONJ && concurrent(((Compound) subject).dt());
+                boolean predConj = predicate.op() == CONJ && concurrent(((Compound) predicate).dt());
                 if (subjConj && !predConj) {
                     final Compound csub = (Compound) subject;
                     TermContainer subjs = csub.subterms();
@@ -962,7 +963,7 @@ public abstract class TermBuilder {
                 Term x = predicate;
                 predicate = subject;
                 subject = x;
-                if (!commutive(dt))
+                if (!concurrent(dt))
                     dt = -dt;
             }
 

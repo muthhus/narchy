@@ -267,7 +267,7 @@ public enum Op {
         return x == False;
     }
 
-    public static boolean commutive(int dt) {
+    public static boolean concurrent(int dt) {
         return (dt == DTERNAL) || (dt == 0);
     }
 

@@ -3,7 +3,6 @@ package nars;
 import jcog.Texts;
 import jcog.pri.PLink;
 import nars.concept.Concept;
-import nars.derive.meta.match.EllipsisMatch;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.data.*;
@@ -165,7 +164,7 @@ public class Builtin {
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
             Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
-            if (c == null || c.op() != CONJ || !commutive(c.dt()))
+            if (c == null || c.op() != CONJ || !concurrent(c.dt()))
                 return False;
 
             int size = c.size();

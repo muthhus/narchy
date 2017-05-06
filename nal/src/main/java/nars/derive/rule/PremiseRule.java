@@ -1049,12 +1049,14 @@ public class PremiseRule extends GenericCompound {
         return timeFunction;
     }
 
-    public @Nullable Compound filterEternalBasis(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn) {
-        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal()  ))) {
+    public @Nullable Compound filterEternalBasis(Compound derived, @NotNull Derivation p, @NotNull long[] occReturn) {
+        if (derived == null)
+            return null;
+
+        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal()  )))
             return null; //no temporal basis
-        } else {
-            return derived;
-        }
+
+        return derived;
     }
 
     public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {

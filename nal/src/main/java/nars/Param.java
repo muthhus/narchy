@@ -29,6 +29,9 @@ public abstract class Param  {
     /** how many answers to record per input question task (in its concept's answer bag) */
     public static final int MAX_INPUT_ANSWERS = 16;
 
+    /** max retries for termpolation to produce a valid task content result during revision */
+    public static final int MAX_TERMPOLATE_RETRIES = 2;
+
 
     /** determines if an input goal or command operation task executes */
     public static float EXECUTION_THRESHOLD = 0.666f;

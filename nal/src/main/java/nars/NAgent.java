@@ -321,15 +321,15 @@ abstract public class NAgent implements NSense, NAct {
                 goal(happiness,
                         t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
                         //ETERNAL
-                        now + dur
+                        now
                 )
         );
-        predictors.add(
-                goal(happiness,
-                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
-                        ETERNAL
-                )
-        );
+//        predictors.add(
+//                goal(happiness,
+//                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
+//                        ETERNAL
+//                )
+//        );
 
 
 //        predictors.addAll(

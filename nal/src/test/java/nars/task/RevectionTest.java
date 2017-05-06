@@ -46,7 +46,7 @@ public class RevectionTest {
         TaskBuilder a = t(1f, 0.5f, -4).evidence(1);
         TaskBuilder b = t(0f, 0.5f, 4).evidence(2);
 
-        int dur = 4;
+        int dur = 9;
         Truth pt = TruthPolation.truth(0, dur, a.apply(n), b.apply(n));
         @Nullable Truth rt = Revision.revise(a, b);
 

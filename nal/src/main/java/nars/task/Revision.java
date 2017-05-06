@@ -1,6 +1,7 @@
 package nars.task;
 
 import nars.$;
+import nars.Param;
 import nars.Task;
 import nars.premise.Derivation;
 import nars.term.Compound;
@@ -114,17 +115,26 @@ public class Revision {
 
         Random rng = ThreadLocalRandom.current(); //DEPRECATED TODO pass rng as parameter up through methods
 
-        MutableFloat accumulatedDifference = new MutableFloat(0);
-        Compound cc = normalizedOrNull(intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms);
+        Compound cc = null;
+        for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
+            MutableFloat accumulatedDifference = new MutableFloat(0);
+            cc = normalizedOrNull(intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms);
+            if (cc!=null && Task.taskContentValid(cc, a.punc(), null, true)) {
+                break;
+            } else {
+                cc = null;
+            }
+        }
+
         if (cc == null)
             return null;
+
         if (cc.op() == NEG) {
             cc = compoundOrNull(cc.unneg());
             if (cc == null)
                 return null;
             newTruth = newTruth.negated();
         }
-
 
         //get a stamp collecting all evidence from the table, since it all contributes to the result
         //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp

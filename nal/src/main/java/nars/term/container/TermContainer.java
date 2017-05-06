@@ -633,7 +633,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /** non-zero or non-iternal dt disqualifies any reason for needing a TermSet */
     public static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
-        return num > 1 && op.commutative && commutive(dt);
+        return num > 1 && op.commutative && concurrent(dt);
     }
 
     default boolean isSorted() {
@@ -769,9 +769,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (!(this instanceof TermContainer))
             throw new UnsupportedOperationException("only implemented for TermVector instance currently");
 
-        return TermVector.the(
-            Stream.of(toArray()).filter(p).toArray(i -> new Term[i])
-        );
+        List<Term> c = $.newArrayList(size());
+        if (OR(x -> p.test(x) && c.add(x)))
+            return TermVector.the(c);
+        else
+            return Terms.ZeroProduct;
     }
 
     /** stream of each subterm */

@@ -174,7 +174,7 @@ public class DynamicBeliefTableTest {
 
     @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
-        int dur = 8;
+        int dur = 9;
         n.time.dur(dur);
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);

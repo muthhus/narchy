@@ -170,6 +170,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
 
+                        return;
                     } else {
                         temporalized = temporalized2;
                     }
@@ -246,6 +247,11 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                         long start = occ[0];
                         long end = occ[1];
+                        if (start!=ETERNAL && start > end) {
+                            //TODO why does this happen
+                            long t = start; start = end; end = t; //swap
+                        }
+
 
                         //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
                         // also confidence should not be changed after this budgeting
@@ -257,7 +263,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                             DerivedTask d =
                                     new DerivedTask.DefaultDerivedTask(
                                             c3, truth, punc,
-                                            ct.evidence, m, nar.time(), occ[0], occ[1]);
+                                            ct.evidence, m, nar.time(), start, end);
 
                             d.setPriority(priority);
 
