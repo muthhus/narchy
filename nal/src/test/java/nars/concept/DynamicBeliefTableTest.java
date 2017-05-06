@@ -106,6 +106,7 @@ public class DynamicBeliefTableTest {
         n.believe($("(x)"), (long)0, 1f, 0.9f);
         n.believe($("(y)"), (long)4, 1f, 0.9f);
         n.run(2);
+        n.time.dur(8);
         CompoundConcept cc = (CompoundConcept) n.conceptualize($("((x) && (y))"));
 //        cc.print();
 //
@@ -173,7 +174,8 @@ public class DynamicBeliefTableTest {
 
     @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
         NAR n = new Default();
-        int dur = n.dur();
+        int dur = 8;
+        n.time.dur(dur);
 
         n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
 

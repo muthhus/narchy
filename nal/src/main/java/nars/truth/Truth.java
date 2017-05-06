@@ -185,7 +185,7 @@ public interface Truth extends Truthed {
     }
 
     default boolean equals(@NotNull Truth x, float tolerance) {
-        return Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
+        return x!=null && Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 
     @NotNull

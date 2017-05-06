@@ -23,7 +23,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 150;
+    final int cycles = 50;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -875,10 +875,10 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalNear() {
         test()
-                //
+                .dur(2)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(1, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.74f, 1)
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 1)
         ;
     }
 
@@ -888,10 +888,11 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalFar() {
         test()
-                //
-                .inputAt(0, "(x --> a). :|:")
-                .inputAt(16, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.31f, 8)
+            .dur(2)
+            //.log()
+            .inputAt(0, "(x --> a). :|:")
+            .inputAt(3, "(y --> a). :|:")
+            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.31f, 3)
         ;
     }
 
@@ -1063,7 +1064,7 @@ public class NAL7Test extends AbstractNALTest {
         // b +10 x
         //   -> b +30 e
         test()
-                .log()
+                //.log()
                 .believe("((b-->x) ==>+10 (c-->x))")
                 .believe("((e-->x) ==>-20 (c-->x))")
                 .mustBelieve(cycles, "(x:e ==>-30 x:b)", 1f, 0.45f)
@@ -1162,7 +1163,7 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .inputAt(1, "(((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
                 .inputAt(1, "((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
-                .mustBelieve(cycles, "(d-->e)", 1f, 0.81f, 10)
+                .mustBelieve(cycles, "(d-->e)", 1f, 0.73f, 10)
                 .mustNotOutput(cycles, "(d-->e)", BELIEF, ETERNAL, 1, 19);
     }
 

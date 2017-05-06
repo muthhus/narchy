@@ -30,6 +30,7 @@ import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +39,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
+import static nars.Op.CONJ;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
@@ -805,6 +807,30 @@ public class PremiseRule extends GenericCompound {
                     }
 
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
+
+                    //HACK retemporalize a non-temporal conjunction result
+                    if (p.taskTerm.op() == CONJ && p.taskTerm.dt()!=DTERNAL &&
+                        derived.op() == CONJ && derived.dt()==DTERNAL) {
+
+                        switch (derived.size()) {
+                            case 2:
+                                Term A = derived.sub(0);
+                                int a = p.taskTerm.subtermTime(A);
+                                Term B = derived.sub(1);
+                                int b = p.taskTerm.subtermTime(B);
+                                if (a > 0) {
+                                    //shift ahead, aligning the first subterm with its position in the task
+                                    occReturn[0] += a;
+                                    b -= a;
+                                }
+                                derived = compoundOrNull(p.index.the(CONJ, b-a, A, B));
+                                break;
+                            default:
+                                assert(derived.dt()==0);
+                                derived = compoundOrNull(p.index.the(derived, 0));
+                                break;
+                        }
+                    }
 
                     return derived;
                 };

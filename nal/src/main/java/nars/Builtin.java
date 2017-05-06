@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
 import nars.term.transform.Functor;
 import nars.term.var.Variable;
@@ -62,15 +63,6 @@ public class Builtin {
             Functor.f2("subterm", (Term x, Term index) -> {
                 if (x instanceof Compound && index instanceof IntTerm) {
                     return ((Compound) x).sub(((IntTerm) index).val);
-                }
-                return x;
-            }),
-            /** subterm, but specifically inside an ellipsis. otherwise pass through */
-            Functor.f2("esubterm", (Term x, Term index) -> {
-                if (!(index instanceof IntTerm))
-                    throw new RuntimeException("why not int: " + index);
-                if (x instanceof EllipsisMatch) {
-                    return ((EllipsisMatch) x).sub(((IntTerm) index).val);
                 }
                 return x;
             }),
@@ -135,6 +127,37 @@ public class Builtin {
      */
     public static void load(NAR nar) {
         nar.on(new DepIndepVarIntroduction.VarIntro(nar));
+
+
+
+                    /** subterm, but specifically inside an ellipsis. otherwise pass through */
+        nar.on(Functor.f("esubterm", (TermContainer c) -> {
+                Term x = c.sub(0, null);
+                if (x==null)
+                    return null;
+
+                if (x instanceof Compound) {
+                    Term index = c.sub(1, null);
+                    int which;
+                    if (index != null) {
+                        if (index instanceof Variable)
+                            return null;
+
+                        if (index instanceof IntTerm) {
+                            which = ((IntTerm) index).val;
+                        } else {
+                            return null;
+                        }
+                    } else {
+                        //random
+                        which = nar.random().nextInt(x.size());
+                    }
+
+                    return ((TermContainer)x).sub(which);
+                }
+                return x;
+            }));
+
 
         /** remove an element from a commutive conjunction, at random, and try re-creating
          * the compound. wont necessarily work in all situations.

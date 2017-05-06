@@ -223,7 +223,7 @@ public class UnificationTest {
                 true);
     }
 
-    @Test
+    @Ignore @Test
     public void pattern_trySubs_Var_2_product_and_common_depvar_bidirectional() {
         Unify sub = test(Op.VAR_DEP,
                 "(<(#1,x) --> on>,<(SELF,x) --> at>)",

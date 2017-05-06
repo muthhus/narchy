@@ -46,8 +46,8 @@ public class RevectionTest {
         TaskBuilder a = t(1f, 0.5f, -4).evidence(1);
         TaskBuilder b = t(0f, 0.5f, 4).evidence(2);
 
-
-        Truth pt = TruthPolation.truth(0, 1, a.apply(n), b.apply(n));
+        int dur = 4;
+        Truth pt = TruthPolation.truth(0, dur, a.apply(n), b.apply(n));
         @Nullable Truth rt = Revision.revise(a, b);
 
         assertEquals(pt.freq(), rt.freq(), 0.01f);
@@ -289,7 +289,7 @@ public class RevectionTest {
         assertEquals(4, b.size(true));
 
         assertEquals(5, b.wave().start());
-        assertEquals(10, b.wave().end());
+        assertEquals(12, b.wave().end());
 
     }
 

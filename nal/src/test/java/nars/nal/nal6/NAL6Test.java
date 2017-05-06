@@ -17,7 +17,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 180;
+    final int cycles = 380;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -450,7 +450,7 @@ public class NAL6Test extends AbstractNALTest {
             .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
             .believe("(((#1 --> lock) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is a lock with the property that when opened by something, this something is a key");
-            .mustBelieve(cycles*2, "lock:lock1", 1.00f, 0.45f) //en("lock1 is a lock");
+            .mustBelieve(cycles*4, "lock:lock1", 1.00f, 0.45f) //en("lock1 is a lock");
         ;
     }
 
