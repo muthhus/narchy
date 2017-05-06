@@ -13,7 +13,7 @@ import javax.swing.*;
 
 public class PacMan {
 
-	int periodMS = 30;
+	int periodMS = 5;
 
 	static final boolean running = true;
 	public final PacComponent view;

@@ -107,19 +107,19 @@ public interface NARBuilder {
 //                return Deriver.get("induction.nal", "nal6.nal");
 //            }
 
-            @Override
-            public PreferSimpleAndPolarized newDerivationBudgeting() {
-                return new PreferSimpleAndPolarized() {
-                    @Override
-                    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
-                        Priority p = super.budget(d, conclusion, truth, punc, start, end);
-                        if (start!=ETERNAL && start >= dur() + time()) {
-                            p.priMult(2);
-                        }
-                        return p;
-                    }
-                };
-            }
+//            @Override
+//            public PreferSimpleAndPolarized newDerivationBudgeting() {
+//                return new PreferSimpleAndPolarized() {
+//                    @Override
+//                    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
+//                        Priority p = super.budget(d, conclusion, truth, punc, start, end);
+//                        if (start!=ETERNAL && start >= dur() + time()) {
+//                            p.priMult(2);
+//                        }
+//                        return p;
+//                    }
+//                };
+//            }
 
 
             //            @Override

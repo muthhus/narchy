@@ -30,13 +30,15 @@ public class Versioning extends
 
         //pop(size - when );
 
-        while (size > when) {
+        int s;
+        while ((s = size()) > when) {
 
             Versioned versioned =
                     //removeLast();
-                    remove(size-1);
+                    remove(s-1);
 
             if (versioned == null) {
+                clear();
                 throw new NullPointerException();
                 //continue;
             }
@@ -44,6 +46,7 @@ public class Versioning extends
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
                 Object removed = versioned.remove(versioned.size()-1); //removeLast();
                 if (removed == null) {
+                    clear();
                     throw new NullPointerException();
                 }
             //}

@@ -219,7 +219,7 @@ public class TermReductionsTest {
         assertEquals(pp, disj(pp, pp));
     }
 
-    @Test public void testRepeatConjunctionTaskReduction() throws Narsese.NarseseException {
+    @Test public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
         assertEquals(
                 "$.50 (x). 0⋈10 %1.0;.90%",
@@ -640,7 +640,9 @@ public class TermReductionsTest {
     @Test public void testRepeatEvent() throws Narsese.NarseseException {
         Terminal n = new Terminal();
 
-        for (String x : new String[] { "((a) ==>+1 (a))", "((a) &&+1 (a))", "((a) <=>+1 (a))" }) {
+        for (String x : new String[] { "((a) ==>+1 (a))",
+            /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
+            "((a) <=>+1 (a))" }) {
             Term t = $(x);
             assertValid(t);
 

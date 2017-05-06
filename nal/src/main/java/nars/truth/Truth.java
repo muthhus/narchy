@@ -180,11 +180,11 @@ public interface Truth extends Truthed {
 //    }
 
     /** the negated (1 - freq) of this truth value */
-    default Truth negated() {
+    @NotNull default Truth negated() {
         return new PreciseTruth(1f - freq(), conf());
     }
 
-    default boolean equals(@NotNull Truth x, float tolerance) {
+    default boolean equals(@Nullable  Truth x, float tolerance) {
         return x!=null && Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 

@@ -2,6 +2,7 @@ package nars.truth;
 
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
@@ -26,14 +27,14 @@ public class PreciseTruth implements Truth {
         this.e = e;
     }
 
-    @Override
+    @NotNull @Override
     public Truth negated() {
         return new PreciseTruth(1f - f, e, false);
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
-        return equals( (Truth)that, Param.TRUTH_EPSILON );
+    public boolean equals(@Nullable Object that) {
+        return that!=null &&equals( (Truth)that, Param.TRUTH_EPSILON );
         //throw new UnsupportedOperationException();
     }
 

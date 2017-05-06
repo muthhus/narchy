@@ -95,7 +95,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         if (rule.minNAL > nar.level())  //HACK
             return;
 
-        try {
+
             //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
             //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
@@ -277,10 +277,10 @@ public final class Conclude extends AbstractPred<Derivation> {
                 }
             }
 
-        } catch (InvalidTermException | InvalidTaskException e) {
-            if (Param.DEBUG_EXTRA)
-                logger.warn("{} {}", m, e.getMessage());
-        }
+//        } catch (InvalidTermException | InvalidTaskException e) {
+//            if (Param.DEBUG_EXTRA)
+//                logger.warn("{} {}", m, e.getMessage());
+//        }
 
     }
 

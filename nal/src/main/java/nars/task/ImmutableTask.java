@@ -7,6 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -44,6 +46,23 @@ public class ImmutableTask extends Pri implements Task {
                 throw new InvalidTaskException(term, "null truth");
         }
 
+        //special case: simplify repeating conjunction
+        if (term.op() == CONJ) {
+            int dt = term.dt();
+            if (dt !=DTERNAL && dt!=0) {
+                Term s0 = term.sub(0);
+                if (s0 instanceof Compound && s0.equals(term.sub(1))) {
+                    term = (Compound) s0;
+                    if (dt > 0) {
+                        end = start + dt;
+                    } else if (dt < 0) {
+                        end = start - dt;
+                    }
+                }
+            }
+        }
+
+        //finally, unwrap negation and invert truth
         if (term.op() == NEG) {
             term = compoundOrNull(term.unneg());
             if (term == null)
@@ -52,6 +71,9 @@ public class ImmutableTask extends Pri implements Task {
             if (truth != null)
                 truth = truth.negated();
         }
+
+
+
 
         Task.taskContentValid(term, punc, null, false);
 

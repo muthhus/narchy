@@ -2,6 +2,7 @@ package nars.premise;
 
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolPred;
 import nars.term.Compound;
@@ -9,6 +10,7 @@ import nars.term.Term;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
+import nars.term.util.InvalidTermException;
 import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -238,7 +240,13 @@ abstract public class Derivation extends Unify {
     }
 
     @Override public final boolean onMatch() {
-        forEachMatch.test(this);
+        try {
+            forEachMatch.test(this);
+        } catch (InvalidTermException t) {
+            if (Param.DEBUG) {
+                logger.error("{}", t.getMessage());
+            }
+        }
         //return  (--matchesRemain > 0) && ;
         return true;
     }
