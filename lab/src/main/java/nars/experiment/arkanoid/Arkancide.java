@@ -14,6 +14,7 @@ import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.time.RealTime;
 import nars.video.CameraSensor;
 import spacegraph.SpaceGraph;
 
@@ -51,6 +52,7 @@ public class Arkancide extends NAgentX {
             try {
                 a = new Arkancide(n, cam, numeric);
                 a.trace = true;
+                ((RealTime)a.nar.time).durSeconds(0.1f);
                 //a.nar.log();
 
             } catch (Narsese.NarseseException e) {

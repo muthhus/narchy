@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 100;
+    final int cycles = 400;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -1163,7 +1163,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "c(x)! :|:")
                 .inputAt(1,"a(x). :|:")
                 .input("((a($x) &&+4 b($x)) ==>-3 c($x)).")
-                .mustDesire(cycles*2, "b(x)", 1f, 0.66f, 4 /* early since c(x) is alrady active when this gets derived */);
+                .mustDesire(cycles*2, "b(x)", 1f, 0.73f, 3 /* early since c(x) is alrady active when this gets derived */);
     }
 
     @Test public void testConjDecomposeWithDepVar() {
@@ -1256,7 +1256,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.81f, 3) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { 3, 0, 10, ETERNAL } );
     }
     @Test public void conjDecoposeGoalBefore() {

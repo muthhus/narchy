@@ -193,7 +193,7 @@ public class DynamicBeliefTableTest {
 
 
 
-        n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
+        n.run(6); //by now, structural decomposition should have also had the opportunity to derive the image
 
         Truth t2 = prod.belief(0, dur);
 

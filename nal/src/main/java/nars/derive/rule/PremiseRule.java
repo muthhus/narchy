@@ -818,7 +818,7 @@ public class PremiseRule extends GenericCompound {
                                 int a = p.taskTerm.subtermTime(A);
                                 Term B = derived.sub(1);
                                 int b = p.taskTerm.subtermTime(B);
-                                if (a > 0) {
+                                if ((a > 0) && (occReturn[0]!=ETERNAL)) {
                                     //shift ahead, aligning the first subterm with its position in the task
                                     occReturn[0] += a;
                                     b -= a;
@@ -832,7 +832,7 @@ public class PremiseRule extends GenericCompound {
                         }
                     }
 
-                    return derived;
+                    return filterEternalBasis(derived, p, occReturn);
                 };
                 break;
             case "belief":
@@ -877,7 +877,7 @@ public class PremiseRule extends GenericCompound {
 
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
-                    return derived;
+                    return filterEternalBasis(derived, p, occReturn);
                 };
                 break;
 
@@ -1047,6 +1047,14 @@ public class PremiseRule extends GenericCompound {
                 throw new RuntimeException("invalid events parameters");
         }
         return timeFunction;
+    }
+
+    public @Nullable Compound filterEternalBasis(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn) {
+        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal()  ))) {
+            return null; //no temporal basis
+        } else {
+            return derived;
+        }
     }
 
     public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
@@ -204,41 +205,53 @@ abstract public class NAgent implements NSense, NAct {
 
     int actionFrame = 0;
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
+
     public void cycle() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-
-        this.now = nar.time();
-
-
-        float r = reward = act();
-        if (r == r) {
-            rewardSum += r;
+        if (!busy.compareAndSet(false, true)) {
+            return; //black-out, the last frame didnt even finish yet
         }
 
+        try {
 
-        /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
-//        float load = nar.exe.load();
-//        if (load < 1) {
-
-
-        long next = now + nar.dur()
-                //+(dur * 3 / 2);
-                ;
+            this.now = nar.time();
 
 
-        ambition.input(predict(next), nar::input);
-        ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
+            float r = reward = act();
+            if (r == r) {
+                rewardSum += r;
+            }
 
-        motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
-        motor.input(curious(next), nar::input);
 
-        sense.input(sense(nar, next), nar::input);
+            /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
+            //        float load = nar.exe.load();
+            //        if (load < 1) {
 
-        eventFrame.emit(this);
 
-        if (trace)
-            logger.info(summary());
+            long next = now + nar.dur()
+                    //+(dur * 3 / 2);
+                    ;
+
+
+            ambition.input(predict(next), nar::input);
+            ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
+
+            motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
+            motor.input(curious(next), nar::input);
+
+            sense.input(sense(nar, next), nar::input);
+
+            eventFrame.emit(this);
+
+            if (trace)
+                logger.info(summary());
+
+        } finally {
+            busy.set(false);
+        }
+
     }
 
     /** provides the stream of the environment's next sensory percept tasks */

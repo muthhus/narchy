@@ -40,12 +40,12 @@ public interface NARBuilder {
     static Default newMultiThreadNAR(int threads, Time time, boolean sync) {
 
         if (threads == -1)
-            threads = 2;
+            threads = 3;
                     //(int) Math.ceil(Runtime.getRuntime().availableProcessors()-2);
 
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 512, sync);
+                new MultiThreadExecutor(threads, 1024, sync);
 
         //exe = new InstrumentedExecutor(exe, 8);
 
@@ -72,13 +72,13 @@ public interface NARBuilder {
         };
 
 
-        int maxConcepts = 256 * 1024;
+        int maxConcepts = 192 * 1024;
 
         int activeConcepts = 1024;
 
         Default nar = new Default(activeConcepts,
 
-                new HijackTermIndex(cb, 1024 * 256, reprobes)
+                new HijackTermIndex(cb, maxConcepts, reprobes)
 
                 //new NullTermIndex(cb)
 //                new CaffeineIndex(cb, /* -1 */ maxConcepts, -1,
