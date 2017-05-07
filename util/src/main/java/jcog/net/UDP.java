@@ -1,7 +1,8 @@
 package jcog.net;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jcog.Util;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,12 +30,7 @@ public class UDP  {
 
     private static final InetAddress local = new InetSocketAddress(0).getAddress();
 
-    //final BidiMap<UUID,IntObjectPair<InetAddress>> who = new DualHashBidiMap<>();
 
-    public final Gson json = new GsonBuilder()
-            //.setLenient()
-            //.disableHtmlEscaping()
-            .create();
 
     private final int port;
 
@@ -165,8 +161,13 @@ public class UDP  {
 //        json.toJson(x, new PrintStream());
 //        return outBytes(dyn.array(), addr);
 
-        String s = json.toJson(x);
-        return outBytes(s.getBytes(UTF8), addr);
+
+        try {
+            return outBytes(Util.toBytes(x), addr);
+        } catch (JsonProcessingException e) {
+            logger.error(" {}", e);
+            return false;
+        }
 
     }
 

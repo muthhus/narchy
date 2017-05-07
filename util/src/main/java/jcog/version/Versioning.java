@@ -3,11 +3,14 @@ package jcog.version;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 
-/** versioning context that holds versioned instances */
+import java.util.Collection;
+
+/**
+ * versioning context that holds versioned instances
+ */
 public class Versioning extends
         FastList<Versioned> {
-        //FasterList<Versioned> {
-
+    //FasterList<Versioned> {
 
 
     public int ttl;
@@ -24,9 +27,11 @@ public class Versioning extends
     }
 
 
-    /** reverts/undo to previous state */
+    /**
+     * reverts/undo to previous state
+     */
     public final boolean revert(int when) {
-        assert(size >= when);
+        assert (size >= when);
 
         //pop(size - when );
 
@@ -35,7 +40,7 @@ public class Versioning extends
 
             Versioned versioned =
                     //removeLast();
-                    remove(s-1);
+                    remove(s - 1);
 
             if (versioned == null) {
                 clear();
@@ -44,11 +49,15 @@ public class Versioning extends
             }
 
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
-                Object removed = versioned.remove(versioned.size()-1); //removeLast();
+            int vs = versioned.size();
+            if (vs > 0) { //HACK wtf would it be empty
+                Object removed = versioned.remove(vs - 1); //removeLast();
                 if (removed == null) {
                     clear();
                     throw new NullPointerException();
                 }
+            }
+
             //}
             //assert(removed!=null);
             //TODO removeLastFast where we dont need the returned value
@@ -57,17 +66,34 @@ public class Versioning extends
     }
 
 
-
     @Override
     public void clear() {
         revert(0);
     }
 
     @Override
-    public boolean add(/*@NotNull */Versioned newItem) {
-        if (newItem == null)
-            throw new NullPointerException();
+    public boolean add(@NotNull Versioned newItem) {
         return tick() && super.add(newItem);
+    }
+
+    @Override
+    public void add(int index, Versioned element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends Versioned> source) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends Versioned> source) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAllIterable(Iterable<? extends Versioned> iterable) {
+        throw new UnsupportedOperationException();
     }
 
     //    @Override
