@@ -16,9 +16,9 @@
     A, B, time(raw), task(positive), belief(positive), task("."), time(dtEvents),                                  notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:Comparison)
     A, B, time(raw), task(positive), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:Comparison)
         A, B, time(raw), task(negative), belief(positive), task("."), time(dtEvents),                              notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonN)
-        A, B, time(raw), task(negative), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B)    notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonN)
+        A, B, time(raw), task(negative), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B)    notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonN)
     A, B, time(raw), task(positive), belief(negative), task("."), time(dtEvents),                                  notImplEqui(A), notImplEqui(B) |- (--,(A <=>+- B)), (Belief:ComparisonPN)
-    A, B, time(raw), task(positive), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- (--,varIntro((A <=>+- B))), (Belief:ComparisonPN)
+    A, B, time(raw), task(positive), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((--,(A <=>+- B))), (Belief:ComparisonPN)
         A, B, time(raw), task(negative), belief(negative), task("."), time(dtEvents),                              notImplEqui(A), notImplEqui(B) |- (A <=>+- B), (Belief:ComparisonNN)
         A, B, time(raw), task(negative), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B)    notImplEqui(A), notImplEqui(B) |- varIntro((A <=>+- B)), (Belief:ComparisonNN)
 
