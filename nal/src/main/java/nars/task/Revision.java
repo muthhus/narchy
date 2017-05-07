@@ -10,6 +10,7 @@ import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -115,24 +116,25 @@ public class Revision {
 
         Random rng = ThreadLocalRandom.current(); //DEPRECATED TODO pass rng as parameter up through methods
 
+        boolean negated = false;
         Compound cc = null;
+
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
-            MutableFloat accumulatedDifference = new MutableFloat(0);
-            cc = normalizedOrNull(intermpolate(a.term(), b.term(), aProp, accumulatedDifference, 1f, rng, mergeOrChoose), $.terms);
-            if (cc!=null && Task.taskContentValid(cc, a.punc(), null, true)) {
+            ObjectBooleanPair<Compound> ccp = Task.tryContent(
+                    intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, rng, mergeOrChoose),
+                    a.punc(), $.terms);
+
+            if (ccp != null) {
+                cc = ccp.getOne();
+                negated = ccp.getTwo();
                 break;
-            } else {
-                cc = null;
             }
         }
 
         if (cc == null)
             return null;
 
-        if (cc.op() == NEG) {
-            cc = compoundOrNull(cc.unneg());
-            if (cc == null)
-                return null;
+        if (negated) {
             newTruth = newTruth.negated();
         }
 

@@ -11,6 +11,7 @@ import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.task.DerivedTask;
 import nars.task.ImmutableTask;
@@ -24,8 +25,12 @@ import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.*;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,6 +43,7 @@ import java.util.Objects;
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
@@ -233,10 +239,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 if (!t.hasAny(Op.StatementBits)) {
                     return fail(t, "Independent variables require statements super-terms", safe);
                 } else {
-                    if (!t.recurseTermsToSet(VAR_INDEP).allSatisfy(v ->
-                            indepValid(t, v)
-                    )) {
-                        return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
+                    //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
+                    if (t.hasAny(Op.VAR_INDEP)) {
+                        UnifiedSet unique = new UnifiedSet(0);
+                        if (!t.ANDrecurse(
+                                v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
+                            return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
+                        }
                     }
                 }
         }
@@ -336,7 +345,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
         Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
         if (c instanceof TaskConcept)
-            return ((TaskConcept)c);
+            return ((TaskConcept) c);
         else
             return null;
 //        if (!(c instanceof TaskConcept)) {
@@ -849,7 +858,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     /**
      * prepares a term for use as a Task's content
      */
-    @Nullable
+    @Deprecated @Nullable
     static Compound content(@Nullable final Term r, NAR nar) {
         if (r == null)
             return null;
@@ -920,7 +929,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                     x.eval(n.concepts)
             );
 
-            if (y!=x) {
+            if (y != x) {
                 if (y == null)
                     throw new InvalidTaskException(this, "un-evaluable");
 
@@ -984,7 +993,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
-            ThreadLocal.withInitial(ObjectFloatHashMap::new );
+            ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
     default Activation activate(@NotNull NAR n, @NotNull Concept c, float scale) {
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
@@ -993,12 +1002,46 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return new SpreadingActivation(this, c, n, scale, activationMapThreadLocal.get());
     }
 
-    /** projected truth value */
-    @Nullable default Truth truth(long when, int dur) {
+    /**
+     * projected truth value
+     */
+    @Nullable
+    default Truth truth(long when, int dur) {
         float e = evi(when, dur);
         if (e <= 0)
             return null;
         return new PreciseTruth(freq(), e, false);
     }
 
+    /**
+     * attempts to prepare a term for use as a Task content.
+     *
+     * @return null if unsuccessful, otherwise the resulting compound term and a
+     * boolean indicating whether a truth negation occurred,
+     * necessitating an inversion of truth when constructing a Task with the input term
+     */
+    @Nullable
+    static ObjectBooleanPair<Compound> tryContent(@NotNull Term t, byte punc, TermIndex index) {
+        @Nullable Compound cc = compoundOrNull(t);
+        if (cc == null)
+            return null;
+
+        boolean negated = false;
+        if (cc.op() == NEG) {
+            cc = compoundOrNull(cc.unneg());
+            if (cc == null)
+                return null;
+            negated = true;
+        }
+
+        //Compound c3 = Task.content(c2, nar);
+
+        if ((cc = normalizedOrNull(cc, index)) == null)
+            return null;
+
+        if (!Task.taskContentValid(cc, punc, null, true))
+            return null;
+
+        return PrimitiveTuples.pair(cc, negated);
+    }
 }

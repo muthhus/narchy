@@ -121,11 +121,14 @@ public interface Termlike extends Termed {
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }
 
-    /** recurses all subterms while the result of the predicate is true;
+    /** recurses all subterms (0th and 1st-layer only) while the result of the predicate is true;
      *  returns true if all true
      *
      * @param v*/
     boolean AND(Predicate<Term> v);
+
+    /** returns false if the supplied predicate fails for any of the recursive subterms of the specified type */
+    boolean ANDrecurse(@NotNull Predicate<Term> v);
 
 
 

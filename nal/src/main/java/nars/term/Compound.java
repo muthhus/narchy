@@ -35,6 +35,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
@@ -49,6 +50,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
@@ -82,6 +84,9 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @NotNull
     default MutableSet<Term> recurseTermsToSet(@NotNull Op onlyType) {
+        if (!hasAny(onlyType))
+            return Sets.mutable.empty();
+
         MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
         recurseTerms((t1) -> {
             if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
@@ -89,6 +94,9 @@ public interface Compound extends Term, IPair, TermContainer {
         });
         return t;
     }
+
+
+
 
 
     /**
@@ -183,6 +191,13 @@ public interface Compound extends Term, IPair, TermContainer {
     default void recurseTerms(@NotNull Consumer<Term> v) {
         v.accept(this);
         subterms().forEach(s -> s.recurseTerms(v));
+    }
+
+    @Override
+    default boolean ANDrecurse(@NotNull Predicate<Term> v) {
+        if (!v.test(this))
+            return false;
+        return subterms().ANDrecurse(v);
     }
 
     @Override

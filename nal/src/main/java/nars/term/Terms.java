@@ -405,12 +405,17 @@ public enum Terms { ;
     }
     @Nullable
     public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
-        if (t == null)
+        Compound c = compoundOrNull(t);
+        if (c == null)
             return null;
-        Compound ct = compoundOrNull(t);
-        if (ct == null)
-            return null;
-        return compoundOrNull(i.normalize(ct));
+
+        if (c.isTemporal()) {
+            //the compound indicated a potential dt, but the premise was actually atemporal;
+            // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
+            return i.retemporalize(c); //retemporalize does normalize at the end
+        } else  {
+            return i.normalize(c);
+        }
     }
 
     /**

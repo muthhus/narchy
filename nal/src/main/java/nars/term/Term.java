@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.Op.False;
 import static nars.time.Tense.DTERNAL;
@@ -88,6 +89,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
     int hashCode();
 
     void recurseTerms(@NotNull Consumer<Term> v);
+
 
 
     default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {

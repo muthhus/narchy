@@ -584,11 +584,16 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @Override
     default boolean AND(@NotNull Predicate<Term> p) {
         int s = size();
-        for (int i = 0; i < s; i++) {
-            if (!p.test(sub(i))) {
+        for (int i = 0; i < s; i++)
+            if (!p.test(sub(i)))
                 return false;
-            }
-        }
+        return true;
+    }
+    default boolean ANDrecurse(@NotNull Predicate<Term> p) {
+        int s = size();
+        for (int i = 0; i < s; i++)
+            if (!sub(i).ANDrecurse(p))
+                return false;
         return true;
     }
 

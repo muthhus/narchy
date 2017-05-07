@@ -25,7 +25,7 @@ public class FZero extends NAgentX {
         Default n = NARBuilder.newMultiThreadNAR(
                 4,
                 new RealTime.DSHalf(true)
-                        .durFPS(10f), true);
+                        .durFPS(4f), true);
 
         FZero a = new FZero(n);
         a.runRT(10f);

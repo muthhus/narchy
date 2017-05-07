@@ -41,6 +41,7 @@ public interface Atomic extends Term {
 
     }
 
+
     @NotNull
     @Override
     String toString();
@@ -65,6 +66,9 @@ public interface Atomic extends Term {
     default boolean AND(@NotNull Predicate<Term> v) {
         return v.test(this);
     }
+
+    @Override
+    default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
 
     @Override
     default boolean OR(@NotNull Predicate<Term> v) {

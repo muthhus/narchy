@@ -34,6 +34,17 @@ import static nars.time.TimeFunctions.occInterpolate;
 @FunctionalInterface
 public interface TimeFunctions {
 
+    /**
+     * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
+     * @param p         current match context
+     * @param d         derivation rule being evaluated
+     * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
+     * @param confScale
+     * @return
+     */
+    @Nullable Compound compute(@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
+
+
     static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
 
         if (derived.op() == CONJ && occReturn[0] != ETERNAL)
@@ -64,15 +75,6 @@ public interface TimeFunctions {
         }
     }
 
-    /**
-     * @param derived   raw resulting untemporalized derived term that may or may not need temporalized and/or occurrence shifted as part of a derived task
-     * @param p         current match context
-     * @param d         derivation rule being evaluated
-     * @param occReturn holds the occurrence time as a return value for the callee to use in building the task
-     * @param confScale
-     * @return
-     */
-    @Nullable Compound compute(@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
     static long earlyOrLate(long t, long b, boolean early) {
@@ -734,7 +736,8 @@ public interface TimeFunctions {
 
 
         if (occ == ETERNAL) {
-            return noTemporalBasis(derived);
+            //return noTemporalBasis(derived);
+            return null;
         }
 
 
@@ -776,17 +779,17 @@ public interface TimeFunctions {
 
     }
 
+//    @Nullable
+//    static Compound noTemporalBasis(@NotNull Compound derived) {
+////        if (Param.DEBUG_EXTRA)
+////            logger.info("{}", new InvalidTermException(derived.op(), derived.dt(), "no basis for relating other occurrence to derived", derived.toArray());
+//
+//
+//        return null;
+//    }
+
+
     @Nullable
-    static Compound noTemporalBasis(@NotNull Compound derived) {
-        if (Param.DEBUG_EXTRA)
-            throw new InvalidTermException(derived.op(), derived.dt(), "no basis for relating other occurrence to derived", derived.toArray()
-            );
-        else
-            return null;
-    }
-
-
-    @NotNull
     static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull Derivation p, boolean taskOrBelief, int polarity) {
 
         Term dtTerm = taskOrBelief ? p.taskTerm.unneg() : p.beliefTerm;
@@ -831,7 +834,7 @@ public interface TimeFunctions {
 
     }
 
-    @NotNull
+    @Nullable
     static Compound deriveDT(@NotNull Compound derived, int polarity, int eventDelta, @NotNull long[] occReturn, Derivation p) {
 
         int dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
@@ -1325,9 +1328,9 @@ public interface TimeFunctions {
 //        }
         if (derived.dt() != dt) {
             TermContainer ds = derived.subterms();
-            @NotNull Term n = p.index.the(o, dt, ds);
-            if (!(n instanceof Compound))
-                throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
+            @NotNull Compound n = compoundOrNull(p.index.the(o, dt, ds));
+            if (n == null)
+                return null; //throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 
             //TODO decide if this is correct
             if (

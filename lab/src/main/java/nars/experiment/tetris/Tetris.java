@@ -509,9 +509,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new FrameTime().dur(5);
+        Time clock = new FrameTime().dur(25);
         NAR n =
-                NARBuilder.newMultiThreadNAR(2, clock);
+                NARBuilder.newMultiThreadNAR(3, clock);
 
         Tetris a = new MyTetris(n);
         a.trace = true;

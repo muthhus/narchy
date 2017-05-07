@@ -7,7 +7,6 @@ import nars.index.term.TermIndex;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
 import nars.task.DerivedTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.util.InvalidTermException;
@@ -15,6 +14,7 @@ import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public final class Conclude extends AbstractPred<Derivation> {
     public Conclude(@NotNull PremiseRule rule, PostCondition p,
                     TruthOperator belief, TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func("derive", p.pattern, $.the("time" + time.toString() )));
+        super($.func("derive", p.pattern, $.the("time" + time.toString())));
 
         this.rule = rule;
 
@@ -89,193 +89,161 @@ public final class Conclude extends AbstractPred<Derivation> {
     /**
      * start for derivation concluder
      */
-    private void accept(@NotNull Derivation m) {
-        NAR nar = m.nar;
+    private void accept(@NotNull Derivation d) {
+        NAR nar = d.nar;
 
         if (rule.minNAL > nar.level())  //HACK
             return;
 
 
-            //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
-            //  which is already determined bythe constructed term's growing complexity) in m.budget()
+        //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
+        //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-            TermIndex index = m.index;
+        TermIndex index = d.index;
 
-            TruthPuncEvidence ct = m.punct;
-            if (ct == null)
+        TruthPuncEvidence ct = d.punct;
+        if (ct == null)
+            return;
+
+        Term b0 = this.conclusionPattern;
+
+        for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
+            Term bp = b0;
+            b0 = compoundOrNull(d.transform(b0, index));
+            if (b0 == null)
                 return;
+            if (b0 == conclusionPattern)
+                return;
+            if (b0 == bp)
+                break; //no change
+        }
 
-            Term b0 = this.conclusionPattern;
+        Compound c0 = (Compound) b0;
 
-            for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
-                Term bp = b0;
-                b0 = compoundOrNull(m.transform(b0, index));
-                if (b0 == null)
-                    return;
-                if (b0 == conclusionPattern)
-                    return;
-                if (b0 == bp)
-                    break; //no change
-            }
-
-            Compound c0 = (Compound) b0;
-
-            final Compound c1 = compoundOrNull(c0.eval(index));
-            if (c1 != null) {
+        final Compound c1 = compoundOrNull(c0.eval(index));
+        if (c1 != null) {
 
 
-                Truth truth = ct.truth;
+            Truth truth = ct.truth;
 
-                @NotNull final long[] occ;
+            @NotNull final long[] occ;
 
-                final Compound c2;
-                if (m.temporal) {
-                    //            if (nar.level() < 7)
-                    //                throw new NAR.InvalidTaskException(content, "invalid NAL level");
+            final Compound c2;
+            if (d.temporal) {
+                //            if (nar.level() < 7)
+                //                throw new NAR.InvalidTaskException(content, "invalid NAL level");
 
 
-                    //process time with the unnegated term
-                    Op o = c1.op();
-                    Compound temporalized;
-                    boolean negated;
-                    if (o == NEG) {
-                        temporalized = Task.content(c1.unneg(), nar);
-                        if (temporalized == null) {
-                            temporalized = c1; //use as-is since it cant be decompressed unnegated
-                            negated = false;
-                        } else
-                            negated = true;
-                    } else {
+                //process time with the unnegated term
+                Op o = c1.op();
+                Compound temporalized;
+                boolean negated;
+                if (o == NEG) {
+                    temporalized = Task.content(c1.unneg(), nar);
+                    if (temporalized == null) {
+                        temporalized = c1; //use as-is since it cant be decompressed unnegated
                         negated = false;
-                        temporalized = c1;
-                    }
+                    } else
+                        negated = true;
+                } else {
+                    negated = false;
+                    temporalized = c1;
+                }
 
-                    long[] occReturn = {ETERNAL, ETERNAL};
-                    float[] confScale = {1f};
+                long[] occReturn = {ETERNAL, ETERNAL};
+                float[] confScale = {1f};
 
-                    @Nullable Compound temporalized2 = this.time.compute(temporalized,
-                            m, this, occReturn, confScale
-                    );
+                @Nullable Compound temporalized2 = this.time.compute(temporalized,
+                        d, this, occReturn, confScale
+                );
 
-                    //temporalization failure, could not determine temporal attributes. seems this can happen normally
-                    if ((temporalized2 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
-                        //                 {
-                        //                    //FOR DEBUGGING, re-run it
-                        //                    Compound temporalized2 = this.time.compute(content,
-                        //                            m, this, occReturn, confScale
-                        //                    );
-                        //                }
+                //temporalization failure, could not determine temporal attributes. seems this can happen normally
+                if ((temporalized2 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+                    //                 {
+                    //                    //FOR DEBUGGING, re-run it
+                    //                    Compound temporalized2 = this.time.compute(content,
+                    //                            m, this, occReturn, confScale
+                    //                    );
+                    //                }
 
 //                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
 
-                        return;
-                    } else {
-                        temporalized = temporalized2;
-                    }
-
-                    int tdt = temporalized.dt();
-                    if (tdt == XTERNAL || tdt == -XTERNAL) {
-                        throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
-                    }
-
-                    //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
-                    //                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
-                    //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
-                    //            }
-
-                    //apply any non 1.0 the confidence scale
-                    if (truth != null) {
-
-                        if (negated)
-                            truth = truth.negated();
-
-                        float cf = confScale[0];
-                        if (cf != 1) {
-                            throw new UnsupportedOperationException("yet");
-
-                            //                    truth = truth.confMultViaWeightMaxEternal(cf);
-                            //                    if (truth == null) {
-                            //                        throw new InvalidTaskException(content, "temporal leak");
-                            //                    }
-                        }
-                    }
-
-
-                    if (occReturn[1] == ETERNAL)
-                        occReturn[1] = occReturn[0];
-
-                    occ = occReturn;
-                    c2 = temporalized;
-
+                    return;
                 } else {
-                    occ = Tense.ETERNAL_RANGE;
-                    c2 = c1;
+                    temporalized = temporalized2;
+                }
+
+                int tdt = temporalized.dt();
+                if (tdt == XTERNAL || tdt == -XTERNAL) {
+                    throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
+                }
+
+                //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
+                //                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
+                //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
+                //            }
+
+                //apply any non 1.0 the confidence scale
+                if (truth != null) {
+
+                    if (negated)
+                        truth = truth.negated();
+
+                    float cf = confScale[0];
+                    if (cf != 1) {
+                        throw new UnsupportedOperationException("yet");
+
+                        //                    truth = truth.confMultViaWeightMaxEternal(cf);
+                        //                    if (truth == null) {
+                        //                        throw new InvalidTaskException(content, "temporal leak");
+                        //                    }
+                    }
                 }
 
 
-                Compound c3 = Task.content(c2, nar);
-                if (c3 != null) {
+                if (occReturn[1] == ETERNAL)
+                    occReturn[1] = occReturn[0];
 
-                    //the derived compound indicated a potential dt, but the premise was actually atemporal;
-                    // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-                    if (c3.isTemporal()) {
-                        c3 = m.index.retemporalize(c3); //retemporalize does normalize at the end
-                    } else if (!c3.isNormalized()) {
-                        c3 = m.index.normalize(c3);
-                    }
+                occ = occReturn;
+                c2 = temporalized;
 
-
-                    if (c3 != null) {
-
-                        if (c3.op() == NEG) {
-                            c3 = compoundOrNull(c3.unneg());
-                            if (c3 == null)
-                                return;
-
-                            if (truth!=null)
-                                truth = truth.negated();
-                        }
-
-//                            c3 = index.normalize(c3);
-//                            if (c3 == null)  return;
-
-                        if (!Task.taskContentValid(c3, ct.punc, nar, true)) {
-                            return;
-                        }
-
-                        long start = occ[0];
-                        long end = occ[1];
-                        if (start!=ETERNAL && start > end) {
-                            //TODO why does this happen
-                            long t = start; start = end; end = t; //swap
-                        }
+            } else {
+                occ = Tense.ETERNAL_RANGE;
+                c2 = c1;
+            }
 
 
-                        //note: the budget function used here should not depend on the truth's frequency. btw, it may be inverted below
-                        // also confidence should not be changed after this budgeting
-                        byte punc = ct.punc;
-                        Priority priority = m.budgeting.budget(m, c3, truth, punc, start, end);
+            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, ct.punc, d.index);
+            if (c3n != null) {
+                if (c3n.getTwo())
+                    truth = truth.negated();
 
-                        if (priority != null) {
+                long start = occ[0];
+                long end = occ[1];
 
-                            DerivedTask d =
-                                    new DerivedTask.DefaultDerivedTask(
-                                            c3, truth, punc,
-                                            ct.evidence, m, nar.time(), start, end);
+                Compound c3 = c3n.getOne();
+                Priority priority = d.budgeting.budget(d, c3, truth, ct.punc, start, end);
 
-                            d.setPriority(priority);
+                if (priority != null) {
 
-                            if (Param.DEBUG)
-                                d.log(rule);
+                    DerivedTask t =
+                            new DerivedTask.DefaultDerivedTask(
+                                    c3, truth, ct.punc,
+                                    ct.evidence, d, nar.time(), start, end);
 
-                            m.derive(d);
+                    t.setPriority(priority);
 
-                        }
-                    }
+                    if (Param.DEBUG)
+                        t.log(rule);
+
+                    d.derive(t);
+
                 }
             }
+
+        }
 
 //        } catch (InvalidTermException | InvalidTaskException e) {
 //            if (Param.DEBUG_EXTRA)
