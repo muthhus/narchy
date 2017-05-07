@@ -5,12 +5,16 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
+import nars.term.container.TermContainer;
 import nars.term.var.GenericVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -269,6 +273,25 @@ public enum Op {
 
     public static boolean concurrent(int dt) {
         return (dt == DTERNAL) || (dt == 0);
+    }
+
+
+    /** decode a term which may be a functor, return null if it isnt */
+    @Nullable
+    public static Pair<Atomic, TermContainer> functor(@NotNull Term maybeOperation) {
+        if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
+            Compound c = (Compound)maybeOperation;
+            if (c.op() == INH) {
+                Term s0 = c.sub(0);
+                if (s0.op() == PROD) {
+                    Term s1 = c.sub(1);
+                    if (s1.op() == ATOM) {
+                        return Tuples.pair((Atomic) s1, ((Compound)s0).subterms());
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /*

@@ -21,11 +21,17 @@
 
 package nars.op;
 
+import javafx.util.Pair;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
+import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +56,6 @@ import static nars.time.Tense.ETERNAL;
      */
     @Nullable Task run(@NotNull Task t, @NotNull NAR nar);
 
-    int OPERATOR_BITS = ATOM.bit | PROD.bit | Op.INH.bit;
 
     /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
     static Operator auto(BiConsumer<Task /* Goal */, Task /* Belief (feedback) */> onExec) {

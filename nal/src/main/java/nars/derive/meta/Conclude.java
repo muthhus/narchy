@@ -4,16 +4,20 @@ import jcog.pri.Priority;
 import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermIndex;
+import nars.op.DepIndepVarIntroduction;
 import nars.premise.Derivation;
 import nars.premise.TruthPuncEvidence;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,6 +44,8 @@ public final class Conclude extends AbstractPred<Derivation> {
     public final PremiseRule rule;
     private final @NotNull TimeFunctions time;
 
+    private final boolean varIntro;
+
     /**
      * result pattern
      */
@@ -62,8 +68,18 @@ public final class Conclude extends AbstractPred<Derivation> {
         this.belief = belief;
         this.goal = goal;
 
-        this.conclusionPattern = p.pattern;
+        Term pp = p.pattern;
 
+        //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
+        Pair<Atomic, TermContainer> outerFunctor = Op.functor(pp);
+        if (outerFunctor!=null && outerFunctor.getOne().toString().equals("varIntro")) {
+            varIntro = true;
+            pp = outerFunctor.getTwo().sub(0);
+        } else {
+            varIntro = false;
+        }
+
+        this.conclusionPattern = pp;
 
         //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
         this.time = time;
@@ -214,8 +230,16 @@ public final class Conclude extends AbstractPred<Derivation> {
                 c2 = c1;
             }
 
+            Compound c2v;
+            if (varIntro) {
+                c2v = compoundOrNull(new DepIndepVarIntroduction.VarIntro(nar).introduce(c2));
+                if (c2v == null)
+                    return;
+            } else {
+                c2v = c2;
+            }
 
-            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, ct.punc, d.index);
+            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, ct.punc, d.index);
             if (c3n != null) {
                 if (c3n.getTwo())
                     truth = truth.negated();
@@ -227,6 +251,10 @@ public final class Conclude extends AbstractPred<Derivation> {
                 Priority priority = d.budgeting.budget(d, c3, truth, ct.punc, start, end);
 
                 if (priority != null) {
+
+                    if (end < start) { //why?
+                        long s = start; start = end; end = s; //swap
+                    }
 
                     DerivedTask t =
                             new DerivedTask.DefaultDerivedTask(

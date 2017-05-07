@@ -160,7 +160,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         }
 
         @NotNull
-        protected Term introduce(Term x) {
+        public Term introduce(Term x) {
             Term[] only = { False };
 
             //temporarily unwrap negation

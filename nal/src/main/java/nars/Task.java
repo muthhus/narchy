@@ -241,7 +241,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 } else {
                     //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
                     if (t.hasAny(Op.VAR_INDEP)) {
-                        UnifiedSet unique = new UnifiedSet(0);
+                        UnifiedSet unique = new UnifiedSet(1); //likely only one var indep repeated twice
                         if (!t.ANDrecurse(
                                 v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
                             return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
