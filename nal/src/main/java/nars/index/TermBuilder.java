@@ -561,7 +561,7 @@ public abstract class TermBuilder {
 
         ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
-        if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
+        if (flatten(CONJ, u, dt, s, true) && !s.isEmpty()) {
             Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
             if (!cs.isEmpty()) {
 
@@ -575,7 +575,7 @@ public abstract class TermBuilder {
                 while (csi.hasNext()) {
                     Term x = csi.next();
 
-                    if (x.op() == NEG && x.subOpIs(0, CONJ)) { //DISJUNCTION
+                    if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
                         Compound disj = (Compound) x.unneg();
                         Set<Term> disjSubs = disj.toSet();
                         //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
@@ -683,18 +683,18 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
+    private static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s, boolean polarity) {
         for (Term x : u) {
-            if (!flatten(op, dt, x, s))
+            if (!flatten(op, dt, x, s, polarity))
                 return false;
         }
         return true;
     }
 
-    private static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
+    private static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s, boolean polarity) {
         int l = u.size();
         for (int i = 0; i < l; i++) {
-            if (!flatten(op, dt, u.sub(i), s))
+            if (!flatten(op, dt, u.sub(i), s, polarity))
                 return false;
         }
         return true;
@@ -702,27 +702,27 @@ public abstract class TermBuilder {
 
     private static boolean flattenMatchDT(int candidate, int target) {
         if (candidate == target) return true;
-        if (target == 0 && candidate == DTERNAL)
-            return true; //promote to parallel
-        return false;
+        return target == 0 && candidate == DTERNAL;
     }
 
-    private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
+    private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s, boolean polarity) {
         Op xo = x.op();
 
+
+        if (xo == NEG) {
+            x = x.unneg();
+            xo = x.op();
+            polarity = !polarity;
+        }
+
         if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
-            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
+            return flatten(op, ((Compound) x).subterms(), dt, s, polarity); //recurse
         } else {
-            byte polarity;
-            Term t;
-            if (xo == NEG) {
-                polarity = -1;
-                t = x.unneg();
-            } else {
-                polarity = +1;
-                t = x;
-            }
-            if (s.getIfAbsentPut(t, polarity) != polarity)
+
+
+            byte polarityByte = (byte) (polarity ? +1 : -1);
+
+            if (s.getIfAbsentPut(x, polarityByte) != polarityByte)
                 return false; //CoNegation
         }
         return true;
@@ -846,22 +846,21 @@ public abstract class TermBuilder {
 
 
                 // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-                    if (dt!=XTERNAL && predicate.op() == IMPL) {
-                        Compound cpr = (Compound)predicate;
-                        int cprDT = cpr.dt();
-                        if (cprDT != XTERNAL) {
-                            Term a = cpr.sub(0);
+                if (dt != XTERNAL && predicate.op() == IMPL) {
+                    Compound cpr = (Compound) predicate;
+                    int cprDT = cpr.dt();
+                    if (cprDT != XTERNAL) {
+                        Term a = cpr.sub(0);
 
-                            subject = conj(dt, subject, a);
-                            predicate = cpr.sub(1);
-                            return statement(IMPL, cprDT, subject, predicate);
-                        }
+                        subject = conj(dt, subject, a);
+                        predicate = cpr.sub(1);
+                        return statement(IMPL, cprDT, subject, predicate);
                     }
+                }
 
 
                 break;
         }
-
 
 
         //factor out any common subterms iff concurrent
@@ -870,9 +869,9 @@ public abstract class TermBuilder {
 //            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
 //                return False; //cyclic
 
-            if ( subject.varPattern() == 0 && predicate.varPattern() == 0 &&
+            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
                     !(subject instanceof Variable) && !(predicate instanceof Variable) &&
-                (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+                    (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
                 return False; //cyclic
 
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should

@@ -220,9 +220,9 @@ public class IRCAgent extends IRC {
 
 
     @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
+    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int threads) {
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(4, 1024, true);
+        MultiThreadExecutor exe = new MultiThreadExecutor(threads, 1024, true);
 
         Default nar = new Default(activeConcepts,
 
@@ -266,7 +266,7 @@ public class IRCAgent extends IRC {
         MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 8, true, 3);
         //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
 
-        new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
+        //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.4f, 8);
 
         nar.loop(framesPerSecond);
@@ -278,7 +278,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(1024, 25, 200);
+        @NotNull Default n = newRealtimeNAR(1024, 25, 2);
 
 
 //        Control c = n.getControl();

@@ -395,6 +395,16 @@ public class TermReductionsTest {
     }
 
     @Test
+    public void testTemporalConjunctionReductionNegatedButSimultaneous() throws Narsese.NarseseException {
+        assertEquals(
+                "( &&+0 ,(--,(y)),(x),(z))",
+                 $("( (x) &| (--,( (y) &| (--,(z)) )))")
+        .toString());
+    }
+
+
+
+    @Test
     public void testTemporalNTermConjunctionParallel() throws Narsese.NarseseException {
         //+0 is the only case in which temporal && can have arity>2
         //TODO fix spacing:
@@ -511,11 +521,17 @@ public class TermReductionsTest {
     @Test public void testConegatedConjunctionTerms1() throws Narsese.NarseseException {
         assertEquals($("((--,((y)&&(z)))&&(x))"), $("((x) && --((y) && (z)))"));
     }
-    @Test public void testConegatedConjunctionTerms1not() throws Narsese.NarseseException {
+     @Test public void testConegatedConjunctionTerms0not() throws Narsese.NarseseException {
         //dont unwrap due to different 'dt'
         assertEquals("((--,((y) &&+0 (z)))&&(x))", $("((x)&&--((y) &&+0 (z)))").toString());
 
         assertEquals("((--,((y)&&(z))) &&+0 (x))", $("((x) &&+0 --((y) && (z)))").toString());
+    }
+    @Test public void testConegatedConjunctionTerms1not() throws Narsese.NarseseException {
+        //dont unwrap due to different 'dt'
+        assertEquals("((--,((y) &&+1 (z)))&&(x))", $("((x)&&--((y) &&+1 (z)))").toString());
+
+        assertEquals("((x) &&+1 (--,((y)&&(z))))", $("((x) &&+1 --((y) && (z)))").toString());
     }
 
     @Test public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {

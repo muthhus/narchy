@@ -6,11 +6,13 @@ import nars.nar.Default;
 import nars.task.util.TaskRule;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Created by me on 4/2/17.
  */
+@Ignore
 public class JsonCompoundTest {
 
     //TODO make into a test

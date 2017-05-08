@@ -54,7 +54,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean subOpIs(int i, Op o) {
+    public boolean subIs(int i, Op o) {
         return i == 0 && the.op() == o;
     }
 

@@ -100,21 +100,7 @@ public class WebServer extends PathHandler /*extends PathHandler*/ {
         }
     }
 
-    public static void main(String[] args) throws Exception {
 
-        int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
-
-        NAR nar =
-                newRealtimeNAR(512, 10, 32);
-
-        InterNAR net = new InterNAR(nar, 8, 10420);
-
-        Hear.wiki(nar);
-
-        new NARWeb(nar ,httpPort);
-
-
-    }
 
 
     /**

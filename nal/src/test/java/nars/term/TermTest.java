@@ -297,8 +297,8 @@ public class TermTest {
         Term t = _t.term();
         if (t.op() == Op.INH) { //Op.hasAll(t.structure(), Op.OperationBits) &&
             Compound c = (Compound) t;
-            return c.subOpIs(1, Op.ATOM) &&
-                    c.subOpIs(0, Op.PROD);
+            return c.subIs(1, Op.ATOM) &&
+                    c.subIs(0, Op.PROD);
         }
         return false;
     }

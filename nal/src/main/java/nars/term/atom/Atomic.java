@@ -128,7 +128,7 @@ public interface Atomic extends Term {
     }
 
     @Override
-    default boolean subOpIs(int i, Op o) {
+    default boolean subIs(int i, Op o) {
         return false;
     }
 }

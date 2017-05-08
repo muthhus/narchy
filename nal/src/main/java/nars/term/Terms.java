@@ -431,7 +431,7 @@ public enum Terms { ;
      * (--, (&&, --A, --B, .., --Z) )
      */
     public static boolean isDisjunction(@NotNull Compound c) {
-        if (c.dt() == DTERNAL && c.op() == NEG && c.subOpIs(0, CONJ)) {
+        if (c.dt() == DTERNAL && c.op() == NEG && c.subIs(0, CONJ)) {
             return allNegated(((Compound) c.sub(0)).subterms());
         }
         return false;

@@ -405,7 +405,7 @@ function taskFeed(socket) {
                 d.className = 'command';
                 break;
         }
-        d.style.opacity = 1f;
+        d.style.opacity = 1;
         d.style.fontSize = fontSize;
         d.innerText = label;
         return d;

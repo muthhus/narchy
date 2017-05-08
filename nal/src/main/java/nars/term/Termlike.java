@@ -180,7 +180,7 @@ public interface Termlike extends Termed {
     /** return whether a subterm op at an index is an operator.
      * if there is no subterm or the index is out of bounds, returns false.
      */
-    default boolean subOpIs(int i, Op o) {
+    default boolean subIs(int i, Op o) {
         Term x = sub(i, null);
         return x != null && x.op() == o;
     }

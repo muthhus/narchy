@@ -1,8 +1,11 @@
 package nars.web;
 
+import nars.InterNAR;
 import nars.NAR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static nars.web.IRCAgent.newRealtimeNAR;
 
 /**
  * Created by me on 1/21/17.
@@ -36,6 +39,22 @@ public class NARWeb extends WebServer {
 //
 //            }
 //        }));
+
+
+    }
+
+        public static void main(String[] args) throws Exception {
+
+        int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
+
+        NAR nar =
+                newRealtimeNAR(512, 3, 2);
+
+        InterNAR net = new InterNAR(nar, 8, 10420);
+
+        Hear.wiki(nar);
+
+        new NARWeb(nar ,httpPort);
 
 
     }

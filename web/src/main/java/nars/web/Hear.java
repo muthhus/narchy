@@ -52,7 +52,11 @@ public class Hear extends Loop {
         @NotNull List<Task> parsed = $.newArrayList();
         @NotNull List<Narsese.NarseseException> errors = $.newArrayList();
 
-        Narsese.the().tasks(msg, parsed, nar);
+        try {
+            Narsese.the().tasks(msg, parsed, nar);
+        } catch (Narsese.NarseseException ignored) {
+            //ignore and continue below
+        }
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
             logger.info("narsese: {}", parsed);
