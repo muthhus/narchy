@@ -561,7 +561,7 @@ public abstract class TermBuilder {
 
         ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
-        if (flatten(CONJ, u, dt, s, true) && !s.isEmpty()) {
+        if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
             Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
             if (!cs.isEmpty()) {
 
@@ -683,18 +683,18 @@ public abstract class TermBuilder {
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
-    private static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s, boolean polarity) {
+    private static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
         for (Term x : u) {
-            if (!flatten(op, dt, x, s, polarity))
+            if (!flatten(op, dt, x, s))
                 return false;
         }
         return true;
     }
 
-    private static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s, boolean polarity) {
+    private static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
         int l = u.size();
         for (int i = 0; i < l; i++) {
-            if (!flatten(op, dt, u.sub(i), s, polarity))
+            if (!flatten(op, dt, u.sub(i), s))
                 return false;
         }
         return true;
@@ -702,27 +702,27 @@ public abstract class TermBuilder {
 
     private static boolean flattenMatchDT(int candidate, int target) {
         if (candidate == target) return true;
-        return target == 0 && candidate == DTERNAL;
+        if (target == 0 && candidate == DTERNAL)
+            return true; //promote to parallel
+        return false;
     }
 
-    private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s, boolean polarity) {
+    private static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
         Op xo = x.op();
 
-
-        if (xo == NEG) {
-            x = x.unneg();
-            xo = x.op();
-            polarity = !polarity;
-        }
-
         if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
-            return flatten(op, ((Compound) x).subterms(), dt, s, polarity); //recurse
+            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
         } else {
-
-
-            byte polarityByte = (byte) (polarity ? +1 : -1);
-
-            if (s.getIfAbsentPut(x, polarityByte) != polarityByte)
+            byte polarity;
+            Term t;
+            if (xo == NEG) {
+                polarity = -1;
+                t = x.unneg();
+            } else {
+                polarity = +1;
+                t = x;
+            }
+            if (s.getIfAbsentPut(t, polarity) != polarity)
                 return false; //CoNegation
         }
         return true;

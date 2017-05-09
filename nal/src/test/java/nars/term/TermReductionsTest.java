@@ -394,15 +394,6 @@ public class TermReductionsTest {
         assertEquals("(a &&+0 b)", $("( a &&+0 (b && b) )").toString());
     }
 
-    @Test
-    public void testTemporalConjunctionReductionNegatedButSimultaneous() throws Narsese.NarseseException {
-        assertEquals(
-                "( &&+0 ,(--,(y)),(x),(z))",
-                 $("( (x) &| (--,( (y) &| (--,(z)) )))")
-        .toString());
-    }
-
-
 
     @Test
     public void testTemporalNTermConjunctionParallel() throws Narsese.NarseseException {
