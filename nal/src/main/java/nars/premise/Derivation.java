@@ -52,8 +52,9 @@ abstract public class Derivation extends Unify {
     private BoolPred forEachMatch;
 
     /**
-     * cached values
+     * cached values ==========================================
      */
+
     /** op ordinals: 0=task, 1=belief */
     public  byte termSub0op;
     public  byte termSub1op;
@@ -91,11 +92,8 @@ abstract public class Derivation extends Unify {
     @Nullable
     private long[] evidenceDouble, evidenceSingle;
 
-
     public boolean cyclic, overlap;
     //public final float overlapAmount;
-
-
 
     public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
@@ -105,10 +103,9 @@ abstract public class Derivation extends Unify {
         this.budgeting = b;
 
         init();
-
     }
 
-    private void init() {
+    @Deprecated private void init() {
         set(new substitute(this));
         set(new substituteIfUnifiesAny(this));
         set(new substituteIfUnifiesDep(this));

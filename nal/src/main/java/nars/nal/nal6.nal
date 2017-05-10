@@ -113,6 +113,7 @@
     Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z,strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z,strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
+    //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
     B, (C && (--,%A)), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
