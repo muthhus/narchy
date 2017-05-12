@@ -10,6 +10,7 @@ import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.MySTMClustered;
@@ -78,14 +79,15 @@ public interface NARBuilder {
 
         Default nar = new Default(activeConcepts,
 
-                //new HijackTermIndex(cb, maxConcepts, reprobes)
+                new HijackTermIndex(cb, maxConcepts, reprobes)
 
                 //new NullTermIndex(cb)
 
-                new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1,
-                    exe
-                    //null /* null = fork join common pool */
-                )
+//                new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1,
+//                    exe
+//                    //null /* null = fork join common pool */
+//                )
+
 //              new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
                 exe) {

@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
@@ -143,7 +144,7 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public Term eval(TermIndex index) {
+    public Term eval(TermContext index) {
         return ref.eval(index);
     }
 

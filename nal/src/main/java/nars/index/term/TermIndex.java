@@ -30,7 +30,7 @@ import static nars.time.Tense.XTERNAL;
 /**
  *
  */
-public abstract class TermIndex extends TermBuilder {
+public abstract class TermIndex extends TermBuilder implements TermContext {
 
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);

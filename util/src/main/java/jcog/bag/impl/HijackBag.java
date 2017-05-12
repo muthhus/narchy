@@ -20,13 +20,15 @@ import java.util.stream.Stream;
 
 /**
  * the superclass's treadmill's extra data slots are used for storing:
- *      0=size
- *      1=capacity
+ * 0=size
+ * 1=capacity
  * this saves the space otherwise necessary for 2 additional AtomicInteger instances
  */
 public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
-    /** value index in the additional slots of the superclass Treadmill */
+    /**
+     * value index in the additional slots of the superclass Treadmill
+     */
     final static int tSIZE = 0;
     final static int tCAPACITY = 1;
 
@@ -135,7 +137,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
 
-
     @Override
     public void clear() {
         AtomicReferenceArray<V> x = reset();
@@ -173,8 +174,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (c == 0)
             return null;
 
-        final int hash = x.hashCode(); /*hash(x)*/;
-        int iStart = i(c, hash);
+        final int hash = x.hashCode(); /*hash(x)*/
+        ;
 
         if (add || remove)
             start(hash);
@@ -184,8 +185,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
             //for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/)
 
-
-            int i = iStart; //dir ? iStart : (iStart + reprobes) - 1;
+            int i = i(c, hash); //dir ? iStart : (iStart + reprobes) - 1;
 
             for (int probe = 0; probe < reprobes; probe++) {
 
@@ -676,7 +676,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         onRemoved(x);
         return s;
     }
-
 
 
     @NotNull

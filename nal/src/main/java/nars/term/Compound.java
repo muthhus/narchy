@@ -24,8 +24,10 @@ import jcog.Util;
 import jcog.data.array.IntArrays;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
+import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.container.TermContainer;
@@ -791,7 +793,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override default Term eval(TermIndex index) {
+    @Override default Term eval(TermContext index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!isDynamic()) //!hasAll(Op.EvalBits))
@@ -803,7 +805,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (inner == null)
                 return this; //dont go further
             else {
-                Term outer = index.neg(inner.eval(index));
+                Term outer = $.neg(inner.eval(index));
                 if (outer==null)
                     return this; //dont go further
                 else

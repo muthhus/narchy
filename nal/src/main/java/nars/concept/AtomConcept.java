@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
@@ -53,7 +54,7 @@ public class AtomConcept extends AtomicString implements Concept {
     }
 
     @Override
-    public final Term eval(TermIndex index) {
+    public final Term eval(TermContext index) {
         //safe to return itself because it's probably what is being resolved anyway
         return this;
     }

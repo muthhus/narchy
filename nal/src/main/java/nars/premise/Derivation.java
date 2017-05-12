@@ -5,8 +5,11 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolPred;
+import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
@@ -28,7 +31,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-abstract public class Derivation extends Unify {
+abstract public class Derivation extends Unify implements TermContext {
 
     @NotNull public final NAR nar;
     @NotNull public final DerivationBudgeting budgeting;
@@ -95,6 +98,10 @@ abstract public class Derivation extends Unify {
     public boolean cyclic, overlap;
     //public final float overlapAmount;
 
+    private substitute _substitute;
+    private substituteIfUnifiesAny _substituteIfUnifiesAny;
+    private substituteIfUnifiesDep _substituteIfUnifiesDep;
+
     public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
                       int stack) {
@@ -102,16 +109,27 @@ abstract public class Derivation extends Unify {
         this.nar = nar;
         this.budgeting = b;
 
-        init();
+        _substitute = new substitute(this);
+        _substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
+        _substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
     }
 
-    @Deprecated private void init() {
-        set(new substitute(this));
-        set(new substituteIfUnifiesAny(this));
-        set(new substituteIfUnifiesDep(this));
+    @Override
+    public Termed get(Term x) {
+        if (x instanceof Atom) {
+            switch (x.toString()) {
+                case "substitute": return _substitute;
+                case "subIfUnifiesAny": return _substituteIfUnifiesAny;
+                case "subIfUnifiesDep": return _substituteIfUnifiesDep;
+            }
+        }
+        return index.get(x);
     }
 
-
+    @Override
+    public Term the(@NotNull Op op, int dt, Term[] subs) {
+        return index.the(op, dt, subs);
+    }
 
 
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
@@ -134,9 +152,8 @@ abstract public class Derivation extends Unify {
             else
                 return false;
         });
-        if (xy.size()!=3) { //HACK TODO fix
+        if (xy.size()!=0) { //HACK TODO fix
             xy.map.clear();
-            init();
             //throw new RuntimeException("not cleared");
         }
 

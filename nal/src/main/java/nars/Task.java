@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Texts;
+import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.pri.PLink;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
@@ -106,16 +108,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
             } else {
                 //nearest endpoint of the interval
-                if (dur > 0)
+                if (dur > 0) {
                     cw = TruthPolation.evidenceDecay(cw, dur, Math.min(Math.abs(a - when), Math.abs(z - when)));
-                else
+                } else {
                     cw = 0;
+                }
 
                 if (eternalizable(term())) {
                     float et = t.eternalizedEvi();
                     if (et > cw)
                         cw = et;
                 }
+
             }
 
             return cw;
@@ -680,6 +684,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             float conf = w2c(cw);
             if (conf > minConf) {
                 return $.t(freq(), conf);
+
+            //quantum entropy uncertainty:
+//                float ff = freq();
+//                ff = (float) Util.unitize(
+//                        (ThreadLocalRandom.current().nextFloat() - 0.5f) *
+//                                2f * Math.pow((1f-conf),4) + ff);
+//                return $.t(ff, conf);
             }
         }
         return null;

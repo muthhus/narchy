@@ -1,6 +1,7 @@
 package nars.term.atom;
 
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
@@ -39,7 +40,7 @@ public class Atom extends AtomicString {
         return Op.ATOM;
     }
 
-    @Override public Term eval(TermIndex index) {
+    @Override public Term eval(TermContext index) {
         Termed existing = index.get(this); //resolve atoms to their concepts for efficiency
         //assumes the AtomConcept returned is the Term itself, as .term() would return
         return existing != null ? existing.term() : this;

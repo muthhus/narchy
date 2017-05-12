@@ -134,7 +134,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
         Compound c0 = (Compound) b0;
 
-        final Compound c1 = compoundOrNull(c0.eval(index));
+        final Compound c1 = compoundOrNull(c0.eval(d));
         if (c1 != null) {
 
 
