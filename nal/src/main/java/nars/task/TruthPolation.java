@@ -6,6 +6,8 @@ import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.Util.sqr;
+
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  * see:
@@ -22,13 +24,15 @@ public enum TruthPolation {
     public static float evidenceDecay(float evi, int dur, long dt) {
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
-        float scale = ((float)dt) / dur;
+        /* float scale = ((float)dt) / dur;
         if (scale > 0.5f) return 0;
-        else return evi * (1f - scale*2f);
+        else return evi * (1f - scale*2f);*/
 
 
         //return evi / (1 + (((float) dt) / dur)); //inverse linear
-        //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
+
+        return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
+
         //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)

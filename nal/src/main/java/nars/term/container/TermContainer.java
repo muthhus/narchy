@@ -109,7 +109,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @Override
     default boolean isDynamic() {
         return
-                (op() == INH && subIs(1,ATOM) && subIs(0, PROD)) /* potential function */
+                (op() == INH && subIs(0, PROD) && subIs(1,ATOM) ) /* potential function */
                         ||
                 (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
     }

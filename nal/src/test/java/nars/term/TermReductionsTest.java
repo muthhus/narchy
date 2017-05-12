@@ -18,6 +18,7 @@ import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTasks;
 import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.term.TermTest.*;
+import static nars.term.TermTest.t;
 import static org.junit.Assert.*;
 
 /**

@@ -3,7 +3,6 @@ package nars.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -12,7 +11,6 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 /**
  * Created by me on 4/2/17.

@@ -20,9 +20,6 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static jcog.Util.lerp;
-import static nars.Op.NEG;
-import static nars.term.Terms.compoundOrNull;
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 

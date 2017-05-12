@@ -21,23 +21,17 @@
 
 package nars.op;
 
-import javafx.util.Pair;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
-import org.eclipse.collections.impl.tuple.Tuples;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
-import static nars.Op.*;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
 /**

@@ -26,7 +26,6 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;

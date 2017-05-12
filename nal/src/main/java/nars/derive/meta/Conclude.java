@@ -32,7 +32,7 @@ import static nars.time.Tense.XTERNAL;
 
 /**
  * Final conclusion step of the derivation process that produces a derived task
- * <p>
+ *
  * Each rule corresponds to a unique instance of this
  */
 public final class Conclude extends AbstractPred<Derivation> {
@@ -46,9 +46,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
     private final boolean varIntro;
 
-    /**
-     * result pattern
-     */
+
     @NotNull
     public final Term conclusionPattern;
 
@@ -58,8 +56,8 @@ public final class Conclude extends AbstractPred<Derivation> {
     //private final ImmutableSet<Term> uniquePatternVar;
 
 
-    public Conclude(@NotNull PremiseRule rule, PostCondition p,
-                    TruthOperator belief, TruthOperator goal,
+    public Conclude(@NotNull PremiseRule rule, @NotNull PostCondition p,
+                    @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
         super($.func("derive", p.pattern, $.the("time" + time.toString())));
 
@@ -193,7 +191,8 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                 int tdt = temporalized.dt();
                 if (tdt == XTERNAL || tdt == -XTERNAL) {
-                    throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
+                    //throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
+                    return;
                 }
 
                 //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {

@@ -99,12 +99,14 @@
             <artifactId>disruptor</artifactId>
             <version>3.3.6</version>
         </dependency>
+
         <dependency>
             <!-- https://vimeo.com/12165742 -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>21.0</version>
+            <version>22.0-rc1</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>

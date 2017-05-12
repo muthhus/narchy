@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static nars.Op.False;
 import static nars.time.Tense.DTERNAL;
@@ -398,10 +397,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
         } else /*else /*if (x.op() == INT )*/ {
             return Texts.i(intTerm.toString(), ifNotInt);
         }
-    }
-
-    default Op opUnneg() {
-        return op();
     }
 
     default Term eval(TermIndex index) {

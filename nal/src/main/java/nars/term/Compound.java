@@ -137,12 +137,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override
-    default Op opUnneg() {
-        return unneg().op();
-    }
-
-
     @NotNull
     @Override
     default public Term unneg() {
@@ -213,7 +207,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Nullable
     default byte[] pathTo(@NotNull Term subterm) {
         if (subterm.equals(this)) return IntArrays.EMPTY_BYTES;
-        if (!containsRecursively(subterm)) return null;
+        //if (!containsRecursively(subterm)) return null;
         return pathTo(new ByteArrayList(0), this, subterm);
     }
 
@@ -242,10 +236,12 @@ public interface Compound extends Term, IPair, TermContainer {
             }
             if (s instanceof Compound) {
                 Compound cs = (Compound) s;
-                if (cs.containsRecursively(target)) {
-                    p.add((byte) i);
-                    return pathTo(p, cs, target);
+                byte[] pt = pathTo(p, cs, target);
+                if (pt!=null) {
+                    p.add((byte)i);
+                    return pt;
                 }
+
             }
         }
 
