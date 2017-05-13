@@ -120,7 +120,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     @Deprecated public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.concepts.conceptBuilder(), n, ((DefaultConceptBuilder) n.concepts.conceptBuilder()).newBagMap(term.volume()));
+        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder(), n, ((DefaultConceptBuilder) n.terms.conceptBuilder()).newBagMap(term.volume()));
     }
 
 

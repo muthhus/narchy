@@ -40,7 +40,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Override
     protected TermIndex index() {
-        return nar.concepts;
+        return nar.terms;
     }
 
     //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;

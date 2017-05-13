@@ -5,11 +5,11 @@ import nars.experiment.pacman.entities.Ghost;
 import nars.experiment.pacman.entities.Player;
 import nars.experiment.pacman.maze.Maze;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.swing.*;
 
 public class PacMan {
 

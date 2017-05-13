@@ -1,7 +1,9 @@
 package nars.experiment.tetris;
 
 import jcog.data.FloatParam;
-import nars.*;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;

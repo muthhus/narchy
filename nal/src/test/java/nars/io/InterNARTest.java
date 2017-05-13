@@ -11,7 +11,6 @@ import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.MultiThreadExecutor;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;

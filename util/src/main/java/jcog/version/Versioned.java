@@ -1,7 +1,6 @@
 package jcog.version;
 
 import jcog.list.FasterList;
-import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

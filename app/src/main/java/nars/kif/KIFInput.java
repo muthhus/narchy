@@ -189,7 +189,7 @@ public class KIFInput implements Runnable {
                         System.err.println("instance expects 2 arguments");
                     } else {
                         try {
-                            y = compoundOrNull(Narsese.the().term("(" + args.get(0) + " --> [" + args.get(1) + "])", nar.concepts, false));
+                            y = compoundOrNull(Narsese.the().term("(" + args.get(0) + " --> [" + args.get(1) + "])", nar.terms, false));
                         } catch (Narsese.NarseseException e) {
                             e.printStackTrace();
                         }
@@ -365,11 +365,11 @@ public class KIFInput implements Runnable {
                             "_" + t.toString().substring(1)));
         });
 
-        conditionTerm = new MapSubst(remap).transform(conditionTerm, nar.concepts);
+        conditionTerm = new MapSubst(remap).transform(conditionTerm, nar.terms);
         if (conditionTerm == null)
             return null;
 
-        actionTerm = new MapSubst(remap).transform(actionTerm, nar.concepts);
+        actionTerm = new MapSubst(remap).transform(actionTerm, nar.terms);
         if (actionTerm == null)
             return null;
 

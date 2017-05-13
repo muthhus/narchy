@@ -316,7 +316,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
         byte[] oo = transcode(ii, en);
 
         if (ii!=oo) {
-            Term y = IO.termFromBytes(oo, nar.concepts);
+            Term y = IO.termFromBytes(oo, nar.terms);
             if (y != null)
                 return y;
         }

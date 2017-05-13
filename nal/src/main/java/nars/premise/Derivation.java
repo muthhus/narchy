@@ -14,7 +14,6 @@ import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;
-import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -105,7 +104,7 @@ abstract public class Derivation extends Unify implements TermContext {
     public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
                       int stack) {
-        super(nar.concepts, VAR_PATTERN, nar.random(), stack, 0);
+        super(nar.terms, VAR_PATTERN, nar.random(), stack, 0);
         this.nar = nar;
         this.budgeting = b;
 

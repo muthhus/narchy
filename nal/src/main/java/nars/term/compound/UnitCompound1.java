@@ -12,8 +12,6 @@ import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
-
 import static nars.time.Tense.DTERNAL;
 
 /**

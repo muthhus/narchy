@@ -243,7 +243,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 aProp,
                 nar.random(),
                 true
-        ), nar.concepts);
+        ), nar.terms);
 
         if (t == null)
             return null;

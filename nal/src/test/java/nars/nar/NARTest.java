@@ -54,10 +54,10 @@ public class NARTest {
         nar.input("<a-->b>.", "<b-->c>.");
         nar.stop();
 
-        assertTrue(nar.concepts.size() > 5);
+        assertTrue(nar.terms.size() > 5);
 
         int nc;
-        assertTrue((nc = nar.concepts.size()) > 0);
+        assertTrue((nc = nar.terms.size()) > 0);
 
 
         //a new nar with the same memory is allowed to
@@ -67,7 +67,7 @@ public class NARTest {
         assertTrue(nar.time() > 1);
 
         //it should have existing concepts
-        assertEquals(nc, nar2.concepts.size());
+        assertEquals(nc, nar2.terms.size());
 
 
     }

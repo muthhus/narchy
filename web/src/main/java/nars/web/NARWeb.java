@@ -26,12 +26,15 @@ public class NARWeb extends WebServer {
 
     private static final Logger logger = LoggerFactory.getLogger(nars.web.NARWeb.class);
 
+    private final NarseseIOService io;
+    private final ActiveConceptService active;
+
     public NARWeb(NAR nar, int httpPort) {
         super(httpPort);
 
-        addPrefixPath("/terminal", socket(new NarseseIOService(nar)));
+        addPrefixPath("/terminal", socket(io = new NarseseIOService(nar)));
         //.addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
-        addPrefixPath("/active", socket(new ActiveConceptService(nar, 200, 48)));
+        addPrefixPath("/active", socket(active = new ActiveConceptService(nar, 200, 48)));
 //        addPrefixPath("/json/in", socket(new WebsocketService() {
 //
 //            @Override
@@ -75,10 +78,10 @@ public class NARWeb extends WebServer {
             return null;
         });
         nar.on("fps", (t, n) -> {
-            @Nullable Pair<Atomic, TermContainer> x = Op.functor(t.term(), nar.concepts);
+            @Nullable Pair<Atomic, TermContainer> x = Op.functor(t.term(), nar.terms);
             if (x != null) {
                 Term z = x.getTwo().sub(0);
-                if (z instanceof IntTerm) {
+                if (z instanceof IntTerm) { //TODO handle float's
                     l.set(nar.loopFPS( (float)( ((IntTerm) z).val)) );
                 }
             }
@@ -99,7 +102,7 @@ public class NARWeb extends WebServer {
 
         Hear.wiki(nar);
 
-        new NARWeb(nar, port);
+        NARWeb w = new NARWeb(nar, port);
 
 
     }

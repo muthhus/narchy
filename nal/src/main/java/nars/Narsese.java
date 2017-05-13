@@ -1135,7 +1135,7 @@ public class Narsese extends BaseParser<Object> {
      */
     public static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
         @NotNull Narsese p = the();
-        p.T = m.concepts;
+        p.T = m.terms;
         try {
 
             int parsedTasks = 0;

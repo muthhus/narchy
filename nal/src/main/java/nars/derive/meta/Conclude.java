@@ -12,8 +12,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.transform.Functor;
-import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;

@@ -25,7 +25,7 @@ public class UnifySubst extends Unify {
     int matches;
 
     public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int ttl) {
-        super(n.concepts, varType, n.random(), Param.SubUnificationStackMax, ttl);
+        super(n.terms, varType, n.random(), Param.SubUnificationStackMax, ttl);
 
         this.nar = n;
         this.target = target;
@@ -93,7 +93,7 @@ public class UnifySubst extends Unify {
 
             return /*subs.isEmpty() ?
                     t : *//* no change necessary */
-                    new MapSubst(subs).transform(t, nar.concepts);
+                    new MapSubst(subs).transform(t, nar.terms);
 //        } catch (InvalidTermException e) {
 //            return null;
 //        }

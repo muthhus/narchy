@@ -2,18 +2,14 @@ package java4k.moo;
 
 import java4k.GamePanel;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
-import javax.swing.*;
 
 public class M extends GamePanel implements Runnable, MouseListener, KeyListener {
 	MouseEvent click = null;

@@ -136,7 +136,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
-        Compound cntt = n.concepts.normalize(t);
+        Compound cntt = n.terms.normalize(t);
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 

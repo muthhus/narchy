@@ -1,7 +1,6 @@
 package nars.op.stm;
 
 import jcog.data.MutableInteger;
-import jcog.event.On;
 import nars.$;
 import nars.NAR;
 import nars.Task;

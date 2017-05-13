@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.Op;
 import nars.index.term.TermContext;
-import nars.index.term.TermIndex;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

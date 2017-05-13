@@ -150,7 +150,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = nar.concepts.the(INH, DTERNAL, csubj.sub(i), pred)) == null) {
+                                if ((x[i] = nar.terms.the(INH, DTERNAL, csubj.sub(i), pred)) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -182,7 +182,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.sub(j++);
                         }
-                        Compound b = compoundOrNull(nar.concepts.the(INH, DTERNAL, $.p(ee), img.sub(0)));
+                        Compound b = compoundOrNull(nar.terms.the(INH, DTERNAL, $.p(ee), img.sub(0)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }
@@ -200,7 +200,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             Term[] x = new Term[s];
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                if ((x[i] = nar.concepts.the(INH, DTERNAL, subj, cpred.sub(i))) == null) {
+                                if ((x[i] = nar.terms.the(INH, DTERNAL, subj, cpred.sub(i))) == null) {
                                     valid = false;
                                     break;
                                 }
@@ -232,7 +232,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                             if (i < s)
                                 ee[i++] = img.sub(j++);
                         }
-                        Compound b = compoundOrNull(nar.concepts.the(INH, DTERNAL, img.sub(0), $.p(ee)));
+                        Compound b = compoundOrNull(nar.terms.the(INH, DTERNAL, img.sub(0), $.p(ee)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
                     }

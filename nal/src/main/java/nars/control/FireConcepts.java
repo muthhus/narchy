@@ -80,7 +80,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         int ttl = Util.lerp(cPri, Param.UnificationTTL, Param.UnificationTTLMin);
         c.tasklinks().commit();
         c.termlinks().commit();
-        nar.concepts.commit(c);
+        nar.terms.commit(c);
 
         long now = nar.time();
         int count = 0;

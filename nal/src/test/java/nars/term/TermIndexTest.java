@@ -190,7 +190,7 @@ public class TermIndexTest {
     public void testRuleTermsAddedToMemoryTermIndex() {
         NAR d = new Default(100);
         Set<Term> t = new TreeSet();
-        d.concepts.forEach(x -> t.add(x.term()));
+        d.terms.forEach(x -> t.add(x.term()));
 
         assertTrue(t.size() > 100); //approximate
 
@@ -233,7 +233,7 @@ public class TermIndexTest {
     }
 
     public static void testCommonPrefix(boolean direction) {
-        MaplikeTermIndex i = (MaplikeTermIndex)(new Default().concepts);
+        MaplikeTermIndex i = (MaplikeTermIndex)(new Default().terms);
         Atomic sui = Atomic.the("substituteIfUnifies");
         Atomic su = Atomic.the("substitute");
 

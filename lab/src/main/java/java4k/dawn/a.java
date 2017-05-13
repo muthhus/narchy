@@ -2,21 +2,14 @@ package java4k.dawn;
 
 import java4k.GamePanel;
 
-import java.awt.Canvas;
-import java.awt.Color;
-//import java.awt.Font;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Polygon;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.util.LinkedList;
 import java.util.Random;
-import javax.swing.*;
+
+//import java.awt.Font;
 
 public class a extends GamePanel implements Runnable, KeyListener, MouseListener, MouseMotionListener {
     @Override

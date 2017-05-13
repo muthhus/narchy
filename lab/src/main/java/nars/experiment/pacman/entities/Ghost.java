@@ -1,11 +1,11 @@
 package nars.experiment.pacman.entities;
 
+import nars.experiment.pacman.maze.Maze;
+import nars.experiment.pacman.maze.Maze.Direction;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
-
-import nars.experiment.pacman.maze.Maze;
-import nars.experiment.pacman.maze.Maze.Direction;
 
 public class Ghost extends Entity {
 	

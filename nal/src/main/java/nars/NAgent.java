@@ -20,7 +20,6 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import nars.util.Loop;
 import nars.util.data.Mix;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -290,7 +289,7 @@ abstract public class NAgent implements NSense, NAct {
 
         return id + " rwrd=" + n2(reward) +
                 " dex=" + n4(dexterity()) +
-                " var=" + n4(varPct(nar)) + "\t" + nar.concepts.summary() + " " +
+                " var=" + n4(varPct(nar)) + "\t" + nar.terms.summary() + " " +
                 nar.emotion.summary();
     }
 
@@ -447,7 +446,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     /**
-     * synchronous execution managed by existing NAR's
+     * synchronous execution
      */
     public NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
 
@@ -467,6 +466,7 @@ abstract public class NAgent implements NSense, NAct {
                 stop();
         });
 
+        nar.loop().join();
 
         return this;
     }
@@ -485,6 +485,12 @@ abstract public class NAgent implements NSense, NAct {
         init();
 
         Timer t = timer.updateAndGet((x)-> x==null ? new Timer() : x);
+        nar.eventReset.onWeak(nn->{
+            t.cancel();
+        });
+
+        Pair<NARLoop, Timer> p = Tuples.pair(nar.loop(), t);
+        //p.getOne().join();
 
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -493,12 +499,7 @@ abstract public class NAgent implements NSense, NAct {
             }
         }, 0, Math.round(1000f / fps));
 
-
-        nar.eventReset.onWeak(nn->{
-            t.cancel();
-        });
-
-        return Tuples.pair(nar.loop(), t);
+        return p;
 
     }
 
@@ -628,7 +629,7 @@ abstract public class NAgent implements NSense, NAct {
             tFinal = null;
         }
 
-        term = nar.concepts.normalize(term);
+        term = nar.terms.normalize(term);
 
         return new ImmutableTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
     }

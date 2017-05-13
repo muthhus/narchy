@@ -1,17 +1,15 @@
 package nars.web;
 
-import ch.qos.logback.classic.AsyncAppender;
-import ch.qos.logback.core.Appender;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.filter.LevelFilter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import ch.qos.logback.core.AsyncAppenderBase;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import jcog.byt.DynByteSeq;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.op.Command;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
 
 import java.io.IOException;
@@ -38,10 +36,14 @@ public class NarseseIOService extends WebsocketService  {
 
             @Override
             protected void append(Object eventObject) {
-                output.accept(Command.logTask($.quote(eventObject.toString())));
+                if (((ILoggingEvent)eventObject).getLevel().isGreaterOrEqual(Level.INFO))
+                    output.accept(Command.logTask($.quote(eventObject.toString())));
 
             }
         });
+        LevelFilter lf = new LevelFilter();
+        lf.setLevel(Level.INFO);
+        appender.addFilter(lf);
         appender.start();
 
         output = new LeakOut(n, 16, 1f) {
@@ -63,6 +65,7 @@ public class NarseseIOService extends WebsocketService  {
     }
 
 
+    //TODO decode binary msgpack array, like send does for outgoing
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
         try {

@@ -267,7 +267,7 @@ public class MySTMClustered extends STMClustered {
     private Compound group(boolean negated, @NotNull Collection<Task> uuu) {
 
 
-        TermIndex index = nar.concepts;
+        TermIndex index = nar.terms;
         if (uuu.size() == 2) {
             //find the dt and construct a sequence
             Task early, late;

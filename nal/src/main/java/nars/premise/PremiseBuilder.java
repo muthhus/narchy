@@ -11,7 +11,6 @@ import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,7 +182,7 @@ public enum PremiseBuilder { ;
         new UnifySubst(null, nar, (aa) -> {
             if (aa instanceof Compound) {
 
-                aa = aa.eval(nar.concepts);
+                aa = aa.eval(nar.terms);
 
                 if (!aa.equals(result[0])) {
                     result[0] = ((Compound) aa);

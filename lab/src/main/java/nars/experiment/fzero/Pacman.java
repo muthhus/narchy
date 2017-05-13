@@ -1,6 +1,5 @@
 package nars.experiment.fzero;
 
-import java4k.gradius4k.Gradius4K;
 import jcog.Util;
 import nars.$;
 import nars.NAR;

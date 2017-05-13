@@ -94,14 +94,14 @@ public final class DynTruth implements Truthed {
         if (c.op().temporal && dt == DTERNAL && start!=ETERNAL)
             dt = 0; //actually it is measured at the current time so make it parallel
 
-        c = compoundOrNull(nar.concepts.the(c.op(), dt, c.toArray()));
+        c = compoundOrNull(nar.terms.the(c.op(), dt, c.toArray()));
         if (c == null)
             return null;
 
         if (null == (c = Task.content(c, nar)))
             return null;
 
-        if (null == (c = nar.concepts.retemporalize(c)))
+        if (null == (c = nar.terms.retemporalize(c)))
             return null;
 
         // then if the term is valid, see if it is valid for a task

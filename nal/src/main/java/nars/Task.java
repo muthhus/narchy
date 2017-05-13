@@ -935,7 +935,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         if (evaluate) {
             Compound x = term();
             Compound y = compoundOrNull(
-                    x.eval(n.concepts)
+                    x.eval(n.terms)
             );
 
             if (y != x) {
@@ -979,7 +979,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
             if (this == accepted) {
 
-                n.concepts.commit(c);
+                n.terms.commit(c);
 
                 if (!isInput()) //dont count direct input as learning
                     n.emotion.learn(inputPri, volume());

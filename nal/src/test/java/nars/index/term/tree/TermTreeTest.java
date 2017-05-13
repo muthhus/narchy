@@ -61,7 +61,7 @@ public class TermTreeTest {
     public void testCompoundInsertion() throws Narsese.NarseseException {
 
         Terminal nar = new Terminal();
-        TreeTermIndex index = new TreeTermIndex(nar.concepts.conceptBuilder(), 1000);
+        TreeTermIndex index = new TreeTermIndex(nar.terms.conceptBuilder(), 1000);
 
         String[] terms = {
                 "x",

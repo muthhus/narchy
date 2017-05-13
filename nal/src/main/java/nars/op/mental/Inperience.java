@@ -216,7 +216,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
         Task task = b.get();
 
         //try {
-            Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.concepts);
+            Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.terms);
             if (r != null) {
 
                 long now = nar.time();
@@ -290,7 +290,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
         arg[k++] = self;
 
-        arg[k++] = nar.concepts.queryToDepVar($.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        arg[k++] = nar.terms.queryToDepVar($.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
 

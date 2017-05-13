@@ -1,6 +1,5 @@
 package nars.experiment.pacman.entities;
 
-import nars.experiment.pacman.PacMan;
 import nars.experiment.pacman.maze.Maze;
 import nars.experiment.pacman.maze.Maze.Direction;
 

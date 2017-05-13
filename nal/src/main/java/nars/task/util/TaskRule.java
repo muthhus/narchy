@@ -40,11 +40,11 @@ public class TaskRule extends TaskMatch {
         super(nar);
 
         this.input = $.$(input);
-        this.outputRaw = (Compound) nar.concepts.parseRaw(output);
+        this.outputRaw = (Compound) nar.terms.parseRaw(output);
 
         VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */);
 
-        this.output = compoundOrNull(nar.concepts.transform(outputRaw, varNorm));
+        this.output = compoundOrNull(nar.terms.transform(outputRaw, varNorm));
         if (this.output == null)
             throw new RuntimeException("output pattern is not compound");
 
@@ -68,7 +68,7 @@ public class TaskRule extends TaskMatch {
         private final Task x;
 
         public MySubUnify(Task x) {
-            super(TaskRule.this.nar.concepts, Op.VAR_PATTERN, TaskRule.this.nar.random(), unification_ttl);
+            super(TaskRule.this.nar.terms, Op.VAR_PATTERN, TaskRule.this.nar.random(), unification_ttl);
             this.x = x;
         }
 
@@ -107,13 +107,13 @@ public class TaskRule extends TaskMatch {
     @Override
     protected void accept(Task X, Map<Term, Term> xy) {
 
-        Compound y = compoundOrNull(new MapSubst(xy).transform(output, nar.concepts));
+        Compound y = compoundOrNull(new MapSubst(xy).transform(output, nar.terms));
         if (y==null) return;
 
         y = Task.content(y, nar);
         if (y==null) return;
 
-        y = nar.concepts.normalize(y);
+        y = nar.terms.normalize(y);
         if (y==null) return;
 
         if (!Task.taskContentValid(y, X.punc(), nar, true))

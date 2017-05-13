@@ -100,7 +100,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * holds known Term's and Concept's
      */
     @NotNull
-    public final TermIndex concepts;
+    public final TermIndex terms;
 
 
     private Focus focus = Focus.NULL_FOCUS;
@@ -183,7 +183,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public NAR(@NotNull Time time, @NotNull TermIndex concepts, @NotNull Random rng, @NotNull Executioner exe) {
+    public NAR(@NotNull Time time, @NotNull TermIndex terms, @NotNull Random rng, @NotNull Executioner exe) {
 
         this.random = rng;
 
@@ -193,11 +193,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         this.time = time;
 
-        this.concepts = concepts;
+        this.terms = terms;
 
         this.emotion = new Emotion();
 
-        concepts.start(this);
+        terms.start(this);
 
 //        eventError.on(e -> {
 //            if (e instanceof Throwable) {
@@ -233,7 +233,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
             clear();
 
-            concepts.clear();
+            terms.clear();
 
             restart();
 
@@ -301,7 +301,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     @NotNull
     public <T extends Term> T term(@NotNull String t) throws NarseseException {
-        return concepts.term(t);
+        return terms.term(t);
     }
 
     @Override
@@ -813,12 +813,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     public final PermanentAtomConcept on(@NotNull Atom a, @NotNull Operator o) {
-        DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
+        DefaultConceptBuilder builder = (DefaultConceptBuilder) terms.conceptBuilder();
         PermanentAtomConcept c = builder.withBags(a,
                 (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
         );
         c.put(Operator.class, o);
-        concepts.set(c);
+        terms.set(c);
         operators.put(c, o);
         return c;
     }
@@ -1320,14 +1320,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             default:
 
                 if (term instanceof Compound) {
-                    term = concepts.atemporalize((Compound) term);
+                    term = terms.atemporalize((Compound) term);
                     if (term == null)
                         return null;
 
                     //atemporalizing can reset normalization state of the result instance
                     //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-                    Compound nterm = concepts.normalize((Compound) term);
+                    Compound nterm = terms.normalize((Compound) term);
 //                    if (nterm == null) {
 //                        concepts.normalize((Compound)term);
 //                        return null;
@@ -1353,7 +1353,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
 
-        Concept c = concepts.concept(term, createIfMissing);
+        Concept c = terms.concept(term, createIfMissing);
 //        if (c != null && createIfMissing && c.isDeleted()) {
 //            //try again
 //            concepts.remove(c.term());
@@ -1371,7 +1371,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
-        concepts.forEach(x -> {
+        terms.forEach(x -> {
             if (x instanceof Concept)
                 recip.accept((Concept) x);
         });
@@ -1487,12 +1487,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final Concept on(@NotNull Concept c) {
 
         //TODO make this a lambda atomic procedure that is passed to the concept index to update it
-        synchronized (concepts) {
+        synchronized (terms) {
             Concept existing = concept(c.term());
             if ((existing != null) && (existing != c))
                 throw new RuntimeException("concept already indexed for term: " + c.term());
 
-            concepts.set(c);
+            terms.set(c);
         }
 
         return c;
@@ -1522,7 +1522,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final void setState(@NotNull Concept c, @NotNull ConceptState p) {
 
         if (c.state(p, this) != p) {
-            concepts.onStateChanged(c);
+            terms.onStateChanged(c);
         }
 
     }
@@ -1572,7 +1572,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     try {
 
                         //HACK temporary until this is debugged
-                        Task xx = IO.taskFromBytes(b, concepts);
+                        Task xx = IO.taskFromBytes(b, terms);
                         if (xx == null || !xx.equals(x)) {
                             //this can happen if a subterm is decompressed only to discover that it contradicts another part of the compound it belongs within
                             //logger.error("task serialization problem: {} != {}", _x, xx);
@@ -1628,7 +1628,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         int count = 0;
 
         while ((i.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
-            Task t = IO.readTask(ii, concepts);
+            Task t = IO.readTask(ii, terms);
             input(t);
             count++;
         }

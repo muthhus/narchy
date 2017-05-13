@@ -26,7 +26,6 @@ import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
-import nars.index.term.TermIndex;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;

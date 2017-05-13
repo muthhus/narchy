@@ -1,18 +1,16 @@
 package nars.experiment.fzero;
 
 import java4k.gradius4k.Gradius4K;
-import jcog.Util;
-import jcog.math.FloatNormalized;
-import nars.*;
-import nars.concept.SensorConcept;
+import nars.$;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
-import org.apache.commons.math3.util.MathUtils;
-import org.jetbrains.annotations.NotNull;
 
 import static nars.$.t;
 

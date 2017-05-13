@@ -3,8 +3,6 @@ package nars.nar;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.concept.Concept;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
 

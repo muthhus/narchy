@@ -1,10 +1,11 @@
 package nars.experiment.pacman;
 
-import java.awt.*;
-import java.util.ArrayList;
-import javax.swing.*;
 import nars.experiment.pacman.entities.Ghost;
 import nars.experiment.pacman.maze.Maze;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
 
 public class PacComponent extends JComponent {
 

@@ -6,8 +6,6 @@ import io.undertow.server.handlers.PathHandler;
 import io.undertow.server.handlers.resource.FileResourceManager;
 import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.extensions.PerMessageDeflateHandshake;
-import nars.InterNAR;
-import nars.NAR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

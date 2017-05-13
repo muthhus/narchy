@@ -1,14 +1,12 @@
 package nars.experiment;
 
 import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Param;
 import nars.Task;
 import nars.concept.ActionConcept;
 import nars.nar.Default;
-import nars.op.RLBooster;
 import nars.test.agent.Line1DSimplest;
 
 import java.util.LinkedHashSet;

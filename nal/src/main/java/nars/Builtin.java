@@ -175,7 +175,7 @@ public class Builtin {
                 return Term.falseIfNull(x[n]);
             } else {
                 Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
-                return Term.falseIfNull(nar.concepts.the(c.op(), c.dt(), y));
+                return Term.falseIfNull(nar.terms.the(c.op(), c.dt(), y));
             }
         }));
 
@@ -206,7 +206,7 @@ public class Builtin {
 
 
         nar.on("memstat", (Command) (op, a, nn) ->
-                Command.log(nn, quote(nn.concepts.summary()))
+                Command.log(nn, quote(nn.terms.summary()))
         );
 
         nar.on("emotion", (Command) (op, a, nn) ->
@@ -220,7 +220,7 @@ public class Builtin {
         nar.on("clear", (Command) (op, args, n) -> {
             n.clear();
             n.runLater(() -> {
-                Command.log(n, "Ready. (" + n.concepts.size() + " subconcepts)");
+                Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)");
             });
         });
 
