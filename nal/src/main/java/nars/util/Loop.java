@@ -68,7 +68,7 @@ abstract public class Loop implements Runnable {
     }
 
     @NotNull
-    public Loop at(float fps) {
+    public Loop atFPS(float fps) {
         setPeriodMS((int) (1000f / fps));
         return this;
     }
@@ -90,8 +90,8 @@ abstract public class Loop implements Runnable {
 
             //try {
 
-                if (!next())
-                    break;
+            if (!next())
+                break;
 
 //            } catch (Throwable e) {
 //                logger.error("{}", e);
@@ -136,9 +136,20 @@ abstract public class Loop implements Runnable {
         }
     }
 
-    public final void setPeriodMS(int period) {
 
-        this.periodMS = period;
+    public final synchronized void setPeriodMS(int newPeriod) {
+
+        int oldPeriod = periodMS;
+        if (oldPeriod != newPeriod) {
+
+            boolean paused = (isPaused());
+
+            this.periodMS = newPeriod;
+            if (paused) {
+                thread.interrupt();
+            }
+
+        }
 //        int prevPeriod = periodMS;
 //
 //        if (prevPeriod == period) return false;
@@ -186,5 +197,9 @@ abstract public class Loop implements Runnable {
 
     public final void pause() {
         setPeriodMS(-1);
+    }
+
+    public boolean isPaused() {
+        return periodMS == -1;
     }
 }

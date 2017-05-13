@@ -390,6 +390,7 @@ public abstract class STMClustered extends STM {
     @Override
     public void clear() {
         input.get().clear();
+        net.clear();
     }
 
     @Override

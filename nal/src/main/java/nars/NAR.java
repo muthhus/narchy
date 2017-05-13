@@ -808,11 +808,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public final void on(@NotNull String atom, @NotNull Operator o) {
-        on((Atom) Atomic.the(atom), o);
+    public final PermanentAtomConcept on(@NotNull String atom, @NotNull Operator o) {
+        return on((Atom) Atomic.the(atom), o);
     }
 
-    public final void on(@NotNull Atom a, @NotNull Operator o) {
+    public final PermanentAtomConcept on(@NotNull Atom a, @NotNull Operator o) {
         DefaultConceptBuilder builder = (DefaultConceptBuilder) concepts.conceptBuilder();
         PermanentAtomConcept c = builder.withBags(a,
                 (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
@@ -820,6 +820,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         c.put(Operator.class, o);
         concepts.set(c);
         operators.put(c, o);
+        return c;
     }
 
     public void input(Function<NAR, Task>... tasks) {

@@ -25,8 +25,7 @@ import static nars.attention.Crosslink.crossLink;
 public final class STMTemporalLinkage extends STM {
 
     @NotNull public final Deque<Task> stm;
-    @NotNull
-    private final On onReset;
+
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
         super(nar, new MutableInteger(capacity));
@@ -36,9 +35,6 @@ public final class STMTemporalLinkage extends STM {
         //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
         stm = new ArrayDeque<>(capacity);
         //stm = new ConcurrentLinkedDeque<>();
-
-        this.onReset = nar.eventReset.on((n)-> clear());
-
     }
 
     @Override

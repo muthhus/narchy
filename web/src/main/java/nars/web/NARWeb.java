@@ -1,11 +1,14 @@
 package nars.web;
 
+import jcog.data.FloatParam;
 import nars.InterNAR;
 import nars.NAR;
+import nars.NARLoop;
+import nars.nar.NARBuilder;
+import nars.time.RealTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nars.web.IRCAgent.newRealtimeNAR;
 
 /**
  * Created by me on 1/21/17.
@@ -43,19 +46,31 @@ public class NARWeb extends WebServer {
 
     }
 
-        public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
         int port = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        NAR nar =
-                newRealtimeNAR(512, 3, 2);
+        FloatParam fps = new FloatParam (5f);
 
+        NAR nar =
+                NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(false), true);
+        NARLoop l = nar.loop(fps.floatValue());
+
+        nar.on("stop", (t, n) -> {
+            l.pause();
+            return null;
+        });
+        nar.on("start", (t, n) -> {
+            l.atFPS(fps.floatValue());
+            return null;
+        });
 
         InterNAR net = new InterNAR(nar, 8, port);
 
+
         Hear.wiki(nar);
 
-        new NARWeb(nar ,port);
+        new NARWeb(nar, port);
 
 
     }
