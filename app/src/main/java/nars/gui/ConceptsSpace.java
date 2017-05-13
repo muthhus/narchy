@@ -138,9 +138,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveChainTest(n, 8,  2048, inh);
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
-        n.focus.activationRate.setValue(0.2f);
+        n.focus.activationRate.setValue(0.05f);
 
-        n.loop(12f);
+        n.loop(3f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",

@@ -1,11 +1,14 @@
 package nars;
 
 
+import nars.index.term.TermContext;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
+import nars.term.transform.Functor;
 import nars.term.var.GenericVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -278,7 +281,7 @@ public enum Op {
 
     /** decode a term which may be a functor, return null if it isnt */
     @Nullable
-    public static Pair<Atomic, TermContainer> functor(@NotNull Term maybeOperation) {
+    public static Pair<Functor, TermContainer> functor(@NotNull Term maybeOperation, TermContext index) {
         if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
             Compound c = (Compound)maybeOperation;
             if (c.op() == INH) {
@@ -286,7 +289,13 @@ public enum Op {
                 if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1.op() == ATOM) {
-                        return Tuples.pair((Atomic) s1, ((Compound)s0).subterms());
+                        Atomic ff = (Atomic) index.getIfPresentElse(s1);
+                        if (ff instanceof Functor) {
+                            return Tuples.pair(
+                                    (Functor)ff,
+                                    ((Compound) s0).subterms()
+                            );
+                        }
                     }
                 }
             }

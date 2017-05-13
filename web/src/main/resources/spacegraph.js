@@ -179,6 +179,7 @@ function spacegraph(opt) {
 
                     }
 
+                    const pp = 0.25 + 0.75 * p;
                     n.style({
                         //                       sg.spacegraph.style().selector('node')
                         //                       .style('background-color', function(x) {
@@ -189,7 +190,7 @@ function spacegraph(opt) {
                         height: ri,
                         fontSize: 1 + parseInt(r/10.0),
                         shape: 'hexagon',
-                        backgroundColor: colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
+                        backgroundColor: colorFunc(pp, pp, pp),
                         //position: n.position() || [ Math.random() * 10, Math.random() * 10]
 
                     });
@@ -205,8 +206,9 @@ function spacegraph(opt) {
                 const p = x.pri;
 
 
+                const ooo = 0.25 + 0.75 * p;
                 e.style({
-                    'lineColor': colorFunc(0.25 + 0.75 * p, x.dur, x.qua),
+                    'lineColor': colorFunc(ooo, ooo, ooo),
                     'width': parseInt(minThick + (maxThick-minThick) * Math.sqrt(p))
                 });
 

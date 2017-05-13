@@ -26,7 +26,7 @@ abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> 
             if (temporallyInductable(t, allowNonInput))
                 accept(t);
         });
-        nar.onReset(n -> clear());
+        nar.eventReset.on(n -> clear());
     }
 
     static boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {

@@ -45,6 +45,7 @@ import static spacegraph.layout.Grid.row;
  */
 public class Recog2D extends NAgentX {
 
+
     private final Graphics2D g;
     private final int h;
     private final int w;
@@ -57,8 +58,6 @@ public class Recog2D extends NAgentX {
     BufferedImage canvas;
 
     public final AtomicBoolean neural = new AtomicBoolean(false);
-
-
 
 
     int image;
@@ -118,16 +117,16 @@ public class Recog2D extends NAgentX {
 
         //nar.log();
 
-        outs = new Outputs(ii -> (Compound)$.inst(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> (Compound) $.inst(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
-                    sp.src instanceof PixelBag ?  Iterables.concat(sensors, ((PixelBag)sp.src).actions) : sensors
+                        sp.src instanceof PixelBag ? Iterables.concat(sensors, ((PixelBag) sp.src).actions) : sensors
                 ),
                 outs, nar);
 
         //new Thread(() -> {
-            SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
+        SpaceGraph.window(conceptTraining(outs, nar), 800, 600);
         //}).start();
 
     }
@@ -146,7 +145,7 @@ public class Recog2D extends NAgentX {
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
                                 reward
-                    //tv.errorSum()
+                        //tv.errorSum()
                 )),
                 //row(s = new Plot2D(history, Plot2D.BarWave).add("Rward", () -> rewardValue)),
 
@@ -223,8 +222,8 @@ public class Recog2D extends NAgentX {
                 outs.expect(image);
             }
             //} else {
-              //  outs.expect(-1);
-              //  outs.verify();
+            //  outs.expect(-1);
+            //  outs.verify();
             //}
 
 
@@ -239,7 +238,8 @@ public class Recog2D extends NAgentX {
         return g;
     }
 
-    @Deprecated public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
+    @Deprecated
+    public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
         long[] btRange = new long[2];
         nar.onCycle(nn -> {
             long now = nn.time();
@@ -258,7 +258,7 @@ public class Recog2D extends NAgentX {
         for (int i = 0; i < maxImages; i++) {
 
 
-            Truth g = nar.concept(outs.outVector[i]).belief( nar.time(), nar.dur() );
+            Truth g = nar.concept(outs.outVector[i]).belief(nar.time(), nar.dur());
 
             if (g == null) {
                 error += 0.5;
@@ -268,9 +268,8 @@ public class Recog2D extends NAgentX {
             }
         }
 
-        return 1f - 2 * (error /  maxImages);
-
-
+        float sharp = 1;
+        return (float) (1f - 2 * Math.pow((error / maxImages), sharp));
 
 //            r = 0.5f - (float) outs.errorSum()
 //                    / outs.states;
@@ -321,11 +320,13 @@ public class Recog2D extends NAgentX {
 
         private final float learningRate = 0.3f;
 
-        /** Introduction of the momentum rate allows the attenuation of oscillations in the gradient descent. The geometric idea behind this idea can probably best be understood in terms of an eigenspace analysis in the linear case. If the ratio between lowest and largest eigenvalue is large then performing a gradient descent is slow even if the learning rate large due to the conditioning of the matrix. The momentum introduces some balancing in the update between the eigenvectors associated to lower and larger eigenvalues.
-
-         For more detail I refer to
-
-         http://page.mi.fu-berlin.de/rojas/neural/chapter/K8.pdf */
+        /**
+         * Introduction of the momentum rate allows the attenuation of oscillations in the gradient descent. The geometric idea behind this idea can probably best be understood in terms of an eigenspace analysis in the linear case. If the ratio between lowest and largest eigenvalue is large then performing a gradient descent is slow even if the learning rate large due to the conditioning of the matrix. The momentum introduces some balancing in the update between the eigenvectors associated to lower and larger eigenvalues.
+         * <p>
+         * For more detail I refer to
+         * <p>
+         * http://page.mi.fu-berlin.de/rojas/neural/chapter/K8.pdf
+         */
         private final float momentum = 0.6f;
 
         public Training(java.util.List<Concept> ins, Outputs outs, NAR nar) {
@@ -335,7 +336,7 @@ public class Recog2D extends NAgentX {
             this.outs = outs;
 
 
-            this.trainer = new MLP(ins.size(), new int[]{ (ins.size()+outs.states)/2,  outs.states }, nar.random());
+            this.trainer = new MLP(ins.size(), new int[]{(ins.size() + outs.states) / 2, outs.states}, nar.random());
             trainer.layers[1].setIsSigmoid(false);
 
         }
@@ -344,11 +345,11 @@ public class Recog2D extends NAgentX {
         float[] in(float[] i, long when) {
             int s = ins.size();
 
-            if (i == null || i.length!= s)
+            if (i == null || i.length != s)
                 i = new float[s];
             for (int j = 0, insSize = ins.size(); j < insSize; j++) {
                 float b = nar.beliefTruth(ins.get(j), when).freq();
-                if (b!=b) //dont input NaN
+                if (b != b) //dont input NaN
                     b = 0.5f;
                 i[j] = b;
             }

@@ -100,16 +100,16 @@ function dock(socket, target) {
         var e = ee.editor;
 
         socket.on('task', (t) => {
-            //HACK
-            if (t.punc === ';') {
-                const pi = t.term.indexOf("(nar(?1),( &&+0 ,");
-                if (pi != -1) {
-                    var src = t.term;
-                    src = src.substring(pi + 17, src.length - 2);
-                    src = src.replace(/,nar/gi, ",\nnar");
-                    e.setValue(src);
-                }
-            }
+            // //HACK
+            // if (t.punc === ';') {
+            //     const pi = t.term.indexOf("(nar(?1),( &&+0 ,");
+            //     if (pi !== -1) {
+            //         var src = t.term;
+            //         src = src.substring(pi + 17, src.length - 2);
+            //         src = src.replace(/,nar/gi, ",\nnar");
+            //         e.setValue(src);
+            //     }
+            // }
         });
 
         socket.send('nar(?1)');

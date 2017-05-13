@@ -28,7 +28,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
-import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -96,9 +95,6 @@ public interface Compound extends Term, IPair, TermContainer {
         });
         return t;
     }
-
-
-
 
 
     /**
@@ -170,8 +166,11 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-    /** temporary: this will be replaced with a smart visitor api */
-    @Override default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+    /**
+     * temporary: this will be replaced with a smart visitor api
+     */
+    @Override
+    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
         return recurseTerms(whileTrue, this);
     }
 
@@ -239,8 +238,8 @@ public interface Compound extends Term, IPair, TermContainer {
             if (s instanceof Compound) {
                 Compound cs = (Compound) s;
                 byte[] pt = pathTo(p, cs, target);
-                if (pt!=null) {
-                    p.add((byte)i);
+                if (pt != null) {
+                    p.add((byte) i);
                     return pt;
                 }
 
@@ -387,11 +386,13 @@ public interface Compound extends Term, IPair, TermContainer {
      * extracts a subterm provided by the address tuple
      * returns null if specified subterm does not exist
      */
-    @Nullable default Term sub(@NotNull byte... path) {
+    @Nullable
+    default Term sub(@NotNull byte... path) {
         return sub(path.length, path);
     }
 
-    @Nullable default Term sub(int n, @NotNull byte... path) {
+    @Nullable
+    default Term sub(int n, @NotNull byte... path) {
         Term ptr = this;
         for (int i = 0; i < n; i++) {
             if ((ptr = ptr.sub((int) path[i], null)) == null)
@@ -558,8 +559,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
-
 //    @Nullable
 //    @Override
 //    default Ellipsis firstEllipsis() {
@@ -587,7 +586,6 @@ public interface Compound extends Term, IPair, TermContainer {
      * gets temporal relation value
      */
     int dt();
-
 
 
     /**
@@ -665,8 +663,8 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean isTemporal() {
         return (isAny(Op.TemporalBits) && (dt() != DTERNAL))
-                        ||
-               (hasAny(Op.TemporalBits) && OR(Term::isTemporal));
+                ||
+                (hasAny(Op.TemporalBits) && OR(Term::isTemporal));
     }
 
     @Override
@@ -793,20 +791,21 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override default Term eval(TermContext index) {
+    @Override
+    default Term eval(TermContext index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!isDynamic()) //!hasAll(Op.EvalBits))
             return this;
 
         //unwrap negation before recursion, it should be more efficient
-        if (op()==NEG) {
+        if (op() == NEG) {
             Compound inner = compoundOrNull(unneg());
             if (inner == null)
                 return this; //dont go further
             else {
                 Term outer = $.neg(inner.eval(index));
-                if (outer==null)
+                if (outer == null)
                     return this; //dont go further
                 else
                     return outer;
@@ -839,53 +838,31 @@ public interface Compound extends Term, IPair, TermContainer {
         //check if this is a funct
         if (op() == INH) {
             //recursively compute contained subterm functors
+            org.eclipse.collections.api.tuple.Pair<Functor, TermContainer> f = Op.functor(this, index);
+            if (f != null) {
+                TermContainer args = f.getTwo();
 
-            final Term subject = sub(0);
-            if (subject.op() == PROD) {
-                Term predicate = sub(1);
-                if (predicate.op() == ATOM) {
-
-                    Functor f = null;
-                    if (predicate instanceof Functor) {
-                        //the term is already the functor we want to apply
-                        f = (Functor) predicate;
-                    } else {
-                        //try to resolve a functor referenced by this term
-                        Termed resolvedPred = index.get(predicate);
-                        if (resolvedPred != null) {
-                            Term resolvedPredTerm = resolvedPred.term();
-                            if (resolvedPredTerm instanceof Functor) {
-                                f = (Functor) resolvedPredTerm;
-                            }
-                        }
-                    }
-
-                    if (f != null) {
-
-                        Term dy = f.apply(((Compound)subject).subterms());
-                        if (dy == null || dy == this) {
-                            return this; //functor returning null return value means keep the original input term
-                        } else {
+                Term dy = f.getOne().apply(args);
+                if (dy == null || dy == this) {
+                    return this; //functor returning null return value means keep the original input term
+                } else {
 //                            if (dy.equals(this)) {
 //                                System.err.println("redundant instance detected: " + subject + " " + dy );
 //                                return this;
 //                            }
-                            return dy.eval(index); //recurse
-                        }
-
-                    }
+                    return dy.eval(index); //recurse
                 }
             }
-
 
         }
 
         return this;
     }
 
-    @Nullable default Term commonParent(List<byte[]> subpaths) {
+    @Nullable
+    default Term commonParent(List<byte[]> subpaths) {
         int subpathsSize = subpaths.size();
-        assert(subpathsSize > 0);
+        assert (subpathsSize > 0);
 
         int c = 0;
 
@@ -896,13 +873,14 @@ public interface Compound extends Term, IPair, TermContainer {
 
         //find longest common prefix
         int i;
-        done: for (i = 0; i < shortest; i++) {
+        done:
+        for (i = 0; i < shortest; i++) {
             byte toMatch = 0;
             for (int j = 0, subPathsSize; j < subpathsSize; j++) {
                 byte[] p = subpaths.get(j);
                 if (j == 0) {
                     toMatch = p[i];
-                } else if (toMatch!=p[i]) {
+                } else if (toMatch != p[i]) {
                     break done; //first mismatch, done
                 } //else: continue downwards
             }

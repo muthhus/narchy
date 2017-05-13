@@ -202,7 +202,7 @@ public class QuestionTest {
 
         Param.DEBUG = true;
 
-        n.onTerm("odd", a->{
+        n.on("odd", a->{
             if (a.size() == 1 && a.sub(0).op()== Op.INT) {
                 return ((IntTerm)a.sub(0)).val() % 2 == 0 ? Op.False : Op.True;
             }

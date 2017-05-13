@@ -37,13 +37,9 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     protected NAR nar;
 
 
-    /**
-     * internal get procedure: get if not absent
-     */
-    @Nullable
-    public Termed get(@NotNull Term t) {
-        return get(t, false);
-    }
+
+
+
 
     /** internal get procedure */
     @Nullable

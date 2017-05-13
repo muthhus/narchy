@@ -115,7 +115,7 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
     @Override
-    public Termed get(Term x) {
+    public Termed get(Term x, boolean createIfAbsent) {
         if (x instanceof Atom) {
             switch (x.toString()) {
                 case "substitute": return _substitute;
@@ -123,7 +123,7 @@ abstract public class Derivation extends Unify implements TermContext {
                 case "subIfUnifiesDep": return _substituteIfUnifiesDep;
             }
         }
-        return index.get(x);
+        return index.get(x, createIfAbsent);
     }
 
     @Override

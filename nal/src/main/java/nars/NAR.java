@@ -229,17 +229,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         synchronized (exe) {
 
-            if (!exe.isRunning()) {
-                logger.warn("can not reset already stopped NAR");
-                return;
-            }
-
             stop();
 
             clear();
 
             concepts.clear();
-
 
             restart();
 
@@ -248,7 +242,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     public void clear() {
-        runLater(() -> eventReset.emit(this));
+        synchronized (exe) {
+            runLater(() -> eventReset.emit(this));
+        }
     }
 
     /**
@@ -584,7 +580,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * returns the Concept (non-null) if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(@NotNull Task input) {
+    public final NAR input(@NotNull Task input) {
 
         try {
 
@@ -601,6 +597,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                 logger.warn("task process: {} {}", e, this);
         }
 
+
+        return this;
 
     }
 
@@ -1493,7 +1491,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * registers a term rewrite functor
      */
     @NotNull
-    public final Concept onTerm(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
+    public final Concept on(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
         return on(f(termAtom, f));
     }
 
@@ -1643,9 +1641,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return focus;
     }
 
-    public final On onReset(Consumer<NAR> o) {
-        return eventReset.onWeak(o);
-    }
+
 
 
 }

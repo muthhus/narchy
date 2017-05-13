@@ -1,36 +1,15 @@
 <html>
 <head>
     <title></title>
-    <script src="lib/labjs/LAB.min.js"></script>
-    <style>
-        #in {
-            position: fixed;
-            width: 100%;
-            height: 4em;
-            bottom: 0;
-        }
-        #out {
 
-        }
-    </style>
+    <script src="lib/labjs/LAB.min.js"></script>
+
+
+
+
 </head>
 
-<body>
-    <div id="in">
-        <div id="options">
-            <button class="cmd run">run</button>
-            <button class="cmd stop">stop</button>
-            <button class="cmd clear">clear</button>
-            <select>
-                <option>*</option>
-                <option>mode 1</option>
-                <option>mode 2</option>
-                <option>sleep</option>
-            </select>
-        </div>
-    </div>
-    <div id="out"></div>
-</body>
+<body class="max"></body>
 
 <script>
 
@@ -39,6 +18,7 @@
         .script("lib/jquery/dist/jquery.min.js")
         .script("lib/fastdom/fastdom.min.js")
         .script("lib/jquery-ui/jquery-ui.min.js")
+        .script("lib/golden-layout/dist/goldenlayout.min.js")
         .script("lib/jsoneditor/dist/jsoneditor-minimalist.min.js")
         .script("lib/cytoscape/dist/cytoscape.js")
         .script("lib/codemirror/lib/codemirror.js")
@@ -48,6 +28,7 @@
         .script("spacegraph.js")
         .script("narchy.js")
         .script("menu.js")
+        .script("dock.js")
         .wait(function() {
 
 
@@ -57,25 +38,7 @@
              var s = null; //HACK
              s = NARSocket('terminal', decodeTasks, {
                 onopen: () => {
-
-                    $('#in').append( NALInputEditor(s).attr('id', 'input') );
-                    $('#out').append( taskFeed(s) );
-
-                    //command widget actions
-                    $('.cmd').each((k,x) => {
-
-                        var cc = $(x).attr('class');
-                        if (cc && cc.startsWith('cmd '))
-                            cc = cc.substr(4);
-
-                        cc += '()';
-
-                        $(x).click( () => {
-                            s.send( cc );
-                        });
-                    });
-
-                    //return dock(s, $('body'));
+                    return dock(s, $('body'));
                 }
             });
 

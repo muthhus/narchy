@@ -45,16 +45,17 @@ public class NARWeb extends WebServer {
 
         public static void main(String[] args) throws Exception {
 
-        int httpPort = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
+        int port = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
         NAR nar =
                 newRealtimeNAR(512, 3, 2);
 
-        InterNAR net = new InterNAR(nar, 8, 10420);
+
+        InterNAR net = new InterNAR(nar, 8, port);
 
         Hear.wiki(nar);
 
-        new NARWeb(nar ,httpPort);
+        new NARWeb(nar ,port);
 
 
     }

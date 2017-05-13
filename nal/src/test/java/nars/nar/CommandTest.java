@@ -1,42 +1,41 @@
 package nars.nar;
 
+import nars.NAR;
+import nars.Narsese;
+import nars.Task;
+import nars.concept.Concept;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static nars.Op.COMMAND;
+import static org.junit.Assert.*;
 
 
 @Ignore
 public class CommandTest {
 
     @Test
-    public void testEcho() {
-//        NAR n = new Default();
-//        AtomicBoolean invoked = new AtomicBoolean();
-//        n.on(new NullOperator("c") {
-//
-//            @Override
-//            public void execute(@NotNull OperationConcept t) {
-//
-//                invoked.set(true);
-////                Term[] a = Operator.argArray(t.term());
-////                assertEquals(1, a.length);
-////                assertEquals("x", a[0].toString());
-//
-//            }
-//        });
-//        Task t = n.task("c(x);");
-//        assertNotNull(t);
-//        assertEquals(Symbols.COMMAND, t.punc());
-//        assertTrue(t.isCommand());
-//        assertEquals("c(x); :0:", t.toString());
-//
-//        n.input(t);
-//
-//        n.run(1);
-//
-//        assertTrue(invoked.get());
-//
-//        //no concepts created because this command bypassed inference
-//        n.concepts.forEach(c -> assertFalse(c instanceof Concept));
+    public void testEcho() throws Narsese.NarseseException {
+        NAR n = new Default();
+        AtomicBoolean invoked = new AtomicBoolean();
+        n.on("c", (args) -> {
+            assertEquals("(x)", args.toString());
+            invoked.set(true);
+            return null;
+        });
+        Task t = n.task("c(x);");
+        assertNotNull(t);
+        assertEquals(COMMAND, t.punc());
+        assertTrue(t.isCommand());
+        assertEquals("c(x);", t.toString());
+
+        n.input(t).run(1);
+
+        assertTrue(invoked.get());
+
 
     }
 }

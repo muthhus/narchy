@@ -509,7 +509,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new FrameTime().dur(25);
+        Time clock = new FrameTime().dur(15);
         NAR n =
                 NARBuilder.newMultiThreadNAR(3, clock);
 

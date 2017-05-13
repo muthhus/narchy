@@ -25,14 +25,13 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/8/16.
  */
-@Ignore
 public class InterNARTest {
 
     final static AtomicInteger nextPort = new AtomicInteger(10000);
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 150;
+        final int CONNECTION_TIME = 50;
 
         Param.ANSWER_REPORTING = false;
 
@@ -61,7 +60,7 @@ public class InterNARTest {
 
             Util.pause(CONNECTION_TIME);
 
-            int postCycles = 384;
+            int postCycles = 16;
             for (int i = 0; i < postCycles; i++) {
                 a.run(1);
                 b.run(1);

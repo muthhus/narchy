@@ -12,6 +12,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
@@ -69,7 +70,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         Term pp = p.pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atomic, TermContainer> outerFunctor = Op.functor(pp);
+        Pair<Functor, TermContainer> outerFunctor = Op.functor(pp, $.terms);
         if (outerFunctor!=null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);
