@@ -130,7 +130,7 @@ abstract public class substituteIfUnifies extends Functor {
         }
     }
 
-    public static final class substituteIfUnifiesDep extends substituteIfUnifies {
+    public static class substituteIfUnifiesDep extends substituteIfUnifies {
 
         final static Atom func = (Atom) $.the("subIfUnifiesDep");
 

@@ -27,7 +27,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private final NAR nar;
 
-    private static final int radix = 4;
+    private static final int radix = 2;
     public final List<PixelConcept> pixels;
     private final Mix.MixStream in;
 

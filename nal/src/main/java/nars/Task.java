@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.Texts;
-import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.pri.PLink;
@@ -14,6 +13,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
+import nars.op.Operator;
 import nars.task.DerivedTask;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
@@ -28,7 +28,6 @@ import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
@@ -685,7 +683,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             if (conf > minConf) {
                 return $.t(freq(), conf);
 
-            //quantum entropy uncertainty:
+                //quantum entropy uncertainty:
 //                float ff = freq();
 //                ff = (float) Util.unitize(
 //                        (ThreadLocalRandom.current().nextFloat() - 0.5f) *
@@ -868,7 +866,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     /**
      * prepares a term for use as a Task's content
      */
-    @Deprecated @Nullable
+    @Deprecated
+    @Nullable
     static Compound content(@Nullable final Term r, NAR nar) {
         if (r == null)
             return null;
@@ -957,8 +956,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             }
         }
 
-        if (isCommand())
+        if (isCommand()) {
+            execute(this, n);
             return; //done
+        }
 
 //        if (n.time instanceof FrameTime) {
 //            //HACK for unique serial number w/ frameclock
@@ -974,7 +975,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         Task accepted = c.process(this, n);
         if (accepted != null) {
 
-            Activation a = activate(n, c, 1f);
+            Activation a = SpreadingActivation.activate(this, n, c, 1f);
 
             if (this == accepted) {
 
@@ -1002,15 +1003,65 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
     }
 
-    ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
-            ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    default Activation activate(@NotNull NAR n, @NotNull Concept c, float scale) {
-        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+    static @Nullable Task execute(Task cmd, NAR nar) {
 
-        //float s = scale * (0.5f + 0.5f * pri(c, 1));
-        return new SpreadingActivation(this, c, n, scale, activationMapThreadLocal.get());
+
+        Compound inputTerm = cmd.term();
+        if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
+            Term func = inputTerm.sub(1);
+            if (func.op() == ATOM) {
+                Term args = inputTerm.sub(0);
+                if (args.op() == PROD) {
+                    Concept funcConcept = nar.concept(func);
+                    if (funcConcept != null) {
+                        Operator o = funcConcept.get(Operator.class);
+                        if (o != null) {
+
+
+                            /*if (isCommand)*/
+                            {
+                                Task result = o.run(cmd, nar);
+                                if (result != null && result != cmd) {
+                                    //return input(result); //recurse
+                                    return result;
+                                }
+                            }
+//                            } else {
+//
+//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
+//                                    inputAt(cmd.start(), cmd); //schedule for execution later
+//                                    return null;
+//                                } else {
+//                                    if (executable(cmd)) {
+//                                        Task result = o.run(cmd, this);
+//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
+//                                            if (result == null) {
+//                                                return null; //finished
+//                                            } else {
+//                                                //input(result); //recurse until its stable
+//                                                return result;
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+
+                        }
+
+                    }
+                }
+            }
+        }
+
+        /*if (isCommand)*/
+        {
+            nar.eventTaskProcess.emit(cmd);
+            return null;
+        }
+
     }
+
 
     /**
      * projected truth value
@@ -1037,21 +1088,24 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return null;
 
         boolean negated = false;
-        if (cc.op() == NEG) {
-            cc = compoundOrNull(cc.unneg());
-            if (cc == null)
-                return null;
-            negated = true;
-        }
 
         //Compound c3 = Task.content(c2, nar);
 
         if ((cc = normalizedOrNull(cc, index)) == null)
             return null;
 
-        if (!Task.taskContentValid(cc, punc, null, true))
+        if (cc.op() == NEG) {
+            cc = compoundOrNull(cc.unneg());
+            if (cc == null)
+                return null;
+
+            negated = !negated;
+        }
+
+        if (Task.taskContentValid(cc, punc, null, true))
+            return PrimitiveTuples.pair(cc, negated);
+        else
             return null;
 
-        return PrimitiveTuples.pair(cc, negated);
     }
 }

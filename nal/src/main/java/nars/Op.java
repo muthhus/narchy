@@ -2,13 +2,11 @@ package nars;
 
 
 import nars.index.term.TermContext;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
-import nars.term.transform.Functor;
 import nars.term.var.GenericVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -35,7 +33,7 @@ public enum Op {
 
     ATOM(".", Op.ANY_LEVEL, OpType.Other),
 
-    VAR_INDEP('$',  6 /*NAL6 for Indep Vars */, OpType.Variable),
+    VAR_INDEP('$', 6 /*NAL6 for Indep Vars */, OpType.Variable),
     VAR_DEP('#', Op.ANY_LEVEL, OpType.Variable),
     VAR_QUERY('?', Op.ANY_LEVEL, OpType.Variable),
 
@@ -45,45 +43,69 @@ public enum Op {
     INH("-->", 1, OpType.Statement, Args.Two),
     SIM("<->", true, 2, OpType.Statement, Args.Two),
 
-    /** extensional intersection */
+    /**
+     * extensional intersection
+     */
     SECTe("&", true, 3, Args.GTETwo),
 
-    /** intensional intersection */
+    /**
+     * intensional intersection
+     */
     SECTi("|", true, 3, Args.GTETwo),
 
-    /** extensional difference */
+    /**
+     * extensional difference
+     */
     DIFFe("-", false, 3, Args.Two),
 
-    /** intensional difference */
+    /**
+     * intensional difference
+     */
     DIFFi("~", false, 3, Args.Two),
 
-    /** PRODUCT */
+    /**
+     * PRODUCT
+     */
     PROD("*", 4, Args.GTEZero),
 
-    /** extensional image */
+    /**
+     * extensional image
+     */
     IMGe("/", 4, Args.GTEOne),
 
-    /** intensional image */
+    /**
+     * intensional image
+     */
     IMGi("\\", 4, Args.GTEOne),
 
 
-    /** conjunction */
+    /**
+     * conjunction
+     */
     CONJ("&&", true, 5, Args.GTETwo),
 
     //SPACE("+", true, 7, Args.GTEOne),
 
 
-    /** intensional set */
+    /**
+     * intensional set
+     */
     SETi("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
-    /** extensional set */
+    /**
+     * extensional set
+     */
     SETe("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
 
 
-    /** implication */
+    /**
+     * implication
+     */
     IMPL("==>", 5, OpType.Statement, Args.Two),
 
-    /** equivalence */
+    /**
+     * equivalence
+     */
     EQUI("<=>", true, 5, OpType.Statement, Args.Two),
 
 
@@ -92,7 +114,7 @@ public enum Op {
     //-------------
     //NONE('\u2205', Op.ANY, null),
 
-//    /** Termject */
+    //    /** Termject */
 //    OBJECT("`", Op.ANY, OpType.Other),
     INT("`i", Op.ANY_LEVEL, OpType.Other),
 
@@ -105,10 +127,12 @@ public enum Op {
     @Deprecated INSTANCE_PROPERTY("{-]", 2, OpType.Statement),
     @Deprecated DISJ("||", true, 5, Args.GTETwo),
 
-    /** for ellipsis, when seen as a term */
-    SUBTERMS("...", 1, OpType.Other );
+    /**
+     * for ellipsis, when seen as a term
+     */
+    SUBTERMS("...", 1, OpType.Other);
 
-    public static final int StatementBits = Op.or(Op.INH,Op.SIM,Op.IMPL,Op.EQUI);
+    public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL, Op.EQUI);
 
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int EvalBits = OpBits; //just an alias for code readabiliy
@@ -140,8 +164,10 @@ public enum Op {
     public static final char COMPOUND_TERM_OPENER = '(';
     public static final char COMPOUND_TERM_CLOSER = ')';
 
-    @Deprecated public static final char STATEMENT_OPENER = '<';
-    @Deprecated public static final char STATEMENT_CLOSER = '>';
+    @Deprecated
+    public static final char STATEMENT_OPENER = '<';
+    @Deprecated
+    public static final char STATEMENT_CLOSER = '>';
 
     public static final char STAMP_OPENER = '{';
     public static final char STAMP_CLOSER = '}';
@@ -149,20 +175,30 @@ public enum Op {
     public static final char STAMP_STARTER = ':';
 
 
-    /** Image index ("imdex") symbol for products, and anonymous variable in products */
+    /**
+     * Image index ("imdex") symbol for products, and anonymous variable in products
+     */
     public static final Atomic Imdex =
             new GenericVariable(Op.VAR_DEP, "_");
 
-    /** absolute true/always */
+    /**
+     * absolute true/always
+     */
     public static final AtomicSingleton True = new AtomicSingleton("†") {
-        @NotNull @Override public Term unneg() {
+        @NotNull
+        @Override
+        public Term unneg() {
             return False;
         }
     };
 
-    /** absolute false/never */
+    /**
+     * absolute false/never
+     */
     public static final AtomicSingleton False = new AtomicSingleton("Ø") {
-        @NotNull @Override public Term unneg() {
+        @NotNull
+        @Override
+        public Term unneg() {
             return True;
         }
     };
@@ -173,18 +209,24 @@ public enum Op {
     public static final AtomicSingleton Null = new AtomicSingleton("null");
 
 
-    /** string representation */
-    @NotNull public final String str;
+    /**
+     * string representation
+     */
+    @NotNull
+    public final String str;
 
-    /** character representation if symbol has length 1; else ch = 0 */
+    /**
+     * character representation if symbol has length 1; else ch = 0
+     */
     public final char ch;
 
     public final OpType type;
 
-    /** arity limits, range is inclusive >= <=
-     *  -1 for unlimited */
+    /**
+     * arity limits, range is inclusive >= <=
+     * -1 for unlimited
+     */
     public final int minSize, maxSize;
-
 
 
     /**
@@ -200,7 +242,9 @@ public enum Op {
     public final boolean statement;
     public final boolean image;
 
-    /** whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images) */
+    /**
+     * whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images)
+     */
     public final boolean hasNumeric;
 
     Op(char c, int minLevel, OpType type) {
@@ -222,6 +266,7 @@ public enum Op {
     Op(@NotNull String string, int minLevel, OpType type) {
         this(string, false /* non-commutive */, minLevel, type, Args.None);
     }
+
     Op(@NotNull String string, int minLevel, OpType type, @NotNull IntIntPair size) {
         this(string, false /* non-commutive */, minLevel, type, size);
     }
@@ -236,14 +281,14 @@ public enum Op {
 
         this.ch = string.length() == 1 ? string.charAt(0) : 0;
 
-        this.minSize= size.getOne();
+        this.minSize = size.getOne();
         this.maxSize = size.getTwo();
 
         this.var = (type == OpType.Variable);
 
         this.statement = str.equals("-->") || str.equals("==>") || str.equals("<=>") || str.equals("<->");
         this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
-            //in(or(CONJUNCTION, IMPLICATION, EQUIV));
+        //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
         this.image = str.equals("/") || str.equals("\\");
 
@@ -255,7 +300,6 @@ public enum Op {
         this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
     }
-
 
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -279,23 +323,25 @@ public enum Op {
     }
 
 
-    /** decode a term which may be a functor, return null if it isnt */
+    /**
+     * decode a term which may be a functor, return null if it isnt
+     */
     @Nullable
-    public static Pair<Functor, TermContainer> functor(@NotNull Term maybeOperation, TermContext index) {
+    public static Pair<Atomic, TermContainer> functor(@NotNull Term maybeOperation, TermContext index) {
         if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
-            Compound c = (Compound)maybeOperation;
+            Compound c = (Compound) maybeOperation;
             if (c.op() == INH) {
                 Term s0 = c.sub(0);
                 if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1.op() == ATOM) {
                         Atomic ff = (Atomic) index.getIfPresentElse(s1);
-                        if (ff instanceof Functor) {
-                            return Tuples.pair(
-                                    (Functor)ff,
-                                    ((Compound) s0).subterms()
-                            );
-                        }
+
+                        return Tuples.pair(
+                                ff,
+                                ((Compound) s0).subterms()
+                        );
+
                     }
                 }
             }
@@ -310,14 +356,11 @@ public enum Op {
     }*/
 
 
-
-
     @NotNull
     @Override
     public String toString() {
         return str;
     }
-
 
 
 //    @NotNull
@@ -368,12 +411,15 @@ public enum Op {
         }
     }
 
-    /** true if matches any of the on bits of the vector */
+    /**
+     * true if matches any of the on bits of the vector
+     */
     public final boolean in(int vector) {
         return in(bit, vector);
     }
 
-    @Deprecated public boolean isSet() {
+    @Deprecated
+    public boolean isSet() {
         return in(SetsBits);
     }
 
@@ -413,7 +459,9 @@ public enum Op {
      */
     public static final int ANY_LEVEL = 0;
 
-    /** top-level Op categories */
+    /**
+     * top-level Op categories
+     */
     public enum OpType {
         Statement,
         Variable,
@@ -423,13 +471,13 @@ public enum Op {
 
     enum Args {
         ;
-        static final IntIntPair None = pair(0,0);
-        static final IntIntPair One = pair(1,1);
-        static final IntIntPair Two = pair(2,2);
+        static final IntIntPair None = pair(0, 0);
+        static final IntIntPair One = pair(1, 1);
+        static final IntIntPair Two = pair(2, 2);
 
-        static final IntIntPair GTEZero = pair(0,-1);
-        static final IntIntPair GTEOne = pair(1,-1);
-        static final IntIntPair GTETwo = pair(2,-1);
+        static final IntIntPair GTEZero = pair(0, -1);
+        static final IntIntPair GTEOne = pair(1, -1);
+        static final IntIntPair GTETwo = pair(2, -1);
 
     }
 
@@ -437,18 +485,19 @@ public enum Op {
     public static final int SetsBits = or(Op.SETe, Op.SETi);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
     public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
-    public static final int ImageBits = or(Op.IMGe,Op.IMGi);
-    public static final int VariableBits = or(Op.VAR_PATTERN,Op.VAR_INDEP,Op.VAR_DEP,Op.VAR_QUERY);
+    public static final int ImageBits = or(Op.IMGe, Op.IMGi);
+    public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
 
 
-    public static final int[] NALLevelEqualAndAbove = new int[8+1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
+    public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
 
-
-    /** index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters */
+    /**
+     * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
+     */
     static final int numByteSymbols = 15;
     static final Op[] byteSymbols = new Op[numByteSymbols];
-    static final ImmutableMap<String,Op> stringToOperator;
+    static final ImmutableMap<String, Op> stringToOperator;
     //static final CharObjectHashMap<Op> _charToOperator = new CharObjectHashMap(values().length * 2);
 
 
@@ -465,7 +514,7 @@ public enum Op {
             }
         }
 
-        final Map<String,Op> _stringToOperator = new HashMap<>(values().length * 2);
+        final Map<String, Op> _stringToOperator = new HashMap<>(values().length * 2);
 
         //Setup NativeOperator String index hashtable
         for (Op r : Op.values()) {

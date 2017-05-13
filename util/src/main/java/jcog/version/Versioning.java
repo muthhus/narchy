@@ -1,5 +1,6 @@
 package jcog.version;
 
+import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.jetbrains.annotations.NotNull;
 
@@ -9,8 +10,8 @@ import java.util.Collection;
  * versioning context that holds versioned instances
  */
 public class Versioning extends
-        FastList<Versioned> {
-    //FasterList<Versioned> {
+        //FastList<Versioned> {
+        FasterList<Versioned> {
 
 
     public int ttl;
@@ -31,19 +32,20 @@ public class Versioning extends
      * reverts/undo to previous state
      */
     public final boolean revert(int when) {
-        assert (size >= when);
+        //assert (size >= when);
 
         //pop(size - when );
 
-        int s;
-        while ((s = size()) > when) {
+        int s = size();
+        int c = s - when;
+
+        while (c-- > 0) {
 
             Versioned versioned =
-                    //removeLast();
-                    remove(s - 1);
+                    removeLast();
+                    //remove(--s);
 
             if (versioned == null) {
-                clear();
                 throw new NullPointerException();
                 //continue;
             }
@@ -51,9 +53,11 @@ public class Versioning extends
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
             int vs = versioned.size();
             if (vs > 0) { //HACK wtf would it be empty
-                Object removed = versioned.remove(vs - 1); //removeLast();
+                Object removed =
+                    // versioned.remove(vs - 1);
+                    versioned.removeLast();
+
                 if (removed == null) {
-                    clear();
                     throw new NullPointerException();
                 }
             }

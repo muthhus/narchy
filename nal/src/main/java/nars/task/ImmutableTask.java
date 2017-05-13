@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
@@ -46,17 +48,20 @@ public class ImmutableTask extends Pri implements Task {
                 throw new InvalidTaskException(term, "null truth");
         }
 
-        //special case: simplify repeating conjunction
+        //special case: simplify repeating conjunction of events
         if (term.op() == CONJ) {
             int dt = term.dt();
             if (dt !=DTERNAL && dt!=0) {
                 Term s0 = term.sub(0);
-                if (s0 instanceof Compound && s0.equals(term.sub(1))) {
-                    term = (Compound) s0;
-                    if (dt > 0) {
-                        end = start + dt;
-                    } else if (dt < 0) {
-                        end = start - dt;
+                if (s0 instanceof Compound && s0.unneg() instanceof Compound && s0.equals(term.sub(1))) {
+                    @Nullable Compound s01 = normalizedOrNull(s0, $.terms);
+                    if (s01!=null) {
+                        term = s01;
+                        if (dt > 0) {
+                            end = start + dt;
+                        } else if (dt < 0) {
+                            end = start - dt;
+                        }
                     }
                 }
             }

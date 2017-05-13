@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.False;
 
 
-public final class substitute extends Functor {
+public class substitute extends Functor {
 
     @NotNull private final Derivation parent;
 

@@ -28,8 +28,8 @@ public class Crosslink {
             return; //null or same concept
 
 
-        ObjectFloatHashMap<Termed> activation = Task.activationMapThreadLocal.get();
-        new SpreadingActivation(srcTask, scale, tgtConcept, 1, activation, nar);
-        new SpreadingActivation(tgtTask, scale, srcConcept, 1, activation, nar);
+        ObjectFloatHashMap<Termed> activation = SpreadingActivation.activationMapThreadLocal.get();
+        new SpreadingActivation(srcTask, scale, tgtConcept, 0, activation, nar);
+        new SpreadingActivation(tgtTask, scale, srcConcept, 0, activation, nar);
     }
 }

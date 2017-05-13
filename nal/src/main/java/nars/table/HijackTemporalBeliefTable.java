@@ -427,11 +427,9 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Interval timeOverlap = ai.intersection(bi);
 
         if (timeOverlap != null) {
-            float aw = a.evi();
-            float bw = b.evi();
 
-            float aa = aw * (1 + ai.length());
-            float bb = bw * (1 + bi.length());
+            float aa = a.evi() * (1 + ai.length());
+            float bb = b.evi() * (1 + bi.length());
             float p = aa / (aa + bb);
 
             float stampDiscount =

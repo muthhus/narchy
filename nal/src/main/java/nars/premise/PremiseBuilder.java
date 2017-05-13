@@ -11,6 +11,7 @@ import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,14 +47,19 @@ public enum PremiseBuilder { ;
 
         if (beliefTerm instanceof Compound) {
 
-            Concept beliefConcept = nar.concept(beliefTerm);
-
             Compound taskTerm = task.term();
-            if (beliefTerm.varQuery() > 0 && !beliefTerm.equals(taskTerm)) {
+
+            boolean beliefIsTask =
+                    beliefTerm.equals(taskTerm);
+                    //Terms.equalAtemporally(task.term(), (beliefTerm));
+
+            if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
                 assert(beliefTerm.op()!=NEG);
                 beliefTerm = unify(taskTerm, (Compound) beliefTerm, nar);
                 assert(beliefTerm.op()!=NEG);
             }
+
+            Concept beliefConcept = nar.concept(beliefTerm);
 
             //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
             if (beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
@@ -79,7 +85,7 @@ public enum PremiseBuilder { ;
                         belief = match;
                     }
 
-                    if (task.isQuestOrQuestion()) {
+                    if (task.isQuestOrQuestion() /*&& beliefIsTask*/) {
                         answer(taskLink, match, nar);
                     }
                 }

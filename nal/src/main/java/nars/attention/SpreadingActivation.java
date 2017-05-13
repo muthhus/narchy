@@ -28,6 +28,10 @@ import static nars.time.Tense.ETERNAL;
  */
 public class SpreadingActivation extends Activation<Task> implements ObjectFloatProcedure<Termed> {
 
+
+    static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
+            ThreadLocal.withInitial(ObjectFloatHashMap::new);
+
     private final int termlinkDepth;
 
 
@@ -129,6 +133,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         }
     }
 
+    public static Activation activate(Task t, @NotNull NAR n, @NotNull Concept c, float scale) {
+        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
+
+        //float s = scale * (0.5f + 0.5f * pri(c, 1));
+        return new SpreadingActivation(t, c, n, scale, activationMapThreadLocal.get());
+    }
+
     @Override
     public void value(Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
@@ -136,7 +147,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         termBidi(c, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
 
         if (c instanceof Concept)
-            tasklink((Concept)c, scale);
+            tasklink((Concept) c, scale);
 
     }
 
@@ -144,7 +155,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     void link(@NotNull Termed target, float scale, int depth) {
 
         if ((target instanceof Variable)) {
-            if (target.op()==VAR_QUERY)
+            if (target.op() == VAR_QUERY)
                 return; //dont create termlinks to query variable subterms
         } else {
             @Nullable PLink<Concept> termConcept = nar.activate(target, inPri * scale);
@@ -152,18 +163,28 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                 target = termConcept.get();
         }
 
-        float parentActivation = scale;
-        if (target instanceof Compound) {
-            if (depth + 1 <= termlinkDepth)
+        final float parentActivation;
+
+        if (depth + 1 <= termlinkDepth) {
+
+            if (target instanceof Compound) {
+                //recurse
                 parentActivation = linkSubterms(((Compound) target).subterms(), scale, depth + 1);
-        } else if (target instanceof AtomConcept) {
-            //activation terminating at an atom: activate through Atom links
-            parentActivation = activateAtom((AtomConcept) target, scale);
+            } else if (target instanceof AtomConcept) {
+                //activation terminating at an atom: activate through Atom links
+                parentActivation = activateAtom((AtomConcept) target, scale);
+            } else {
+                parentActivation = 0;
+            }
+        } else {
+            parentActivation = scale;
         }
 
-        assert(target.op() != NEG); //should have been un-negated already
+        assert (target.op() != NEG); //should have been un-negated already
 
-        spread.addToValue(target, parentActivation);
+        if (parentActivation > 0)
+            spread.addToValue(target, parentActivation);
+
     }
 
     protected float activateAtom(AtomConcept atom, float scale) {
@@ -180,7 +201,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             long inEnd = in.end();
 
             if (subActivation > minScale) {
-                float[] additionalPressure = { 0 };
+                float[] additionalPressure = {0};
                 tlinks.commit((b) -> {
                     float subSubActivation = subActivation;/// * b.qua();
 

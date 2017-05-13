@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
  * Managed by a Versioning context
  */
 public class Versioned<X>
-        extends FastList<X>
-        //extends FasterList<X>
+        //extends FastList<X>
+        extends FasterList<X>
 {
 
 

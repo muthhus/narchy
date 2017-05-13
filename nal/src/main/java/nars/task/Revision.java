@@ -121,8 +121,14 @@ public class Revision {
                     intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, rng, mergeOrChoose),
                     a.punc(), $.terms);
 
+
             if (ccp != null) {
+
                 cc = ccp.getOne();
+
+                if (!cc.isNormalized())
+                    throw new RuntimeException("should have been normalized");
+
                 negated = ccp.getTwo();
                 break;
             }
@@ -217,7 +223,6 @@ public class Revision {
         } else {
             a0 = a.sub(1);
             a1 = a.sub(0);
-            adt = -adt;
         }
         if ((bdt >= 0) || (bdt == DTERNAL)) {
             b0 = b.sub(0);
@@ -225,7 +230,6 @@ public class Revision {
         } else {
             b0 = b.sub(1);
             b1 = b.sub(0);
-            bdt = -bdt;
         }
         return $.the(a.op(), dt,
                 intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),

@@ -29,6 +29,7 @@ import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.op.mental.Abbreviation;
+import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.Functor;
@@ -822,11 +823,16 @@ public interface Compound extends Term, IPair, TermContainer {
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
                 Term x = tt.sub(i);
                 Term y = x.eval(index);
-                if (!x.equals(y)) {
-                    modified = true;
-                } else {
+                if (y == null) {
                     y = x;
+                } else if (x != y) {
+
+                    if (!y.equals(x)) {
+                        //the result comparing with the x
+                        modified = true;
+                    }
                 }
+
                 evalSubs[i] = y;
             }
             if (modified) {
@@ -838,11 +844,11 @@ public interface Compound extends Term, IPair, TermContainer {
         //check if this is a funct
         if (op() == INH) {
             //recursively compute contained subterm functors
-            org.eclipse.collections.api.tuple.Pair<Functor, TermContainer> f = Op.functor(this, index);
-            if (f != null) {
+            org.eclipse.collections.api.tuple.Pair<Atomic, TermContainer> f = Op.functor(this, index);
+            if (f != null && f.getOne() instanceof Functor) {
                 TermContainer args = f.getTwo();
 
-                Term dy = f.getOne().apply(args);
+                Term dy = ((Functor)f.getOne()).apply(args);
                 if (dy == null || dy == this) {
                     return this; //functor returning null return value means keep the original input term
                 } else {

@@ -109,10 +109,17 @@ abstract public class Derivation extends Unify implements TermContext {
         this.nar = nar;
         this.budgeting = b;
 
-        _substitute = new substitute(this);
-        _substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
-        _substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
+        _substitute = new substitute(this) {
+            @Override public boolean equals(Object u) { return this == u; }
+        };
+        _substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
+            @Override public boolean equals(Object u) { return this == u; }
+        };
+        _substituteIfUnifiesDep = new substituteIfUnifiesDep(this) {
+            @Override public boolean equals(Object u) { return this == u; }
+        };
     }
+
 
     @Override
     public Termed get(Term x, boolean createIfAbsent) {
@@ -146,16 +153,17 @@ abstract public class Derivation extends Unify implements TermContext {
 //
 
         //remove common variable entries because they will just consume memory if retained as empty
-        xy.map.entrySet().removeIf(e -> {
-            if (e.getKey() instanceof CommonVariable)
-                return true;
-            else
-                return false;
-        });
-        if (xy.size()!=0) { //HACK TODO fix
-            xy.map.clear();
-            //throw new RuntimeException("not cleared");
-        }
+//        xy.map.entrySet().removeIf(e -> {
+//            if (e.getKey() instanceof CommonVariable)
+//                return true;
+//            else
+//                return false;
+//        });
+//        if (xy.size()!=0) { //HACK TODO fix
+//            xy.map.clear();
+//            //throw new RuntimeException("not cleared");
+//        }
+        xy.map.clear();
 
         punct = null;
         forEachMatch = null;

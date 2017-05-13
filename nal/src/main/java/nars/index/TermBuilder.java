@@ -9,6 +9,7 @@ import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
@@ -200,21 +201,21 @@ public abstract class TermBuilder {
         return t;
     }
 
-    /**
-     * collection implementation of the conjunction true/false filter
-     */
-    @NotNull
-    private static Set<Term> conjTrueFalseFilter(@NotNull Set<Term> terms) {
-        Iterator<Term> ii = terms.iterator();
-        while (ii.hasNext()) {
-            Term n = ii.next();
-            if (isTrue(n))
-                ii.remove();
-            else if (isFalse(n))
-                return Collections.emptySet();
-        }
-        return terms;
-    }
+//    /**
+//     * collection implementation of the conjunction true/false filter
+//     */
+//    @NotNull
+//    private static Set<Term> conjTrueFalseFilter(@NotNull Set<Term> terms) {
+//        Iterator<Term> ii = terms.iterator();
+//        while (ii.hasNext()) {
+//            Term n = ii.next();
+//            if (isTrue(n))
+//                ii.remove();
+//            else if (isFalse(n))
+//                return Collections.emptySet();
+//        }
+//        return terms;
+//    }
 
 
     /**
@@ -282,6 +283,13 @@ public abstract class TermBuilder {
     @NotNull
     public TermContainer intern(@NotNull Term[] s) {
         return TermVector.the(s);
+    }
+
+    protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
+//        if (subterms.length==1 && subterms[0].vars() == 0) {
+//            return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
+//        }
+        return newCompound(op, dt, intern(subterms));
     }
 
     /**
@@ -400,7 +408,7 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, intern(args));
+        return newCompound(op, dt, args);
         //}
     }
 

@@ -52,8 +52,8 @@ public abstract class MaplikeTermIndex extends TermIndex {
         return next;
     };
 
-    protected final HijackMemoize<ProtoCompound,Term> build = new HijackMemoize<>(
-        384*1024, 4,
+    protected final HijackMemoize<ProtoCompound,Term> terms = new HijackMemoize<>(
+        256*1024, 5,
         (C) -> {
             try {
                 return super.the(C.op(), C.dt(), C.subterms());
@@ -73,17 +73,17 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //        }
 //    };
 
-    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<>(
-        64 * 1024, 2,
-        super::normalize
-    );
+//    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<>(
+//        64 * 1024, 2,
+//        super::normalize
+//    );
 
     @Override
     public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u)  {
         if (u.length < 2)
             return super.the(op, dt, u);
 
-        return build.apply(new AppendProtoCompound( op, dt, u ));
+        return terms.apply(new AppendProtoCompound( op, dt, u ));
     }
 
     @Override public Term the(ProtoCompound c) {
@@ -94,24 +94,27 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //            build.miss.increment();
 //            return super.the(c.op(), c.dt(), c.subterms()); //immediate construct
 //        } else {
-            return build.apply(c);
+            return terms.apply(c);
 //        }
     }
 
 
-    @Nullable
-    @Override public final Compound normalize(@NotNull Compound x) {
-
-        if (x.isNormalized()) {
-            return x;
-        } else {
-            return compoundOrNull(normalize.apply(x));
-        }
-    }
+    //
+//    @Nullable
+//    @Override public final Compound normalize(@NotNull Compound x) {
+//
+//        if (x.isNormalized()) {
+//            return x;
+//        } else {
+//            return compoundOrNull(normalize.apply(x));
+//        }
+//    }
 
 
     @Override
     public @NotNull String summary() {
-        return "CACHE: build=" + build.summary() + " normalize=" + normalize.summary();
+        return "CACHE build=" + terms.summary()
+        //+ " normalize=" + normalize.summary()
+        ;
     }
 }
