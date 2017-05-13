@@ -9,8 +9,13 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector1;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;
 
@@ -26,9 +31,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     public UnitCompound1(@NotNull Op op, @NotNull Term arg) {
         super(arg);
 
-        if (arg.vars() > 0)
-            throw new UnsupportedOperationException("variable argument not supported");
-
         this.op = op;
         this.hash = Util.hashCombine(hashCodeSubTerms(), op.ordinal(), DTERNAL);
     }
@@ -40,10 +42,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return hash;
     }
 
+
     @Override
-    public int vars() {
-        return the.vars();
+    public int structure() {
+        return op.bit | super.structure();
     }
+
 
     @Override
     public int hashCode() {
@@ -55,23 +59,20 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return super.hashCode();
     }
 
+
+
     @Override
     public boolean equals(@Nullable Object that) {
         if (this == that) return true;
 
         Compound t;
-        if (that instanceof Concept) {
-            Term tt = ((Concept) that).term();
-            if (!(tt instanceof Compound))
-                return false;
-            t = ((Compound)tt);
-        } else if (that instanceof Compound)
+        if (that instanceof Compound)
             t = (Compound)that;
         else
             return false;
 
         //TODO if this is a NEG then size and dt can be assumed
-        return (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.sub(0)));
+        return hash == that.hashCode() && (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.sub(0)));
     }
 
     @NotNull
@@ -85,9 +86,8 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return op;
     }
 
-    @Override
-    public @NotNull TermContainer subterms() {
-        return this;
+    @Deprecated /* HACK */ @Override public @NotNull TermContainer subterms() {
+        return new SubtermView(this);
     }
 
     @Override
@@ -106,13 +106,69 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return DTERNAL;
     }
 
-    @Override
-    public boolean impossibleSubTermVolume(int otherTermVolume) {
-        return the.impossibleSubTermVolume(otherTermVolume /* -1 ? +1 ? */);
-    }
+    private static final class SubtermView implements TermContainer {
+        private final Compound c;
 
-    @Override
-    public boolean impossibleSubTerm(@NotNull Termlike target) {
-        return the.impossibleSubTerm(target);
+        public SubtermView(Compound c) {
+            this.c = c;
+        }
+
+        @Override
+        public int volume() {
+            return c.volume()-1;
+        }
+
+        @Override
+        public int complexity() {
+            return c.complexity()-1;
+        }
+
+        @Override
+        public @NotNull Term sub(int i) {
+            return c.sub(i);
+        }
+
+        @Override
+        public int hashCode() {
+            return c.hashCodeSubTerms();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+
+            if (obj instanceof TermContainer) {
+                TermContainer t = (TermContainer) obj;
+                if (t.hashCode()==hashCode()) {
+                    int ss = size();
+                    if (t.size() == ss) {
+                        for (int i = 0; i < ss; i++) {
+                            if (!sub(i).equals(t.sub(i)))
+                                return false;
+                        }
+
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public void forEach(Consumer<? super Term> action, int start, int stop) {
+            for (int i = start; i < stop; i++)
+                action.accept(c.sub(i));
+        }
+
+        @NotNull
+        @Override
+        public Iterator<Term> iterator() {
+            return c.iterator();
+        }
+
+        @Override
+        public int size() {
+            return c.size();
+        }
     }
 }

@@ -356,9 +356,11 @@ abstract public class PatternCompound extends GenericCompound {
                 return alreadyInY.equals(yFree);
             } else {
 
-                yFree.removeIf(alreadyInY::contains);
+                if (!yFree.isEmpty()) {
+                    yFree.removeIf(alreadyInY::contains);
 
-                xFree.removeIf(yFree::remove); //eliminated
+                    xFree.removeIf(yFree::remove); //eliminated
+                }
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
 

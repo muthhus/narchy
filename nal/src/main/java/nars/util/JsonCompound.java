@@ -18,7 +18,7 @@ import java.util.List;
 public enum JsonCompound  { ;
 
 
-    public static GenericCompound the(JsonNode j) {
+    public static Compound the(JsonNode j) {
 
         Op op;
         Term[] subterms;

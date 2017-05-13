@@ -5,6 +5,7 @@ import jcog.Util;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override @NotNull public Set<Term> toSet() {
-        return Collections.singleton(the);
+        return Sets.mutable.of(the);
     }
 
     @NotNull

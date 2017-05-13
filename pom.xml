@@ -37,6 +37,8 @@
 
                         <skipTests>true</skipTests> <!-- WARNING -->
 
+
+                        <redirectTestOutputToFile>false</redirectTestOutputToFile>
                         <testFailureIgnore>true</testFailureIgnore>
                         <disableXmlReport>true</disableXmlReport>
                         <detail>false</detail>

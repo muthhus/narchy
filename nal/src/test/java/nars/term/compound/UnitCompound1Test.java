@@ -9,7 +9,10 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static junit.framework.TestCase.assertNotSame;
+import static nars.Op.NEG;
 import static nars.Op.PROD;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -57,10 +60,25 @@ public class UnitCompound1Test {
     public void testUnitCompoundNeg() {
         Atomic x = Atomic.the("x");
 
-        Compound c = $.neg(x);
-        System.out.println(c);
-        System.out.println(c.sub(0));
-        assertEquals(UnitCompound1.class, c.getClass());
+        Compound u = $.neg(x);
+        System.out.println(u);
+        System.out.println(u.sub(0));
+        assertEquals(UnitCompound1.class, u.getClass());
+
+        GenericCompound g = new GenericCompound(NEG, DTERNAL, TermVector.the(x));
+        assertNotSame(u, g);
+        assertEquals(u, g);
+        assertEquals(g, u);
+        assertEquals(u, u);
+        assertEquals(g, g);
+        assertEquals(u.subterms(), g.subterms());
+        assertEquals(u.hashCode(), g.hashCode());
+        assertEquals(u.hashCodeSubTerms(), g.hashCodeSubTerms());
+        assertEquals(u.toString(), g.toString());
+        assertEquals(0, u.compareTo(g));
+        assertEquals(0, g.compareTo(u));
+        assertEquals(g.structure(), u.structure());
+        assertEquals(g.volume(), u.volume());
     }
 
 }
