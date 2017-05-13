@@ -110,7 +110,7 @@ public class TetriSchool implements Runnable {
                 //NAgents.newAlann();
                 NARBuilder.newMultiThreadNAR(3,
                     new RealTime.DS(true)
-                ).loop(40).nar;
+                ).loopPeriodMS(40).nar;
 
 
         TetriSchool t = new TetriSchool(n, W, H);

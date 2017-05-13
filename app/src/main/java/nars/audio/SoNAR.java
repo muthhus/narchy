@@ -191,7 +191,7 @@ public class SoNAR extends TimerTask {
 
         //n.log();
         n.input("a:b. :|: (--,b:c). c:d. d:e. (--,e:f). f:g. b:f. a:g?");
-        n.loop(64);
+        n.loopPeriodMS(64);
         SoNAR s = new SoNAR(n);
         SampleDirectory d = new SampleDirectory();
         d.samples("/home/me/wav");

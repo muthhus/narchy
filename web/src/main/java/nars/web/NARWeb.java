@@ -1,13 +1,22 @@
 package nars.web;
 
-import jcog.data.FloatParam;
+import com.google.common.util.concurrent.AtomicDouble;
 import nars.InterNAR;
 import nars.NAR;
 import nars.NARLoop;
+import nars.Op;
 import nars.nar.NARBuilder;
+import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
+import nars.term.obj.IntTerm;
 import nars.time.RealTime;
+import org.eclipse.collections.api.tuple.Pair;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -50,19 +59,39 @@ public class NARWeb extends WebServer {
 
         int port = args.length < 1 ? 8080 : Integer.parseInt(args[0]);
 
-        FloatParam fps = new FloatParam (5f);
 
         NAR nar =
                 NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(false), true);
-        NARLoop l = nar.loop(fps.floatValue());
+
+        AtomicDouble fps = new AtomicDouble(5f);
+        AtomicReference<NARLoop> l = new AtomicReference<>(nar.loopFPS(fps.floatValue()));
 
         nar.on("stop", (t, n) -> {
-            l.pause();
+            l.get().stop();
             return null;
         });
         nar.on("start", (t, n) -> {
-            l.atFPS(fps.floatValue());
+            l.set(nar.loopFPS(fps.floatValue()));
             return null;
+        });
+        nar.on("fps", (t, n) -> {
+            @Nullable Pair<Atomic, TermContainer> x = Op.functor(t.term(), nar.concepts);
+            if (x != null) {
+                Term z = x.getTwo().sub(0);
+                if (z instanceof IntTerm) {
+                    l.set(nar.loopFPS( (float)( ((IntTerm) z).val)) );
+                }
+            }
+            return null;
+        });
+        nar.on("cpustat", (t, n) -> {
+            NARLoop ll = nar.loop;
+            if (ll!=null)
+                NAR.logger.info("{}", ll.toString());
+            else
+                NAR.logger.info("paused");
+
+           return null;
         });
 
         InterNAR net = new InterNAR(nar, 8, port);

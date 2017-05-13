@@ -116,7 +116,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     int level;
 
 
-    private NARLoop loop;
+    public NARLoop loop;
 
     public final Mix<Object, Task> mix = new Mix();
 
@@ -1031,23 +1031,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     /**
-     * creates a new loop which begins paused
+     * creates a new loop which runs at max speed
      */
     @NotNull
     public NARLoop loop() {
-        return loop(-1);
+        return loopPeriodMS(0);
     }
 
     @NotNull
-    public NARLoop loop(float initialFPS) {
+    public NARLoop loopFPS(float initialFPS) {
         if (initialFPS < 0)
-            return loop((int) -1); //pause
+            return loopPeriodMS((int) -1); //pause
 
         if (initialFPS == 0)
-            return loop((int) 0); //infinite
+            return loopPeriodMS((int) 0); //infinite
 
         float millisecPerFrame = 1000.0f / initialFPS;
-        return loop((int) millisecPerFrame);
+        return loopPeriodMS((int) millisecPerFrame);
     }
 
     /**
@@ -1056,15 +1056,25 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * @param initialFramePeriodMS in milliseconds
      */
     @NotNull
-    private NARLoop loop(int initialFramePeriodMS) {
+    public NARLoop loopPeriodMS(int initialFramePeriodMS) {
 
-        synchronized (concepts) {
-            if (this.loop != null) {
-                throw new RuntimeException("Already running: " + this.loop);
+        synchronized (exe) {
+
+            NARLoop ll = this.loop;
+            if (ll != null && !ll.isStopped()) {
+                if (initialFramePeriodMS < 0) {
+                    ll.stop();
+                    this.loop = null;
+                } else {
+                    ll.setPeriodMS(initialFramePeriodMS);
+                }
+            } else if ((ll == null) || (ll.isStopped())) {
+                this.loop = ll = (initialFramePeriodMS >= 0) ? new NARLoop(this, initialFramePeriodMS) : null;
             }
 
-            return this.loop = new NARLoop(this, initialFramePeriodMS);
+            return this.loop;
         }
+
     }
 
 

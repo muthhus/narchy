@@ -22,6 +22,8 @@ import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.data.Mix;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -465,13 +467,11 @@ abstract public class NAgent implements NSense, NAct {
                 stop();
         });
 
-        nar.loop().join();
 
         return this;
     }
 
-    @NotNull
-    public Loop runRT(float fps) {
+    public Pair<NARLoop, Timer> runRT(float fps) {
         return runRT(fps, -1);
     }
 
@@ -480,8 +480,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
-    @NotNull
-    public Loop runRT(float fps, long stopTime) {
+    public Pair<NARLoop, Timer> runRT(float fps, long stopTime) {
 
         init();
 
@@ -495,10 +494,11 @@ abstract public class NAgent implements NSense, NAct {
         }, 0, Math.round(1000f / fps));
 
 
-//        nar.onReset(nn->{
-//            t.cancel();
-//        });
-        return nar.loop();
+        nar.eventReset.onWeak(nn->{
+            t.cancel();
+        });
+
+        return Tuples.pair(nar.loop(), t);
 
     }
 

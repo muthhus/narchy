@@ -1,13 +1,15 @@
 package nars.web;
 
+import ch.qos.logback.classic.AsyncAppender;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.AppenderBase;
+import ch.qos.logback.core.AsyncAppenderBase;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import jcog.byt.DynByteSeq;
-import nars.IO;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.bag.leak.LeakOut;
+import nars.op.Command;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.web.WebsocketService;
@@ -17,17 +19,31 @@ import java.io.IOException;
 /**
  * Created by me on 4/21/16.
  */
-public class NarseseIOService extends WebsocketService {
+public class NarseseIOService extends WebsocketService  {
 
-    static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
+    //static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
     private final NAR nar;
 
     final LeakOut output;
 
+    final AppenderBase appender;
+
     public NarseseIOService(NAR n) {
         super();
         this.nar = n;
+
+        //((ch.qos.logback.classic.Logger)NAR.logger)
+        $.LOG.addAppender(appender = new AppenderBase() {
+
+            @Override
+            protected void append(Object eventObject) {
+                output.accept(Command.logTask($.quote(eventObject.toString())));
+
+            }
+        });
+        appender.start();
+
         output = new LeakOut(n, 16, 1f) {
             @Override protected float send(Task task) {
 

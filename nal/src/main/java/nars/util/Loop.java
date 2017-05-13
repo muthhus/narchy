@@ -1,5 +1,6 @@
 package nars.util;
 
+import jcog.Texts;
 import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,11 @@ abstract public class Loop implements Runnable {
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
     private int periodMS;
 
+    @Override
+    public String toString() {
+        return "ideal=" + periodMS + "ms, " +
+                Texts.n4(frameTime.getMean()) + "+-" + Texts.n4(frameTime.getStandardDeviation()) + "ms avg";
+    }
 
     public Loop(@NotNull String threadName, int periodMS) {
         this(threadName);
@@ -61,17 +67,12 @@ abstract public class Loop implements Runnable {
     }
 
     protected void start(int period) {
-
-        setPeriodMS(period);
-        thread.start();
-        logger.info("started {}", thread);
+        if (setPeriodMS(period)) {
+            logger.info("start {}", thread);
+            thread.start();
+        }
     }
 
-    @NotNull
-    public Loop atFPS(float fps) {
-        setPeriodMS((int) (1000f / fps));
-        return this;
-    }
 
     /**
      * dont call this directly
@@ -137,19 +138,26 @@ abstract public class Loop implements Runnable {
     }
 
 
-    public final synchronized void setPeriodMS(int newPeriod) {
+    public final synchronized boolean setPeriodMS(int newPeriod) {
 
         int oldPeriod = periodMS;
         if (oldPeriod != newPeriod) {
+
+            logger.info("period={}ms", newPeriod);
 
             boolean paused = (isPaused());
 
             this.periodMS = newPeriod;
             if (paused) {
+                logger.info("waking {}", thread);
                 thread.interrupt();
             }
 
+            return true;
+
         }
+        return false;
+
 //        int prevPeriod = periodMS;
 //
 //        if (prevPeriod == period) return false;
@@ -178,10 +186,14 @@ abstract public class Loop implements Runnable {
 //        return true;
     }
 
-    public void stop() /*throws InterruptedException */ {
+    public synchronized void stop() /*throws InterruptedException */ {
+
         logger.info("stopping {}", this);
 
         stopping = true;
+        thread.stop();
+        stopped = true;
+
 
 //        synchronized (thread) {
 //            if (stopping || stopped)
@@ -201,5 +213,9 @@ abstract public class Loop implements Runnable {
 
     public boolean isPaused() {
         return periodMS == -1;
+    }
+
+    public boolean isStopped() {
+        return stopped;
     }
 }

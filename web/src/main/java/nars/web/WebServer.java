@@ -19,7 +19,6 @@ import static io.undertow.Handlers.resource;
 import static io.undertow.Handlers.websocket;
 import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
-import static nars.web.IRCAgent.newRealtimeNAR;
 
 
 public class WebServer extends PathHandler /*extends PathHandler*/ {

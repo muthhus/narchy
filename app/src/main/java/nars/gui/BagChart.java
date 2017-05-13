@@ -32,7 +32,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 
         SpaceGraph.window(tc, 800, 600);
 
-        d.loop(30f);
+        d.loopFPS(30f);
 
     }
 

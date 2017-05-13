@@ -115,7 +115,7 @@ abstract public class NAgentX extends NAgent {
         if (endTime <= 0) {
             a.runRT(fps);
         } else {
-            a.runRT(0, endTime).join();
+            a.runRT(0, endTime);
         }
 
         return nar;

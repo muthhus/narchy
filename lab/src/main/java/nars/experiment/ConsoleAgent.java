@@ -143,7 +143,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         a.trace = true;
 
-        a.runRT(4f).join();
+        a.runRT(4f);
     }
 
     private static float similarity(char[][] a, char[][] b) {

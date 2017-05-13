@@ -11,7 +11,6 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.op.Command;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.time.RealTime;
@@ -269,7 +268,7 @@ public class IRCAgent extends IRC {
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.4f, 8);
 
-        nar.loop(framesPerSecond);
+        nar.loopPeriodMS(framesPerSecond);
 
         return nar;
     }

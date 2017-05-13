@@ -311,7 +311,7 @@ public class IRCNLP extends IRC {
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.25f, 8);
 
-        nar.loop(framesPerSecond);
+        nar.loopPeriodMS(framesPerSecond);
 
         return nar;
     }
