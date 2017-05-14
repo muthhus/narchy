@@ -8,8 +8,10 @@ import nars.conceptualize.ConceptBuilder;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.compound.UnitCompound1;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static nars.Op.False;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Index which is supported by Map/Cache-like operations
@@ -27,7 +30,8 @@ public abstract class MaplikeTermIndex extends TermIndex {
 
     final static Logger logger = LoggerFactory.getLogger(MaplikeTermIndex.class);
 
-    @NotNull protected final ConceptBuilder conceptBuilder;
+    @NotNull
+    protected final ConceptBuilder conceptBuilder;
 
 
     public MaplikeTermIndex(@NotNull ConceptBuilder conceptBuilder) {
@@ -49,20 +53,20 @@ public abstract class MaplikeTermIndex extends TermIndex {
         return next;
     };
 
-    protected final HijackMemoize<ProtoCompound,Term> terms = new HijackMemoize<>(
-        256*1024, 5,
-        (C) -> {
-            try {
-                return super.the(C.op(), C.dt(), C.subterms());
-            } catch ( InvalidTermException e) {
-                if (Param.DEBUG_EXTRA)
-                    logger.error("{}", e);
-                return False;
-            } catch (Throwable t) {
-                logger.error("{}", t);
-                return False;
+    protected final HijackMemoize<ProtoCompound, Term> terms = new HijackMemoize<>(
+            256 * 1024, 5,
+            (C) -> {
+                try {
+                    return super.the(C.op(), C.dt(), C.subterms());
+                } catch (InvalidTermException e) {
+                    if (Param.DEBUG_EXTRA)
+                        logger.error("{}", e);
+                    return False;
+                } catch (Throwable t) {
+                    logger.error("{}", t);
+                    return False;
+                }
             }
-        }
     );
 //        @Override
 //        public float value(@NotNull ProtoCompound protoCompound) {
@@ -75,15 +79,26 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //        super::normalize
 //    );
 
+
     @Override
-    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u)  {
+    protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
+//        if (subterms.length == 1 && dt == DTERNAL) {
+//            if (subterms[0].vars() == 0 && subterms[0].varPattern() == 0)
+//                return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
+//        }
+        return newCompound(op, dt, intern(subterms));
+    }
+
+    @Override
+    public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u) {
         if (u.length < 2)
             return super.the(op, dt, u);
 
-        return terms.apply(new AppendProtoCompound( op, dt, u ));
+        return terms.apply(new AppendProtoCompound(op, dt, u));
     }
 
-    @Override public Term the(ProtoCompound c) {
+    @Override
+    public Term the(ProtoCompound c) {
         if (c.size() < 2)
             return super.the(c);
 
@@ -91,7 +106,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
 //            build.miss.increment();
 //            return super.the(c.op(), c.dt(), c.subterms()); //immediate construct
 //        } else {
-            return terms.apply(c);
+        return terms.apply(c);
 //        }
     }
 
@@ -111,7 +126,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
     @Override
     public @NotNull String summary() {
         return "CACHE build=" + terms.summary()
-        //+ " normalize=" + normalize.summary()
-        ;
+                //+ " normalize=" + normalize.summary()
+                ;
     }
 }

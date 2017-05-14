@@ -3,18 +3,15 @@ package nars.term.compound;
 import jcog.Util;
 import nars.IO;
 import nars.Op;
-import nars.concept.Concept;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector1;
-import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.DTERNAL;
@@ -33,14 +30,15 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         this.op = op;
         this.hash = Util.hashCombine(hashCodeSubTerms(), op.ordinal(), DTERNAL);
+        if (arg.isNormalized()) setNormalized();
     }
 
-    @Override
-    public int init(@NotNull int[] meta) {
-        the.init(meta);
-        meta[5] |= op.bit;
-        return hash;
-    }
+//    @Override
+//    public int init(@NotNull int[] meta) {
+//        the.init(meta);
+//        //meta[5] |= op.bit;
+//        return hash;
+//    }
 
 
     @Override
@@ -60,20 +58,21 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
 
-
     @Override
     public boolean equals(@Nullable Object that) {
         if (this == that) return true;
 
-        Compound t;
-        if (that instanceof Compound)
-            t = (Compound)that;
-        else
+        if (!(that instanceof Compound)) {
             return false;
+        }
+
+        Compound t = (Compound) that;
 
         //TODO if this is a NEG then size and dt can be assumed
-        return hash == that.hashCode() && (op==t.op()) && (t.size()==1) && (t.dt()==DTERNAL) && (the.equals(t.sub(0)));
+        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && (t.dt() == DTERNAL) && equalTo(t);
     }
+
+
 
     @NotNull
     @Override
@@ -86,7 +85,9 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return op;
     }
 
-    @Deprecated /* HACK */ @Override public @NotNull TermContainer subterms() {
+    @Deprecated /* HACK */
+    @Override
+    public @NotNull TermContainer subterms() {
         return new SubtermView(this);
     }
 
@@ -98,7 +99,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Override
     public void setNormalized() {
         if (the instanceof Compound)
-            ((Compound)the).setNormalized();
+            ((Compound) the).setNormalized();
     }
 
     @Override
@@ -115,12 +116,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         @Override
         public int volume() {
-            return c.volume()-1;
+            return c.volume() - 1;
         }
 
         @Override
         public int complexity() {
-            return c.complexity()-1;
+            return c.complexity() - 1;
         }
 
         @Override
@@ -139,7 +140,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
             if (obj instanceof TermContainer) {
                 TermContainer t = (TermContainer) obj;
-                if (t.hashCode()==hashCode()) {
+                if (t.hashCode() == hashCode()) {
                     int ss = size();
                     if (t.size() == ss) {
                         for (int i = 0; i < ss; i++) {

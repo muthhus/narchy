@@ -135,11 +135,11 @@ public class TermVector1 implements TermContainer {
         action.accept(the);
     }
 
-    @Override public boolean equalTo(@NotNull TermContainer b) {
-        return //(hashCode() == b.hashCode()) &&
-                (b.size()==1) &&
-                the.equals(b.sub(0));
-    }
+//    @Override public boolean equalTo(@NotNull TermContainer b) {
+//        return //(hashCode() == b.hashCode()) &&
+//                (b.size()==1) &&
+//                the.equals(b.sub(0));
+//    }
 
 
     @Override

@@ -287,7 +287,9 @@ public abstract class TermBuilder {
 
     protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
 //        if (subterms.length==1 && dt == DTERNAL) {
-//            return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
+//            if (subterms[0].isNormalized())
+//            //if (subterms[0].vars() == 0 && subterms[0].varPattern() == 0)
+//                return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
 //        }
         return newCompound(op, dt, intern(subterms));
     }

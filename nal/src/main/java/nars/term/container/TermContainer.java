@@ -39,7 +39,7 @@ import static nars.Op.*;
 public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
-    default public TermContainer append(@NotNull Term x) {
+    @Deprecated default public TermContainer append(@NotNull Term x) {
 
         return TermVector.the(ArrayUtils.add(toArray(),x));
     }
@@ -310,10 +310,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * should be called only from equals()
      */
     default boolean equalTo(@NotNull TermContainer b) {
-        return (hashCode() == b.hashCode()) &&
+        return this == b || ((hashCode() == b.hashCode()) &&
                 //(structure() == b.structure()) &&
                 //(volume() == b.volume()) &&
-                (equalTerms(b));
+                (equalTerms(b)));
     }
 
 
