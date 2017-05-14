@@ -485,11 +485,9 @@ function taskFeed(socket) {
         var p = div().attr('class', 'task');
         p.data('task', x);
 
-        var exp = div().attr('class', 'exp');
-        exp.hide();
-        p.append(exp); //expanded
 
-        const onClick = (e) => {
+
+        const onClick0 = (e) => {
             const task = $(e.target).parent().data('task');
 
             if (!exp.is(':visible')) {
@@ -502,10 +500,18 @@ function taskFeed(socket) {
             });
             //console.log( task );
         };
+        const onClick = (e) => {
+            const task = $(e.target).parent().data('task');
 
-        console.log(iconColor);
+            var exp = div().attr('class', 'exp');
+            exp.html(JSON.stringify(task, null, 4));
 
-        const icon = $(document.createElement('button')).text('*').click(onClick);
+            const w = window.open("", "_blank", "titlebar=no,statusbar=no,location=no,toolbar=no,resizable=yes,width=400,height=400");
+            $(w.document.body).html(exp);
+        };
+
+
+        const icon = $(document.createElement('button')).html('&nbsp;').click(onClick);
         icon[0].style.border = 'none';
         icon[0].style.backgroundColor = iconColor;
 
