@@ -7,6 +7,51 @@ function labelize(l) {
     return l.length > maxLabelLen ? l.substr(0, maxLabelLen) + '..' : l;
 }
 
+'use strict';
+
+//from: https://github.com/StarryInternet/map-memo/blob/master/lib/map-memo.js
+class Cache {
+
+    constructor() {
+        this.map     = new Map();
+        this.weakmap = new WeakMap();
+    }
+
+    // create or retrieve a nested Cache instance based on an arguments object
+    get( args ) {
+        return args.reduce( Cache.reducer, this );
+    }
+
+    // get a backing store (map/weakmap) based on a given value
+    store( value ) {
+        const t = typeof value;
+        const isObject = ( t === 'object' || t === 'function' ) && value !== null;
+        return Reflect.get( this, isObject ? 'weakmap' : 'map' );
+    }
+
+    static reducer( cache, value ) {
+        const store = cache.store( value );
+        return store.get( value ) || store.set( value, new Cache() ).get( value );
+    }
+
+}
+
+function memoize( fn, { ttl = Infinity } = {} ) {
+    const cache = new Cache();
+
+    return function( ...args ) {
+        // get (or create) a cache item
+        const item = cache.get( args );
+
+        if ( item.hasOwnProperty('value') && item.expires >= Date.now() ) {
+            return item.value;
+        }
+
+        item.expires = Date.now() + ttl;
+        return item.value = fn.apply( this, args );
+    };
+}
+
 function MainMenuButton() {
     return $('<div>[@]</div>').addClass('MainMenuButton').click(() => setTimeout(menu, 0));
 }
@@ -23,9 +68,9 @@ function truthString(f, c) {
 function truthComponentStr(x) {
 
     const i = parseInt(Math.round(100 * x));
-    if (i == 100)
+    if (i === 100)
         return '1.0';
-    else if (i == 0)
+    else if (i === 0)
         return '0.0';
     else
         return i / 100.0;
@@ -136,15 +181,20 @@ function decodeTasks(e, m) {
                 const end = endLow | (endHigh << 32);
 
                 let freq, conf;
-                if ((punct == '.') || (punct == '!')) {
+                if ((punct === '.') || (punct === '!')) {
                     freq = d.getFloat32(j); j += 4;
                     conf = d.getFloat32(j); j += 4;
                 } else {
                     freq = conf = undefined;
                 }
                 const termStrLen = d.getUint16(j); j += 2;
-                const term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+                var term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
 
+                if (freq!==undefined & freq < 0.5) {
+                    //negate
+                    freq = 1.0 - freq;
+                    term = '(--,' + term + ')';
+                }
 
                 e.emit('task', {
                     term: term,
@@ -278,7 +328,7 @@ function graphConcepts(tgt) {
 
                 //TERMLINKS sequence
                 {
-                    var termlinks = new Array();
+                    const termlinks = new Array();
 
                     do {
 
@@ -384,31 +434,82 @@ function taskFeed(socket) {
     return new NARConsole(socket, (x) => {
 
 
-        const label = x.term + x.punc + truthString(x.freq, x.conf);
-
         //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
         //const fontSize = parseInt(75.0 + 100.0 * Math.sqrt( x.pri )) + '%';
+        var termStr = x.term;
 
 
-        const d = document.createElement('div');
+        const label = document.createElement('span');
+        var iconColor;
         switch (x.punc) {
             case '.':
-                d.className = 'belief';
+                label.className = 'belief';
+                const f = x.freq;
+                const c = x.conf;
+                if (f < 0.5) {
+                    //should not happen
+                }
+
+                iconColor = 'rgb(' + parseInt(c  * 256) + ',' + parseInt(c  * 256) + ',' + parseInt((f-0.5) * 2 * 256) + ')';
+
                 break;
             case '?':
-                d.className = 'question';
+                label.className = 'question';
+                iconColor = 'blue';
+                break;
+            case '@':
+                label.className = 'quest';
+                iconColor = 'purple';
                 break;
             case '!':
-                d.className = 'goal';
+                label.className = 'goal';
+                const m = 2 * (x.freq - 0.5) * x.conf;
+                if (m < 0) {
+                    iconColor = 'rgb(' + parseInt(-m * 256) + ',0,0)';
+                } else {
+                    iconColor = 'rgb(0,' + parseInt(m * 256) + ',0)';
+                }
                 break;
             case ';':
-                d.className = 'command';
+                label.className = 'command';
+                iconColor = 'gray';
                 break;
         }
-        //d.style.opacity = 1;
-        //d.style.fontSize = fontSize;
-        d.innerText = label;
-        return d;
+
+        label.style.opacity = x.punc === ';' ? 1.0 //commands at full opacity
+            : 0.5 + 0.5 * x.pri;
+
+        //label.style.fontSize = fontSize;
+        label.innerText = termStr + x.punc + truthString(x.freq, x.conf);
+
+        var p = div().attr('class', 'task');
+        p.data('task', x);
+
+        var exp = div().attr('class', 'exp');
+        exp.hide();
+        p.append(exp); //expanded
+
+        const onClick = (e) => {
+            const task = $(e.target).parent().data('task');
+
+            if (!exp.is(':visible')) {
+                //regenerate
+                exp.html(JSON.stringify(task));
+            }
+
+            exp.toggle( "slow", function() {
+                // Animation complete.
+            });
+            //console.log( task );
+        };
+
+        console.log(iconColor);
+
+        const icon = $(document.createElement('button')).text('*').click(onClick);
+        icon[0].style.border = 'none';
+        icon[0].style.backgroundColor = iconColor;
+
+        return p.prepend(icon, $(label))[0];
 
 
     }).addClass('terminal');
@@ -621,6 +722,8 @@ function NARConsole(socket, render) {
 
     const maxLines = 128;
 
+    //render = memoize(render);
+
     let shown = [];
 
     let queued = false;
@@ -629,7 +732,7 @@ function NARConsole(socket, render) {
 
         queued = false;
 
-        fastdom.mutate(()=> {
+        //fastdom.mutate(()=> {
             const oldItems = items[0];
             const newItems = oldItems.cloneNode(false);
             for (let a of Array.from(shown, render)) {
@@ -642,9 +745,11 @@ function NARConsole(socket, render) {
 
             const height = newItems.scrollHeight;
 
-            later( () => view.scrollTop(height) );
+            later( () =>
+                 view.scrollTop(height)
+            );
 
-        });
+        //});
 
     };
 

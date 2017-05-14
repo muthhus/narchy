@@ -9,8 +9,32 @@
             height: 4em;
             bottom: 0;
         }
-        #out {
-            padding-bottom: 4em;
+
+        .task {
+            overflow-x: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: break-all;
+            word-wrap: break-word;
+        }
+
+        .task:hover {
+            background-color: #151515;
+        }
+
+
+        #input {
+            width: 75%;
+            float: left;
+        }
+
+        #out .terminal {
+            max-height: 90%;
+        }
+
+        .task .exp {
+            padding-left: 4em; /*indent*/
+            margin-bottom: 1em;
         }
     </style>
 </head>
@@ -60,13 +84,12 @@
              s = NARSocket('terminal', decodeTasks, {
                 onopen: () => {
 
-                    $('#in').append( NALInputEditor(s).attr('id', 'input') );
+                    $('#in').prepend( NALInputEditor(s).attr('id', 'input') );
                     $('#out').append( taskFeed(s) );
 
                     //command widget actions
                     $('.cmd').each((k,x) => {
 
-                        console.log(k, x);
                         var cc = $(x).attr('class');
                         if (cc && cc.startsWith('cmd '))
                             cc = cc.substr(4);

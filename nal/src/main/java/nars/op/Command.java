@@ -43,39 +43,35 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
             if (Param.DEBUG)
                 throw error;
             else
-                return error(error);
+                return error(error, nar.time());
         }
     }
 
-    static Task error(Throwable error) {
+    static Task error(Throwable error, long when ) {
         StringWriter ss = new StringWriter();
         ExceptionUtils.printRootCauseStackTrace(error, new PrintWriter(ss));
-        return Command.task("error", $.quote(ss.toString()));
+        return Command.task("error", when, $.quote(ss.toString()));
     }
 
 
-    static Task task(Compound content) {
-        return new ImmutableTask(content, Op.COMMAND, null, ETERNAL, ETERNAL, ETERNAL, new long[] { });
+    static Task task(Compound content, long when) {
+        return new ImmutableTask(content, Op.COMMAND, null, when, when, when, new long[] { });
     }
 
     public static Task logTask(@NotNull Term content) {
-        return Command.task(LOG_FUNCTOR, content);
+        return logTask(content, ETERNAL);
     }
 
-    static Task task(String func, @NotNull Term... args) {
-        return Command.task($.func(func, args));
+    static Task logTask(@NotNull Term content, long when) {
+        return Command.task(LOG_FUNCTOR, when, content );
     }
 
-    public static Task logTask(@NotNull String msg) {
-        return Command.logTask($.quote(msg));
-    }
-
-    static void log(NAR nar, @NotNull Term content) {
-        nar.input( Command.logTask(content) );
+    static Task task(String func, long now, @NotNull Term... args) {
+        return Command.task($.func(func, args), now);
     }
 
     public static void log(NAR nar, @NotNull String msg) {
-        nar.input( Command.logTask(msg) );
+        nar.input( Command.logTask($.quote(msg), nar.time()) );
     }
 
 

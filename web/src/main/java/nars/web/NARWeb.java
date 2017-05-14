@@ -71,10 +71,8 @@ public class NARWeb extends WebServer {
         NAR nar =
                 NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false), true);
 
-        nar.log();
-        nar.onCycle(r -> {
-           System.out.println("cycle " + r);
-        });
+        //nar.log();
+
 
         AtomicDouble fps = new AtomicDouble(5f);
         AtomicReference<NARLoop> l = new AtomicReference<>(nar.loopFPS(fps.floatValue()));

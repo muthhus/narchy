@@ -26,25 +26,19 @@ body {
 }
 
 .belief {
-    color: #d4d4d4;
 }
 
 .command {
-    color: greenyellow;
-    background-color: #003;
 }
 
 .question {
-    color: #8e70ff;
 }
 
 .goal {
-    color: orange;
 }
 
 #input {
-    border: 2px solid rgba(244, 255, 0, 0.5);
-    margin: 0.25em;
+    border: 1px solid rgba(244, 255, 0, 0.5);
 }
 
 
