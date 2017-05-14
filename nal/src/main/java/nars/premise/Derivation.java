@@ -14,6 +14,7 @@ import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;
+import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -138,6 +139,22 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
 
+    @NotNull public void restart(@NotNull Task task) {
+
+        this.task = task;
+
+        this.taskTruth = task.truth();
+        this.taskPunct = task.punc();
+
+        Compound tt = task.term();
+        this.taskTerm = tt;
+        this.termSub0Struct = tt.structure();
+        Op tOp = tt.op();
+        this.termSub0op = (byte) tOp.ordinal();
+        this.termSub0opBit = tOp.bit;
+
+    }
+
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         assert(ttl >= 0);
@@ -152,17 +169,17 @@ abstract public class Derivation extends Unify implements TermContext {
 //
 
         //remove common variable entries because they will just consume memory if retained as empty
-//        xy.map.entrySet().removeIf(e -> {
-//            if (e.getKey() instanceof CommonVariable)
-//                return true;
-//            else
-//                return false;
-//        });
+        xy.map.entrySet().removeIf(e -> {
+            if (e.getKey() instanceof CommonVariable)
+                return true;
+            else
+                return false;
+        });
 //        if (xy.size()!=0) { //HACK TODO fix
 //            xy.map.clear();
 //            //throw new RuntimeException("not cleared");
 //        }
-        xy.map.clear();
+        //xy.map.clear();
 
         punct = null;
         forEachMatch = null;
@@ -171,10 +188,7 @@ abstract public class Derivation extends Unify implements TermContext {
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
 
-        taskTerm = null;
-        beliefTerm = null;
-        belief = task = null;
-        taskTruth = null;
+        belief = null;
         beliefTruth = beliefTruthRaw = null;
 
 
@@ -183,16 +197,11 @@ abstract public class Derivation extends Unify implements TermContext {
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
-
-
         this.premise = p;
 
-        Task task;
-        this.task = task = p.task;
-        Compound tt = task.term();
-        Term taskTerm = this.taskTerm = tt;
-        this.taskTruth = task.truth();
-        this.taskPunct = task.punc();
+
+        if (this.task == null)
+            restart(p.task);
 
         Task belief;
         this.belief = belief = p.belief;
@@ -223,10 +232,7 @@ abstract public class Derivation extends Unify implements TermContext {
         }
 
 
-        Op tOp = taskTerm.op();
-        this.termSub0op = (byte) tOp.ordinal();
-        this.termSub0opBit = tOp.bit;
-        this.termSub0Struct = taskTerm.structure();
+
         this.termSub1Struct = beliefTerm.structure();
 
         Op bOp = beliefTerm.op();

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -75,9 +76,10 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      */
     int premiseVector(PLink<Concept> pc, Derivation d) {
 
-        Concept c = pc.get();
         float cPri = pc.priSafe(0);
         int ttl = Util.lerp(cPri, Param.UnificationTTL, Param.UnificationTTLMin);
+
+        Concept c = pc.get();
         c.tasklinks().commit();
         c.termlinks().commit();
         nar.terms.commit(c);
@@ -88,34 +90,39 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         int premiseCost = Param.BeliefMatchTTL;
         int linkSampleCost = 1;
 
+        Random rng = nar.random();
+
         @Nullable PLink<Task> tasklink = null;
         @Nullable PLink<Term> termlink = null;
+        float taskPri = -1f, termPri = -1f;
+
         while (ttl > 0) {
-            if (tasklink == null || nar.random().nextFloat() > tasklink.priSafe(0)) { //sample a new link inversely probabalistically in proportion to priority
+            if (tasklink == null || rng.nextFloat() > taskPri) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
                 ttl -= linkSampleCost;
                 if (tasklink == null)
-                    continue;
+                    break;
+
+                taskPri = tasklink.priSafe(0);
+                d.restart(tasklink.get());
             }
 
 
-            if (termlink == null || nar.random().nextFloat() > termlink.priSafe(0)) { //sample a new link inversely probabalistically in proportion to priority
+            if (termlink == null || rng.nextFloat() > termPri) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = c.termlinks().sample();
                 ttl -= linkSampleCost;
                 if (termlink == null)
-                    continue;
+                    break;
+                termPri = termlink.priSafe(0);
             }
 
             if (ttl <= premiseCost)
                 break; //not enough remaining to create premise
 
             Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
+            ttl -= premiseCost; //failure of premise generation still causes cost
 
             if (p != null) {
-
-                ttl -= p.beliefTerm() instanceof Compound ?
-                        premiseCost : //TODO get actual amount consumed which may be less than premiseCost
-                        1;  //atomic belief term means belief was null and there was no belief to even search for
 
                 int start = ttl;
 
@@ -126,10 +133,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 count++;
 
                 ttl -= (start - ttlRemain);
-            } else {
-                ttl -= premiseCost; //failure of premise generation still causes cost
             }
-
         }
 
 
