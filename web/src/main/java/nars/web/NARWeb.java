@@ -69,9 +69,12 @@ public class NARWeb extends WebServer {
 
 
         NAR nar =
-                NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(false), true);
+                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false), true);
 
         nar.log();
+        nar.onCycle(r -> {
+           System.out.println("cycle " + r);
+        });
 
         AtomicDouble fps = new AtomicDouble(5f);
         AtomicReference<NARLoop> l = new AtomicReference<>(nar.loopFPS(fps.floatValue()));
@@ -106,11 +109,12 @@ public class NARWeb extends WebServer {
         });
 
 
-        start(nar, l, fps.floatValue());
 
         Hear.wiki(nar);
 
         NARWeb w = new NARWeb(nar, port);
+
+        start(nar, l, fps.floatValue());
 
 
     }

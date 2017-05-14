@@ -66,6 +66,7 @@
                     //command widget actions
                     $('.cmd').each((k,x) => {
 
+                        console.log(k, x);
                         var cc = $(x).attr('class');
                         if (cc && cc.startsWith('cmd '))
                             cc = cc.substr(4);

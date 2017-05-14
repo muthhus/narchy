@@ -31,7 +31,7 @@ abstract public class Loop implements Runnable {
 
     @Override
     public String toString() {
-        return "ideal=" + periodMS + "ms, " +
+        return super.toString() + " ideal=" + periodMS + "ms, " +
                 Texts.n4(frameTime.getMean()) + "+-" + Texts.n4(frameTime.getStandardDeviation()) + "ms avg";
     }
 

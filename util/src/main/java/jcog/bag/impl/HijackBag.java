@@ -424,7 +424,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             break;
                     }
                 }
-                nulls = 0;
+                nulls = 0; //reset nulls
             } else {
                 nulls++;
             }
