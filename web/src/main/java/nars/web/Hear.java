@@ -59,7 +59,7 @@ public class Hear extends Loop {
         }
 
         if (!parsed.isEmpty() && errors.isEmpty()) {
-            logger.info("narsese: {}", parsed);
+            logger.debug("narsese: {}", parsed);
             nar.input(parsed);
             return null;
         } else {

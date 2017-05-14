@@ -37,13 +37,11 @@ public class NarseseIOService extends WebsocketService  {
             @Override
             protected void append(Object eventObject) {
                 if (((ILoggingEvent)eventObject).getLevel().isGreaterOrEqual(Level.INFO))
-                    output.accept(Command.logTask($.quote(eventObject.toString())));
+                    output.accept(Command.logTask($.quote(((ILoggingEvent) eventObject).getLoggerName() + ", " + eventObject.toString())));
 
             }
         });
-        LevelFilter lf = new LevelFilter();
-        lf.setLevel(Level.INFO);
-        appender.addFilter(lf);
+
         appender.start();
 
         output = new LeakOut(n, 16, 1f) {

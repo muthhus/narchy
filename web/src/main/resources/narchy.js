@@ -450,8 +450,8 @@ function NALInputEditor(socket, initialValue) {
         if (event.ctrlKey && event.code==="Enter") {
             const txt = editor.getValue();
             if (txt) {
-                socket.send(txt);
                 editor.setValue('');
+                socket.send(txt);
             }
 
         }
