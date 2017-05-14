@@ -998,6 +998,7 @@ public abstract class TermBuilder {
 //        return difference(setType, A, B);
 //    }
 
+
     @NotNull
     private Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
@@ -1087,17 +1088,19 @@ public abstract class TermBuilder {
 
         //reduction between one or both of the intersection type
 
-        Term[] args;
+        TreeSet<Term> args = new TreeSet<>();
         if (o1 == intersection) {
-            args = ArrayUtils.addAll(
-                    ((TermContainer) term1).toArray(),
-                    o2 == intersection ? ((TermContainer) term2).toArray() : new Term[]{term2}
-            );
+            ((TermContainer)term1).forEach(args::add);
+            if (o2 == intersection)
+                ((TermContainer)term2).forEach(args::add);
+            else
+                args.add(term2);
         } else {
-            args = new Term[]{term1, term2};
+            args.add(term1);
+            args.add(term2);
         }
 
-        return finalize(intersection, Terms.sorted(args));
+        return finalize(intersection, args);
     }
 
 

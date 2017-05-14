@@ -109,8 +109,8 @@ public class TermReductionsTest {
 
     @Test
     public void testInheritNegative() throws Narsese.NarseseException {
-        assertEquals("(--,(x-->y))", $.inh($.neg($("x")), $("y")).toString()  );
-        assertEquals("(x-->y)", $.inh($.neg($("x")), $.neg($("y"))).toString()  );
+        assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString()  );
+        assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString()  );
     }
 
     @Test
@@ -216,7 +216,7 @@ public class TermReductionsTest {
 
     @Test
     public void testDisjunctEqual() throws Narsese.NarseseException {
-        @NotNull Compound pp = $.p(this.p);
+        @NotNull Compound pp = p(this.p);
         assertEquals(pp, disj(pp, pp));
     }
 
@@ -229,7 +229,7 @@ public class TermReductionsTest {
 
     @Test
     public void testConjunctionEqual() throws Narsese.NarseseException {
-        assertEquals(p, $.conj(p, p));
+        assertEquals(p, conj(p, p));
     }
 
     @Test
@@ -241,7 +241,7 @@ public class TermReductionsTest {
 
     @Test
     public void testIntExtEqual() throws Narsese.NarseseException {
-        assertEquals(p, $.secte(p, p));
+        assertEquals(p, secte(p, p));
         assertEquals(p, secti(p, p));
     }
 
@@ -339,8 +339,8 @@ public class TermReductionsTest {
     public void testDifferenceImmediate2() throws Narsese.NarseseException {
 
 
-        Compound a = $.sete($("a"), $("b"), $("c"));
-        Compound b = $.sete($("d"), $("b"));
+        Compound a = sete($("a"), $("b"), $("c"));
+        Compound b = sete($("d"), $("b"));
         Term d = diffe(a, b);
         assertEquals(Op.SETe, d.op());
         assertEquals(d.toString(), 2, d.size());
@@ -497,7 +497,7 @@ public class TermReductionsTest {
 
 
     @Test public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
-        assertEquals(False, $.parallel($.varDep(1), $.neg($.varDep(1))));
+        assertEquals(False, parallel(varDep(1), neg(varDep(1))));
     }
 
     @Test public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
@@ -576,7 +576,7 @@ public class TermReductionsTest {
         assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals(False, $.parallel($.varDep(0), $.neg($.varDep(0)), Atomic.the("x")));
+        assertEquals(False, parallel(varDep(0), neg(varDep(0)), Atomic.the("x")));
     }
 
     @Test
@@ -654,7 +654,7 @@ public class TermReductionsTest {
             Term t = $(x);
             assertValid(t);
 
-            Task y = task((Compound)t, Op.BELIEF, $.t(1f,0.9f)).apply(n);
+            Task y = task((Compound)t, Op.BELIEF, t(1f,0.9f)).apply(n);
 
             assertEquals(x, y.term().toString());
 
@@ -676,10 +676,10 @@ public class TermReductionsTest {
     }
 
     @Test public void testSimEquivOfAbsoluteTrueFalse() throws Narsese.NarseseException {
-        assertEquals(True, $.sim(True,True));
-        assertEquals(True, $.sim(False,False));
-        assertEquals(False, $.sim(True,False));
-        assertEquals(True, $.sim($.neg(True),False));
+        assertEquals(True, sim(True,True));
+        assertEquals(True, sim(False,False));
+        assertEquals(False, sim(True,False));
+        assertEquals(True, sim(neg(True),False));
     }
 
     /**
@@ -718,10 +718,11 @@ public class TermReductionsTest {
 
     @Test
     public void testOneArgIntersection() throws Narsese.NarseseException {
-        assertEquals("(x)", $("(|,(x))").toString());
-        assertEquals("(x)", $("(|,(x),(x))").toString());
-        assertEquals("(x)", $("(&,(x))").toString());
-        assertEquals("(x)", $("(&,(x),(x))").toString());
+        Term x = $.p($.the("x"));
+        assertEquals(x, $("(|,(x))"));
+        assertEquals(x, $("(|,(x),(x))"));
+        assertEquals(x, $("(&,(x))"));
+        assertEquals(x, $("(&,(x),(x))"));
     }
 
     @Test
@@ -743,7 +744,7 @@ public class TermReductionsTest {
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
 
-                $.parallel($("(ball_left)"), $("(ball_right)"), $("((--,(ball_left)) &&-270 (ball_right)))"))
+                parallel($("(ball_left)"), $("(ball_right)"), $("((--,(ball_left)) &&-270 (ball_right)))"))
                         .toString());
 
     }
@@ -787,19 +788,19 @@ public class TermReductionsTest {
 
     @Test public void testImageUnwrap0() throws Narsese.NarseseException {
         assertEquals("(a,b)",
-           $.p(imageUnwrap($("(\\,n,_,b)"), $("a"))).toString());
+           p(imageUnwrap($("(\\,n,_,b)"), $("a"))).toString());
     }
     @Test public void testImageUnwrap1() throws Narsese.NarseseException {
         assertEquals("(a,b)",
-            $.p(imageUnwrap($("(\\,n,a,_)"), $("b"))).toString());
+            p(imageUnwrap($("(\\,n,a,_)"), $("b"))).toString());
     }
     @Test public void testImageUnwrap2() throws Narsese.NarseseException {
         assertEquals("(a,b)",
-            $.p(imageUnwrap($("(/,n,_,b)"), $("a"))).toString());
+            p(imageUnwrap($("(/,n,_,b)"), $("a"))).toString());
     }
     @Test public void testImageUnwrap3() throws Narsese.NarseseException {
         assertEquals(     "(a,b)",
-           $.p(imageUnwrap($("(/,n,a,_)"), $("b"))).toString());
+           p(imageUnwrap($("(/,n,a,_)"), $("b"))).toString());
     }
 
     @Test public void testImageInSubtermsProductNormalFormIntensional() throws Narsese.NarseseException {

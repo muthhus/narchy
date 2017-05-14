@@ -92,16 +92,12 @@ public class TaskConcept extends CompoundConcept {
 
     @NotNull
     protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
-        int eCap = state.beliefCap(this, beliefOrGoal, true);
-        int tCap = state.beliefCap(this, beliefOrGoal, false);
-        return newBeliefTable(nar, beliefOrGoal, eCap, tCap);
-    }
-
-
-    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal, int eCap, int tCap) {
-
         return new DefaultBeliefTable();
+//        int eCap = state.beliefCap(this, beliefOrGoal, true);
+//        int tCap = state.beliefCap(this, beliefOrGoal, false);
+//        return newBeliefTable(nar, beliefOrGoal, eCap, tCap);
     }
+
 
     public TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         return new HijackTemporalBeliefTable(tCap);
