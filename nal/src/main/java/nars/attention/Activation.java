@@ -18,13 +18,13 @@ abstract public class Activation<B extends Prioritized> {
 
     @NotNull
     protected final NAR nar;
-    final float minScale; //cut-off limit for recursive spread
+
     protected final B in;
 
     public Activation(@NotNull B in, float scale, @NotNull Concept origin, NAR nar) {
         this.nar = nar;
         this.in = in;
-        this.minScale = Priority.EPSILON_DEFAULT / (scale * in.pri());
+        //this.minScale = Priority.EPSILON / (scale * in.pri());
         this.origin = origin;
 
     }

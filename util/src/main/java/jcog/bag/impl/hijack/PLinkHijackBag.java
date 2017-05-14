@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.pri.Priority.EPSILON_DEFAULT;
+import static jcog.pri.Priority.EPSILON;
 
 /**
  * Created by me on 2/17/17.
@@ -75,7 +75,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     protected PLink<X> merge(@Nullable PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
         float pressure = PriMerge.combine(existing, incoming, scale);
 
-        if (pressure >= Priority.EPSILON_DEFAULT)
+        if (pressure >= Priority.EPSILON)
             pressurize(pressure);
 
         return existing!=null ? existing : incoming;
@@ -83,7 +83,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected float priEpsilon() {
-        return EPSILON_DEFAULT;
+        return EPSILON;
     }
 
 

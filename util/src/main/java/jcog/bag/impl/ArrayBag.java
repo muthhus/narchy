@@ -513,7 +513,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 each.accept(b);
             }
 
-            if (pBelow - p >= Priority.EPSILON_DEFAULT) {
+            if (pBelow - p >= Priority.EPSILON) {
                 sorted = false;
             }
 

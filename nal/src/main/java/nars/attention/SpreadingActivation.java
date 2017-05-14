@@ -11,6 +11,7 @@ import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -32,18 +33,37 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    private final int termlinkDepth;
 
 
     final ObjectFloatHashMap<Termed> spread;
 
-    final float parentRetention;
 
-    transient final int dur; //cache
-    transient final float inPri; //cached priority value of input at input
+    /**
+     * cached for fast access
+     */
+    transient final int dur;
+
+    /**
+     * priority value of input at input, cached for fast access
+     */
+    transient final float inPri;
+
+    /**
+     * cached
+     */
     transient final Term originTerm;
 
-    private static final float temporalSpecificity = 0.25f;
+
+    /**
+     * momentum > 0.5 means parents preserve more of the priority than sharing with children
+     */
+    final float momentum;
+
+    /**
+     * values closer to zero mean atom tasklink activation is less filtered by time;
+     * values closer to one mean atom tasklink activation is more filtered to specific time
+     */
+    private static final float temporalSpecificity = 0.5f;
 
     /**
      * 0.5 = forward/backward termlinking is balanced.
@@ -55,24 +75,18 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, @NotNull Concept c, @NotNull NAR nar, float scale, ObjectFloatHashMap<Termed> spread) {
-        this(in, scale, c, levels(in.term()),
-                spread,
-                nar);
+    public SpreadingActivation(@NotNull Task in, @NotNull Concept c, @NotNull NAR nar, float scale) {
+        this(in, scale, c,  activationMapThreadLocal.get(), nar);
     }
 
 
     /**
      * unidirectional task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, float scale, @NotNull Concept src, int termlinkDepth, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
+    public SpreadingActivation(@NotNull Task in, float scale, @NotNull Concept src, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
         super(in, scale, src, nar);
 
-        this.termlinkDepth = termlinkDepth;
-
-        this.spread = spread;
-
-        this.parentRetention = nar.momentum.floatValue();
+        this.momentum = nar.momentum.floatValue();
 
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
         this.dur = nar.dur();
@@ -80,15 +94,16 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         Term originTerm = origin.term();
         this.originTerm = originTerm;// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
+        this.spread = spread;
+        spread.clear();
+
         link(src, scale, 0);
 
         spread.forEachKeyValue(this);
 
-        spread.clear();
-
         nar.emotion.stress(linkOverflow);
-
     }
+
 
 
     public static int levels(@NotNull Compound host) {
@@ -107,18 +122,20 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                 return 1;
 
             case SIM:
-                return 3;
+                return 2;
 
             case INH:
-                return 3;
+                return 2;
 
             case EQUI:
                 //return (host.vars() > 0) ? 3 : 2;
-                return 3;
+                return 2;
 
             case IMPL:
-            case CONJ:
                 return 3;
+            case CONJ:
+                return 2;
+
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
 //                    int vars = host.vars();
@@ -137,7 +154,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
 
         //float s = scale * (0.5f + 0.5f * pri(c, 1));
-        return new SpreadingActivation(t, c, n, scale, activationMapThreadLocal.get());
+        return new SpreadingActivation(t, c, n, scale);
     }
 
     @Override
@@ -146,8 +163,11 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         termBidi(c, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
 
-        if (c instanceof Concept)
+        if (c instanceof Concept) {
             tasklink((Concept) c, scale);
+        } else if (c instanceof AtomConcept) {
+            activateAtom((AtomConcept) c, scale);
+        }
 
     }
 
@@ -165,20 +185,20 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         final float parentActivation;
 
-        if (depth + 1 <= termlinkDepth) {
+        /*if (depth + 1 <= termlinkDepth)*/ {
 
             if (target instanceof Compound) {
                 //recurse
                 parentActivation = linkSubterms(((Compound) target).subterms(), scale, depth + 1);
             } else if (target instanceof AtomConcept) {
                 //activation terminating at an atom: activate through Atom links
-                parentActivation = activateAtom((AtomConcept) target, scale);
+                parentActivation = scale;
             } else {
                 parentActivation = 0;
             }
-        } else {
+        } /*else {
             parentActivation = scale;
-        }
+        }*/
 
         assert (target.op() != NEG); //should have been un-negated already
 
@@ -194,58 +214,56 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         if (n > 0) {
 
             //initially start with a fair budget assuming each link receives a full share
-            float subActivation = ((1f - parentRetention) * scale) / (n);
+            float subActivation = ((1f - momentum) * scale) / (n);
             //final float[] change = {0};
 
             long inStart = in.start();
             long inEnd = in.end();
 
-            if (subActivation > minScale) {
-                float[] additionalPressure = {0};
-                tlinks.commit((b) -> {
-                    float subSubActivation = subActivation;/// * b.qua();
+            float[] additionalPressure = {0};
+            tlinks.commit((b) -> {
+                float subSubActivation = subActivation;/// * b.qua();
 
-                    if (inStart != ETERNAL) {
-                        Task bt = b.get();
-                        long bs = bt.start();
-                        if (bs != ETERNAL) {
-                            //Temporal vs. temporal: reduce subActivation by temporal distance
+                if (inStart != ETERNAL) {
+                    Task bt = b.get();
+                    long bs = bt.start();
+                    if (bs != ETERNAL) {
+                        //Temporal vs. temporal: reduce subActivation by temporal distance
 
-                            long be = bt.end();
-                            long timeDistance = Math.max(0,
-                                    unionLength(inStart, inEnd, bs, be)
-                                            - (inEnd - inStart) //task range
-                                            - (be - bs)  //belief range
-                                            - dur
-                            ); //perceptual duration
+                        long be = bt.end();
+                        long timeDistance = Math.max(0,
+                                unionLength(inStart, inEnd, bs, be)
+                                        - (inEnd - inStart) //task range
+                                        - (be - bs)  //belief range
+                                        - dur
+                        ); //perceptual duration
 
-                            //multiply by temporal relevancy
-                            subSubActivation = subSubActivation * (
-                                    (1f - temporalSpecificity) + //min reduction
-                                            (temporalSpecificity) * TruthPolation.evidenceDecay(
-                                                    1f,
-                                                    (int) Math.ceil(dur),
-                                                    timeDistance));
+                        //multiply by temporal relevancy
+                        subSubActivation = subSubActivation * (
+                                (1f - temporalSpecificity) + //min reduction
+                                        (temporalSpecificity) * TruthPolation.evidenceDecay(
+                                                1f,
+                                                (int) Math.ceil(dur),
+                                                timeDistance));
 
-                        }
                     }
-
-                    if (subSubActivation >= minScale) {
-                        subSubActivation -= b.priAddOverflow(subSubActivation, additionalPressure); //activate the link
-                    }
-
-                    //change[0] += (subActivation - subSubActivation);
-                });
-                if (additionalPressure[0] > 0) {
-                    tlinks.pressurize(additionalPressure[0]);
                 }
 
-                //recoup losses to the parent
-                //parentActivation += change[0];
-                float parentActivation = (parentRetention * scale);
-                return parentActivation;
+                if (subSubActivation >= PLink.EPSILON) {
+                    subSubActivation -= b.priAddOverflow(subSubActivation, additionalPressure); //activate the link
+                }
 
+                //change[0] += (subActivation - subSubActivation);
+            });
+            if (additionalPressure[0] > 0) {
+                tlinks.pressurize(additionalPressure[0]);
             }
+
+            //recoup losses to the parent
+            //parentActivation += change[0];
+            float parentActivation = (momentum * scale);
+            return parentActivation;
+
 
         } else {
             //termlinks?
@@ -258,14 +276,14 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         int n = targetSubs.size();
         if (n > 0) {
-            float childScale = ((1f - parentRetention) * scale) / (n);
-            if (childScale >= minScale) {
-                for (int i = 0; i < n; i++) {
-                    link(targetSubs.sub(i).unneg(), childScale, nextDepth); //link and recurse to the concept
-                }
-                float parentActivation = scale * parentRetention;
-                return parentActivation;
+            float childScale = ((1f - momentum) * scale) / (n);
+
+            for (int i = 0; i < n; i++) {
+                link(targetSubs.sub(i).unneg(), childScale, nextDepth); //link and recurse to the concept
             }
+            float parentActivation = scale * momentum;
+            return parentActivation;
+
         }
 
         return scale;
@@ -288,14 +306,19 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     }
 
     void tasklink(Concept rcpt, float scale) {
-        rcpt.tasklinks().put(
-                new RawPLink(in, inPri),
-                //new DependentBLink(src),
-                scale, null);
+        float p = inPri * scale;
+        if (p >= PLink.EPSILON) {
+            rcpt.tasklinks().put(
+                    new RawPLink(in, p),
+                    //new DependentBLink(src),
+                    1f, null);
+        }
     }
 
     void termlink(Concept recipient, Term target, float scale) {
-        recipient.termlinks().put(new RawPLink(target, inPri), scale, linkOverflow);
+        float p = inPri * scale;
+        if (p >= PLink.EPSILON)
+            recipient.termlinks().put(new RawPLink(target, p), 1f, linkOverflow);
     }
 
 

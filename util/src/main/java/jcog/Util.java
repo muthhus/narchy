@@ -955,13 +955,13 @@ public enum Util {
 
 
     public static double normalize(double x, double min, double max) {
-        if (equals(min, max, PLink.EPSILON_DEFAULT))
+        if (equals(min, max, PLink.EPSILON))
             return min;
         return (x - min) / (max - min);
     }
 
     public static float normalize(float x, float min, float max) {
-        if (equals(min, max, PLink.EPSILON_DEFAULT))
+        if (equals(min, max, PLink.EPSILON))
             return min;
         return (x - min) / (max - min);
     }

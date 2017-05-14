@@ -24,8 +24,8 @@ public interface Priority extends Prioritized {
     /** common instance for a 'zero budget'.*/
     Priority Zero = new ROBudget(0);
 
-    /** minimum difference necessary to indicate a significant modification in budget float number components */
-    float EPSILON_DEFAULT = 0.00001f;
+    /** default minimum difference necessary to indicate a significant modification in budget float number components */
+    float EPSILON = 0.0001f;
 
 
     static String toString(@NotNull Priority b) {

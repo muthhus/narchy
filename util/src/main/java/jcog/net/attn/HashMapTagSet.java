@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static jcog.pri.Priority.EPSILON_DEFAULT;
+import static jcog.pri.Priority.EPSILON;
 
 /**
  * Created by me on 5/2/17.
@@ -75,22 +75,22 @@ public class HashMapTagSet implements TagSet, Serializable {
     @Override
     public boolean pri(String tag, float pri) {
         pri = Util.unitize(pri);
-        if (Util.equals(pri, 0f, EPSILON_DEFAULT))
+        if (Util.equals(pri, 0f, EPSILON))
             return data.remove(tag) != null;
         else {
             Float existing = data.put(tag, pri);
-            return existing == null || !Util.equals(existing, EPSILON_DEFAULT);
+            return existing == null || !Util.equals(existing, EPSILON);
         }
     }
 
     public boolean add(String tag, float pri) {
-        if (pri <= EPSILON_DEFAULT)
+        if (pri <= EPSILON)
             return false;
 
         final boolean[] mod = {true};
         data.merge(tag, pri, (existing, added) -> {
             float next = Util.unitize(existing + added );
-            mod[0] = !Util.equals(existing,next, EPSILON_DEFAULT);
+            mod[0] = !Util.equals(existing,next, EPSILON);
             return next;
         });
 

@@ -24,12 +24,12 @@ public class Crosslink {
     public static void crossLink(@NotNull Concept srcConcept, @NotNull Task srcTask, @NotNull Task tgtTask, float scale, @NotNull NAR nar) {
 
         Concept tgtConcept = tgtTask.concept(nar);
-        if (tgtConcept == null || tgtConcept.term().equals(srcConcept.term()))
+        if (tgtConcept == null || tgtConcept.equals(srcConcept))
             return; //null or same concept
 
 
         ObjectFloatHashMap<Termed> activation = SpreadingActivation.activationMapThreadLocal.get();
-        new SpreadingActivation(srcTask, scale, tgtConcept, 0, activation, nar);
-        new SpreadingActivation(tgtTask, scale, srcConcept, 0, activation, nar);
+        new SpreadingActivation(srcTask, scale, tgtConcept, activation, nar);
+        new SpreadingActivation(tgtTask, scale, srcConcept, activation, nar);
     }
 }

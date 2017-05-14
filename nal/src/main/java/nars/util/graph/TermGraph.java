@@ -137,7 +137,7 @@ public abstract class TermGraph {
             } else {
                 neg = false;
             }
-            if (val < Priority.EPSILON_DEFAULT)
+            if (val < Priority.EPSILON)
                 return;
 
             Term S = reverse ? $.negIf(pred, neg) : subj;
