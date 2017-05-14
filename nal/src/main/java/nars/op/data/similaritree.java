@@ -3,7 +3,7 @@ package nars.op.data;
 import jcog.Texts;
 import nars.$;
 import nars.term.Term;
-import nars.term.transform.Functor;
+import nars.term.Functor;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.Nullable;
 

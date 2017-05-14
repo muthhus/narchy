@@ -25,6 +25,7 @@ import nars.NAR;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +38,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * interface which defines the behavior for processing functor tasks
  */
-@FunctionalInterface public interface Operator {
+@Deprecated @FunctionalInterface public interface Operator {
 
     static Term[] args(Task t) {
         return ((Compound)(t.term(0)/*subject*/)).toArray();
@@ -48,26 +49,27 @@ import static nars.time.Tense.ETERNAL;
      * @param t task being processed
      * @return the task to continue processing, or null to cancel
      */
-    @Nullable Task run(@NotNull Task t, @NotNull NAR nar);
+    //@Nullable Task run(@NotNull Task t, @NotNull NAR nar);
+    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
 
 
-    /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
-    static Operator auto(BiConsumer<Task /* Goal */, Task /* Belief (feedback) */> onExec) {
-        return (g, nar) -> {
-            if (g.punc() == GOAL) {
-                Compound c = g.term();
-                Task b = null;
-                if (c.vars() == 0 && c.varPattern() == 0) {
-                    long occurrence = g.start();
-                    if (occurrence == ETERNAL || occurrence >= nar.time()) {
-                        b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confDefault(BELIEF));
-                    }
-                }
-                onExec.accept(g, b);
-            }
-            return g;
-        };
-    }
+//    /** if goal, automatically generates a corresponding feedback belief in the eternal, present, or future. */
+//    static Operator auto(BiConsumer<Task /* Goal */, Task /* Belief (feedback) */> onExec) {
+//        return (g, nar) -> {
+//            if (g.punc() == GOAL) {
+//                Compound c = g.term();
+//                Task b = null;
+//                if (c.vars() == 0 && c.varPattern() == 0) {
+//                    long occurrence = g.start();
+//                    if (occurrence == ETERNAL || occurrence >= nar.time()) {
+//                        b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confDefault(BELIEF));
+//                    }
+//                }
+//                onExec.accept(g, b);
+//            }
+//            return g;
+//        };
+//    }
 
 
 //    @Override

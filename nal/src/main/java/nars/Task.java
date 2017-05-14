@@ -1014,20 +1014,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 Term args = inputTerm.sub(0);
                 if (args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
-                    if (funcConcept != null) {
-                        Operator o = funcConcept.get(Operator.class);
-                        if (o != null) {
+                    if (funcConcept instanceof Command) {
+                        Command o = (Command)funcConcept;
 
+                        Task result = o.run(cmd, nar);
+                        if (result != null && result != cmd) {
+                            //return input(result); //recurse
+                            return execute(result, nar);
+                        }
 
-                            /*if (isCommand)*/
-                            {
-                                Task result = o.run(cmd, nar);
-                                if (result != null && result != cmd) {
-                                    //return input(result); //recurse
-                                    return result;
-                                }
-                            }
-//                            } else {
+                        //                            } else {
 //
 //                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
 //                                    inputAt(cmd.start(), cmd); //schedule for execution later
@@ -1047,7 +1043,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 //                                }
 //                            }
 
-                        }
+
 
                     }
                 }

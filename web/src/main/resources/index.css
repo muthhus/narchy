@@ -38,14 +38,15 @@ body {
     color: #8e70ff;
 }
 
-#input {
-    border: 2px solid rgba(244, 255, 0, 0.71);
-    margin: 0.25em;
-}
-
 .goal {
     color: orange;
 }
+
+#input {
+    border: 2px solid rgba(244, 255, 0, 0.5);
+    margin: 0.25em;
+}
+
 
 /*.grid-stack-item {*/
 /*border: 2px solid green;*/

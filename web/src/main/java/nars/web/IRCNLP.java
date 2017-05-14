@@ -348,7 +348,7 @@ public class IRCNLP extends IRC {
 
         n.truthResolution.setValue(0.01f);
 
-        n.on("say", (Command)(x, aa, nn) -> {
+        n.on("say", (x, aa, nn) -> {
             String msg = Joiner.on(' ').join(
                 Stream.of(aa).map(t -> {
                     if (t.op()== Op.VAR_DEP) {

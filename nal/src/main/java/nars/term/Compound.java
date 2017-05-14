@@ -32,7 +32,6 @@ import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import nars.term.transform.Functor;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;

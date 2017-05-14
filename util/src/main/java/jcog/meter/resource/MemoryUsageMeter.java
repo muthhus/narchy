@@ -9,11 +9,11 @@ import jcog.meter.event.DoubleMeter;
  * Uses Runtime methods to calculate changes in memory use, measured in KiloBytes (1024 bytes)
  * TODO also use https://github.com/dropwizard/metrics/blob/master/metrics-jvm/src/main/java/com/codahale/metrics/jvm/MemoryUsageGaugeSet.java
  */
-public class MemoryUseTracker extends DoubleMeter {
+public class MemoryUsageMeter extends DoubleMeter {
 
     //long lastUsedMemory = -1;
 
-    public MemoryUseTracker(String id) {
+    public MemoryUsageMeter(String id) {
         super(id);
     }
 

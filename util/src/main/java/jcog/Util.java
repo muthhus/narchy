@@ -15,6 +15,7 @@
 package jcog;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -1561,10 +1562,16 @@ public enum Util {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
     }
 
+    public static JsonNode toJSON(Object x) {
+        return msgPackMapper.valueToTree(x);
+    }
+
     /** x in -1..+1, y in -1..+1.   typical value for sharpen will be ~ >5
      * http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoMS8oMStleHAoLTUqeCkpLTAuNSkqMiIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0xIiwiMSIsIi0xIiwiMSJdfV0-
      * */
     public static float sigmoidSymmetric(float x, float sharpen) {
         return (float) ((1.0/(1 + Math.exp(-sharpen*x))-0.5)*2);
     }
+
+
 }

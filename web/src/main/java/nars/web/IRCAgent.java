@@ -303,7 +303,7 @@ public class IRCAgent extends IRC {
                 "#nars"
         );
 
-        n.on("trace", (Command) (a, t, nn) -> {
+        n.on("trace", (a, t, nn) -> {
             if (t.length > 0) {
                 switch (t[0].toString()) {
                     case "on": bot.setTrace(true); break;

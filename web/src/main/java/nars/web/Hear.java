@@ -129,7 +129,7 @@ public class Hear extends Loop {
     }
 
     static public void wiki(NAR nar) {
-        nar.on("readWiki", (Command) (op, args, n) -> {
+        nar.on("readWiki",  (op, args, n) -> {
 
             try {
                 String base = "simple.wikipedia.org";

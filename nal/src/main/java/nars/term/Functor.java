@@ -1,4 +1,4 @@
-package nars.term.transform;
+package nars.term;
 
 import jcog.bag.Bag;
 import nars.$;
@@ -7,7 +7,6 @@ import nars.Op;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;

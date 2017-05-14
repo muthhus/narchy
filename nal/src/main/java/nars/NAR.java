@@ -11,21 +11,20 @@ import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
-import nars.concept.PermanentAtomConcept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
+import nars.op.Command;
 import nars.op.Operator;
 import nars.table.BeliefTable;
 import nars.task.ImmutableTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.transform.Functor;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -45,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -56,8 +54,8 @@ import java.util.stream.Stream;
 import static nars.$.$;
 import static nars.$.newArrayList;
 import static nars.Op.*;
+import static nars.term.Functor.f;
 import static nars.term.Terms.compoundOrNull;
-import static nars.term.transform.Functor.f;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -91,7 +89,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
-    final Map<PermanentAtomConcept, Operator> operators = new ConcurrentHashMap();
+
     @NotNull
     public final transient Emotion emotion;
     @NotNull
@@ -808,19 +806,42 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public final PermanentAtomConcept on(@NotNull String atom, @NotNull Operator o) {
-        return on((Atom) Atomic.the(atom), o);
+    @Deprecated
+    public final void on(@NotNull String atom, @NotNull Operator o) {
+        on((Atom) Atomic.the(atom), o);
     }
 
-    public final PermanentAtomConcept on(@NotNull Atom a, @NotNull Operator o) {
-        DefaultConceptBuilder builder = (DefaultConceptBuilder) terms.conceptBuilder();
-        PermanentAtomConcept c = builder.withBags(a,
-                (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
-        );
-        c.put(Operator.class, o);
+    @Deprecated
+    public final void on(@NotNull Atom a, @NotNull Operator o) {
+//        DefaultConceptBuilder builder = (DefaultConceptBuilder) terms.conceptBuilder();
+//        PermanentAtomConcept c = builder.withBags(a,
+//                (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
+//        );
+//        c.put(Operator.class, o);
+//        terms.set(c);
+        on(new Command(a) {
+
+            @Override
+            public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
+                Compound c = t.term();
+                //try {
+                    o.run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
+                    return t;
+//                } catch (Throwable error) {
+//                    if (Param.DEBUG)
+//                        throw error;
+//                    else
+//                        return error(error);
+//                }
+
+                //return o.run(t, nar);
+            }
+
+        });
+    }
+
+    public final void on(@NotNull Command c) {
         terms.set(c);
-        operators.put(c, o);
-        return c;
     }
 
     public void input(Function<NAR, Task>... tasks) {
@@ -845,7 +866,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * returns concept belief/goal truth evaluated at a given time
      */
-    @Nullable public Truth truth(@Nullable Termed concept, byte punc, long when) {
+    @Nullable
+    public Truth truth(@Nullable Termed concept, byte punc, long when) {
         if (concept != null) {
             @Nullable Concept c = concept(concept);
             if (c != null) {
@@ -1651,8 +1673,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public Focus focus() {
         return focus;
     }
-
-
 
 
 }

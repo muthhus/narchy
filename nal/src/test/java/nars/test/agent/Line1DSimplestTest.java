@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.Param;
 import nars.nar.Default;
 import nars.op.Command;
+import nars.op.Operator;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import org.junit.Ignore;
@@ -315,7 +316,7 @@ public class Line1DSimplestTest {
         Param.DEBUG = true;
 
         Default n = new Default(1024);
-        n.on("say", (Command) (op, args, nar) -> {
+        n.on("say", (Operator) (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
                 try {
                     n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");

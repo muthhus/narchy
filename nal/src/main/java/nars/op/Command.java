@@ -1,6 +1,10 @@
 package nars.op;
 
+import jcog.bag.Bag;
+import jcog.pri.PLink;
 import nars.*;
+import nars.concept.AtomConcept;
+import nars.concept.PermanentConcept;
 import nars.task.ImmutableTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -17,15 +21,20 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Operator interface specifically for Command ';' punctuation
  */
-@FunctionalInterface
-public interface Command extends Operator {
 
-    String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
+abstract public class Command extends AtomConcept implements PermanentConcept {
 
-    void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar);
+    public static String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
-    @Override
-    default @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
+    public Command(@NotNull Atomic atom) {
+        super(atom, Bag.EMPTY, Bag.EMPTY);
+    }
+
+    @Deprecated protected void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar) {
+
+    }
+
+    public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
         Compound c = t.term();
         try {
             run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
@@ -49,7 +58,7 @@ public interface Command extends Operator {
         return new ImmutableTask(content, Op.COMMAND, null, ETERNAL, ETERNAL, ETERNAL, new long[] { });
     }
 
-    static Task logTask(@NotNull Term content) {
+    public static Task logTask(@NotNull Term content) {
         return Command.task(LOG_FUNCTOR, content);
     }
 
@@ -57,7 +66,7 @@ public interface Command extends Operator {
         return Command.task($.func(func, args));
     }
 
-    static Task logTask(@NotNull String msg) {
+    public static Task logTask(@NotNull String msg) {
         return Command.logTask($.quote(msg));
     }
 
@@ -65,7 +74,7 @@ public interface Command extends Operator {
         nar.input( Command.logTask(content) );
     }
 
-    static void log(NAR nar, @NotNull String msg) {
+    public static void log(NAR nar, @NotNull String msg) {
         nar.input( Command.logTask(msg) );
     }
 

@@ -387,7 +387,7 @@ function taskFeed(socket) {
         const label = x.term + x.punc + truthString(x.freq, x.conf);
 
         //const fontSize = 2 * (1 + parseInt(x.pri * 99.0)) + '%';
-        const fontSize = parseInt(75.0 + 100.0 * Math.sqrt( x.pri )) + '%';
+        //const fontSize = parseInt(75.0 + 100.0 * Math.sqrt( x.pri )) + '%';
 
 
         const d = document.createElement('div');
@@ -405,8 +405,8 @@ function taskFeed(socket) {
                 d.className = 'command';
                 break;
         }
-        d.style.opacity = 1;
-        d.style.fontSize = fontSize;
+        //d.style.opacity = 1;
+        //d.style.fontSize = fontSize;
         d.innerText = label;
         return d;
 

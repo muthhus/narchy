@@ -1,6 +1,6 @@
 package jcog.meter;
 
-import jcog.meter.resource.MemoryUseTracker;
+import jcog.meter.resource.MemoryUsageMeter;
 import jcog.meter.resource.ThreadCPUTimeTracker;
 
 /**
@@ -9,7 +9,7 @@ import jcog.meter.resource.ThreadCPUTimeTracker;
  */
 public class ResourceMeter {
 
-	public final MemoryUseTracker CYCLE_RAM_USED = new MemoryUseTracker(
+	public final MemoryUsageMeter CYCLE_RAM_USED = new MemoryUsageMeter(
 			"ram.used");
 
 	/** the cpu time of each cycle */

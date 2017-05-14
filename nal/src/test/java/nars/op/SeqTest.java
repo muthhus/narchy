@@ -2,13 +2,16 @@ package nars.op;
 
 import com.google.common.base.Joiner;
 import jcog.list.CircularArrayList;
+import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.Functor;
+import nars.term.Functor;
+import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -44,7 +47,7 @@ public class SeqTest {
         float expThresh = 0.66f;
 
         public Seq on(NAR n) {
-            n.on("seqAdd", new seqAdd());
+            n.on( new seqAdd());
             n.on(Functor.f2("seq", (key, index) -> {
                 if (key.vars()==0 && index.vars()==0) {
                     int i = Term.intValue(index, Integer.MIN_VALUE);
@@ -67,8 +70,12 @@ public class SeqTest {
             return Joiner.on('\n').join(seqs.entrySet());
         }
 
-        private class seqAdd implements Operator {
+        private class seqAdd extends Command {
 
+
+            public seqAdd() {
+                super((Atom)$.the("seqAdd"));
+            }
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {

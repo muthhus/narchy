@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.transform.Functor;
+import nars.term.Functor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -5,6 +5,7 @@ import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
+import nars.op.Operator;
 import nars.op.data.*;
 import nars.term.Compound;
 import nars.term.Term;
@@ -12,7 +13,7 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
-import nars.term.transform.Functor;
+import nars.term.Functor;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
@@ -179,7 +180,7 @@ public class Builtin {
             }
         }));
 
-        nar.on("assertEquals", (Command) (op, args, nn) -> {
+        nar.on("assertEquals", (Operator) (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             Assert.assertEquals(/*msg,*/ 2, args.length);
             Assert.assertEquals(/*msg,*/ args[0], args[1]);
@@ -190,34 +191,25 @@ public class Builtin {
         nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(c.belief(n.time.time(), n.dur()))));
         nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(c.goal(n.time.time(), n.dur()))));
 
-        nar.on("concept", (Command) (op, a, nn) -> {
-            Concept c = nn.concept(a[0]);
-            Command.log(nn,
-                    (c != null) ?
-                            quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
-            );
-        });
+//        nar.on("concept", (Operator) (op, a, nn) -> {
+//            Concept c = nn.concept(a[0]);
+//            Command.log(nn,
+//                (c != null) ?
+//                    quote(c.print(new StringBuilder(1024))) : $.func("unknown", a[0])
+//            );
+//        });
 
-        Command log = (a, t, n) -> NAR.logger.info("{}", t);
+        Operator log = (a, t, n) -> NAR.logger.info("{}", t);
         nar.on("log", log);
         nar.on(Command.LOG_FUNCTOR, log);
 
-        nar.on("error", (Command) (a, t, n) -> NAR.logger.error("{}", t));
+        nar.on("error", (Operator) (a, t, n) -> NAR.logger.error("{}", t));
 
-
-        nar.on("memstat", (Command) (op, a, nn) ->
-                Command.log(nn, quote(nn.terms.summary()))
-        );
-
-        nar.on("emotion", (Command) (op, a, nn) ->
-                Command.log(nn, quote(nn.emotion.summary()))
-        );
-
-        nar.on("reset", (Command) (op, args1, nn) ->
+        nar.on("reset", (Operator) (op, args1, nn) ->
                 nn.runLater(NAR::reset)
         );
 
-        nar.on("clear", (Command) (op, args, n) -> {
+        nar.on("clear", (Operator) (op, args, n) -> {
             n.clear();
             n.runLater(() -> {
                 Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)");
@@ -225,7 +217,7 @@ public class Builtin {
         });
 
 
-        nar.on("top", (Command) (op, args, n) -> {
+        nar.on("top", (Operator) (op, args, n) -> {
             Iterable<PLink<Concept>> ii = n.focus().concepts();
 
             int MAX_RESULT_LENGTH = 250;

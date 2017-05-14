@@ -26,7 +26,7 @@ public class NLPOperatorTest {
         //n.quaMin.setValue(0.1f);
         n.truthResolution.setValue(0.1f);
 
-        n.on("say", (Command)(x, args, nn) -> {
+        n.on("say", (x, args, nn) -> {
             System.err.println(Arrays.toString(args));
         });
 
