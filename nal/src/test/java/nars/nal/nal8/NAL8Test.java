@@ -1136,15 +1136,17 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testGoalEquivComponent() {
         test()
                 .input("(happy)!")
-                .input("((happy) <=>+0 ((--,(happy))&&(--,(out)))).")
-                .mustDesire(cycles, "((--,(happy))&&(--,(out)))", 1f, 0.81f);
+                .input("((happy) <=>+0 ((--,(x))&&(--,(out)))).")
+                .mustDesire(cycles, "((--,(x))&&(--,(out)))", 1f, 0.81f);
     }
     @Test public void testGoalEquivComponentNeg() {
         test()
+                .log()
                 .input("(happy)!")
-                .input("(--(happy) <=>+0 ((--,(happy))&&(--,(out)))).")
-                .mustDesire(cycles, "((--,(happy))&&(--,(out)))", 0f, 0.81f);
+                .input("(--(happy) <=>+0 ((--,(x))&&(--,(out)))).")
+                .mustDesire(cycles, "((--,(x))&&(--,(out)))", 0f, 0.81f);
     }
+
     @Test public void testGoalImplComponentEternal() {
         test()
                 .input("(happy)!")

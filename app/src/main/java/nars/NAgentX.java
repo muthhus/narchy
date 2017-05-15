@@ -254,42 +254,42 @@ abstract public class NAgentX extends NAgent {
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
     protected CameraSensor senseCamera(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
-        return senseCamera(id, w, pw, ph, (v) -> t(v, alpha()));
+        return senseCamera(id, w, pw, ph);
     }
 
-    protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCamera(id, new Scale(w, pw, ph), pixelTruth);
+    protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph) throws Narsese.NarseseException {
+        return senseCamera(id, new Scale(w, pw, ph));
     }
 
-    protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCamera(id, new Scale(new SwingBitmap2D(w), pw, ph), pixelTruth);
-    }
+//    protected CameraSensor<Scale> senseCamera(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
+//        return senseCamera(id, new Scale(new SwingBitmap2D(w), pw, ph));
+//    }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
-        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph, (v) -> t(v, alpha()));
+        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph);
     }
 
     protected Sensor2D<PixelBag> senseCameraRetina(String id, Container w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph, pixelTruth);
+        return senseCameraRetina(id, new SwingBitmap2D(w), pw, ph);
     }
 
-    protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
+    protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph) throws Narsese.NarseseException {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
-        return senseCamera(id, pb, pixelTruth);
+        return senseCamera(id, pb);
     }
 
-    protected Sensor2D<WaveletBag> senseCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
+    protected Sensor2D<WaveletBag> senseCameraFreq(String id, Supplier<BufferedImage> w, int pw, int ph) throws Narsese.NarseseException {
         WaveletBag pb = new WaveletBag(w, pw, ph);
-        return senseCamera(id, pb, pixelTruth);
+        return senseCamera(id, pb);
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc, FloatToObjectFunction<Truth> pixelTruth) throws Narsese.NarseseException {
-        return senseCamera($.$(id), bc, pixelTruth);
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc) throws Narsese.NarseseException {
+        return senseCamera($.$(id), bc);
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
-        return senseCamera(id.toString(), new CameraSensor( bc, this, CameraSensor.XY(id, bc.width(), bc.height())));
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {
+        return senseCamera(id.toString(), new CameraSensor( id, bc, this ));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {

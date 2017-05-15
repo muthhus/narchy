@@ -113,7 +113,7 @@ public class Recog2D extends NAgentX {
                 //$.the("zoom")
                 //)
                 ,
-                new Blink(new Scale(() -> canvas, w, h), 0.8f), v -> $.t(v, alpha()));
+                new Blink(new Scale(() -> canvas, w, h), 0.8f));
 
         //nar.log();
 

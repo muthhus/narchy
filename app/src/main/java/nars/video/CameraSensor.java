@@ -44,8 +44,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor(Term root, P src, NAgent agent) {
         this(src, agent,
-                XY(root, src.width(), src.height())
-                //RadixProduct(root, src.width(), src.height(), radix)
+                //XY(root, 2,  src.width(), src.height())
+                RadixProduct(root, src.width(), src.height(), 2)
         );
     }
 
@@ -77,6 +77,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public static Int2Function<Compound> XY(Term root, int width, int height) {
         return (x, y) -> {
             return $.inh($.p(x, y), root);
+        };
+    }
+    public static Int2Function<Compound> XY(Term root, int radix, int width, int height) {
+        return (x, y) -> {
+            return $.inh($.p($.pRadix(x, radix, width), $.pRadix(y, radix, height)), root);
         };
     }
 
@@ -218,7 +223,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public class PixelConcept extends SensorConcept {
 
 //        //private final int x, y;
-//        private final TermContainer templates;
+        private final TermContainer templates;
 
         public PixelConcept(Compound cell, int x, int y) {
             super(cell, nar, null, brightnessTruth);
@@ -236,13 +241,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                if (y < h-1) s.add( concept(x, y+1) );
 //
 //                return TermVector.the(s);
-            //this.templates = new PixelNeighborsManhattanRandom(subterms(),2,  x, y, w, h);
+            this.templates = new PixelNeighborsManhattanRandom(subterms(),2,  x, y, w, h);
         }
 
-//        @Override
-//        public TermContainer templates() {
-//            return templates;
-//        }
+        @Override
+        public TermContainer templates() {
+            return templates;
+        }
 
 
         //        @Override
@@ -280,13 +285,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
             switch (i) {
                 case 0:
-                    return (x == 0) ? sub(1) : concept(x - 1, y);
+                    return (x == 0) ? sub(1) : concept(x - 1, y).sub(0);
                 case 1:
-                    return (x == w - 1) ? sub(0) : concept(x + 1, y);
+                    return (x == w - 1) ? sub(0) : concept(x + 1, y).sub(0);
                 case 2:
-                    return (y == 0) ? sub(3) : concept(x, y - 1);
+                    return (y == 0) ? sub(3) : concept(x, y - 1).sub(0);
                 case 3:
-                    return (y == h - 1) ? sub(2) : concept(x, y + 1);
+                    return (y == h - 1) ? sub(2) : concept(x, y + 1).sub(0);
                 default:
                     return subs.sub(i - 4);
             }
@@ -325,7 +330,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 return concept(
                         x + (nar.random().nextBoolean() ? -1 : +1),
                         y + (nar.random().nextBoolean() ? -1 : +1)
-                );
+                ).sub(0);
             } else
                 return subs.sub(i);
 

@@ -132,6 +132,8 @@ public class Builtin {
 
                     /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {
+
+
                 Term x = c.sub(0, null);
                 if (x==null)
                     return null;

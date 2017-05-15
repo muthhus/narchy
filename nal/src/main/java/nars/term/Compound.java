@@ -835,7 +835,10 @@ public interface Compound extends Term, IPair, TermContainer {
                 evalSubs[i] = y;
             }
             if (modified) {
-                return index.the(op(), dt(), evalSubs).eval(index);
+                return
+                    //index.the(op(), dt(), evalSubs)
+                    $.terms.the(op(), dt(), evalSubs)
+                            .eval(index);
             }
         }
 

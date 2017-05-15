@@ -5,7 +5,6 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.Param;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
@@ -74,7 +73,7 @@ public class NARio extends NAgentX {
             //cc.setXRelative( mario.)
         });
 
-        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc, (v) -> t(v, alpha()));
+        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
         sc.setResolution(0.01f);
         sc.pri(0.2f);
 

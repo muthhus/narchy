@@ -33,8 +33,8 @@ public class Gradius extends NAgentX {
                 BufferedImageBitmap2D.ColorMode.G
         }) {
             senseCamera("(G,c" + cm.name() + ")",
-                    camScale.filter(cm),
-                    (v) -> t(v, alpha()))
+                    camScale.filter(cm)
+            )
                     .setResolution(0.2f);
         }
 

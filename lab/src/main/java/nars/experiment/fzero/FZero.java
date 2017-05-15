@@ -40,7 +40,7 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", () -> fz.image, 32, 24, (v) -> t(v, alpha()))
+        senseCamera("fz", () -> fz.image, 32, 24)
                 .setResolution(0.01f);
 
 

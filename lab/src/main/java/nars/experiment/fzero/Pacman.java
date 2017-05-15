@@ -37,8 +37,8 @@ public class Pacman extends NAgentX {
                     BufferedImageBitmap2D.ColorMode.B
             }) {
                 senseCamera("(G,c" + cm.name() + ")",
-                        camScale.filter(cm),
-                        (v) -> t(v, alpha()))
+                        camScale.filter(cm)
+                )
                         .setResolution(0.5f);
             }
 

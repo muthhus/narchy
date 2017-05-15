@@ -13,8 +13,8 @@
         ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         ((--,%Z) &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-     (&&,X,A..+), B, task("!"), time(task, esubterm(A..+, 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:Strong)
-        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm(A..+, 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:StrongPN)
+     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:Strong)
+        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:StrongPN)
 
      //X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
      //   X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()

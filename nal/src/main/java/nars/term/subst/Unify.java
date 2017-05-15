@@ -50,7 +50,7 @@ public abstract class Unify implements Termutator, Subst {
     @NotNull
     public final Op type;
 
-    @Nullable
+    @NotNull
     protected final List<Termutator> termutes = $.newArrayList();
 
     @NotNull
@@ -135,8 +135,8 @@ public abstract class Unify implements Termutator, Subst {
                 if (!finish) {
                     result = true; //return to callee to continue in subsequent operation
                 } else {
-                    @Nullable List<Termutator> t = termutes;
-                    if (t == null) {
+                    List<Termutator> t = termutes;
+                    if (t.isEmpty()) {
                         result = onMatch();
                     } else {
 

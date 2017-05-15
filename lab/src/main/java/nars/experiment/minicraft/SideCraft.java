@@ -1,7 +1,6 @@
 package nars.experiment.minicraft;
 
 import jcog.Util;
-import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
@@ -58,7 +57,7 @@ public class SideCraft extends NAgentX {
         //window(camAE.newChart(), 500, 500);
 
 
-        pixels = senseCamera("cra", cam, (v) -> $.t(v, alpha()));
+        pixels = senseCamera("cra", cam);
 
 
 //        new NObj("cra", craft, nar)

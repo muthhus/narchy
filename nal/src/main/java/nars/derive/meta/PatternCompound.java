@@ -310,8 +310,13 @@ abstract public class PatternCompound extends GenericCompound {
             boolean ellipsisMatched = false;
 
             int s = size();
-            for (int i = 0; i < s; i++) {
-                Term x = sub(i);
+            int dir = subst.random.nextBoolean() ? +1 : -1;
+            int i = subst.random.nextInt(s);
+            int ik = i;
+            for (int k = 0; k < s; k++, ik+=dir) {
+                if (ik < 0) ik += s;
+                else ik = ik % s;
+                Term x = sub(ik);
 
                 //boolean xVar = x.op() == type;
                 //ellipsis to be matched in stage 2
