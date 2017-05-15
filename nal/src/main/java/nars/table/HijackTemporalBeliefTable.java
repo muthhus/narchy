@@ -21,6 +21,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
 
@@ -61,7 +63,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(c);
     }
 
-      @Override
+//    @Override
+//    protected Consumer<Task> forget(float avgToBeRemoved) {
+//        return null; //handled below on replace
+//    }
+
+    @Override
     protected boolean replace(Task incoming, Task existing, float scaleIgnored) {
         assert(scaleIgnored==1f);
 
@@ -70,7 +77,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         if (existing instanceof ActionConcept.CuriosityTask)
             return true;
 
-        return replace(priConf(incoming) , priConf(existing));
+        if (!replace(priConf(incoming) , priConf(existing))) {
+            //existing.priMult((1f - incoming.conf()/reprobes));
+            return false;
+        }
+        return true;
         //return super.replace(incoming, existing, scale);
     }
 
@@ -100,7 +111,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
     public float priConf(@NotNull Task key) {
-        return (/*1f +*/ key.pri()) * (1f + key.conf());
+        return ( key.priSafe(0)) * (1f + key.conf());
         //float p = Util.or(/*1f +*/ key.pri(), key.conf());
 //        long range = key.end() - key.start();
 //        p *= (range > 0) ?
@@ -519,9 +530,15 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Override
     public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
 
-        return TruthPolation.truth(
+        Truth x = TruthPolation.truth(
                 eternal != null ? eternal.strongest() : null,
                 when, dur, this);
+
+        if (x==null || x.conf() < Param.TRUTH_EPSILON)
+            return null; //cut-off
+        else
+            return x;
+
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;
     }

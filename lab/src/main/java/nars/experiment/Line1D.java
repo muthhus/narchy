@@ -124,8 +124,8 @@ public class Line1D {
 
 
         NAR n = new Default();
-        n.time.dur(16);
-        n.termVolumeMax.setValue(24);
+        n.time.dur(32);
+        n.termVolumeMax.setValue(16);
 
 
         Line1DSimplest a = new Line1DSimplest(n);
@@ -146,7 +146,7 @@ public class Line1D {
 
         NAgentX.chart(a);
 
-        a.runCycles(50000);
+        a.runCycles(5000000);
 
 
     }

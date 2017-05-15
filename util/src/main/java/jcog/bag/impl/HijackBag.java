@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static jcog.pri.Priority.EPSILON;
+
 /**
  * the superclass's treadmill's extra data slots are used for storing:
  * 0=size
@@ -182,14 +184,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
             //for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/)
 
-            int iStart = Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
-            int iEnd = (iStart + reprobes);
-            int i = iStart;// + shuff;
+            int i = Math.abs(hash) % c; //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
+            //int iEnd = (iStart + reprobes);
+            //int i = iStart;// + shuff;
             for (int probe = 0; probe < reprobes; probe++) {
 
-                int ic = i % c;
 
-                V current = map.get(ic);
+
+                V current = map.get(i);
                 if (current != null) {
                     K y = key(current);
                     if (equals(y, x)) { //existing
@@ -202,7 +204,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                                     //merge failed, continue
                                 } else if (next != current) {
                                     //replace
-                                    if (!map.compareAndSet(ic, current, next)) {
+                                    if (!map.compareAndSet(i, current, next)) {
                                         //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
                                     } else {
                                         //replaced
@@ -222,7 +224,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                         } else {
 
                             if (remove) { //remove
-                                if (map.compareAndSet(ic, current, null)) {
+                                if (map.compareAndSet(i, current, null)) {
                                     found = current;
                                 }
                             } else {
@@ -240,7 +242,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                     if (current == null || replace(adding, current, scale)) {
                         V toAdd = merge(current, adding, scale);
-                        if (toAdd!=null && map.compareAndSet(ic, current, toAdd)) { //inserted
+                        if (toAdd!=null && map.compareAndSet(i, current, toAdd)) { //inserted
                             found = current;
                             added = toAdd;
                             break; //done
@@ -250,7 +252,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                 //i = dir ? (i + 1) : (i - 1);
                 i++;
-                if (i == iEnd) i = iStart;
+                if (i == c) i = 0;
 
             }
 
@@ -364,9 +366,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         float priEpsilon = priEpsilon();
 
         if (oldPri > priEpsilon) {
-            return random.nextFloat() > (oldPri / ((newPri / reprobes) + oldPri));
+            float thresh = 1f - (1f - (oldPri / (newPri + oldPri))) / reprobes;
+            return random.nextFloat() > thresh;
         } else {
-            return (newPri > priEpsilon) || random.nextFloat() > 0.5f / reprobes;
+            return (newPri >= priEpsilon) || random.nextBoolean();// / reprobes;
             // random.nextBoolean(); //50/50 chance
         }
     }
@@ -621,7 +624,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     protected float priEpsilon() {
-        return Float.MIN_VALUE;
+        return EPSILON;
     }
 
     //final AtomicBoolean busy = new AtomicBoolean(false);

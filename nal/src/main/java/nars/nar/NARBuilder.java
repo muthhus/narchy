@@ -210,8 +210,8 @@ public interface NARBuilder {
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.75f);
-        nar.goalConfidence(0.5f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.75f);
 
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
@@ -219,7 +219,7 @@ public interface NARBuilder {
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
-        nar.focus.activationRate.setValue(1f/Math.sqrt(activeConcepts));
+        nar.focus.activationRate.setValue(2f/Math.sqrt(activeConcepts));
 
         //nar.stmLinkage.capacity.set(0);
 

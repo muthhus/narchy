@@ -1,9 +1,11 @@
 package nars.test.agent;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
@@ -51,19 +53,28 @@ public class Line1DSimplest extends NAgent {
 
         //out = null;
         Compound O = $.inh(Atomic.the("o"), id);
-//        out = actionTriState(O, (d) -> {
-//            switch (d) {
-//                case -1:
-//                case +1:
-//                    this.o.setValue(Math.max(0f, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
-//                    return true;
-//
-//            }
-//            return false;
-//        });
-        out = actionBipolar(O, v -> { o.setValue(
-                Math.max(0f, Math.min(1f, this.o.floatValue() + v * speed.floatValue()))); return true; }
-        );
+        out = actionTriState(O, (d) -> {
+            switch (d) {
+                case -1:
+                case +1:
+                    this.o.setValue(Math.max(0f, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
+                    return true;
+
+            }
+            return false;
+        });
+//        out = actionBipolar(O, v -> {
+//            float current = this.o.floatValue();
+//            float nv = Util.unitize( current + v * speed.floatValue());
+//                    //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
+//                        o.setValue(
+//                                nv
+//                        );
+//                        return true;
+//                    //}
+//                    //return false;
+//                }
+//        );
 
 //        out = action(
 //                //$.inh($.the("o"), id),
@@ -102,7 +113,7 @@ public class Line1DSimplest extends NAgent {
         float dist = Math.abs(i.floatValue() - o.floatValue());
 
         //return (1f - dist); //unipolar, 0..1.0
-        return (((1f - dist)-0.5f) * 2f); //bipolar, normalized to -1..+1
+        return (((1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
         //return ((Util.sqr(1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
     }
 
@@ -110,7 +121,8 @@ public class Line1DSimplest extends NAgent {
     public float target() {
         return i.asFloat();
     }
+
     public void target(float v) {
-        i.setValue(v);
+        i.setValue(Util.unitize(v));
     }
 }

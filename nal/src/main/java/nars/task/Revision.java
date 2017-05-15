@@ -274,8 +274,8 @@ public class Revision {
             return t;
 
         //int dur = p.nar.dur();
-        float tw = t.evi();
-        float bw = b.evi();
+        float tw = t.conf();
+        float bw = b.conf();
 
         //randomize choice by confidence
         return p.random.nextFloat() < tw / (tw + bw) ? t : b;

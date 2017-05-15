@@ -231,7 +231,7 @@ abstract public class NAgent implements NSense, NAct {
             //        if (load < 1) {
 
 
-            long next = now + nar.dur()
+            long next = now + nar.dur()/2
                     //+(dur * 3 / 2);
                     ;
 
@@ -288,7 +288,7 @@ abstract public class NAgent implements NSense, NAct {
         //sendInfluxDB("localhost", 8089);
 
         return id + " rwrd=" + n2(reward) +
-                " dex=" + n4(dexterity()) +
+                " dex=" + /*n4*/(dexterity()) +
                 " var=" + n4(varPct(nar)) + "\t" + nar.terms.summary() + " " +
                 nar.emotion.summary();
     }
@@ -376,8 +376,9 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
+                    //question(seq(action, dur, happiness), now),
+                    //question(seq(neg(action), dur, happiness), now),
+
                     question(impl(action, dur, happiness), now),
                     question(impl(neg(action), dur, happiness), now)
 //                    question(impl(conj(varQuery(0),action), dur, happiness), now),

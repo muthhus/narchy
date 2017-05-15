@@ -879,8 +879,8 @@ public abstract class TermBuilder {
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((!(pu instanceof Variable) && subject.containsRecursively(predicate)) ||
-                (!(su instanceof Variable) && predicate.containsRecursively(subject)) )
+            if ((!(pu instanceof Variable) && (subject.equals(pu) || subject.containsRecursively(pu))) ||
+                (!(su instanceof Variable) && (predicate.equals(su) || predicate.containsRecursively(su))) )
                     //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 

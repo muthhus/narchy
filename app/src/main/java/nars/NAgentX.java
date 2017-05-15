@@ -254,7 +254,7 @@ abstract public class NAgentX extends NAgent {
      * pixelTruth defaults to linear monochrome brightness -> frequency
      */
     protected CameraSensor senseCamera(String id, Container w, int pw, int ph) throws Narsese.NarseseException {
-        return senseCamera(id, w, pw, ph);
+        return senseCamera(id, new SwingBitmap2D(w), pw, ph);
     }
 
     protected CameraSensor<Scale> senseCamera(String id, Supplier<BufferedImage> w, int pw, int ph) throws Narsese.NarseseException {
