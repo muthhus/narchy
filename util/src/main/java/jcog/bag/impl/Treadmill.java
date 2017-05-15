@@ -75,6 +75,8 @@ public class Treadmill extends AtomicIntegerArray {
     }
 
     public void end(int hash) {
+        if (hash == 0) hash = 1; //reserve 0
+
         for (int i = 0; i < slots; i++) {
             if (compareAndSet(i, hash, 0))
                 return; //done

@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
@@ -11,10 +12,13 @@ import nars.gui.Vis;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
+import spacegraph.render.Draw;
+import spacegraph.widget.meter.MatrixView;
 import spacegraph.widget.slider.FloatSlider;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
@@ -45,7 +49,7 @@ public class BagLab  {
         int inputs = 10;
         inputSliders = $.newArrayList(inputs);
         for (int i = 0; i < inputs; i++)
-            inputSliders.add(new FloatSlider(0.1f, 0, 1));
+            inputSliders.add(new FloatSlider(0.5f, 0, 1));
 
 
     }
@@ -59,44 +63,71 @@ public class BagLab  {
                             ()->selectionHistogram, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))),
                     Vis.pane("Bag Content Distribution (0..1)", new HistogramChart(
                             ()->bag.priHistogram(new double[10]), new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
-                )
+                ),
+                hijackVis((HijackBag)bag)
         );
+    }
+
+    private Surface hijackVis(HijackBag bag) {
+        int c = bag.capacity();
+        int w = (int) Math.ceil(Math.sqrt(1 + c));
+        int h = c / w;
+        return new MatrixView(w, h, (x,y, gl) -> {
+            try {
+                Object m = bag.map.get();
+                float p = -1;
+                if (m != null) {
+                    int i = y * w + x;
+                    if (i < c) {
+
+                        Object val = ((AtomicReferenceArray) m).get(i);
+                        if (val != null)
+                            p = bag.priSafe(val, 0);
+                    }
+                }
+                Draw.colorPolarized(gl, p);
+            } catch (Exception e) {
+
+            }
+            return 0;
+        } );
+
     }
 
 
     public static void main(String[] arg) {
+        DefaultHijackBag<Integer> h = new DefaultHijackBag<>(PriMerge.plus, 1024, 3);
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
-                new DefaultHijackBag<Integer>(PriMerge.plus, 1024, 4
-                ) {
-                        //BudgetMerge.maxBlend) {
-
-                }
+                h
         );
 
         SpaceGraph.window(
-            bagLab.surface(), 800, 800);
+            bagLab.surface(), 1200, 800);
 
         long delayMS = 30;
-        new Thread(()->{
+        //new Thread(()->{
             while (true) {
                 bagLab.update();
                 Util.sleep(delayMS);
             }
-        }).start();
+        //}).start();
     }
 
 
-    private void update() {
+    private synchronized void update() {
 
 
 
-        int n = inputSliders.size();
-        for (int i = 0; i < n; i++) {
-            if (Math.random() < inputSliders.get(i).value()) {
-                float p = (i + (float)Math.random()) / (n - 1);
-                float q = (float)Math.random(); //random quality
-                bag.put(new RawPLink<>((int) Math.floor(Math.random() * uniques), p));
+        int inputRate = 20;
+        for (int j = 0; j < inputRate; j++) {
+            int n = inputSliders.size();
+            for (int i = 0; i < n; i++) {
+                if (Math.random() < inputSliders.get(i).value()) {
+                    float p = (i + (float) Math.random()) / (n - 1);
+                    //float q = (float)Math.random(); //random quality
+                    bag.put(new RawPLink<>((int) Math.floor(Math.random() * uniques), p));
+                }
             }
         }
 
@@ -105,7 +136,7 @@ public class BagLab  {
 
         int bins = selectionHistogram.length;
         float sampleBatches = 1;
-        int batchSize = 512;
+        int batchSize = 32;
 
         if (iteration++ % clearInterval == 0)
             Arrays.fill(selectionHistogram, 0);

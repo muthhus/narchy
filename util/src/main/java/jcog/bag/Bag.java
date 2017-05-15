@@ -17,6 +17,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static jcog.Util.sqr;
+
 
 /**
  * K=key, V = item/value of type Item
@@ -56,14 +58,14 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     @Nullable
     public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
-        float estimatedExcess = (m + p) - (c * (1f - temperature));
-        if (estimatedExcess > 0) {
-            float presentAndFutureExcess = estimatedExcess;
+//        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
+//        if (estimatedExcess > 0) {
+//            float presentAndFutureExcess = estimatedExcess;
                     //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-            float perMember = Util.unitize(presentAndFutureExcess / s);
+            float perMember = (float) Util.unitize(sqr(temperature * ((p)/(m+p))) );
             if (perMember >= priEpsilon)
-                return f.valueOf(presentAndFutureExcess);
-        }
+                return f.valueOf(perMember);
+//        }
         return null;
     }
 

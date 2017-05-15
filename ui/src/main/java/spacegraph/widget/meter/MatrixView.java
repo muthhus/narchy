@@ -34,7 +34,7 @@ public class MatrixView extends Widget {
         float update(float x, GL2 gl);
     }
 
-    public interface ViewFunction2D {
+    @FunctionalInterface public interface ViewFunction2D {
         /**
          * updates the GL state for each visited matrix cell (ex: gl.glColor...)
          * before a rectangle is drawn at the returned z-offset
