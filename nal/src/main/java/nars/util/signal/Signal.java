@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.LongSupplier;
 
+import static nars.time.Tense.ETERNAL;
+
 /**
  * Manages the creation of a stream of tasks for a changing Truth value
  * input signal
@@ -20,13 +22,11 @@ public class Signal {
 
     public FloatSupplier pri;
 
-    /** budget boost factor applied when the signal value has not changed since
-     * last cycle */
-    final static float residualBudgetFactor = 0.5f;
 
-    /** quantizes the output truth, ie. truth epsilon,
-     *  (does not process the value of the input signal)
-     * */
+    /**
+     * quantizes the output truth, ie. truth epsilon,
+     * (does not process the value of the input signal)
+     */
     public final FloatSupplier resolution;
 
 //    boolean inputIfSame;
@@ -35,7 +35,8 @@ public class Signal {
 
     final byte punc;
 
-    public long lastInputTime;
+    public long lastInputTime = ETERNAL;
+
     @Nullable
     public SignalTask current;
 
@@ -49,44 +50,59 @@ public class Signal {
     public Task set(Compound term, Truth nextTruth, LongSupplier stamper, NAR nar) {
 
 
+        long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
+
+
         int halfDur = Math.max(1, nar.dur() / 2);
+        long next = now + halfDur;
 
-        long now = nar.time() + halfDur; //allow the current percept to extend 1/2 duration into the future
-
-        if (current != null) {
-            current.setEnd(now);
-        }
-
+        long last = this.lastInputTime;
+        if (last == ETERNAL)
+            last = now;
         this.lastInputTime = now;
 
+        if (this.current != null)
+            this.current.setEnd(now);
+
+        Task previous = current;
+
+
+        //no signal
         if (nextTruth == null) {
             this.current = null;
             return null;
-        }
-
-
-        if (current!=null) {
-            if (current.truth.equals(nextTruth, resolution.asFloat())) {
-                if (residualBudgetFactor > 0) {
-                    current.budget(residualBudgetFactor, nar); //rebudget
-                    return current;
-                }
-                return null;
-            }
-        }
-
-
-        long last = nar.time() - halfDur;
-        SignalTask t = task(term, nextTruth,
-                last, now,
-                this.current, stamper.getAsLong(), nar);
-        if (t == null) {
-            this.current = null; //signal dropped
-            return null;
         } else {
-            t.budget(nar);
+
+
+            SignalTask t;
+            //merge existing signal
+            if (current != null && current.truth.equals(nextTruth, resolution.asFloat())) {
+//                if (residualBudgetFactor > 0) {
+//                    current.budget(residualBudgetFactor, nar); //rebudget
+//                    current.setEnd(next);
+//                    return current;
+//                }
+//                return null;
+                //nothing, keep as-is
+                t = current;
+            } else {
+
+
+                t = task(term, nextTruth,
+                        now, now,
+                        previous, stamper.getAsLong(), nar);
+
+                if (t != null)
+                    t.budget(nar);
+
+            }
+
+
+
             return (this.current = t);
         }
+
+
     }
 
     @Nullable

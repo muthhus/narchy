@@ -127,7 +127,7 @@ public interface TimeFunctions {
      */
     @Nullable TimeFunctions dternal = (derived, p, d, occReturn, confScale) -> dt(derived, DTERNAL, occReturn, p);
 
-    @NotNull
+    @Nullable
     static Compound dtDiff(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
 
         Compound taskTerm = (Compound) p.taskTerm.unneg();

@@ -74,8 +74,8 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.setResolution(0.01f);
-        sc.pri(0.2f);
+        sc.setResolution(0.05f);
+        sc.pri(0.3f);
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);
 //        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);
@@ -107,7 +107,7 @@ public class NARio extends NAgentX {
             }
             mario.scene.toggleKey(Mario.KEY_LEFT, n);
             mario.scene.toggleKey(Mario.KEY_RIGHT, p);
-            return i!=0;
+            return true;
         });
         actionTriState($("nario:y"), i -> {
             boolean n, p;
@@ -130,7 +130,7 @@ public class NARio extends NAgentX {
             mario.scene.toggleKey(Mario.KEY_DOWN, n);
             mario.scene.toggleKey(Mario.KEY_UP, p);
             mario.scene.toggleKey(Mario.KEY_JUMP, p);
-            return i!=0;
+            return true;
         });
 
 
@@ -208,7 +208,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 20);
+        }, 10);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

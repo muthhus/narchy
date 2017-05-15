@@ -358,16 +358,16 @@ abstract public class NAgent implements NSense, NAct {
 
 //                    question(impl($.varQuery(1), happiness), ETERNAL)
 
-        //predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
-        //predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
+//        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
+//        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
 
         for (Concept a : actions) {
             Term action = a.term();
 
             ((FasterList) predictors).addAll(
 
-                    quest((Compound) (action.term()),
-                            now),
+//                    quest((Compound) (action.term()),
+//                            now),
 //                            //ETERNAL)
 
                     //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
@@ -376,8 +376,12 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
+                    question(seq(action, dur, happiness), now),
+                    question(seq(neg(action), dur, happiness), now),
                     question(impl(action, dur, happiness), now),
                     question(impl(neg(action), dur, happiness), now)
+//                    question(impl(conj(varQuery(0),action), dur, happiness), now),
+//                    question(impl(conj(varQuery(0),neg(action)), dur, happiness), now)
 
 //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
 //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),

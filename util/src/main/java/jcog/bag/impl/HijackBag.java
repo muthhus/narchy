@@ -56,11 +56,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return ThreadLocalRandom.current();
     }
 
-    @Contract(pure = true)
-    private static int i(int c, int hash) {
-        //return (int) (Integer.toUnsignedLong(hash) % c);
-        return Math.abs(hash) % c;
-    }
+
 
     public static boolean hijackGreedy(float newPri, float weakestPri) {
         return weakestPri <= newPri;
@@ -174,8 +170,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (c == 0)
             return null;
 
+        //int shuff = random().nextInt(reprobes);
+
         final int hash = x.hashCode(); /*hash(x)*/
-        ;
 
         if (add || remove)
             start(hash);
@@ -185,11 +182,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
             //for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/)
 
-            int i = i(c, hash); //dir ? iStart : (iStart + reprobes) - 1;
-
+            int iStart = Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
+            int iEnd = (iStart + reprobes);
+            int i = iStart;// + shuff;
             for (int probe = 0; probe < reprobes; probe++) {
 
-                V current = map.get(i);
+                int ic = i % c;
+
+                V current = map.get(ic);
                 if (current != null) {
                     K y = key(current);
                     if (equals(y, x)) { //existing
@@ -198,9 +198,11 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             if (current != adding) {
                                 //float curPri = pri(current);
                                 V next = merge(current, adding, scale);
-                                if (next != current) {
+                                if (next == null) {
+                                    //merge failed, continue
+                                } else if (next != current) {
                                     //replace
-                                    if (!map.compareAndSet(i, current, next)) {
+                                    if (!map.compareAndSet(ic, current, next)) {
                                         //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
                                     } else {
                                         //replaced
@@ -220,7 +222,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                         } else {
 
                             if (remove) { //remove
-                                if (map.compareAndSet(i, current, null)) {
+                                if (map.compareAndSet(ic, current, null)) {
                                     found = current;
                                 }
                             } else {
@@ -237,9 +239,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 if (add && !merged) {
 
                     if (current == null || replace(adding, current, scale)) {
-                        if (map.compareAndSet(i, current, adding)) { //inserted
+                        V toAdd = merge(current, adding, scale);
+                        if (toAdd!=null && map.compareAndSet(ic, current, toAdd)) { //inserted
                             found = current;
-                            added = merge(current, adding, scale);
+                            added = toAdd;
                             break; //done
                         }
                     }
@@ -247,7 +250,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                 //i = dir ? (i + 1) : (i - 1);
                 i++;
-                if (i == c) i = 0;
+                if (i == iEnd) i = iStart;
 
             }
 
@@ -322,8 +325,11 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * this supports fairness so that existing items will not have a
      * second-order budgeting advantage of not contributing as much
      * to the presssure as new insertions.
+     *
+     * if returns null, the merge is considered failed and will try inserting/merging
+     * at a different probe location
      */
-    @NotNull
+    @Nullable
     protected abstract V merge(@Nullable V existing, @NotNull V incoming, float scale);
 
     /**

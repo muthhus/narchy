@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
@@ -43,12 +44,24 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
+//    @Override
+//    protected Task merge(@Nullable Task existing, @NotNull Task incoming, float scaleIgnored) {
+//        if (incoming instanceof SignalTask)
+//            return incoming;
+//
+//        if (existing!=null && !existing.equals(incoming)) {
+//            return merge(existing, incoming, Math.max(incoming.creation(), existing.creation()), 0f);
+//        } else {
+//            return super.merge(existing, incoming, scaleIgnored);
+//        }
+//    }
+
     @Override
     public void capacity(int c, NAR nar) {
         setCapacity(c);
     }
 
-    @Override
+      @Override
     protected boolean replace(Task incoming, Task existing, float scaleIgnored) {
         assert(scaleIgnored==1f);
 
@@ -61,8 +74,38 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         //return super.replace(incoming, existing, scale);
     }
 
+
+    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {
+        assert(scaleIgnored==1f);
+
+        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
+            return true;
+//        if (existing instanceof ActionConcept.CuriosityTask)
+//            return true;
+
+        if (!(existing instanceof SignalTask)) {
+            //return true if there is a possibility of merge, and do a merge of 2 non-equal tasks in merge()
+            Task i = (Task) incoming;
+            if ((random().nextFloat()) >= Math.abs(existing.freq() - i.freq())) {
+                /*if (!Stamp.overlapping(i, known))*/
+                {
+                    if (null != Interval.intersect(existing.start(), existing.end(), i.start(), i.end()))
+                        return true;
+                }
+            }
+        }
+
+        return replace(priConf(incoming) , priConf(existing));
+        //return super.replace(incoming, existing, scale);
+    }
+
     public float priConf(@NotNull Task key) {
-        return (1f + key.pri()) * (1f + key.conf()) * (1f + (key.end()-key.start()));
+        return (/*1f +*/ key.pri()) * (1f + key.conf());
+        //float p = Util.or(/*1f +*/ key.pri(), key.conf());
+//        long range = key.end() - key.start();
+//        p *= (range > 0) ?
+//            (1f + Math.min(3, (float)Math.log(1+range))) : 1f; //duration factor
+        //return p;
     }
 
 

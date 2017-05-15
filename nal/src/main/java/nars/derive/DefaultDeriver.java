@@ -11,7 +11,7 @@ public class DefaultDeriver  {
                 "nal1.nal",
                 "nal2.nal",
                 "nal3.nal",
-                "nal4.nal",
+                //"nal4.nal",
                 "nal6.nal",
                 "induction.nal",
                 "misc.nal"

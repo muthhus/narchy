@@ -876,13 +876,18 @@ public abstract class TermBuilder {
         //factor out any common subterms iff concurrent
         if (concurrent(dt)) {
 
-//            if (subject.contains(predicate) || predicate.contains(subject)) //first layer only, not recursively
-//                return False; //cyclic
-
-            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
-                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
-                    (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+            Term pu = predicate.unneg();
+            Term su = subject.unneg();
+            //first layer only, not recursively
+            if ((!(pu instanceof Variable) && subject.containsRecursively(predicate)) ||
+                (!(su instanceof Variable) && predicate.containsRecursively(subject)) )
+                    //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
+
+//            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
+//                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
+//                    (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
+//                return False; //cyclic
 
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
 

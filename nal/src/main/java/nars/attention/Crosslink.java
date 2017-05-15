@@ -1,5 +1,7 @@
 package nars.attention;
 
+import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -28,8 +30,11 @@ public class Crosslink {
             return; //null or same concept
 
 
-        ObjectFloatHashMap<Termed> activation = SpreadingActivation.activationMapThreadLocal.get();
-        new SpreadingActivation(srcTask, scaleSrcTgt, tgtConcept, activation, nar);
-        new SpreadingActivation(tgtTask, scaleTgtSrc, srcConcept, activation, nar);
+
+        tgtConcept.tasklinks().put( new RawPLink(srcTask, srcTask.pri()), scaleSrcTgt, null );
+        srcConcept.tasklinks().put( new RawPLink(tgtTask, tgtTask.pri()), scaleTgtSrc, null );
+
+//        new SpreadingActivation(srcTask, scaleSrcTgt, tgtConcept, activation, nar);
+//        new SpreadingActivation(tgtTask, scaleTgtSrc, srcConcept, activation, nar);
     }
 }
