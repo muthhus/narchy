@@ -139,7 +139,9 @@ public class Arkancide extends NAgentX {
         Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
         actionBipolar(paddleControl, (v) -> {
 
-            float dx = paddleSpeed.floatValue() * maxPaddleSpeed * Util.sigmoidSymmetric(v, 6);
+            float dx = paddleSpeed.floatValue() * maxPaddleSpeed *
+                    v;
+                    //Util.sigmoidSymmetric(v, 6);
 
             noid.paddle.move(dx);
             //System.out.println(v + " "  + dx + " -> " + noid.paddle.x);

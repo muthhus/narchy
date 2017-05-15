@@ -67,8 +67,9 @@ public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
     }
 
     protected void link(Task x, Concept cx, Task y) {
+
         float xPri = x.priSafe(0);
-        crossLink(cx, x, y, strength * or(xPri, y.priSafe(0)), nar);
+        crossLink(cx, x, y, strength * xPri, strength * y.priSafe(0), nar);
     }
 
 

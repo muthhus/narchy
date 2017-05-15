@@ -21,7 +21,7 @@ public class Crosslink {
      * @param tgt task with a term equal to another concept's
      * @return true if the tgt task's concept is different from this Concept, in which case a crossLink has been applied. false otherwise
      */
-    public static void crossLink(@NotNull Concept srcConcept, @NotNull Task srcTask, @NotNull Task tgtTask, float scale, @NotNull NAR nar) {
+    public static void crossLink(@NotNull Concept srcConcept, @NotNull Task srcTask, @NotNull Task tgtTask, float scaleSrcTgt, float scaleTgtSrc, @NotNull NAR nar) {
 
         Concept tgtConcept = tgtTask.concept(nar);
         if (tgtConcept == null || tgtConcept.equals(srcConcept))
@@ -29,7 +29,7 @@ public class Crosslink {
 
 
         ObjectFloatHashMap<Termed> activation = SpreadingActivation.activationMapThreadLocal.get();
-        new SpreadingActivation(srcTask, scale, tgtConcept, activation, nar);
-        new SpreadingActivation(tgtTask, scale, srcConcept, activation, nar);
+        new SpreadingActivation(srcTask, scaleSrcTgt, tgtConcept, activation, nar);
+        new SpreadingActivation(tgtTask, scaleTgtSrc, srcConcept, activation, nar);
     }
 }

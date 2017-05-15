@@ -72,6 +72,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
      */
     private static final float TERMLINK_BALANCE = 0.5f;
 
+    private final float linkScale;
+
     /**
      * runs the task activation procedure
      */
@@ -87,6 +89,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         super(in, scale, src, nar);
 
         this.momentum = nar.momentum.floatValue();
+        this.linkScale = nar.linkActivation.floatValue();
 
         this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
         this.dur = nar.dur();
@@ -160,6 +163,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     @Override
     public void value(Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
+
+        scale *= linkScale;
 
         termBidi(c, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
 

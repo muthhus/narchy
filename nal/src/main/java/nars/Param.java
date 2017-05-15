@@ -157,6 +157,9 @@ public abstract class Param  {
      */
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
+    /** global scaling factor applied to termlink/tasklink activation */
+    public final FloatParam linkActivation = new FloatParam(1f, 0, 1f);
+
     public float confDefault(byte punctuation) {
 
         switch (punctuation) {
