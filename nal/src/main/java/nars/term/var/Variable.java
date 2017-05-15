@@ -44,7 +44,7 @@ public interface Variable extends Atomic {
 
 
     @Override
-    default int init(@NotNull int[] meta) {
+    default void init(@NotNull int[] meta) {
         int i;
         switch (op()) {
             case VAR_DEP:
@@ -65,7 +65,23 @@ public interface Variable extends Atomic {
         meta[i] ++;
         meta[4] ++;
         meta[5] |= structure();
-        return hashCode();
     }
 
+    @Override
+    default int varQuery() {
+        return 0;
+    }
+
+    @Override
+    default int varPattern() {
+        return 0;
+    }
+
+    @Override
+    default int varIndep() {
+        return 0;
+    }
+
+    @Override
+    default int varDep() { return 0; }
 }

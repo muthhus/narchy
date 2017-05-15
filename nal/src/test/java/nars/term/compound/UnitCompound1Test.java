@@ -1,8 +1,10 @@
 package nars.term.compound;
 
 import nars.$;
+import nars.Narsese;
 import nars.index.term.tree.TermKey;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermVector;
 import org.junit.Test;
@@ -81,4 +83,10 @@ public class UnitCompound1Test {
         assertEquals(g.volume(), u.volume());
     }
 
+    @Test public void testRecursiveContains() throws Narsese.NarseseException {
+        Term s = $.$("(--,(x))");
+        Term p = $.$("((--,(x)) &&+0 (--,(y)))");
+        assertTrue(p.contains(s));
+        assertTrue(p.containsRecursively(s));
+    }
 }

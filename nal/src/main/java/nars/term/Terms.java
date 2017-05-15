@@ -68,7 +68,8 @@ public enum Terms { ;
         int result = 1;
         for (Term t : term) {
             //result = 31 /*Util.PRIME1 */ * result + t.init(meta);
-            result = Util.hashCombine(t.init(meta), result);
+            t.init(meta);
+            result = Util.hashCombine(t.hashCode(), result);
         }
         return result;
     }

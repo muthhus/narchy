@@ -196,13 +196,12 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default int init(@NotNull int[] meta) {
+    default void init(@NotNull int[] meta) {
 
         subterms().init(meta);
 
         meta[5] |= op().bit;
 
-        return hashCode();
     }
 
     @Nullable
@@ -836,8 +835,8 @@ public interface Compound extends Term, IPair, TermContainer {
             }
             if (modified) {
                 return
-                    //index.the(op(), dt(), evalSubs)
-                    $.terms.the(op(), dt(), evalSubs)
+                    index.the(op(), dt(), evalSubs)
+                    //$.terms.the(op(), dt(), evalSubs)
                             .eval(index);
             }
         }

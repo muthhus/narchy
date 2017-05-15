@@ -12,11 +12,11 @@ import java.util.function.Predicate;
  */
 public interface Termlike extends Termed {
 
-    /**
-     * volume = total number of terms = complexity + # total variables
-     */
-    @Override
-    default int volume() { return 0; }
+//    /**
+//     * volume = total number of terms = complexity + # total variables
+//     */
+//    @Override
+//    default int volume() { return 0; }
 
     /**
      * total number of leaf terms, excluding variables which have a complexity of zero
@@ -24,8 +24,8 @@ public interface Termlike extends Termed {
 //    @Override
 //    default int complexity() { return term().complexity(); }
 
-    @Override
-    default int structure() { return 0; }
+//    @Override
+//    default int structure() { return 0; }
 
     /**
      * number of subterms. if atomic, size=0
@@ -103,7 +103,7 @@ public interface Termlike extends Termed {
      * @param meta 6-element array that accumulates the metadata
      * @return returns hashcode if a Term, but TermContainers may return zero
      */
-    default int init(@NotNull int[] meta) {
+    default void init(@NotNull int[] meta) {
 
         meta[0] += varDep();
         meta[1] += varIndep();
@@ -113,7 +113,6 @@ public interface Termlike extends Termed {
         meta[4] += volume();
         meta[5] |= structure();
 
-        return 0;
     }
 
     default boolean impossibleSubTermOrEquality(@NotNull Term target) {
@@ -148,7 +147,12 @@ public interface Termlike extends Termed {
         return varDep() + varIndep() + varQuery();
     }
 
-    /** # of contained independent variables in subterms (1st layer only) */
+//    @Override int varIndep();
+//    @Override int varDep();
+//    @Override int varQuery();
+//    @Override int varPattern();
+
+        /** # of contained independent variables in subterms (1st layer only) */
     @Override
     default int varIndep() { return 0; }
     /** # of contained dependent variables in subterms (1st layer only) */

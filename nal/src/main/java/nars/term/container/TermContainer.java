@@ -116,9 +116,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @Override
     default boolean isDynamic() {
         return
-                (op() == INH && subIs(0, PROD) && subIs(1,ATOM) ) /* potential function */
+                hasAll(EvalBits) &&
+                    ((op() == INH && subIs(0, PROD) && subIs(1,ATOM) ) /* potential function */
                         ||
-                (hasAll(EvalBits) && OR(Termlike::isDynamic)); /* possible function in subterms */
+                    (OR(Termlike::isDynamic))); /* possible function in subterms */
     }
 
     @Override
@@ -667,17 +668,17 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         int diff;
 
+        int s;
+        if ((diff = Integer.compare((s = a.size()), b.size())) != 0)
+            return diff;
+
 //        if ((diff = (a.hashCode() - b.hashCode())) != 0)
 //            return diff;
 
-        if ((diff = (a.structure() - b.structure())) != 0)
+        if ((diff = Integer.compare(a.structure(), b.structure())) != 0)
             return diff;
 
-        if ((diff = (a.volume() - b.volume())) != 0)
-            return diff;
-
-        int s;
-        if ((diff = ((s = a.size()) - b.size())) != 0)
+        if ((diff = Integer.compare(a.volume(), b.volume())) != 0)
             return diff;
 
         TermContainer B = (TermContainer) b;

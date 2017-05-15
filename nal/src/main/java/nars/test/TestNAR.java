@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.lang.Float.NaN;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertTrue;
@@ -348,10 +349,9 @@ public class TestNAR {
         if (t.truth() != null) {
             float freq = t.freq();
             float conf = t.conf();
-            long occurrence = t.start();
-            return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, occurrence, occurrence);
+            return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, t.start(), t.end());
         } else {
-            return mustEmit(c, now, now + withinCycles, termString, t.punc(), -1, -1, -1, -1);
+            return mustEmit(c, now, now + withinCycles, termString, t.punc(), NaN, NaN, NaN, NaN, t.start(), t.end());
         }
     }
 
@@ -445,7 +445,7 @@ public class TestNAR {
     }
 
     private TestNAR mustOutput(long withinCycles, @NotNull String qt, byte question) {
-        return mustOutput(withinCycles, qt, question, Float.NaN, Float.NaN);
+        return mustOutput(withinCycles, qt, question, NaN, NaN);
     }
 
     @NotNull

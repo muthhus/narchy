@@ -28,7 +28,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     }
 
     @Override
-    public int init(@NotNull int[] meta) {
+    public void init(@NotNull int[] meta) {
         throw new UnsupportedOperationException();
     }
 
@@ -58,9 +58,6 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
         return srcsubs.sub(super.permute(i));
     }
 
-    public boolean isTerm(int i, @NotNull Op o) {
-        return this.sub(i).op() == o;
-    }
 
 //    @Override
 //    public boolean equalTerms(@NotNull TermContainer c) {

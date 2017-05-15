@@ -54,12 +54,11 @@ public abstract class AtomicString extends ToStringAtomic {
     }
 
     @Override
-    public final int init(@NotNull int[] meta) {
+    public final void init(@NotNull int[] meta) {
 
         meta[4] ++; //volume
         meta[5] |= op().bit; //structure();
 
-        return hash;
     }
 
 

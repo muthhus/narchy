@@ -238,7 +238,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
      * subclasses can override this for more efficient aggregation if certain features are sure to be absent
      */
     @Override
-    default int init(@NotNull int[] meta) {
+    default void init(@NotNull int[] meta) {
 
         if (vars() > 0) {
             meta[0] += varDep();
@@ -250,7 +250,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
         meta[4] += volume();
         meta[5] |= structure();
 
-        return hashCode();
     }
 
     default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
@@ -320,9 +319,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
     default int compareTo(@NotNull Termlike y) {
         if (this == y /*|| this.equals(y)*/) return 0;
 
-//        int diff2 = hashCode() - y.hashCode();
+//        int diff2 = Integer.compare(hashCode(), y.hashCode());
 //        if (diff2 != 0)
 //            return diff2;
+
+        if (this.equals(y)) return 0;
 
         int d = this.op().compareTo( y.op() );
         if (d != 0)
@@ -338,8 +339,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
             if (!cxx.equals(cyy)) {
                 int c = TermContainer.compare(cxx, cyy);
-                if (c > 0) return +1;
-                else if (c < 0) return -1;
+                if (c != 0)
+                    return c;
             }
 
             return Integer.compare(cx.dt(), cy.dt());

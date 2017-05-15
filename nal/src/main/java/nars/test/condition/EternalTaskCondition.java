@@ -21,6 +21,8 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static nars.term.Terms.normalizedOrNull;
+
 public class EternalTaskCondition implements NARCondition, Predicate<Task>, Consumer<Tasked> {
 
     //private static final Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
@@ -97,7 +99,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             this.confMin = Math.max(0.0f, confMin);
             this.punc = punc;
             this.term =
-                    $.terms.term( sentenceTerm ).term();
+                    normalizedOrNull($.terms.term( sentenceTerm ).term(), $.terms);
     }
 
     @NotNull
@@ -238,8 +240,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     private boolean truthMatches(@NotNull Truthed task) {
         if ((punc == Op.BELIEF) || (punc == Op.GOAL)) {
             Truth tt = task.truth();
-            if (tt == null)
-                return false;
+//            if (tt == null)
+//                return false;
 
             float co = tt.conf();
             if ((co > confMax) || (co < confMin))
@@ -249,8 +251,10 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if ((fr > freqMax) || (fr < freqMin))
                 return false;
 
+            return true;
+        } else {
+            return task.truth()==null;
         }
-        return true;
     }
 
     public boolean timeMatches(@NotNull Task t) {

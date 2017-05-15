@@ -59,10 +59,6 @@ public class TermVector1 implements TermContainer {
         return i == 0 && the.op() == o;
     }
 
-    @Override
-    public boolean isDynamic() {
-        return the.isDynamic();
-    }
 
     /** vol and complexity are reported as if they were already part of an enclosing Compound */
     @Override public int volume() {
@@ -175,6 +171,10 @@ public class TermVector1 implements TermContainer {
         return the.varPattern();
     }
 
+    @Override
+    public int vars() {
+        return the.vars();
+    }
 
 
 

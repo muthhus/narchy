@@ -10,7 +10,6 @@ import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -46,6 +45,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return op.bit | super.structure();
     }
 
+    @Override
+    public void init(@NotNull int[] meta) {
+        the.init(meta);
+        meta[4]++; //for wrapping it
+        meta[5] |= op().bit;
+    }
 
     @Override
     public int hashCode() {
@@ -73,7 +78,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
 
-
     @NotNull
     @Override
     public String toString() {
@@ -89,6 +93,18 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Override
     public @NotNull TermContainer subterms() {
         return new SubtermView(this);
+    }
+
+    @Override
+    public boolean isTemporal() {
+        return the.isTemporal();
+    }
+
+
+
+    @Override
+    public boolean impossibleSubTermVolume(int otherTermVolume) {
+        return the.impossibleSubTermVolume(otherTermVolume);
     }
 
     @Override
@@ -108,20 +124,56 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     private static final class SubtermView implements TermContainer {
-        private final Compound c;
+        private final UnitCompound1 c;
 
-        public SubtermView(Compound c) {
+        public SubtermView(UnitCompound1 c) {
             this.c = c;
         }
 
         @Override
+        public boolean isTemporal() {
+            return c.isTemporal();
+        }
+
+        @Override
+        public int vars() {
+            return c.vars();
+        }
+
+        @Override
+        public int varQuery() {
+            return c.varQuery();
+        }
+
+        @Override
+        public int varDep() {
+            return c.varDep();
+        }
+
+        @Override
+        public int varIndep() {
+            return c.varIndep();
+        }
+
+        @Override
+        public int varPattern() {
+            return c.varPattern();
+        }
+
+
+        @Override
+        public int structure() {
+            return c.the.structure();
+        }
+
+        @Override
         public int volume() {
-            return c.volume() - 1;
+            return c.volume();
         }
 
         @Override
         public int complexity() {
-            return c.complexity() - 1;
+            return c.complexity();
         }
 
         @Override
