@@ -289,7 +289,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc, FloatToObjectFunction<Truth> pixelTruth) {
-        return senseCamera(id.toString(), new CameraSensor<>(id, bc, this, pixelTruth));
+        return senseCamera(id.toString(), new CameraSensor( bc, this, CameraSensor.XY(id, bc.width(), bc.height())));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {

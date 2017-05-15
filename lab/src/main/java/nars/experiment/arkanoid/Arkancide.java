@@ -18,7 +18,7 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(3f, 0.1f, 6f);
     public final FloatParam paddleSpeed = new FloatParam(1f, 0.1f, 3f);
@@ -49,7 +49,7 @@ public class Arkancide extends NAgentX {
             try {
                 a = new Arkancide(n, cam, numeric);
                 a.trace = true;
-                ((RealTime)a.nar.time).durSeconds(0.1f);
+                //((RealTime)a.nar.time).durSeconds(0.05f);
                 //a.nar.log();
 
             } catch (Narsese.NarseseException e) {

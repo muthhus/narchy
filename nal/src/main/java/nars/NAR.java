@@ -1375,7 +1375,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
 
-        Concept c = terms.concept(term, createIfMissing);
+        Concept c = terms.concept(term.unneg(), createIfMissing);
 //        if (c != null && createIfMissing && c.isDeleted()) {
 //            //try again
 //            concepts.remove(c.term());

@@ -26,8 +26,6 @@ abstract public class DerivedTask extends ImmutableTask {
 
         this.premise = Param.DEBUG ? p.premise : null;
 
-
-
 //        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {
 //            //if this is a question or temporal relation use default method
 //            this.startEnd = null;

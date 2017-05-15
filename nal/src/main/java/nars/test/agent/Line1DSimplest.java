@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.term.Compound;
 import nars.term.atom.Atomic;
 
 
@@ -20,7 +21,7 @@ public class Line1DSimplest extends NAgent {
      * the target value
      */
     public final FloatParam i = new FloatParam(0.5f, 0, 1f);
-    public final FloatParam speed = new FloatParam(0.1f, 0f, 0.5f);
+    public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
     public final ActionConcept out;
     /**
@@ -49,14 +50,20 @@ public class Line1DSimplest extends NAgent {
 //        }));
 
         //out = null;
-        out = actionTriState($.inh(Atomic.the("o"), id), (d) -> {
-            switch (d) {
-                case -1:
-                case +1:
-                    o.setValue(Math.max(0f, Math.min(1f, o.floatValue() + d * speed.floatValue())));
-                    break;
-            }
-        });
+        Compound O = $.inh(Atomic.the("o"), id);
+//        out = actionTriState(O, (d) -> {
+//            switch (d) {
+//                case -1:
+//                case +1:
+//                    this.o.setValue(Math.max(0f, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
+//                    return true;
+//
+//            }
+//            return false;
+//        });
+        out = actionBipolar(O, v -> { o.setValue(
+                Math.max(0f, Math.min(1f, this.o.floatValue() + v * speed.floatValue()))); return true; }
+        );
 
 //        out = action(
 //                //$.inh($.the("o"), id),

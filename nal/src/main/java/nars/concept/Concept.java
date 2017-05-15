@@ -31,6 +31,7 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import nars.util.SoftException;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -439,6 +440,10 @@ public interface Concept extends Termed {
      * returns the previous state
      */
     @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
+
+    /** can return null if no templates */
+    @Nullable TermContainer templates();
+
 
 
 //    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {

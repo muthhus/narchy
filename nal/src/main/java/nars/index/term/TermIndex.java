@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -402,7 +403,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        term = term.unneg();
+        assert(term.op()!=NEG); //term = term.unneg();
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {

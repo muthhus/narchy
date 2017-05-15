@@ -125,23 +125,23 @@ public class Line1D {
 
         NAR n = new Default();
         n.time.dur(16);
-        n.termVolumeMax.setValue(16);
+        n.termVolumeMax.setValue(24);
 
 
         Line1DSimplest a = new Line1DSimplest(n);
-        Line1DTrainer trainer = new Line1DTrainer(a);
+        //Line1DTrainer trainer = new Line1DTrainer(a);
 
         //new RLBooster(a, new HaiQAgent());
 
 //ImplicationBooster.implAccelerator(a);
-//        a.onFrame((z) -> {
-//            a.target(
-//                    0.5f * (Math.sin(n.time() / 200f) + 1f)
-//                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
-//                    //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
-//            );
+        a.onFrame((z) -> {
+            a.target(
+                    (float) (0.5f * (Math.sin(n.time() / 500f) + 1f))
+                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                    //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
+            );
 
-//        });
+        });
 
 
         NAgentX.chart(a);

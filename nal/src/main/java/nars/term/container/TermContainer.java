@@ -1,5 +1,6 @@
 package nars.term.container;
 
+import com.google.common.collect.Iterators;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -13,6 +14,7 @@ import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.iterator.IntIterator;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -85,6 +87,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return ((Compound) sub(i));
     }
 
+    @NotNull
+    @Override
+    default Iterator<Term> iterator() {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * returns subterm automatically casted as compound (Use with caution)
@@ -393,7 +400,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
 
-    void forEach(Consumer<? super Term> action, int start, int stop);
+    default void forEach(Consumer<? super Term> action, int start, int stop) {
+        for (int i = start; i < stop; i++)
+            action.accept(sub(i));
+    }
 
 
     default void forEachAtomic(@NotNull Consumer<? super Atomic> action) {
@@ -415,11 +425,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         forEach(action, 0, size());
     }
 
-    static void forEach(@NotNull TermContainer c, @NotNull Consumer action, int start, int stop) {
-        for (int i = start; i < stop; i++) {
-            action.accept(c.sub(i));
-        }
-    }
+
 
 //    static Term[] copyByIndex(TermContainer c) {
 //        int s = c.size();

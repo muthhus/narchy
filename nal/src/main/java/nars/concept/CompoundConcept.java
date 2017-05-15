@@ -115,6 +115,10 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         return termLinks;
     }
 
+    @Override
+    public TermContainer templates() {
+        return subterms();
+    }
 
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization

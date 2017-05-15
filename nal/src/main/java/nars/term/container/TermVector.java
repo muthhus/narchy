@@ -168,8 +168,6 @@ public abstract class TermVector implements TermContainer {
     @Override
     public abstract Iterator<Term> iterator();
 
-    @Override
-    public abstract void forEach(@NotNull Consumer<? super Term> action, int start, int stop);
 
     @Override
     public final boolean equals(@NotNull Object obj) {

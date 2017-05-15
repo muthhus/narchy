@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 import java.util.function.IntSupplier;
 
 import static nars.Op.BELIEF;
@@ -79,7 +80,11 @@ public interface NAct {
      */
     @Nullable
     default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
+        return actionTriState(s, (v) -> { i.accept(v); return true; } );
+    }
 
+    @Nullable
+    default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
 
         ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
             float deadZoneFreq =
@@ -100,7 +105,7 @@ public interface NAct {
                     ii = 0;
             }
 
-            i.accept(ii);
+            boolean accepted = i.test(ii);
 
             float f;
             switch (ii) {
@@ -117,13 +122,13 @@ public interface NAct {
                     throw new RuntimeException();
             }
 
-            return
+            return accepted ?
                     //d!=null ?
                     $.t(f,
                             //d!=null ? d.conf() : nar().confMin.floatValue()
                             nar().confDefault(BELIEF)
                     )
-                    //: null
+                    : null
                     ;
         });
 

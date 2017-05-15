@@ -25,10 +25,10 @@ public class FZero extends NAgentX {
         Default n = NARBuilder.newMultiThreadNAR(
                 4,
                 new RealTime.DSHalf(true)
-                        .durFPS(4f), true);
+                        .durFPS(10f), true);
 
         FZero a = new FZero(n);
-        a.runRT(10f);
+        a.runRT(20f);
 
 
         NAgentX.chart(a);
@@ -44,12 +44,12 @@ public class FZero extends NAgentX {
                 .setResolution(0.01f);
 
 
-        actionBipolar($.inh(Atomic.the("fwd"), id), (t) -> {
-            fz.vehicleMetrics[0][6] += t * 1f;
+        actionBipolar($.inh(Atomic.the("fwd"), id), (r) -> {
+            fz.vehicleMetrics[0][6] += (r*r*r) * 1f;
             return true;
         });
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
-            fz.playerAngle += r * 0.1f;
+            fz.playerAngle += (r*r*r) * 0.15f;
             return true;
         });
 

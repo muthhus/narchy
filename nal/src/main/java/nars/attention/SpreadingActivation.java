@@ -2,8 +2,10 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
+import jcog.pri.Priority;
 import jcog.pri.RawPLink;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
@@ -11,7 +13,6 @@ import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -32,7 +33,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
-
 
 
     final ObjectFloatHashMap<Termed> spread;
@@ -78,7 +78,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
      * runs the task activation procedure
      */
     public SpreadingActivation(@NotNull Task in, @NotNull Concept c, @NotNull NAR nar, float scale) {
-        this(in, scale, c,  activationMapThreadLocal.get(), nar);
+        this(in, scale, c, activationMapThreadLocal.get(), nar);
     }
 
 
@@ -106,7 +106,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         nar.emotion.stress(linkOverflow);
     }
-
 
 
     public static int levels(@NotNull Compound host) {
@@ -170,14 +169,18 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         if (c instanceof Concept) {
             tasklink((Concept) c, scale);
-        } else if (c instanceof AtomConcept) {
-            activateAtom((AtomConcept) c, scale);
+            if (c instanceof AtomConcept) {
+                activateAtom((AtomConcept) c, scale);
+            }
         }
 
     }
 
     @Nullable
     void link(@NotNull Termed target, float scale, int depth) {
+
+        if (scale < Priority.EPSILON)
+            return;
 
         if ((target instanceof Variable)) {
             if (target.op() == VAR_QUERY)
@@ -188,19 +191,22 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                 target = termConcept.get();
         }
 
-        final float parentActivation;
+        float parentActivation = scale;
 
-        /*if (depth + 1 <= termlinkDepth)*/ {
+        /*if (depth + 1 <= termlinkDepth)*/
+        {
 
-            if (target instanceof Compound) {
-                //recurse
-                parentActivation = linkSubterms(((Compound) target).subterms(), scale, depth + 1);
-            } else if (target instanceof AtomConcept) {
-                //activation terminating at an atom: activate through Atom links
-                parentActivation = scale;
-            } else {
-                parentActivation = 0;
-            }
+
+            //recurse
+            TermContainer t =
+                    target instanceof Concept ?
+                            ((Concept) target).templates() : //allow concept to override its templates
+                            target instanceof Compound ? ((Compound) target).subterms() : null;
+
+            if (t != null && t.size() > 0)
+                parentActivation = linkSubterms(t, scale, depth + 1);
+
+
         } /*else {
             parentActivation = scale;
         }*/

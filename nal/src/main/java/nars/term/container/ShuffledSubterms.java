@@ -83,10 +83,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 //        return srcsubs.firstEllipsis();
 //    }
 
-    @Override
-    public void forEach(@NotNull Consumer action, int start, int stop) {
-        TermContainer.forEach(this, action, start, stop);
-    }
+
 
     @Override
     public int varDep() {

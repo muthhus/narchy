@@ -12,6 +12,7 @@ import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicString;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,6 +45,11 @@ public class AtomConcept extends AtomicString implements Concept {
         this.taskLinks = taskLinks;
 
         this.state = ConceptState.Deleted;
+    }
+
+    @Override
+    public TermContainer templates() {
+        return null;
     }
 
     @NotNull

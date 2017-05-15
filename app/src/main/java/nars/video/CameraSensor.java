@@ -1,12 +1,15 @@
 package nars.video;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.Op;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import nars.util.data.Mix;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -17,17 +20,16 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static nars.Op.BELIEF;
-
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
  * monochrome
  */
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
+
+    ;
     private final NAR nar;
 
-    private static final int radix = 2;
     public final List<PixelConcept> pixels;
     private final Mix.MixStream in;
 
@@ -35,44 +37,32 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     final int numPixels;
 
+
+    transient int w, h;
+    transient float conf;
+
+
     public CameraSensor(Term root, P src, NAgent agent) {
-        this(root, src, agent, (v) -> $.t(v, agent.nar.confDefault(BELIEF)));
+        this(src, agent,
+                XY(root, src.width(), src.height())
+                //RadixProduct(root, src.width(), src.height(), radix)
+        );
     }
 
-    public CameraSensor(Term root, P src, NAgent agent, FloatToObjectFunction<Truth> brightnessToTruth) {
+    public CameraSensor(P src, NAgent agent, Int2Function<Compound> pixelTermer) {
         super(src, src.width(), src.height());
 
         this.nar = agent.nar;
 
-        numPixels = src.width() * src.height();
-        //sqrtNumPixels = (float)Math.sqrt(numPixels);
+        this.w = src.width();
+        this.h = src.height();
+        numPixels = w * h;
 
         this.in = nar.mix.stream(this);
 
-
-        pixels = encode((x, y) ->
-                        $.inh(
-                                //$.inh(
-
-
-                                //$.secte
-                                    radix > 1 ?
-                                        //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
-                                        $.p( zipCoords(coord(x, width), coord(y, height)) ) :
-                                        //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
-                                        //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                        $.p( $.the(x), $.the(y) ),
-
-                                root
-
-
-                        )
-                , brightnessToTruth);
-
-        //System.out.println(Joiner.on('\n').join(pixels));
+        pixels = encode(pixelTermer);
 
         agent.onFrame(this);
-
     }
 
     @NotNull
@@ -81,6 +71,34 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         return pixels.iterator();
     }
 
+
+    private final FloatToObjectFunction<Truth> brightnessTruth = (v) -> $.t(Util.round(v, resolution), conf);
+
+    public static Int2Function<Compound> XY(Term root, int width, int height) {
+        return (x, y) -> {
+            return $.inh($.p(x, y), root);
+        };
+    }
+
+    private static Int2Function<Compound> RadixProduct(Term root, int width, int height, int radix) {
+        return (x, y) ->
+                $.inh(
+                        //$.inh(
+
+
+                        //$.secte
+                        radix > 1 ?
+                                //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
+                                $.p(zipCoords(coord(x, width), coord(y, height))) :
+                                //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
+                                //new Term[]{coord('x', x, width), coord('y', y, height)} :
+                                $.p($.the(x), $.the(y)),
+
+                        root
+
+
+                );
+    }
 
     private static Term[] zipCoords(@NotNull Term[] x, @NotNull Term[] y) {
         int m = Math.max(x.length, y.length);
@@ -91,10 +109,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         for (int i = 0; i < m; i++) {
             Term xy;
             char levelPrefix =
-                (char)('a' + (m-1 - i)); //each level given a different scale prefix
-                //'p';
+                    (char) ('a' + (m - 1 - i)); //each level given a different scale prefix
+            //'p';
 
-            if (i >= sx && i >=sy) {
+            if (i >= sx && i >= sy) {
                 xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++].toString());
             } else if (i >= sx) {
                 xy = Atomic.the(levelPrefix + x[ix++].toString() + "_");
@@ -110,28 +128,27 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public static Compound coord(char prefix, int n, int max) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         //return $.pRecurse($.radixArray(n, radix, max));
-        return $.p($.radixArray(n, radix, max));
+        return $.p($.radixArray(n, 2, max));
     }
 
     @NotNull
     public static Term[] coord(int n, int max) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         //return $.pRecurse($.radixArray(n, radix, max));
-        return $.radixArray(n, radix, max);
+        return $.radixArray(n, 2, max);
     }
 
 
-
-    public List<PixelConcept> encode(Int2Function<Compound> cellTerm, FloatToObjectFunction<Truth> brightnessToTruth) {
+    public List<PixelConcept> encode(Int2Function<Compound> cellTerm) {
         List<PixelConcept> l = $.newArrayList();
-        for (int x = 0; x < width; x++) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
 
-            for (int y = 0; y < height; y++) {
                 //TODO support multiple coordinate termizations
                 Compound cell = cellTerm.get(x, y);
 
 
-                PixelConcept sss = new PixelConcept(cell, brightnessToTruth, x, y);
+                PixelConcept sss = new PixelConcept(cell, x, y);
 
 
                 l.add(sss);
@@ -151,13 +168,21 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor setResolution(float resolution) {
         this.resolution = resolution;
-        pixels.forEach(p -> {
-        });
+//        pixels.forEach(p -> {
+//        });
         return this;
     }
 
     public PixelConcept concept(int x, int y) {
-        return pixels.get(y * width + x);
+        if (x < 0)
+            x += w;
+        if (y < 0)
+            y += h;
+        if (x >= w)
+            x -= w;
+        if (y >= h)
+            y -= h;
+        return (PixelConcept) matrix[x][y]; //pixels.get(x * width + y);
     }
 
     @Override
@@ -166,12 +191,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         //frameStamp();
 
         src.update(1);
+        this.conf = nar.confDefault(Op.BELIEF);
 
         NAR nar = a.nar;
 
         in.input(pixels.stream()/*filter(PixelConcept::update).*/
-                .map(c -> c.apply(nar)),
-                y -> nar.input((Stream)y));
+                        .map(c -> c.apply(nar)),
+                y -> nar.input((Stream) y));
     }
 
     public void pri(float v) {
@@ -188,22 +214,124 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        nextStamp = nar.time.nextStamp();
 //    }
 
+
     public class PixelConcept extends SensorConcept {
 
-        //private final int x, y;
+//        //private final int x, y;
+//        private final TermContainer templates;
 
-        public PixelConcept(Compound cell, FloatToObjectFunction<Truth> brightnessToTruth, int x, int y) {
-            super(cell, nar, null, brightnessToTruth);
-            //this.x = x;
-            //this.y = y;
-            setSignal(()->src.brightness(x, y));
+        public PixelConcept(Compound cell, int x, int y) {
+            super(cell, nar, null, brightnessTruth);
+            setSignal(() -> src.brightness(x, y));
+
+            //            this.x = x;
+//            this.y = y;
+
+            //                List<Term> s = $.newArrayList(4);
+//                //int extraSize = subs.size() + 4;
+//
+//                if (x > 0) s.add( concept(x-1, y) );
+//                if (x < w-1) s.add( concept(x+1, y) );
+//                if (y > 0) s.add( concept(x, y-1) );
+//                if (y < h-1) s.add( concept(x, y+1) );
+//
+//                return TermVector.the(s);
+            //this.templates = new PixelNeighborsManhattanRandom(subterms(),2,  x, y, w, h);
         }
 
 //        @Override
+//        public TermContainer templates() {
+//            return templates;
+//        }
+
+
+        //        @Override
 //        protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
 //            return ()->nextStamp;
 //        }
 
+    }
+
+
+    private class PixelNeighborsManhattan implements TermContainer {
+
+        private final int x;
+        private final int y;
+        private final int w;
+        private final int h;
+        private final TermContainer subs;
+
+        public PixelNeighborsManhattan(TermContainer subs, int x, int y, int w, int h) {
+            this.subs = subs;
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+        }
+
+        @Override
+        public int size() {
+            return 4 + subs.size();
+        }
+
+        @Override
+        public @NotNull Term sub(int i) {
+
+
+            switch (i) {
+                case 0:
+                    return (x == 0) ? sub(1) : concept(x - 1, y);
+                case 1:
+                    return (x == w - 1) ? sub(0) : concept(x + 1, y);
+                case 2:
+                    return (y == 0) ? sub(3) : concept(x, y - 1);
+                case 3:
+                    return (y == h - 1) ? sub(2) : concept(x, y + 1);
+                default:
+                    return subs.sub(i - 4);
+            }
+
+        }
+    }
+
+    private class PixelNeighborsManhattanRandom implements TermContainer {
+
+        private final int x;
+        private final int y;
+        private final int w;
+        private final int h;
+        private final TermContainer subs;
+        private final int extra;
+
+        public PixelNeighborsManhattanRandom(TermContainer subs, int x, int y, int w, int h, int extra) {
+            this.subs = subs;
+            this.extra = extra;
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+        }
+
+        @Override
+        public int size() {
+            return extra + subs.size();
+        }
+
+        @Override
+        public @NotNull Term sub(int i) {
+
+            if (i >= subs.size()) {
+                //extra
+                return concept(
+                        x + (nar.random().nextBoolean() ? -1 : +1),
+                        y + (nar.random().nextBoolean() ? -1 : +1)
+                );
+            } else
+                return subs.sub(i);
+
+
+
+        }
     }
 
 }

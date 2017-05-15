@@ -108,6 +108,7 @@ public class NARio extends NAgentX {
             }
             mario.scene.toggleKey(Mario.KEY_LEFT, n);
             mario.scene.toggleKey(Mario.KEY_RIGHT, p);
+            return i!=0;
         });
         actionTriState($("nario:y"), i -> {
             boolean n, p;
@@ -130,6 +131,7 @@ public class NARio extends NAgentX {
             mario.scene.toggleKey(Mario.KEY_DOWN, n);
             mario.scene.toggleKey(Mario.KEY_UP, p);
             mario.scene.toggleKey(Mario.KEY_JUMP, p);
+            return i!=0;
         });
 
 
@@ -167,7 +169,7 @@ public class NARio extends NAgentX {
     public static void main(String[] args) {
 
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         NAR nar = runRT((NAR n) -> {
 
@@ -207,7 +209,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 10);
+        }, 20);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

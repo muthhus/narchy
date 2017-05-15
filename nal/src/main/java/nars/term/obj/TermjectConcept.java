@@ -14,6 +14,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +53,10 @@ public class TermjectConcept<X> implements Atomic, Concept, Termject<X> {
         return term().op();
     }
 
+    @Override
+    public TermContainer templates() {
+        return null;
+    }
 
     @Override
     public int complexity() {
