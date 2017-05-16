@@ -37,10 +37,6 @@
 <body>
 
 
-
-
-
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
 <script src="http://threejs.org/build/three.min.js"></script>
 
@@ -52,13 +48,9 @@
 <script src="http://jeromeetienne.github.io/threex.htmlmixer/threex.htmlmixer.js"></script>
 
 
-
 <script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
 <!--<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>-->
 <script src="https://threejs.org/examples/js/controls/DragControls.js"></script>
-
-
-
 
 
 <!--<script src="js/libs/stats.min.js"></script>-->
@@ -387,102 +379,69 @@
 
     "use strict";
 
-    var nodeData = [];
-    var nodes;
-    var nodePos;
+    class GraJS {
 
-    //var pointCloud;
-    var edgeMesh;
+        constructor(targetElement) {
+            const view = this.view = targetElement;
 
-    var maxParticleCount = 1000;
-    var particleCount = 500;
-    var r = 800;
-    var rHalf = r / 2;
+            const options = {alpha: true, antialias: false};
 
-    var effectController = {
-        showDots: true,
-        showLines: true,
-        minDistance: 150,
-        limitConnections: false,
-        maxConnections: 20,
-        particleCount: 500
-    };
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 4000);
+            camera.position.z = 1750;
 
+            //const controls = new THREE.OrbitControls(camera, view);
 
+            const controls = this.controls = new THREE.TrackballControls(camera);
+            controls.rotateSpeed = 1.0;
+            controls.zoomSpeed = 1.2;
+            controls.panSpeed = 0.8;
+            controls.noZoom = false;
+            controls.noPan = false;
+            controls.staticMoving = true;
+            controls.dynamicDampingFactor = 0.3;
 
-    const view =
-        document.body;
-        //document.getElementById('view');
+            const scene = this.scene = new THREE.Scene();
+            { //LIGHTING
+                scene.add(new THREE.AmbientLight(0x505050));
 
-//    const blocker = document.getElementById('blocker');
-//    blocker.style.display = 'none';
-//    view.addEventListener('mousedown', () => {
-//        blocker.style.display = '';
-//    });
-//    view.addEventListener('mouseup', () => {
-//        blocker.style.display = 'none';
-//    });
-
-    const options = {alpha: true, antialias: false};
-
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 4000);
-    camera.position.z = 1750;
-
-    //const controls = new THREE.OrbitControls(camera, view);
-
-    const controls = new THREE.TrackballControls( camera );
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.noZoom = false;
-    controls.noPan = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
+                var light = new THREE.SpotLight(0xffffff, 1.5);
+                light.position.set(0, 500, 2000);
+                light.castShadow = false;
+                scene.add(light);
+                //        light.castShadow = true;
+                //        light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
+                //        light.shadow.bias = - 0.00022;
+                //        light.shadow.mapSize.width = 2048;
+                //        light.shadow.mapSize.height = 2048;
+            }
 
 
+            //    var helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
+            //    helper.material.color.setHex(0x080808);
+            //    helper.material.blending = THREE.AdditiveBlending;
+            //    helper.material.transparent = true;
+            //    group.add(helper);
 
-    const scene = new THREE.Scene();
-    {
-        scene.add(new THREE.AmbientLight(0x505050));
 
-        var light = new THREE.SpotLight( 0xffffff, 1.5 );
-        light.position.set( 0, 500, 2000 );
-        light.castShadow = false;
-        scene.add( light );
-//        light.castShadow = true;
-//        light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
-//        light.shadow.bias = - 0.00022;
-//        light.shadow.mapSize.width = 2048;
-//        light.shadow.mapSize.height = 2048;
-    }
+            const renderer = this.renderer = new THREE.WebGLRenderer(options);
+            renderer.autoClear = false;
+            renderer.setClearColor(0x000000, 0.0);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.gammaInput = true;
+            renderer.gammaOutput = true;
+            renderer.sortObjects = true;
+            const elementGL = this.elementGL = renderer.domElement;
+
+
+            const dragControls = this.dragControls = new THREE.DragControls(this.draggable = [], camera, elementGL);
+            dragControls.addEventListener('dragstart', event => controls.enabled = false);
+            dragControls.addEventListener('dragend', event => controls.enabled = true);
+
+
+            this.EVENTS = new THREEx.DomEvents(camera, window);
 
 
 
-//    var helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
-//    helper.material.color.setHex(0x080808);
-//    helper.material.blending = THREE.AdditiveBlending;
-//    helper.material.transparent = true;
-//    group.add(helper);
-
-
-
-    const renderer = new THREE.WebGLRenderer(options);
-    renderer.autoClear = false;
-    renderer.setClearColor(0x000000, 0.0);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.gammaInput = true;
-    renderer.gammaOutput = true;
-    renderer.sortObjects = true;
-    var elementGL = renderer.domElement;
-
-
-    const draggable = [];
-    var dragControls = new THREE.DragControls( draggable, camera, elementGL );
-    dragControls.addEventListener( 'dragstart', function ( event ) { controls.enabled = false; } );
-    dragControls.addEventListener( 'dragend', function ( event ) { controls.enabled = true; } );
-
-
-    var EVENTS = new THREEx.DomEvents(camera, window);
 //    THREEx.DomEvents.eventNames.forEach(function(eventName){
 //        if( eventName === 'mousemove' )	return;
 //
@@ -491,348 +450,369 @@
 //        }, false);
 //    });
 
-    //init CSS3D
-    const DOMs = new THREEx.HtmlMixer.Context(renderer, scene, camera);
-    const rendererCSS = DOMs.rendererCss;
-    {
-        elementGL.style.position = 'absolute';
-        elementGL.style.top = '0px';
-        elementGL.style.width = '100%';
-        elementGL.style.height = '100%';
+            //init CSS3D
+            const DOMs = this.DOMs = new THREEx.HtmlMixer.Context(renderer, scene, camera);
+            const rendererCSS = DOMs.rendererCss;
+            {
+                elementGL.style.position = 'absolute';
+                elementGL.style.top = '0px';
+                elementGL.style.width = '100%';
+                elementGL.style.height = '100%';
 
-        //elementGL.style.pointerEvents = 'none';
+                //elementGL.style.pointerEvents = 'none';
 
 
-        /** view-source:http://jeromeetienne.github.io/threex.htmlmixer/examples/basic.html */
+                /** view-source:http://jeromeetienne.github.io/threex.htmlmixer/examples/basic.html */
 
-        rendererCSS.autoClear = false;
-        rendererCSS.setClearColor(0x000000, 0.0);
-        rendererCSS.gammaInput = true;
-        rendererCSS.gammaOutput = true;
+                rendererCSS.autoClear = false;
+                rendererCSS.setClearColor(0x000000, 0.0);
+                rendererCSS.gammaInput = true;
+                rendererCSS.gammaOutput = true;
 
 
-        var elementCSS = rendererCSS.domElement;
-        elementCSS.style.position = 'absolute';
-        elementCSS.style.top = '0px';
-        elementCSS.style.width = '100%';
-        elementCSS.style.height = '100%';
-        view.appendChild(elementCSS);
+                var elementCSS = rendererCSS.domElement;
+                elementCSS.style.position = 'absolute';
+                elementCSS.style.top = '0px';
+                elementCSS.style.width = '100%';
+                elementCSS.style.height = '100%';
+                view.appendChild(elementCSS);
 
 
-        elementCSS.appendChild(elementGL);
-    }
-
-
-
-
-    const resizer = () => {
-        const ww = window.innerWidth;
-        const hh = window.innerHeight;
-        camera.aspect = ww / hh;
-        camera.updateProjectionMatrix();
-
-        renderer.setSize(ww, hh);
-        rendererCSS.setSize(ww, hh);
-    };
-
-    window.addEventListener('resize', resizer, false);
-
-
-    resizer();
-    animate();
-
-    {
-        var gui = new dat.GUI();
-        gui.add(effectController, "showLines").onChange(function (value) {
-            edgeMesh.visible = value;
-        });
-        gui.add(effectController, "minDistance", 10, 300);
-        gui.add(effectController, "limitConnections");
-        gui.add(effectController, "maxConnections", 0, 30, 1);
-        gui.add(effectController, "particleCount", 0, maxParticleCount, 1).onChange(function (value) {
-            particleCount = parseInt(value);
-            nodes.setDrawRange(0, particleCount);
-        });
-    }
-
-
-    //---------------------
-
-    {
-        const group = new THREE.Group();
-        scene.add(group);
-
-        var segments = maxParticleCount * maxParticleCount;
-
-        var POS = new Float32Array(segments * 3);
-        var COLOR = new Float32Array(segments * 3);
-
-//        var pMaterial = new THREE.PointsMaterial({
-//            color: 0xFFFFFF,
-//            size: 3,
-//            blending: THREE.AdditiveBlending,
-//            transparent: true,
-//            sizeAttenuation: false
-//        });
-        var material = new THREE.LineBasicMaterial({
-            vertexColors: THREE.VertexColors,
-            blending: THREE.AdditiveBlending,
-            transparent: true
-        });
-
-        nodes = new THREE.BufferGeometry();
-        nodePos = new Float32Array(maxParticleCount * 3);
-        for (var i = 0; i < maxParticleCount; i++) {
-            var x = Math.random() * r - r / 2;
-            var y = Math.random() * r - r / 2;
-            var z = Math.random() * r - r / 2;
-            nodePos[i * 3] = x;
-            nodePos[i * 3 + 1] = y;
-            nodePos[i * 3 + 2] = z;
-            // add it to the geometry
-            nodeData.push({
-                vel: new THREE.Vector3(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2),
-                arity: 0
-            });
-        }
-        nodes.setDrawRange(0, particleCount);
-        nodes.addAttribute('position', new THREE.BufferAttribute(nodePos, 3).setDynamic(true));
-
-
-        //groupGL.add(pointCloud = new THREE.Points(nodes, pMaterial));
-
-
-        var geometry = new THREE.BufferGeometry();
-        geometry.addAttribute('position', new THREE.BufferAttribute(POS, 3).setDynamic(true));
-        geometry.addAttribute('color', new THREE.BufferAttribute(COLOR, 3).setDynamic(true));
-        geometry.computeBoundingSphere();
-        geometry.setDrawRange(0, 0);
-
-        edgeMesh = new THREE.LineSegments(geometry, material);
-        group.add(edgeMesh);
-
-    }
-
-
-
-    {
-        //mrdoob.com/lab/javascript/threejs/css3d/
-        //groupCSS.add( DomSurface( 'http://fsf.org', 0, 0, - 240, Math.PI ) );
-        //groupCSS.add(DomSurface('http://narchy.xyz', -240, 32, 0, -Math.PI / 2));
-
-        // create the iframe element
-        var url =
-            //'http://narchy.xyz/';
-            '/index.html';
-        var iframe = document.createElement('iframe');
-        iframe.src = url;
-        iframe.style.width = '480px';
-        iframe.style.height = '360px';
-        iframe.style.border = 'none';
-
-        // create the plane
-        var mixerPlane = new THREEx.HtmlMixer.Plane(DOMs, iframe);
-        const obj = mixerPlane.object3d;
-        obj.scale.multiplyScalar(700);
-
-        //steal focus
-        EVENTS.bind(obj, 'mouseover', () => {
-            //console.info('mouseover', elementGL.style.pointerEvents);
-            controls.enabled = false;
-            dragControls.enabled = false;
-            elementGL.style.pointerEvents = 'none';
-            return true;
-        });
-
-        EVENTS.bind(obj, 'mouseout', () => {
-            controls.enabled = true;
-            dragControls.enabled = true;
-            elementGL.style.pointerEvents = 'inherit';
-            //console.info('mouseout', elementGL.style.pointerEvents);
-            return true;
-        });
-
-        scene.add(obj);
-        //draggable.push(mixerPlane.object3d);
-    }
-
-
-
-    var geometry = new THREE.BoxGeometry( 40, 40, 40 );
-    for ( var i = 0; i < 16; i++ ) {
-        var object = new THREE.Mesh( geometry,
-            new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } )
-            //material
-        );
-        object.position.x = Math.random() * 1000 - 500;
-        object.position.y = Math.random() * 600 - 300;
-        object.position.z = Math.random() * 800 - 400;
-        object.rotation.x = Math.random() * 2 * Math.PI;
-        object.rotation.y = Math.random() * 2 * Math.PI;
-        object.rotation.z = Math.random() * 2 * Math.PI;
-        object.scale.x = Math.random() * 2 + 1;
-        object.scale.y = Math.random() * 2 + 1;
-        object.scale.z = Math.random() * 2 + 1;
-        object.castShadow = true;
-        object.receiveShadow = true;
-        scene.add( object );
-        draggable.push( object );
-
-        //EVENTS.addEventListener(object, 'mouseover', event => console.log(event), false);
-    }
-
-
-
-
-
-
-    /** https://github.com/mrdoob/three.js/blob/master/examples/css3d_youtube.html  */
-    function DomSurface(url, x, y, z, ry) {
-        var div = document.createElement('div');
-        div.style.width = '480px';
-        div.style.height = '360px';
-        div.style.backgroundColor = '#000';
-        var iframe = document.createElement('iframe');
-        iframe.style.width = '480px';
-        iframe.style.height = '360px';
-        iframe.style.border = '0px';
-        iframe.src = url;
-        div.appendChild(iframe);
-
-
-        var material = new THREE.MeshBasicMaterial({wireframe: true});
-        var geometry = new THREE.PlaneGeometry();
-        var planeMesh = new THREE.Mesh(geometry, material);
-        scene.add(planeMesh);
-
-
-        var co = new THREE.CSS3DObject(div);
-
-        co.position = planeMesh.position;
-        co.rotation = planeMesh.rotation;
-
-    }
-
-    function update(delta, now) {
-
-
-
-        controls.update();
-
-        if (nodeData.length > 0) {
-            var vertexpos = 0;
-            var colorpos = 0;
-            var numEdges = 0;
-
-            for (var i = 0; i < particleCount; i++)
-                nodeData[i].arity = 0;
-
-            for (var i = 0; i < particleCount; i++) {
-
-                // get the particle
-                var A = nodeData[i];
-
-                const iii = i * 3;
-
-                nodePos[iii] += A.vel.x;
-                nodePos[iii + 1] += A.vel.y;
-                nodePos[iii + 2] += A.vel.z;
-
-                if (nodePos[iii + 1] < -rHalf || nodePos[iii + 1] > rHalf)
-                    A.vel.y = -A.vel.y;
-
-                if (nodePos[iii] < -rHalf || nodePos[iii] > rHalf)
-                    A.vel.x = -A.vel.x;
-
-                if (nodePos[iii + 2] < -rHalf || nodePos[iii + 2] > rHalf)
-                    A.vel.z = -A.vel.z;
-
-                if (effectController.limitConnections && A.arity >= effectController.maxConnections)
-                    continue;
-
-                const minDistanceSq = effectController.minDistance * effectController.minDistance;
-
-                // Check collision
-                for (var j = i + 1; j < particleCount; j++) {
-
-                    var B = nodeData[j];
-                    if (effectController.limitConnections && B.arity >= effectController.maxConnections)
-                        continue;
-
-                    const jjj = j * 3;
-
-
-                    var distSq = 0;
-                    var dx = nodePos[iii] - nodePos[jjj];
-                    distSq += dx * dx;
-                    if (distSq > minDistanceSq) continue;
-                    var dy = nodePos[iii + 1] - nodePos[jjj + 1];
-                    distSq += dy * dy;
-                    if (distSq > minDistanceSq) continue;
-                    var dz = nodePos[iii + 2] - nodePos[jjj + 2];
-                    distSq += dz * dz;
-                    if (distSq > minDistanceSq) continue;
-
-
-                    A.arity++;
-                    B.arity++;
-
-                    var alpha = 1.0 - Math.sqrt(distSq) / effectController.minDistance;
-
-                    POS[vertexpos++] = nodePos[iii];
-                    POS[vertexpos++] = nodePos[iii + 1];
-                    POS[vertexpos++] = nodePos[iii + 2];
-
-                    POS[vertexpos++] = nodePos[jjj];
-                    POS[vertexpos++] = nodePos[jjj + 1];
-                    POS[vertexpos++] = nodePos[jjj + 2];
-
-                    COLOR[colorpos++] = alpha;
-                    COLOR[colorpos++] = alpha;
-                    COLOR[colorpos++] = alpha;
-
-                    COLOR[colorpos++] = alpha;
-                    COLOR[colorpos++] = alpha;
-                    COLOR[colorpos++] = alpha;
-
-                    numEdges++;
-
-                }
+                elementCSS.appendChild(elementGL);
             }
 
 
-            edgeMesh.geometry.setDrawRange(0, numEdges * 2);
-            edgeMesh.geometry.attributes.position.needsUpdate = true;
-            edgeMesh.geometry.attributes.color.needsUpdate = true;
+            const resizer = () => {
+                const ww = window.innerWidth;
+                const hh = window.innerHeight;
+                camera.aspect = ww / hh;
+                camera.updateProjectionMatrix();
 
-            //pointCloud.geometry.attributes.position.needsUpdate = true;
+                renderer.setSize(ww, hh);
+                rendererCSS.setSize(ww, hh);
+            };
+
+
+            var lastTimeMsec = null;
+
+            function animate(nowMsec) {
+                // keep looping
+
+                // measure time
+                lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60.0;
+                const deltaMsec = Math.min(200.0, nowMsec - lastTimeMsec);
+                lastTimeMsec = nowMsec;
+                // call each update function
+
+                const delta = (deltaMsec / 1000);
+                const now = nowMsec / 1000;
+
+                update(delta, now);
+
+                DOMs.update(delta, now)
+                renderer.render(scene, camera);
+
+                requestAnimationFrame(animate);
+            }
+
+
+            function update(delta, now) {
+                controls.update();
+            }
+
+            resizer();
+            window.addEventListener('resize', resizer, false);
+            requestAnimationFrame(animate); //START
         }
 
+
+        focusSteal(obj, enable) {
+
+            const that = this;
+            const eve = that.EVENTS;
+
+            if (enable && !obj.focusSteal) {
+                eve.bind(obj, 'mouseover', () => {
+                    //console.info('mouseover', elementGL.style.pointerEvents);
+                    that.controls.enabled = false;
+                    that.dragControls.enabled = false;
+                    that.elementGL.style.pointerEvents = 'none';
+                    return true;
+                });
+
+                eve.bind(obj, 'mouseout', () => {
+                    that.controls.enabled = true;
+                    that.dragControls.enabled = true;
+                    that.elementGL.style.pointerEvents = 'inherit';
+                    //console.info('mouseout', elementGL.style.pointerEvents);
+                    return true;
+                });
+                obj.focusSteal = true;
+            } else if (!enable && obj.focusSteal) {
+                eve.unbind(obj, 'mouseover');
+                eve.unbind(obj, 'mouseout');
+
+                obj.focusSteal = false;
+            }
+        }
+
+        add(object, opt = {draggable: true}) {
+
+            const that = this;
+
+            object.delete = function () {
+                if (object.draggable) {
+                    that.draggable.remove(object);
+                    delete object.draggable;
+                }
+                if (object.focusSteal) {
+                    that.focusSteal(object, false);
+                    delete object.focusSteal;
+                }
+                scene.remove(object);
+            };
+
+            this.scene.add(object);
+            if (opt.draggable) {
+                object.draggable = true;
+                that.draggable.push(object);
+            }
+
+            return object;
+        }
+
+        addIcon() {
+            var geometry = new THREE.BoxGeometry(40, 40, 40);
+            var object = new THREE.Mesh(geometry,
+                new THREE.MeshLambertMaterial({color: Math.random() * 0xffffff})
+            );
+            object.position.x = Math.random() * 1000 - 500;
+            object.position.y = Math.random() * 600 - 300;
+            object.position.z = Math.random() * 800 - 400;
+            object.rotation.x = Math.random() * 2 * Math.PI;
+            object.rotation.y = Math.random() * 2 * Math.PI;
+            object.rotation.z = Math.random() * 2 * Math.PI;
+            object.scale.x = Math.random() * 2 + 1;
+            object.scale.y = Math.random() * 2 + 1;
+            object.scale.z = Math.random() * 2 + 1;
+            object.castShadow = false;
+            object.receiveShadow = false;
+
+            return this.add(object);
+        }
+
+        /** https://github.com/mrdoob/three.js/blob/master/examples/css3d_youtube.html  */
+        addIFrame(url) {
+            var ele = document.createElement('div');
+            ele.style.width = '480px';
+            ele.style.height = '360px';
+            ele.style.backgroundColor = '#000';
+            var iframe = document.createElement('iframe');
+            iframe.style.width = '480px';
+            iframe.style.height = '360px';
+            iframe.style.border = '0px';
+            iframe.src = url;
+            ele.appendChild(iframe);
+            return this.addDOM(ele);
+        }
+
+        addDOM(ele) {
+
+
+            //mrdoob.com/lab/javascript/threejs/css3d/
+            //groupCSS.add( DomSurface( 'http://fsf.org', 0, 0, - 240, Math.PI ) );
+            //groupCSS.add(DomSurface('http://narchy.xyz', -240, 32, 0, -Math.PI / 2));
+
+
+            // create the plane
+            const mixerPlane = new THREEx.HtmlMixer.Plane(this.DOMs, ele);
+            const obj = mixerPlane.object3d;
+            obj.scale.multiplyScalar(700);
+
+            this.focusSteal(obj, true);
+
+            return this.add(obj);
+        }
+
+        stop() {
+
+        }
     }
 
-    var lastTimeMsec= null;
-    function animate(nowMsec){
-        // keep looping
+    const g = new GraJS(document.body);
+    g.addIcon();
+    g.addIFrame('/index.html');
 
-        // measure time
-        lastTimeMsec	= lastTimeMsec || nowMsec-1000/60.0;
-        const deltaMsec	= Math.min(200.0, nowMsec - lastTimeMsec);
-        lastTimeMsec	= nowMsec;
-        // call each update function
+    const b = document.createElement('button');
+    b.innerHTML = ('wtf');
+    g.addDOM(b);
 
-        const delta = (deltaMsec/1000);
-        const now = nowMsec/1000;
 
-        update(delta, now);
+    /*
+     {
+     const group = new THREE.Group();
+     scene.add(group);
 
-        DOMs.update(delta, now)
-        renderer.render(scene, camera);
+     var segments = maxParticleCount * maxParticleCount;
 
-        requestAnimationFrame( animate );
-    }
+     var POS = new Float32Array(segments * 3);
+     var COLOR = new Float32Array(segments * 3);
 
-    requestAnimationFrame(animate);
+     //        var pMaterial = new THREE.PointsMaterial({
+     //            color: 0xFFFFFF,
+     //            size: 3,
+     //            blending: THREE.AdditiveBlending,
+     //            transparent: true,
+     //            sizeAttenuation: false
+     //        });
+     var material = new THREE.LineBasicMaterial({
+     vertexColors: THREE.VertexColors,
+     blending: THREE.AdditiveBlending,
+     transparent: true
+     });
 
+     nodes = new THREE.BufferGeometry();
+     nodePos = new Float32Array(maxParticleCount * 3);
+     for (var i = 0; i < maxParticleCount; i++) {
+     var x = Math.random() * r - r / 2;
+     var y = Math.random() * r - r / 2;
+     var z = Math.random() * r - r / 2;
+     nodePos[i * 3] = x;
+     nodePos[i * 3 + 1] = y;
+     nodePos[i * 3 + 2] = z;
+     // add it to the geometry
+     nodeData.push({
+     vel: new THREE.Vector3(-1 + Math.random() * 2, -1 + Math.random() * 2, -1 + Math.random() * 2),
+     arity: 0
+     });
+     }
+     nodes.setDrawRange(0, particleCount);
+     nodes.addAttribute('position', new THREE.BufferAttribute(nodePos, 3).setDynamic(true));
+
+
+     //groupGL.add(pointCloud = new THREE.Points(nodes, pMaterial));
+
+
+     var geometry = new THREE.BufferGeometry();
+     geometry.addAttribute('position', new THREE.BufferAttribute(POS, 3).setDynamic(true));
+     geometry.addAttribute('color', new THREE.BufferAttribute(COLOR, 3).setDynamic(true));
+     geometry.computeBoundingSphere();
+     geometry.setDrawRange(0, 0);
+
+     edgeMesh = new THREE.LineSegments(geometry, material);
+     group.add(edgeMesh);
+
+     }
+
+     //    {
+     //        var gui = new dat.GUI();
+     //        gui.add(effectController, "showLines").onChange(function (value) {
+     //            edgeMesh.visible = value;
+     //        });
+     //        gui.add(effectController, "minDistance", 10, 300);
+     //        gui.add(effectController, "limitConnections");
+     //        gui.add(effectController, "maxConnections", 0, 30, 1);
+     //        gui.add(effectController, "particleCount", 0, maxParticleCount, 1).onChange(function (value) {
+     //            particleCount = parseInt(value);
+     //            nodes.setDrawRange(0, particleCount);
+     //        });
+     //    }
+
+
+     //---------------------
+
+
+     if (nodeData.length > 0) {
+     var vertexpos = 0;
+     var colorpos = 0;
+     var numEdges = 0;
+
+     for (var i = 0; i < particleCount; i++)
+     nodeData[i].arity = 0;
+
+     for (var i = 0; i < particleCount; i++) {
+
+     // get the particle
+     var A = nodeData[i];
+
+     const iii = i * 3;
+
+     nodePos[iii] += A.vel.x;
+     nodePos[iii + 1] += A.vel.y;
+     nodePos[iii + 2] += A.vel.z;
+
+     if (nodePos[iii + 1] < -rHalf || nodePos[iii + 1] > rHalf)
+     A.vel.y = -A.vel.y;
+
+     if (nodePos[iii] < -rHalf || nodePos[iii] > rHalf)
+     A.vel.x = -A.vel.x;
+
+     if (nodePos[iii + 2] < -rHalf || nodePos[iii + 2] > rHalf)
+     A.vel.z = -A.vel.z;
+
+     if (effectController.limitConnections && A.arity >= effectController.maxConnections)
+     continue;
+
+     const minDistanceSq = effectController.minDistance * effectController.minDistance;
+
+     // Check collision
+     for (var j = i + 1; j < particleCount; j++) {
+
+     var B = nodeData[j];
+     if (effectController.limitConnections && B.arity >= effectController.maxConnections)
+     continue;
+
+     const jjj = j * 3;
+
+
+     var distSq = 0;
+     var dx = nodePos[iii] - nodePos[jjj];
+     distSq += dx * dx;
+     if (distSq > minDistanceSq) continue;
+     var dy = nodePos[iii + 1] - nodePos[jjj + 1];
+     distSq += dy * dy;
+     if (distSq > minDistanceSq) continue;
+     var dz = nodePos[iii + 2] - nodePos[jjj + 2];
+     distSq += dz * dz;
+     if (distSq > minDistanceSq) continue;
+
+
+     A.arity++;
+     B.arity++;
+
+     var alpha = 1.0 - Math.sqrt(distSq) / effectController.minDistance;
+
+     POS[vertexpos++] = nodePos[iii];
+     POS[vertexpos++] = nodePos[iii + 1];
+     POS[vertexpos++] = nodePos[iii + 2];
+
+     POS[vertexpos++] = nodePos[jjj];
+     POS[vertexpos++] = nodePos[jjj + 1];
+     POS[vertexpos++] = nodePos[jjj + 2];
+
+     COLOR[colorpos++] = alpha;
+     COLOR[colorpos++] = alpha;
+     COLOR[colorpos++] = alpha;
+
+     COLOR[colorpos++] = alpha;
+     COLOR[colorpos++] = alpha;
+     COLOR[colorpos++] = alpha;
+
+     numEdges++;
+
+     }
+     }
+
+
+     edgeMesh.geometry.setDrawRange(0, numEdges * 2);
+     edgeMesh.geometry.attributes.position.needsUpdate = true;
+     edgeMesh.geometry.attributes.color.needsUpdate = true;
+
+     //pointCloud.geometry.attributes.position.needsUpdate = true;
+     }
+
+
+     */
 </script>
 
 </body>
