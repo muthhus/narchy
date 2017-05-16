@@ -12,32 +12,29 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
     <style>
-        html, body, #view, #blocker {
+        body, .max {
             width: 100%;
             height: 100%;
+        }
+        body {
             overflow: hidden;
-            position: absolute;
+            position: fixed;
             top: 0px;
             left: 0px;
-        }
-
-        body {
-            color: #cccccc;
-            font-family: Monospace;
-            background-color: #000000;
             margin: 0px;
+            color: #cccccc;
+            background-color: #000000;
+            font-family: monospace,sans-serif;
         }
 
-        a {
-            color: #0080ff;
-        }
 
     </style>
 </head>
 <body>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.5/dat.gui.min.js"></script>
 <script src="http://threejs.org/build/three.min.js"></script>
 
 <!--
@@ -384,28 +381,28 @@
         constructor(targetElement) {
             const view = this.view = targetElement;
 
-            const options = {alpha: true, antialias: false};
+            const options = {alpha: true, antialias: true};
 
-            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 4000);
+            const camera = new THREE.PerspectiveCamera(45, parseFloat(window.innerWidth) / window.innerHeight, 1, 4000);
             camera.position.z = 1750;
 
             //const controls = new THREE.OrbitControls(camera, view);
 
             const controls = this.controls = new THREE.TrackballControls(camera);
             controls.rotateSpeed = 1.0;
-            controls.zoomSpeed = 1.2;
+            controls.zoomSpeed = 5.2;
             controls.panSpeed = 0.8;
             controls.noZoom = false;
             controls.noPan = false;
             controls.staticMoving = true;
-            controls.dynamicDampingFactor = 0.3;
+            controls.dynamicDampingFactor = 0.5;
 
             const scene = this.scene = new THREE.Scene();
             { //LIGHTING
-                scene.add(new THREE.AmbientLight(0x505050));
+                scene.add(new THREE.AmbientLight(0x909090));
 
                 var light = new THREE.SpotLight(0xffffff, 1.5);
-                light.position.set(0, 500, 2000);
+                light.position.set(0, 500, 1000);
                 light.castShadow = false;
                 scene.add(light);
                 //        light.castShadow = true;
@@ -415,21 +412,25 @@
                 //        light.shadow.mapSize.height = 2048;
             }
 
+            //const group = this.group = new THREE.Group();
+            //scene.add(group);
 
-            //    var helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
-            //    helper.material.color.setHex(0x080808);
-            //    helper.material.blending = THREE.AdditiveBlending;
-            //    helper.material.transparent = true;
-            //    group.add(helper);
+
+                /*var helper = new THREE.BoxHelper(new THREE.Mesh(new THREE.BoxGeometry(r, r, r)));
+                helper.material.color.setHex(0x080808);
+                helper.material.blending = THREE.AdditiveBlending;
+                //helper.material.transparent = true;
+                group.add(helper);
+                */
 
 
             const renderer = this.renderer = new THREE.WebGLRenderer(options);
             renderer.autoClear = false;
-            renderer.setClearColor(0x000000, 0.0);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.gammaInput = true;
-            renderer.gammaOutput = true;
-            renderer.sortObjects = true;
+            //renderer.setClearColor(0x000000, 0.0);
+            //renderer.setPixelRatio(window.devicePixelRatio);
+            //renderer.gammaInput = true;
+            //renderer.gammaOutput = true;
+            //renderer.sortObjects = false;
             const elementGL = this.elementGL = renderer.domElement;
 
 
@@ -454,21 +455,6 @@
             const DOMs = this.DOMs = new THREEx.HtmlMixer.Context(renderer, scene, camera);
             const rendererCSS = DOMs.rendererCss;
             {
-                elementGL.style.position = 'absolute';
-                elementGL.style.top = '0px';
-                elementGL.style.width = '100%';
-                elementGL.style.height = '100%';
-
-                //elementGL.style.pointerEvents = 'none';
-
-
-                /** view-source:http://jeromeetienne.github.io/threex.htmlmixer/examples/basic.html */
-
-                rendererCSS.autoClear = false;
-                rendererCSS.setClearColor(0x000000, 0.0);
-                rendererCSS.gammaInput = true;
-                rendererCSS.gammaOutput = true;
-
 
                 var elementCSS = rendererCSS.domElement;
                 elementCSS.style.position = 'absolute';
@@ -477,13 +463,30 @@
                 elementCSS.style.height = '100%';
                 view.appendChild(elementCSS);
 
-
+                elementGL.style.position = 'absolute';
+                elementGL.style.top = '0px';
+                elementGL.style.width = '100%';
+                elementGL.style.height = '100%';
                 elementCSS.appendChild(elementGL);
+
+                //elementGL.style.pointerEvents = 'none';
+
+
+                /** view-source:http://jeromeetienne.github.io/threex.htmlmixer/examples/basic.html */
+                //rendererCSS.setClearColor(0x000000, 0.0);
+                //rendererCSS.autoClear = false;
+                //rendererCSS.gammaInput = true;
+                //rendererCSS.gammaOutput = true;
+
+
+
+
+
             }
 
 
             const resizer = () => {
-                const ww = window.innerWidth;
+                const ww = parseFloat(window.innerWidth);
                 const hh = window.innerHeight;
                 camera.aspect = ww / hh;
                 camera.updateProjectionMatrix();
@@ -509,8 +512,11 @@
 
                 update(delta, now);
 
-                DOMs.update(delta, now)
+
                 renderer.render(scene, camera);
+                DOMs.update(delta, now);
+
+
 
                 requestAnimationFrame(animate);
             }
@@ -569,10 +575,12 @@
                     that.focusSteal(object, false);
                     delete object.focusSteal;
                 }
-                scene.remove(object);
+                that.scene.remove(object);
             };
 
-            this.scene.add(object);
+            that.scene.add(object);
+
+
             if (opt.draggable) {
                 object.draggable = true;
                 that.draggable.push(object);
@@ -582,7 +590,7 @@
         }
 
         addIcon() {
-            var geometry = new THREE.BoxGeometry(40, 40, 40);
+            var geometry = new THREE.BoxGeometry(20, 20, 20);
             var object = new THREE.Mesh(geometry,
                 new THREE.MeshLambertMaterial({color: Math.random() * 0xffffff})
             );
@@ -592,60 +600,77 @@
             object.rotation.x = Math.random() * 2 * Math.PI;
             object.rotation.y = Math.random() * 2 * Math.PI;
             object.rotation.z = Math.random() * 2 * Math.PI;
-            object.scale.x = Math.random() * 2 + 1;
-            object.scale.y = Math.random() * 2 + 1;
-            object.scale.z = Math.random() * 2 + 1;
+            object.scale.x = Math.random() * 5 + 1;
+            object.scale.y = Math.random() * 5 + 1;
+            object.scale.z = Math.random() * 5 + 1;
             object.castShadow = false;
             object.receiveShadow = false;
 
-            return this.add(object);
+            return this.add(object, {draggable: true});
         }
 
         /** https://github.com/mrdoob/three.js/blob/master/examples/css3d_youtube.html  */
-        addIFrame(url) {
-            var ele = document.createElement('div');
-            ele.style.width = '480px';
-            ele.style.height = '360px';
-            ele.style.backgroundColor = '#000';
+        addIFrame(url, pw, ph) {
+            //var ele = document.createElement('div');
+            //ele.style.width = '100%';
+            //ele.style.height = '100%';
             var iframe = document.createElement('iframe');
-            iframe.style.width = '480px';
-            iframe.style.height = '360px';
             iframe.style.border = '0px';
             iframe.src = url;
-            ele.appendChild(iframe);
-            return this.addDOM(ele);
+//            iframe.style.width = '100%';
+//            iframe.style.height = '100%';
+            //ele.appendChild(iframe);
+            return this.addDOM(
+                //($('<div>').append(iframe))[0],
+                iframe,
+                pw, ph);
         }
 
-        addDOM(ele) {
+        addDOM(ele, pw, ph) {
 
-
-            //mrdoob.com/lab/javascript/threejs/css3d/
-            //groupCSS.add( DomSurface( 'http://fsf.org', 0, 0, - 240, Math.PI ) );
-            //groupCSS.add(DomSurface('http://narchy.xyz', -240, 32, 0, -Math.PI / 2));
-
-
-            // create the plane
-            const mixerPlane = new THREEx.HtmlMixer.Plane(this.DOMs, ele);
+            const wrapper = ($('<div>').append(ele))[0];
+            const mixerPlane = new THREEx.HtmlMixer.Plane(this.DOMs, wrapper);
             const obj = mixerPlane.object3d;
-            obj.scale.multiplyScalar(700);
+            obj.scale.x = obj.scale.y = obj.scale.z = 1000;
+
+
 
             this.focusSteal(obj, true);
 
-            return this.add(obj);
+            const d = this.add(obj, {draggable: false});
+
+            //console.log( $(ele).parent(),$(ele).parent().width());
+            //$(ele).css({'width': '', 'height': ''});
+            //console.log( pw, ph, $(ele)[0] );
+
+            wrapper.style.width = pw + 'px';
+            wrapper.style.height = ph + 'px';
+            $(ele).addClass('max');
+
+            return d;
         }
 
         stop() {
-
+            //TODO
         }
     }
 
     const g = new GraJS(document.body);
-    g.addIcon();
-    g.addIFrame('/index.html');
 
-    const b = document.createElement('button');
-    b.innerHTML = ('wtf');
-    g.addDOM(b);
+
+
+    g.addIFrame('/index.html', 400, 400);
+
+    const b = g.addDOM($('<div><button>wtf</button><div contenteditable="true">idk</div></div>')
+            .attr('style', 'padding: 1em; border: 3px solid purple;')[0],
+             200, 200);
+    b.position.x = 250;
+    b.position.y = 250;
+
+    for (var kk = 0; kk < 16; kk++) {
+        const ic = g.addIcon();
+    }
+    console.log(g.scene);
 
 
     /*
