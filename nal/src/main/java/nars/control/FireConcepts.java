@@ -19,7 +19,6 @@ import nars.premise.DerivationBudgeting;
 import nars.premise.Premise;
 import nars.premise.PremiseBuilder;
 import nars.task.DerivedTask;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -77,7 +76,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     int premiseVector(PLink<Concept> pc, Derivation d) {
 
         float cPri = pc.priSafe(0);
-        int ttl = Util.lerp(cPri, Param.UnificationTTL, Param.UnificationTTLMin);
+        int ttl = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
 
         Concept c = pc.get();
         c.tasklinks().commit();
@@ -171,7 +170,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 if (p != null) {
 
                     float invest = Util.or(tlPri, termlink.pri());
-                    int ttl = Util.lerp(invest, Param.UnificationTTL, Param.UnificationTTLMin);
+                    int ttl = Util.lerp(invest, Param.UnificationTTLMax, Param.UnificationTTLMin);
 
                     if (deriver.test(d.restart(p, ttl)))
                         count++;

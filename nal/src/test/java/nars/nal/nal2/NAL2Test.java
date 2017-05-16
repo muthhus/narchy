@@ -25,6 +25,7 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void revision()  {
         TestNAR tester = test();
+        tester.log();
         tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
         tester.believe("<robin <-> swan>") ;//;//Robin is similar to swan.");
         tester.believe("<robin <-> swan>", 0.1f, 0.6f);

@@ -442,7 +442,7 @@ public class KIFInput implements Runnable {
                        public void derive(Task x) {
                            e.input(x);
                        }
-                   }.restart(new Premise( t, Terms.ZeroProduct, null, 1f), Param.UnificationTTL));
+                   }.restart(new Premise( t, Terms.ZeroProduct, null, 1f), Param.UnificationTTLMax));
                //});
            }
         });

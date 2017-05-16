@@ -6,6 +6,7 @@ import nars.Task;
 import nars.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -31,16 +32,16 @@ public class Revision {
     public static final Logger logger = LoggerFactory.getLogger(Revision.class);
 
     @Nullable
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minConf) {
+    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minEvi) {
         float w1 = a.evi() * factor;
         float w2 = b.evi() * factor;
         float w = (w1 + w2);
-        float c = w2c(w);
-        return c < minConf ?
+        return w <= minEvi ?
                 null :
-                $.t(
+                new PreciseTruth(
                         (w1 * a.freq() + w2 * b.freq()) / w,
-                        c
+                        w,
+                        false
                 );
     }
 
@@ -150,8 +151,9 @@ public class Revision {
                 now, start, end,
                 evidence
         );
+        t.setPri(a.priSafe(0) +
+                b.priSafe(0));
 
-        t.budget(a, b);
 
         return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }

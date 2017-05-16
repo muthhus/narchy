@@ -1,11 +1,15 @@
 
 package jcog.event;
 
+
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * notifies subscribers when a value is emitted
@@ -25,15 +29,17 @@ public interface Topic<V> {
         return all(obj, f, (key)->true);
     }
 
-    static void each(Object obj, Consumer<Field /* fieldName*/> f) {
-        /** TODO cache the fields because reflection may be slow */
-        for (Field field : obj.getClass().getFields()) {
-            Class<?> returnType = field.getType();
-            if (returnType.equals(Topic.class)) {
-                f.accept(field);
-            }
+    /** warning this could grow large */
+    static final Map<Class,Field[]> fieldCache = new ConcurrentHashMap();
 
-            //System.out.println(obj + "  " + f + " " + returnType);
+    static void each(Class c, Consumer<Field /* fieldName*/> f) {
+        /** TODO cache the fields because reflection may be slow */
+
+
+        for (Field field : fieldCache.computeIfAbsent(c, (cc) ->
+            Stream.of(cc.getFields()).filter(x -> x.getType().equals(Topic.class)).toArray(Field[]::new)
+        )) {
+            f.accept(field);
         }
 
     }
@@ -46,7 +52,7 @@ public interface Topic<V> {
 
         Ons s = new Ons();
 
-        each(obj, (field) -> {
+        each(obj.getClass(), (field) -> {
             String fieldName = field.getName();
             if (includeKey!=null && !includeKey.test(fieldName))
                 return;

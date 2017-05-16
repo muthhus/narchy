@@ -11,6 +11,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -217,19 +218,28 @@ public class MySTMClustered extends STMClustered {
                         if (conf < confMin)
                             return null;
 
-                        long[] evidence = Stamp.zip(uu);
 
                         @Nullable Compound conj = group(negated, uu);
                         if (conj == null)
                             return null;
 
-                        Task m = new GeneratedTask(conj, punc,
-                                $.t(finalFreq, conf), now, start[0], end[0], evidence ); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                        @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
+                        if (cp!=null) {
+                            long[] evidence = Stamp.zip(uu);
+
+                            Task m = new GeneratedTask(cp.getOne(), punc,
+                                    $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                            m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()), false));
+                            return m;
+
+                        }
+
+                        return null;
 
 //                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
 //                        float priAvg = ((float)(priTotal / uu.size()));
 //
-                        m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()), false));
+
 //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -244,7 +254,6 @@ public class MySTMClustered extends STMClustered {
 //        return this;
                         //m.log("STMCluster CoOccurr");
 
-                        return m;
 
                         //logger.debug("{}", m);
                         //generate.emit(m);

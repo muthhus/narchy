@@ -82,7 +82,7 @@ public class UnificationTest {
 
             final Term finalT = t1;
             Unify sub = new Unify($.terms, type,
-                    nar.random(), Param.UnificationStackMax, Param.UnificationTTL) {
+                    nar.random(), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
 
                 @Override

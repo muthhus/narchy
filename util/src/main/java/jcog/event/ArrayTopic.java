@@ -54,17 +54,31 @@ public class ArrayTopic<V> extends ArraySharingList<Consumer<V>> implements Topi
         //register(this);
     }
 
-    @Override
+     @Override
     public final void emit(Object /* V */ arg) {
         Consumer[] vv = getCachedNullTerminatedArray();
-        if (vv != null) {
-            for (int i = 0; ; ) {
-                Consumer c = vv[i++];
-                if (c != null) {
-                    try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
-                } else
-                    break; //null terminator hit
-            }
+        if (vv == null) return;
+
+        for (int i = 0; ; ) {
+            Consumer c = vv[i++];
+            if (c == null)
+                break; //null terminator hit
+
+            c.accept(arg);
+        }
+    }
+
+
+    public final void emitSafe(Object /* V */ arg) {
+        Consumer[] vv = getCachedNullTerminatedArray();
+        if (vv == null) return;
+
+        for (int i = 0; ; ) {
+            Consumer c = vv[i++];
+            if (c == null)
+                break; //null terminator hit
+
+            try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
         }
     }
 

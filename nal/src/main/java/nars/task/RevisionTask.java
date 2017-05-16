@@ -27,7 +27,9 @@ public class RevisionTask extends AnswerTask {
 
 
     public RevisionTask(@NotNull Compound term, @NotNull Task newBelief, @NotNull Task oldBelief, Truth conclusion, long creationTime, long start, long end) {
-        super(term, newBelief, oldBelief, conclusion, creationTime, start, end, 0.5f);
+        super(term, newBelief, oldBelief, conclusion, creationTime, start, end,
+                0.5f /* TODO try proportional stamps */);
+
     }
 
 

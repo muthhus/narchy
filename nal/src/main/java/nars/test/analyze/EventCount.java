@@ -25,7 +25,7 @@ public class EventCount {
         Map<Object, HitMeter> eventMeters
                 = this.eventMeters = $.newHashMap();
 
-        Topic.each(nar, (field) -> {
+        Topic.each(NAR.class, (field) -> {
             String nn = field.getName();
             eventMeters.put(nn, new HitMeter(nn));
         });

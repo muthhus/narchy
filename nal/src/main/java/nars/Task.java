@@ -974,16 +974,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         Task accepted = c.process(this, n);
         if (accepted != null) {
 
-            Activation a = SpreadingActivation.activate(this, n, c, 1f);
+            Activation a = SpreadingActivation.activate(accepted, n, c, 1f);
 
-            if (this == accepted) {
+            if (this == accepted || !this.equals(accepted)) {
 
                 n.terms.commit(c);
 
                 if (!isInput()) //dont count direct input as learning
-                    n.emotion.learn(inputPri, volume());
+                    n.emotion.learn(accepted.pri(), volume());
 
-                n.eventTaskProcess.emit(/*post*/(this));
+                n.eventTaskProcess.emit(/*post*/accepted);
 
                 // SUCCESSFULLY PROCESSED
 

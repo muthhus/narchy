@@ -21,6 +21,7 @@
 package nars.budget;
 
 import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Task;
 import nars.util.UtilityFunctions;
@@ -220,22 +221,31 @@ public final class BudgetFunctions extends UtilityFunctions {
 
     /** TODO guarantee balanced input and output */
     @NotNull
-    public static Priority fund(@NotNull Iterable<Task> tt, float paymentProportion, boolean copyOrTransfer) {
+    public static Priority fund(@NotNull Iterable<? extends Priority> tt, float paymentProportion, boolean copyOrTransfer) {
         Pri u = new Pri(0f);
-        for (Task t : tt) {
-            Priority tbudget = t.priority();
-            if (copyOrTransfer) {
-                //COPY
-                plus.merge(u, tbudget, paymentProportion);
-            } else {
-                //TRANSFER
-                float before = u.pri();
-                plus.merge(u, tbudget, paymentProportion);
-                float after = u.pri();
-                tbudget.priAdd(-(after - before));
-            }
-        }
+        for (Priority t : tt)
+            fund(u, t, paymentProportion, copyOrTransfer);
         return u;
+    }
+    @NotNull
+    public static Priority fund(float paymentProportion, boolean copyOrTransfer, Priority... src) {
+        Pri u = new Pri(0f);
+        for (Priority t : src)
+            fund(u, t, paymentProportion, copyOrTransfer);
+        return u;
+    }
+
+    public static void fund(Priority target, Priority source, float paymentProportion, boolean copyOrTransfer) {
+        if (copyOrTransfer) {
+            //COPY
+            plus.merge(target, source, paymentProportion);
+        } else {
+            //TRANSFER
+            float before = target.priSafe(0);
+            plus.merge(target, source, paymentProportion);
+            float after = target.priSafe(0);
+            source.priAdd(-(after - before));
+        }
     }
 
     /**

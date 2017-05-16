@@ -3,7 +3,9 @@ package nars.table;
 import jcog.data.sorted.SortedArray;
 import jcog.pri.PriMerge;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.budget.BudgetFunctions;
 import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.RevisionTask;
@@ -168,7 +170,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    private /*Revision*/Task tryRevision(@NotNull Task newBelief /* input */, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -178,10 +180,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         //Try to select a best revision partner from existing beliefs:
         Task oldBelief = null;
-        float bestRank = 0f, bestConf = 0f;
         Truth conclusion = null;
 
-        Truth newBeliefTruth = input.truth();
+        Truth newBeliefTruth = newBelief.truth();
 
         int dur = nar.dur();
 
@@ -191,13 +192,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x == null) //the array has trailing nulls from having extra capacity
                 break;
 
-            if (x.equals(input)) {
-                if (x != input)
-                    PriMerge.max(x, input.priority());
+            if (x.equals(newBelief)) {
+                if (x != newBelief)
+                    PriMerge.max(x, newBelief.priority());
                 return x;
             }
 
-            if (!Revision.isRevisible(input, x))
+            if (!Revision.isRevisible(newBelief, x))
                 continue;
 
 
@@ -215,31 +216,24 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, bestConf);
+            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, conclusion == null ?  0 : conclusion.evi());
 
             //avoid a weak or duplicate truth
             if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
                 continue;
 
-            float cconf = c.conf();
-            final int totalEvidence = 1; //newBelief.evidence().length + x.evidence().length; //newBelief.evidence().length + x.evidence().length;
-            float rank = rank(cconf, totalEvidence);
+            oldBelief = x;
+            conclusion = c;
 
-            if (rank > bestRank) {
-                bestRank = rank;
-                bestConf = cconf;
-                oldBelief = x;
-                conclusion = c;
-            }
         }
 
         if (oldBelief == null)
             return null;
 
-        final float newBeliefWeight = input.evi();
+        final float newBeliefWeight = newBelief.evi();
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
         Compound t = normalizedOrNull(Revision.intermpolate(
-                input.term(), oldBelief.term(),
+                newBelief.term(), oldBelief.term(),
                 aProp,
                 nar.random(),
                 true
@@ -249,31 +243,36 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             return null;
 
         RevisionTask r = new RevisionTask(t,
-                input, oldBelief,
+                newBelief, oldBelief,
                 conclusion,
                 nar.time(),
-                ETERNAL, ETERNAL
-        );
+                ETERNAL, ETERNAL);
+        r.setPri(BudgetFunctions.fund(0.5f,false,oldBelief,newBelief));
 
-        return r.log("Insertion Revision");
+        if (Param.DEBUG)
+            r.log("Insertion Revision");
+
+        return r;
     }
 
     @Nullable
     public Task put(@NotNull final Task incoming) {
         Task displaced = null;
 
-        if (size() == capacity()) {
-            Task weakestPresent = weakest();
-            if (weakestPresent != null) {
-                if (floatValueOf(weakestPresent) <= floatValueOf(incoming)) {
-                    displaced = removeLast();
-                } else {
-                    return incoming; //insufficient confidence
+        synchronized (this) {
+            if (size() == capacity()) {
+                Task weakestPresent = weakest();
+                if (weakestPresent != null) {
+                    if (floatValueOf(weakestPresent) <= floatValueOf(incoming)) {
+                        displaced = removeLast();
+                    } else {
+                        return incoming; //insufficient confidence
+                    }
                 }
             }
-        }
 
-        add(incoming, this);
+            add(incoming, this);
+        }
 
         return displaced;
     }
@@ -334,7 +333,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             return null;
         }
 
-        Task revised = null;
 
 
         if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
@@ -348,49 +346,33 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         //Try forming a revision and if successful, inputs to NAR for subsequent cycle
             /*if (!(input instanceof AnswerTask))*/
 
-        revised = tryRevision(input, concept, nar);
-        if (revised != null) {
-            if (revised.equals(input)) {
-                //duplicate
-                //TODO decide what to do here
-                return revised;
+        Task revised = tryRevision(input, concept, nar);
+        if (revised != null && revised.equals(input)) {
+            //duplicate
+            //TODO decide what to do here
+            return revised;
+        }
+
+
+
+
+
+        if (revised == null) {
+            return insert(input) ? input : null;
+        } else {
+            boolean revisedIns = insert(revised);
+            if (!revisedIns) {
+                return null; //couldnt even insert the revised, another thread must have inserted better beliefs in-between the revision test and here
             }
+            boolean inputIns = insert(input);
+            if (inputIns) {
+                //return revised but only emit a process input. the revised (stronger) will be used for activation
+                nar.eventTaskProcess.emit(input);
+            }
+            return revised;
         }
 
 
-        boolean inserted;
-        synchronized (this) {
-            //Finally try inserting this task.  If successful, it will be returned for link activation etc
-            inserted = insert(input);
-        }
-
-
-        if (revised != null) {
-
-            //            revised = insert(revised, displaced) ? revised : null;
-            //
-            //            if (revised!=null) {
-            //                if (result == null) {
-            //                    result = revised;
-            //                } else {
-            //                    //HACK
-            //                    //insert a tasklink since it will not be created normally
-            //                    nar.activate(revised, nar.conceptActivation.floatValue() /* correct? */);
-            //                    revised.onConcept(revised.concept(nar), 0f);
-            //
-            //                }
-            //            }
-            //result = insert(revised, et) ? revised : result;
-
-            nar.input(revised);
-
-            //            nar.runLater(() -> {
-            //                if (!revised.isDeleted())
-            //                    nar.input(revised);
-            //            });
-        }
-
-        return inserted ? input : null;
     }
 
 
@@ -437,13 +419,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
 
-    public final float rank(float eConf, int length) {
-        //return rankEternalByConfAndOriginality(eConf, length);
-        return eConf;
-    }
 
-    public boolean isFull() {
-        return size() == capacity();
-    }
 
 }

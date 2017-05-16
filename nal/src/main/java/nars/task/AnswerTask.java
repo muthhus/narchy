@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -41,12 +42,6 @@ public class AnswerTask extends ImmutableTask {
 
 
 
-    @Nullable
-    public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        setPri(a.priSafe(0) +
-                b.priSafe(0));
-        return this;
-    }
 
 
 //    @Override
