@@ -13,42 +13,42 @@ function labelize(l) {
 class Cache {
 
     constructor() {
-        this.map     = new Map();
+        this.map = new Map();
         this.weakmap = new WeakMap();
     }
 
     // create or retrieve a nested Cache instance based on an arguments object
-    get( args ) {
-        return args.reduce( Cache.reducer, this );
+    get(args) {
+        return args.reduce(Cache.reducer, this);
     }
 
     // get a backing store (map/weakmap) based on a given value
-    store( value ) {
+    store(value) {
         const t = typeof value;
         const isObject = ( t === 'object' || t === 'function' ) && value !== null;
-        return Reflect.get( this, isObject ? 'weakmap' : 'map' );
+        return Reflect.get(this, isObject ? 'weakmap' : 'map');
     }
 
-    static reducer( cache, value ) {
-        const store = cache.store( value );
-        return store.get( value ) || store.set( value, new Cache() ).get( value );
+    static reducer(cache, value) {
+        const store = cache.store(value);
+        return store.get(value) || store.set(value, new Cache()).get(value);
     }
 
 }
 
-function memoize( fn, { ttl = Infinity } = {} ) {
+function memoize(fn, {ttl = Infinity} = {}) {
     const cache = new Cache();
 
-    return function( ...args ) {
+    return function (...args) {
         // get (or create) a cache item
-        const item = cache.get( args );
+        const item = cache.get(args);
 
-        if ( item.hasOwnProperty('value') && item.expires >= Date.now() ) {
+        if (item.hasOwnProperty('value') && item.expires >= Date.now()) {
             return item.value;
         }
 
         item.expires = Date.now() + ttl;
-        return item.value = fn.apply( this, args );
+        return item.value = fn.apply(this, args);
     };
 }
 
@@ -89,7 +89,7 @@ const defaultHostname = window.location.hostname || 'localhost';
 const defaultWSPort = window.location.port || 8080;
 
 /** creates a websocket connection to a path on the server that hosts the currently visible webpage */
-const NARSocket = function(path, onMessage, options) {
+const NARSocket = function (path, onMessage, options) {
     const ws = new ReconnectingWebSocket('ws://' +
         defaultHostname + ':' +
         defaultWSPort + '/' +
@@ -113,12 +113,12 @@ const NARSocket = function(path, onMessage, options) {
 
     const e = new EventEmitter();
 
-    ws.onmessage = function(m) {
+    ws.onmessage = function (m) {
 
         const d = m.data;
 
         //setTimeout(() => {
-            onMessage(e, d);
+        onMessage(e, d);
         //} ,0);
 // //        try {
 //
@@ -142,7 +142,6 @@ const NARSocket = function(path, onMessage, options) {
 
     return e;
 };
-
 
 
 if (!("TextEncoder" in window))
@@ -170,27 +169,36 @@ function decodeTasks(e, m) {
             case '?':
             case '@':
             case ';': {
-                const pri = d.getFloat32(j); j += 4;
+                const pri = d.getFloat32(j);
+                j += 4;
 
-                const startLow = d.getInt32(j); j += 4;
-                const startHigh = d.getInt32(j); j += 4;
+                const startLow = d.getInt32(j);
+                j += 4;
+                const startHigh = d.getInt32(j);
+                j += 4;
                 const start = startLow | (startHigh << 32);
 
-                const endLow = d.getInt32(j); j += 4;
-                const endHigh = d.getInt32(j); j += 4;
+                const endLow = d.getInt32(j);
+                j += 4;
+                const endHigh = d.getInt32(j);
+                j += 4;
                 const end = endLow | (endHigh << 32);
 
                 let freq, conf;
                 if ((punct === '.') || (punct === '!')) {
-                    freq = d.getFloat32(j); j += 4;
-                    conf = d.getFloat32(j); j += 4;
+                    freq = d.getFloat32(j);
+                    j += 4;
+                    conf = d.getFloat32(j);
+                    j += 4;
                 } else {
                     freq = conf = undefined;
                 }
-                const termStrLen = d.getUint16(j); j += 2;
-                var term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+                const termStrLen = d.getUint16(j);
+                j += 2;
+                var term = decoder.decode(m.slice(j, j + termStrLen));
+                j += termStrLen;
 
-                if (freq!==undefined & freq < 0.5) {
+                if (freq !== undefined & freq < 0.5) {
                     //negate
                     freq = 1.0 - freq;
                     term = '(--,' + term + ')';
@@ -200,7 +208,7 @@ function decodeTasks(e, m) {
                     term: term,
                     punc: punct,
                     pri: pri,
-                    when: [start,end],
+                    when: [start, end],
                     freq: freq,
                     conf: conf
                 });
@@ -272,19 +280,23 @@ function graphConcepts(tgt) {
     function nextBudgeted(d, m) {
         var j = d.j || 0;
 
-        const p = d.getFloat32(j); j += 4;
+        const p = d.getFloat32(j);
+        j += 4;
 
-        const x = { };
+        const x = {};
 
         if (p >= 0) {
             x.pri = p;
 
-            const termStrLen = d.getInt16(j); j += 2;
+            const termStrLen = d.getInt16(j);
+            j += 2;
             if (termStrLen > 0) {
-                x.term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+                x.term = decoder.decode(m.slice(j, j + termStrLen));
+                j += termStrLen;
             }
 
-        } /* else, it is end of segment signal */
+        }
+        /* else, it is end of segment signal */
 
         d.j = j;
 
@@ -294,24 +306,29 @@ function graphConcepts(tgt) {
     function nextBudgeted(d, m) {
         var j = d.j || 0;
 
-        const p = d.getFloat32(j); j += 4;
+        const p = d.getFloat32(j);
+        j += 4;
 
-        const x = { };
+        const x = {};
 
         if (p >= 0) {
             x.pri = p;
 
-            const termStrLen = d.getInt16(j); j += 2;
+            const termStrLen = d.getInt16(j);
+            j += 2;
             if (termStrLen > 0) {
-                x.term = decoder.decode(m.slice(j, j + termStrLen)); j += termStrLen;
+                x.term = decoder.decode(m.slice(j, j + termStrLen));
+                j += termStrLen;
             }
 
-        } /* else, it is end of segment signal */
+        }
+        /* else, it is end of segment signal */
 
         d.j = j;
 
         return x;
     }
+
     function decodeConceptSummaries(e, m) {
         const d = new DataView(m);
         let j = 0;
@@ -366,7 +383,7 @@ function graphConcepts(tgt) {
 
     active.on('concept_summary', function (xx) {
 
-        c.graph.batch(()=> {
+        c.graph.batch(() => {
             for (const x of xx) {
 
                 const id = x.term;
@@ -450,7 +467,7 @@ function taskFeed(socket) {
                     //should not happen
                 }
 
-                iconColor = 'rgb(' + parseInt(c  * 256) + ',' + parseInt(c  * 256) + ',' + parseInt((f-0.5) * 2 * 256) + ')';
+                iconColor = 'rgb(' + parseInt(c * 256) + ',' + parseInt(c * 256) + ',' + parseInt((f - 0.5) * 2 * 256) + ')';
 
                 break;
             case '?':
@@ -486,7 +503,6 @@ function taskFeed(socket) {
         p.data('task', x);
 
 
-
         const onClick0 = (e) => {
             const task = $(e.target).parent().data('task');
 
@@ -495,7 +511,7 @@ function taskFeed(socket) {
                 exp.html(JSON.stringify(task));
             }
 
-            exp.toggle( "slow", function() {
+            exp.toggle("slow", function () {
                 // Animation complete.
             });
             //console.log( task );
@@ -520,7 +536,6 @@ function taskFeed(socket) {
 
     }).addClass('terminal');
 }
-
 
 
 function Editor(options) {
@@ -553,8 +568,8 @@ function NALInputEditor(socket, initialValue) {
 
     div.editor = editor;
 
-    editor.on('keypress', function(instance, event) {
-        if (event.ctrlKey && event.code==="Enter") {
+    editor.on('keypress', function (instance, event) {
+        if (event.ctrlKey && event.code === "Enter") {
             const txt = editor.getValue();
             if (txt) {
                 editor.setValue('');
@@ -577,7 +592,6 @@ function NALInputEditor(socket, initialValue) {
 
     return div;
 }
-
 
 
 function NARSpeechRecognition(editor) {
@@ -606,11 +620,11 @@ function NARSpeechRecognition(editor) {
         console.log(msg);
     }
 
-    recognition.onstart = function() {
+    recognition.onstart = function () {
         recognizing = true;
         //showInfo('info_speak_now');
     };
-    recognition.onerror = function(event) {
+    recognition.onerror = function (event) {
         if (event.error == 'no-speech') {
             alert('no speech');
             ignore_onend = true;
@@ -628,7 +642,7 @@ function NARSpeechRecognition(editor) {
             ignore_onend = true;
         }
     };
-    recognition.onend = function() {
+    recognition.onend = function () {
         recognizing = false;
         if (ignore_onend) {
             return;
@@ -646,11 +660,11 @@ function NARSpeechRecognition(editor) {
         // }
 
     };
-    recognition.onresult = function(event) {
+    recognition.onresult = function (event) {
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             const r = event.results[i];
             if (r.isFinal) {
-                editor.insert( r[0].transcript );
+                editor.insert(r[0].transcript);
             }
         }
 
@@ -692,7 +706,7 @@ function NARSpeechRecognition(editor) {
 
     setRecording(false);
 
-    return speechToggleButton.click(function() {
+    return speechToggleButton.click(function () {
         const recording = !speechToggleButton.data('record');
 
         setRecording(recording);
@@ -739,27 +753,27 @@ function NARConsole(socket, render) {
         queued = false;
 
         //fastdom.mutate(()=> {
-            const oldItems = items[0];
-            const newItems = oldItems.cloneNode(false);
-            for (let a of Array.from(shown, render)) {
-                if (a) {
-                    newItems.appendChild(a);
-                }
+        const oldItems = items[0];
+        const newItems = oldItems.cloneNode(false);
+        for (let a of Array.from(shown, render)) {
+            if (a) {
+                newItems.appendChild(a);
             }
-            view[0].replaceChild(newItems, oldItems);
-            items[0] = newItems;
+        }
+        view[0].replaceChild(newItems, oldItems);
+        items[0] = newItems;
 
-            const height = newItems.scrollHeight;
+        const height = newItems.scrollHeight;
 
-            later( () =>
-                 view.scrollTop(height)
-            );
+        later(() =>
+            view.scrollTop(height)
+        );
 
         //});
 
     };
 
-    socket.on('task', function(x) {
+    socket.on('task', function (x) {
 
         //console.log('console: ', JSON.stringify(x), x);
 
@@ -778,7 +792,7 @@ function NARConsole(socket, render) {
 
         const len = shown.length;
         if (len > maxLines) {
-            shown = shown.slice(len-maxLines, len-1);
+            shown = shown.slice(len - maxLines, len - 1);
         }
 
 
@@ -790,23 +804,23 @@ function NARConsole(socket, render) {
         }
 
 
-            // const lines = editor.session.getLength() + newTasks.length;
-            // const linesOver = lines - maxLines;
-            // if (linesOver > 0) {
-            //     editor.session.getDocument().removeFullLines(0, linesOver);
-            // }
-            //
-            // editor.navigateFileEnd();
-            // editor.navigateLineEnd();
-            //
-            // for (let n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
-            //     if (lines + n > 0)
-            //         editor.insert('\n');
-            //     editor.navigateLineStart();
-            //     editor.insert(line(newTasks[n]));
-            // }
-            //
-            // editor.scrollToRow(editor.getLastVisibleRow());
+        // const lines = editor.session.getLength() + newTasks.length;
+        // const linesOver = lines - maxLines;
+        // if (linesOver > 0) {
+        //     editor.session.getDocument().removeFullLines(0, linesOver);
+        // }
+        //
+        // editor.navigateFileEnd();
+        // editor.navigateLineEnd();
+        //
+        // for (let n = Math.max(0, newTasks.length - maxLines); n < newTasks.length; n++) {
+        //     if (lines + n > 0)
+        //         editor.insert('\n');
+        //     editor.navigateLineStart();
+        //     editor.insert(line(newTasks[n]));
+        // }
+        //
+        // editor.scrollToRow(editor.getLastVisibleRow());
 
 
     });
@@ -824,7 +838,7 @@ function TopTable(s) {
         const e = document.createElement('span');
 
         e.className = 'ConceptRow';
-        e.style.fontSize = parseInt(70.0 + 2 * 100.0*pri) + '%';
+        e.style.fontSize = parseInt(70.0 + 2 * 100.0 * pri) + '%';
         const pp = parseInt(128 + 128 * pri);
         e.style.color = 'rgb(' + pp + ',' + pp + ',' + pp + ')';
         e.innerText = c.term;//[0];
@@ -836,9 +850,9 @@ function TopTable(s) {
 
     var shown = [];
     var busy = false;
-    var maxShown = 1024*1024; //unlimited
+    var maxShown = 1024 * 1024; //unlimited
 
-    s.on('concept_summary', function(cs) {
+    s.on('concept_summary', function (cs) {
 
 
         shown.push(cs);
@@ -849,8 +863,8 @@ function TopTable(s) {
                 busy = false;
 
                 //const m = JSON.parse(msg.data);
-                shown.sort((a,b)=>{
-                   return b.pri - a.pri;
+                shown.sort((a, b) => {
+                    return b.pri - a.pri;
                 });
 
 
@@ -866,9 +880,7 @@ function TopTable(s) {
                 fastdom.mutate(() =>
 
                     d.empty().append(rr)
-
                 );
-
 
 
             }, 0);
@@ -878,9 +890,6 @@ function TopTable(s) {
     return d;
 
 }
-
-
-
 
 
 
@@ -902,9 +911,6 @@ function TopTable(s) {
 //                verticalMargin: 20,
 //                horizontalMargin: 20
 //            })
-
-
-
 
 
 // function SocketNARGraph(path) {

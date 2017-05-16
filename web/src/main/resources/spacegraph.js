@@ -101,7 +101,7 @@ function spacegraph(opt) {
 
 
         const nodes = c.nodes();
-        const toRemove = nodes.size() - maxNodes;
+        const toRemove = nodes.cap() - maxNodes;
         var sorted;
         if (toRemove > 0) {
             sorted = nodes.sort((a, b) => {
