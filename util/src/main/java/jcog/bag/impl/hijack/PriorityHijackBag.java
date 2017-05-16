@@ -18,9 +18,7 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
 
     @Override
     protected V merge(@NotNull V existing, @NotNull V incoming, float scale) {
-        float pressure = PriMerge.combine(existing, incoming, scale);
-        if (pressure >= Priority.EPSILON)
-            pressurize(pressure);
+        existing.priAdd(incoming.priSafe(0) * scale);
         return existing; //default to the original instance
     }
 

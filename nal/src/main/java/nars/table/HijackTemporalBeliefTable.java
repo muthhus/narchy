@@ -75,7 +75,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
         float inPri = incoming.priSafe(0);
         if (!replace(inPri, existing.priSafe(0))) {
-            existing.priMult(1f - temperature() * inPri/reprobes);
+            existing.priMult(1f - /*temperature() * */ inPri/reprobes);
             return false;
         }
         return true;
@@ -83,7 +83,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
-//    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {
+
+    //    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {
 //        assert(scaleIgnored==1f);
 //
 //        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority

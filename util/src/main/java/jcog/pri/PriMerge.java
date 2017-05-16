@@ -16,27 +16,9 @@ import static jcog.pri.PriMerge.PriMergeOp.*;
 public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
 
 
-    /**
-     * simple additive Priority merging
-     * if existing is not null, then priority from incoming is applied to it * scale
-     * if existing is null, then incoming enters existence with incoming priority * scale
-     * returns the delta change in ambient pressure
-     */
-    static float combine(@NotNull Priority existing, @NotNull Priority incoming, float scale) {
-        float pAdd = incoming.priSafe(0) * scale;
 
-        float before = existing.priSafe(0);
 
-            //modify existing
-        existing.priAdd(pAdd);
 
-        return existing.priSafe(0) - before;
-
-    }
-
-    static float combine(@Nullable Priority existing, @NotNull Priority incoming) {
-        return combine(existing, incoming, 1f);
-    }
 
     /** merge 'incoming' budget (scaled by incomingScale) into 'existing'
      *  incomingScale is a factor (0 < s <= 1) by which the incoming budget's effect is multiplied,

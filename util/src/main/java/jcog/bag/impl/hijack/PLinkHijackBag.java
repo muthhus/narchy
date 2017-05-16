@@ -73,11 +73,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
-        float pressure = PriMerge.combine(existing, incoming, scale);
-
-        if (pressure >= Priority.EPSILON)
-            pressurize(pressure);
-
+        existing.priAdd(incoming.priSafe(0) * scale);
         return existing;
     }
 
