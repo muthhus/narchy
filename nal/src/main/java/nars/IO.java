@@ -76,7 +76,7 @@ public class IO {
         long cre = in.readLong();
 
         ImmutableTask mm = new ImmutableTask(term, punc, truth, cre, start, end, evi);
-        mm.setPriority(pri);
+        mm.setPri(pri);
         return mm;
     }
 

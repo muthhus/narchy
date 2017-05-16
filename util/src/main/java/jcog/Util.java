@@ -25,6 +25,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
 import jcog.list.FasterList;
+import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.PLink;
 import org.apache.commons.lang3.ArrayUtils;
@@ -592,12 +593,23 @@ public enum Util {
     /**
      * clamps a value to 0..1 range
      */
-    public static float unitize(float p) {
-        if (p > 1.0f)
-            p = 1.0f;
-        else if (p < 0.0f)
-            p = 0.0f;
-        return p;
+    public static float unitize(float x) {
+        notNaN(x);
+        if (x > 1.0f)
+            x = 1.0f;
+        else if (x < 0.0f)
+            x = 0.0f;
+        return x;
+    }
+
+    public static float notNaN(float x) throws NumberException {
+        if (x!=x) throw new NumberException("NaN");
+        return x;
+    }
+    public static float notNaNOrNeg(float x) throws NumberException {
+        if (notNaN(x) < 0)
+            throw new NumberException("Negative");
+        return x;
     }
 
     /**
@@ -1572,6 +1584,7 @@ public enum Util {
     public static float sigmoidSymmetric(float x, float sharpen) {
         return (float) ((1.0/(1 + Math.exp(-sharpen*x))-0.5)*2);
     }
+
 
 
 }

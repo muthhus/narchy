@@ -2,7 +2,10 @@ package nars.task;
 
 import nars.NAR;
 import nars.Task;
+import nars.concept.Concept;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.util.InvalidTermException;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
@@ -29,13 +32,7 @@ public class AnswerTask extends ImmutableTask {
         //this.bBelief = null; //bBelief;
     }
 
-    /**
-     * rather than store weakrefs to these tasks, just use normal refs but be sure to nullify them before returning from onConcept
-     */
-    @Deprecated public void unlink() {
 
-        //this.aBelief = this.bBelief = null;
-        }
 
     @Override
     public final boolean isInput() {
@@ -46,23 +43,18 @@ public class AnswerTask extends ImmutableTask {
 
     @Nullable
     public AnswerTask budget(@NotNull Task a, @NotNull Task b) {
-        pri(a.priSafe(0) +
+        setPri(a.priSafe(0) +
                 b.priSafe(0));
         return this;
     }
 
 
-    @Override
-    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-        unlink();
-    }
-
-    @Override
-    public boolean delete() {
-        if (super.delete()) {
-            unlink();
-            return true;
-        }
-        return false;
-    }
+//    @Override
+//    public boolean delete() {
+//        if (super.delete()) {
+//            unlink();
+//            return true;
+//        }
+//        return false;
+//    }
 }

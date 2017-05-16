@@ -202,7 +202,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
         float pp = priSafe(-1);
         if (pp < 0) {
-            setPriority(n.priorityDefault(punc));
+            setPri(n.priorityDefault(punc));
         }
 
 
@@ -233,7 +233,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
         }
 
         ImmutableTask i = new ImmutableTask(term, punc, tFinal, creation, start, end, evidence);
-        i.setPriority(this);
+        i.setPri(this);
         //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -256,6 +256,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
 //    protected void onInput(@NotNull Memory m) {
 //
 //    }
+
 
 
     @NotNull
@@ -542,10 +543,14 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
         return evidence(evidenceToCopy.stamp());
     }
 
+    @NotNull public TaskBuilder setPriThen(float p) {
+        setPri(p);
+        return this;
+    }
 
     @NotNull
     public final TaskBuilder pri(@NotNull Priority bb) {
-        setPriority(bb);
+        setPri(bb);
         //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -570,8 +575,4 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
     }
 
 
-    public TaskBuilder pri(float p) {
-        setPriority(p);
-        return this;
-    }
 }

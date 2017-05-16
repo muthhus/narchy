@@ -517,7 +517,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
 
         Task y = new ImmutableTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
-        y.setPriority(pri);
+        y.setPri(pri);
 
         input(y);
 

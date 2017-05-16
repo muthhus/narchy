@@ -6,7 +6,6 @@ import jcog.pri.PriMerge;
 import nars.Task;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Created by me on 2/17/17.
  */
-public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskTable {
+public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements TaskTable {
 
     public TaskHijackBag(int reprobes) {
         super(reprobes);
@@ -22,23 +21,20 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
 
     @Override
-    protected Task merge(@Nullable Task existing, @NotNull Task incoming, float scaleIgnored) {
-        if (existing!=null) {
-            Task next;
+    protected Task merge(@NotNull Task existing, @NotNull Task incoming, float scaleIgnored) {
+        Task next;
 
-            //prefer the existing task unless the newer has a grown start/stop range
-            //  (which is possible from an input task which has grown in timespan)
-            if (incoming.isInput() && (incoming.start() < existing.start() || incoming.end() > existing.end())) {
-                PriMerge.max(incoming, existing);
-                next = incoming; //use the newer task
-            } else {
-                PriMerge.max(existing, incoming);
-                next = existing; //use the existing
-            }
-            return next;
+        //prefer the existing task unless the newer has a grown start/stop range
+        //  (which is possible from an input task which has grown in timespan)
+        if (incoming.isInput() && (incoming.start() < existing.start() || incoming.end() > existing.end())) {
+            PriMerge.max(incoming, existing);
+            next = incoming; //use the newer task
         } else {
-            return incoming;
+            PriMerge.max(existing, incoming);
+            next = existing; //use the existing
         }
+        return next;
+
     }
 
     @NotNull
@@ -61,7 +57,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     @Override
     public boolean isEmpty() {
-        return size()==0;
+        return size() == 0;
     }
 
     @Override
@@ -71,7 +67,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
 
     @Override
     public boolean removeTask(Task x) {
-        if (remove(x)!=null) {
+        if (remove(x) != null) {
             return true;
         }
         return false;
@@ -84,7 +80,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task,Task> implements TaskT
         Task y = put(x);
         return y;
     }
-
 
 
 //    public static void flatForget(TaskHijackBag b, @NotNull NAR n) {

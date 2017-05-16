@@ -3,7 +3,6 @@ package nars.task;
 import jcog.Util;
 import jcog.pri.Pri;
 import nars.$;
-import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.task.util.InvalidTaskException;
@@ -11,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.apache.commons.collections4.map.Flat3Map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -183,10 +181,6 @@ public class ImmutableTask extends Pri implements Task {
         return stamp;
     }
 
-    @Override
-    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar) {
-
-    }
 
     @Override
     public boolean delete() {
@@ -262,7 +256,7 @@ public class ImmutableTask extends Pri implements Task {
 
     public Task clone(Compound x) {
         ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start(), end(), stamp);
-        t.setPriority(this);
+        t.setPri(this);
         return t;
     }
 

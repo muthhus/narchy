@@ -13,7 +13,6 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-import nars.op.Operator;
 import nars.task.DerivedTask;
 import nars.task.ImmutableTask;
 import nars.task.Tasked;
@@ -356,12 +355,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 //        }
     }
 
-    /**
-     * called if this task is entered into a concept's belief tables
-     * TODO what about for questions/quests
-     */
-    void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
-
+//    /**
+//     * called if this task is entered into a concept's belief tables
+//     * TODO what about for questions/quests
+//     */
+//    void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
+//
 
     default boolean isQuestOrQuestion() {
         byte c = punc();
@@ -745,7 +744,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
             return null;
 
         ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
-        y.setPriority(b);
+        y.setPri(b);
         //        if (srcCopy == null) {
 //            delete();
 //        } else {
@@ -777,7 +776,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 x.creation(),
                 x.start(), x.end(),
                 x.stamp());
-        y.setPriority(x);
+        y.setPri(x);
         y.meta = x.meta();
         return y;
     }
@@ -834,7 +833,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     default Task budget(float factor, NAR nar) {
-        setPriority(factor * nar.priorityDefault(punc()));
+        setPri(factor * nar.priorityDefault(punc()));
         return this;
     }
 

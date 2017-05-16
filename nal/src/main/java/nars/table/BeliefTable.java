@@ -259,7 +259,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                     answer,
                     question,
                     aProj, now, when, when, 0.5f);
-            a.setPriority(answer.priority());
+            a.setPri(answer.priority());
 
 //            if (Param.DEBUG)
 //                a.log("Answer Projected");

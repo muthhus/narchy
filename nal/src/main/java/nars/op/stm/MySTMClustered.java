@@ -229,7 +229,7 @@ public class MySTMClustered extends STMClustered {
 //                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
 //                        float priAvg = ((float)(priTotal / uu.size()));
 //
-                        m.priority().setPriority(BudgetFunctions.fund(uu, (1f / uu.size()), false));
+                        m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()), false));
 //        if (srcCopy == null) {
 //            delete();
 //        } else {

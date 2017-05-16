@@ -5,7 +5,11 @@ import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
+import nars.concept.Concept;
+import nars.concept.TaskConcept;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.util.InvalidTermException;
 import nars.truth.Truth;
 import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
@@ -61,31 +65,28 @@ public class RevisionTask extends AnswerTask {
      * According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links
      */
     @Override
-    public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+    public void eval(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
         //TODO reimplement again
 
         float resultPri = pri();
         if (resultPri != resultPri) {
-            unlink();
             return;
         }
 
         Task parentNewBelief = getParentTask();
         if (parentNewBelief == null) {
-            unlink();
-            return; //HACK
+            return;
         }
 
         Task parentOldBelief = getParentBelief();
         if (parentOldBelief == null) {
-            unlink();
-            return; //HACK
+            return;
         }
 
         float newBeliefContribution;
         if (parentNewBelief.isBeliefOrGoal()) {
-            int dur = nar.dur();
+            //int dur = n.dur();
             float newBeliefConf = parentNewBelief.evi();
             newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi());
         } else {
@@ -101,14 +102,15 @@ public class RevisionTask extends AnswerTask {
                 newBeliefContribution);
 
         //Balance Tasklinks
-        Bag<Task, PLink<Task>> tasklinks = concept(nar).tasklinks();
+        TaskConcept cn = concept(n);
+        Bag<Task, PLink<Task>> tasklinks = cn.tasklinks();
         BudgetFunctions.balancePri(
                 tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
                 resultPri,
                 newBeliefContribution);
 
 
-        unlink();
+
     }
 
 //    private void weaken(Task parent) {

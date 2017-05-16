@@ -6,14 +6,13 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by me on 2/17/17.
  */
-public class RawPLink<X> implements PLink<X> {
+public class RawPLink<X> extends Pri implements PLink<X> {
 
-    protected final X id;
-    float pri;
+    @NotNull protected final X id;
 
-    public RawPLink(X x, float p) {
+    public RawPLink(@NotNull X x, float p) {
+        super(p);
         this.id = x;
-        setPriority(p);
     }
 
     @Nullable @Override
@@ -23,47 +22,25 @@ public class RawPLink<X> implements PLink<X> {
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
-        if (this==that)
-            return true;
-
-        Object b = ((PLink) that).get();
-        return this.id.equals(b);
+    final public boolean equals(@NotNull Object that) {
+        return ((this == that) || this.id.equals(that)) ||
+                ((that instanceof PLink) && id.equals(((PLink) that).get()));
     }
 
     @Override
-    public int hashCode() {
+    final public int hashCode() {
         return id.hashCode();
     }
 
     @Override
-    public void setPriority(float p) {
-        this.pri = Priority.validPriority(p);
-    }
-
-    @Override
     @NotNull
-    public X get() {
+    final public X get() {
         return id;
     }
 
     @Override
     public String toString() {
-        return id + "=" + pri;
+        return id + "=" + pri();
     }
 
-    @Override
-    public float pri() {
-        return pri;
-    }
-
-    @Override
-    public boolean delete() {
-        float pri = this.pri;
-        if (pri == pri) {
-            this.pri = Float.NaN;
-            return true;
-        }
-        return false;
-    }
 }

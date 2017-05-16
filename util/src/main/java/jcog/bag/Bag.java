@@ -44,32 +44,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     }
 
     /**
-     * temperature parameter, in the range of 0..1.0 controls the target average priority that
-     * forgetting should attempt to cause.
-     * <p>
-     * higher temperature means faster forgetting allowing new items to more easily penetrate into
-     * the bag.
-     * <p>
-     * lower temperature means old items are forgotten more slowly
-     * so new items have more difficulty entering.
-     *
-     * @return the update function to apply to a bag
-     */
-    @Nullable
-    public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
-
-//        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
-//        if (estimatedExcess > 0) {
-//            float presentAndFutureExcess = estimatedExcess;
-                    //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-            float perMember = (float) Util.unitize(sqr(temperature * ((p)/(m+p))) );
-            if (perMember >= priEpsilon)
-                return f.valueOf(perMember);
-//        }
-        return null;
-    }
-
-    /**
      * returns the bag to an empty state
      */
     @Override
@@ -245,6 +219,14 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * returns the priority of a value, or NaN if such entry is not present
      */
     float pri(@NotNull V key);
+
+    default float pri(@NotNull Object key, float ifMissing) {
+        V x = get(key);
+        if (x == null)
+            return ifMissing;
+        else
+            return priSafe(x, ifMissing);
+    }
 
     default boolean active(@NotNull V key) {
         return priSafe(key, -1) >= 0;

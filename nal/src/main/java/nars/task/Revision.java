@@ -125,9 +125,7 @@ public class Revision {
             if (ccp != null) {
 
                 cc = ccp.getOne();
-
-                if (!cc.isNormalized())
-                    throw new RuntimeException("should have been normalized");
+                assert(cc.isNormalized());
 
                 negated = ccp.getTwo();
                 break;

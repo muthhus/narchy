@@ -1,10 +1,9 @@
 package jcog.pri;
 
 
+import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static jcog.pri.Priority.validPriority;
 
 /**
  * default mutable prioritized implementation
@@ -18,6 +17,7 @@ public class Pri implements Priority {
 
 
     public Pri() {
+        priority = Float.NaN;
     }
 
     public Pri(@NotNull Prioritized b, float scale) {
@@ -29,7 +29,7 @@ public class Pri implements Priority {
     }
 
     public Pri(float p) {
-        this.priority = validPriority(p);
+        setPri(p);
     }
 
 
@@ -72,12 +72,12 @@ public class Pri implements Priority {
 
 
     public boolean equals(Object that) {
-        throw new RuntimeException("RawBudget equality is N/A");
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int hashCode() {
-        throw new RuntimeException("RawBudget hashcode is N/A");
+        throw new UnsupportedOperationException();
      }
 
     /**
@@ -91,24 +91,15 @@ public class Pri implements Priority {
         return getBudgetString();
     }
 
-
-
     @Override
-    public final void setPriority(float p) {
-        this.priority = validPriority(p);
+    public final float setPri(float p) {
+        return this.priority = Util.unitize(p);
     }
 
-
-
-
-
-    /** if p is NaN (indicating deletion), p <== 0 */
-    @NotNull public Pri pri(float p) {
-        priority = p;
+    @NotNull public Pri setPriThen(float p) {
+        setPri(p);
         return this;
     }
-
-
 
 
 }

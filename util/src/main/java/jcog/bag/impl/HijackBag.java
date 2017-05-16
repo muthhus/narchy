@@ -2,8 +2,8 @@ package jcog.bag.impl;
 
 import jcog.bag.Bag;
 import jcog.list.FasterList;
+import jcog.pri.PForget;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static jcog.bag.impl.HijackBag.Mode.*;
 import static jcog.pri.Priority.EPSILON;
 
 /**
@@ -57,7 +58,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     protected Random random() {
         return ThreadLocalRandom.current();
     }
-
 
 
     public static boolean hijackGreedy(float newPri, float weakestPri) {
@@ -155,144 +155,123 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return prevMap;
     }
 
+    enum Mode {
+        GET, PUT, REMOVE
+    }
+
     @Nullable
-    protected V update(Object x, @Nullable V adding /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
-
-        boolean add = adding != null;
-        boolean remove = (!add && (scale == -1));
-
-        V added = null,
-                found = null; //get: the found item,  remove: the hijacked item
-
-        boolean merged = false;
-
+    private V update(Object k, @Nullable V v /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
             return null;
 
+        final Mode mode;
+        if (v != null) {
+            mode = PUT;
+        } else if (scale < 0) {
+            mode = REMOVE;
+        } else {
+            mode = GET;
+        }
 
-        final int hash = x.hashCode(); /*hash(x)*/
+        V yAdded = null, yRemoved = null, yReturned = null;
+
+
+        final int hash = k.hashCode(); /*hash(x)*/
 
         try {
 
-            if (add || remove)
+            final int start = Math.abs(hash) % c; //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
+
+            if (mode != GET)
                 start(hash);
 
-            //for (int retry = 0; retry < reprobes; retry++ /*, dir = !dir*/)
+            probing:
+            for (int i = start, probe = reprobes; probe > 0; probe--) {
 
-            int i = Math.abs(hash) % c; //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
-            //int iEnd = (iStart + reprobes);
-            //int i = iStart;// + shuff;
-            for (int probe = 0; probe < reprobes; probe++) {
+                V p = map.get(i); //probed value 'p'
 
+                if (p != null && equals(key(p), k)) { //existing, should only occurr at most ONCE in this loop
+                    switch (mode) {
 
+                        case GET:
+                            yReturned = p;
+                            break;
 
-                V current = map.get(i);
-                if (current != null) {
-                    K y = key(current);
-                    if (equals(y, x)) { //existing
-
-                        if (add) { //put
-                            if (current != adding) {
-                                //float curPri = pri(current);
-                                V next = merge(current, adding, scale);
-                                if (next == null) {
-                                    //merge failed, continue
-                                } else if (next != current) {
-                                    //replace
-                                    if (!map.compareAndSet(i, current, next)) {
-                                        //failed to replace; the original may have changed so continue and maybe reinsert in a new cell
-                                    } else {
-                                        //replaced
-                                        //pressurize(-curPri); //discount original priority
-                                        added = next;
-                                        merged = true;
-                                        break;
-                                    }
-
-                                } else {
-                                    //keep original
-                                    added = current;
-                                    merged = true;
-                                    break;
-                                }
-                            }
-                        } else {
-
-                            if (remove) { //remove
-                                if (map.compareAndSet(i, current, null)) {
-                                    found = current;
-                                }
+                        case PUT:
+                            if (p == v) {
+                                yReturned = p; //identical match found, keep original
                             } else {
-                                found = current; //get
+                                V next = merge(p, v, scale);
+                                if (next != null && (next == p || map.compareAndSet(i, p, next))) {
+                                    if (next != p) {
+                                        yRemoved = p; //replaced
+                                        yAdded = next;
+                                    }
+                                    yReturned = next;
+                                }
                             }
+                            break;
 
-                        }
-
-                        break; //continue below
-
+                        case REMOVE:
+                            if (map.compareAndSet(i, p, null)) {
+                                yReturned = yRemoved = p;
+                            }
+                            break;
                     }
+
+                    break probing; //successful if y!=null
                 }
 
-                if (add && !merged) {
-
-                    if (current == null || replace(adding, current, scale)) {
-                        V toAdd = merge(current, adding, scale);
-                        if (toAdd!=null && map.compareAndSet(i, current, toAdd)) { //inserted
-                            found = current;
-                            added = toAdd;
-                            break; //done
-                        }
-                    }
-                }
-
-                //i = dir ? (i + 1) : (i - 1);
-                i++;
-                if (i == c) i = 0;
-
+                if (++i == c) i = 0; //continue to next probed location
             }
 
-//                if (!add || (added != null))
-//                    break;
-            //else: try again
+            if (mode == PUT && yReturned == null) {
+                //attempt insert
+                inserting:
+                for (int i = start, probe = reprobes; probe > 0; probe--) {
+
+                    V p = map.compareAndExchange(i, null, v);//probed value 'p'
+
+                    if (p == null) {
+
+                        yReturned = yAdded = v;
+                        break inserting; //took empty slot, done
+
+                    } else {
+                        //attempt HIJACK (tm)
+                        if (replace(v, p, scale)) {
+                            V next = merge(p, v, scale);
+                            if (next != null && next != p && map.compareAndSet(i, p, next)) { //inserted
+                                yRemoved = p;
+                                yReturned = yAdded = next;
+                                break inserting; //hijacked replaceable slot, done
+                            }
+                        }
+                    }
+
+                    if (++i == c) i = 0; //continue to next probed location
+                }
+
+            }
 
         } catch (Throwable t) {
             t.printStackTrace(); //should not happen
         } finally {
-            if (add || remove) {
+            if (mode != GET)
                 end(hash);
-            }
         }
 
-        if (!merged) {
-            if (found != null && (add || remove)) {
-                _onRemoved(found);
-            }
-
-            if (added != null) {
-                _onAdded(added);
-            } else if (add) {
-                //rejected: add but not added and not merged
-            }
-
-
+        if (yRemoved != null) {
+            _onRemoved(yRemoved);
+        }
+        if (yAdded != null) {
+            _onAdded(yAdded);
         }
 
-//        /*if (Param.DEBUG)*/
-//        {
-//            int cnt = size.get();
-//            if (cnt > c) {
-//                //throw new RuntimeException("overflow");
-//            } else if (cnt < 0) {
-//                //throw new RuntimeException("underflow");
-//            }
-//        }
-
-
-        return add ? added : found;
-
+        return yReturned;
     }
 
 
@@ -325,12 +304,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * this supports fairness so that existing items will not have a
      * second-order budgeting advantage of not contributing as much
      * to the presssure as new insertions.
-     *
+     * <p>
      * if returns null, the merge is considered failed and will try inserting/merging
      * at a different probe location
      */
     @Nullable
-    protected abstract V merge(@Nullable V existing, @NotNull V incoming, float scale);
+    protected abstract V merge(@NotNull V existing, @NotNull V incoming, float scale);
 
     /**
      * can override in subclasses for custom replacement policy.
@@ -377,7 +356,11 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     @Override
     public final V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
 
-        pressurize(priSafe(v, 0) * scale);
+        float p = pri(v);
+        if (p != p)
+            return null; //already deleted
+
+        pressurize(p * scale);
 
         V y = update(key(v), v, scale);
 
@@ -441,117 +424,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             commit(null);
 
         return this;
-//
-////        float min = priMin;
-////        float max = priMax;
-////        float priRange = max - min;
-//
-//        //TODO detect when the array is completely empty after 1 iteration through it in case the scan limit > 1.0
-//
-//
-//        //boolean di = random.nextBoolean(); //randomly choose traversal direction
-//
-//        int selected = 0;
-//
-//        //int nulls = c - s; //approximate number of empty slots that would be expected
-//
-//        float priToHits = Math.max(1, ((n) / ((float)(s))));
-//
-//        int skipped = 0;
-//
-//        //final int N = n;
-//        int removed = 0;
-//
-//        while (n > 0 && skipped < c) {
-//
-//            //if (di) {
-//            if (++i == c) i = 0;
-//            /*} else {
-//                if (--i == -1) i = c - 1;
-//            }*/
-//
-//            V v = map.getOpaque(i);
-//            if (v != null) {
-//                float p = pri(v);
-//                if (p == p) {
-//
-//                    float fhits = (p * priToHits);
-//                    int hits = (int) Math.floor(fhits);
-//                    float remainder = fhits - hits;
-//                    if (remainder > 0) {
-//                        if (remainder >= random.nextFloat()) //use the change to select +1 probabalistically
-//                            hits++;
-//                    }
-//
-//                    if (hits > 0) {
-//                        if (map.weakCompareAndSetVolatile(i, v, null)) {
-//                            int taken = each.intValueOf(hits, v);
-//                            boolean popped = (taken < 0);
-//                            if (popped) {
-//                                onRemoved(v);
-//                                removed++;
-//                                if (--s <= 0) {
-//                                    break;
-//                                } else {
-//                                    skipped++;
-//                                    taken = -taken; //make positive
-//                                }
-//                            } else if (taken > 0) {
-//                                //try to reinsert in that slot we removed it temporarily from
-//                                if (!map.compareAndSet(i, null, v)) {
-//
-//                                    if (put(v) == null) { //try to insert as if normally
-//                                        //but if it didnt happen, give up, admit that it lost it
-//                                        onRemoved(v);
-//                                        removed++;
-//                                        if (--s <= 0)
-//                                            break;
-//                                        else {
-//                                            skipped++;
-//                                            continue;
-//                                        }
-//                                    }
-//                                }
-//
-//                            }
-//
-//                            n -= taken;
-//                            selected += taken;
-//                        }
-//
-//                    } else {
-//                        skipped++;
-//                    }
-//                }
-//            } else {
-//                skipped++;
-//                //early deletion nullify
-////                    if (map.compareAndSet(m, v, null)) {
-////                        size.decrementAndGet();
-////                        onRemoved(v);
-////                    }
-//            }
-//
-//
-//        }
-//
-//        if (removed > 0) {
-//            commit(null);
-//        }
-//
-//        return selected;
     }
 
-
-//    /**
-//     * a value between 0 and 1 of how much percent of the priority range
-//     * to accept an item which is below the current sampling target priority.
-//     * generally this should be a monotonically increasing function of
-//     * the scan progress proportion, a value in 0..1.0 also.
-//     */
-//    protected static float tolerance(float scanProgressProportion) {
-//        return /*Util.sqr*/(Util.sqr(scanProgressProportion)); /* polynomial curve */
-//    }
 
     @Override
     public int size() {
@@ -563,13 +437,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         forEachActive(this, e);
     }
 
-//    /**
-//     * yields the next threshold value to sample against
-//     */
-//    public float curve() {
-//        float c = random.nextFloat();
-//        return 1f - (c * c);
-//    }
 
     @Override
     public Spliterator<V> spliterator() {
@@ -597,7 +464,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        Bag.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
+                        PForget.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
                         null
         );
 
@@ -618,7 +485,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * higher value means faster forgetting
      */
     public float temperature() {
-        return 0.75f;
+        return 0.25f;
     }
 
     protected float priEpsilon() {

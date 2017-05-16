@@ -3,6 +3,7 @@ package jcog.bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.list.FasterList;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
@@ -11,15 +12,14 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
 import static jcog.pri.PriMerge.max;
 import static jcog.pri.PriMerge.plus;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author me
@@ -43,39 +43,39 @@ public class BagTest {
     public static void testBasicInsertionRemoval(Bag<String,PLink<String>> c) {
 
 
-        Assert.assertEquals(1, c.capacity());
+        assertEquals(1, c.capacity());
         if (!(c instanceof DefaultHijackBag)) {
-            Assert.assertEquals(0, c.size());
-            Assert.assertTrue(c.isEmpty());
+            assertEquals(0, c.size());
+            assertTrue(c.isEmpty());
         }
 
         //insert an item with zero budget
         c.put(new RawPLink("x", 0));
         c.commit();
 
-        Assert.assertEquals(1, c.size());
+        assertEquals(1, c.size());
 
 
-        Assert.assertEquals(0, c.priMin(), 0.001f);
+        assertEquals(0, c.priMin(), 0.001f);
 
-        Assert.assertTrue(Priority.Zero.equalsBudget(c.get("x"), 0.01f));
+        assertTrue(Priority.Zero.equalsBudget(c.get("x"), 0.01f));
 
     }
 
     @Test
     public void testBudgetMerge() {
         ArrayBag<String> a = new ArrayBag<String>(4, plus, new HashMap<>(4));
-        Assert.assertEquals(0, a.size());
+        assertEquals(0, a.size());
 
         a.put(new RawPLink("x", 0.1f));
         a.put(new RawPLink("x", 0.1f));
-        a.commit();
-        Assert.assertEquals(1, a.size());
+        a.commit(null);
+        assertEquals(1, a.size());
 
 
         PLink<String> agx = a.get("x");
         Pri expect = new Pri(0.2f);
-        Assert.assertTrue(agx + "==?==" + expect, expect.equalsBudget(
+        assertTrue(agx + "==?==" + expect, expect.equalsBudget(
                 agx, 0.01f));
 
     }
@@ -87,25 +87,25 @@ public class BagTest {
         a.put(new RawPLink("x",0.1f));
         a.put(new RawPLink("y",0.2f));
 
-        a.commit();
+        a.commit(null);
 
         Iterator<PLink<String>> ii = a.iterator();
-        Assert.assertEquals("y", ii.next().get());
-        Assert.assertEquals("x", ii.next().get());
+        assertEquals("y", ii.next().get());
+        assertEquals("x", ii.next().get());
 
 
-        Assert.assertEquals("[y=0.2, x=0.1]", a.listCopy().toString());
+        assertEquals("[y=0.2, x=0.1]", a.listCopy().toString());
 
         a.put(new RawPLink("x", 0.2f));
         a.commit();
 
         //x should now be ahead
-        Assert.assertTrue(a.listCopy().toString().contains("[x="));
-        Assert.assertTrue(a.listCopy().toString().contains(", y="));
+        assertTrue(a.listCopy().toString().contains("[x="));
+        assertTrue(a.listCopy().toString().contains(", y="));
 
         ii = a.iterator();
-        Assert.assertEquals("x", ii.next().get());
-        Assert.assertEquals("y", ii.next().get());
+        assertEquals("x", ii.next().get());
+        assertEquals("y", ii.next().get());
 
     }
 
@@ -115,15 +115,15 @@ public class BagTest {
 
         a.put(new RawPLink("x", 0.1f));
         a.put(new RawPLink("y", 0.2f));
-        a.commit();        a.print();
-        Assert.assertEquals(2, a.size());
+        a.commit(null);        a.print(); System.out.println();
+        assertEquals(2, a.size());
 
-        Assert.assertEquals( 0.1f , a.priMin(), 0.2f /* to allow for any forgetting that was applied */);
+        assertEquals( 0.1f , a.priMin(), 0.01f);
 
         a.put(new RawPLink("z", 0.05f));
-        a.commit();        a.print();
-        Assert.assertEquals(2, a.size());
-        Assert.assertTrue(a.contains("x") && a.contains("y"));
+        a.commit();        a.print(); System.out.println();
+        assertEquals(2, a.size());
+        assertTrue(a.contains("x") && a.contains("y"));
         Assert.assertFalse(a.contains("z"));
 
     }
@@ -137,50 +137,52 @@ public class BagTest {
 
         a.put(new RawPLink("x", 0.1f));
         a.commit();
-        Assert.assertEquals(1, a.size());
+        assertEquals(1, a.size());
 
         a.remove("x");
         a.commit();
-        Assert.assertEquals(0, a.size());
-        Assert.assertTrue(a.isEmpty());
+        assertEquals(0, a.size());
+        assertTrue(a.isEmpty());
         if (a instanceof ArrayBag) {
-            Assert.assertTrue(((ArrayBag)a).listCopy().isEmpty());
-            Assert.assertTrue(((ArrayBag)a).keySet().isEmpty());
+            assertTrue(((ArrayBag)a).listCopy().isEmpty());
+            assertTrue(((ArrayBag)a).keySet().isEmpty());
         }
 
     }
 
-    @Test
-    public void testScalePutArray() {
-        testScalePut(new ArrayBag<>(2, max, new HashMap<>(2)));
-        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
-
-    }
 
 
     public static Random rng() {
         return new XorShift128PlusRandom(1);
     }
 
-    public static void testScalePut(Bag<String,PLink<String>> a) {
-        a.put(new RawPLink("x",0.1f));
-        a.put(new RawPLink("x",0.15f), 0.5f, null);
-        Assert.assertNotNull(a.get("x"));
-        a.commit();
 
-        a.print();
+    public static void testScalePutHalfs(float expect, Bag<String,PLink<String>> a, float... scales) {
+        for (float s : scales) {
+            a.put(new RawPLink("x", 0.5f), s, null);
+            Assert.assertNotNull(a.get("x"));
+        }
+        a.commit(null);
 
-        Assert.assertEquals(0.100, a.get("x").pri(), 0.02f);
+
+        assertEquals(expect, a.get("x").pri(), 0.01f);
+        assertEquals(expect, a.pri("x", -1), 0.01f);
     }
 
     public static void testScalePut2(Bag<String,PLink<String>> a) {
 
         a.put(new RawPLink("y",0.1f));
+        assertEquals(1, a.size());
         a.put(new RawPLink("y",0.1f), 0.5f, null);
+        assertEquals(1, a.size());
         a.put(new RawPLink("y",0.1f), 0.25f, null);
-        //a.commit();
+        assertEquals(1, a.size());
 
-        Assert.assertEquals(0.175, a.get("y").pri(), 0.001f);
+        a.commit(null);
+
+        assertTrue(a.contains("y"));
+
+        assertEquals(0.1 + 0.05 + 0.025, a.pri("y", -1), 0.001f);
 
     }
 
@@ -261,7 +263,7 @@ public class BagTest {
 
     }
 
-    public static void testSamplingFlat(Bag<String,PLink<String>> a, float level) {
+    public static void testPutMinMaxAndUniqueness(Bag<String,PLink<String>> a, float level) {
         int n = a.capacity()*2;
 
 
@@ -269,10 +271,19 @@ public class BagTest {
             a.put(new RawPLink("x" + i, level));
         }
 
-        a.commit(); //commit necessary to set sampler's dynamic range
+        a.commit(null); //commit but dont forget
 
-        Assert.assertEquals(level, a.priMin(), 0.01f);
-        Assert.assertEquals(a.priMin(), a.priMax(), 0.08f);
+        a.print();
+
+        System.out.println(n + " " + a.size());
+
+        List<String> keys = new FasterList(n);
+        a.forEachKey(keys::add);
+        assertEquals(a.size(), keys.size());
+        assertEquals(new HashSet(keys).size(), keys.size());
+
+        assertEquals(level, a.priMin(), 0.01f);
+        assertEquals(a.priMin(), a.priMax(), 0.08f);
 
     }
 
@@ -293,7 +304,7 @@ public class BagTest {
                     rng.nextFloat() * dPri + minPri)
             );
         }
-        b.commit();
+        b.commit(null);
 
     }
 

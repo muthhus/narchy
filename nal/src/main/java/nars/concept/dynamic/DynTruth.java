@@ -113,7 +113,7 @@ public final class DynTruth implements Truthed {
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, start + dur, evidence());
-        dyn.setPriority(priority);
+        dyn.setPri(priority);
         //        if (srcCopy == null) {
 //            delete();
 //        } else {

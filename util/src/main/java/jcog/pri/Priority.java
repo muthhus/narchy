@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.lerp;
+import static jcog.Util.notNaN;
+import static jcog.Util.notNaNOrNeg;
 
 /**
  * Created by me on 2/17/17.
@@ -63,18 +65,36 @@ public interface Priority extends Prioritized {
     }
 
     default void priMax(float max) {
-        setPriority(Math.max(priSafe(0), max));
+        setPri(Math.max(priSafe(0), max));
     }
-    default void priAdd(float toAdd) {
-        setPriority(priSafe(0) + toAdd);
+
+
+    default float priAdd(float toAdd) {
+        float e = priSafe(-1);
+        if (e!=e) {
+            if (toAdd > 0) e = 0;  //adding to deleted resurrects it to pri=0 before adding
+            else return Float.NaN; //subtracting from deleted has no effect
+        }
+        return setPri(e + notNaN(toAdd));
     }
-    default void priSub(float toSubtract) { setPriority(priSafe(0) - toSubtract); }
+
+//    default float priAddAndGetDelta(float toAdd) {
+//
+//        float before = priSafe(0);
+//        return setPri(before + notNaN(toAdd)) - before;
+//    }
+
+    default float priSub(float toSubtract) {
+        //setPri(priSafe(0) - toSubtract);
+        return priAdd(-toSubtract);
+    }
+
     default void priSub(float maxToSubtract, float minFractionRetained) {
         float p = priSafe(0);
         if (p > 0) {
             float pMin = minFractionRetained * p;
             float pNext = Math.max((p - maxToSubtract), pMin);
-            setPriority(pNext);
+            setPri(pNext);
         }
     }
 
@@ -92,34 +112,22 @@ public interface Priority extends Prioritized {
 //        return priAddOverflow(toAdd, null);
 //    }
 
-    default float priAddOverflow(float toAdd, float[] pressurized) {
-        float before = priSafe(0);
-        float next = before + toAdd;
-        float change;
-        if (next > 1) {
-            change = next - 1;
-            next = 1;
-        } else {
-            change = 0;
+    default float priAddOverflow(float toAdd, @Nullable float[] pressurized) {
+        if (Math.abs(toAdd) <= PLink.EPSILON) {
+            return 0; //no change
         }
 
-        setPriority(next);
+        float before = priSafe(0);
+        float next = priAdd(toAdd);
+        float delta = next-before;
+        float excess = toAdd - delta;
 
         if (pressurized!=null)
-            pressurized[0] += Math.max(0, (next - before));
+            pressurized[0] += delta;
 
-        return change;
+        return excess;
     }
 
-    static float validPriority(float p) {
-        if (p!=p /* fast NaN test */)
-            throw new PriorityException();
-        if (p > 1.0f)
-            p = 1.0f;
-        else if (p < 0.0f)
-            p = 0.0f;
-        return p;
-    }
 
     /**
      * Change priority value
@@ -127,34 +135,26 @@ public interface Priority extends Prioritized {
      * @param p The new priority
      * @return whether the operation had any effect
      */
-    void setPriority(float p);
+    float setPri(float p);
 
-    default void setPriority(@NotNull Prioritized p) {
-        setPriority(p.pri());
+    default float setPri(@NotNull Prioritized p) {
+        return setPri(p.pri());
     }
-
-    //    default Budget mult(float priFactor, int durFactor, float quaFactor) {
-    //        if (priFactor!=1) priMult(priFactor);
-    //        if (durFactor!=1) durMult(durFactor);
-    //        if (quaFactor!=1) quaMult(quaFactor);
-    //        return this;
-    //    }
-    //
 
     @NotNull
     default Priority priMult(float factor) {
-        float p = pri();
-        if (p==p)
-            setPriority(p * factor);
+        //float p = priSafe(0);
+        float p = notNaN(pri());
+        setPri(p * notNaNOrNeg(factor));
         return this;
     }
 
-
-    @NotNull
-    default Priority priLerp(float target, float speed) {
-        setPriority(lerp(speed, target, pri()));
-        return this;
-    }
+//
+//    @NotNull
+//    default Priority priLerp(float target, float speed) {
+//        setPri(lerp(speed, target, pri()));
+//        return this;
+//    }
 
 //    /** returns the delta */
 //    default float priLerpMult(float factor, float speed) {
@@ -210,19 +210,5 @@ public interface Priority extends Prioritized {
 //    void orPriority(float v);
 //
 //    void orPriority(float x, float y);
-
-    final class PriorityException extends RuntimeException {
-        public PriorityException() {
-            super("NaN");
-        }
-        public PriorityException(String message) {
-            super(message);
-        }
-
-        @Override
-        public Throwable fillInStackTrace() {
-            return null;
-        }
-    }
 
 }

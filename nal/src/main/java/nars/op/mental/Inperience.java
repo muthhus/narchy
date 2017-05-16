@@ -237,7 +237,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
                         task.stamp()
                 );
                 e.log("Inperience");
-                e.setPriority( task.priSafe(0) * priFactor );
+                e.setPri( task.priSafe(0) * priFactor );
 
                 logger.info(" {}", e);
                 nar.input(e);

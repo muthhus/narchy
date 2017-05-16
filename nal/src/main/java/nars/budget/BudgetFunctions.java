@@ -275,8 +275,8 @@ public final class BudgetFunctions extends UtilityFunctions {
             //assert (!((aPriNext < 0) || (bPriNext < 0))); //throw new RuntimeException("revision budget underflow");
 
             //apply the changes
-            a.setPriority(aPriNext);
-            b.setPriority(bPriNext);
+            a.setPri(aPriNext);
+            b.setPri(bPriNext);
         } else if (aExist /*&& !bExist*/) {
             //take from 'a' only
             a.priSub(resultPri);

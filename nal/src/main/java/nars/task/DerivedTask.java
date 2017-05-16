@@ -118,26 +118,6 @@ abstract public class DerivedTask extends ImmutableTask {
         }
 
 
-        @Override
-        public void feedback(@Nullable TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
-
-            if (delta == null) {
-
-                //negativeFeedback(nar);
-
-            } else {
-
-                //feedbackToPremiseConcepts(nar);
-                //feedbackToPremiseLinks(deltaConfidence, deltaSatisfaction, nar);
-
-            }
-
-            if (!Param.DEBUG) {
-                this.premise = null;
-            }
-        }
-
-
 //        private void feedbackToPremiseConcepts(@NotNull NAR nar) {
 //            Concept thisConcept = concept(nar);
 //            if (thisConcept != null) {

@@ -1,11 +1,13 @@
 package jcog.pri;
 
-import jcog.bag.Bag;
+import jcog.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+
+import static jcog.Util.sqr;
 
 /**
  * decreases priority at a specified rate which is diminished in proportion to a budget's quality
@@ -21,16 +23,43 @@ public class PForget<X extends Priority> implements Consumer<X> {
 
     @Nullable
     public static <X> Consumer<X> forget(int s, int c, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-        return Bag.forget(s, c, p, m, 0.5f, Priority.EPSILON, f);
+        return forget(s, c, p, m, 0.5f, Priority.EPSILON, f);
+    }
+
+    /**
+     * temperature parameter, in the range of 0..1.0 controls the target average priority that
+     * forgetting should attempt to cause.
+     * <p>
+     * higher temperature means faster forgetting allowing new items to more easily penetrate into
+     * the bag.
+     * <p>
+     * lower temperature means old items are forgotten more slowly
+     * so new items have more difficulty entering.
+     *
+     * @return the update function to apply to a bag
+     */
+    @Nullable
+    public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
+
+//        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
+//        if (estimatedExcess > 0) {
+//            float presentAndFutureExcess = estimatedExcess;
+                    //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
+            float perMember = (float) Util.unitize( (temperature * ((p)/(m+p))) );
+            if (perMember >= priEpsilon)
+                return f.valueOf(perMember);
+//        }
+        return null;
     }
 
     @Override
     public void accept(@NotNull X b) {
-        b.priSub(avgToBeRemoved
-            ,0.5f //50% retained
-            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
-            //,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
-        );
+        b.priSub(avgToBeRemoved);
+//        b.priSub(avgToBeRemoved
+//            ,0.5f //50% retained
+//            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+//            //,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+//        );
     }
 
 }

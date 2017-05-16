@@ -25,7 +25,6 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -213,7 +212,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
                             new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
                     );
                     abbreviationTask.log("Abbreviate");
-                    abbreviationTask.priority().setPriority(b);
+                    abbreviationTask.priority().setPri(b);
                     abbreviationTask.priority();
 //        if (srcCopy == null) {
 //            delete();
@@ -434,17 +433,17 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
         }
 
 
-        @Override
-        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
-
-            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
-
-
-            if (deltaConfidence == deltaConfidence /* wasn't deleted, even for questions */ && !isDeleted()) {
-                @Nullable Concept c = concept(nar);
-                c.put(Abbreviation.class, alias);
-
-            }
-        }
+//        @Override
+//        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+//
+//            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+//
+//
+//            if (deltaConfidence == deltaConfidence /* wasn't deleted, even for questions */ && !isDeleted()) {
+//                @Nullable Concept c = concept(nar);
+//                c.put(Abbreviation.class, alias);
+//
+//            }
+//        }
     }
 }

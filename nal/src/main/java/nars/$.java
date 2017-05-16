@@ -1052,7 +1052,7 @@ public enum $ {
     public static TaskBuilder command(@NotNull Compound op) {
         //TODO use lightweight CommandTask impl without all the logic metadata
         TaskBuilder t = new TaskBuilder(op, COMMAND, null);
-        t.setPriority(1f);
+        t.setPri(1f);
         return t;
     }
 

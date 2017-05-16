@@ -22,23 +22,16 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
      * if existing is null, then incoming enters existence with incoming priority * scale
      * returns the delta change in ambient pressure
      */
-    static float combine(@Nullable Priority existing, @NotNull Priority incoming, float scale) {
+    static float combine(@NotNull Priority existing, @NotNull Priority incoming, float scale) {
         float pAdd = incoming.priSafe(0) * scale;
-        float pressure;
 
-        if (existing != null) {
-            float before = existing.priSafe(0);
+        float before = existing.priSafe(0);
 
             //modify existing
-            existing.priAdd(pAdd);
+        existing.priAdd(pAdd);
 
-            pressure = existing.priSafe(0) - before;
-        } else {
-            //modify incoming
-            incoming.setPriority(pAdd);
-            pressure = (pAdd);
-        }
-        return pressure;
+        return existing.priSafe(0) - before;
+
     }
 
     static float combine(@Nullable Priority existing, @NotNull Priority incoming) {
@@ -127,7 +120,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
         }
 
 
-        exi.setPriority( nextPri );
+        exi.setPri( nextPri );
 
         return overflow;
     }

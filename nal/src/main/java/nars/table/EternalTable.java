@@ -254,7 +254,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 nar.time(),
                 ETERNAL, ETERNAL
         );
-        r.budget(oldBelief, input);
+
         return r.log("Insertion Revision");
     }
 

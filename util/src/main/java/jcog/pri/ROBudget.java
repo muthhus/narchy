@@ -26,7 +26,7 @@ public final class ROBudget implements Priority {
     }
 
     @Override
-    public void setPriority(float p) {
+    public float setPri(float p) {
         throw new UnsupportedOperationException();
     }
 

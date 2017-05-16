@@ -1,12 +1,14 @@
 package jcog.bag;
 
 import com.google.common.base.Joiner;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeSet;
 
@@ -22,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 public class HijackBagTest {
 
     @Test public void testSamplingFlatHijack() {
-        testSamplingFlat(new DefaultHijackBag<String>(max, 64, 4), 0.076f);
+        testPutMinMaxAndUniqueness(new DefaultHijackBag<String>(max, 64, 4), 0.076f);
     }
 
     @Test public void testRemoveByKey() {
@@ -30,11 +32,28 @@ public class HijackBagTest {
     }
 
 
+
     @Test
-    public void testScalePutHija() {
-        BagTest.testScalePut(new DefaultHijackBag(max, 2, 1));
-        BagTest.testScalePut(new DefaultHijackBag(max, 2, 2));
+    public void testScalePutArray() {
+        testScalePutHalfs(0.5f, new ArrayBag<>(2, max, new HashMap<>(2)), 1f, 0.5f);
+        testScalePutHalfs(0.75f, new ArrayBag<>(2, plus, new HashMap<>(2)), 1f, 0.5f);
+        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
+
+    }
+    @Test
+    public void testScalePutHijaMax() {
+        //second scale has no effect being smaller than the first one
+        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 1), 1f, 0.5f);
+        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 2), 1f, 0.5f);
+
+        BagTest.testScalePutHalfs(0.75f, new DefaultHijackBag(plus, 2, 2), 1f, 0.5f);
+    }
+    @Test
+    public void testScalePutHija3() {
         BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
+    }
+    @Test
+    public void testScalePutHija4() {
         BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
     }
 

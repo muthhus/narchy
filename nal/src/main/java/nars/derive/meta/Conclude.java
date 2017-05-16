@@ -259,7 +259,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                                     c3, truth, ct.punc,
                                     ct.evidence, d, nar.time(), start, end);
 
-                    t.setPriority(priority);
+                    t.setPri(priority);
 
                     if (Param.DEBUG)
                         t.log(rule);

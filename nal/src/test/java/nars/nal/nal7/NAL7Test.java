@@ -920,7 +920,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(x3, "(x). :|:")
                 .inputAt(x3 + eventDT,
 
-                        $.task($("(y)"), QUESTION, null).time(x3, x3 + eventDT).pri(1f).apply(t.nar)
+                        $.task($("(y)"), QUESTION, null).time(x3, x3 + eventDT).setPriThen(1f).apply(t.nar)
                 )
 
                 .mustBelieve(deadline, "(x)", 1f, 0.73f, x4)
