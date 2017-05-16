@@ -1,9 +1,6 @@
 package jcog.bag.impl.hijack;
 
-import jcog.pri.PForget;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.Priority;
+import jcog.pri.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -47,7 +44,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
 
     @Override
     protected float priEpsilon() {
-        return Priority.EPSILON;
+        return Pri.EPSILON;
     }
 
 

@@ -61,7 +61,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-                new PLinkHijackBag(numEdges, 3);
+                new PLinkHijackBag(numEdges, 2);
         //new ArrayBag<>(numEdges, BudgetMerge.avgBlend, new HashMap<>(numEdges));
         edges.setCapacity(numEdges);
 
@@ -122,28 +122,24 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
         if (c != null) {
 
-            edges.commit(x -> {
-                TermEdge xx = x.get();
-
-                if (!xx.target.active()) {
-                    x.delete();
-                } else {
-                    xx.clear();
-                }
-
-            });
 
             //phase 1: collect
             c.tasklinks().forEach(this);
             c.termlinks().forEach(this);
 
             float priSum = edges.priSum();
-            edges.forEachKey(x -> x.update(priSum));
+            edges.commit(x -> {
+                TermEdge xx = x.get();
+                if (!xx.target.active()) {
+                    x.delete();
+                } else {
+                   xx.update(priSum);
+                }
+            });
 
             conceptVis.apply(this, key);
 
         } else {
-            edges.clear();
             delete(space.space.dyn);
         }
 
@@ -205,8 +201,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 
     void renderEdges(GL2 gl) {
-        edges.forEach(ff -> {
-            TermEdge f = ff.get();
+        edges.forEachKey(f -> {
             if (f.a > 0)
                 render(gl, f);
         });

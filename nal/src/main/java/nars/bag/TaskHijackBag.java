@@ -20,21 +20,27 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     }
 
 
+//    @Override
+//    protected Task merge(@NotNull Task existing, @NotNull Task incoming, float scaleIgnored) {
+//        Task next;
+//
+//        //prefer the existing task unless the newer has a grown start/stop range
+//        //  (which is possible from an input task which has grown in timespan)
+//        if (incoming.isInput() && (incoming.start() < existing.start() || incoming.end() > existing.end())) {
+//            PriMerge.max(incoming, existing);
+//            next = incoming; //use the newer task
+//        } else {
+//            PriMerge.max(existing, incoming);
+//            next = existing; //use the existing
+//        }
+//        return next;
+//
+//    }
+
+
     @Override
-    protected Task merge(@NotNull Task existing, @NotNull Task incoming, float scaleIgnored) {
-        Task next;
-
-        //prefer the existing task unless the newer has a grown start/stop range
-        //  (which is possible from an input task which has grown in timespan)
-        if (incoming.isInput() && (incoming.start() < existing.start() || incoming.end() > existing.end())) {
-            PriMerge.max(incoming, existing);
-            next = incoming; //use the newer task
-        } else {
-            PriMerge.max(existing, incoming);
-            next = existing; //use the existing
-        }
-        return next;
-
+    public void onRemoved(@NotNull Task t) {
+        t.delete();
     }
 
     @NotNull

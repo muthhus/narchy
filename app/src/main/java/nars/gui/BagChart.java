@@ -38,11 +38,14 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 
     public void update() {
         if (busy.compareAndSet(false, true)) {
-            update(1f, 1f, input, this, i -> {
-                @Nullable X ii = i.get();
-                return ii != null ? newItem(i) : null;
-            });
-            busy.set(false);
+            try {
+                update(1f, 1f, input, this, i -> {
+                    @Nullable X ii = i.get();
+                    return ii != null ? newItem(i) : null;
+                });
+            } finally {
+                busy.set(false);
+            }
         }
     }
 

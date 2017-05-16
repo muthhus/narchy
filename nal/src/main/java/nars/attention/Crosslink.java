@@ -31,8 +31,8 @@ public class Crosslink {
 
 
 
-        tgtConcept.tasklinks().put( new RawPLink(srcTask, srcTask.pri()), scaleSrcTgt, null );
-        srcConcept.tasklinks().put( new RawPLink(tgtTask, tgtTask.pri()), scaleTgtSrc, null );
+        tgtConcept.tasklinks().put( new RawPLink(srcTask, srcTask.priSafe(0)), scaleSrcTgt, null );
+        srcConcept.tasklinks().put( new RawPLink(tgtTask, tgtTask.priSafe(0)), scaleTgtSrc, null );
 
 //        new SpreadingActivation(srcTask, scaleSrcTgt, tgtConcept, activation, nar);
 //        new SpreadingActivation(tgtTask, scaleTgtSrc, srcConcept, activation, nar);

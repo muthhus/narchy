@@ -15,7 +15,7 @@ public class DependentBLink<X extends Prioritized> extends RawPLink<X> {
         super(id, id.priSafe(0));
     }
 
-    public DependentBLink(@NotNull X id, float p, float q) {
+    public DependentBLink(@NotNull X id, float p) {
         super(id, p);
     }
 

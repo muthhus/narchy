@@ -224,7 +224,7 @@ abstract public class NAgentX extends NAgent {
 
             //Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
 
-            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 32, 0.05f), 32, a.nar);
+            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 32, 0.5f), 32, a.nar);
 
 
             window(

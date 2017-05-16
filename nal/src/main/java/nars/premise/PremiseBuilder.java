@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import static jcog.Util.or;
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.UtilityFunctions.aveAri;
 
 
 public enum PremiseBuilder { ;
@@ -71,13 +72,13 @@ public enum PremiseBuilder { ;
                 int dur = nar.dur();
 
                 Task match;
-                if (task.isQuestOrQuestion()) {
+                //if (task.isQuestOrQuestion()) {
                     long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
-                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, nar);
-                } else {
-                    long when = task.start();
-                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
-                }
+                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, beliefConcept, nar);
+//                } else {
+//                    long when = task.start();
+//                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
+//                }
 
                 if (match != null) {
                     if (match.isBelief() /* not Goal */) {
@@ -93,34 +94,27 @@ public enum PremiseBuilder { ;
         }
 
 
-        Priority beliefPriority;
-        if (belief != null) {
-            beliefPriority = belief.priority().clone();
-            if (beliefPriority == null)
-                belief = null;
-        } else {
-            beliefPriority = null;
-        }
+        float beliefPriority = belief!=null ? belief.pri() : Float.NaN;
 
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
         float taskPri =
-                task.priSafe(-1);
+                task.pri();
         //taskLinkCopy.pri();
         //Math.max(task.priSafe(0), taskLinkCopy.priSafe(0));
         //taskLinkCopy.pri();
         //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
-        if (taskPri < 0)
+        if (taskPri != taskPri)
             return null; //task deleted
 
-        float pri = beliefPriority == null ? taskPri :
+        float pri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
-                //aveAri
-                or
-                    (taskPri, beliefPriority.priSafe(0));
+                aveAri
+                //or
+                    (taskPri, beliefPriority);
 
         if (pri < priMin)
             return null;

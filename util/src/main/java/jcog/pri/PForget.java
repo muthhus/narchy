@@ -15,16 +15,13 @@ import static jcog.Util.sqr;
  */
 public class PForget<X extends Priority> implements Consumer<X> {
 
+    public static final float DEFAULT_TEMP = 0.75f;
     public final float avgToBeRemoved;
 
     public PForget(float avgToBeRemoved) {
         this.avgToBeRemoved = avgToBeRemoved;
     }
 
-    @Nullable
-    public static <X> Consumer<X> forget(int s, int c, float p, float m, FloatToObjectFunction<Consumer<X>> f) {
-        return forget(s, c, p, m, 0.5f, Priority.EPSILON, f);
-    }
 
     /**
      * temperature parameter, in the range of 0..1.0 controls the target average priority that
@@ -41,7 +38,7 @@ public class PForget<X extends Priority> implements Consumer<X> {
     @Nullable
     public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
-        if ((s > 0) && (p > 0) && (m > 0)) {
+        if ((s > 0) && (p > 0)) {
 
 //        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
 //        if (estimatedExcess > 0) {

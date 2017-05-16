@@ -35,21 +35,6 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     @Override
     abstract public Iterator<V> iterator();
 
-    @Override
-    public void forEachWhile(@NotNull Predicate<? super V> action, int n) {
-        int s = size();
-        if (n < 0)
-            n = s;
-        else
-            n = Math.min(s, n);
-
-        for (int i = 0; i < n; i++) {
-            V x = get(i);
-            if (x == null || (!action.test(x)))
-                break;
-        }
-    }
-
 
     @Override
     public void clear() {

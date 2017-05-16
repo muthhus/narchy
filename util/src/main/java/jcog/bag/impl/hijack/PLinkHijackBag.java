@@ -3,14 +3,11 @@ package jcog.bag.impl.hijack;
 import jcog.bag.impl.HijackBag;
 import jcog.pri.PForget;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.pri.Priority.EPSILON;
+import static jcog.pri.Pri.EPSILON;
 
 /**
  * Created by me on 2/17/17.

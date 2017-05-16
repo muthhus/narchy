@@ -562,11 +562,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
             return 0;
         }
 
-        @Override
-        public void forEachWhile(@NotNull Predicate each, int n) {
-
-        }
-
     };
 
 

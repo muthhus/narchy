@@ -2,11 +2,11 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
-import jcog.pri.Priority;
+import jcog.pri.Pri;
 import jcog.pri.RawPLink;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
+import nars.budget.DependentBLink;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
@@ -34,7 +34,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    private static final int MAX_DEPTH = 3;
+    private final int maxDepth;
 
 
     final ObjectFloatHashMap<Termed> spread;
@@ -87,22 +87,24 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     /**
      * unidirectional task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, float scale, @NotNull Concept src, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
-        super(in, scale, src, nar);
+    public SpreadingActivation(@NotNull Task in, float scale, @NotNull Concept origin, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
+        super(in, origin, nar);
+
 
         this.momentum = nar.momentum.floatValue();
         this.linkScale = nar.linkActivation.floatValue();
 
-        this.inPri = in.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
+        this.inPri = in.priSafe(0) * scale; // * in.qua(); //activate concept by the priority times the quality
         this.dur = nar.dur();
 
-        Term originTerm = origin.term();
-        this.originTerm = originTerm;// instanceof Compound ? nar.pre(originTerm) : originTerm;
+        this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
+
+        this.maxDepth = levels((Compound)originTerm);
 
         this.spread = spread;
         spread.clear();
 
-        link(src, scale, 0);
+        link(origin, 1f, 0);
 
         spread.forEachKeyValue(this);
 
@@ -112,9 +114,12 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
+
             case PROD:
+
             case SETe:
             case SETi:
+
             case IMGe:
             case IMGi:
                 return 1;
@@ -129,16 +134,16 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                 return 2;
 
             case INH:
-                return 2;
+                return 3;
 
             case EQUI:
-                //return (host.vars() > 0) ? 3 : 2;
-                return 2;
+                return 3;
 
             case IMPL:
                 return 3;
+
             case CONJ:
-                return 2;
+                return 3;
 
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
@@ -165,14 +170,21 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     public void value(Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        scale *= linkScale;
+        if (inPri * scale >= Pri.EPSILON) {
+            nar.activate(c, inPri * scale);
+        }
 
-        termBidi(c, scale * TERMLINK_BALANCE, scale * (1f - TERMLINK_BALANCE));
+        float linkPri = inPri * linkScale;
+        if (linkPri * scale >= Pri.EPSILON) {
 
-        if (c instanceof Concept) {
-            tasklink((Concept) c, scale);
-            if (c instanceof AtomConcept) {
-                activateAtom((AtomConcept) c, scale);
+
+            termBidi(c, linkPri * TERMLINK_BALANCE, linkPri * (1f - TERMLINK_BALANCE), scale);
+
+            if (c instanceof Concept) {
+                tasklink((Concept) c, linkPri, scale);
+                //            if (c instanceof AtomConcept) {
+                //                activateAtom((AtomConcept) c, scale);
+                //            }
             }
         }
 
@@ -181,21 +193,21 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     @Nullable
     void link(@NotNull Termed target, float scale, int depth) {
 
-        if (scale < Priority.EPSILON)
-            return;
+//        if (scale < Pri.EPSILON)
+//            return;
 
         if ((target instanceof Variable)) {
             if (target.op() == VAR_QUERY)
                 return; //dont create termlinks to query variable subterms
         } else {
-            @Nullable PLink<Concept> termConcept = nar.activate(target, inPri * scale);
+            @Nullable Concept termConcept = nar.conceptualize(target);
             if (termConcept != null)
-                target = termConcept.get();
+                target = termConcept;
         }
 
         float parentActivation = scale;
 
-        if (depth < MAX_DEPTH) {
+        if (depth < maxDepth) {
 
 
             //recurse
@@ -212,7 +224,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             parentActivation = scale;
         }*/
 
-        assert (target.op() != NEG); //should have been un-negated already
+        //assert (target.op() != NEG); //should have been un-negated already
 
         if (parentActivation > 0)
             spread.addToValue(target, parentActivation);
@@ -233,7 +245,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             long inEnd = in.end();
 
             float[] additionalPressure = {0};
-            tlinks.commit((b) -> {
+            tlinks.forEach((b) -> {
                 float subSubActivation = subActivation;/// * b.qua();
 
                 if (inStart != ETERNAL) {
@@ -261,7 +273,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                     }
                 }
 
-                if (subSubActivation >= PLink.EPSILON) {
+                if (subSubActivation >= Pri.EPSILON) {
                     subSubActivation -= b.priAddOverflow(subSubActivation, additionalPressure); //activate the link
                 }
 
@@ -302,7 +314,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     }
 
 
-    final void termBidi(@NotNull Termed rcpt, float tlForward, float tlReverse) {
+    final void termBidi(@NotNull Termed rcpt, float tlForward, float tlReverse, float scale) {
 
         if (rcpt == this.origin)
             return;
@@ -310,27 +322,25 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
         Term rcptTerm = rcpt.term();
 
         if (tlForward > 0)
-            termlink(origin, rcptTerm, tlForward);
+            termlink(origin, rcptTerm, tlForward, scale);
 
         if (rcpt instanceof Concept && tlReverse > 0)
-            termlink((Concept) rcpt, originTerm, tlReverse);
+            termlink((Concept) rcpt, originTerm, tlReverse, scale);
 
     }
 
-    void tasklink(Concept rcpt, float scale) {
-        float p = inPri * scale;
-        if (p >= PLink.EPSILON) {
-            rcpt.tasklinks().put(
-                    new RawPLink(in, p),
-                    //new DependentBLink(src),
-                    1f, null);
-        }
+    void tasklink(Concept rcpt, float pri, float scale) {
+
+        rcpt.tasklinks().put(
+                //new RawPLink(in, pri),
+                new DependentBLink(in, pri),
+                scale, null);
+
     }
 
-    void termlink(Concept recipient, Term target, float scale) {
-        float p = inPri * scale;
-        if (p >= PLink.EPSILON)
-            recipient.termlinks().put(new RawPLink(target, p), 1f, linkOverflow);
+    void termlink(Concept recipient, Term target, float pri, float scale) {
+
+            recipient.termlinks().put(new RawPLink(target, pri), scale, linkOverflow);
     }
 
 

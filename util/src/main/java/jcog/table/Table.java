@@ -48,16 +48,6 @@ public interface Table<K,V> extends Iterable<V> {
 //        });
 //    }
 
-    /**
-     * if predicate evaluates false, it terminates the iteration,
-     * or if n items have been reached (whichever comes first)
-     *
-     * if n is -1, it will visit all items
-     */
-    void forEachWhile(@NotNull Predicate<? super V> each, int n);
 
-    default void forEachWhile(@NotNull Predicate<? super V> action) {
-        forEachWhile(action, -1);
-    }
 
 }

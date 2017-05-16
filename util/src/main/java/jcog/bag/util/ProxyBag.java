@@ -38,11 +38,6 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
     }
 
     @Override
-    public void forEachWhile(@NotNull Predicate<? super Y> each, int n) {
-        bag.forEachWhile(each, n);
-    }
-
-    @Override
     public void forEach(Consumer<? super Y> action) {
         bag.forEach(action);
     }
@@ -52,10 +47,7 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
         bag.forEachKey(each);
     }
 
-    @Override
-    public void forEachWhile(@NotNull Predicate<? super Y> action) {
-        bag.forEachWhile(action);
-    }
+
 
     public void forEach(int max, @NotNull Consumer<? super Y> action) {
         throw new UnsupportedOperationException(); //typing issue, TODO

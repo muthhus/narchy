@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Pri implements Priority {
 
+    /** default minimum difference necessary to indicate a significant modification in budget float number components */
+    public static final float EPSILON = 0.0001f;
     /**
      * The relative share of time resource to be allocated
      */

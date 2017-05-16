@@ -10,6 +10,7 @@ import nars.Param;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.MySTMClustered;
@@ -50,12 +51,12 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 4;
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
                 new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
-                new DefaultConceptState("awake", 32, 32, 4, 32, 24)
+                new DefaultConceptState("awake", 16, 16, 3, 24, 16)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
@@ -78,14 +79,13 @@ public interface NARBuilder {
 
         Default nar = new Default(activeConcepts,
 
-                //new HijackTermIndex(cb, maxConcepts, reprobes)
+                new HijackTermIndex(cb, maxConcepts, reprobes)
 
                 //new NullTermIndex(cb)
 
-                new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1,
-                    exe
+                //new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1, exe)
                     //null /* null = fork join common pool */
-                )
+
 
 //              new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
                 ,time,
@@ -210,7 +210,7 @@ public interface NARBuilder {
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.75f);
         nar.goalConfidence(0.75f);
 
         float p = 0.5f;
@@ -220,9 +220,9 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.focus.activationRate.setValue(
-                0.5f
+                //0.5f
+                2f/Math.sqrt(activeConcepts)
         );
-                //2f/Math.sqrt(activeConcepts));
 
         //nar.stmLinkage.capacity.set(0);
 
@@ -232,7 +232,7 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 256, BELIEF, 4, false, 32);
+        MySTMClustered stm = new MySTMClustered(nar, 128, BELIEF, 3, false, 16);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, false, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

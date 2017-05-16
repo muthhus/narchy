@@ -27,7 +27,7 @@ import jcog.io.BinTxt;
 import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
-import jcog.pri.PLink;
+import jcog.pri.Pri;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -967,13 +967,13 @@ public enum Util {
 
 
     public static double normalize(double x, double min, double max) {
-        if (equals(min, max, PLink.EPSILON))
+        if (equals(min, max, Pri.EPSILON))
             return min;
         return (x - min) / (max - min);
     }
 
     public static float normalize(float x, float min, float max) {
-        if (equals(min, max, PLink.EPSILON))
+        if (equals(min, max, Pri.EPSILON))
             return min;
         return (x - min) / (max - min);
     }

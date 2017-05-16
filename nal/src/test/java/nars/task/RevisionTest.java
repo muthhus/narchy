@@ -260,7 +260,7 @@ public class RevisionTest {
         float linksBeforeRevisionLink = tasklinks.priSum();
 
         b.believe(0.0f, 0.5f).run(1);
-        assertEquals(3, tasklinks.size());
+        assertEquals(2, tasklinks.size());
         printTaskLinks(b);        System.out.println("--------");
 
         b.run(1); //allow enough time for tasklinks bag to commit

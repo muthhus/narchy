@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static jcog.bag.impl.HijackBag.Mode.*;
-import static jcog.pri.Priority.EPSILON;
+import static jcog.pri.Pri.EPSILON;
 
 /**
  * the superclass's treadmill's extra data slots are used for storing:
@@ -378,13 +378,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return xGet(tCAPACITY);
     }
 
-    @Override
-    @Deprecated
-    public void forEachWhile(@NotNull Predicate<? super V> each, int n) {
-        throw new UnsupportedOperationException("yet");
-    }
-
-
     @NotNull
     public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
 
@@ -464,7 +457,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        PForget.forget(s, capacity(), (float) p, mass, temperature(), priEpsilon(), this::forget) :
+                        PForget.forget(s, capacity(), (float) p, mass, PForget.DEFAULT_TEMP, priEpsilon(), this::forget) :
                         null
         );
 
@@ -481,12 +474,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     abstract protected Consumer<V> forget(float rate);
 
-    /**
-     * higher value means faster forgetting
-     */
-    public float temperature() {
-        return 0.5f;
-    }
+
 
     protected float priEpsilon() {
         return EPSILON;

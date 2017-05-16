@@ -21,7 +21,7 @@ abstract public class Activation<B extends Prioritized> {
 
     protected final B in;
 
-    public Activation(@NotNull B in, float scale, @NotNull Concept origin, NAR nar) {
+    public Activation(@NotNull B in, @NotNull Concept origin, NAR nar) {
         this.nar = nar;
         this.in = in;
         //this.minScale = Priority.EPSILON / (scale * in.pri());

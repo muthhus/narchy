@@ -29,7 +29,7 @@ public class NAL7DurationTest {
         //with duration = 5, the evidence surrounding a point
         // belief/goal will decay in the +/- 2.5 radius of time surrounding it.
 
-        assertNull( n.beliefTruth("(x)", 7) );
+        assertEquals(0.85f, n.beliefTruth("(x)",  7).conf(), 0.01f );
         assertEquals(0.64f, n.beliefTruth("(x)",  8).conf(), 0.01f );
         assertEquals(0.84f, n.beliefTruth("(x)",  9).conf(), 0.01f );
         assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.01f );

@@ -26,9 +26,6 @@ public interface Priority extends Prioritized {
     /** common instance for a 'zero budget'.*/
     Priority Zero = new ROBudget(0);
 
-    /** default minimum difference necessary to indicate a significant modification in budget float number components */
-    float EPSILON = 0.00001f;
-
 
     static String toString(@NotNull Priority b) {
         return toStringBuilder(null, Texts.n4(b.pri())).toString();
@@ -113,7 +110,7 @@ public interface Priority extends Prioritized {
 //    }
 
     default float priAddOverflow(float toAdd, @Nullable float[] pressurized) {
-        if (Math.abs(toAdd) <= PLink.EPSILON) {
+        if (Math.abs(toAdd) <= Pri.EPSILON) {
             return 0; //no change
         }
 

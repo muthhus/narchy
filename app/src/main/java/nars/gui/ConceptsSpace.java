@@ -24,7 +24,7 @@ import static spacegraph.layout.Grid.col;
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
-    public static final float UPDATE_RATE = 0.5f;
+    public static final float UPDATE_RATE = 0.25f;
     public final NAR nar;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
@@ -67,6 +67,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
 
+        bag.update();
         bag.forEach(maxNodes, (PLink<Concept> concept) ->
             displayNext.add( widgetGetOrCreate(concept.get()) )
             //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)

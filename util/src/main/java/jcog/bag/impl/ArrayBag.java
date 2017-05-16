@@ -199,9 +199,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
             map.remove(key(w));
 
-            //pressure -= w.priIfFiniteElseZero(); //release pressure
             onRemoved(w);
-            w.delete();
 
         }
 
@@ -335,7 +333,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflow) {
 
-        pressurize(b.pri() * scale);
+        pressurize(b.priSafe(0) * scale);
 
         final boolean[] isNew = {false};
 
@@ -355,7 +353,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 float oo = mergeFunction.merge(n, b, scale);
                 float np = n.pri();
 
-                if (size() >= capacity && np < priMinFast()) {
+                if (size() >= capacity && np < priMinFast(-1)) {
                     res = null; //failed insert
                     o = 0;
                 } else {
@@ -380,9 +378,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
         if (isNew[0]) {
             boolean added = updateItems(v); //attempt new insert
-            if (!added) {
-                v.delete();
-            } else {
+            if (added) {
                 onAdded(v);
                 return v;
             }
@@ -410,7 +406,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     public Bag<X, PLink<X>> commit() {
         double p = this.pressure.sumThenReset();
         if (p > 0) {
-            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget::new));
+            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget.DEFAULT_TEMP, Pri.EPSILON, PForget::new));
         }
         return this;
     }
@@ -525,7 +521,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 each.accept(b);
             }
 
-            if (pBelow - p >= Priority.EPSILON) {
+            if (pBelow - p >= Pri.EPSILON) {
                 sorted = false;
             }
 
@@ -565,7 +561,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             items.forEach(x -> {
                 map.remove(x.get());
                 onRemoved(x);
-                x.delete();
             });
             items.clear();
         }
@@ -591,13 +586,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     @Override
-    public void forEachKey(@NotNull Consumer<? super X> each) {
-        forEach(x -> each.accept(x.get()));
-    }
-
-    @Override
-    public void forEach(Consumer<? super PLink<X>> action) {
-
+    public void forEach(int max, @NotNull Consumer<? super PLink<X>> action) {
         ensureSorted();
 
         Object[] x = items.array();
@@ -605,14 +594,31 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             for (PLink a : ((PLink[]) x)) {
                 if (a != null) {
                     PLink<X> b = a;
-                    if (!b.isDeleted())
+                    if (!b.isDeleted()) {
                         action.accept(b);
+                        if (--max <= 0)
+                            break;
+                    }
                 }
+
             }
         }
+
     }
 
-//    public void sortPartial(float sortPercentage) {
+    @Override
+    public void forEachKey(@NotNull Consumer<? super X> each) {
+        forEach(x -> each.accept(x.get()));
+    }
+
+    @Override
+    public void forEach(Consumer<? super PLink<X>> action) {
+
+        forEach(Integer.MAX_VALUE, action);
+    }
+
+
+    //    public void sortPartial(float sortPercentage) {
 //        int s = size();
 //        int sortRange = (int) Math.ceil(s * sortPercentage);
 //        int start = sampleIndex();
@@ -763,14 +769,14 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public float priMin() {
         ensureSorted();
-        return priMinFast();
+        return priMinFast(0);
     }
 
     /** doesnt ensure sorting to avoid synchronization */
-    float priMinFast() {
+    float priMinFast(float ifDeleted) {
         PLink x;
         x = items.last();
-        return x != null ? x.priSafe(0) : 0f;
+        return x != null ? x.priSafe(ifDeleted) : ifDeleted;
     }
 
 

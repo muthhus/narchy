@@ -24,15 +24,14 @@ public class Bagregate<X> extends ArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<PLink<X>> src, int capacity, float scale) {
-        super(capacity, PriMerge.max, new ConcurrentHashMap<>(capacity));
+        super(capacity, PriMerge.avg, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
 
-        update();
     }
 
-    protected void update() {
+    public void update() {
         if (!busy.compareAndSet(false, true))
             return;
 
@@ -44,9 +43,10 @@ public class Bagregate<X> extends ArrayBag<X> {
 
             src.forEach(p -> {
                 X x = p.get();
-                if (x != null && include(x)) {
+                if (include(x)) {
                     float pri = p.pri();
-                    put(new RawPLink(x, pri), scale, null);
+                    if (pri==pri)
+                        put(new RawPLink(x, pri), scale, null);
                 }
             });
 //        } catch (Exception e) {
@@ -64,15 +64,5 @@ public class Bagregate<X> extends ArrayBag<X> {
         return true;
     }
 
-    @Override
-    public void forEach(Consumer<? super PLink<X>> action) {
-        forEach(size(), action);
-    }
-
-    @Override
-    public void forEach(int max, Consumer<? super PLink<X>> action) {
-        update();
-        super.forEach(max, action);
-    }
 
 }

@@ -224,7 +224,7 @@ public abstract class STMClustered extends STM {
         }
 
         public TLink(@NotNull Task t, float p, float q) {
-            super(t, p, q);
+            super(t, p);
             this.coord = getCoord(t);
         }
 

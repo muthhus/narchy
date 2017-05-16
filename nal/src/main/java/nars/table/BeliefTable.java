@@ -3,6 +3,7 @@ package nars.table;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
+import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.task.AnswerTask;
 import nars.term.Compound;
@@ -70,7 +71,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, Concept beliefConcept, NAR nar) {
             return null;
         }
 
@@ -231,7 +232,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, Concept beliefConcept, NAR nar) {
 
         boolean novel;
 
@@ -251,23 +252,24 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                 when = now;
 
             Truth aProj = answer.truth(when, dur, 0 /* nar.confMin.floatValue() */);
-            if (aProj == null)
-                return null;
+            if (aProj != null) {
 
-            AnswerTask a = new AnswerTask(
-                    answer.term(),
-                    answer,
-                    question,
-                    aProj, now, when, when, 0.5f);
-            a.setPri(answer.priSafe(0) * (aProj.evi() / answer.evi()));
 
-//            if (Param.DEBUG)
-//                a.log("Answer Projected");
-            novel = true; //because it was projected
-            answer = a;
+                AnswerTask a = new AnswerTask(
+                        answer.term(),
+                        answer,
+                        question,
+                        aProj, now, when, when, 0.5f);
+                a.setPri(answer.priSafe(0));
+
+                //            if (Param.DEBUG)
+                //                a.log("Answer Projected");
+                novel = true; //because it was projected
+                answer = a;
+            }
         }
 
-        if (novel) {
+        if (novel && question.isQuestOrQuestion() && question.concept(nar).equals(beliefConcept)) {
             nar.input(answer);
         }
 

@@ -3,6 +3,7 @@ package spacegraph.widget.meter;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.jogamp.opengl.GL2;
+import jcog.bag.util.Bagregate;
 import jcog.list.FasterList;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import spacegraph.Surface;
@@ -72,6 +73,9 @@ public class TreeChart<X> extends Surface {
 		CircularFifoQueue<ItemVis<X>> newChildren = new CircularFifoQueue<>(limit + 1);
 
 		final int[] i = {limit < 0 ? Integer.MAX_VALUE : limit};
+
+		if (nextChildren instanceof Bagregate)
+			((Bagregate)nextChildren).update(); //HACK
 
 		nextChildren.forEach(item -> {
 			if (item == null || i[0]-- <= 0)

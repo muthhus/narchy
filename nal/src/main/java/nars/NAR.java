@@ -1309,7 +1309,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     @Nullable
-    public Concept concept(@NotNull Termed termed, boolean createIfMissing) {
+    private Concept concept(@NotNull Termed termed, boolean createIfMissing) {
 
         if (termed instanceof Concept) {
             Concept ct = (Concept) termed;
