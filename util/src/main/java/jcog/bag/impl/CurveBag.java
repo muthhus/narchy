@@ -34,9 +34,7 @@ public class CurveBag<X> extends ArrayBag<X> {
     @NotNull
     @Override
     public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
-        int size = size();
-        if (size > 0)
-            sample(each, ThreadLocalRandom.current().nextInt(size));
+        sample(each, -1);
         return this;
     }
 

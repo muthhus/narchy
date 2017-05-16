@@ -3,6 +3,7 @@ package jcog.bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.data.array.LongArrays;
 import jcog.list.FasterList;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
@@ -26,7 +27,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class BagTest {
 
-    static final Random rng = rng();
 
     @Test
     public void testBasicInsertionRemovalArray() {
@@ -97,6 +97,10 @@ public class BagTest {
         assertEquals("[y=0.2, x=0.1]", a.listCopy().toString());
 
         a.put(new RawPLink("x", 0.2f));
+
+        a.print();
+        System.out.println( a.listCopy() );
+
         a.commit();
 
         //x should now be ahead
@@ -263,26 +267,28 @@ public class BagTest {
 
     }
 
-    public static void testPutMinMaxAndUniqueness(Bag<String,PLink<String>> a, float level) {
-        int n = a.capacity()*2;
+    public static void testPutMinMaxAndUniqueness(Bag<Integer,PLink<Integer>> a) {
+        float pri = 0.5f;
+        int n = a.capacity()*16; //insert enough to fully cover all slots. strings have bad hashcode when input iteratively so this may need to be a high multiple
 
 
         for (int i = 0; i < n; i++) {
-            a.put(new RawPLink("x" + i, level));
+            a.put(new RawPLink((i), pri));
         }
 
         a.commit(null); //commit but dont forget
+        assertEquals(a.capacity(), a.size());
 
-        a.print();
+        //a.print();
 
-        System.out.println(n + " " + a.size());
+        //System.out.println(n + " " + a.size());
 
-        List<String> keys = new FasterList(n);
+        List<Integer> keys = new FasterList(a.capacity());
         a.forEachKey(keys::add);
         assertEquals(a.size(), keys.size());
         assertEquals(new HashSet(keys).size(), keys.size());
 
-        assertEquals(level, a.priMin(), 0.01f);
+        assertEquals(pri, a.priMin(), 0.01f);
         assertEquals(a.priMin(), a.priMax(), 0.08f);
 
     }

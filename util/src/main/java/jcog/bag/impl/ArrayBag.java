@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Consumer;
@@ -295,13 +296,24 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @NotNull
     @Override
     public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
-        if (size() > 0)
-            sample(each, 0);
+        sample(each, 0);
         return this;
     }
 
+    /**
+     *
+     * @param each
+     * @param startingIndex if negative, a random starting location is used
+     */
     protected void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<X>> each, int startingIndex) {
         int i = startingIndex;
+        if (i < 0) {
+            int s = size();
+            if (s == 0) return;
+            else if (s == 1) i = 0;
+            else i = ThreadLocalRandom.current().nextInt(s);
+        }
+
         boolean modified = false;
         BagCursorAction next = BagCursorAction.Next;
         int s;

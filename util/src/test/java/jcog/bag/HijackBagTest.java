@@ -24,7 +24,12 @@ import static org.junit.Assert.assertTrue;
 public class HijackBagTest {
 
     @Test public void testSamplingFlatHijack() {
-        testPutMinMaxAndUniqueness(new DefaultHijackBag<String>(max, 64, 4), 0.076f);
+        for (int reprobes : new int[] { 1, 2, 4, 8 }) {
+            for (int capacity : new int[] { 1, 2, 4, 8, 16, 32, 64, 128 }) {
+                testPutMinMaxAndUniqueness(
+                        new DefaultHijackBag<>(max, capacity, reprobes));
+            }
+        }
     }
 
     @Test public void testRemoveByKey() {
