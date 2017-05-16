@@ -63,10 +63,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(c);
     }
 
-//    @Override
-//    protected Consumer<Task> forget(float avgToBeRemoved) {
-//        return null; //handled below on replace
-//    }
 
     @Override
     protected boolean replace(Task incoming, Task existing, float scaleIgnored) {
@@ -77,8 +73,9 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         if (existing instanceof ActionConcept.CuriosityTask)
             return true;
 
-        if (!replace(priConf(incoming) , priConf(existing))) {
-            //existing.priMult((1f - incoming.conf()/reprobes));
+        float inPri = incoming.priSafe(0);
+        if (!replace(inPri, existing.priSafe(0))) {
+            existing.priMult(1f - temperature() * inPri/reprobes);
             return false;
         }
         return true;
@@ -86,38 +83,31 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
-    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {
-        assert(scaleIgnored==1f);
-
-        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
-            return true;
-//        if (existing instanceof ActionConcept.CuriosityTask)
+//    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {
+//        assert(scaleIgnored==1f);
+//
+//        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
 //            return true;
+////        if (existing instanceof ActionConcept.CuriosityTask)
+////            return true;
+//
+//        if (!(existing instanceof SignalTask)) {
+//            //return true if there is a possibility of merge, and do a merge of 2 non-equal tasks in merge()
+//            Task i = (Task) incoming;
+//            if ((random().nextFloat()) >= Math.abs(existing.freq() - i.freq())) {
+//                /*if (!Stamp.overlapping(i, known))*/
+//                {
+//                    if (null != Interval.intersect(existing.start(), existing.end(), i.start(), i.end()))
+//                        return true;
+//                }
+//            }
+//        }
+//
+//        return replace(priConf(incoming) , priConf(existing));
+//        //return super.replace(incoming, existing, scale);
+//    }
 
-        if (!(existing instanceof SignalTask)) {
-            //return true if there is a possibility of merge, and do a merge of 2 non-equal tasks in merge()
-            Task i = (Task) incoming;
-            if ((random().nextFloat()) >= Math.abs(existing.freq() - i.freq())) {
-                /*if (!Stamp.overlapping(i, known))*/
-                {
-                    if (null != Interval.intersect(existing.start(), existing.end(), i.start(), i.end()))
-                        return true;
-                }
-            }
-        }
 
-        return replace(priConf(incoming) , priConf(existing));
-        //return super.replace(incoming, existing, scale);
-    }
-
-    public float priConf(@NotNull Task key) {
-        return ( key.priSafe(0)) * (1f + key.conf());
-        //float p = Util.or(/*1f +*/ key.pri(), key.conf());
-//        long range = key.end() - key.start();
-//        p *= (range > 0) ?
-//            (1f + Math.min(3, (float)Math.log(1+range))) : 1f; //duration factor
-        //return p;
-    }
 
 
 

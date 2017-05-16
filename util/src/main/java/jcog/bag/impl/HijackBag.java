@@ -485,7 +485,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * higher value means faster forgetting
      */
     public float temperature() {
-        return 0.25f;
+        return 0.5f;
     }
 
     protected float priEpsilon() {

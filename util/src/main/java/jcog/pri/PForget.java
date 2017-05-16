@@ -41,24 +41,28 @@ public class PForget<X extends Priority> implements Consumer<X> {
     @Nullable
     public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
 
+        if ((s > 0) && (p > 0) && (m > 0)) {
+
 //        float estimatedExcess = p/(m+p); //(m + p) - (c * (1f - temperature));
 //        if (estimatedExcess > 0) {
 //            float presentAndFutureExcess = estimatedExcess;
-                    //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-            float perMember = (float) Util.unitize( (temperature * ((p)/(m+p))) );
+            //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
+            float perMember = temperature * (p) / s;
             if (perMember >= priEpsilon)
                 return f.valueOf(perMember);
 //        }
+        }
         return null;
     }
 
     @Override
     public void accept(@NotNull X b) {
         b.priSub(avgToBeRemoved);
+
 //        b.priSub(avgToBeRemoved
 //            ,0.5f //50% retained
-//            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
-//            //,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+////            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+////            //,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
 //        );
     }
 

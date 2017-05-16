@@ -96,7 +96,8 @@ public class BagLab  {
 
 
     public static void main(String[] arg) {
-        DefaultHijackBag<Integer> h = new DefaultHijackBag<>(PriMerge.plus, 1024, 3);
+        DefaultHijackBag<Integer> h = new DefaultHijackBag<>(
+                PriMerge.plus, 1024, 8);
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
                 h

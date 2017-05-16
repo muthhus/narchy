@@ -34,6 +34,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
+    private static final int MAX_DEPTH = 3;
+
 
     final ObjectFloatHashMap<Termed> spread;
 
@@ -193,8 +195,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         float parentActivation = scale;
 
-        /*if (depth + 1 <= termlinkDepth)*/
-        {
+        if (depth < MAX_DEPTH) {
 
 
             //recurse
