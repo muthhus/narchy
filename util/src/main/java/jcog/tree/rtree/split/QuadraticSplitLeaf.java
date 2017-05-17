@@ -35,6 +35,7 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         super(builder, mMin, mMax, RTree.Split.QUADRATIC);
     }
 
+
     @Override
     protected Node<T> split(final T t) {
 

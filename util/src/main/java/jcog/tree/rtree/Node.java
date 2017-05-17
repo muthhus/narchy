@@ -21,7 +21,11 @@ package jcog.tree.rtree;
  */
 
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -51,7 +55,7 @@ public interface Node<T> {
      *
      * @param t - value to remove from index
      */
-    Node<T> remove(T t);
+    @NotNull Node<T> remove(T t);
 
     /**
      * update an existing t in the index
@@ -98,6 +102,14 @@ public interface Node<T> {
     boolean intersecting(HyperRect rect, Predicate<T> consumer);
 
     boolean containing(HyperRect rect, Predicate<T> t);
+
+    default <C extends Collection> C containing(HyperRect rect, C t) {
+        containing(rect, (Predicate)x -> {t.add(x); return true; });
+        return t;
+    }
+    default Set<T> containedSet(HyperRect rect) {
+        return containing(rect, new HashSet());
+    }
 
     /**
      * Recurses over index collecting stats

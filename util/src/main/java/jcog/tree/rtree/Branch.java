@@ -144,29 +144,33 @@ public final class Branch<T> implements Node<T> {
     @Override
     public Node<T> remove(final T t) {
         final HyperRect tRect = builder.apply(t);
-        Node<T> returned = null;
+
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(tRect)) {
                 child[i] = child[i].remove(t);
 
-                if (child[i] == null) {
-                    for (int j = i + 1; j < size; j++) {
-                        child[j - 1] = child[j];
-                    }
-                    size--;
-                } else if (!child[i].isLeaf() && child[i].size() == 1) {
-                    final Branch<T> c = (Branch<T>) child[i];
-                    child[i] = c.child[0];
+                if (child[i].size() == 0) {
+                    System.arraycopy(child, i + 1, child, i, size - i - 1);
+                    child[--size] = null;
+                    if (size > 0) i--;
                 }
             }
         }
-        if (size == 0) {
-            return null;
-        } else if (size == 1) {
-            return child[0];
-        }
-        return this;
 
+        if (size > 0) {
+
+            if (size == 1) {
+                // unsplit branch
+                return child[0];
+            }
+
+            mbr = child[0].bounds();
+            for (int i = 1; i < size; i++) {
+                grow(child[i]);
+            }
+        }
+
+        return this;
     }
 
     public int childSize(int i) {
@@ -178,13 +182,13 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public Node<T> update(final T told, final T tnew) {
-           final HyperRect tRect = builder.apply(told);
-        for(int i = 0; i < size; i++){
-            if(tRect.intersects(child[i].bounds())) {
+        final HyperRect tRect = builder.apply(told);
+        for (int i = 0; i < size; i++) {
+            if (tRect.intersects(child[i].bounds())) {
                 child[i] = child[i].update(told, tnew);
             }
-            if(i==0) {
-                mbr = child[i].bounds();
+            if (i == 0) {
+                mbr = child[0].bounds();
             } else {
                 grow(child[i]);
             }
@@ -214,8 +218,6 @@ public final class Branch<T> implements Node<T> {
             if (rect.intersects(c.bounds())) {
                 if (!c.containing(rect, t))
                     return false;
-            } else {
-                System.out.println(rect + " does not contain " + c.bounds());
             }
         }
         return true;

@@ -57,6 +57,25 @@ public abstract class Leaf<T> implements Node<T> {
 
     @Override
     public Node<T> add(final T t) {
+        if (size < mMax) {
+            final HyperRect tRect = builder.apply(t);
+            if (mbr != null) {
+                mbr = mbr.mbr(tRect);
+            } else {
+                mbr = tRect;
+            }
+
+            r[size] = tRect;
+            entry[size++] = t;
+        } else {
+            return split(t);
+        }
+
+        return this;
+    }
+
+
+    public Node<T> add0(final T t) {
 
         if (contains(t))
             return this;
@@ -103,73 +122,76 @@ public abstract class Leaf<T> implements Node<T> {
     }
 
 
-    @Override
-    public Node<T> remove(final T t) {
+        @Override
+    public Node<T> remove(final T t)  {
 
-        int i = 0;
+        int i=0;
         int j;
 
-        while (i < size && (entry[i] != t) && (!entry[i].equals(t))) {
+        while(i<size && (entry[i]!=t) && (!entry[i].equals(t))) {
             i++;
         }
 
-        j = i;
+        j=i;
 
-        while (j < size && ((entry[i] == t) || entry[j].equals(t))) {
+        while(j<size && ((entry[j]==t) || entry[j].equals(t))) {
             j++;
         }
 
-        if (i < j) {
+        if(i < j) {
+            final int nRemoved = j-i;
             if (j < size) {
-                r[i] = r[j];
-                entry[i] = entry[j];
-                mbr = r[j];
-                j++;
-                i++;
-                for (; j < size; j++, i++) {
-                    r[i] = r[j];
-                    entry[i] = entry[j];
-                    mbr = mbr.mbr(r[j]);
-                }
-                size -= j - i;
-                for (; i < j; i++) {
-                    entry[i] = null;
+                final int nRemaining = size-j;
+                System.arraycopy(r, j, r, i, nRemaining);
+                System.arraycopy(entry, j, entry, i, nRemaining);
+
+                //TODO use Array.fill
+                for (int k=size-nRemoved; k < size; k++) {
+                    r[k] = null;
+                    entry[k] = null;
                 }
             } else {
-                if (i >= 0) {
-                    mbr = r[0];
-                    for (int k = 1; k < i; k++) {
-                        mbr = mbr.mbr(r[k]);
-                    }
-                    size -= j - i;
-                    for (; i < j; i++) {
-                        entry[i] = null;
-                    }
-                } else {
-                    // clean sweep
-                    return null;
+                //TODO use Array.fill
+                for (int k=i; k < size; k++) {
+                    r[k] = null;
+                    entry[k] = null;
+
                 }
+
             }
+
+            size -= nRemoved;
+
+            if (size > 0) {
+                mbr = r[0];
+                for (int k = 1; k < size; k++) {
+                    mbr = mbr.mbr(r[k]);
+                }
+            } else {
+                mbr = null;
+            }
+
         }
 
         return this;
 
     }
 
+
     @Override
     public Node<T> update(final T told, final T tnew) {
-        if(size > 0) {
+        if (size > 0) {
 
             final HyperRect bbox = builder.apply(tnew);
 
-            for(int i=0; i<size; i++) {
-                if(entry[i].equals(told)) {
+            for (int i = 0; i < size; i++) {
+                if (entry[i].equals(told)) {
                     r[i] = bbox;
                     entry[i] = tnew;
                 }
 
-                if(i==0) {
-                    mbr = r[i];
+                if (i == 0) {
+                    mbr = r[0];
                 } else {
                     mbr = mbr.mbr(r[i]);
                 }
@@ -178,7 +200,6 @@ public abstract class Leaf<T> implements Node<T> {
 
         return this;
     }
-
 
 
     @Override

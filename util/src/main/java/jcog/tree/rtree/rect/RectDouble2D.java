@@ -23,6 +23,7 @@ package jcog.tree.rtree.rect;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -132,7 +133,7 @@ public class RectDouble2D implements HyperRect<Double2D> {
     }
 
     @Override
-    public boolean contains(final HyperRect r) {
+    public boolean contains(@NotNull final HyperRect r) {
         final RectDouble2D r2 = (RectDouble2D) r;
 
         return min.x <= r2.min.x &&

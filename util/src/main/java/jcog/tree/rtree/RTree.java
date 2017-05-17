@@ -126,21 +126,21 @@ public class RTree<T> implements Spatialized<T> {
         root.update(told, tnew);
     }
 
-    /**
-     * returns whether or not the HyperRect will enclose all of the data entries in t
-     *
-     * @param rect HyperRect to contain entries
-     * @param t    Data entries to be evaluated
-     * @return Whether or not all entries lie inside rect
-     */
-    public boolean contains(final HyperRect rect, final T... t) {
-        for (int i = 0; i < t.length; i++) {
-            if (!rect.contains(spatialize.apply(t[i]))) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    /**
+//     * returns whether or not the HyperRect will enclose all of the data entries in t
+//     *
+//     * @param rect HyperRect to contain entries
+//     * @param t    Data entries to be evaluated
+//     * @return Whether or not all entries lie inside rect
+//     */
+//    public boolean contains(final HyperRect rect, final T... t) {
+//        for (int i = 0; i < t.length; i++) {
+//            if (!rect.contains(spatialize.apply(t[i]))) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     /**
      * @return number of data entries stored in the RTree
