@@ -1622,7 +1622,7 @@ public class MyConcurrentRadixTree<X> implements /*RadixTree<X>,*/Serializable, 
     }
 
 
-    private class DescendantKeys extends LazyIterator<ByteSeq> implements Iterable<ByteSeq>, Iterator<ByteSeq> {
+    private class DescendantKeys extends LazyIterator<ByteSeq> implements Iterable<ByteSeq> {
         private final ByteSeq startKey;
         private final Node startNode;
         private Iterator<NodeKeyPair> descendantNodes;

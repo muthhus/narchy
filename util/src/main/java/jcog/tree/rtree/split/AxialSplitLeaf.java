@@ -41,60 +41,57 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
     @Override
     protected Node<T> split(final T t) {
-        final int nD = r[0].dim();
+        final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
 
-        final HyperRect[] sortedMbr = r.clone();
+
+        final int nD = r[0].dim();
 
         // choose axis to split
         int axis = 0;
-        double rangeD = 0;
-        for (int d = 0; d < nD; d++) {
-            // split along the greatest finite range extent
+        double rangeD = mbr.getRange(0);
+        for(int d=1; d<nD; d++) {
+            // split along the greatest range extent
             final double dr = mbr.getRangeFinite(d, 0);
-            if (dr < 0)
-                throw new UnsupportedOperationException("range must be non-negative");
-            if (dr > rangeD) {
+            if(dr > rangeD) {
                 axis = d;
                 rangeD = dr;
             }
         }
 
-        if (rangeD == 0/* || !Double.isFinite(rangeD)*/)
-            throw new UnsupportedOperationException("infinitisemal range can not be split in " + this);
-
+        // sort along split dimension
         final int splitDimension = axis;
-
+        final HyperRect[] sortedMbr = r.clone();
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
+        // divide sorted leafs
         final Node<T> l1Node = splitType.newLeaf(builder, mMin, mMax);
-        for (int i = 0; i < size / 2; i++) {
-            outerLoop:
-            for (int j = 0; j < size; j++) {
-                if (r[j] == sortedMbr[i]) {
-                    l1Node.add(entry[j]);
-                    break outerLoop;
-                }
-            }
-        }
+        transfer(sortedMbr, l1Node, 0, size/2);
 
         final Node<T> l2Node = splitType.newLeaf(builder, mMin, mMax);
-        for (int i = size / 2; i < size; i++) {
-            outerLoop:
-            for (int j = 0; j < size; j++) {
-                if (r[j] == sortedMbr[i]) {
-                    l2Node.add(entry[j]);
-                    break outerLoop;
-                }
-            }
-        }
+        transfer(sortedMbr, l2Node, size / 2, size);
 
         classify(l1Node, l2Node, t);
 
-        final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);
 
         return pNode;
+    }
+
+
+
+    private void transfer(HyperRect[] sortedSrc, Node<T> target, int from, int to) {
+        for (int i = from; i < to; i++) {
+            HyperRect si = sortedSrc[i];
+
+            outerLoop:
+            for (int j = 0; j < size; j++) {
+                if (r[j] == si) {
+                    target.add(entry[j]);
+                    break outerLoop;
+                }
+            }
+        }
     }
 
 }

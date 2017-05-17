@@ -86,6 +86,9 @@ public interface Node<T> {
      */
     void forEach(Consumer<T> consumer);
 
+    boolean AND(Predicate<T> p);
+    boolean OR(Predicate<T> p);
+
     /**
      * Consumer "accepts" every node in the given rect
      *  @param rect     - limiting rect

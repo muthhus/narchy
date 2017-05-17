@@ -39,12 +39,12 @@ public abstract class Leaf<T> implements Node<T> {
     protected final HyperRect[] r;
     protected final T[] entry;
 
-    protected final Function<T,HyperRect> builder;
+    protected final Function<T, HyperRect> builder;
     public final RTree.Split splitType;
     protected HyperRect mbr;
     protected int size;
 
-    protected Leaf(final Function<T,HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
+    protected Leaf(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
         this.mMax = mMax;
         this.mbr = null;
@@ -82,47 +82,104 @@ public abstract class Leaf<T> implements Node<T> {
         return this;
     }
 
-    public boolean contains(T t) {
-        for (int i = 0; i < size; i++) {
-            if (entry[i].equals(t)) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public boolean AND(Predicate<T> p) {
+        for (int i = 0; i < size; i++)
+            if (!p.test(entry[i]))
+                return false;
+        return true;
     }
 
     @Override
+    public boolean OR(Predicate<T> p) {
+        for (int i = 0; i < size; i++)
+            if (p.test(entry[i]))
+                return true;
+        return false;
+    }
+
+    public boolean contains(T t) {
+        return OR(e -> e.equals(t));
+    }
+
+
+    @Override
     public Node<T> remove(final T t) {
-        for (int i = 0; i < size; i++) {
-            if (entry[i].equals(t)) {
-                entry[i] = null;
-                r[i] = null;
-                if (i < (size - 1)) {
-                    entry[i] = entry[size - 1];
-                    r[i] = r[size - 1];
-                    entry[size - 1] = null;
-                    r[size - 1] = null;
+
+        int i = 0;
+        int j;
+
+        while (i < size && (entry[i] != t) && (!entry[i].equals(t))) {
+            i++;
+        }
+
+        j = i;
+
+        while (j < size && ((entry[i] == t) || entry[j].equals(t))) {
+            j++;
+        }
+
+        if (i < j) {
+            if (j < size) {
+                r[i] = r[j];
+                entry[i] = entry[j];
+                mbr = r[j];
+                j++;
+                i++;
+                for (; j < size; j++, i++) {
+                    r[i] = r[j];
+                    entry[i] = entry[j];
+                    mbr = mbr.mbr(r[j]);
                 }
-                if (--size > 0) {
+                size -= j - i;
+                for (; i < j; i++) {
+                    entry[i] = null;
+                }
+            } else {
+                if (i >= 0) {
                     mbr = r[0];
-                    for (i = 1; i < size; i++) {
-                        mbr = mbr.mbr(r[i]);
+                    for (int k = 1; k < i; k++) {
+                        mbr = mbr.mbr(r[k]);
                     }
+                    size -= j - i;
+                    for (; i < j; i++) {
+                        entry[i] = null;
+                    }
+                } else {
+                    // clean sweep
+                    return null;
                 }
-                return this;
             }
         }
-        return null;
+
+        return this;
+
     }
 
     @Override
     public Node<T> update(final T told, final T tnew) {
+        if(size > 0) {
 
-        remove(told);
-        add(tnew);
+            final HyperRect bbox = builder.apply(tnew);
+
+            for(int i=0; i<size; i++) {
+                if(entry[i].equals(told)) {
+                    r[i] = bbox;
+                    entry[i] = tnew;
+                }
+
+                if(i==0) {
+                    mbr = r[i];
+                } else {
+                    mbr = mbr.mbr(r[i]);
+                }
+            }
+        }
 
         return this;
     }
+
+
 
     @Override
     public boolean containing(HyperRect rect, Predicate<T> t) {
@@ -153,9 +210,6 @@ public abstract class Leaf<T> implements Node<T> {
         return size;
     }
 
-    public T getEntry(final int dx) {
-        return entry[dx];
-    }
 
     @Override
     public boolean isLeaf() {
@@ -257,6 +311,6 @@ public abstract class Leaf<T> implements Node<T> {
 
     @Override
     public String toString() {
-        return "Leaf" + splitType + "{" + mbr + "x" + size +'}';
+        return "Leaf" + splitType + "{" + mbr + "x" + size + '}';
     }
 }

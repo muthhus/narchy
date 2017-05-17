@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by jcairns on 4/30/15.
  */
@@ -54,10 +56,10 @@ public class RTree2DTest {
         Assert.assertEquals(7, n);
 
         for(int i=0; i<n; i++) {
-            Assert.assertTrue(result[i].x >= 2);
-            Assert.assertTrue(result[i].x <= 8);
-            Assert.assertTrue(result[i].y >= 2);
-            Assert.assertTrue(result[i].y <= 8);
+            assertTrue(result[i].x >= 2);
+            assertTrue(result[i].x <= 8);
+            assertTrue(result[i].y >= 2);
+            assertTrue(result[i].y <= 8);
         }
     }
 
@@ -93,7 +95,7 @@ public class RTree2DTest {
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                Assert.assertTrue("Unexpected result found", results.get(i).min.x == i + 2 && results.get(i).min.y == i + 2 && results.get(i).max.x == i + 5 && results.get(i).max.y == i + 5);
+                assertTrue("Unexpected result found", results.get(i).min.x == i + 2 && results.get(i).min.y == i + 2 && results.get(i).max.x == i + 5 && results.get(i).max.y == i + 5);
             }
         }
     }
@@ -126,9 +128,9 @@ public class RTree2DTest {
             }
 
             final int expectedCount = entryCount;
-            Assert.assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
+            assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
                     Math.abs(expectedCount - foundCount) < 10 /* in case of duplicates */);
-            Assert.assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
+            assertTrue("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount,
                     Math.abs(expectedCount - resultCount) < 10 /* in case of duplicates */);
 
         }
@@ -204,11 +206,11 @@ public class RTree2DTest {
         }
         RectDouble2D[] searchResults = new RectDouble2D[10];
         for(int i = 0; i < rects.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containing(rects[i], searchResults) == 0);
+            assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containing(rects[i], searchResults) == 0);
         }
 
         rTree.add(new RectDouble2D(0,0,5,5));
-        Assert.assertTrue("Found hyperRect that should have been removed on search ", rTree.size() != 0);
+        assertTrue("Found hyperRect that should have been removed on search ", rTree.size() != 0);
     }
 
     @Test
@@ -217,11 +219,11 @@ public class RTree2DTest {
 
         RectDouble2D rect = new RectDouble2D(0,0,2,2);
         rTree.add(rect);
-        Assert.assertTrue("Did not add HyperRect to Tree", rTree.size() > 0);
-        rTree.remove(rect);
-        Assert.assertTrue("Did not remove HyperRect from Tree", rTree.size() == 0);
+        assertTrue("Did not add HyperRect to Tree", rTree.size() > 0);
+        assertTrue( rTree.remove(rect) );
+        assertTrue("Did not remove HyperRect from Tree", rTree.size() == 0);
         rTree.add(rect);
-        Assert.assertTrue("Tree nulled out and could not add HyperRect back in", rTree.size() > 0);
+        assertTrue("Tree nulled out and could not add HyperRect back in", rTree.size() > 0);
     }
 
     @Ignore
@@ -271,7 +273,7 @@ public class RTree2DTest {
         rTree.update(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
         int num = rTree.containing(newRect, results);
-        Assert.assertTrue("Did not find the updated HyperRect", num == 1);
+        assertTrue("Did not find the updated HyperRect", num == 1);
         String st = results[0].toString();
         System.out.print(st);
     }

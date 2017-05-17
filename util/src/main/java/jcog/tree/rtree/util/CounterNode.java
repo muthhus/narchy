@@ -64,6 +64,15 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
+    public boolean AND(Predicate<T> p) {
+        throw new UnsupportedOperationException("TODO");
+    }
+    @Override
+    public boolean OR(Predicate<T> p) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
     public int containing(HyperRect rect, T[] t, int n) {
         searchCount++;
         bboxEvalCount += this.node.size();

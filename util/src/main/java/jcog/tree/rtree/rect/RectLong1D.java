@@ -52,12 +52,13 @@ public class RectLong1D implements HyperRect<Long1D> {
 
     @Override
     public double center(int d) {
-        assert (d == 0);
+        assert(d==0);
         return (from + to) / 2.0;
     }
 
     @Override
     public double getRange(int d) {
+        assert(d==0);
         return Math.abs(from - to);
     }
 

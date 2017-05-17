@@ -22,7 +22,6 @@ package jcog.tree.rtree;
 
 import jcog.tree.rtree.util.Stats;
 
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
