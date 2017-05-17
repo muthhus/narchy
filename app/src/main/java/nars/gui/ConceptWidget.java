@@ -313,19 +313,21 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                 float minLineWidth = 5f;
                 float priToWidth = 10f;
 
-                this.width = minLineWidth + priToWidth * edgeSum;
+                this.width = minLineWidth + priToWidth * Math.min(edgeSum, 5);
+
                 //z.r = 0.25f + 0.7f * (pri * 1f / ((Term)target.key).volume());
 //                float qEst = ff.qua();
 //                if (qEst!=qEst)
 //                    qEst = 0f;
 
 
+
                 if (edgeSum > 0) {
-                    this.b = 0.4f;
-                    this.r = 0.2f + 0.7f * (edgeSum > 0 ? (tasklinkPri / edgeSum) : 0);
-                    this.g = 0.2f + 0.7f * (edgeSum > 0 ? (termlinkPri / edgeSum) : 0);
+                    this.b = 0.1f;
+                    this.r = 0.1f + 0.7f * (tasklinkPri / edgeSum);
+                    this.g = 0.1f + 0.7f * (termlinkPri / edgeSum);
                 } else {
-                    this.r = this.g = this.b = 0.5f;
+                    this.r = this.g = this.b = 0.1f;
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
@@ -333,15 +335,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
-                        0.1f + 0.9f * edgeProp;
+                        0.1f + 0.7f * edgeProp;
 
-                this.attraction = 2f * edgeSum/conceptEdgePriSum;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
-            this.attractionDist = 5f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+            this.attractionDist = 3f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
 
         @Override
@@ -376,8 +378,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 2f;
-        final float maxSize = 16f;
+        final float minSize = 5f;
+        final float maxSize = 30f;
 
         @Override
         public void apply(ConceptWidget cw, Term tt) {

@@ -61,6 +61,8 @@ public class HistogramChart extends Surface {
         int N = data.length;
         float dx = 1f / N;
         double max = data[Util.argmax(data)];
+        if (max == 0)
+            return; //empty
 
         float x = 0;
 
