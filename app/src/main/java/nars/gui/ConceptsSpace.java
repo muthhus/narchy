@@ -1,5 +1,6 @@
 package nars.gui;
 
+import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.bag.util.Bagregate;
 import jcog.pri.PLink;
 import nars.NAR;
@@ -9,7 +10,9 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
@@ -26,22 +29,23 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     public static final float UPDATE_RATE = 0.5f;
     public final NAR nar;
-    private final int maxEdgesPerNode;
+    public final int maxEdgesPerNodeMin, maxEdgesPerNodeMax;
     final Bagregate<Concept> bag;
     private final int maxNodes;
     public long now;
     public int dur;
 
-    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNode) {
-        this(nar, maxNodes, maxNodes, maxEdgesPerNode);
+    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
     }
 
-    public ConceptsSpace(NAR nar, int maxNodes, int bufferedNodes, int maxEdgesPerNode) {
+    public ConceptsSpace(NAR nar, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar);
         this.nar = nar;
         this.maxNodes = maxNodes;
-        this.maxEdgesPerNode = maxEdgesPerNode;
-        bag = new Bagregate<Concept>(nar.focus().concepts(), maxNodes + bufferedNodes, UPDATE_RATE) {
+        this.maxEdgesPerNodeMin = maxEdgesPerNodeMin;
+        this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
+        bag = new Bagregate<>(nar.focus().concepts(), maxNodes + bufferedNodes, UPDATE_RATE) {
             @Override
             protected boolean include(Concept x) {
                 return ConceptsSpace.this.include(x.term());
@@ -55,9 +59,6 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
             @Override
             public void onRemoved(@NotNull PLink<Concept> value) {
                 widgetRemove(value.get());
-//                    cw.deactivate();
-//                    //cw.delete();
-//                }
             }
         };
     }
@@ -69,45 +70,62 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         bag.update();
         bag.forEach(maxNodes, (PLink<Concept> concept) ->
-            displayNext.add( widgetGetOrCreate(concept.get()) )
+            displayNext.add( widgetGetOrCreate(concept))
             //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
         );
 
 
-        //System.out.println(nar.time() + " " + displayNext.size() );
-
+//        //System.out.println(nar.time() + " " + displayNext.size() );
+//        System.out.println("space:" + space.summary());
+//        System.out.println("\twidgt:" + widgets.summary());
+//        System.out.println("\tedges:" + edges.summary());
+//        if (!displayNext.isEmpty())
+//            System.out.println(displayNext.iterator().next());
     }
 
-    ConceptWidget widgetRemove(Concept concept) {
-        ConceptWidget cw = concept.remove(this);
-        if (cw!=null) {
-            cw.delete(space.dyn);
+    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
+        ConceptWidget y = new ConceptWidget(c);
+        y.concept = c;
+        return y;
+    }) {
+        @Override
+        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
+            value.get().getTwo().delete(space.dyn);
         }
-        return cw;
-    }
+    };
 
-    ConceptWidget widgetGet(Concept concept) {
-        return concept.get(this);
+    public final HijackMemoize<Pair<Concept,ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>(4096, 2, (to) -> {
+        return new ConceptWidget.TermEdge(to.getTwo());
+    });
+
+    void widgetRemove(Concept concept) {
+        @Nullable ConceptWidget cw = widgets.getIfPresent(concept);
+        if (cw != null) {
+            cw.hide();
+        }
+    }
+////        cw.delete();
+////
+////        ConceptWidget cw = concept.remove(this);
+////        if (cw!=null) {
+////            cw.delete(space.dyn);
+////        }
+////        return cw;
+//    }
+
+
+    ConceptWidget widgetGetOrCreate(PLink<Concept> clink) {
+        ConceptWidget cw = widgetGetOrCreate(clink.get());
+        cw.pri = clink.priSafe(0);
+        return cw;
     }
 
     ConceptWidget widgetGetOrCreate(Concept concept) {
-        @NotNull ConceptWidget cw = concept.meta(this, (k, p) -> {
-            if (p == null) {
-                ConceptWidget c = materializer().apply(concept);
-                c.concept = concept;
-                p = c;
-            }
-            return p;
-        });
-
+        ConceptWidget cw = widgets.apply(concept);
         cw.activate();
-
         return cw;
     }
 
-    private Function<Termed, ConceptWidget> materializer() {
-        return t -> new ConceptWidget(nar, t, maxEdgesPerNode);
-    }
 
     @Override
     protected void update() {
@@ -141,7 +159,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
         //n.focus.activationRate.setValue(0.05f);
 
-        n.loopFPS(64f);
+        n.loopFPS(16f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
@@ -159,7 +177,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 192, 5) {
+        NARSpace cs = new ConceptsSpace(n, 128, 1, 8) {
 //            @Override
 //            protected boolean include(Term term) {
 //

@@ -35,6 +35,8 @@ import jcog.Util;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.phys.BulletGlobals;
 
+import static jcog.Util.notNaN;
+
 /**
  * A generic 3-element tuple that is represented by single precision-floating
  * point x,y,z coordinates.
@@ -67,9 +69,9 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
      * @param z the z coordinate
      */
     public Tuple3f(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = notNaN(x);
+        this.y = notNaN(y);
+        this.z = notNaN(z);
     }
 
 
@@ -132,9 +134,9 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
 //        if ((x!=x) || (y!=y) || (z!=z))
 //            throw new UnsupportedOperationException();
 
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = notNaN(x);
+        this.y = notNaN(y);
+        this.z = notNaN(z);
     }
 
     /** assumes z=0 */

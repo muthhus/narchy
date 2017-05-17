@@ -80,7 +80,7 @@ public class ImmutableTask extends Pri implements Task {
 
         Task.taskContentValid(term, punc, null, false);
 
-        this.priority = 0;
+        this.pri = 0;
 
         this.term = term;
 

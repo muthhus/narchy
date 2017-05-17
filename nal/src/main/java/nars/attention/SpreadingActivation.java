@@ -2,11 +2,11 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
+import jcog.pri.Priority;
 import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
-import nars.budget.DependentBLink;
+import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.math.Interval.unionLength;
-import static nars.Op.NEG;
 import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
 
@@ -168,12 +167,12 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     public void value(Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        if (inPri * scale >= Pri.EPSILON) {
+        if (inPri * scale >= Priority.EPSILON) {
             nar.activate(c, inPri * scale);
         }
 
         float linkPri = inPri;
-        if (linkPri * scale >= Pri.EPSILON) {
+        if (linkPri * scale >= Priority.EPSILON) {
 
 
             termBidi(c, linkPri * TERMLINK_BALANCE, linkPri * (1f - TERMLINK_BALANCE), scale);
@@ -271,7 +270,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
                     }
                 }
 
-                if (subSubActivation >= Pri.EPSILON) {
+                if (subSubActivation >= Priority.EPSILON) {
                     subSubActivation -= b.priAddOverflow(subSubActivation, additionalPressure); //activate the link
                 }
 
@@ -331,7 +330,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         rcpt.tasklinks().put(
                 //new RawPLink(in, pri),
-                new DependentBLink(in, pri),
+                new PLinkUntilDeleted(in, pri),
                 scale, null);
 
     }

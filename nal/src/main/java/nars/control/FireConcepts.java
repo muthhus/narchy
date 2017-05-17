@@ -3,7 +3,6 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
-import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
 import jcog.data.sorted.SortedArray;
 import jcog.event.On;
@@ -25,10 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
@@ -76,19 +73,18 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * returns ttl consumed
      */
-    int premiseVector(PLink<Concept> pc, Derivation d) {
+    int fire(PLink<Concept> pc, Derivation d) {
 
         float cPri = pc.priSafe(0);
         final int startTTL = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
         int ttl = startTTL;
 
         Concept c = pc.get();
-        c.tasklinks().commit().normalize();
-        c.termlinks().commit().normalize();
+        c.tasklinks().commit().normalize(0.1f);
+        c.termlinks().commit().normalize(0.1f);
         nar.terms.commit(c);
 
-        long now = nar.time();
-        int count = 0;
+
 
         int premiseCost = Param.BeliefMatchTTL;
         int linkSampleCost = 1;
@@ -99,6 +95,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         @Nullable PLink<Term> termlink = null;
         float taskLinkPri = -1f, termPri = -1f;
 
+        d.restartA();
         while (ttl > 0) {
             if (tasklink == null || (rng.nextFloat()) > taskLinkPri) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
@@ -107,7 +104,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                     break;
 
                 taskLinkPri = tasklink.priSafe(0);
-                d.restart(tasklink.get());
+                d.restartB(tasklink.get());
             }
 
 
@@ -122,7 +119,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             if (ttl <= premiseCost)
                 break; //not enough remaining to create premise
 
-            Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
+            Premise p = PremiseBuilder.premise(c, tasklink, termlink, d.time, nar, -1f);
             ttl -= premiseCost; //failure of premise generation still causes cost
 
             if (p != null) {
@@ -132,8 +129,6 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 int ttlRemain = deriver.run(d, p, ttl);
 
                 assert (start >= ttlRemain);
-
-                count++;
 
                 ttl -= (start - ttlRemain);
             }
@@ -265,7 +260,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             csrc.active.sample( p -> {
 
 
-                int ttlConsumed = premiseVector(p, dd);
+                int ttlConsumed = fire(p, dd);
                 p.priMult(decay);
                 curTTL[0]-=ttlConsumed;
                 return curTTL[0] > 0 ? Next : Stop;

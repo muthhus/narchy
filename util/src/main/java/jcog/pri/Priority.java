@@ -26,6 +26,9 @@ public interface Priority extends Prioritized {
     /** common instance for a 'zero budget'.*/
     Priority Zero = new ROBudget(0);
 
+    /** default minimum difference necessary to indicate a significant modification in budget float number components */
+    float EPSILON = 0.0001f;
+
 
     static String toString(@NotNull Priority b) {
         return toStringBuilder(null, Texts.n4(b.pri())).toString();
@@ -110,7 +113,7 @@ public interface Priority extends Prioritized {
 //    }
 
     default float priAddOverflow(float toAdd, @Nullable float[] pressurized) {
-        if (Math.abs(toAdd) <= Pri.EPSILON) {
+        if (Math.abs(toAdd) <= EPSILON) {
             return 0; //no change
         }
 
@@ -146,12 +149,14 @@ public interface Priority extends Prioritized {
         return this;
     }
 
-//
-//    @NotNull
-//    default Priority priLerp(float target, float speed) {
-//        setPri(lerp(speed, target, pri()));
-//        return this;
-//    }
+
+    @NotNull
+    default Priority priLerp(float target, float speed) {
+        float pri = pri();
+        if (pri == pri)
+            setPri(lerp(speed, target, pri));
+        return this;
+    }
 
 //    /** returns the delta */
 //    default float priLerpMult(float factor, float speed) {
@@ -204,12 +209,17 @@ public interface Priority extends Prioritized {
         return toString(this);
     }
 
-    /** normalizes the current value to within: min..(range+min), (range=max-min) */
     default void normalizePri(float min, float range) {
+        //setPri( (p - min)/range );
+        normalizePri(min, range, 1f);
+    }
+
+    /** normalizes the current value to within: min..(range+min), (range=max-min) */
+    default void normalizePri(float min, float range, float lerp) {
         float p = priSafe(-1);
         if (p < 0) return; //dont normalize if deleted
 
-        setPri( (p - min)/range );
+        priLerp((p - min)/range, lerp );
     }
 
 //    void orPriority(float v);

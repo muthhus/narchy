@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * something which has a priority floating point value
  */
-public interface Prioritized {
+public interface Prioritized extends Deletes {
 
     /**
      * a value in range 0..1.0 inclusive.

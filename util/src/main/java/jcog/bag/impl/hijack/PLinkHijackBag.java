@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static jcog.pri.Pri.EPSILON;
+import static jcog.pri.Priority.EPSILON;
 
 /**
  * Created by me on 2/17/17.
@@ -19,13 +19,13 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     }
 
     @Override
-    public float pri(@NotNull PLink<X> key) {
+    public final float pri(@NotNull PLink<X> key) {
         return key.pri();
     }
 
     @NotNull
     @Override
-    public X key(PLink<X> value) {
+    public final X key(PLink<X> value) {
         return value.get();
     }
 
@@ -74,10 +74,6 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
         return existing;
     }
 
-    @Override
-    protected float priEpsilon() {
-        return EPSILON;
-    }
 
 
     @Override

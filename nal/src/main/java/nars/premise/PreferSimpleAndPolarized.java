@@ -130,7 +130,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
             1f -
                 //(float)Math.sqrt(
-                Util.sqr(
+                /*Util.sqr*/(
                     Util.unitize(
                         ((float)derivedComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
                     )

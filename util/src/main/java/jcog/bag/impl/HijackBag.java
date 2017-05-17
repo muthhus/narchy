@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static jcog.bag.impl.HijackBag.Mode.*;
-import static jcog.pri.Pri.EPSILON;
+import static jcog.pri.Priority.EPSILON;
 
 /**
  * the superclass's treadmill's extra data slots are used for storing:

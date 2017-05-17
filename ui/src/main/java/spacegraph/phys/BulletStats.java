@@ -92,18 +92,18 @@ public class BulletStats {
 	 * @param name must be {@link String#intern interned} String (not needed for String literals)
 	 */
 	public static void pushProfile(String name) {
-		if (enableProfile) {
-			CProfileManager.startProfile(name);
-		}
+//		if (enableProfile) {
+//			CProfileManager.startProfile(name);
+//		}
 	}
 	
 	/**
 	 * Pops profile node.
 	 */
 	public static void popProfile() {
-		if (enableProfile) {
-			CProfileManager.stopProfile();
-		}
+//		if (enableProfile) {
+//			CProfileManager.stopProfile();
+//		}
 	}
 	
 }

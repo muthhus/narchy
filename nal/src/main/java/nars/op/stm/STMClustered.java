@@ -11,7 +11,7 @@ import jcog.pri.PriMerge;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
-import nars.budget.DependentBLink;
+import nars.budget.PLinkUntilDeleted;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -205,7 +205,7 @@ public abstract class STMClustered extends STM {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends DependentBLink<Task> implements Truthed {
+    public final class TLink extends PLinkUntilDeleted<Task> implements Truthed {
 
         /**
          * feature vector representing the item as learned by clusterer
@@ -219,12 +219,7 @@ public abstract class STMClustered extends STM {
         @Nullable TasksNode node;
 
         public TLink(@NotNull Task t) {
-            super(t);
-            this.coord = getCoord(t);
-        }
-
-        public TLink(@NotNull Task t, float p, float q) {
-            super(t, p);
+            super(t, t.priSafe(0));
             this.coord = getCoord(t);
         }
 

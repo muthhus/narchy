@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
-import jcog.pri.Pri;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -137,7 +137,7 @@ public abstract class TermGraph {
             } else {
                 neg = false;
             }
-            if (val < Pri.EPSILON)
+            if (val < Priority.EPSILON)
                 return;
 
             Term S = reverse ? $.negIf(pred, neg) : subj;

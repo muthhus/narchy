@@ -125,31 +125,31 @@ public abstract class Collisions<X> {
 
 
 	public void solveCollisions() {
-		BulletStats.pushProfile("performDiscreteCollisionDetection");
+		//BulletStats.pushProfile("performDiscreteCollisionDetection");
 		try {
 			//DispatcherInfo dispatchInfo = getDispatchInfo();
 
 			updateAabbs();
 
-			BulletStats.pushProfile("calculateOverlappingPairs");
+			//BulletStats.pushProfile("calculateOverlappingPairs");
 			try {
 				broadphase.update(intersecter);
 			}
 			finally {
-				BulletStats.popProfile();
+				//BulletStats.popProfile();
 			}
 
 
-            BulletStats.pushProfile("dispatchAllCollisionPairs");
+            //BulletStats.pushProfile("dispatchAllCollisionPairs");
             try {
                 intersecter.dispatchAllCollisionPairs(broadphase.getOverlappingPairCache(), dispatchInfo, this.intersecter);
             }
             finally {
-                BulletStats.popProfile();
+                //BulletStats.popProfile();
             }
         }
 		finally {
-			BulletStats.popProfile();
+			//BulletStats.popProfile();
 		}
 	}
 
@@ -219,13 +219,13 @@ public abstract class Collisions<X> {
 	}
 
 	public void updateAabbs() {
-		BulletStats.pushProfile("updateAabbs");
-		try {
+//		BulletStats.pushProfile("updateAabbs");
+//		try {
 			collidables().forEach(this::updateAabbsIfActive);
-		}
-		finally {
-			BulletStats.popProfile();
-		}
+//		}
+//		finally {
+//			BulletStats.popProfile();
+//		}
 	}
 
 	private final void updateAabbsIfActive(Collidable<X> colObj) {

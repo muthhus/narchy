@@ -31,6 +31,7 @@
 
 package spacegraph.math;
 
+import jcog.Util;
 import spacegraph.phys.BulletGlobals;
 
 import java.util.Random;
@@ -235,7 +236,11 @@ public class v3 extends Tuple3f implements java.io.Serializable {
      * @return the angle in radians in the range [0,PI]
      */
     public final float angle(v3 v1) {
-        double vDot = this.dot(v1) / (this.length() * v1.length());
+        float div = this.length() * v1.length();
+        if (Util.equals(div, 0, BulletGlobals.FLT_EPSILON))
+            return Float.NaN;
+
+        double vDot = this.dot(v1) / div;
         if (vDot < -1.0) vDot = -1.0;
         if (vDot > 1.0) vDot = 1.0;
         return ((float) (Math.acos(vDot)));

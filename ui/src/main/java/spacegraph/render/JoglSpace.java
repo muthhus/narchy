@@ -294,6 +294,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
 
+
     private static class MyFPSAnimator extends FPSAnimator {
 
         int idealFPS, minFPS;

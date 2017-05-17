@@ -77,6 +77,7 @@ abstract public class Derivation extends Unify implements TermContext {
 
     /** current NAR time, set at beginning of derivation */
     public long time = ETERNAL;
+    public int dur = -1;
 
     @Nullable
     public  Truth taskTruth;
@@ -108,6 +109,7 @@ abstract public class Derivation extends Unify implements TermContext {
     private substitute _substitute;
     private substituteIfUnifiesAny _substituteIfUnifiesAny;
     private substituteIfUnifiesDep _substituteIfUnifiesDep;
+
 
 
     public Derivation(@NotNull NAR nar,
@@ -147,7 +149,17 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
 
-    @NotNull public void restart(@NotNull Task task) {
+    /** concept-scope */
+    @NotNull public void restartA() {
+        this.time = nar.time();
+        this.dur = nar.dur();
+        this.truthResolution = nar.truthResolution.floatValue();
+        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
+    }
+
+    /** tasklink scope */
+    @NotNull public void restartB(@NotNull Task task) {
+
 
         this.task = task;
 
@@ -163,14 +175,9 @@ abstract public class Derivation extends Unify implements TermContext {
 
     }
 
-    /** set in Solve once these (3) conclusion parameters have been determined */
-    public void truth(Truth truth, byte punc, long[] evidence) {
-        this.concTruth = truth;
-        this.concPunc = punc;
-        this.concEvidence = evidence;
-    }
 
-    @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
+    /** termlink scope */
+    @NotNull public Derivation restartC(@NotNull Premise p, int ttl) {
 
         assert(ttl >= 0);
 
@@ -197,7 +204,6 @@ abstract public class Derivation extends Unify implements TermContext {
 //        }
         //xy.map.clear();
 
-        this.time = nar.time();
 
         this.concTruth = null;
         this.concPunc = 0;
@@ -215,14 +221,11 @@ abstract public class Derivation extends Unify implements TermContext {
 
         this.versioning.setTTL(ttl);
 
-        this.truthResolution = nar.truthResolution.floatValue();
-        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
 
         this.premise = p;
 
 
-        if (this.task == null)
-            restart(p.task);
+        assert(this.task!=null); //        if (this.task == null) restart(nar.time(), p.task);
 
         Task belief;
         this.belief = belief = p.belief;
@@ -232,7 +235,6 @@ abstract public class Derivation extends Unify implements TermContext {
         }
 
 
-        int dur = nar.dur();
         if (belief == null) {
             this.beliefTruth = this.beliefTruthRaw = null;
         } else {
@@ -272,6 +274,13 @@ abstract public class Derivation extends Unify implements TermContext {
 
     /** called by conclusion */
     abstract public void derive(Task t);
+
+  /** set in Solve once these (3) conclusion parameters have been determined */
+    public void truth(Truth truth, byte punc, long[] evidence) {
+        this.concTruth = truth;
+        this.concPunc = punc;
+        this.concEvidence = evidence;
+    }
 
     /**
      * only one thread should be in here at a time

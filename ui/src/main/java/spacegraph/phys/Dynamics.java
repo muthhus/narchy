@@ -61,6 +61,9 @@ import static spacegraph.phys.Dynamic.ifDynamic;
 public abstract class Dynamics<X> extends Collisions<X> {
 
     private static final Comparator<TypedConstraint> sortConstraintOnIslandPredicate = (lhs, rhs) -> {
+        if (lhs == rhs)
+            return 0;
+
         int rIslandId0, lIslandId0;
         rIslandId0 = getConstraintIslandId(rhs);
         lIslandId0 = getConstraintIslandId(lhs);
@@ -92,6 +95,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     protected InternalTickCallback preTickCallback;
     private float dt;
 
+    private final List<Animated> animations = new FasterList();
 
     public Dynamics(Intersecter intersecter, Broadphase broadphase) {
         this(intersecter, broadphase, null);
@@ -171,11 +175,11 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     int stepSimulation(float timeStep, int maxSubSteps, float fixedTimeStep) {
-        startProfiling(timeStep);
+        //startProfiling(timeStep);
 
         long t0 = System.nanoTime();
 
-        BulletStats.pushProfile("stepSimulation");
+        //BulletStats.pushProfile("stepSimulation");
         try {
             int numSimulationSubSteps = 0;
 
@@ -220,7 +224,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
 
             return numSimulationSubSteps;
         } finally {
-            BulletStats.popProfile();
+            //BulletStats.popProfile();
 
             BulletStats.stepSimulationTime = (System.nanoTime() - t0) / 1000000;
         }
@@ -280,7 +284,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
         //System.out.println(nextCollidables.size() + " " + pairs().size());
 
 
-        List<Collidable> prevCollidables = collidable;
+        //List<Collidable> prevCollidables = collidable;
         this.collidable = nextCollidables;
     }
 
@@ -995,7 +999,6 @@ public abstract class Dynamics<X> extends Collisions<X> {
 //		return worldUserInfo;
 //	}
 
-    private final List<Animated> animations = new FasterList();
 
     public void addAnimation(Animated a) {
         animations.add(a);
@@ -1012,7 +1015,7 @@ public abstract class Dynamics<X> extends Collisions<X> {
     }
 
     public String summary() {
-        return this.toString();
+        return ("collidables=" + collidable.size() + " pairs=" + pairs().size());
     }
 
     // JAVA NOTE: not part of the original api

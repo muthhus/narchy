@@ -4,7 +4,7 @@ import jcog.bag.impl.ArrayBag;
 import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
-import nars.budget.DependentBLink;
+import nars.budget.PLinkUntilDeleted;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +50,7 @@ public class LambdaQuestionTask extends ImmutableTask {
         //answer = super.onAnswered(answer, nar);
 
         boolean novel = !answers.contains(answer);
-        answers.put(new DependentBLink<>(answer));
+        answers.put(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
         if (novel) {
             eachAnswer.accept(this, answer);
         }

@@ -79,22 +79,35 @@ public class HijackMemoize<K,V> extends PriorityHijackBag<K,PLink<Pair<K,V>>> im
         return this;
     }
 
-    @Override
-    @Nullable public V apply(@NotNull K k) {
+    @Nullable public V getIfPresent(@NotNull Object k) {
         PLink<Pair<K, V>> exists = get(k);
         if (exists!=null) {
             exists.priAdd(CACHE_HIT_BOOST);
             hit.increment();
             return exists.get().getTwo();
-        } else {
-            V v = func.apply(k);
-            if (put(new RawPLink<>(Tuples.pair(k, v), value(k)))!=null) {
+        }
+        return null;
+    }
+     @Nullable public V removeIfPresent(@NotNull K k) {
+        PLink<Pair<K, V>> exists = remove(k);
+        if (exists!=null) {
+            return exists.get().getTwo();
+        }
+        return null;
+    }
+
+    @Override
+    @Nullable public V apply(@NotNull K k) {
+        V v = getIfPresent(k);
+        if (v == null) {
+            v = func.apply(k);
+            if (put(new RawPLink<>(Tuples.pair(k, v), value(k))) != null) {
                 miss.increment();
             } else {
                 reject.increment();
             }
-            return v;
         }
+        return v;
     }
 
 

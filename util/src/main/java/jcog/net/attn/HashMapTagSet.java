@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static jcog.pri.Pri.EPSILON;
+import static jcog.pri.Priority.EPSILON;
 
 /**
  * Created by me on 5/2/17.

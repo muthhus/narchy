@@ -11,15 +11,13 @@ import spacegraph.widget.Label;
  */
 public class ConceptIcon extends Label {
 
-    private final Term concept;
     private Concept _concept;
 
     //private float[] bgColor = new float[4];
 
-    public ConceptIcon(NAR nar, Termed c) {
+    public ConceptIcon(Termed c) {
         super(c.toString());
 
-        this.concept = c.term();
         //update(nar.concept(this.concept), nar.time());
     }
 

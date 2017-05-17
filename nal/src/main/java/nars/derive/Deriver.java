@@ -39,7 +39,7 @@ public interface Deriver extends Predicate<Derivation> {
     default int run(Derivation d, Premise p, int ttl) {
 
         try {
-            d.restart(p, ttl);
+            d.restartC(p, ttl);
             test(d);
         } catch (Throwable t) {
             //if (Param.DEBUG)

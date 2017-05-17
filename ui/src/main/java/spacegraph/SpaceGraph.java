@@ -237,17 +237,20 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         s.update(this);
 
     }
-
-    void print(AbstractSpace s) {
-        System.out.println();
-        //+ active.size() + " active, "
-        System.out.println(s + ": " + this.atoms.estimatedSize() + " cached; " + "\t" + dyn.summary());
-        /*s.forEach(System.out::println);
-        dyn.objects().forEach(x -> {
-            System.out.println("\t" + x.getUserPointer());
-        });*/
-        System.out.println();
+    public String summary() {
+        return this.atoms.estimatedSize() + " cached; " + "\t" + dyn.summary();
     }
+
+//    void print(AbstractSpace s) {
+//        System.out.println();
+//        //+ active.size() + " active, "
+//        System.out.println(s + ": " + this.atoms.estimatedSize() + " cached; " + "\t" + dyn.summary());
+//        /*s.forEach(System.out::println);
+//        dyn.objects().forEach(x -> {
+//            System.out.println("\t" + x.getUserPointer());
+//        });*/
+//        System.out.println();
+//    }
 
     public ListSpace<X, ?> add(Spatial<X>... s) {
         ListSpace<X, Spatial<X>> l = new ListSpace<>(s);

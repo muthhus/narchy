@@ -27,7 +27,7 @@ import jcog.io.BinTxt;
 import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
-import jcog.pri.Pri;
+import jcog.pri.Priority;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -501,7 +501,7 @@ public enum Util {
     }
 
     public static long lerp(float factor, long max, long min) {
-        return min + Math.round((max - min) * ((double) unitize(factor)));
+        return min + Math.round((max - min) * unitize((double)factor));
     }
 
     public static int lerp(float factor, int max, int min) {
@@ -594,8 +594,7 @@ public enum Util {
      * clamps a value to 0..1 range
      */
     public static float unitize(float x) {
-        notNaN(x);
-        if (x > 1.0f)
+        if (notNaN(x) > 1.0f)
             x = 1.0f;
         else if (x < 0.0f)
             x = 0.0f;
@@ -967,13 +966,13 @@ public enum Util {
 
 
     public static double normalize(double x, double min, double max) {
-        if (equals(min, max, Pri.EPSILON))
+        if (equals(min, max, Priority.EPSILON))
             return min;
         return (x - min) / (max - min);
     }
 
     public static float normalize(float x, float min, float max) {
-        if (equals(min, max, Pri.EPSILON))
+        if (equals(min, max, Priority.EPSILON))
             return min;
         return (x - min) / (max - min);
     }

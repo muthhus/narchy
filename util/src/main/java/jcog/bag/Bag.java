@@ -3,8 +3,6 @@ package jcog.bag;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -120,19 +118,20 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return l;
     }
 
-    default void normalize() {
+    default void normalize(float lerp) {
 
         int size = size();
-        if (size == 0)
+        if (size == 0 || lerp < Priority.EPSILON)
             return;
+
         float min = priMin();
         float max = priMax();
-        float range = max - min;
-        if (Util.equals(min, max, Pri.EPSILON)) {
+        if (Util.equals(min, max, Priority.EPSILON)) {
             //flatten all to 0.5
-            commit(x -> ((Priority)x).setPri(0.5f));
+            commit(x -> ((Priority)x).priLerp(0.5f, lerp));
         } else {
-            commit(x -> ((Priority)x).normalizePri(min, range));
+            float range = max - min;
+            commit(x -> ((Priority)x).normalizePri(min, range, lerp));
         }
     }
 

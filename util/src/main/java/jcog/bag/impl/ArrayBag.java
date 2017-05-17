@@ -93,7 +93,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
         SortedArray<PLink<X>> items;
 
-        List<PLink<X>> pendingRemoval = null;
+        List<PLink> pendingRemoval = null;
         boolean result;
         synchronized (items = this.items) {
             int additional = (toAdd != null) ? 1 : 0;
@@ -165,7 +165,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     }
 
-    private int clean(@Nullable PLink<X> toAdd, int s, int minRemoved, List<PLink<X>> trash) {
+    private int clean(@Nullable PLink<X> toAdd, int s, int minRemoved, List<PLink> trash) {
 
         final int s0 = s;
 
@@ -188,10 +188,10 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      * return whether to clean deleted entries prior to removing any lowest ranked items
      */
     protected boolean cleanDeletedEntries() {
-        return false;
+        return true;
     }
 
-    private void clean2(List<PLink<X>> trash) {
+    private void clean2(List<PLink> trash) {
         int toRemoveSize = trash.size();
 
         for (int i = 0; i < toRemoveSize; i++) {
@@ -206,7 +206,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     }
 
-    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<PLink<X>> toRemove, boolean pendingAddition) {
+    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<PLink> toRemove, boolean pendingAddition) {
         SortedArray<PLink<X>> items = this.items;
         final int c = capacity;
         while (!isEmpty() && ((s - c) + (pendingAddition ? 1 : 0)) > 0) {
@@ -406,7 +406,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     public Bag<X, PLink<X>> commit() {
         double p = this.pressure.sumThenReset();
         if (p > 0) {
-            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget.DEFAULT_TEMP, Pri.EPSILON, PForget::new));
+            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget.DEFAULT_TEMP, Priority.EPSILON, PForget::new));
         }
         return this;
     }
@@ -521,7 +521,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 each.accept(b);
             }
 
-            if (pBelow - b.priSafe(-2) >= Pri.EPSILON) {
+            if (pBelow - b.priSafe(-2) >= Priority.EPSILON) {
                 sorted = false;
             }
 
@@ -534,7 +534,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
 
-    private int removeDeleted(@NotNull Collection<PLink<X>> removed, int minRemoved) {
+    private int removeDeleted(@NotNull List<PLink> trash, int minRemoved) {
 
         SortedArray<PLink<X>> items = this.items;
         final Object[] l = items.array();
@@ -542,11 +542,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
         //iterate in reverse since null entries should be more likely to gather at the end
         for (int s = size() - 1; removedFromMap < minRemoved && s >= 0; s--) {
-            PLink<X> x = (PLink<X>) l[s];
-            if (x == null || x.isDeleted()) {
+            PLink x = (PLink) l[s];
+            if (x == null || (x.isDeleted() && trash.add(x))) {
                 items.removeFast(s);
-                if (x != null)
-                    removed.add(x);
                 removedFromMap++;
             }
         }
@@ -594,7 +592,8 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             for (PLink a : ((PLink[]) x)) {
                 if (a != null) {
                     PLink<X> b = a;
-                    if (!b.isDeleted()) {
+                    float p = b.pri();
+                    if (p == p) {
                         action.accept(b);
                         if (--max <= 0)
                             break;

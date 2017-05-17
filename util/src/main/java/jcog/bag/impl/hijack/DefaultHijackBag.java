@@ -44,7 +44,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
 
     @Override
     protected float priEpsilon() {
-        return Pri.EPSILON;
+        return Priority.EPSILON;
     }
 
 

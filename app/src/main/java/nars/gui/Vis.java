@@ -218,7 +218,7 @@ public class Vis {
     public static SpaceGraph<Term> conceptsWindow3D(NAR nar, int maxNodes, int maxEdges) {
 
 
-        NARSpace n = new ConceptsSpace(nar, maxNodes, maxEdges);
+        NARSpace n = new ConceptsSpace(nar, maxNodes, 1, maxEdges);
 
 
         SpaceGraph<Term> s = new SpaceGraph(
@@ -261,39 +261,39 @@ public class Vis {
 
     }
 
-    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
-        return conceptsWindow(new ConceptsSpace(nar, maxNodes, maxEdges));
-    }
-
-    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, Iterable<? extends Termed> terms, int max, int maxEdges) {
-        List<ConceptWidget> termWidgets = StreamSupport.stream(terms.spliterator(), false).map(x -> new ConceptWidget(nar, x.term(), maxEdges)).collect(toList());
-
-        NARSpace active = new NARSpace(nar) {
-
-            final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
-            final FloatFunction<Term> termFloatFunction = k -> nar.pri(k);
-
-            @Override
-            protected void get(Collection displayNext) {
-                Collections.sort(termWidgets, (a, b) -> {
-                    return Float.compare(
-                            priCache.getIfAbsentPutWithKey(b.key, termFloatFunction),
-                            priCache.getIfAbsentPutWithKey(a.key, termFloatFunction)
-                    );
-                });
-                priCache.clear();
-
-                for (int i = 0; i < max; i++) {
-                    ConceptWidget w = termWidgets.get(i);
-                    displayNext.add(w);
-                }
-            }
-        };
-
-        return conceptsWindow(
-                active
-        );
-    }
+//    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
+//        return conceptsWindow(new ConceptsSpace(nar, maxNodes, 1, maxEdges));
+//    }
+//
+//    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, Iterable<? extends Termed> terms, int max, int maxEdges) {
+//        List<ConceptWidget> termWidgets = StreamSupport.stream(terms.spliterator(), false).map(x -> new ConceptWidget(x.term())).collect(toList());
+//
+//        NARSpace active = new NARSpace(nar) {
+//
+//            final ObjectFloatHashMap<Term> priCache = new ObjectFloatHashMap<>();
+//            final FloatFunction<Term> termFloatFunction = k -> nar.pri(k);
+//
+//            @Override
+//            protected void get(Collection displayNext) {
+//                Collections.sort(termWidgets, (a, b) -> {
+//                    return Float.compare(
+//                            priCache.getIfAbsentPutWithKey(b.key, termFloatFunction),
+//                            priCache.getIfAbsentPutWithKey(a.key, termFloatFunction)
+//                    );
+//                });
+//                priCache.clear();
+//
+//                for (int i = 0; i < max; i++) {
+//                    ConceptWidget w = termWidgets.get(i);
+//                    displayNext.add(w);
+//                }
+//            }
+//        };
+//
+//        return conceptsWindow(
+//                active
+//        );
+//    }
 
     public static SpaceGraph<Term> conceptsWindow(AbstractSpace nn) {
         Surface controls = col(new PushButton("x"), row(new FloatSlider("z", 0, 0, 4)), new CheckBox("?"))

@@ -97,7 +97,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
 
     public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
         super();
-        priority = p; //direct set
+        pri = p; //direct set
 
         this.punc = (byte) punctuation;
 

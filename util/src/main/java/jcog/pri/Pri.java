@@ -10,16 +10,14 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Pri implements Priority {
 
-    /** default minimum difference necessary to indicate a significant modification in budget float number components */
-    public static final float EPSILON = 0.0001f;
     /**
      * The relative share of time resource to be allocated
      */
-    protected float priority;
+    protected float pri;
 
 
     public Pri() {
-        priority = Float.NaN;
+        pri = Float.NaN;
     }
 
     public Pri(@NotNull Prioritized b, float scale) {
@@ -39,7 +37,7 @@ public class Pri implements Priority {
     @Nullable
     @Override
     public Priority clone() {
-        float p = priority;
+        float p = pri;
         return p != p /* deleted? */ ? null : new Pri(p);
     }
 
@@ -49,8 +47,8 @@ public class Pri implements Priority {
      * @return The current priority
      */
     @Override
-    public final float pri() {
-        return priority;
+    public float pri() {
+        return pri;
     }
 
 
@@ -59,10 +57,10 @@ public class Pri implements Priority {
 
     @Override
     public boolean delete() {
-        float p = priority;
+        float p = pri;
         if (p==p) {
         //if (!isDeleted()) { //dont call isDeleted it may be overridden in a cyclical way
-            this.priority = Float.NaN;
+            this.pri = Float.NaN;
             return true;
         }
         //logger.warn("alredy deleted");
@@ -95,7 +93,7 @@ public class Pri implements Priority {
 
     @Override
     public final float setPri(float p) {
-        return this.priority = Util.unitize(p);
+        return this.pri = Util.unitize(p);
     }
 
     @NotNull public Pri setPriThen(float p) {

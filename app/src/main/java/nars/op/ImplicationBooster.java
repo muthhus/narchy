@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -133,7 +133,7 @@ public class ImplicationBooster {
                                 if (tt != null) {
 
                                     float activation = w2c(s.edgeValue(subj, pred));
-                                    if (activation >= Pri.EPSILON) {
+                                    if (activation >= Priority.EPSILON) {
                                         Concept csubj = n.concept(subj);
                                         if (csubj != null)
                                             n.activate(csubj, activation);
