@@ -24,7 +24,7 @@ import static spacegraph.layout.Grid.col;
 public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
-    public static final float UPDATE_RATE = 0.25f;
+    public static final float UPDATE_RATE = 0.5f;
     public final NAR nar;
     private final int maxEdgesPerNode;
     final Bagregate<Concept> bag;
@@ -139,9 +139,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveChainTest(n, 8,  2048, inh);
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
-        n.focus.activationRate.setValue(0.05f);
+        //n.focus.activationRate.setValue(0.05f);
 
-        n.loopFPS(3f);
+        n.loopFPS(64f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",
@@ -159,7 +159,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 64, 8) {
+        NARSpace cs = new ConceptsSpace(n, 192, 5) {
 //            @Override
 //            protected boolean include(Term term) {
 //

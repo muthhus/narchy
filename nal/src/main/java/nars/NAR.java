@@ -1277,13 +1277,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public NAR forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
                            boolean includeTaskLinks, int maxPerConcept,
                            @NotNull Consumer<Task> recip) {
+        Consumer<? super PLink<Task>> action = t -> recip.accept(t.get());
         forEachConcept(c -> {
             if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
             if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);
             if (includeConceptGoals) c.goals().forEach(maxPerConcept, recip);
             if (includeConceptQuests) c.quests().forEach(maxPerConcept, recip);
             if (includeTaskLinks) {
-                Consumer<? super PLink<Task>> action = t -> recip.accept(t.get());
                 c.tasklinks().sample(maxPerConcept, action);
             }
         });

@@ -3,9 +3,11 @@ package jcog.bag;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static jcog.Util.sqr;
+import static jcog.bag.Bag.BagCursorAction.Next;
 
 
 /**
@@ -111,12 +114,27 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
             return Collections.emptyList();
 
         List<V> l = new FasterList(n);
-        sample(n, x -> {
+        sample(n, Next, x -> {
             l.add(x);
         });
         return l;
     }
 
+    default void normalize() {
+
+        int size = size();
+        if (size == 0)
+            return;
+        float min = priMin();
+        float max = priMax();
+        float range = max - min;
+        if (Util.equals(min, max, Pri.EPSILON)) {
+            //flatten all to 0.5
+            commit(x -> ((Priority)x).setPri(0.5f));
+        } else {
+            commit(x -> ((Priority)x).normalizePri(min, range));
+        }
+    }
 
 
     /** convenience macro for using sample(BagCursor).
@@ -126,16 +144,25 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         final int[] count = {max};
         return sample((x) -> {
             return (kontinue.test(x) && ((count[0]--) > 0)) ?
-                    Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+                    Next : Bag.BagCursorAction.Stop;
         });
     }
 
     /** convenience macro */
-    default Bag<K,V> sample(int max, Consumer<? super V> kontinue) {
+    default Bag<K,V> sample(int max, Consumer<? super V> each) {
+        return sample(max, Next, each);
+    }
+
+    default Bag<K,V> pop(int max, Consumer<? super V> each) {
+        return sample(max, BagCursorAction.Remove, each);
+    }
+
+    /** convenience macro */
+    default Bag<K,V> sample(int max, BagCursorAction action, Consumer<? super V> each) {
         final int[] count = {max};
         return sample((x) -> {
-            kontinue.accept(x);
-            return ((count[0]--) > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+            each.accept(x);
+            return ((count[0]--) > 0) ? action : Bag.BagCursorAction.Stop;
         });
     }
 

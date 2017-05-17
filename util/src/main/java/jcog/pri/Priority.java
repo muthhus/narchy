@@ -204,6 +204,14 @@ public interface Priority extends Prioritized {
         return toString(this);
     }
 
+    /** normalizes the current value to within: min..(range+min), (range=max-min) */
+    default void normalizePri(float min, float range) {
+        float p = priSafe(-1);
+        if (p < 0) return; //dont normalize if deleted
+
+        setPri( (p - min)/range );
+    }
+
 //    void orPriority(float v);
 //
 //    void orPriority(float x, float y);

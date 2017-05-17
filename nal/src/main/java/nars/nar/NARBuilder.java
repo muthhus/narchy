@@ -206,7 +206,7 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(0.05f);
+        nar.deriver.rate.setValue(Param.UnificationTTLMax * 32);
 
         nar.termVolumeMax.setValue(64);
 
@@ -220,8 +220,8 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.focus.activationRate.setValue(
-                //0.5f
-                2f/Math.sqrt(activeConcepts)
+                0.5f
+               // 2f/Math.sqrt(activeConcepts)
         );
 
         //nar.stmLinkage.capacity.set(0);

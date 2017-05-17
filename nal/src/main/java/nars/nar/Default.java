@@ -5,6 +5,7 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.Param;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;
@@ -80,7 +81,7 @@ public class Default extends NAR {
                 new FireConcepts.FireConceptsDirect(newDeriver(), derivationBudgeting, this);
 
 
-        deriver.rate.setValue(0.02f);
+        deriver.rate.setValue(Param.UnificationTTLMax * 16);
     }
 
     public Deriver newDeriver() {

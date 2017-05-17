@@ -74,7 +74,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
      */
     private static final float TERMLINK_BALANCE = 0.5f;
 
-    private final float linkScale;
 
     /**
      * runs the task activation procedure
@@ -92,7 +91,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
 
         this.momentum = nar.momentum.floatValue();
-        this.linkScale = nar.linkActivation.floatValue();
 
         this.inPri = in.priSafe(0) * scale; // * in.qua(); //activate concept by the priority times the quality
         this.dur = nar.dur();
@@ -174,7 +172,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             nar.activate(c, inPri * scale);
         }
 
-        float linkPri = inPri * linkScale;
+        float linkPri = inPri;
         if (linkPri * scale >= Pri.EPSILON) {
 
 

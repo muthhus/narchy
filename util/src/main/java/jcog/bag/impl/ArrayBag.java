@@ -515,13 +515,13 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         for (int i = s - 1; i >= 0; ) {
             PLink b = l[i];
 
-            float p = (b != null) ? b.priSafe(-1) : -2; //sort nulls to the end of the end
+            float p = (b != null) ? b.priSafe(-2) : -2; //sort nulls to the end of the end
 
-            if (p > 0) {
+            if (p >= 0) { //Bag.active(p) semantics
                 each.accept(b);
             }
 
-            if (pBelow - p >= Pri.EPSILON) {
+            if (pBelow - b.priSafe(-2) >= Pri.EPSILON) {
                 sorted = false;
             }
 

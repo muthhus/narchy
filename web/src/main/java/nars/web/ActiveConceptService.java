@@ -135,7 +135,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
                 //TODO write budget info
             } catch (IOException e) {            }
         };
-        b.sample(termlinks, action);
+        b.sample(termlinks, nextAction, action);
 
         out.writeFloat(-1); //end of termlinks, will be detected when trying to read next priority
     }

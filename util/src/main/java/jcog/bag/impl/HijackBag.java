@@ -42,7 +42,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     public final DoubleAdder pressure = new DoubleAdder();
 
-    float mass;
+    private float mass, min, max;
 
     public HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
@@ -463,14 +463,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     }
 
-//    @Override
-//    public float priMin() {
-//        throw new UnsupportedOperationException();
-//    }
-//    @Override
-//    public float priMax() {
-//        throw new UnsupportedOperationException();
-//    }
+    @Override
+    public float priMin() {
+        return min;
+    }
+    @Override
+    public float priMax() {
+        return max;
+    }
 
     abstract protected Consumer<V> forget(float rate);
 
@@ -495,6 +495,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             }
 
             float mass = 0;
+            float min = Float.POSITIVE_INFINITY;
+            float max = Float.NEGATIVE_INFINITY;
 
             int count = 0;
 
@@ -508,6 +510,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 float p = pri(f);
                 if (p == p) {
                     mass += p;
+                    if (p > max) max = p;
+                    if (p < min) min = p;
                     count++;
                 } else {
                     if (a.compareAndSet(i, f, null)) {
@@ -520,6 +524,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             xSet(tSIZE, count);
 
             this.mass = mass;
+            this.min = min;
+            this.max = max;
 
         } finally {
             //   busy.set(false);

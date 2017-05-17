@@ -157,8 +157,6 @@ public abstract class Param  {
      */
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
 
-    /** global scaling factor applied to termlink/tasklink activation */
-    public final FloatParam linkActivation = new FloatParam(1f, 0, 1f);
 
     public float confDefault(byte punctuation) {
 
@@ -283,15 +281,5 @@ public abstract class Param  {
     abstract public int level();
 
 
-//    @NotNull
-//    Predicate levelMax(int level) {
-//        return (r -> (level() <= level));
-//    }
-
-//    //TODO use IntStream.range?
-//    Predicate[] maxLevel = {
-//            levelMax(0), levelMax(1), levelMax(2), levelMax(3), levelMax(4), levelMax(5), levelMax(6), levelMax(7)
-//    };
-//
 
 }

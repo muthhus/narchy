@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
+import static jcog.bag.Bag.BagCursorAction.Next;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
 
@@ -30,9 +31,10 @@ public class BagLab  {
 
     public static final int BINS = 64;
 
-    int clearInterval = 64;
+    int histogramResetPeriod = 64;
     int iteration = 0;
 
+    static final Bag.BagCursorAction sampling = Next;
 
     final Bag<Integer,PLink<Integer>> bag;
     private final List<FloatSlider> inputSliders;
@@ -139,7 +141,7 @@ public class BagLab  {
         float sampleBatches = 1;
         int batchSize = 32;
 
-        if (iteration++ % clearInterval == 0)
+        if (iteration++ % histogramResetPeriod == 0)
             Arrays.fill(selectionHistogram, 0);
 
         //System.out.println(bag.size());
@@ -147,7 +149,8 @@ public class BagLab  {
         List<PLink<Integer>> sampled = $.newArrayList(1024);
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
-            bag.sample(batchSize, (v) -> {
+
+            bag.sample(batchSize, sampling, (v) -> {
                 //System.out.println(h + " " + v);
                 sampled.add(v);
             });

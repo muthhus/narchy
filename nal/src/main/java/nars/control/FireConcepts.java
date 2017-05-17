@@ -30,6 +30,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import static jcog.bag.Bag.BagCursorAction.Next;
+import static jcog.bag.Bag.BagCursorAction.Stop;
+
 
 /**
  * controls an active focus of concepts
@@ -37,16 +40,15 @@ import java.util.function.Consumer;
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
 
-    public final AtomicBoolean clear = new AtomicBoolean(false);
 
     public final DerivationBudgeting budgeting;
     public final Deriver deriver;
 
 
     /**
-     *
+     * in TTL per cycle
      */
-    public final @NotNull FloatParam rate = new FloatParam(1f);
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (1 * 32 * 1024));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -71,16 +73,17 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //    }
 
     /**
-     * returns # of derivations processed
+     * returns ttl consumed
      */
     int premiseVector(PLink<Concept> pc, Derivation d) {
 
         float cPri = pc.priSafe(0);
-        int ttl = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
+        final int startTTL = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
+        int ttl = startTTL;
 
         Concept c = pc.get();
-        c.tasklinks().commit();
-        c.termlinks().commit();
+        c.tasklinks().commit().normalize();
+        c.termlinks().commit().normalize();
         nar.terms.commit(c);
 
         long now = nar.time();
@@ -93,21 +96,21 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Nullable PLink<Task> tasklink = null;
         @Nullable PLink<Term> termlink = null;
-        float taskPri = -1f, termPri = -1f;
+        float taskLinkPri = -1f, termPri = -1f;
 
         while (ttl > 0) {
-            if (tasklink == null || rng.nextFloat() > taskPri) { //sample a new link inversely probabalistically in proportion to priority
+            if (tasklink == null || (rng.nextFloat()) > taskLinkPri) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
                 ttl -= linkSampleCost;
                 if (tasklink == null)
                     break;
 
-                taskPri = tasklink.priSafe(0);
+                taskLinkPri = tasklink.priSafe(0);
                 d.restart(tasklink.get());
             }
 
 
-            if (termlink == null || rng.nextFloat() > termPri) { //sample a new link inversely probabalistically in proportion to priority
+            if (termlink == null || (rng.nextFloat()) > termPri) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = c.termlinks().sample();
                 ttl -= linkSampleCost;
                 if (termlink == null)
@@ -136,51 +139,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         }
 
 
-        return count;
+        return startTTL - ttl;
     }
 
-    /**
-     * returns # of derivations processed
-     */
-    int premiseVector0(PLink<Concept> pc, Derivation d, MutableIntRange taskLinksFiredPerConcept, MutableIntRange termLinksFiredPerConcept) {
-
-        Concept c = pc.get();
-        float cPri = pc.priSafe(0);
-
-        List<PLink<Task>> tasklinks = c.tasklinks().commit().sampleToList(taskLinksFiredPerConcept.lerp(cPri));
-        if (tasklinks.isEmpty())
-            return 0;
-
-        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerConcept.lerp(cPri));
-        if (termlinks.isEmpty())
-            return 0;
-
-        int count = 0;
-
-        long now = nar.time();
-        for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
-            PLink<Task> tasklink = tasklinks.get(i);
-
-            float tlPri = tasklink.pri();
-
-            for (int j = 0, termlinksSize = termlinks.size(); j < termlinksSize; j++) {
-                PLink<Term> termlink = termlinks.get(j);
-
-                Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
-                if (p != null) {
-
-                    float invest = Util.or(tlPri, termlink.pri());
-                    int ttl = Util.lerp(invest, Param.UnificationTTLMax, Param.UnificationTTLMin);
-
-                    if (deriver.test(d.restart(p, ttl)))
-                        count++;
-                }
-            }
-        }
-
-        return count;
-
-    }
 
 
     /**
@@ -204,27 +165,26 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         @Override
         public void fire() {
             ConceptBagFocus csrc = (ConceptBagFocus) source;
-            int count = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() * csrc.active.capacity());
-            if (count == 0)
+            int ttl = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() );
+            if (ttl == 0)
                 return; //idle
 
             if (nar.exe.concurrent()) {
-                int remain = count;
-                float granularity = 8;
-                float batchDivisor = nar.exe.concurrency() * granularity;
-                int batchSize = (int) Math.ceil(remain / batchDivisor);
+                int remain = ttl;
+                float granularity = 2; //additional dividing factor to increase granularity
+                int batchSize = (int) Math.ceil(remain / (nar.exe.concurrency() * granularity));
                 while (remain > 0) {
                     int nextBatchSize = Math.min(remain, batchSize);
                     nar.runLater(() -> {
 
-                        fire(csrc, nextBatchSize);
+                        fire(csrc, nextBatchSize );
 
                     });
                     remain -= nextBatchSize;
                 }
 
             } else {
-                fire(csrc, count);
+                fire(csrc, ttl);
             }
         }
 
@@ -246,15 +206,15 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
                 });
             }
 
-            void commit(int derivations) {
+            void commit(/*int derivations*/) {
                 if (!buffer.isEmpty()) {
                     int mPerDeriv = maxInputTasksPerDerivation.intValue();
-                    int max = mPerDeriv * derivations;
-                    if (mPerDeriv == -1 || buffer.size() <= max) {
+                    //int max = mPerDeriv * derivations;
+                    //if (mPerDeriv == -1 || buffer.size() <= max) {
                         nar.input(buffer.values());
-                    } else {
-                        nar.input(top(buffer, max));
-                    }
+                    //} else {
+                    //    nar.input(top(buffer, max));
+                    //}
 
 
                     buffer.clear();
@@ -285,15 +245,24 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         //double dt = (end - start) / ((float)nextBatchSize);
         //rate.hitNano(dt);
 
-        public void fire(ConceptBagFocus csrc, int count) {
+        public void fire(ConceptBagFocus csrc, int ttl) {
             MyDerivation d = derivation.get();
 
-            final int[] derivations = {0};
+            final int[] curTTL = { ttl };
             MyDerivation dd = d;
-            csrc.active.sample(count, p -> {
-                derivations[0] += premiseVector(p, dd);
+
+            csrc.active.commit(null);
+
+            float decay = 1f - (((float)csrc.active.size()) / csrc.active.capacity());
+
+            csrc.active.sample( p -> {
+                p.priMult(decay);
+
+                int ttlConsumed = premiseVector(p, dd);
+                curTTL[0]-=ttlConsumed;
+                return curTTL[0] > 0 ? Next : Stop;
             });
-            d.commit(derivations[0]);
+            d.commit();
         }
 
         @Override
@@ -316,21 +285,58 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     @Override
     public void run() {
-        ConceptBagFocus f = (ConceptBagFocus) this.source;
-
-        //while clear is enabled, keep active clear
-        if (clear.get()) {
-            f.active.clear();
-            clear.set(false);
-        } else {
-            f.active.commit();
-        }
-
+        ((ConceptBagFocus) this.source).active
+                .commit(null);
         fire();
     }
 
     abstract protected void fire();
 }
+
+//    /**
+//     * returns # of derivations processed
+//     */
+//    int premiseVector0(PLink<Concept> pc, Derivation d, MutableIntRange taskLinksFiredPerConcept, MutableIntRange termLinksFiredPerConcept) {
+//
+//        Concept c = pc.get();
+//        float cPri = pc.priSafe(0);
+//
+//        List<PLink<Task>> tasklinks = c.tasklinks().commit().sampleToList(taskLinksFiredPerConcept.lerp(cPri));
+//        if (tasklinks.isEmpty())
+//            return 0;
+//
+//        List<PLink<Term>> termlinks = c.termlinks().commit().sampleToList(termLinksFiredPerConcept.lerp(cPri));
+//        if (termlinks.isEmpty())
+//            return 0;
+//
+//        int count = 0;
+//
+//        long now = nar.time();
+//        for (int i = 0, tasklinksSize = tasklinks.size(); i < tasklinksSize; i++) {
+//            PLink<Task> tasklink = tasklinks.get(i);
+//
+//            float tlPri = tasklink.pri();
+//
+//            for (int j = 0, termlinksSize = termlinks.size(); j < termlinksSize; j++) {
+//                PLink<Term> termlink = termlinks.get(j);
+//
+//                Premise p = PremiseBuilder.premise(c, tasklink, termlink, now, nar, -1f);
+//                if (p != null) {
+//
+//                    float invest = Util.or(tlPri, termlink.pri());
+//                    int ttl = Util.lerp(invest, Param.UnificationTTLMax, Param.UnificationTTLMin);
+//
+//                    if (deriver.test(d.restart(p, ttl)))
+//                        count++;
+//                }
+//            }
+//        }
+//
+//        return count;
+//
+//    }
+
+
 //    class PremiseMatrixBatch implements Consumer<NAR> {
 //        private final int _tasklinks;
 //        private final int batchSize;
