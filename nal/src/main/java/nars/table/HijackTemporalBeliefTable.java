@@ -33,7 +33,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     public HijackTemporalBeliefTable(int initialCapacity) {
-        super(5 /* reprobes */);
+        super(3 /* reprobes */);
         setCapacity(initialCapacity);
     }
 
@@ -86,10 +86,10 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         //return super.replace(incoming, existing, scale);
     }
 
-    @Override
-    protected boolean replace(float incoming, float existing) {
-        return incoming >= existing;
-    }
+//    @Override
+//    protected boolean replace(float incoming, float existing) {
+//        return incoming >= existing;
+//    }
 
 
     //    protected boolean replace0(Task incoming, Task existing, float scaleIgnored) {

@@ -176,7 +176,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             mode = GET;
         }
 
-        V yAdded = null, yRemoved = null, yReturned = null;
+        V toAdd = null, toRemove = null, toReturn = null;
 
 
         final int hash = k.hashCode(); /*hash(x)*/
@@ -197,27 +197,27 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                     switch (mode) {
 
                         case GET:
-                            yReturned = p;
+                            toReturn = p;
                             break;
 
                         case PUT:
                             if (p == v) {
-                                yReturned = p; //identical match found, keep original
+                                toReturn = p; //identical match found, keep original
                             } else {
                                 V next = merge(p, v, scale);
                                 if (next != null && (next == p || map.compareAndSet(i, p, next))) {
                                     if (next != p) {
-                                        yRemoved = p; //replaced
-                                        yAdded = next;
+                                        toRemove = p; //replaced
+                                        toAdd = next;
                                     }
-                                    yReturned = next;
+                                    toReturn = next;
                                 }
                             }
                             break;
 
                         case REMOVE:
                             if (map.compareAndSet(i, p, null)) {
-                                yReturned = yRemoved = p;
+                                toReturn = toRemove = p;
                             }
                             break;
                     }
@@ -228,7 +228,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 if (++i == c) i = 0; //continue to next probed location
             }
 
-            if (mode == PUT && yReturned == null) {
+            if (mode == PUT && toReturn == null) {
                 //attempt insert
                 inserting:
                 for (int i = start, probe = reprobes; probe > 0; probe--) {
@@ -237,19 +237,19 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                     if (p == null) {
 
-                        yReturned = yAdded = v;
+                        toReturn = toAdd = v;
                         break inserting; //took empty slot, done
 
                     } else {
-                        //attempt HIJACK (tm)
-                        if (replace(v, p, scale)) {
-                            V next = merge(p, v, scale);
-                            if (next != null && next != p && map.compareAndSet(i, p, next)) { //inserted
-                                yRemoved = p;
-                                yReturned = yAdded = next;
-                                break inserting; //hijacked replaceable slot, done
+                            //attempt HIJACK (tm)
+                            if (replace(v, p, scale)) {
+                                if (map.compareAndSet(i, p, v)) { //inserted
+                                    toRemove = p;
+                                    toReturn = toAdd = v;
+                                    break inserting; //hijacked replaceable slot, done
+                                }
                             }
-                        }
+
                     }
 
                     if (++i == c) i = 0; //continue to next probed location
@@ -264,14 +264,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 end(hash);
         }
 
-        if (yRemoved != null) {
-            _onRemoved(yRemoved);
+        if (toRemove != null) {
+            _onRemoved(toRemove);
         }
-        if (yAdded != null) {
-            _onAdded(yAdded);
+        if (toAdd != null) {
+            _onAdded(toAdd);
         }
 
-        return yReturned;
+        return toReturn;
     }
 
 
