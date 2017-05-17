@@ -8,7 +8,6 @@ class LFU extends Map {
         this.cap = cap;
         this.halflife = halflife || null;
         this.head = this.freq();
-        this.length = 0;
         this.lastDecay = Date.now();
     }
 
@@ -39,13 +38,12 @@ class LFU extends Map {
         this.lastDecay = now;
         var diff = now - this.halflife;
         //var halflife = this.halflife;
-        var el, weight, cur, prev;
-        for (const key in this.cache) {
-            el = super.get(key);
-            if (diff > el.atime) {
+        var weight, cur, prev;
+        for (var [key, value] of this) {
+            if (diff > value.atime) {
                 // decay that one
                 // 1) find freq
-                cur = el.parent;
+                cur = value.parent;
                 weight = Math.round(cur.weight / 2);
                 if (weight === 1) continue;
                 prev = cur.prev;
@@ -61,8 +59,8 @@ class LFU extends Map {
                 if (prev.weight < weight) {
                     prev = this.entry(weight, prev, cur);
                 }
-                this.removeFromParent(el.parent, key);
-                el.parent = prev;
+                this.removeFromParent(value.parent, key);
+                value.parent = prev;
                 prev.items.add(key);
             }
         }
@@ -74,33 +72,44 @@ class LFU extends Map {
             el.data = obj;
             return;
         }
+
         var now = Date.now();
-        if (this.halflife && now - this.lastDecay >= this.halflife) {
-            this.decay(now);
+
+        while (this.size+1 > this.cap) {
+            if (this.halflife && now - this.lastDecay >= this.halflife) {
+                this.decay(now);
+            }
+
+            try {
+                this.evict();
+            } catch (e) {
+                console.error(e);
+            }
         }
-        if (this.length === this.cap) {
-            this.evict();
-        }
-        this.length++;
+
+
         var cur = this.head.next;
         if (!cur || cur.weight !== 1) {
             cur = this.entry(1, this.head, cur);
         }
         cur.items.add(key);
 
+
         super.set(key, { //TODO store this as a 3 element tuple
             data: obj,
             atime: now,
             parent: cur
         });
+
+
     }
 
     remove(key) {
         var el = super.get(key);
-        if (!el) return;
+        if (!el)
+            return;
         this.delete(key);
         this.removeFromParent(el.parent, key);
-        this.length--;
         return el.data;
     }
 
@@ -115,12 +124,26 @@ class LFU extends Map {
     }
 
     evict() {
-        const least = this.head.next && this.head.next.items.keys().next().value;
+        const least = this.next();
         if (least) {
-            this.evicted(least, this.remove(least));
+            const victim = this.remove(least);
+            if (victim) {
+                this.evicted(least, victim);
+            } else {
+                throw new Error("null victim");
+            }
         } else {
             throw new Error("Cannot find an element to evict - please report issue");
         }
+    }
+
+    next() {
+        if (this.head.next) {
+            const items = this.head.next.items;
+            if (items.size > 0)
+                return items.keys().next().value;
+        }
+        return null;
     }
 
     evicted(key, value) {
@@ -164,27 +187,50 @@ class Node {
 
 
 
-class LRUGraph extends LFU {
+class LFUGraph extends LFU {
 
     constructor(maxNodes) {
         super(maxNodes);
+    }
+
+    node(nid, createIfMissing) {
+        const x = this.get(nid);
+        if (x || !createIfMissing)
+            return x;
+
+        const n = new Node();
+        this.set(nid, n);
+        this.nodeAdded(nid, n);
+        return n;
     }
 
     nodeIfPresent(nodeID) {
         return this.entry(nodeID, false);
     }
 
+    evicted(nid, n) {
+        super.evicted(nid, n);
 
-    node(nodeID, createIfMissing) {
-        const x = this.get(nodeID);
-        if (x || !createIfMissing)
-            return x;
+        this.nodeRemoved(nid, n);
 
-        const y = new Node();
-        this.set(nodeID, y);
-        return y;
+        for (const tgt of n.o.keys()) {
+            const tgtNode = this.get(tgt);
+            if (tgtNode) //not sure why if ever this would return null
+                tgtNode.i.remove(nid);
+        }
+        delete n.o;
+        for (const src of n.i.keys()) {
+            const srcNode = this.get(src);
+            if (srcNode) //not sure why if ever this would return null
+                srcNode.o.remove(nid);
+        }
+        delete n.i;
     }
 
+    nodeAdded(nid, n) { }
+    nodeRemoved(nid, n) { }
+    edgeAdded(srcID, tgtID, e) { }
+    edgeRemoved(srcID, tgtID, e) { }
 
     edge(src, tgt, edgeSupplier) {
         if (src == tgt)
@@ -247,64 +293,14 @@ class LRUGraph extends LFU {
         return x;
     }
 
-    evicted(nodeID, node) {
-        super.evicted(nodeID, node);
 
-        for (const tgt of node.o.keys()) {
-            const tgtNode = this.get(tgt);
-            if (tgtNode) //not sure why if ever this would return null
-                tgtNode.i.remove(nodeID);
-        }
-        delete node.o;
-        for (const src of node.i.keys()) {
-            const srcNode = this.get(src);
-            if (srcNode) //not sure why if ever this would return null
-                srcNode.o.remove(nodeID);
-        }
-        delete node.i;
-    }
 
 }
 
 (function(exports){
 
-    exports.LRUGraph = LRUGraph;
+    exports.LFUGraph = LFUGraph;
 
 }(typeof exports === 'undefined' ? this.share = {} : exports));
 
-
-
-
-// function Set() {
-//     this.hash = {};
-//     this.head = {};
-//     this.length = 0;
-// }
-//
-// Set.prototype.add = function(str) {
-//     if (this.hash[str]) return;
-//     var item = {
-//         next: this.head.next,
-//         prev: this.head,
-//         val: str
-//     };
-//     var next = this.head.next;
-//     this.head.next = item;
-//     if (next) next.prev = item;
-//     this.hash[str] = item;
-//     this.length++;
-// };
-//
-// Set.prototype.remove = function(str) {
-//     var item = this.hash[str];
-//     if (!item) return;
-//     delete this.hash[str];
-//     item.prev.next = item.next;
-//     if (item.next) item.next.prev = item.prev;
-//     this.length--;
-// };
-//
-// Set.prototype.first = function() {
-//     return this.head.next && this.head.next.val;
-// };
 
