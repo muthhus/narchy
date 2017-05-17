@@ -51,12 +51,12 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 3;
+        final int reprobes = 4;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
                 new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
-                new DefaultConceptState("awake", 16, 16, 3, 24, 16)
+                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
         ) {
             @Override
             public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
@@ -79,11 +79,11 @@ public interface NARBuilder {
 
         Default nar = new Default(activeConcepts,
 
-                new HijackTermIndex(cb, maxConcepts, reprobes)
+                //new HijackTermIndex(cb, maxConcepts, reprobes)
 
                 //new NullTermIndex(cb)
 
-                //new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1, exe)
+                new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1, exe)
                     //null /* null = fork join common pool */
 
 
@@ -210,7 +210,7 @@ public interface NARBuilder {
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.75f);
 
         float p = 0.5f;
@@ -220,7 +220,7 @@ public interface NARBuilder {
         nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
 
         nar.focus.activationRate.setValue(
-                0.5f
+                1f
                // 2f/Math.sqrt(activeConcepts)
         );
 

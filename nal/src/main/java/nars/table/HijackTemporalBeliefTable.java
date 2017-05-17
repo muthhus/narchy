@@ -33,7 +33,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     public HijackTemporalBeliefTable(int initialCapacity) {
-        super(3 /* reprobes */);
+        super(4 /* reprobes */);
         setCapacity(initialCapacity);
     }
 

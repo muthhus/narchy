@@ -1,6 +1,7 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.data.MutableInteger;
@@ -39,7 +40,7 @@ import static jcog.bag.Bag.BagCursorAction.Stop;
  */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
-
+    static final float BATCHING_GRANULARITY_DIVISOR = 4; //additional dividing factor to increase granularity
 
     public final DerivationBudgeting budgeting;
     public final Deriver deriver;
@@ -171,8 +172,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             if (nar.exe.concurrent()) {
                 int remain = ttl;
-                float granularity = 2; //additional dividing factor to increase granularity
-                int batchSize = (int) Math.ceil(remain / (nar.exe.concurrency() * granularity));
+
+                int batchSize = (int) Math.ceil(remain / (nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR));
                 while (remain > 0) {
                     int nextBatchSize = Math.min(remain, batchSize);
                     nar.runLater(() -> {
@@ -253,12 +254,19 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             csrc.active.commit(null);
 
-            float decay = 1f - (((float)csrc.active.size()) / csrc.active.capacity());
+            float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
+            float decay =
+                    //1f - (((float)csrc.active.size()) / csrc.active.capacity());
+                    Util.unitize(
+                    1f - (((HijackBag)csrc.active).mass /
+                            idealMass)
+                    );
 
             csrc.active.sample( p -> {
-                p.priMult(decay);
+
 
                 int ttlConsumed = premiseVector(p, dd);
+                p.priMult(decay);
                 curTTL[0]-=ttlConsumed;
                 return curTTL[0] > 0 ? Next : Stop;
             });

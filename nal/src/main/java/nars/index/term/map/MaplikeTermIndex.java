@@ -54,7 +54,7 @@ public abstract class MaplikeTermIndex extends TermIndex {
     };
 
     protected final HijackMemoize<ProtoCompound, Term> terms = new HijackMemoize<>(
-            256 * 1024, 5,
+            256 * 1024, 3,
             (C) -> {
                 try {
                     return super.the(C.op(), C.dt(), C.subterms());

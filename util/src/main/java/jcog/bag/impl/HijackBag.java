@@ -42,7 +42,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     public final DoubleAdder pressure = new DoubleAdder();
 
-    private float mass, min, max;
+    public float mass;
+    private float min;
+    private float max;
 
     public HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
