@@ -1,7 +1,6 @@
 package nars.attention;
 
 import jcog.pri.Prioritized;
-import jcog.pri.Priority;
 import nars.NAR;
 import nars.concept.Concept;
 import org.apache.commons.lang3.mutable.MutableFloat;

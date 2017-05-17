@@ -13,7 +13,6 @@ import nars.video.PixelBag;
 import javax.swing.*;
 
 import static nars.$.$;
-import static nars.$.t;
 
 public class NARio extends NAgentX {
 

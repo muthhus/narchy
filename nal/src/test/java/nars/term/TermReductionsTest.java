@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.$.*;
+import static nars.$.t;
 import static nars.Op.*;
 import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTasks;

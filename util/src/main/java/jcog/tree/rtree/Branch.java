@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  */
 public final class Branch<T> implements Node<T> {
 
-    private final Node[] child;
+    private final Node<T>[] child;
     private final Function<T,HyperRect> builder;
     private final int mMax;
     private final int mMin;
@@ -254,7 +254,7 @@ public final class Branch<T> implements Node<T> {
      *
      * @return array of child nodes (leaves or branches)
      */
-    public Node[] getChildren() {
+    public Node<T>[] children() {
         return child;
     }
 

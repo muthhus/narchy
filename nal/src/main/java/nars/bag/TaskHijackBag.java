@@ -2,7 +2,6 @@ package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.PForget;
-import jcog.pri.PriMerge;
 import nars.Task;
 import nars.table.TaskTable;
 import org.jetbrains.annotations.NotNull;

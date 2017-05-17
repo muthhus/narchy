@@ -1,6 +1,5 @@
 package nars.table;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
@@ -20,8 +19,6 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;

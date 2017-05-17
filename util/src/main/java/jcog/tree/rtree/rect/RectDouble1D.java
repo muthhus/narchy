@@ -1,6 +1,5 @@
 package jcog.tree.rtree.rect;
 
-import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.point.Double1D;
 
@@ -31,17 +30,17 @@ public abstract class RectDouble1D implements HyperRect<Double1D> {
     }
 
     @Override
-    public HyperPoint min() {
+    public Double1D min() {
         return new Double1D(from());
     }
 
     @Override
-    public HyperPoint max() {
+    public Double1D max() {
         return new Double1D(to());
     }
 
     @Override
-    public HyperPoint center() {
+    public Double1D center() {
         return new Double1D(center(0));
     }
 

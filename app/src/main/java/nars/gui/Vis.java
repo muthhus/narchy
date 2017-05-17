@@ -15,8 +15,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
@@ -41,8 +39,6 @@ import spacegraph.widget.meter.Plot2D;
 import spacegraph.widget.slider.FloatSlider;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;

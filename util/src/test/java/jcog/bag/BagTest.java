@@ -3,7 +3,6 @@ package jcog.bag;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.data.array.LongArrays;
 import jcog.list.FasterList;
 import jcog.pri.*;
 import jcog.random.XorShift128PlusRandom;
@@ -17,7 +16,6 @@ import java.util.*;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static jcog.pri.PriMerge.max;
 import static jcog.pri.PriMerge.plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

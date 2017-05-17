@@ -1,7 +1,6 @@
 package nars.op;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
 import nars.*;
 import nars.concept.AtomConcept;
 import nars.concept.PermanentConcept;

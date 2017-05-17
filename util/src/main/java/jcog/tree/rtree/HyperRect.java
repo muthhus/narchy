@@ -26,7 +26,7 @@ package jcog.tree.rtree;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRect<X> {
+public interface HyperRect<X extends HyperPoint> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
@@ -48,23 +48,26 @@ public interface HyperRect<X> {
      *
      * @return min HyperPoint
      */
-    HyperPoint min();
+    X min();
 
     /**
      * Get the minimum HyperPoint of this HyperRect
      *
      * @return min HyperPoint
      */
-    HyperPoint max();
+    X max();
+
 
     /**
      * Get the HyperPoint representing the center point in all dimensions of this HyperRect
      *
      * @return middle HyperPoint
      */
-    HyperPoint center();
+    X center();
 
-    double center(int d);
+    default double center(int d) {
+        return center().coord(d);
+    }
 
     /**
      * Calculate the distance between the min and max HyperPoints in given dimension
@@ -89,7 +92,7 @@ public interface HyperRect<X> {
      * @param r - HyperRect to test
      * @return true if contains, false otherwise
      */
-    boolean contains(HyperRect r);
+    boolean contains(HyperRect<X> r);
 
     /**
      * Determines if this HyperRect contains or intersects parameter HyperRect
@@ -97,7 +100,7 @@ public interface HyperRect<X> {
      * @param r - HyperRect to test
      * @return true if intersects, false otherwise
      */
-    boolean intersects(HyperRect r);
+    boolean intersects(HyperRect<X> r);
 
     /**
      * Calculate the "cost" of this HyperRect - usually the area across all dimensions

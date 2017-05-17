@@ -1,6 +1,9 @@
 package jcog.bag.impl.hijack;
 
-import jcog.pri.*;
+import jcog.pri.PForget;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
+import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

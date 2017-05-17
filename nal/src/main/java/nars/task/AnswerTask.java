@@ -1,17 +1,10 @@
 package nars.task;
 
-import jcog.pri.PriMerge;
-import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.util.InvalidTermException;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 7/3/16.

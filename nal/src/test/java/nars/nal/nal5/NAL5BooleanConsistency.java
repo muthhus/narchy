@@ -2,7 +2,6 @@ package nars.nal.nal5;
 
 import nars.$;
 import nars.Narsese;
-import nars.Param;
 import nars.Task;
 import nars.derive.Deriver;
 import nars.nar.Default;

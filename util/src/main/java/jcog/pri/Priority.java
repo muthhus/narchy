@@ -5,9 +5,7 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.lerp;
-import static jcog.Util.notNaN;
-import static jcog.Util.notNaNOrNeg;
+import static jcog.Util.*;
 
 /**
  * Created by me on 2/17/17.

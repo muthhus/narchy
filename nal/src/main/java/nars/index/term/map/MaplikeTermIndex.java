@@ -8,10 +8,8 @@ import nars.conceptualize.ConceptBuilder;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.compound.UnitCompound1;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -21,7 +19,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static nars.Op.False;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * Index which is supported by Map/Cache-like operations

@@ -24,7 +24,6 @@ import java.util.function.Supplier;
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
 import static nars.$.$;
-import static nars.$.t;
 
 /**
  * Created by me on 9/22/16.

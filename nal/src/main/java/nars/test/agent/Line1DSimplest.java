@@ -5,7 +5,6 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;

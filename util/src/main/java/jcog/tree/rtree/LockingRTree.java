@@ -32,12 +32,12 @@ import java.util.function.Predicate;
  */
 public class LockingRTree<T> implements Spatialized<T> {
 
-    private final Spatialized<T> rTree;
+    public final RTree<T> tree;
     private final Lock readLock;
     private final Lock writeLock;
 
-    public LockingRTree(Spatialized<T> rTree, ReadWriteLock lock) {
-        this.rTree = rTree;
+    public LockingRTree(RTree<T> tree, ReadWriteLock lock) {
+        this.tree = tree;
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
     }
@@ -53,7 +53,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public int containing(HyperRect rect, T[] t) {
         readLock.lock();
         try {
-            return rTree.containing(rect, t);
+            return tree.containing(rect, t);
         } finally {
             readLock.unlock();
         }
@@ -68,7 +68,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public void add(T t) {
         writeLock.lock();
         try {
-            rTree.add(t);
+            tree.add(t);
         } finally {
             writeLock.unlock();
         }
@@ -80,10 +80,28 @@ public class LockingRTree<T> implements Spatialized<T> {
      * @param t - entry to remove
      */
     @Override
-    public void remove(T t) {
+    public boolean remove(T t) {
         writeLock.lock();
         try {
-            rTree.remove(t);
+            return tree.remove(t);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void read(Consumer<RTree<T>> x) {
+        readLock.lock();
+        try {
+            x.accept(tree);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public void write(Consumer<RTree<T>> x) {
+        writeLock.lock();
+        try {
+            x.accept(tree);
         } finally {
             writeLock.unlock();
         }
@@ -110,7 +128,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public void update(T told, T tnew) {
         writeLock.lock();
         try {
-            rTree.update(told, tnew);
+            tree.update(told, tnew);
         } finally {
             writeLock.unlock();
         }
@@ -126,7 +144,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public int trySearch(HyperRect rect, T[] t) {
         if (readLock.tryLock()) {
             try {
-                return rTree.containing(rect, t);
+                return tree.containing(rect, t);
             } finally {
                 readLock.unlock();
             }
@@ -143,7 +161,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public boolean tryAdd(T t) {
         if (writeLock.tryLock()) {
             try {
-                rTree.add(t);
+                tree.add(t);
             } finally {
                 writeLock.unlock();
             }
@@ -161,7 +179,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public boolean tryRemove(T t) {
         if (writeLock.tryLock()) {
             try {
-                rTree.remove(t);
+                tree.remove(t);
             } finally {
                 writeLock.unlock();
             }
@@ -180,7 +198,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public boolean tryUpdate(T told, T tnew) {
         if (writeLock.tryLock()) {
             try {
-                rTree.update(told, tnew);
+                tree.update(told, tnew);
             } finally {
                 writeLock.unlock();
             }
@@ -191,14 +209,14 @@ public class LockingRTree<T> implements Spatialized<T> {
 
     @Override
     public int size() {
-        return rTree.size();
+        return tree.size();
     }
 
     @Override
     public void forEach(Consumer<T> consumer) {
         readLock.lock();
         try {
-            rTree.forEach(consumer);
+            tree.forEach(consumer);
         } finally {
             readLock.unlock();
         }
@@ -209,7 +227,7 @@ public class LockingRTree<T> implements Spatialized<T> {
         boolean result;
         readLock.lock();
         try {
-            result = rTree.containing(rect, consumer);
+            result = tree.containing(rect, consumer);
         } finally {
             readLock.unlock();
         }
@@ -221,7 +239,7 @@ public class LockingRTree<T> implements Spatialized<T> {
         boolean result;
         readLock.lock();
         try {
-            result = rTree.intersecting(rect, consumer);
+            result = tree.intersecting(rect, consumer);
         } finally {
             readLock.unlock();
         }
@@ -232,7 +250,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public Stats stats() {
         readLock.lock();
         try {
-            return rTree.stats();
+            return tree.stats();
         } finally {
             readLock.unlock();
         }
@@ -240,6 +258,6 @@ public class LockingRTree<T> implements Spatialized<T> {
 
     @Override
     public String toString() {
-        return rTree.toString();
+        return tree.toString();
     }
 }

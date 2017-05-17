@@ -1,6 +1,6 @@
 package nars.term.container;
 
-import com.google.common.collect.Iterators;
+import com.google.common.collect.TreeTraverser;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -14,7 +14,6 @@ import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
-import org.eclipse.collections.api.iterator.IntIterator;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.factory.Sets;

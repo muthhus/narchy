@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.$.t;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
 

@@ -1,6 +1,5 @@
 package nars.premise;
 
-import jcog.pri.Priority;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

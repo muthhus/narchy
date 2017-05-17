@@ -2,8 +2,8 @@ package nars.op.data;
 
 import nars.$;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.Functor;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

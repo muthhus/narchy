@@ -18,7 +18,7 @@ import java.io.IOException;
 
 import static nars.Op.INT;
 
-public interface Termject<X> extends Term {
+@Deprecated  public interface Termject<X> extends Term {
 
     /**
      * the associated data value of this term

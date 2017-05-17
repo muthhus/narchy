@@ -2,7 +2,6 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
@@ -11,7 +10,6 @@ import nars.gui.Vis;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
 import nars.video.CameraSensor;
 import spacegraph.SpaceGraph;
 

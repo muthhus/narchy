@@ -1,14 +1,12 @@
 package nars.term.container;
 
 import jcog.math.ShuffledPermutations;
-import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.Consumer;
 
 /**
  * proxy to a TermContainer providing access to its subterms via a shuffling order

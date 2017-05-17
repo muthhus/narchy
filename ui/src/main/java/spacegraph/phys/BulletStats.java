@@ -24,7 +24,6 @@
 package spacegraph.phys;
 
 import spacegraph.math.v3;
-import spacegraph.phys.math.CProfileManager;
 import spacegraph.phys.math.Clock;
 
 /**

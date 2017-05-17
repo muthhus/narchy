@@ -1,12 +1,9 @@
 package nars.attention;
 
-import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.term.Termed;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 
 /**

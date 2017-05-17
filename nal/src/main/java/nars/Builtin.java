@@ -8,19 +8,18 @@ import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.obj.IntTerm;
-import nars.term.Functor;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 
 import java.util.Arrays;
 
-import static nars.$.quote;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 

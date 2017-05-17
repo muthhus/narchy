@@ -12,7 +12,6 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.op.Command;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Compound;

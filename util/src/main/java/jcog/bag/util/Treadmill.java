@@ -1,4 +1,4 @@
-package jcog.bag.impl;
+package jcog.bag.util;
 
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
  *  on a linear probed atomic integer array of fixed size */
 public class Treadmill extends AtomicIntegerArray {
 
-    final static int concurrency = Runtime.getRuntime().availableProcessors();
+    protected final static int concurrency = Runtime.getRuntime().availableProcessors();
 
     private final int slots;
 

@@ -27,13 +27,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
-
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * interface which defines the behavior for processing functor tasks

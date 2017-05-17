@@ -3,7 +3,6 @@ package nars.nlp;
 import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
-import nars.op.Command;
 import org.junit.Ignore;
 import org.junit.Test;
 

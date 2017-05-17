@@ -19,8 +19,9 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
     public SensorBeliefTable() {
         super();
-
     }
+
+
 
 
 

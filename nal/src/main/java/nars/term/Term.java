@@ -21,6 +21,9 @@
 package nars.term;
 
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.TreeTraverser;
 import jcog.Texts;
 import jcog.data.array.IntArrays;
 import nars.$;
@@ -43,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -414,5 +418,9 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return (maybeNull==null) ? False : maybeNull;
     }
 
+    /** https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/TreeTraverser.html */
+    default TreeTraverser<Term> termverse() {
+        return TreeTraverser.using(x -> x instanceof Compound ? ((Compound)x).subterms() : Collections.emptyList());
+    }
 }
 

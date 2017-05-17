@@ -1,8 +1,6 @@
 package nars.gui;
 
-import nars.NAR;
 import nars.concept.Concept;
-import nars.term.Term;
 import nars.term.Termed;
 import spacegraph.widget.Label;
 

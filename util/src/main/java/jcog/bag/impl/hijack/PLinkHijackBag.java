@@ -7,8 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static jcog.pri.Priority.EPSILON;
-
 /**
  * Created by me on 2/17/17.
  */

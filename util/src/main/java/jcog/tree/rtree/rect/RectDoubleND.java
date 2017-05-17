@@ -21,7 +21,6 @@ package jcog.tree.rtree.rect;
  */
 
 
-import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.point.DoubleND;
 
@@ -165,7 +164,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
     @Override
-    public HyperPoint center() {
+    public DoubleND center() {
         int dim = dim();
         double[] c = new double[dim];
         for (int i = 0; i < dim; i++) {

@@ -1,6 +1,7 @@
 package jcog.bag.impl;
 
 import jcog.bag.Bag;
+import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
 import jcog.pri.PForget;
 import org.apache.commons.lang3.mutable.MutableFloat;

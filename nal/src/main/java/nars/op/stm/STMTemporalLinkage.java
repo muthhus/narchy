@@ -14,7 +14,6 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-import static jcog.Util.or;
 import static nars.attention.Crosslink.crossLink;
 
 /**

@@ -72,7 +72,7 @@ public class LinearSplitLeafTest {
         rTree.add(new RectDouble2D(0, 2, 1, 4));
 
         Branch root = (Branch) rTree.getRoot();
-        Node<RectDouble2D>[] children = root.getChildren();
+        Node<RectDouble2D>[] children = root.children();
         int childCount = 0;
         for(Node c : children) {
             if (c != null) {

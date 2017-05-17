@@ -112,11 +112,13 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     @Override
-    public void remove(final T t) {
+    public boolean remove(final T t) {
         Node<T> removed = root.remove(t);
         if (removed != null) {
             entryCount--;
+            return true;
         }
+        return false;
     }
 
     @Override

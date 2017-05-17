@@ -2,8 +2,6 @@ package nars.premise;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.pri.Priority;
-import nars.$;
 import nars.Task;
 import nars.term.Compound;
 import nars.truth.Truth;

@@ -1,7 +1,6 @@
 package nars.web;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.filter.LevelFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import io.undertow.websockets.core.BufferedTextMessage;

@@ -21,7 +21,6 @@ package jcog.tree.rtree.rect;
  */
 
 
-import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.point.FloatND;
 
@@ -165,7 +164,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
     }
 
     @Override
-    public HyperPoint center() {
+    public FloatND center() {
         int dim = dim();
         float[] c = new float[dim];
         for (int i = 0; i < dim; i++) {

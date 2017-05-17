@@ -21,9 +21,7 @@
 package nars.budget;
 
 import jcog.pri.Pri;
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import nars.Task;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 

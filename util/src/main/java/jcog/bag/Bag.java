@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static jcog.Util.sqr;
 import static jcog.bag.Bag.BagCursorAction.Next;
 
 

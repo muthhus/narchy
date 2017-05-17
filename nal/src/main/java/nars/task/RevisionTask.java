@@ -11,7 +11,6 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.util.InvalidTermException;
 import nars.truth.Truth;
-import nars.truth.TruthDelta;
 import org.jetbrains.annotations.NotNull;
 
 /**

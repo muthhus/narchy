@@ -60,17 +60,17 @@ public interface Spatialized<T> {
     static <T> Spatialized<T> rTree(final Function<T,HyperRect> builder, final int minM, final int maxM, final RTree.Split splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
-
-    /**
-     * Create a protected R-Tree with default values for m, M, and split type
-     *
-     * @param builder - Builder implementation used to create HyperRects out of T's
-     * @param <T>     - The store type of the bound
-     * @return SpatialSearch - The spatial search and index structure
-     */
-    static <T> Spatialized<T> lockingRTree(final Function builder) {
-        return new LockingRTree<>(rTree(builder), new ReentrantReadWriteLock(true));
-    }
+//
+//    /**
+//     * Create a protected R-Tree with default values for m, M, and split type
+//     *
+//     * @param builder - Builder implementation used to create HyperRects out of T's
+//     * @param <T>     - The store type of the bound
+//     * @return SpatialSearch - The spatial search and index structure
+//     */
+//    static <T> Spatialized<T> lockingRTree(final Function builder) {
+//        return new LockingRTree<>(rTree(builder), new ReentrantReadWriteLock(true));
+//    }
 
 //    /**
 //     * Create a protected R-Tree with specified values for m, M, and split type
@@ -100,7 +100,7 @@ public interface Spatialized<T> {
      *
      * @param t Data entry to be removed
      */
-    void remove(final T t);
+    boolean remove(final T t);
 
     /**
      * Update entry in tree

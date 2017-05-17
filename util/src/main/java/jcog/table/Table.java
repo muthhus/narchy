@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /** nearly a Map */
 public interface Table<K,V> extends Iterable<V> {

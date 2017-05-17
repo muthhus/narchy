@@ -60,12 +60,6 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
 
     @Override
-    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-//        return new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
-        return new HijackTemporalBeliefTable( tCap );
-    }
-
-    @Override
     public EternalTable newEternalTable(int eCap) {
         return EternalTable.EMPTY;
     }
@@ -97,27 +91,4 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         @Nullable MotorFunction Null = (believed, desired) -> null;
     }
 
-    protected class MyListTemporalBeliefTable extends HijackTemporalExtendedBeliefTable {
-
-        public MyListTemporalBeliefTable(int tCap, int historicCap) {
-            super(tCap, historicCap);
-        }
-
-//        @Override
-//        public float pri(@NotNull Task t) {
-//            float mult = 1f;
-//            if (t.start() > now)
-//                mult = 4f;
-//            return mult *  super.pri(t);
-//        }
-
-        @Override
-        protected boolean save(Task t) {
-//            if (t.isBelief())
-//                return t instanceof SignalTask;
-//            else
-                return true; //accept all goals
-        }
-
-    }
 }

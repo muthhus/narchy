@@ -9,7 +9,6 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Term;
-import nars.term.Termed;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +17,6 @@ import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 import static nars.gui.Vis.MyForceDirected;
 import static nars.gui.Vis.reflect;

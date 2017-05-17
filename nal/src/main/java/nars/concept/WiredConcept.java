@@ -1,6 +1,11 @@
 package nars.concept;
 
 import nars.NAR;
+import nars.Task;
+import nars.table.HijackTemporalBeliefTable;
+import nars.table.HijackTemporalExtendedBeliefTable2;
+import nars.table.TemporalBeliefTable;
+import nars.task.SignalTask;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +42,17 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         return this;
     }
 
+    @Override
+    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+        return
+            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
+            new HijackTemporalExtendedBeliefTable2(tCap, tCap*4) {
+                @Override
+                protected boolean include(Task t) {
+                    return t instanceof SignalTask || t.isGoal();
+                }
+            };
+    }
 
     //    @Override
 //    protected TermContainer buildTemplates(Compound term, NAR nar) {

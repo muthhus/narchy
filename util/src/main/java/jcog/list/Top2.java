@@ -13,8 +13,12 @@ public final class Top2<T> implements Consumer<T> {
     public T a, b;
     public float aa = Float.NEGATIVE_INFINITY, bb = Float.NEGATIVE_INFINITY;
 
-    public Top2(Function<T, Float> rank, Iterable<T> from) {
+    public Top2(Function<T, Float> rank) {
         this.rank = rank;
+    }
+
+    public Top2(Function<T, Float> rank, Iterable<T> from) {
+        this(rank);
         from.forEach(this);
     }
 

@@ -8,7 +8,7 @@ import static nars.Op.INT;
 /**
  * Created by me on 8/29/16.
  */
-public class IntTerm extends Termject.PrimTermject<Integer> {
+@Deprecated public class IntTerm extends Termject.PrimTermject<Integer> {
 
     public IntTerm(@NotNull int val) {
         super(val, Integer.toString(val));

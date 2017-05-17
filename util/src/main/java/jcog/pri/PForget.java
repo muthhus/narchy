@@ -1,13 +1,10 @@
 package jcog.pri;
 
-import jcog.Util;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
-
-import static jcog.Util.sqr;
 
 /**
  * decreases priority at a specified rate which is diminished in proportion to a budget's quality

@@ -11,8 +11,6 @@ import nars.time.RealTime;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.$.t;
-
 /**
  * Created by me on 3/21/17.
  */

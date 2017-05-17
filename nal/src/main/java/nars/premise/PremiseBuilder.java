@@ -1,7 +1,6 @@
 package nars.premise;
 
 import jcog.pri.PLink;
-import jcog.pri.Priority;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -15,7 +14,6 @@ import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.or;
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;

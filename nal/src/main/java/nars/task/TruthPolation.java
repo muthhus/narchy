@@ -6,8 +6,6 @@ import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.sqr;
-
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  * see:

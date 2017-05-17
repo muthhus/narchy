@@ -20,7 +20,6 @@ package jcog.tree.rtree.rect;
  * #L%
  */
 
-import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
@@ -30,7 +29,7 @@ import java.util.function.Function;
 /**
  * Created by jcovert on 6/15/15.
  */
-public class RectDouble2D implements HyperRect<RectDouble2D> {
+public class RectDouble2D implements HyperRect<Double2D> {
     public final Double2D min;
     public final Double2D max;
 
@@ -78,7 +77,7 @@ public class RectDouble2D implements HyperRect<RectDouble2D> {
 
 
     @Override
-    public HyperRect mbr(final HyperRect r) {
+    public HyperRect<Double2D> mbr(final HyperRect<Double2D> r) {
         final RectDouble2D r2 = (RectDouble2D) r;
         final double minX = Math.min(min.x, r2.min.x);
         final double minY = Math.min(min.y, r2.min.y);
@@ -95,7 +94,7 @@ public class RectDouble2D implements HyperRect<RectDouble2D> {
     }
 
     @Override
-    public HyperPoint center() {
+    public Double2D center() {
         final double dx = center(0);
         final double dy = center(1);
 
@@ -112,12 +111,12 @@ public class RectDouble2D implements HyperRect<RectDouble2D> {
     }
 
         @Override
-    public HyperPoint min() {
+    public Double2D min() {
         return min;
     }
 
     @Override
-    public HyperPoint max() {
+    public Double2D max() {
         return max;
     }
 

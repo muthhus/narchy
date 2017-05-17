@@ -14,8 +14,6 @@ import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
 
-import static nars.$.t;
-
 /**
  * Created by me on 4/30/17.
  */

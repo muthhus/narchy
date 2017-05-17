@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.or;
 import static nars.attention.Crosslink.crossLink;
 
 /**
