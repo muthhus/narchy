@@ -94,10 +94,11 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
         <dependency>
-            <groupId>com.lmax</groupId>
+            <groupId>com.conversantmedia</groupId>
             <artifactId>disruptor</artifactId>
-            <version>3.3.6</version>
+            <version>1.2.10</version>
         </dependency>
 
         <dependency>

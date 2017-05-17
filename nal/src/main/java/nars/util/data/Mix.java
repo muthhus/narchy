@@ -78,7 +78,7 @@ public class Mix<K, P extends Prioritized>  {
     public final Map<K, MixStream> streams = new ConcurrentHashMap();
     //TODO use a WeakValue map?
 
-    final static int WINDOW = 64; //changing this affects the temporal precision
+    final static int WINDOW = 8; //changing this affects the temporal precision
 
     /** gets or creates a mix stream for the given key */
     public MixStream stream(K x) {

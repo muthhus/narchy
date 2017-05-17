@@ -3,6 +3,8 @@ package nars.util.exe;
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 /**
  * Created by me on 8/16/16.
  */
@@ -40,14 +42,19 @@ public class SynchronousExecutor extends Executioner {
     }
 
     @Override
+    public void run(@NotNull Consumer<NAR> r) {
+        r.accept(nar);
+    }
+
+    @Override
     public final void run(@NotNull Runnable r) {
         //pending.add/*Last*/(r);
 
-        try {
+        //try {
             r.run();
-        } catch (Throwable t) {
-            NAR.logger.error("{} {}", r, t.getMessage());
-        }
+//        } catch (Throwable t) {
+//            NAR.logger.error("{} {}", r, t.getMessage());
+//        }
     }
 
 

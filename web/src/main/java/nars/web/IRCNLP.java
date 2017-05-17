@@ -265,7 +265,7 @@ public class IRCNLP extends IRC {
     @NotNull
     public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(3, 1024, true);
+        MultiThreadExecutor exe = new MultiThreadExecutor(3);
 
         Default nar = new Default(activeConcepts,
 

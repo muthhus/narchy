@@ -234,15 +234,14 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     /** projects a match */
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, Concept beliefConcept, NAR nar) {
 
-        boolean novel;
 
         Task answer = match(when, now, dur, question, template, false);
-        if (answer == null || answer.isDeleted()) {
+        if (answer == null || answer.isDeleted())
             return null;
-        } else {
-            novel = (answer instanceof AnswerTask); //includes: answers, revision, or dynamic
+
+        boolean novel = (answer instanceof AnswerTask); //includes: answers, revision, or dynamic
                     //&& !(answer instanceof DynamicBeliefTask);
-        }
+
 
         //project if different occurrence
         long answerStart = answer.start();
@@ -276,9 +275,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return answer;
     }
 
-    @Override default void forEachTask(Consumer<? super Task> x) {
-        forEach(x);
-    }
+
 
 //    /** 2-element array containing running min/max range accumulator */
 //    void range(long[] t);

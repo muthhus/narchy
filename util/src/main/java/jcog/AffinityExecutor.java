@@ -10,12 +10,12 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * uses affinity locking to pin new threads to their own unique, stable CPU core/hyperthread etc
  */
-public class AffinityExecutor implements Executor {
+public class AffinityExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(AffinityExecutor.class);
 
@@ -30,15 +30,16 @@ public class AffinityExecutor implements Executor {
     final class AffinityThread extends Thread {
 
         Runnable cmd;
+
         public AffinityThread(@NotNull String name, Runnable cmd) {
             super(name);
+
             this.cmd = cmd;
         }
 
         @Override
         public void run() {
 
-            threads.add( this );
 
             try (AffinityLock lock = AffinityLock.acquireLock()) {
                 cmd.run(); //avoid virtual call to super etc
@@ -50,15 +51,32 @@ public class AffinityExecutor implements Executor {
     }
 
 
+    static final AtomicInteger serial = new AtomicInteger(0);
 
-    @Override
-    public final void execute(Runnable command) {
-
-        final Thread thread = new AffinityThread(id + ":" + threads.size(), command);
-
-        thread.start();
-
+    public void stop() {
+        synchronized (threads) {
+            threads.removeIf(t -> {
+                t.stop();
+                return true;
+            });
+            assert (threads.isEmpty());
+        }
     }
+
+    public final void work(Runnable worker, int count) {
+        synchronized (threads) {
+            assert (threads.isEmpty());
+
+            for (int i = 0; i < count; i++) {
+                threads.add(
+                    new AffinityThread(id + "_" + serial.getAndIncrement(),
+                        worker));
+            }
+
+            threads.forEach(Thread::start);
+        }
+    }
+
 
 //        @Override
 //        public String toString()

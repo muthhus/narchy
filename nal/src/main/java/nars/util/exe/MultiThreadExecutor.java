@@ -1,43 +1,52 @@
 package nars.util.exe;
 
-import com.lmax.disruptor.*;
-import com.lmax.disruptor.dsl.Disruptor;
-import com.lmax.disruptor.dsl.EventHandlerGroup;
-import com.lmax.disruptor.dsl.ProducerType;
-import jcog.AffinityExecutor;
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import jcog.Util;
+import jcog.event.On;
 import nars.NAR;
-import nars.Param;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
  * Created by me on 8/16/16.
  */
-public class MultiThreadExecutor extends Executioner  {
+public class MultiThreadExecutor extends Executioner {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
-    /** actual load value to report as 100% load */
-    public final long safetyLimit;
 
     private final int threads;
-    private final RingBuffer<TaskEvent> ring;
-    @NotNull
-    private final int cap;
+    private final DisruptorBlockingQueue queue;
+
 
     //private CPUThrottle throttle;
 
-    private final SequenceBarrier barrier;
-    private long cursor;
-    private boolean sync = true;
+    //
+//    private final DisruptorBlockingQueue queue;
+//    private final AffinityExecutor exe;
+//    private final Runnable worker;
+//    private Consumer<NAR> cycle;
+//    private int cap;
+    private On onReset;
+    //private Loop loop;
 
-//    @Override
+    @Override
+    public void run(Runnable cmd) {
+        //exe.execute(cmd);
+        execute(cmd);
+    }
+
+    @Override
+    public void run(@NotNull Consumer<NAR> r) {
+        execute(() -> r.accept(nar));
+    }
+
+    //    @Override
 //    public void handleEventException(Throwable ex, long sequence, TaskEvent event) {
 //
 //    }
@@ -53,106 +62,143 @@ public class MultiThreadExecutor extends Executioner  {
 //    }
 
 
-    enum EventType {
-        RUNNABLE, NAR_CONSUMER
-    }
+//    public boolean tryRun(@NotNull Consumer<NAR> r) {
+//        return queue.offer(r);
+//    }
 
-    static final class TaskEvent {
-        @Nullable Object val;
-    }
+//    @Override
+//    public final void run(@NotNull Runnable r) {
+//        if (!queue.offer(r)) {
+//            //logger.error("unable to queue {}", r);
+//            r.run(); //execute in callee's thread
+//        }
+//    }
+//
+//    @Override
+//    public final void run(@NotNull Consumer<NAR> r) {
+////        try {
+////            queue.put(r);
+////        } catch (InterruptedException e) {
+////            logger.error("{}", r);
+////        }
+//        if (!queue.offer(r)) {
+//            //logger.error("unable to queue {}", r);
+//            r.accept(nar); //execute in callee's thread
+//        }
+//    }
 
-    @NotNull
-    final Disruptor<TaskEvent> disruptor;
+    public MultiThreadExecutor(int threads) {
 
-
-
-
-
-    public MultiThreadExecutor(int threads, int ringSize, boolean sync) {
-        this(threads, ringSize, sync, new AffinityExecutor("exe"));
-    }
-
-    public MultiThreadExecutor(int threads, int ringSize, boolean sync, Executor exe) {
-        this(threads, ringSize, exe);
-        sync(sync);
-    }
-
-    public MultiThreadExecutor(int threads, int ringSize, Executor exe) {
-
+        this.queue = new DisruptorBlockingQueue(64);
         this.threads = threads;
 
-        this.cap = ringSize;
-
-        float safetyThreshold = 0.1f;
-        this.safetyLimit =
-                (int)(Math.ceil(ringSize * safetyThreshold));
-                //1;
-
-        this.disruptor = new Disruptor<>(
-                TaskEvent::new,
-                ringSize /* ringbuffer size */,
-                exe,
-                ProducerType.MULTI,
-                //new BusySpinWaitStrategy()
-                //new PhasedBackoffWaitStrategy(1,1, TimeUnit.MILLISECONDS,
-                //        new SleepingWaitStrategy())
-                //new LiteBlockingWaitStrategy()
-                new SleepingWaitStrategy()
-                //new BlockingWaitStrategy()
-                //new LiteTimeoutBlockingWaitStrategy(1, TimeUnit.MILLISECONDS)
-        );
-
-        this.ring = disruptor.getRingBuffer();
-        //this.cursor = ring.getCursor();
+        exe = //new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true);
+                //Executors.newFixedThreadPool(threads);
+                new ThreadPoolExecutor(threads, threads,
+                        1, TimeUnit.MINUTES,
+                        queue
+                );
+        exe.prestartAllCoreThreads();
 
 
-        WorkHandler[] taskWorker = new WorkHandler[threads];
-        for (int i = 0; i < threads; i++)
-            taskWorker[i] = new TaskEventWorkHandler();
-        EventHandlerGroup workers = disruptor.handleEventsWithWorkerPool(taskWorker);
+//        this.queue = new DisruptorBlockingQueue<>(ringSize);
+//        this.exe = new AffinityExecutor("exe");
 
 
-
-        barrier = workers.asSequenceBarrier();
-
+//        worker = () -> { //worker thread
+//
+//            while (true) {
+//                try {
+//                    Object r = queue.take();
+//                    if (r instanceof Consumer)
+//                        ((Consumer) r).accept(nar);
+//                    else
+//                        ((Runnable) r).run();
+//                } catch (Throwable e) {
+//                    logger.error("{}", e);
+//                    continue;
+//                }
+//            }
+//        };
 
 
     }
 
-    public MultiThreadExecutor sync(boolean b) {
-        this.sync = b;
-        return this;
+
+    @Override
+    public void execute(Runnable pooled) {
+        //exe.execute(pooled);
+
+        if (!queue.offer(pooled))
+            pooled.run();
+
     }
 
+    @Override
+    public void start(@NotNull NAR nar) {
+        synchronized (exe) {
+//            cap = queue.capacity();
+//
+//            exe.work(worker, threads);
+
+            onReset = nar.eventReset.on((n) -> {
+                if (isRunning()) {
+                    synchronized (exe) {
+                        stop();
+                        start(n);
+                    }
+                }
+            });
+
+            super.start(nar);
+//            loop = new Loop(50) {
+//
+//                @Override
+//                public boolean next() {
+//                    //sync
+//                    //queue.
+//                    nar.cycle();
+//
+//                    return true;
+//                }
+//            };
+
+        }
+
+    }
+
+    final ThreadPoolExecutor exe;
 
 
     @Override
     public void stop() {
 
-        synchronized (disruptor) {
+        synchronized (exe) {
 
-            sync = false;
-            disruptor.halt();
-
-            try {
-                disruptor.shutdown(1, TimeUnit.SECONDS);
-            } catch (TimeoutException e) {
-                e.printStackTrace();
+            if (onReset != null) {
+                onReset.off();
+                onReset = null;
             }
+
+            //exe.shutdown();
 
             super.stop();
         }
+
 
     }
 
     @Override
     public final float load() {
+        //ForkJoinPool.commonPool().getActiveThreadCount()
+        //return 0f;
+        return 1f - ((float) queue.remainingCapacity()) / queue.capacity();
 
-        int remaining = (int) ring.remainingCapacity();
-        if (remaining < safetyLimit)
-            return 1f;
-
-        return Math.max(0f, 1f - ((float)ring.remainingCapacity() / (cap - safetyLimit)));
+//        int remaining = (int) ring.remainingCapacity();
+//        if (remaining < safetyLimit)
+//            return 1f;
+//
+//        return Math.max(0f, 1f - ((float)ring.remainingCapacity() / (cap - safetyLimit)));
     }
 
     @Override
@@ -162,105 +208,61 @@ public class MultiThreadExecutor extends Executioner  {
 
     @Override
     public void cycle(@NotNull NAR nar) {
+        //throw new UnsupportedOperationException("Real-time mode only");
 
-        //SYNCHRONIZE -----------------------------
-        if (sync) {
-            try {
-                long lastCursor = this.cursor;
-                if (lastCursor != (this.cursor = ring.getCursor())) {
-                    barrier.waitFor(cursor);
-                }
-            } catch (@NotNull AlertException | InterruptedException | TimeoutException e1) {
-                logger.error("Barrier Synchronization: {}", e1);
-            }
-        } /*else {
-            if (!ring.hasAvailableCapacity(((int)(0.25f * ring.getBufferSize())))) {
-                return; //allow buffer to clear
-            }
-        }*/
+
+//        if (load() > 0.5f) {
+//            Util.sleep(10);
+//            return;
+//        }
+
+
+//        try {
+//            exe.awaitTermination(1000, TimeUnit.MILLISECONDS);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        while (queue.remainingCapacity()<queue.capacity()/2) {
+//            Util.sleep(100);
+//        }
 
         Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
-                if (c == null)
-                    break; //null terminator hit
+                if (c == null) break; //null terminator hit
 
-                nar.exe.run(c); //use nar.exe because this executor may be wrapped in something else that we want this to pass through, ie. instrumentor
+                //nar.exe.run(c); //use nar.exe because this executor may be wrapped in something else that we want this to pass through, ie. instrumentor
+                run(c);
             }
         }
-
     }
 
-    @Override
-    public void start(@NotNull NAR nar) {
-        synchronized (disruptor) {
-            super.start(nar);
-            disruptor.start();
-        }
 
-//        nar.eventReset.on((n) -> {
-//            sync(); //should empty all pending tasks
-//        });
-
-//        this.throttle = new CPUThrottle(
-//                new MutableFloat(25));
-//                //new MutableFloat(0.5f),
-//                //exe.threadIDs());
-    }
-
-//    @Override public float throttle() {
-//        return throttle.throttle;
+//
+//
+//    private final class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
+//
+//        @Override
+//        public final void onEvent(@NotNull TaskEvent te) {
+//
+//            Object val = te.val;
+//            te.val = null;
+//
+//            //try {
+//                if (val instanceof Runnable) {
+//                    ((Runnable) val).run();
+//                } else {
+//                    ((Consumer) val).accept(nar);
+//                }
+////            } catch (Throwable t) {
+////                if (Param.DEBUG)
+////                    logger.error("{} {} ", val, t);
+////            }
+//        }
+//
+//
 //    }
-
-
-    final static EventTranslatorOneArg<TaskEvent, Runnable> runPublisher = (TaskEvent x, long seq, Runnable b) -> {
-        x.val = b;
-    };
-
-    final static EventTranslatorOneArg<TaskEvent, Consumer<NAR>> narPublisher = (TaskEvent x, long seq, Consumer<NAR> b) -> {
-        x.val = b;
-    };
-
-
-    @Override
-    public final void run(@NotNull Runnable r) {
-        if (!ring.tryPublishEvent(runPublisher, r)) {
-            r.run(); //execute in callee's thread
-        }
-    }
-
-    @Override
-    public final void run(@NotNull Consumer<NAR> r) {
-        if (!ring.tryPublishEvent(narPublisher, r)) {
-            r.accept(nar); //execute in callee's thread
-        }
-    }
-
-
-    private final class TaskEventWorkHandler implements WorkHandler<TaskEvent> {
-
-        @Override
-        public final void onEvent(@NotNull TaskEvent te) {
-
-            Object val = te.val;
-            te.val = null;
-
-            try {
-                if (val instanceof Runnable) {
-                    ((Runnable) val).run();
-                } else {
-                    ((Consumer) val).accept(nar);
-                }
-            } catch (Throwable t) {
-                if (Param.DEBUG)
-                    logger.error("{} {} ", val, t);
-            }
-        }
-
-
-    }
-
 
 
 }

@@ -47,14 +47,16 @@ abstract public class Executioner implements Executor {
 
 
 
+
     /** default impl: */
-    public void run(@NotNull Consumer<NAR> r) {
-        if (nar!=null) {
-            this.run(() -> r.accept(nar));
-        } else {
-            throw new RuntimeException("stopped");
-        }
-    }
+    abstract public void run(@NotNull Consumer<NAR> r);
+
+//        if (nar!=null) {
+//            this.run(() -> r.accept(nar));
+//        } else {
+//            throw new RuntimeException("stopped");
+//        }
+
 
     abstract public void run(Runnable cmd);
 
@@ -75,7 +77,7 @@ abstract public class Executioner implements Executor {
     public float load() { return 0; }
 
     @Override
-    public final void execute(Runnable command) {
+    public void execute(Runnable command) {
         run(command);
     }
 

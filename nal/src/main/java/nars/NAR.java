@@ -825,8 +825,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
                 Compound c = t.term();
                 //try {
-                    o.run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
-                    return t;
+                o.run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
+                return t;
 //                } catch (Throwable error) {
 //                    if (Param.DEBUG)
 //                        throw error;
@@ -920,8 +920,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * steps 1 frame forward. cyclesPerFrame determines how many cycles this frame consists of
      */
     @NotNull
-    public final NAR cycle() {
-        return run(1);
+    public final void cycle() {
+        time.cycle();
+
+        emotion.cycle();
+
+        exe.cycle(this);
     }
 
 
@@ -934,13 +938,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final NAR run(int frames) {
 
         for (; frames > 0; frames--) {
-
-            time.cycle();
-
-            emotion.cycle();
-
-            exe.cycle(this);
-
+            cycle();
         }
 
         return this;
@@ -1316,9 +1314,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
+        } else if (termed instanceof Variable) {
+            return null;
         }
 
-        Term term = termed.term();
+        Term term = termed.unneg();
 
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
@@ -1328,61 +1328,38 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
 //            termPre = term;
 
-        switch (term.op()) {
-            case VAR_DEP:
-            case VAR_INDEP:
-            case VAR_QUERY:
-            case VAR_PATTERN:
-                //throw new InvalidConceptException((Compound)term, "variables can not be conceptualized");
+
+        if (term instanceof Compound) {
+            term = terms.atemporalize((Compound) term);
+            if (term == null)
                 return null;
 
-            case NEG:
-                term = term.unneg(); //fallthru
+            //atemporalizing can reset normalization state of the result instance
+            //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-            default:
+            term = compoundOrNull(terms.normalize((Compound) term));
+            if (term == null)
+                return null;
 
-                if (term instanceof Compound) {
-                    term = terms.atemporalize((Compound) term);
-                    if (term == null)
-                        return null;
-
-                    //atemporalizing can reset normalization state of the result instance
-                    //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
-
-                    Compound nterm = terms.normalize((Compound) term);
+            term = compoundOrNull(term.unneg());
 //                    if (nterm == null) {
 //                        concepts.normalize((Compound)term);
 //                        return null;
 //                    }
-                    term = nterm;
-
-                }
-
-
-
-
-
-                /*
-                if (term instanceof Compound) {
-                    term = concepts.normalize((Compound) term);
-                    if (term == null)
-                        return null;
-                }
-                */
 
         }
+
 
         if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
 
-        Concept c = terms.concept(term.unneg(), createIfMissing);
+        return terms.concept(term, createIfMissing);
 //        if (c != null && createIfMissing && c.isDeleted()) {
 //            //try again
 //            concepts.remove(c.term());
 //            return concepts.concept(term, createIfMissing);
 //        }
 
-        return c;
     }
 
     @Nullable

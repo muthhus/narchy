@@ -49,7 +49,8 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
             new HijackTemporalExtendedBeliefTable2(tCap, tCap*4) {
                 @Override
                 protected boolean include(Task t) {
-                    return t instanceof SignalTask || t.isGoal();
+                    return true;
+                    //return t instanceof SignalTask || t.isGoal();
                 }
             };
     }

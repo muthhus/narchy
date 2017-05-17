@@ -11,6 +11,7 @@ import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.MultiThreadExecutor;
+import nars.util.exe.SynchronousExecutor;
 import org.junit.Test;
 
 import java.util.concurrent.Executors;
@@ -81,7 +82,7 @@ public class InterNARTest {
     private static Default newNAR() {
         return new Default(1024,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
-                new RealTime.DSHalf(), new MultiThreadExecutor(3, 128, Executors.newCachedThreadPool()));
+                new RealTime.DSHalf(), new SynchronousExecutor());
     }
 
     @Test

@@ -361,10 +361,6 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
 
-    @Nullable
-    public Term transform(@NotNull Term t, @NotNull Subst subst) {
-        return subst.transform(t, index);
-    }
 }
 
 

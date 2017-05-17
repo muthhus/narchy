@@ -1,6 +1,5 @@
 package nars.table;
 
-import jcog.list.Top2;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.LockingRTree;
 import jcog.tree.rtree.Node;
@@ -9,9 +8,12 @@ import jcog.tree.rtree.point.Long1D;
 import jcog.tree.rtree.rect.RectLong1D;
 import nars.$;
 import nars.Task;
+import nars.task.Revision;
+import nars.task.TruthPolation;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
@@ -35,9 +37,9 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
     public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
         Task t = super.match(when, now, dur, against);
 
-        Task h = matchHistory(when);
+        Task h = historicTask(when, dur);
         if (h != null) {
-            if ((t == null) || (h!=t && h.evi(when, dur) > t.evi(when, dur))) {
+            if ((t == null) || (h != t && h.evi(when, dur) > t.evi(when, dur))) {
                 return h;
             }
         }
@@ -53,25 +55,45 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
     @Override
     public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
         Truth a = super.truth(when, dur, eternal);
-        Task h = matchHistory(when);
-        if (h != null) {
-            Truth b = h.truth(when, dur);
-            if (b!=null && (a == null || b.evi() > a.evi()))
-                return b;
+        Truth b = historicTruth(when, dur, 4 /* HEURISTIC */);
+        if (a == null)
+            return b;
+        if (b == null)
+            return a;
+
+        return Revision.revise(a,b);
+    }
+
+    @Nullable Truth historicTruth(long when, int dur, int limit) {
+
+        List<Task> t = $.newArrayList(limit);
+        history.intersecting(new RectLong1D(when - dur, when + dur), (x) -> {
+            t.add(x);
+            return t.size() < limit;
+        });
+        switch (t.size()) {
+            case 0: return null;
+            default:
+                return TruthPolation.truth(null, when, dur, t);
         }
-        return a;
+
     }
 
     //TODO use a better method:
-    Task matchHistory(long when) {
+    @Nullable Task historicTask(long when, int dur) {
 
         //TODO either write Top1 or use Top2, or a Top2 with a separate ranking bi-float-function for comparing #2's to #1's
-        Top2<Task> found = new Top2<>(t -> t.pri());
-        history.intersecting(new RectLong1D(when), (x) -> {
-            found.accept(x);
+        Task[] found = new Task[1];
+        final float[] bestEvi = {0};
+        history.intersecting(new RectLong1D(when - dur, when + dur), (x) -> {
+            float evi = x.evi(when, dur);
+            if (bestEvi[0] < evi) {
+                bestEvi[0] = evi;
+                found[0] = x;
+            }
             return true;
         });
-        return found.a;
+        return found[0];
     }
 
     @Override
@@ -129,7 +151,7 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
                 break;
 
             boolean removed = history.remove(x);
-            assert(removed);
+            assert (removed);
 
             super.onRemoved(x);
         }

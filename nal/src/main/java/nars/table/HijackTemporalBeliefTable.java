@@ -1,7 +1,6 @@
 package nars.table;
 
 import jcog.list.FasterList;
-import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
@@ -14,7 +13,6 @@ import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
@@ -70,8 +68,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         if (existing instanceof ActionConcept.CuriosityTask)
             return true;
 
-        float exPri = existing.priSafe(-1);
-        if (exPri < 0)
+        float exPri = existing.pri();
+        if (exPri!=exPri)
             return true;
 
         float inPri = incoming.priSafe(0);
@@ -316,38 +314,33 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        }
 //    }
 
-
-    final boolean remove(MutableList<Task> l, @NotNull Task x, boolean delete) {
-        if (l.remove(x)) {
-            if (delete)
-                x.delete();
-            remove(x);
-            return true;
-        }
-        return false;
-    }
-
-
-    static private Function<Task, Float> temporalConfidence(long when, long now, int dur) {
-        return x -> rankTemporalByConfidence(x, when, dur);
-    }
-
-//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
-//        return x -> rankTemporalByConfidence(x, when, now, dur);
+//
+//    final boolean remove(MutableList<Task> l, @NotNull Task x, boolean delete) {
+//        if (l.remove(x)) {
+//            if (delete)
+//                x.delete();
+//            remove(x);
+//            return true;
+//        }
+//        return false;
 //    }
 
-    static final float rankTemporalByConfidence(@NotNull Task t, long when,/* long now,*/ int dur) {
 
-        float r = t.evi(when, dur);
-        //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
+    static FloatFunction<Task> evidence(long when, long now, int dur) {
+        return (x) -> x.evi(when, dur);
+
+
+            //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
 
 //        //HACK present/future prediction boost
 //        if (t.start() >= now) {
 //            r += 1f;
 //        }
-
-        return r;
     }
+
+//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
+//        return x -> rankTemporalByConfidence(x, when, now, dur);
+//    }
 
     @Nullable
     static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
@@ -400,69 +393,69 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
-    /**
-     * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
-     */
-    protected Task compress(@Nullable Task input, long now, FasterList<Task> l, int dur, float confMin) {
-
-        int cap = capacity();
-
-        if (l.size() < cap || clean(l)) {
-            return input; //no need for compression
-        }
-
-        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
-        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
-
-        Task a = l.minBy(temporalConfidence(now, now, dur));
-
-        if (a == null) {
-            return null; // this probably shouldnt happen
-        }
-
-        if (inputRank < rankTemporalByConfidence(a, now, dur)) {
-            //if weaker than everything else, attempt a merge of the input with another
-
-            Task b = matchMerge(l, now, input, dur);
-            if (b == null) {
-                return null; //nothing to merge with
-            }
-
-            Task merged = merge(input, b, now, confMin);
-            if (merged == null) {
-                return null; //merge failed
-            }
-
-            remove(l, b, true);
-
-            return merged;
-
-        } else {
-            //merge 2 weakest and allow the input as-is
-
-            remove(l, a, false);
-
-            Task b = matchMerge(l, now, a, dur);
-            if (b != null) {
-                Task merged = merge(a, b, now, confMin);
-
-                a.delete();  //delete a after the merge, so that its budget revises
-
-                if (merged == null) {
-                    return input;
-                } else {
-                    remove(l, b, true);
-                    return merged;
-                }
-            } else {
-                a.delete();
-
-                return input;
-            }
-
-        }
-
-    }
+//    /**
+//     * frees one slot by removing 2 and projecting a new belief to their midpoint. returns the merged task
+//     */
+//    protected Task compress(@Nullable Task input, long now, FasterList<Task> l, int dur, float confMin) {
+//
+//        int cap = capacity();
+//
+//        if (l.size() < cap || clean(l)) {
+//            return input; //no need for compression
+//        }
+//
+//        //return rankTemporalByConfidenceAndOriginality(t, when, now, -1);
+//        float inputRank = input != null ? rankTemporalByConfidence(input, now, dur) : Float.POSITIVE_INFINITY;
+//
+//        Task a = l.minBy(temporalConfidence(now, now, dur));
+//
+//        if (a == null) {
+//            return null; // this probably shouldnt happen
+//        }
+//
+//        if (inputRank < rankTemporalByConfidence(a, now, dur)) {
+//            //if weaker than everything else, attempt a merge of the input with another
+//
+//            Task b = matchMerge(l, now, input, dur);
+//            if (b == null) {
+//                return null; //nothing to merge with
+//            }
+//
+//            Task merged = merge(input, b, now, confMin);
+//            if (merged == null) {
+//                return null; //merge failed
+//            }
+//
+//            remove(l, b, true);
+//
+//            return merged;
+//
+//        } else {
+//            //merge 2 weakest and allow the input as-is
+//
+//            remove(l, a, false);
+//
+//            Task b = matchMerge(l, now, a, dur);
+//            if (b != null) {
+//                Task merged = merge(a, b, now, confMin);
+//
+//                a.delete();  //delete a after the merge, so that its budget revises
+//
+//                if (merged == null) {
+//                    return input;
+//                } else {
+//                    remove(l, b, true);
+//                    return merged;
+//                }
+//            } else {
+//                a.delete();
+//
+//                return input;
+//            }
+//
+//        }
+//
+//    }
 
     /**
      * t is the target time of the new merged task
@@ -510,18 +503,22 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     }
 
 
+
     @Nullable
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against) {
 
-        Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), this);
+        return maxBy(evidence(when, now, dur));
 
-        Task a = s.a;
-        if (s.b == null)
-            return a;
-        Task c = merge(a, s.b, now, a.conf());
-        return c != null ? c : a;
+//        Top2<Task> s = new Top2<>(temporalConfidence(when, now, dur), this);
+//
+//        Task a = s.a;
+//        if (s.b == null)
+//            return a;
+//        Task c = merge(a, s.b, now, a.conf());
+//        return c != null ? c : a;
     }
+
 
     @Override
     public Truth truth(long when, int dur, @Nullable EternalTable eternal) {

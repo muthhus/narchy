@@ -48,7 +48,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
     public JoglSpace() {
         super();
-        frameTimeMS = new PeriodMeter(toString(), 60);
+        frameTimeMS = new PeriodMeter(toString(), 8);
         meters.put(this, this);
     }
 

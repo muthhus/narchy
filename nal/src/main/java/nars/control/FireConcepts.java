@@ -22,6 +22,8 @@ import nars.task.DerivedTask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,7 +39,7 @@ import static jcog.bag.Bag.BagCursorAction.Stop;
  */
 abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
-    static final float BATCHING_GRANULARITY_DIVISOR = 4; //additional dividing factor to increase granularity
+    static final float BATCHING_GRANULARITY_DIVISOR = 3; //additional dividing factor to increase granularity
 
     public final DerivationBudgeting budgeting;
     public final Deriver deriver;
@@ -46,7 +48,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * in TTL per cycle
      */
-    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (1 * 32 * 1024));
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, ( 256 * 1024));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -73,47 +75,58 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
     /**
      * returns ttl consumed
      */
-    int fire(PLink<Concept> pc, Derivation d) {
+    int fire(PLink<Concept> pc, FireConceptsDirect.MyDerivation d) {
 
         float cPri = pc.priSafe(0);
         final int startTTL = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
         int ttl = startTTL;
 
         Concept c = pc.get();
-        c.tasklinks().commit().normalize(0.1f);
-        c.termlinks().commit().normalize(0.1f);
+        c.tasklinks().commit();//.normalize(0.1f);
+        c.termlinks().commit();//.normalize(0.1f);
         nar.terms.commit(c);
 
 
 
         int premiseCost = Param.BeliefMatchTTL;
         int linkSampleCost = 1;
+        int derivedTaskCost = 2;
 
         Random rng = nar.random();
 
         @Nullable PLink<Task> tasklink = null;
         @Nullable PLink<Term> termlink = null;
-        float taskLinkPri = -1f, termPri = -1f;
+        float taskLinkPri = -1f, termLinkPri = -1f;
 
+        int derivedTasks = d.buffer.size();
+
+        /**
+         * this implements a pair of roulette wheel random selectors
+         * which have their options weighted according to the normalized
+         * termlink and tasklink priorities.  normalization allows the absolute
+         * range to be independent which should be ok since it is only affecting
+         * the probabilistic selection sequence and doesnt affect derivation
+         * budgeting directly.
+         */
         d.restartA();
         while (ttl > 0) {
-            if (tasklink == null || (rng.nextFloat()) > taskLinkPri) { //sample a new link inversely probabalistically in proportion to priority
+            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = c.tasklinks().sample();
                 ttl -= linkSampleCost;
                 if (tasklink == null)
                     break;
 
-                taskLinkPri = tasklink.priSafe(0);
+                taskLinkPri = c.tasklinks().normalizeMinMax(tasklink.priSafe(0));
                 d.restartB(tasklink.get());
             }
 
 
-            if (termlink == null || (rng.nextFloat()) > termPri) { //sample a new link inversely probabalistically in proportion to priority
+            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = c.termlinks().sample();
                 ttl -= linkSampleCost;
                 if (termlink == null)
                     break;
-                termPri = termlink.priSafe(0);
+                termLinkPri = c.termlinks().normalizeMinMax(termlink.priSafe(0));
             }
 
             if (ttl <= premiseCost)
@@ -126,11 +139,17 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
                 int start = ttl;
 
-                int ttlRemain = deriver.run(d, p, ttl);
 
-                assert (start >= ttlRemain);
 
-                ttl -= (start - ttlRemain);
+                int ttlRemain = deriver.run(d, p, ttl); assert (start >= ttlRemain);
+
+                ttl -= (start - ttlRemain);  if (ttl <= 0) break;
+
+                int nextDerivedTasks = d.buffer.size();
+                int numDerived = nextDerivedTasks - derivedTasks;
+                ttl -= numDerived * derivedTaskCost;
+                derivedTasks = nextDerivedTasks;
+
             }
         }
 
@@ -144,6 +163,8 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
      * directly inptus each result upon derive, for single-thread
      */
     public static class FireConceptsDirect extends FireConcepts {
+
+        public static final Logger logger = LoggerFactory.getLogger(FireConceptsDirect.class);
 
         private final ThreadLocal<FireConceptsDirect.MyDerivation> derivation =
                 ThreadLocal.withInitial(()->
@@ -160,21 +181,27 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         @Override
         public void fire() {
+
+            float load = nar.exe.load();
+//            if (load > 0.9f) {
+//                logger.error("overload {}", load);
+//                return;
+//            }
+
             ConceptBagFocus csrc = (ConceptBagFocus) source;
-            int ttl = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() );
+
+            int ttl = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() * (1f - load) );
             if (ttl == 0)
                 return; //idle
 
             if (nar.exe.concurrent()) {
                 int remain = ttl;
 
-                int batchSize = (int) Math.ceil(remain / (nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR));
+                int batchSize = (int) Math.ceil(remain / ((float)(nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR)));
                 while (remain > 0) {
                     int nextBatchSize = Math.min(remain, batchSize);
-                    nar.runLater(() -> {
-
+                    nar.runLater((n) -> {
                         fire(csrc, nextBatchSize );
-
                     });
                     remain -= nextBatchSize;
                 }
@@ -188,7 +215,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         private static class MyDerivation extends Derivation {
             final Map<Task, Task> buffer = new LinkedHashMap();
 
-            private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
+            //private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
             public MyDerivation(DerivationBudgeting b, NAR nar) {
                 super(nar, b, Param.UnificationStackMax);
@@ -197,14 +224,14 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             @Override
             public void derive(Task x) {
                 buffer.merge(x, x, (prev, next) -> {
-                    PriMerge.max.merge(prev, next);
+                    PriMerge.avg.merge(prev, next);
                     return prev;
                 });
             }
 
             void commit(/*int derivations*/) {
                 if (!buffer.isEmpty()) {
-                    int mPerDeriv = maxInputTasksPerDerivation.intValue();
+                    //int mPerDeriv = maxInputTasksPerDerivation.intValue();
                     //int max = mPerDeriv * derivations;
                     //if (mPerDeriv == -1 || buffer.size() <= max) {
                         nar.input(buffer.values());
@@ -241,31 +268,41 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
         //double dt = (end - start) / ((float)nextBatchSize);
         //rate.hitNano(dt);
 
-        public void fire(ConceptBagFocus csrc, int ttl) {
-            MyDerivation d = derivation.get();
+        public void fire(ConceptBagFocus csrc, final int startTTL) {
+            MyDerivation dd = derivation.get();
 
-            final int[] curTTL = { ttl };
-            MyDerivation dd = d;
+            final int[] curTTL = { startTTL };
 
             csrc.active.commit(null);
 
             float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
-            float decay =
+            float mass = ((HijackBag)csrc.active).mass;
+            float priDecayFactor =
                     //1f - (((float)csrc.active.size()) / csrc.active.capacity());
                     Util.unitize(
-                    1f - (((HijackBag)csrc.active).mass /
-                            idealMass)
+                    1f - mass / (mass + idealMass)
                     );
 
+            final int[] sampled = {0};
+
             csrc.active.sample( p -> {
-
-
                 int ttlConsumed = fire(p, dd);
-                p.priMult(decay);
+                sampled[0]++;
+                p.priMult(priDecayFactor);
                 curTTL[0]-=ttlConsumed;
                 return curTTL[0] > 0 ? Next : Stop;
             });
-            d.commit();
+
+//            logger.info(
+//                "{} {}",
+//                dd, Thread.currentThread()
+//            );
+//            logger.info(
+//                "\t{} TTL budgeted -> {} sampled priDecayFactor={} -> {} derived tasks",
+//                startTTL, sampled[0], priDecayFactor, dd.buffer.size()
+//            );
+
+            dd.commit();
         }
 
         @Override
@@ -288,9 +325,9 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
     @Override
     public void run() {
-        ((ConceptBagFocus) this.source).active
-                .commit(null);
-        fire();
+        if (((ConceptBagFocus) this.source).active
+                .commit(null).size() > 0)
+            fire();
     }
 
     abstract protected void fire();

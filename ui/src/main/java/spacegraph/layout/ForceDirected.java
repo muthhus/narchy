@@ -128,6 +128,9 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
 
         float len = delta.normalize();
+        if (!Float.isFinite(len))
+            return;
+
         //len -= idealDistRads * Math.max(xp.radius(), yp.radius());
         //if (len <= 0)
             //return;

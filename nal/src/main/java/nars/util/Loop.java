@@ -21,7 +21,7 @@ abstract public class Loop implements Runnable {
      */
     @NotNull
     protected final Thread thread;
-    protected final int windowLength = 16;
+    protected final int windowLength = 4;
 
     protected long afterTime;
     protected boolean stopping;

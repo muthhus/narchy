@@ -1,5 +1,6 @@
 package nars.index.term.tree;
 
+import com.google.common.base.Charsets;
 import io.airlift.compress.lz4.Lz4Compressor;
 import io.airlift.compress.lz4.Lz4RawCompressor;
 import jcog.byt.HashCachedDynByteSeq;
@@ -14,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
-import static jcog.Hack.bytes;
 import static nars.IO.SPECIAL_OP;
 import static nars.IO.writeEvidence;
 
@@ -31,7 +32,9 @@ public class TermKey extends HashCachedDynByteSeq {
     private final static int MIN_COMPRESSION_INPUT = 16;
     private static final boolean COMPRESS = false;
 
-    /** term with volume byte prepended for sorting by volume */
+    /**
+     * term with volume byte prepended for sorting by volume
+     */
     @NotNull
     public static TermKey term(@NotNull Term x) {
         TermKey y = new TermKey(x.volume() * 4 + 64 /* ESTIMATE */);
@@ -100,7 +103,7 @@ public class TermKey extends HashCachedDynByteSeq {
             return false;
         }
 
-        int uncLength = to-from;
+        int uncLength = to - from;
 
         byte[] uncompressed = this.bytes;
         byte[] compressed = new byte[from + Lz4RawCompressor.maxCompressedLength(uncLength)];
@@ -108,7 +111,7 @@ public class TermKey extends HashCachedDynByteSeq {
         int compressedLength = compressor.get()
                 .compress(uncompressed, from, uncLength, compressed, from, compressed.length);
 
-        if (compressedLength <= (int)(uncLength * minCompressionRatio)) {
+        if (compressedLength <= (int) (uncLength * minCompressionRatio)) {
 
             System.arraycopy(bytes, 0, compressed, 0, from); //copy prefix
             //TODO copy suffix
@@ -149,6 +152,12 @@ public class TermKey extends HashCachedDynByteSeq {
         }
     }
 
+    static final Charset utf8 = Charsets.UTF_8;
+
+    public static byte[] bytes(String s) {
+        return s.getBytes(utf8); //SAFE access:
+    }
+
     static void writeStringBytes(@NotNull DataOutput out, @NotNull Object o) throws IOException {
         out.write(bytes(o.toString()));
     }
@@ -180,7 +189,7 @@ public class TermKey extends HashCachedDynByteSeq {
         int siz = c.size();
         for (int i = 0; i < siz; i++) {
             writeTermSeq(out, c.sub(i), includeTemporal);
-            if (i < siz-1)
+            if (i < siz - 1)
                 out.writeByte(',');
         }
 

@@ -283,7 +283,7 @@ public class RevectionTest {
         b.believe(0.5f, 1.0f, 0.99f, 12); //this should cause the cycle=10 and cycle=11 beliefs to get revected into one and allow this belief to be inserted
         //the cycle=5 belief should remain since it is more unique
 
-        n.cycle().cycle().cycle();
+        n.run(3);
         b.print();
         assertEquals(4, b.capacity(true));
         assertEquals(4, b.size(true));

@@ -6,6 +6,7 @@ import jcog.pri.PLink;
 import jcog.pri.Priority;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,13 +34,18 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
         public boolean remove;
         public boolean stop;
+
         BagCursorAction(boolean remove, boolean stop) {
-            this.remove = remove; this.stop = stop;
+            this.remove = remove;
+            this.stop = stop;
         }
     }
 
-    /** used for sampling */
-    @FunctionalInterface interface BagCursor<V> {
+    /**
+     * used for sampling
+     */
+    @FunctionalInterface
+    interface BagCursor<V> {
         @NotNull BagCursorAction next(@NotNull V x);
     }
 
@@ -104,7 +110,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     /* sample the bag, optionally removing each visited element as decided by the visitor's
      * return value */
-    @NotNull Bag<K,V> sample(@NotNull Bag.BagCursor<? super V> each);
+    @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each);
 
     default List<V> sampleToList(int n) {
         if (n == 0)
@@ -117,7 +123,13 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return l;
     }
 
-    default void normalize(float lerp) {
+
+    /** normalizes a priorty to within the present min/max range of this bag, and unitized to within 0..1.0 clipping if exceeded */
+    default float normalizeMinMax(float pri) {
+        return Util.unitize(Util.lerp(pri, priMax(), priMin()));
+    }
+
+    default void normalizeAll(float lerp) {
 
         int size = size();
         if (size == 0 || lerp < Priority.EPSILON)
@@ -127,18 +139,20 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         float max = priMax();
         if (Util.equals(min, max, Priority.EPSILON)) {
             //flatten all to 0.5
-            commit(x -> ((Priority)x).priLerp(0.5f, lerp));
+            commit(x -> ((Priority) x).priLerp(0.5f, lerp));
         } else {
             float range = max - min;
-            commit(x -> ((Priority)x).normalizePri(min, range, lerp));
+            commit(x -> ((Priority) x).normalizePri(min, range, lerp));
         }
     }
 
 
-    /** convenience macro for using sample(BagCursor).
+    /**
+     * convenience macro for using sample(BagCursor).
      * continues while either the predicate hasn't returned false and
-     * < max true's have been returned */
-    default Bag<K,V> sample(int max, Predicate<? super V> kontinue) {
+     * < max true's have been returned
+     */
+    default Bag<K, V> sample(int max, Predicate<? super V> kontinue) {
         final int[] count = {max};
         return sample((x) -> {
             return (kontinue.test(x) && ((count[0]--) > 0)) ?
@@ -146,17 +160,21 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         });
     }
 
-    /** convenience macro */
-    default Bag<K,V> sample(int max, Consumer<? super V> each) {
+    /**
+     * convenience macro
+     */
+    default Bag<K, V> sample(int max, Consumer<? super V> each) {
         return sample(max, Next, each);
     }
 
-    default Bag<K,V> pop(int max, Consumer<? super V> each) {
+    default Bag<K, V> pop(int max, Consumer<? super V> each) {
         return sample(max, BagCursorAction.Remove, each);
     }
 
-    /** convenience macro */
-    default Bag<K,V> sample(int max, BagCursorAction action, Consumer<? super V> each) {
+    /**
+     * convenience macro
+     */
+    default Bag<K, V> sample(int max, BagCursorAction action, Consumer<? super V> each) {
         final int[] count = {max};
         return sample((x) -> {
             each.accept(x);
@@ -164,6 +182,44 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         });
     }
 
+    @Nullable
+    default V maxBy(FloatFunction<V> rank) {
+        final float[] best = {Float.NEGATIVE_INFINITY};
+        final Object[] which = new Object[1];
+        forEach(x -> {
+            float y = rank.floatValueOf(x);
+            if (y > best[0]) {
+                best[0] = y;
+                which[0] = x;
+            }
+        });
+        return (V) which[0];
+    }
+
+    @FunctionalInterface
+    interface EarlyFailRanker<X> {
+        /**
+         * return the computed value or Float.NaN if it
+         * terminated early by deciding that the currently calculated
+         * value would never exceed the provided current best,
+         * which is initialized to NEGATIVE_INFINITY
+         */
+        public float floatValueOf(X x, float mustExceed);
+    }
+
+    @Nullable
+    default V maxBy(EarlyFailRanker<V> rank) {
+        final float[] best = {Float.NEGATIVE_INFINITY};
+        final Object[] which = new Object[1];
+        forEach(x -> {
+            float y = rank.floatValueOf(x, best[0]);
+            if ((y == y) && (y > best[0])) {
+                best[0] = y;
+                which[0] = x;
+            }
+        });
+        return (V) which[0];
+    }
 
     /**
      * The number of items in the bag
@@ -208,7 +264,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * @return Whether the Item is in the Bag
      */
     default boolean contains(@NotNull K it) {
-        return get(it)!=null;
+        return get(it) != null;
     }
 
     default boolean isEmpty() {
@@ -463,8 +519,11 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return x;
     }
 
-    /** double[histogramID][bin] */
-    @NotNull public static <X, Y> double[][] histogram(@NotNull Iterable<PLink<Y>> pp, @NotNull BiConsumer<PLink<Y>, double[][]> each, @NotNull double[][] d) {
+    /**
+     * double[histogramID][bin]
+     */
+    @NotNull
+    public static <X, Y> double[][] histogram(@NotNull Iterable<PLink<Y>> pp, @NotNull BiConsumer<PLink<Y>, double[][]> each, @NotNull double[][] d) {
 
         pp.forEach(y -> {
             each.accept(y, d);
@@ -508,7 +567,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
             return this;
         }
 
-        @Override public void clear() {        }
+        @Override
+        public void clear() {
+        }
 
         @Override
         public Object key(Object value) {

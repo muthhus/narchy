@@ -21,10 +21,7 @@ public interface Time extends Serializable {
 		/** called each cycle */
 	void cycle();
 
-	default void cycle(int ticks) {
-		for (int i = 0; i < ticks; i++)
-			cycle();
-	}
+
 
 	long elapsed();
 

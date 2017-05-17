@@ -45,7 +45,7 @@ public interface NARBuilder {
 
         Executioner exe =
                 //new SynchronousExecutor();
-                new MultiThreadExecutor(threads, 1024, sync);
+                new MultiThreadExecutor(threads);
 
         //exe = new InstrumentedExecutor(exe, 8);
 

@@ -527,8 +527,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             xSet(tSIZE, count);
 
             this.mass = mass;
-            this.min = min;
-            this.max = max;
+            if (count > 0) {
+                this.min = min;
+                this.max = max;
+            } else {
+                this.min = this.max = 0;
+            }
 
         } finally {
             //   busy.set(false);
