@@ -2,10 +2,8 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Task;
-import nars.table.HijackTemporalBeliefTable;
 import nars.table.HijackTemporalExtendedBeliefTable2;
 import nars.table.TemporalBeliefTable;
-import nars.task.SignalTask;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

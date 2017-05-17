@@ -13,7 +13,6 @@ import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
-import nars.term.obj.IntTerm;
 import nars.term.util.InvalidTermException;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -37,8 +36,8 @@ import static nars.time.Tense.XTERNAL;
 
 /**
  * Created by me on 5/29/16.
- * @see:
- *      RLP classes: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/RLP.java
+ *
+ * @see: RLP classes: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/RLP.java
  */
 public class IO {
 
@@ -199,9 +198,6 @@ public class IO {
                     return a; //just the term
             }
 
-            case INT:
-                return $.the(in.readInt());
-
             default:
 
                 String s = in.readUTF();
@@ -252,7 +248,7 @@ public class IO {
 
         if (term instanceof SerialCompound) {
             //it's already serialized in a SerialCompound
-            ((SerialCompound)term).appendTo(out);
+            ((SerialCompound) term).appendTo(out);
             return;
         }
 
@@ -268,9 +264,6 @@ public class IO {
 
         if (term instanceof Atomic) {
             switch (o) {
-                case INT:
-                    out.writeInt(((IntTerm) term).val);
-                    break;
                 case VAR_DEP:
                 case VAR_INDEP:
                 case VAR_QUERY:
@@ -323,7 +316,7 @@ public class IO {
     public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         int siz = in.readByte();
 
-        assert(siz < Param.COMPOUND_SUBTERMS_MAX);
+        assert (siz < Param.COMPOUND_SUBTERMS_MAX);
 
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
@@ -348,7 +341,7 @@ public class IO {
 
         if (o.image) {
             dt = in.readByte();
-            assert(dt >= 0);
+            assert (dt >= 0);
         } else if (o.temporal) {
             dt = in.readInt();
         } else {
@@ -445,8 +438,11 @@ public class IO {
         }
     }
 
-    /** WARNING */
-    @Nullable public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    /**
+     * WARNING
+     */
+    @Nullable
+    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTask(input(b), index);
         } catch (IOException e) {
@@ -457,8 +453,11 @@ public class IO {
         }
     }
 
-    /** WARNING */
-    @Nullable public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    /**
+     * WARNING
+     */
+    @Nullable
+    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
         try {
             return IO.readTerm(input(b), index);
         } catch (IOException e) {
@@ -625,7 +624,7 @@ public class IO {
 
             int dt = c.dt();
             boolean reversedDT;
-            if (c.op().commutative && dt!=XTERNAL && dt!=DTERNAL && dt < 0) {
+            if (c.op().commutative && dt != XTERNAL && dt != DTERNAL && dt < 0) {
                 reversedDT = true;
                 Term x = a;
                 a = b;
@@ -770,7 +769,7 @@ public class IO {
 
         new Utf8Writer(d).write(s);
 
-        o.writeShort( d.length() );
+        o.writeShort(d.length());
         d.appendTo(o);
     }
 
@@ -910,7 +909,8 @@ public class IO {
      */
 
 
-    @FunctionalInterface  public interface EachTerm {
+    @FunctionalInterface
+    public interface EachTerm {
         void nextTerm(Op o, int depth, int byteStart);
     }
 
@@ -926,7 +926,8 @@ public class IO {
         do {
 
             int termStart = i;
-            byte ob = term[i]; i++;
+            byte ob = term[i];
+            i++;
             Op o = Op.values()[ob];
             t.nextTerm(o, level, termStart);
 
@@ -934,14 +935,12 @@ public class IO {
             if (o.var) {
                 i += 1; //int id = input(term, i).readByte();
             } else if (o.atomic) {
-                if (o == INT) {
-                     i+=4; //32bit
-                } else {
-                    int hi = term[i++] & 0xff;
-                    int lo = term[i++] & 0xff;
-                    int utfLen = (hi << 8) | lo;
-                    i += utfLen;
-                }
+
+                int hi = term[i++] & 0xff;
+                int lo = term[i++] & 0xff;
+                int utfLen = (hi << 8) | lo;
+                i += utfLen;
+
             } else {
 
                 int subterms = term[i++];
@@ -951,7 +950,8 @@ public class IO {
 
             }
 
-            pop: while (level > 0) {
+            pop:
+            while (level > 0) {
                 byte[] ll = levels[level - 1];
                 byte subtermsRemain = ll[1];
                 if (subtermsRemain == 0) {
@@ -964,7 +964,7 @@ public class IO {
                     level--;
                     continue pop; //see if the next level up is finished
                 } else {
-                    ll[1] = (byte)(subtermsRemain - 1);
+                    ll[1] = (byte) (subtermsRemain - 1);
                     break; //continue to next subterm
                 }
             }

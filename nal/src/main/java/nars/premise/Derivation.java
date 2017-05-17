@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;

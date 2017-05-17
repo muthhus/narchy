@@ -72,7 +72,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     }
 
     private static byte ttl(Task x) {
-        return (byte)Util.lerp((1f + x.pri()) /* * (1f + x.qua())*/, 5, 2);
+        return (byte)Util.lerp((1f + x.priSafe(0)) /* * (1f + x.qua())*/, 5, 2);
     }
 
     @Override

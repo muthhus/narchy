@@ -21,17 +21,13 @@
 package nars.term;
 
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.TreeTraverser;
-import jcog.Texts;
 import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.obj.IntTerm;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
@@ -382,26 +378,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
     @Override
     default Term unneg() {
         return this;
-    }
-
-    @Deprecated
-    static int intValue(Term intTerm) {
-        if (intTerm instanceof IntTerm) {
-            return ((IntTerm) intTerm).val;
-        } else /*else /*if (x.op() == INT )*/ {
-            String xs = intTerm.toString();
-            return Integer.valueOf(xs);
-        }/* else {
-            throw new NumberFormatException(x + " is not an IntTerm");
-        }*/
-    }
-
-    static int intValue(Term intTerm, int ifNotInt) {
-        if (intTerm instanceof IntTerm) {
-            return ((IntTerm) intTerm).val;
-        } else /*else /*if (x.op() == INT )*/ {
-            return Texts.i(intTerm.toString(), ifNotInt);
-        }
     }
 
     default Term eval(TermContext index) {

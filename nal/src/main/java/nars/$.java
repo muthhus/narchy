@@ -6,24 +6,22 @@ import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
+import jcog.Texts;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.LambdaPred;
-import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.obj.IntTerm;
+import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.GenericVariable;
 import nars.term.var.VarPattern;
@@ -41,7 +39,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -127,11 +124,11 @@ public enum $ {
 
 
     @NotNull
-    public static IntTerm the(int i) {
+    public static Atom the(int i) {
         if (i >= 0 && i < MAX_CACHED_INTS) {
             return digits[i];
         } else {
-            return new IntTerm(i);
+            return new Atom(Integer.toString(i));
         }
     }
 
@@ -655,11 +652,11 @@ public enum $ {
 
 
     final static int MAX_CACHED_INTS = 16;
-    private static final IntTerm[] digits = new IntTerm[MAX_CACHED_INTS];
+    private static final Atom[] digits = new Atom[MAX_CACHED_INTS];
 
     static {
         for (int i = 0; i < MAX_CACHED_INTS; i++) {
-            digits[i] = new IntTerm(i);
+            digits[i] = new Atom(Integer.toString(i));
         }
     }
 
@@ -838,7 +835,7 @@ public enum $ {
     /**
      * static storeless term builder
      */
-    public static final StaticTermBuilder terms = new StaticTermBuilder();
+    public static final StaticTermIndex terms = new StaticTermIndex();
 
     /**
      * determines if the string is invalid as an unquoted term according to the characters present
@@ -874,7 +871,7 @@ public enum $ {
         int l = i.length;
         Term[] x = new Term[l];
         for (int j = 0; j < l; j++) {
-            x[j] = new IntTerm(i[j]);
+            x[j] = the(i[j]);
         }
         return x;
     }
@@ -1105,69 +1102,21 @@ public enum $ {
         });
     }
 
-    /** note: has an internal cache by extending the MaplikeTermIndex */
-    public static final class StaticTermBuilder extends /*Maplike*/TermIndex {
-
-//        public StaticTermBuilder() {
-//            super(new ConceptBuilder.NullConceptBuilder());
-//        }
-
-//        @Override
-//        protected Term the(ProtoCompound c) {
-////            if (Math.random() < 0.01f)
-////                System.out.println(build.summary());
-//            return super.the(c);
-//        }
-
-
-        @Override
-        public @NotNull ConceptBuilder conceptBuilder() {
-            return ConceptBuilder.Null;
+    public static int intValue(Term intTerm) throws NumberFormatException {
+        if (intTerm instanceof Atom) {
+            String xs = intTerm.toString();
+            return Texts.i(xs);
+        } else {
+            throw new NumberFormatException();
         }
+    }
 
-        @Override
-        public
-        @Nullable
-        Termed get(@NotNull Term t, boolean createIfMissing) {
-            return createIfMissing ? t : null;
+    public static int intValue(Term intTerm, int ifNotInt) {
+        if (intTerm instanceof Atom) {
+            return Texts.i(intTerm.toString(), ifNotInt);
+        } else {
+            return ifNotInt;
         }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-
-        @Override
-        public @NotNull String summary() {
-            return "";
-        }
-
-        @Override
-        public void remove(@NotNull Term entry) {
-
-        }
-
-
-        @Override
-        public void clear() {
-
-        }
-
-        @Override
-        public void forEach(Consumer<? super Termed> c) {
-
-        }
-
-
-        @Nullable
-        @Override
-        public void set(@NotNull Term s, Termed t) {
-            throw new UnsupportedOperationException();
-        }
-
-
-
     }
 
 

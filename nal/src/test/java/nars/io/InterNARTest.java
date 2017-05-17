@@ -10,11 +10,9 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.MultiThreadExecutor;
 import nars.util.exe.SynchronousExecutor;
 import org.junit.Test;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;

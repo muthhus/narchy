@@ -17,7 +17,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.Op.INT;
 import static nars.term.Terms.atomOrNull;
 import static nars.term.atom.Atomic.the;
 
@@ -126,10 +125,11 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     public static Concept f2Int(@NotNull String termAtom, @NotNull IntIntFunc ff) {
         return f2(fName(termAtom), (xt, yt) -> {
-            if ((xt.op() != INT) || (yt.op() != INT))
+            try {
+                return $.the(ff.apply($.intValue(xt), $.intValue(yt)));
+            } catch(NumberFormatException e) {
                 return null;
-            else
-                return $.the(ff.apply(Term.intValue(xt), Term.intValue(yt)));
+            }
         });
     }
 

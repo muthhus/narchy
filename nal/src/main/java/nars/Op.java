@@ -114,9 +114,7 @@ public enum Op {
     //-------------
     //NONE('\u2205', Op.ANY, null),
 
-    //    /** Termject */
-//    OBJECT("`", Op.ANY, OpType.Other),
-    INT("`i", Op.ANY_LEVEL, OpType.Other),
+
 
     VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 

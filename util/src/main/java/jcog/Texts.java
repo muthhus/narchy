@@ -377,7 +377,7 @@ public enum Texts {
     /**
      * fast parse an int under certain conditions, avoiding Integer.parse if possible
      */
-    public static int i(String s) {
+    public static int i(String s) throws NumberFormatException {
         if (s.length() == 1) {
             char c = s.charAt(0);
             int i = i(c);

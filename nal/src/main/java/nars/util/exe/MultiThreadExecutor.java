@@ -1,7 +1,6 @@
 package nars.util.exe;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
-import jcog.Util;
 import jcog.event.On;
 import nars.NAR;
 import org.jetbrains.annotations.NotNull;

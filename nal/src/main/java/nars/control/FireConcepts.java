@@ -3,7 +3,6 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
-import jcog.data.MutableInteger;
 import jcog.data.sorted.SortedArray;
 import jcog.event.On;
 import jcog.pri.PLink;
@@ -194,21 +193,21 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
             if (ttl == 0)
                 return; //idle
 
-            if (nar.exe.concurrent()) {
-                int remain = ttl;
-
-                int batchSize = (int) Math.ceil(remain / ((float)(nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR)));
-                while (remain > 0) {
-                    int nextBatchSize = Math.min(remain, batchSize);
-                    nar.runLater((n) -> {
-                        fire(csrc, nextBatchSize );
-                    });
-                    remain -= nextBatchSize;
-                }
-
-            } else {
+//            if (nar.exe.concurrent()) {
+//                int remain = ttl;
+//
+//                int batchSize = (int) Math.ceil(remain / ((float)(nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR)));
+//                while (remain > 0) {
+//                    int nextBatchSize = Math.min(remain, batchSize);
+//                    nar.runLater((n) -> {
+//                        fire(csrc, nextBatchSize );
+//                    });
+//                    remain -= nextBatchSize;
+//                }
+//
+//            } else {
                 fire(csrc, ttl);
-            }
+            //}
         }
 
 

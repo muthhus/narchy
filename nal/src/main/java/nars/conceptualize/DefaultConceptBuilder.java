@@ -23,8 +23,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.obj.Termject;
-import nars.term.obj.TermjectConcept;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -286,10 +284,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         } else {
 
-            if (term instanceof Termject) {
-                return withBags(term, (termbag, taskbag) ->
-                        new TermjectConcept((Termject) term, termbag, taskbag));
-            }
 
             if (term instanceof Variable) {
                 //final int s = this.serial;

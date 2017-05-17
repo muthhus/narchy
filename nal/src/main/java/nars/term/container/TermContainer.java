@@ -1,6 +1,5 @@
 package nars.term.container;
 
-import com.google.common.collect.TreeTraverser;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;

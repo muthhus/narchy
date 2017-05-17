@@ -5,7 +5,6 @@ import nars.nar.Default;
 import nars.task.util.TaskStatistics;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.obj.IntTerm;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
@@ -203,8 +202,12 @@ public class QuestionTest {
         Param.DEBUG = true;
 
         n.on("odd", a->{
-            if (a.size() == 1 && a.sub(0).op()== Op.INT) {
-                return ((IntTerm)a.sub(0)).val() % 2 == 0 ? Op.False : Op.True;
+            if (a.size() == 1 && a.sub(0).op()== Op.ATOM) {
+                try {
+                    return $.intValue(a.sub(0)) % 2 == 0 ? Op.False : Op.True;
+                } catch (NumberFormatException ignored) {
+
+                }
             }
             return null; //$.f("odd", a[0]); //vars, etc.
         });

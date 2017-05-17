@@ -2,13 +2,13 @@ package nars.web;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
+import nars.$;
 import nars.InterNAR;
 import nars.NAR;
 import nars.NARLoop;
 import nars.nar.NARBuilder;
 import nars.op.Command;
 import nars.term.Term;
-import nars.term.obj.IntTerm;
 import nars.time.RealTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +82,9 @@ public class NARWeb extends WebServer {
             float nextFPS = fps.floatValue();
             if (t.length>0) {
                 Term z = t[0];
-                if (z instanceof IntTerm) { //TODO handle float's
-                    fps.set(nextFPS = (float)( ((IntTerm) z).val));
-                }
+                int x = $.intValue(z, -1); //TODO handle float's
+                if (x >= 0)
+                    fps.set(nextFPS = x);
             }
             start(nar, l, nextFPS);
         });

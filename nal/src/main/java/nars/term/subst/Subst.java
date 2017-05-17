@@ -49,7 +49,6 @@ public interface Subst  {
         Op op = src.op();
         switch (op) {
             case ATOM:
-            case INT:
             case VAR_DEP:
             case VAR_INDEP:
             case VAR_QUERY:

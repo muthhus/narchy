@@ -49,7 +49,7 @@ public class SeqTest {
             n.on( new seqAdd());
             n.on(Functor.f2("seq", (key, index) -> {
                 if (key.vars()==0 && index.vars()==0) {
-                    int i = Term.intValue(index, Integer.MIN_VALUE);
+                    int i = $.intValue(index, Integer.MIN_VALUE);
                     if (i!=Integer.MIN_VALUE) {
                         CircularArrayList<Term> c = seqs.get(key);
                         if (c!=null) {

@@ -1,12 +1,9 @@
 package nars.io;
 
 import jcog.Texts;
-
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class TextsTest {

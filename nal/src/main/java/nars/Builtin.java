@@ -10,15 +10,11 @@ import nars.op.data.*;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
-import nars.term.obj.IntTerm;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
-
-import java.util.Arrays;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
@@ -60,65 +56,20 @@ public class Builtin {
 //                    --(x diff y) && --(y diff x) )),
 
             Functor.f2("subterm", (Term x, Term index) -> {
-                if (x instanceof Compound && index instanceof IntTerm) {
-                    return ((Compound) x).sub(((IntTerm) index).val);
+                try {
+                    if (x instanceof Compound && index instanceof Atom) {
+                        return ((Compound) x).sub($.intValue(index));
+                    }
+                } catch (NumberFormatException ignored) {
                 }
-                return x;
+                return null;
             }),
 
             Functor.f2Int("add", (x, y) -> x + y),
             //Functor.f2Int("sub", (x, y) -> x - y),
 
 
-            Functor.f1("quote", x -> x), //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
-
-            /** slice(<compound>,<selector>)
-            selector :-
-            a specific integer value index, from 0 to compound size
-            (a,b) pair of integers, a range of indices */
-            Functor.f("slice", (args) -> {
-                if (args.size() == 2) {
-                    Compound x = compoundOrNull(args.sub(0));
-                    if (x != null) {
-                        int len = x.size();
-
-                        Term index = args.sub(1);
-                        Op o = index.op();
-                        if (o == INT) {
-                            //specific index
-                            int i = ((IntTerm) index).val;
-                            if (i >= 0 && i < len)
-                                return x.sub(i);
-                            else
-                                return False;
-
-                        } else if (o == PROD && index.size() == 2) {
-                            Term start = ((Compound) index).sub(0);
-                            if (start.op() == INT) {
-                                Term end = ((Compound) index).sub(1);
-                                if (end.op() == INT) {
-                                    int si = ((IntTerm) start).val;
-                                    if (si >= 0 && si < len) {
-                                        int ei = ((IntTerm) end).val;
-                                        if (ei >= 0 && ei <= len) {
-                                            if (si == ei)
-                                                return Terms.ZeroProduct;
-                                            if (si < ei) {
-                                                return $.p(Arrays.copyOfRange(x.toArray(), si, ei));
-                                            }
-                                        }
-                                    }
-                                    //TODO maybe reverse order will return reversed subproduct
-                                    return False;
-                                }
-                            }
-
-                        }
-                    }
-                }
-                return null;
-            })
-
+            Functor.f1("quote", x -> x) //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
     };
 
     /**
@@ -144,9 +95,8 @@ public class Builtin {
                         if (index instanceof Variable)
                             return null;
 
-                        if (index instanceof IntTerm) {
-                            which = ((IntTerm) index).val;
-                        } else {
+                        which = $.intValue(index, -1);
+                        if (which < 0) {
                             return null;
                         }
                     } else {
@@ -248,6 +198,56 @@ public class Builtin {
             //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
 
         });
+
+
+//            /** slice(<compound>,<selector>)
+//            selector :-
+//            a specific integer value index, from 0 to compound size
+//            (a,b) pair of integers, a range of indices */
+//            Functor.f("slice", (args) -> {
+//                if (args.size() == 2) {
+//                    Compound x = compoundOrNull(args.sub(0));
+//                    if (x != null) {
+//                        int len = x.size();
+//
+//                        Term index = args.sub(1);
+//                        Op o = index.op();
+//                        if (o == INT) {
+//                            //specific index
+//                            int i = ((IntTerm) index).val;
+//                            if (i >= 0 && i < len)
+//                                return x.sub(i);
+//                            else
+//                                return False;
+//
+//                        } else if (o == PROD && index.size() == 2) {
+//                            Term start = ((Compound) index).sub(0);
+//                            if (start.op() == INT) {
+//                                Term end = ((Compound) index).sub(1);
+//                                if (end.op() == INT) {
+//                                    int si = ((IntTerm) start).val;
+//                                    if (si >= 0 && si < len) {
+//                                        int ei = ((IntTerm) end).val;
+//                                        if (ei >= 0 && ei <= len) {
+//                                            if (si == ei)
+//                                                return Terms.ZeroProduct;
+//                                            if (si < ei) {
+//                                                return $.p(Arrays.copyOfRange(x.toArray(), si, ei));
+//                                            }
+//                                        }
+//                                    }
+//                                    //TODO maybe reverse order will return reversed subproduct
+//                                    return False;
+//                                }
+//                            }
+//
+//                        }
+//                    }
+//                }
+//                return null;
+//            })
+//
+//    };
 
 
 //                Functor.f0("help", () -> {
