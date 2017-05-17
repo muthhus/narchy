@@ -1,12 +1,10 @@
 package nars.derive.meta;
 
-import jcog.pri.Priority;
 import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermIndex;
 import nars.op.DepIndepVarIntroduction;
 import nars.premise.Derivation;
-import nars.premise.TruthPuncEvidence;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -114,9 +112,6 @@ public final class Conclude extends AbstractPred<Derivation> {
 
         TermIndex index = d.index;
 
-        TruthPuncEvidence ct = d.punct;
-        if (ct == null)
-            return;
 
         Term b0 = this.conclusionPattern;
 
@@ -137,7 +132,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         if (c1 != null) {
 
 
-            Truth truth = ct.truth;
+            Truth truth = d.concTruth;
 
             @NotNull final long[] occ;
 
@@ -237,7 +232,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                 c2v = c2;
             }
 
-            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, ct.punc, d.index);
+            byte concPunc = d.concPunc;
+            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, concPunc, d.index);
             if (c3n != null) {
                 if (c3n.getTwo())
                     truth = truth.negated();
@@ -246,9 +242,9 @@ public final class Conclude extends AbstractPred<Derivation> {
                 long end = occ[1];
 
                 Compound c3 = c3n.getOne();
-                Priority priority = d.budgeting.budget(d, c3, truth, ct.punc, start, end);
+                float priority = d.budgeting.budget(d, c3, truth, concPunc, start, end);
 
-                if (priority != null) {
+                if (priority == priority) {
 
                     if (end < start) { //why?
                         long s = start; start = end; end = s; //swap
@@ -256,8 +252,8 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                     DerivedTask t =
                             new DerivedTask.DefaultDerivedTask(
-                                    c3, truth, ct.punc,
-                                    ct.evidence, d, nar.time(), start, end);
+                                    c3, truth, concPunc,
+                                    d.concEvidence, d, d.time, start, end);
 
                     t.setPri(priority);
 

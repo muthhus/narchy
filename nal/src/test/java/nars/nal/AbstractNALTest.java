@@ -73,7 +73,6 @@ public abstract class AbstractNALTest {
 
                     d.nal(level);
                     d.termVolumeMax.setValue(36);
-                    d.deriver.rate.setValue(0.05f);
                     return d;
                 }
         ));

@@ -81,15 +81,6 @@ public abstract class MaplikeTermIndex extends TermIndex {
 
 
     @Override
-    protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
-//        if (subterms.length == 1 && dt == DTERNAL) {
-//            if (subterms[0].vars() == 0 && subterms[0].varPattern() == 0)
-//                return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
-//        }
-        return newCompound(op, dt, intern(subterms));
-    }
-
-    @Override
     public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u) {
         if (u.length < 2)
             return super.the(op, dt, u);

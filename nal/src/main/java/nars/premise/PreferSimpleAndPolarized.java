@@ -19,6 +19,7 @@ import static nars.Op.*;
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     public final FloatParam polarityFactor = new FloatParam(0.75f, 0f, 1f);
+
     public final FloatParam belief = new FloatParam(1f, 0f, 2f);
     public final FloatParam goal = new FloatParam(1f, 0f, 2f);
     public final FloatParam question = new FloatParam(1f, 0f, 2f);
@@ -56,11 +57,9 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
 
     @Override
-    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
+    public float budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
 
         float p = d.premise.pri();
-
-
 
         if (truth!=null) { //belief and goal:
             float polarityFactor = this.polarityFactor.floatValue();
@@ -76,7 +75,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
         p *= opFactor(conclusion).floatValue();
 
-        return $.b(p);
+        return p;
     }
 
 //    static float polarizationFactor(@Nullable Truth truth) {
@@ -131,9 +130,11 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
             1f -
                 //(float)Math.sqrt(
+                Util.sqr(
                     Util.unitize(
                         ((float)derivedComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
-                //)
+                    )
+                    //)
                     //Math.max(0, (float)(derivedComplexity - parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity))
                     //((float) parentComplexity) / (parentComplexity + derivedComplexity)
                     //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))

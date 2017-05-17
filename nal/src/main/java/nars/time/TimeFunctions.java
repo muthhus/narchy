@@ -375,7 +375,7 @@ public interface TimeFunctions {
     }
 
     static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Compound x) {
-        if ((x != null) && p.task.isGoal() && p.punct.punc == GOAL && (occReturn[0] != ETERNAL)) {
+        if ((x != null) && p.task.isGoal() && p.concPunc == GOAL && (occReturn[0] != ETERNAL)) {
             long taskStart = p.task.start();
 
 

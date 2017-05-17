@@ -275,7 +275,7 @@ public class RevisionTest {
 
 
         float beliefAfter2;
-        assertEquals(2.0f, beliefAfter2 = b.priSum(), 0.1f /* large delta to allow for forgetting */);
+        assertEquals(1.0f, beliefAfter2 = b.priSum(), 0.1f /* large delta to allow for forgetting */);
 
         //assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 

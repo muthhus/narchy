@@ -2,7 +2,6 @@ package nars.derive.meta;
 
 import nars.Op;
 import nars.premise.Derivation;
-import nars.premise.TruthPuncEvidence;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
@@ -31,7 +30,19 @@ abstract public class Solve extends AbstractPred<Derivation> {
     }
 
 
-    final boolean measure(@NotNull Derivation m, byte punct) {
+    final boolean measure(@NotNull Derivation m, byte punc) {
+        if (!_measure(m, punc)) {
+//            m.truth(
+//                    null,
+//                    (byte)0,
+//                    null
+//            );
+            return false;
+        } else {
+            return true;
+        }
+    }
+    final boolean _measure(@NotNull Derivation m, byte punct) {
 
         boolean single;
         Truth t;
@@ -91,9 +102,11 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 throw new Op.InvalidPunctuationException(punct);
         }
 
-        m.punct = (new TruthPuncEvidence(t, punct,
-                single ? m.evidenceSingle() : m.evidenceDouble()
-        ));
+        m.truth(
+            t,
+            punct,
+            single ? m.evidenceSingle() : m.evidenceDouble()
+        );
         return true;
     }
 

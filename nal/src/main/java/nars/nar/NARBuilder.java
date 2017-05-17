@@ -83,7 +83,7 @@ public interface NARBuilder {
 
                 //new NullTermIndex(cb)
 
-                new CaffeineIndex(cb, /* -1 */ maxConcepts * 3 /* by weight */, -1, exe)
+                new CaffeineIndex(cb, /* -1 */ maxConcepts * 6 /* by weight */, -1, exe)
                     //null /* null = fork join common pool */
 
 
@@ -210,7 +210,7 @@ public interface NARBuilder {
 
         nar.termVolumeMax.setValue(64);
 
-        nar.beliefConfidence(0.9f);
+        nar.beliefConfidence(0.85f);
         nar.goalConfidence(0.75f);
 
         float p = 0.5f;

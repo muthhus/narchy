@@ -35,9 +35,14 @@ abstract public class Derivation extends Unify implements TermContext {
 
     @NotNull public final NAR nar;
     @NotNull public final DerivationBudgeting budgeting;
-    @Nullable public TruthPuncEvidence punct;
     public float truthResolution;
     public float confMin;
+
+    @Nullable public Truth concTruth = null;
+    public byte concPunc = 0;
+    @Nullable public long[] concEvidence = null;
+
+
 
     /**
      * the current premise being evaluated in this context TODO make private again
@@ -70,6 +75,8 @@ abstract public class Derivation extends Unify implements TermContext {
     public  int termSub0Struct;
     public  int termSub1Struct;
 
+    /** current NAR time, set at beginning of derivation */
+    public long time = ETERNAL;
 
     @Nullable
     public  Truth taskTruth;
@@ -101,6 +108,7 @@ abstract public class Derivation extends Unify implements TermContext {
     private substitute _substitute;
     private substituteIfUnifiesAny _substituteIfUnifiesAny;
     private substituteIfUnifiesDep _substituteIfUnifiesDep;
+
 
     public Derivation(@NotNull NAR nar,
                       DerivationBudgeting b,
@@ -155,9 +163,17 @@ abstract public class Derivation extends Unify implements TermContext {
 
     }
 
+    /** set in Solve once these (3) conclusion parameters have been determined */
+    public void truth(Truth truth, byte punc, long[] evidence) {
+        this.concTruth = truth;
+        this.concPunc = punc;
+        this.concEvidence = evidence;
+    }
+
     @NotNull public Derivation restart(@NotNull Premise p, int ttl) {
 
         assert(ttl >= 0);
+
 
 //        if (now()!=0)
 //            throw new RuntimeException("not cleared");
@@ -181,7 +197,12 @@ abstract public class Derivation extends Unify implements TermContext {
 //        }
         //xy.map.clear();
 
-        punct = null;
+        this.time = nar.time();
+
+        this.concTruth = null;
+        this.concPunc = 0;
+        this.concEvidence = null;
+
         forEachMatch = null;
         termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
 

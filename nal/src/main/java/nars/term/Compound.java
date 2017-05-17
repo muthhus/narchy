@@ -836,8 +836,8 @@ public interface Compound extends Term, IPair, TermContainer {
             if (modified) {
                 return
                     index.the(op(), dt(), evalSubs)
-                    /*$.terms.the(op(), dt(), evalSubs) //evaluate in static context to absolutely avoid memoization?
-                             */
+                    //$.terms.the(op(), dt(), evalSubs) //evaluate in static context to absolutely avoid memoization?
+
                         .eval(index);
             }
         }

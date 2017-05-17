@@ -19,7 +19,6 @@ public class NARBenchmark {
     public void prepare() {
 
         n = new Default();
-        n.deriver.rate.setValue(0.05f);
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);

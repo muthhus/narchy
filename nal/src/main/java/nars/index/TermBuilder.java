@@ -3,6 +3,7 @@ package nars.index;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.match.Ellipsislike;
+import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -286,7 +287,7 @@ public abstract class TermBuilder {
     }
 
     protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
-        if (subterms.length==1 && dt == DTERNAL) {
+        if (!(this instanceof PatternTermIndex) /* HACK */ && subterms.length==1 && dt == DTERNAL) {
             return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
         }
         return newCompound(op, dt, intern(subterms));
@@ -296,7 +297,7 @@ public abstract class TermBuilder {
      * directly constructs a new instance, applied at the end.
      */
     protected Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
-         if (subterms.size()==1 && dt == DTERNAL) {
+        if (!(this instanceof PatternTermIndex) /* HACK */ && subterms.size()==1 && dt == DTERNAL) {
             return new UnitCompound1(op, subterms.sub(0)); //HACK avoid creating the TermContainer if possible
         }
         return new GenericCompound(op, dt, subterms);

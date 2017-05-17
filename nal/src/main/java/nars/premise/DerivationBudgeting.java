@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface DerivationBudgeting {
 
-    /** return null to cancel a derivation */
-    Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end);
+    /** return NaN to cancel a derivation */
+    float budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end);
 
 }
