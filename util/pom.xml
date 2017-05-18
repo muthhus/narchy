@@ -136,10 +136,10 @@
         <!--</dependency>-->
 
 
-        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-all -->
+        <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm-tree -->
         <dependency>
             <groupId>org.ow2.asm</groupId>
-            <artifactId>asm</artifactId>
+            <artifactId>asm-debug-all</artifactId>
             <version>6.0_ALPHA</version>
         </dependency>
 
