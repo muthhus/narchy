@@ -112,13 +112,13 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    protected Stream<Task> predict(long next) {
+    protected Stream<Task> predictions(long next) {
         return Stream.concat(
            Stream.concat(
                W.input(),
                R.input()
            ),
-           super.predict(next)
+           super.predictions(next)
         );
     }
 

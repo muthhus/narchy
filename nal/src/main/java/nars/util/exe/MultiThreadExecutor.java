@@ -6,6 +6,7 @@ import jcog.event.On;
 import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
+import nars.concept.SensorConcept;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,8 @@ public class MultiThreadExecutor extends Executioner {
     }
 
     protected void forget(Task task) {
-        task.delete();
+        if (!(task instanceof SensorConcept))
+            task.delete();
 
     }
 

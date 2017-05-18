@@ -520,7 +520,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
         NAgentX.chart(a);
-        a.runCycles(5, 10000);
+        a.runRT(10, 10000);
 
         //nar.index.print(System.out);
         n.forEachTask(System.out::println);

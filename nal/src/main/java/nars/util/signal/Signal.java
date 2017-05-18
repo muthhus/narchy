@@ -62,8 +62,12 @@ public class Signal {
             last = now;
         this.lastInputTime = now;
 
-        if (this.current != null)
-            this.current.setEnd(now);
+        if (this.current != null) {
+            this.current.setEnd((now+last)/2);
+            if (now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)) {
+                this.current = null;
+            }
+        }
 
         Task previous = current;
 
@@ -79,8 +83,8 @@ public class Signal {
             //merge existing signal
 
 
-            if (current != null && (now - lastInputTime < (nar.dur() * MAX_PERCEPT_DURATIONS)) &&
-                    current.truth.equals(nextTruth, resolution.asFloat())) {
+
+            if (current != null && current.truth.equals(nextTruth, resolution.asFloat())) {
 //                if (residualBudgetFactor > 0) {
 //                    current.budget(residualBudgetFactor, nar); //rebudget
 //                    current.setEnd(next);
@@ -93,14 +97,11 @@ public class Signal {
 
 
                 t = task(term, nextTruth,
-                        now, now,
+                    (now+last)/2, now,
                         previous, stamper.getAsLong(), nar);
-
-                if (t != null)
-                    t.budget(nar);
-
             }
 
+            t.priMax(pri.asFloat() * deltaFactor(previous, t.truth()));
 
 
             return (this.current = t);
@@ -114,11 +115,7 @@ public class Signal {
 
 
         SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
-        s.setPri(pri.asFloat() * deltaFactor(previous, t));
 
-        //float changeFactor = prevV==prevV ? Math.abs(v - prevV) : 1f /* if prevV == NaN */;
-        //s.budgetByTruth( Math.max(Param.BUDGET_EPSILON*2, changeFactor * pri.asFloat())  /*(v, now, prevF, lastInput)*/);
-        //.log(this);
         return s;
     }
 
@@ -127,12 +124,11 @@ public class Signal {
      * TODO revise
      */
     protected float deltaFactor(@Nullable Truthed a, Truth b) {
-        return 1f;
+        //return 1f;
 
-//        if (a == null)
-//            return 1f;
-//
-//        return Math.abs(a.freq() - b.freq());
+        if (a == null)
+            return 1f;
+        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));
     }
 
     @NotNull

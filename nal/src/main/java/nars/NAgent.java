@@ -74,9 +74,10 @@ abstract public class NAgent implements NSense, NAct {
     public final FloatParam predictAheadDurs = new FloatParam(2, 1, 32);
 
 
-    public final FloatParam predictorProbability = new FloatParam(1f);
+    //public final FloatParam predictorProbability = new FloatParam(1f);
     private final Mix.MixStream<String, Task> sense;
     private final Mix.MixStream<String, Task> ambition;
+    private final Mix.MixStream<String, Task> predict;
     private final Mix.MixStream<String, Task> motor;
 
 
@@ -146,6 +147,7 @@ abstract public class NAgent implements NSense, NAct {
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
+        this.predict = nar.mix.stream(id + " predict");
         this.motor = nar.mix.stream(id + " motor");
     }
 
@@ -208,7 +210,9 @@ abstract public class NAgent implements NSense, NAct {
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public void cycle() {
+
+    /** predict() is not called here, do that separately, probably at a higher framerate than the sensorimotor loop */
+    protected void senseAndMotor() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
         if (!busy.compareAndSet(false, true)) {
@@ -235,8 +239,6 @@ abstract public class NAgent implements NSense, NAct {
                     //+(dur * 3 / 2);
                     ;
 
-
-            ambition.input(predict(next), nar::input);
             ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
 
             motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
@@ -253,6 +255,10 @@ abstract public class NAgent implements NSense, NAct {
             busy.set(false);
         }
 
+    }
+
+    protected void predict() {
+        predict.input(predictions(now), nar::input);
     }
 
     /** provides the stream of the environment's next sensory percept tasks */
@@ -446,14 +452,14 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    public NAgent runCycles(final int totalCycles) {
+    @Deprecated public NAgent runCycles(final int totalCycles) {
         return runCycles(nar.dur(), totalCycles);
     }
 
     /**
      * synchronous execution
      */
-    public NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
+    @Deprecated public NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
 
         init();
 
@@ -466,7 +472,7 @@ abstract public class NAgent implements NSense, NAct {
                 return; //only execute at most one agent frame per duration
             }
 
-            cycle();
+            senseAndMotor();
             if (frameRemain[0]-- == 0)
                 stop();
         });
@@ -497,35 +503,63 @@ abstract public class NAgent implements NSense, NAct {
         Pair<NARLoop, Timer> p = Tuples.pair(nar.loop(), t);
         //p.getOne().join();
 
+
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                cycle();
+                senseAndMotor();
             }
         }, 0, Math.round(1000f / fps));
+
+        new Periodic(nar, t, fps, this::senseAndMotor);
+        new Periodic(nar, t, fps/2f, this::predict);
+
 
         return p;
 
     }
 
+    public static class Periodic extends TimerTask {
 
-    protected Stream<Task> predict(long next) {
+        //private final FloatParam fps = new FloatParam(0);
+        private final Runnable run;
+        private final NAR nar;
+        //final AtomicBoolean busy = new AtomicBoolean(false);
+
+        public Periodic(NAR nar, Timer t, float fps, Runnable run) {
+            //fps.setValue(initialFPS);
+            this.run = run;
+            this.nar = nar;
+            t.scheduleAtFixedRate(this, 0, Math.round(1000f / fps));
+        }
+
+        @Override
+        public void run() {
+//            if (!busy.compareAndSet(false, true)) {
+//                return; //black-out, the last frame didnt even finish yet
+//            }
+
+            nar.runLater(run);
+        }
+
+
+    }
+
+
+    protected Stream<Task> predictions(long now) {
 
 
         int dur = nar.dur();
+
         int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
 
         //long frameDelta = now-prev;
 
         int num = predictors.size();
 
-        float pp = predictorProbability.floatValue();
+        long next = now + nar.dur()/2;
 
-        return IntStream.range(0, num).mapToObj(i -> {
-            if (nar.random().nextFloat() > pp)
-                return null;
-
-            Task x = predictors.get(i);
+        return predictors.stream().map(x -> {
             if (x != null) {
                 Task y = predict(x, next, horizon);
 //                if (x != y && x!=null) {
