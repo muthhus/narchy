@@ -35,7 +35,7 @@ public class Pri implements Priority {
 
 
     @Nullable
-    @Override
+    @Deprecated @Override
     public Priority clone() {
         float p = pri;
         return p != p /* deleted? */ ? null : new Pri(p);
@@ -71,14 +71,14 @@ public class Pri implements Priority {
 
 
 
-    public boolean equals(Object that) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int hashCode() {
-        throw new UnsupportedOperationException();
-     }
+//    public boolean equals(Object that) {
+//        throw new UnsupportedOperationException();
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        throw new UnsupportedOperationException();
+//     }
 
     /**
      * Fully display the BudgetValue

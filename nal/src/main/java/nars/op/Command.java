@@ -4,7 +4,7 @@ import jcog.bag.Bag;
 import nars.*;
 import nars.concept.AtomConcept;
 import nars.concept.PermanentConcept;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -54,7 +54,7 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
 
 
     static Task task(Compound content, long when) {
-        return new ImmutableTask(content, Op.COMMAND, null, when, when, when, new long[] { });
+        return new NALTask(content, Op.COMMAND, null, when, when, when, new long[] { });
     }
 
     public static Task logTask(@NotNull Term content) {

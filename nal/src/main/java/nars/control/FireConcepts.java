@@ -3,10 +3,8 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
-import jcog.data.sorted.SortedArray;
 import jcog.event.On;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import nars.Focus;
 import nars.NAR;
 import nars.Param;
@@ -17,37 +15,40 @@ import nars.premise.Derivation;
 import nars.premise.DerivationBudgeting;
 import nars.premise.Premise;
 import nars.premise.PremiseBuilder;
-import nars.task.DerivedTask;
+import nars.task.AbstractTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Term;
+import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
 import static jcog.bag.Bag.BagCursorAction.Stop;
 
 
 /**
- * controls an active focus of concepts
+ * fires sampled active focus concepts
  */
-abstract public class FireConcepts implements Runnable {
+public class FireConcepts implements Runnable {
 
-    static final float BATCHING_GRANULARITY_DIVISOR = 3; //additional dividing factor to increase granularity
 
     public final DerivationBudgeting budgeting;
     public final Deriver deriver;
 
 
+    private final ThreadLocal<FireConcepts.DirectDerivation> derivation;
+
+    final int MISFIRE_COST = 1;
+    int premiseCost = Param.BeliefMatchTTL;
+    int linkSampleCost = 1;
+
+
     /**
      * in TTL per cycle
      */
-    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, ( 256 * 1024));
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (256 * 1024));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -71,241 +72,106 @@ abstract public class FireConcepts implements Runnable {
 //        }
 //    }
 
-    /**
-     * returns ttl consumed
-     */
-    int fire(PLink<Concept> pc, FireConceptsDirect.MyDerivation d) {
+    public class ConceptFire extends AbstractTask {
 
-        float cPri = pc.priSafe(0);
-        final int startTTL = Util.lerp(cPri, Param.UnificationTTLMax, Param.UnificationTTLMin);
-        int ttl = startTTL;
-
-        Concept c = pc.get();
-        c.tasklinks().commit();//.normalize(0.1f);
-        c.termlinks().commit();//.normalize(0.1f);
-        nar.terms.commit(c);
+        private final Concept c;
 
 
-
-        int premiseCost = Param.BeliefMatchTTL;
-        int linkSampleCost = 1;
-        int derivedTaskCost = 3;
-
-        Random rng = nar.random();
-
-        @Nullable PLink<Task> tasklink = null;
-        @Nullable PLink<Term> termlink = null;
-        float taskLinkPri = -1f, termLinkPri = -1f;
-
-        int derivedTasks = d.buffer.size();
-
-        /**
-         * this implements a pair of roulette wheel random selectors
-         * which have their options weighted according to the normalized
-         * termlink and tasklink priorities.  normalization allows the absolute
-         * range to be independent which should be ok since it is only affecting
-         * the probabilistic selection sequence and doesnt affect derivation
-         * budgeting directly.
-         */
-        d.restartA();
-        while (ttl > 0) {
-            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                tasklink = c.tasklinks().sample();
-                ttl -= linkSampleCost;
-                if (tasklink == null)
-                    break;
-
-                taskLinkPri = c.tasklinks().normalizeMinMax(tasklink.priSafe(0));
-                d.restartB(tasklink.get());
-            }
-
-
-            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                termlink = c.termlinks().sample();
-                ttl -= linkSampleCost;
-                if (termlink == null)
-                    break;
-                termLinkPri = c.termlinks().normalizeMinMax(termlink.priSafe(0));
-            }
-
-            if (ttl <= premiseCost)
-                break; //not enough remaining to create premise
-
-            Premise p = PremiseBuilder.premise(c, tasklink, termlink, d.time, nar, -1f);
-            ttl -= premiseCost; //failure of premise generation still causes cost
-
-            if (p != null) {
-
-                int start = ttl;
-
-
-
-                int ttlRemain = deriver.run(d, p, ttl); assert (start >= ttlRemain);
-
-                ttl -= (start - ttlRemain);  if (ttl <= 0) break;
-
-                int nextDerivedTasks = d.buffer.size();
-                int numDerived = nextDerivedTasks - derivedTasks;
-                ttl -= numDerived * derivedTaskCost;
-                derivedTasks = nextDerivedTasks;
-
-            }
+        public ConceptFire(Concept concept, float pri) {
+            super(pri);
+            this.c = concept;
         }
 
-
-        return startTTL - ttl;
-    }
-
-
-
-    /**
-     * directly inptus each result upon derive, for single-thread
-     */
-    public static class FireConceptsDirect extends FireConcepts {
-
-        public static final Logger logger = LoggerFactory.getLogger(FireConceptsDirect.class);
-
-        private final ThreadLocal<FireConceptsDirect.MyDerivation> derivation =
-                ThreadLocal.withInitial(()->
-                    new MyDerivation(budgeting, nar)
-                );
-
-        public FireConceptsDirect(Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
-            this(nar.focus(), deriver, budgeting, nar);
-        }
-
-        public FireConceptsDirect(Focus focus, Deriver deriver, DerivationBudgeting budgeting, @NotNull NAR nar) {
-            super(focus, deriver, budgeting, nar);
+        public int ttlMax() {
+            float pri = pri();
+            if (pri!=pri) //deleted
+                return -1;
+            return Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin);
         }
 
         @Override
-        public void fire() {
+        public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
-            float load = nar.exe.load();
-//            if (load > 0.9f) {
-//                logger.error("overload {}", load);
-//                return;
-//            }
-
-            ConceptBagFocus csrc = (ConceptBagFocus) source;
-
-            int ttl = /*Math.min(csrc.active.size(), */(int) Math.ceil(rate.floatValue() * (1f - load) );
-            if (ttl == 0)
-                return; //idle
-
-//            if (nar.exe.concurrent()) {
-//                int remain = ttl;
-//
-//                int batchSize = (int) Math.ceil(remain / ((float)(nar.exe.concurrency() * BATCHING_GRANULARITY_DIVISOR)));
-//                while (remain > 0) {
-//                    int nextBatchSize = Math.min(remain, batchSize);
-//                    nar.runLater((n) -> {
-//                        fire(csrc, nextBatchSize );
-//                    });
-//                    remain -= nextBatchSize;
-//                }
-//
-//            } else {
-                fire(csrc, ttl);
-            //}
-        }
+            int ttl = ttlMax();
+            if (ttl <= 0)
+                return; //??
 
 
-        private static class MyDerivation extends Derivation {
-            final Map<Task, Task> buffer = new LinkedHashMap();
+            c.tasklinks().commit();//.normalize(0.1f);
+            c.termlinks().commit();//.normalize(0.1f);
+            nar.terms.commit(c);
 
-            //private final MutableInteger maxInputTasksPerDerivation = new MutableInteger(-1);
 
-            public MyDerivation(DerivationBudgeting b, NAR nar) {
-                super(nar, b, Param.UnificationStackMax);
-            }
 
-            @Override
-            public void derive(Task x) {
-//                buffer.merge(x, x, (prev, next) -> {
-//                    PriMerge.avg.merge(prev, next);
-//                    return prev;
-//                });
-                nar.input(x);
-            }
 
-//            void commit(/*int derivations*/) {
-//                if (!buffer.isEmpty()) {
-//                    //int mPerDeriv = maxInputTasksPerDerivation.intValue();
-//                    //int max = mPerDeriv * derivations;
-//                    //if (mPerDeriv == -1 || buffer.size() <= max) {
-//                        nar.input(buffer.values());
-//                    //} else {
-//                    //    nar.input(top(buffer, max));
-//                    //}
-//
-//
-//                    buffer.clear();
-//                }
-//            }
-        }
 
-        static Iterable<Task> top(Map<Task, Task> m, int max) {
-            SortedArray<Task> sa = new SortedArray<>(new Task[max]);
-            m.values().forEach(x -> {
-                if (sa.size() >= max) {
-                    if (sa.last().pri() > x.pri()) {
-                        return; //too low priority
-                    } else {
-                        sa.removeLast(); //remove current last
-                    }
+            @Nullable PLink<Task> tasklink = null;
+            @Nullable PLink<Term> termlink = null;
+            float taskLinkPri = -1f, termLinkPri = -1f;
+
+
+            FireConcepts.DirectDerivation d = derivation.get();
+
+
+            /**
+             * this implements a pair of roulette wheel random selectors
+             * which have their options weighted according to the normalized
+             * termlink and tasklink priorities.  normalization allows the absolute
+             * range to be independent which should be ok since it is only affecting
+             * the probabilistic selection sequence and doesnt affect derivation
+             * budgeting directly.
+             */
+            d.restartA();
+            while (ttl > 0) {
+                if (tasklink == null || (d.random.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+                    tasklink = c.tasklinks().sample();
+                    ttl -= linkSampleCost;
+                    if (tasklink == null)
+                        break;
+
+                    taskLinkPri = c.tasklinks().normalizeMinMax(tasklink.priSafe(0));
+                    d.restartB(tasklink.get());
                 }
-                sa.add(x, z -> -z.pri());
-//                while (sa.size() > max)
-//                    sa.removeLast();
-            });
-            assert (sa.size() <= max);
-            return sa;
-        }
 
-        //long start = nanoTime();
-        //long end = nanoTime();
-        //double dt = (end - start) / ((float)nextBatchSize);
-        //rate.hitNano(dt);
 
-        public void fire(ConceptBagFocus csrc, final int startTTL) {
-            MyDerivation dd = derivation.get();
+                if (termlink == null || (d.random.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+                    termlink = c.termlinks().sample();
+                    ttl -= linkSampleCost;
+                    if (termlink == null)
+                        break;
+                    termLinkPri = c.termlinks().normalizeMinMax(termlink.priSafe(0));
+                }
 
-            final int[] curTTL = { startTTL };
+                if (ttl <= premiseCost)
+                    break; //not enough remaining to create premise
 
-            csrc.active.commit(null);
+                Premise p = PremiseBuilder.premise(c, tasklink, termlink, d.time, nar, -1f);
+                ttl -= premiseCost; //failure of premise generation still causes cost
 
-            float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
-            float mass = ((HijackBag)csrc.active).mass;
-            float priDecayFactor =
-                    //1f - (((float)csrc.active.size()) / csrc.active.capacity());
-                    Util.unitize(
-                    1f - mass / (mass + idealMass)
-                    );
+                if (p != null) {
 
-            final int[] sampled = {0};
+                    int start = ttl;
 
-            csrc.active.sample( p -> {
-                int ttlConsumed = fire(p, dd);
-                sampled[0]++;
-                p.priMult(priDecayFactor);
-                curTTL[0]-=ttlConsumed;
-                return curTTL[0] > 0 ? Next : Stop;
-            });
 
-//            logger.info(
-//                "{} {}",
-//                dd, Thread.currentThread()
-//            );
-//            logger.info(
-//                "\t{} TTL budgeted -> {} sampled priDecayFactor={} -> {} derived tasks",
-//                startTTL, sampled[0], priDecayFactor, dd.buffer.size()
-//            );
+                    int ttlRemain = deriver.run(d, p, ttl);
+                    assert (start >= ttlRemain);
 
-            //dd.commit();
+                    ttl -= (start - ttlRemain);
+                    if (ttl <= 0) break;
+
+//                    int nextDerivedTasks = d.buffer.size();
+//                    int numDerived = nextDerivedTasks - derivedTasks;
+//                    ttl -= numDerived * derivedTaskCost;
+//                    derivedTasks = nextDerivedTasks;
+
+                }
+            }
+
+
         }
 
     }
+
 
     public FireConcepts(@NotNull Focus source, Deriver dderiver, DerivationBudgeting bbudgeting, NAR nar) {
 
@@ -315,17 +181,76 @@ abstract public class FireConcepts implements Runnable {
         this.nar = nar;
         this.source = source;
 
+        this.derivation =
+                ThreadLocal.withInitial(() ->
+                        new FireConcepts.DirectDerivation(budgeting, nar)
+                );
+
         this.on = nar.onCycle(this);
     }
 
     @Override
     public void run() {
-        if (((ConceptBagFocus) this.source).active
-                .commit(null).size() > 0)
-            fire();
+
+        float load = 0f;
+                //nar.exe.load();
+//            if (load > 0.9f) {
+//                logger.error("overload {}", load);
+//                return;
+//            }
+
+        ConceptBagFocus csrc = (ConceptBagFocus) source;
+        if (((ConceptBagFocus) this.source).active.commit(null).size() == 0)
+            return; //no concepts
+
+        final int[] curTTL = {(int) Math.ceil(rate.floatValue() * (1f - load))};
+        if (curTTL[0] == 0)
+            return; //idle
+
+        float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
+        float mass = ((HijackBag) csrc.active).mass;
+        float priDecayFactor =
+                //1f - (((float)csrc.active.size()) / csrc.active.capacity());
+                Util.unitize(
+                        1f - mass / (mass + idealMass)
+                );
+
+
+        final int[] fired = {0};
+        csrc.active.sample(pc -> {
+
+            ConceptFire cf = new ConceptFire(pc.get(), pc.priSafe(0));
+            fired[0]++;
+            nar.input(cf);
+
+            pc.priMult(priDecayFactor);
+            int ttlMax = cf.ttlMax();
+            if (ttlMax < 0)
+                ttlMax = MISFIRE_COST;
+
+            curTTL[0] -= ttlMax;
+            return curTTL[0] > 0 ? Next : Stop;
+        });
+
+
     }
 
-    abstract protected void fire();
+
+    private static class DirectDerivation extends Derivation {
+
+
+        public DirectDerivation(DerivationBudgeting b, NAR nar) {
+            super(nar, b);
+        }
+
+        @Override
+        public void derive(Task x) {
+            nar.input(x);
+        }
+
+    }
+
+
 }
 
 //    /**

@@ -4,6 +4,7 @@ import jcog.list.ArraySharingList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -83,17 +84,18 @@ public class ArrayTopic<V> extends ArraySharingList<Consumer<V>> implements Topi
     }
 
     @Override
-    public void emitAsync(V arg, ExecutorService exe) {
+    public void emitAsync(V arg, Executor exe) {
         Consumer[] vv = getCachedNullTerminatedArray();
         if (vv != null) {
             for (int i = 0; ; ) {
                 Consumer c = vv[i++];
-                if (c != null) {
-                    exe.submit(()-> {
-                        try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
-                    });
-                } else
+                if (c == null)
                     break; //null terminator hit
+
+                exe.execute(()-> {
+                    //try {  c.accept(arg);  } catch (Exception e) {  logger.warn("{}: {}", c, e); }
+                    c.accept(arg);
+                });
             }
         }
 

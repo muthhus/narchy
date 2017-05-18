@@ -27,7 +27,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * Created by me on 2/24/17.
  */
-public class ImmutableTask extends Pri implements Task {
+public class NALTask extends Pri implements Task {
 
     public final Compound term;
     public final DiscreteTruth truth;
@@ -39,7 +39,7 @@ public class ImmutableTask extends Pri implements Task {
     public Map meta;
 
 
-    public ImmutableTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
+    public NALTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
         if ((punc == BELIEF) || (punc == GOAL)) {
             if (truth == null)
@@ -255,7 +255,7 @@ public class ImmutableTask extends Pri implements Task {
 //    }
 
     public Task clone(Compound x) {
-        ImmutableTask t = new ImmutableTask(x, punc, truth, creation, start(), end(), stamp);
+        NALTask t = new NALTask(x, punc, truth, creation, start(), end(), stamp);
         t.setPri(this);
         return t;
     }

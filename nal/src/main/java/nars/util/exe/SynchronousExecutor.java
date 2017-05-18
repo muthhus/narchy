@@ -3,6 +3,7 @@ package nars.util.exe;
 import com.google.common.collect.MinMaxPriorityQueue;
 import nars.NAR;
 import nars.Task;
+import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -49,7 +50,7 @@ public class SynchronousExecutor extends Executioner {
     }
 
     @Override
-    public final void run(@NotNull Runnable r) {
+    public final void runLater(@NotNull Runnable r) {
         //pending.add/*Last*/(r);
 
         //try {
@@ -60,7 +61,7 @@ public class SynchronousExecutor extends Executioner {
     }
 
 
-    @Override public void run(@NotNull Task input) {
+    @Override public void run(@NotNull ITask input) {
         input.run(nar);
     }
 

@@ -10,10 +10,12 @@ import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
@@ -33,10 +35,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    private final int maxDepth;
+    @Deprecated private final int maxDepth; //TODO subtract from this then it wont need stored
 
-
-    final ObjectFloatHashMap<Termed> spread;
 
 
     /**
@@ -73,19 +73,13 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
      */
     private static final float TERMLINK_BALANCE = 0.5f;
 
+    transient private ObjectFloatHashMap<Termed> spread;
+
 
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, @NotNull Concept c, @NotNull NAR nar, float scale) {
-        this(in, scale, c, activationMapThreadLocal.get(), nar);
-    }
-
-
-    /**
-     * unidirectional task activation procedure
-     */
-    public SpreadingActivation(@NotNull Task in, float scale, @NotNull Concept origin, ObjectFloatHashMap<Termed> spread, @NotNull NAR nar) {
+    public SpreadingActivation(@NotNull Task in, @NotNull Concept origin, @NotNull NAR nar, float scale) {
         super(in, origin, nar);
 
 
@@ -98,16 +92,25 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         this.maxDepth = levels((Compound)originTerm);
 
-        this.spread = spread;
-        spread.clear();
 
-        link(origin, 1f, 0);
 
-        spread.forEachKeyValue(this);
-
-        nar.emotion.stress(linkOverflow);
     }
 
+    @Override
+    public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+
+        spread = activationMapThreadLocal.get();
+        try {
+
+            link(origin, 1f, 0);
+
+            spread.forEachKeyValue(this);
+
+            nar.emotion.stress(linkOverflow);
+        } finally {
+            spread.clear();
+        }
+    }
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
@@ -154,13 +157,6 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             default:
                 throw new UnsupportedOperationException("unhandled operator type: " + host.op());
         }
-    }
-
-    public static Activation activate(Task t, @NotNull NAR n, @NotNull Concept c, float scale) {
-        //return new DepthFirstActivation(input, this, nar, nar.priorityFactor.floatValue());
-
-        //float s = scale * (0.5f + 0.5f * pri(c, 1));
-        return new SpreadingActivation(t, c, n, scale);
     }
 
     @Override

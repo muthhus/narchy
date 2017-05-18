@@ -14,7 +14,7 @@ import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.table.EternalTable;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
@@ -246,7 +245,7 @@ abstract public class NAgent implements NSense, NAct {
 
             sense.input(sense(nar, next), nar::input);
 
-            eventFrame.emit(this);
+            eventFrame.emitAsync(this, nar.exe);
 
             if (trace)
                 logger.info(summary());
@@ -504,12 +503,6 @@ abstract public class NAgent implements NSense, NAct {
         //p.getOne().join();
 
 
-        t.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                senseAndMotor();
-            }
-        }, 0, Math.round(1000f / fps));
 
         new Periodic(nar, t, fps, this::senseAndMotor);
         new Periodic(nar, t, fps/2f, this::predict);
@@ -670,7 +663,7 @@ abstract public class NAgent implements NSense, NAct {
 
         term = nar.terms.normalize(term);
 
-        return new ImmutableTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
+        return new NALTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
     }
 
     public final float alpha() {

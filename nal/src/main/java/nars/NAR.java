@@ -16,7 +16,8 @@ import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
 import nars.table.BeliefTable;
-import nars.task.ImmutableTask;
+import nars.task.ITask;
+import nars.task.NALTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -25,7 +26,6 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
@@ -241,7 +241,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     public void clear() {
         synchronized (exe) {
-            runLater(() -> eventReset.emit(this));
+            eventReset.emit(this);
         }
     }
 
@@ -516,7 +516,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             throw new InvalidTaskException(term, "insufficient confidence");
         }
 
-        Task y = new ImmutableTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
+        Task y = new NALTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
         y.setPri(pri);
 
         input(y);
@@ -541,7 +541,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-                new ImmutableTask(term, punc, null,
+                new NALTask(term, punc, null,
                         time(), when, when,
                         new long[]{time.nextStamp()}
                 ).budget(this)
@@ -578,7 +578,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * returns the Concept (non-null) if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final void input(@NotNull Task input) {
+    public final void input(@NotNull ITask input) {
 
         //try {
 
@@ -1101,7 +1101,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        exe.run(t);
+        exe.runLater(t);
     }
 
     /**
@@ -1131,31 +1131,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
     }
 
-    public final void runLater(@NotNull Consumer<NAR> t) {
-        exe.run(t);
-    }
-
-
-    //    @Nullable
-//    public Future runAsync(@NotNull Runnable t, int maxRunsPerFrame) {
-//        final Semaphore s = new Semaphore(0);
-//        onFrame(nn -> {
-//            int a = s.availablePermits();
-//            if (a < maxRunsPerFrame)
-//                s.release(1); //maxRunsPerFrame-a);
-//        });
-//        return runAsync(() -> {
-//            while (true) {
-//                try {
-//                    s.acquire();
-//                    t.run();
-//                } catch (Throwable e) {
-//                    e.printStackTrace();
-//                    //...then try again
-//                }
-//            }
-//        });
-//    }
 
     @NotNull
     @Override
@@ -1163,22 +1138,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return self() + ":" + getClass().getSimpleName();
     }
 
-
-//    /**
-//     * inputs the question and observes answer events for a solution
-//     */
-//    @NotNull
-//    public NAR onAnswer(@NotNull Task questionOrQuest, @NotNull Consumer<Task> c) {
-//        new AnswerReaction(this, questionOrQuest) {
-//
-//            @Override
-//            public void onSolution(Task belief) {
-//                c.accept(belief);
-//            }
-//
-//        };
-//        return this;
-//    }
 
     @NotNull
     public NAR input(@NotNull String... ss) throws NarseseException {

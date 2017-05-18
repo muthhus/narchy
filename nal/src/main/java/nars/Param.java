@@ -74,7 +74,7 @@ public abstract class Param  {
      */
     public static final int STAMP_CAPACITY = 12;
 
-    public final static int UnificationStackMax = 128;
+    public final static int UnificationStackMax = 64;
     public static final int UnificationConstraintsMax = 6;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 

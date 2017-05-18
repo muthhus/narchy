@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 2/12/17.
  */
-public class SignalTask extends ImmutableTask {
+public class SignalTask extends NALTask {
 
     /** because this is an input task, its hash and equality will not depend on this value so it is free to change to represent a growing duration */
     public long slidingEnd;

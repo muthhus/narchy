@@ -1,7 +1,7 @@
 package nars.task.util;
 
 import nars.*;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
@@ -119,7 +119,7 @@ public class TaskRule extends TaskMatch {
         if (!Task.taskContentValid(y, X.punc(), nar, true))
             return;
 
-        Task Y = ((ImmutableTask)X).clone(y);
+        Task Y = ((NALTask)X).clone(y);
         if (Y != null) {
             logger.info("{}\t{}", X, Y);
             nar.input(Y);

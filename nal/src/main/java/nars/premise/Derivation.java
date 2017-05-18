@@ -112,9 +112,8 @@ abstract public class Derivation extends Unify implements TermContext {
 
 
     public Derivation(@NotNull NAR nar,
-                      DerivationBudgeting b,
-                      int stack) {
-        super(nar.terms, VAR_PATTERN, nar.random(), stack, 0);
+                      DerivationBudgeting b) {
+        super(nar.terms, VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
         this.nar = nar;
         this.budgeting = b;
 

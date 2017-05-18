@@ -11,6 +11,7 @@ import nars.nar.NARBuilder;
 import nars.task.util.TaskStatistics;
 import nars.term.atom.Atomic;
 import nars.time.FrameTime;
+import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
 import nars.video.Bitmap2D;
@@ -511,7 +512,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new FrameTime().dur(15);
+        Time clock = new RealTime.DSHalf().durFPS(10f);
         NAR n =
                 NARBuilder.newMultiThreadNAR(3, clock);
 

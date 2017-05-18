@@ -7,16 +7,12 @@ import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
-import nars.attention.Activation;
 import nars.attention.SpreadingActivation;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-import nars.task.DerivedTask;
-import nars.task.ImmutableTask;
-import nars.task.Tasked;
-import nars.task.TruthPolation;
+import nars.task.*;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
@@ -54,10 +50,7 @@ import static nars.truth.TruthFunctions.w2c;
  * <p>
  * TODO decide if the Sentence fields need to be Reference<> also
  */
-public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority {
-
-
-    byte punc();
+public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
 
     @Override
@@ -732,12 +725,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     @Nullable
-    static ImmutableTask clone(@NotNull Task x, long created, long start, long end) {
+    static NALTask clone(@NotNull Task x, long created, long start, long end) {
         Priority b = x.priority().clone(); //snapshot its budget
         if (b.isDeleted())
             return null;
 
-        ImmutableTask y = new ImmutableTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
+        NALTask y = new NALTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
         y.setPri(b);
         //        if (srcCopy == null) {
 //            delete();
@@ -756,7 +749,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
     }
 
     @Nullable
-    static ImmutableTask clone(@NotNull Task x, @NotNull Compound newContent) {
+    static NALTask clone(@NotNull Task x, @NotNull Compound newContent) {
 
         boolean negated = (newContent.op() == NEG);
         if (negated) {
@@ -765,7 +758,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
                 return null;
         }
 
-        ImmutableTask y = new ImmutableTask(newContent, x.punc(),
+        NALTask y = new NALTask(newContent, x.punc(),
                 x.isBeliefOrGoal() ? (DiscreteTruth) x.truth().negIf(negated) : null,
                 x.creation(),
                 x.start(), x.end(),
@@ -914,6 +907,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         else return s - t;
     }
 
+    @Override
     default void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
         float inputPri = this.priSafe(-1);
@@ -937,7 +931,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
 
                 if (!x.equals(y)) {
-                    ImmutableTask inputY = clone(this, y);
+                    NALTask inputY = clone(this, y);
                     assert (inputY != null);
 
                     delete(); //transfer control to clone
@@ -968,22 +962,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         Task accepted = c.process(this, n);
         if (accepted != null) {
 
-            Activation a = SpreadingActivation.activate(accepted, n, c, 1f);
-
             if (this == accepted || !this.equals(accepted)) {
 
                 n.terms.commit(c);
 
                 if (!isInput()) //dont count direct input as learning
-                    n.emotion.learn(accepted.pri(), volume());
+                    n.emotion.learn(accepted.pri(), accepted.volume());
 
                 n.eventTaskProcess.emit(/*post*/accepted);
 
-                // SUCCESSFULLY PROCESSED
-
             }
 
-            // ACTIVATED BUT NOT ACCEPTED: dont proceeed further, just this re-activation
+            n.input( new SpreadingActivation(accepted, c, n, 1f) );
 
         } else {
 

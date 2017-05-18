@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 /**
  * Question task which accepts a callback to be invoked on answers
  */
-public class LambdaQuestionTask extends ImmutableTask {
+public class LambdaQuestionTask extends NALTask {
 
     private @NotNull final BiConsumer<? super LambdaQuestionTask /* Q */, Task /* A */ > eachAnswer;
 

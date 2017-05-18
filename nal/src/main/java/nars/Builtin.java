@@ -157,7 +157,7 @@ public class Builtin {
         nar.on("error", (Operator) (a, t, n) -> NAR.logger.error("{}", t));
 
         nar.on("reset", (Operator) (op, args1, nn) ->
-                nn.runLater(NAR::reset)
+                nn.runLater(nn::reset)
         );
 
         nar.on("clear", (Operator) (op, args, n) -> {

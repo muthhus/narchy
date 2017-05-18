@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 7/3/16.
  */
-public class AnswerTask extends ImmutableTask {
+public class AnswerTask extends NALTask {
 
 
 //    @Nullable

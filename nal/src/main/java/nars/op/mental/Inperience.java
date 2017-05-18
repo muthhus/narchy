@@ -8,7 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -229,7 +229,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
                     end = task.end();
                 }
 
-                ImmutableTask e = new ImmutableTask(
+                NALTask e = new NALTask(
                         r,
                         BELIEF,
                         new DiscreteTruth(1, nar.confDefault(BELIEF)),

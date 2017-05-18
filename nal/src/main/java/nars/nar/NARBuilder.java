@@ -205,7 +205,7 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(Param.UnificationTTLMax * 32);
+        nar.deriver.rate.setValue(Param.UnificationTTLMax * 4);
 
         nar.termVolumeMax.setValue(64);
 

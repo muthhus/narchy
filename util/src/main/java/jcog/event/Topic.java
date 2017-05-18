@@ -5,6 +5,7 @@ package jcog.event;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -105,7 +106,7 @@ public interface Topic<V> {
 
     boolean isEmpty();
 
-    void emitAsync(V inputted, ExecutorService e);
+    void emitAsync(V inputted, Executor e);
 
 //    String name();
 

@@ -391,73 +391,73 @@ public class KIFInput implements Runnable {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        Param.DEBUG = true;
-
-
-
-
-
-
-        Default e = new Default();
-
-        NAR d = new Terminal();
-        KIFInput k = new KIFInput(d, "/home/me/sumo/Merge.kif");
-        k.run();
-
-        //(($_#AGENT,#OBJECT)-->needs)==>($_#AGENT,#OBJECT)-->wants)).
-        //String rules = "((%AGENT,%OBJECT)-->needs), %X |- ((%AGENT,%OBJECT)-->wants), (Belief:Identity)\n";
-
-
-        TrieDeriver miniDeriver =
-                //new TrieDeriver(PremiseRuleSet.rules(false, "nal6.nal"));
-                TrieDeriver.get(new PremiseRuleSet(
-                        k.impl.parallelStream().map(tt -> {
-                            try {
-                                return PremiseRuleSet.parse(tt.getOne() + ", () |- " + tt.getTwo() + ", (Belief:Identity)\n");
-                            } catch (Exception e1) {
-                                //e1.printStackTrace();
-                                return null;
-                            }
-                        }).filter(Objects::nonNull).toArray(PremiseRule[]::new)
-                ) );
-
-
-        miniDeriver.print(System.out);
-
-        //d.clear();
-        e.log();
-
-        PreferSimpleAndPolarized budgeting = new PreferSimpleAndPolarized();
-
-        e.onTask(t -> {
-           if (t.isInput()) {
-               //d.forEachTask(b -> {
-                   miniDeriver.test(new Derivation(
-                           e,
-                           budgeting,
-                           Param.UnificationStackMax
-                   ) {
-                       @Override
-                       public void derive(Task x) {
-                           e.input(x);
-                       }
-                   }.restartC(new Premise( t, Terms.ZeroProduct, null, 1f), Param.UnificationTTLMax));
-               //});
-           }
-        });
-        e.input("[Physical]:X.");
-        e.input("[Atom]:Y.");
-        e.input("[Electron]:E.");
-        e.input("[Proton]:P.");
-        e.input("contains(X,Y).");
-        e.input("([Integer]:1 && [Integer]:3).");
-        e.input("starts(A,B).");
-        e.input("[GovernmentFn]:A.");
-        e.input("[WealthFn]:B.");
-        e.run(500);
-//        d.conceptsActive().forEach(System.out::println);
-        //d.concept("[Phrase]").print();
-
-    }
+//    public static void main(String[] args) throws Exception {
+//        Param.DEBUG = true;
+//
+//
+//
+//
+//
+//
+//        Default e = new Default();
+//
+//        NAR d = new Terminal();
+//        KIFInput k = new KIFInput(d, "/home/me/sumo/Merge.kif");
+//        k.run();
+//
+//        //(($_#AGENT,#OBJECT)-->needs)==>($_#AGENT,#OBJECT)-->wants)).
+//        //String rules = "((%AGENT,%OBJECT)-->needs), %X |- ((%AGENT,%OBJECT)-->wants), (Belief:Identity)\n";
+//
+//
+//        TrieDeriver miniDeriver =
+//                //new TrieDeriver(PremiseRuleSet.rules(false, "nal6.nal"));
+//                TrieDeriver.get(new PremiseRuleSet(
+//                        k.impl.parallelStream().map(tt -> {
+//                            try {
+//                                return PremiseRuleSet.parse(tt.getOne() + ", () |- " + tt.getTwo() + ", (Belief:Identity)\n");
+//                            } catch (Exception e1) {
+//                                //e1.printStackTrace();
+//                                return null;
+//                            }
+//                        }).filter(Objects::nonNull).toArray(PremiseRule[]::new)
+//                ) );
+//
+//
+//        miniDeriver.print(System.out);
+//
+//        //d.clear();
+//        e.log();
+//
+//        PreferSimpleAndPolarized budgeting = new PreferSimpleAndPolarized();
+//
+//        e.onTask(t -> {
+//           if (t.isInput()) {
+//               //d.forEachTask(b -> {
+//                   miniDeriver.test(new Derivation(
+//                           e,
+//                           budgeting,
+//                           Param.UnificationStackMax
+//                   ) {
+//                       @Override
+//                       public void derive(Task x) {
+//                           e.input(x);
+//                       }
+//                   }.restartC(new Premise( t, Terms.ZeroProduct, null, 1f), Param.UnificationTTLMax));
+//               //});
+//           }
+//        });
+//        e.input("[Physical]:X.");
+//        e.input("[Atom]:Y.");
+//        e.input("[Electron]:E.");
+//        e.input("[Proton]:P.");
+//        e.input("contains(X,Y).");
+//        e.input("([Integer]:1 && [Integer]:3).");
+//        e.input("starts(A,B).");
+//        e.input("[GovernmentFn]:A.");
+//        e.input("[WealthFn]:B.");
+//        e.run(500);
+////        d.conceptsActive().forEach(System.out::println);
+//        //d.concept("[Phrase]").print();
+//
+//    }
 }

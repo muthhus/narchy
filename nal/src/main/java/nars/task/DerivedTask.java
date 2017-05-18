@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * TODO extend an ImmutableTask class
  */
-abstract public class DerivedTask extends ImmutableTask {
+abstract public class DerivedTask extends NALTask {
 
     @Nullable public transient Premise premise;
 

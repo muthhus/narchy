@@ -2,7 +2,7 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Task;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
@@ -47,7 +47,7 @@ public class BeliefActionConcept extends ActionConcept {
             DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
                 long now = nar.time();
-                return new ImmutableTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
+                return new NALTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
             }
         }
 

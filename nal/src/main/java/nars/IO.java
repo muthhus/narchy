@@ -5,7 +5,7 @@ import jcog.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
 import nars.index.term.TermIndex;
-import nars.task.ImmutableTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -50,7 +50,7 @@ public class IO {
 
 
     @NotNull
-    public static ImmutableTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static NALTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
 
 
         Compound preterm = compoundOrNull(readTerm(in, t));
@@ -74,7 +74,7 @@ public class IO {
 
         long cre = in.readLong();
 
-        ImmutableTask mm = new ImmutableTask(term, punc, truth, cre, start, end, evi);
+        NALTask mm = new NALTask(term, punc, truth, cre, start, end, evi);
         mm.setPri(pri);
         return mm;
     }

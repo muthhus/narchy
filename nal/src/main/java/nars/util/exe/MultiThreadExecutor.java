@@ -1,22 +1,22 @@
 package nars.util.exe;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.AffinityExecutor;
 import jcog.event.On;
 import jcog.pri.Priority;
 import nars.NAR;
-import nars.Task;
-import nars.concept.SensorConcept;
+import nars.task.ITask;
+import nars.task.NALTask;
+import org.apache.commons.collections4.bag.HashBag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
+
+import static nars.Op.COMMAND;
 
 /**
  * Created by me on 8/16/16.
@@ -26,39 +26,36 @@ public class MultiThreadExecutor extends Executioner {
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
 
-    private final DisruptorBlockingQueue passive;
-    private final AffinityExecutor active;
+    //private final ArrayBlockingQueue<Runnable> passive;
+    private final ForkJoinPool passive;
+
+    final ConcurrentSkipListSet<ITask> active = new ConcurrentSkipListSet(Priority.COMPARATOR);
+    private final AffinityExecutor activeExec;
+
     private final int concurrency;
 
+    final int maxActive = 1024;
 
-    //private CPUThrottle throttle;
 
-    //
-//    private final DisruptorBlockingQueue queue;
-//    private final AffinityExecutor exe;
-//    private final Runnable worker;
-//    private Consumer<NAR> cycle;
-//    private int cap;
     private On onReset;
-    //private Loop loop;
 
-    final int maxPending = 1024;
-    final AtomicInteger numPending = new AtomicInteger(); //because skiplist size() is slow
-    final LongAdder added = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
-    final ConcurrentSkipListSet<Task> pending = new ConcurrentSkipListSet(Priority.COMPARATOR);
+    final AtomicInteger numActive = new AtomicInteger(); //because skiplist size() is slow
+    final LongAdder input = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
+
 
     @Override
-    public void run(@NotNull Task t) {
-        if (t.isCommand()) {
-            run(() -> t.run(nar));
+    public void run(@NotNull ITask t) {
+        if (t.punc()==COMMAND) {
+            runLater(() -> t.run(nar));
         } else {
-            if (pending.add(t)) {
-                int p = numPending.incrementAndGet();
-                if (p > maxPending) {
+            input.increment();
+            if (active.add(t)) {
+                int p = numActive.incrementAndGet();
+                if (p > maxActive) {
 
                     do {
-                        if (numPending.compareAndSet(p, p - 1)) {
-                            Task forgotten = pending.pollFirst(); //remove lowest
+                        if (numActive.compareAndSet(p, p - 1)) {
+                            ITask forgotten = active.pollFirst(); //remove lowest
                             if (forgotten != null) {
                                 forgot.increment();
                                 forget(forgotten);
@@ -66,28 +63,39 @@ public class MultiThreadExecutor extends Executioner {
                         } else {
                             break;
                         }
-                    } while ((p = numPending.get()) > maxPending);
+                    } while ((p = numActive.get()) > maxActive);
                 }
-                added.increment();
             }
         }
     }
 
-    protected void forget(Task task) {
-        if (!(task instanceof SensorConcept))
-            task.delete();
-
+    protected void forget(ITask task) {
+        task.delete();
     }
 
+
     @Override
-    public void run(Runnable cmd) {
-        //exe.execute(cmd);
-        execute(cmd);
+    public void runLater(Runnable cmd) {
+        passive.execute(cmd);
     }
 
     @Override
     public void run(@NotNull Consumer<NAR> r) {
-        execute(() -> r.accept(nar));
+        this.passive.execute(new RunNAR(r));
+    }
+
+    final class RunNAR implements Runnable {
+
+        private final Consumer<NAR> run;
+
+        public RunNAR(@NotNull Consumer<NAR> r) {
+            this.run = r;
+        }
+
+        @Override
+        public void run() {
+            run.accept(nar);
+        }
     }
 
     //    @Override
@@ -135,36 +143,30 @@ public class MultiThreadExecutor extends Executioner {
 
         this.concurrency = activeThreads + passiveThreads;
 
-        this.passive = new DisruptorBlockingQueue(512);
+        this.passive =
+                new ForkJoinPool(passiveThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
+//                new ThreadPoolExecutor(passiveThreads, passiveThreads,
+//                        1, TimeUnit.MINUTES, passive);
+        //passiveExec.prestartAllCoreThreads();
 
-        exe = //new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true);
-                //Executors.newFixedThreadPool(threads);
-                new ThreadPoolExecutor(passiveThreads, passiveThreads,
-                        1, TimeUnit.MINUTES,
-                        passive
-                );
-        exe.prestartAllCoreThreads();
-
-        this.active = new AffinityExecutor("exe");
-        active.work(() -> { //worker thread
+        this.activeExec = new AffinityExecutor("exe");
+        activeExec.work(() -> { //worker thread
 
             while (true) {
                 try {
 
-                    Task next = pending.pollLast(); //highest, because the comparator is descending
+                    ITask next = active.pollLast(); //highest, because the comparator is descending
                     if (next == null) {
                         Thread.yield();
                         continue;
                     }
-                    numPending.decrementAndGet();
+                    numActive.decrementAndGet();
+                    executed.increment();
 
                     next.run(nar);
 
-                    executed.increment();
-
                 } catch (Throwable e) {
                     logger.error("{}", e);
-                    continue;
                 }
             }
         }, activeThreads);
@@ -177,24 +179,15 @@ public class MultiThreadExecutor extends Executioner {
 
 
     @Override
-    public void execute(Runnable pooled) {
-        //exe.execute(pooled);
-
-        if (!passive.offer(pooled))
-            pooled.run();
-
-    }
-
-    @Override
     public void start(@NotNull NAR nar) {
-        synchronized (exe) {
+        synchronized (nar) {
 //            cap = queue.capacity();
 //
 //            exe.work(worker, threads);
 
             onReset = nar.eventReset.on((n) -> {
                 if (isRunning()) {
-                    synchronized (exe) {
+                    synchronized (nar) {
                         stop();
                         start(n);
                     }
@@ -202,48 +195,34 @@ public class MultiThreadExecutor extends Executioner {
             });
 
             super.start(nar);
-//            loop = new Loop(50) {
-//
-//                @Override
-//                public boolean next() {
-//                    //sync
-//                    //queue.
-//                    nar.cycle();
-//
-//                    return true;
-//                }
-//            };
-
         }
 
     }
 
-    final ThreadPoolExecutor exe;
-
-
     @Override
     public void stop() {
 
-        synchronized (exe) {
+        synchronized (nar) {
 
             if (onReset != null) {
                 onReset.off();
                 onReset = null;
             }
 
-            //exe.shutdown();
+            active.clear();
+            activeExec.stop();
+            passive.shutdownNow();
 
             super.stop();
         }
-
 
     }
 
     @Override
     public final float load() {
         //ForkJoinPool.commonPool().getActiveThreadCount()
-        //return 0f;
-        return 1f - ((float) passive.remainingCapacity()) / passive.capacity();
+        return ((float)this.numActive.get()) / maxActive;
+        //return 1f - ((float) passive.remainingCapacity()) / passive.capacity();
 
 //        int remaining = (int) ring.remainingCapacity();
 //        if (remaining < safetyLimit)
@@ -262,29 +241,25 @@ public class MultiThreadExecutor extends Executioner {
 
 
         System.out.println(
-                added.sumThenReset() + " added, " +
-                        executed.sum() + " executed, " +
-                        forgot.sum() + " forgot, " +
-                        numPending.longValue() + " pending");
 
+                input.sumThenReset() + " input, " +
+                executed.sumThenReset() + " executed, " +
+                forgot.sumThenReset() + " forgot, " +
+                numActive.longValue() + " active, "
 
-        //throw new UnsupportedOperationException("Real-time mode only");
+                //+ passive
+        );
+        System.out.println(activeProfile());
 
-
-//        if (load() > 0.5f) {
-//            Util.sleep(10);
-//            return;
+//        while (numActive.get() > 0) {
+//            Thread.yield();
 //        }
+        while (!passive.awaitQuiescence(100, TimeUnit.MILLISECONDS)) {
+            logger.warn("awaiting {} passive processes", passive.getQueuedTaskCount());
+        }
 
 
-//        try {
-//            exe.awaitTermination(1000, TimeUnit.MILLISECONDS);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        while (queue.remainingCapacity()<queue.capacity()/2) {
-//            Util.sleep(100);
-//        }
+
 
         Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
         if (vv != null) {
@@ -296,6 +271,20 @@ public class MultiThreadExecutor extends Executioner {
                 run(c);
             }
         }
+    }
+
+    private HashBag<String> activeProfile() {
+        HashBag<String> h = new HashBag();
+        active.forEach(x -> {
+            String key;
+            if (x instanceof NALTask) {
+                key = Character.toString((char)((NALTask) x).punc);
+            } else {
+                key = x.getClass().getSimpleName();
+            }
+            h.add(key);
+        });
+        return h;
     }
 
 

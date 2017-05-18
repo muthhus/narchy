@@ -232,7 +232,7 @@ public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, T
             tFinal = null;
         }
 
-        ImmutableTask i = new ImmutableTask(term, punc, tFinal, creation, start, end, evidence);
+        NALTask i = new NALTask(term, punc, tFinal, creation, start, end, evidence);
         i.setPri(this);
         //        if (srcCopy == null) {
 //            delete();

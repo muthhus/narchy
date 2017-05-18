@@ -1,6 +1,7 @@
 package jcog.event;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
@@ -32,7 +33,7 @@ public class ListTopic<V> extends ArrayList<Consumer<V>> implements Topic<V> {
     }
 
     @Override
-    public void emitAsync(V v, ExecutorService executorService) {
+    public void emitAsync(V v, Executor executorService) {
         throw new UnsupportedOperationException();
     }
 

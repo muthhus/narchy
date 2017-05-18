@@ -2,6 +2,7 @@ package nars.util.exe;
 
 import nars.NAR;
 import nars.Task;
+import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +60,7 @@ abstract public class Executioner implements Executor {
 //        }
 
 
-    abstract public void run(Runnable cmd);
+    abstract public void runLater(Runnable cmd);
 
 
     /** a positive or negative value indicating the percentage difference from the
@@ -78,11 +79,11 @@ abstract public class Executioner implements Executor {
     public float load() { return 0; }
 
     @Override
-    public void execute(Runnable command) {
-        run(command);
+    public final void execute(Runnable whenIGetAroundToIt) {
+        runLater(whenIGetAroundToIt);
     }
 
-    abstract public void run(@NotNull Task input);
+    abstract public void run(@NotNull ITask input);
 }
 
 //package nars.nar.exe;
