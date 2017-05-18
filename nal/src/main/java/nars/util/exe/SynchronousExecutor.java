@@ -1,6 +1,8 @@
 package nars.util.exe;
 
+import com.google.common.collect.MinMaxPriorityQueue;
 import nars.NAR;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -57,5 +59,9 @@ public class SynchronousExecutor extends Executioner {
 //        }
     }
 
+
+    @Override public void run(@NotNull Task input) {
+        input.run(nar);
+    }
 
 }

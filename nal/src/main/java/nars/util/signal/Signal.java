@@ -19,6 +19,7 @@ import static nars.time.Tense.ETERNAL;
  * input signal
  */
 public class Signal {
+    final int MAX_PERCEPT_DURATIONS = 4;
 
     public FloatSupplier pri;
 
@@ -53,8 +54,8 @@ public class Signal {
         long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
 
 
-        int halfDur = Math.max(1, nar.dur() / 2);
-        long next = now + halfDur;
+        //int halfDur = Math.max(1, nar.dur() / 2);
+        //long next = now + halfDur;
 
         long last = this.lastInputTime;
         if (last == ETERNAL)
@@ -76,7 +77,10 @@ public class Signal {
 
             SignalTask t;
             //merge existing signal
-            if (current != null && current.truth.equals(nextTruth, resolution.asFloat())) {
+
+
+            if (current != null && (now - lastInputTime < (nar.dur() * MAX_PERCEPT_DURATIONS)) &&
+                    current.truth.equals(nextTruth, resolution.asFloat())) {
 //                if (residualBudgetFactor > 0) {
 //                    current.budget(residualBudgetFactor, nar); //rebudget
 //                    current.setEnd(next);

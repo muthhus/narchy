@@ -1,14 +1,20 @@
 package nars.util.exe;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import jcog.AffinityExecutor;
 import jcog.event.On;
+import jcog.pri.Priority;
 import nars.NAR;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 
 /**
@@ -19,8 +25,9 @@ public class MultiThreadExecutor extends Executioner {
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
 
-    private final int threads;
-    private final DisruptorBlockingQueue queue;
+    private final DisruptorBlockingQueue passive;
+    private final AffinityExecutor active;
+    private final int concurrency;
 
 
     //private CPUThrottle throttle;
@@ -33,6 +40,42 @@ public class MultiThreadExecutor extends Executioner {
 //    private int cap;
     private On onReset;
     //private Loop loop;
+
+    final int maxPending = 1024;
+    final AtomicInteger numPending = new AtomicInteger(); //because skiplist size() is slow
+    final LongAdder added = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
+    final ConcurrentSkipListSet<Task> pending = new ConcurrentSkipListSet(Priority.COMPARATOR);
+
+    @Override
+    public void run(@NotNull Task t) {
+        if (t.isCommand()) {
+            run(() -> t.run(nar));
+        } else {
+            if (pending.add(t)) {
+                int p = numPending.incrementAndGet();
+                if (p > maxPending) {
+
+                    do {
+                        if (numPending.compareAndSet(p, p - 1)) {
+                            Task forgotten = pending.pollFirst(); //remove lowest
+                            if (forgotten != null) {
+                                forgot.increment();
+                                forget(forgotten);
+                            }
+                        } else {
+                            break;
+                        }
+                    } while ((p = numPending.get()) > maxPending);
+                }
+                added.increment();
+            }
+        }
+    }
+
+    protected void forget(Task task) {
+        task.delete();
+
+    }
 
     @Override
     public void run(Runnable cmd) {
@@ -86,39 +129,46 @@ public class MultiThreadExecutor extends Executioner {
 //        }
 //    }
 
-    public MultiThreadExecutor(int threads) {
+    public MultiThreadExecutor(int activeThreads, int passiveThreads) {
 
-        this.queue = new DisruptorBlockingQueue(64);
-        this.threads = threads;
+        this.concurrency = activeThreads + passiveThreads;
+
+        this.passive = new DisruptorBlockingQueue(512);
 
         exe = //new ForkJoinPool(threads, defaultForkJoinWorkerThreadFactory, null, true);
                 //Executors.newFixedThreadPool(threads);
-                new ThreadPoolExecutor(threads, threads,
+                new ThreadPoolExecutor(passiveThreads, passiveThreads,
                         1, TimeUnit.MINUTES,
-                        queue
+                        passive
                 );
         exe.prestartAllCoreThreads();
 
+        this.active = new AffinityExecutor("exe");
+        active.work(() -> { //worker thread
+
+            while (true) {
+                try {
+
+                    Task next = pending.pollLast(); //highest, because the comparator is descending
+                    if (next == null) {
+                        Thread.yield();
+                        continue;
+                    }
+                    numPending.decrementAndGet();
+
+                    next.run(nar);
+
+                    executed.increment();
+
+                } catch (Throwable e) {
+                    logger.error("{}", e);
+                    continue;
+                }
+            }
+        }, activeThreads);
+
 
 //        this.queue = new DisruptorBlockingQueue<>(ringSize);
-//        this.exe = new AffinityExecutor("exe");
-
-
-//        worker = () -> { //worker thread
-//
-//            while (true) {
-//                try {
-//                    Object r = queue.take();
-//                    if (r instanceof Consumer)
-//                        ((Consumer) r).accept(nar);
-//                    else
-//                        ((Runnable) r).run();
-//                } catch (Throwable e) {
-//                    logger.error("{}", e);
-//                    continue;
-//                }
-//            }
-//        };
 
 
     }
@@ -128,7 +178,7 @@ public class MultiThreadExecutor extends Executioner {
     public void execute(Runnable pooled) {
         //exe.execute(pooled);
 
-        if (!queue.offer(pooled))
+        if (!passive.offer(pooled))
             pooled.run();
 
     }
@@ -191,7 +241,7 @@ public class MultiThreadExecutor extends Executioner {
     public final float load() {
         //ForkJoinPool.commonPool().getActiveThreadCount()
         //return 0f;
-        return 1f - ((float) queue.remainingCapacity()) / queue.capacity();
+        return 1f - ((float) passive.remainingCapacity()) / passive.capacity();
 
 //        int remaining = (int) ring.remainingCapacity();
 //        if (remaining < safetyLimit)
@@ -202,11 +252,20 @@ public class MultiThreadExecutor extends Executioner {
 
     @Override
     public int concurrency() {
-        return threads;
+        return concurrency;
     }
 
     @Override
     public void cycle(@NotNull NAR nar) {
+
+
+        System.out.println(
+                added.sumThenReset() + " added, " +
+                        executed.sum() + " executed, " +
+                        forgot.sum() + " forgot, " +
+                        numPending.longValue() + " pending");
+
+
         //throw new UnsupportedOperationException("Real-time mode only");
 
 

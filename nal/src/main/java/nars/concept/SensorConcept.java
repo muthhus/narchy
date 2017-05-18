@@ -28,6 +28,8 @@ import java.util.function.LongSupplier;
  */
 public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR,Task> {
 
+
+
     @NotNull
     public final ScalarSignal sensor;
     private final FloatParam resolution;

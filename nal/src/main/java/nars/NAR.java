@@ -578,25 +578,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * returns the Concept (non-null) if the task was processed
      * if the task was a command, it will return false even if executed
      */
-    public final NAR input(@NotNull Task input) {
+    public final void input(@NotNull Task input) {
 
-        try {
+        //try {
 
-            input.eval(this);
-
-        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
-
-            input.delete();
-
-            emotion.eror(input.volume());
-
-            //input.feedback(null, Float.NaN, Float.NaN, this);
-            if (Param.DEBUG)
-                logger.warn("task process: {} {}", e, this);
-        }
+            exe.run(input);
 
 
-        return this;
+//        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
+//
+//            input.delete();
+//
+//            emotion.eror(input.volume());
+//
+//            //input.feedback(null, Float.NaN, Float.NaN, this);
+//            if (Param.DEBUG)
+//                logger.warn("task process: {} {}", e, this);
+//        }
 
     }
 
@@ -1314,11 +1312,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
-        } else if (termed instanceof Variable) {
-            return null;
         }
 
-        Term term = termed.unneg();
+        Term term = conceptTerm(termed.unneg());
+        return (term == null) ? null : terms.concept(term, createIfMissing);
+
+
+    }
+
+    /** returns the canonical Concept term for any given Term, or null if it is unconceptualizable */
+    @Nullable public Term conceptTerm(@NotNull Term term) {
+
+        if (term instanceof Variable) {
+            return null;
+        }
 
 //        Term termPre = null;
 //        while (term instanceof Compound && termPre != term) {
@@ -1352,14 +1359,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
             return null;
-
-        return terms.concept(term, createIfMissing);
-//        if (c != null && createIfMissing && c.isDeleted()) {
-//            //try again
-//            concepts.remove(c.term());
-//            return concepts.concept(term, createIfMissing);
-//        }
-
+        return term;
     }
 
     @Nullable

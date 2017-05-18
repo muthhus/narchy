@@ -23,10 +23,10 @@ public class HashSlabPerformanceRun {
             HashSlab<Integer, FloatWrapper> hashtable = HashSlab.of(N, floats);
 
             for (int i = 1; i <= N; i++) {
-                hashtable.lookup(i).setValue(1.0f / i);
+                hashtable.get(i).setValue(1.0f / i);
             }
 
-            System.out.println("m[100] = " + hashtable.lookup(100).getValue());
+            System.out.println("m[100] = " + hashtable.get(100).getValue());
 
             long time = System.currentTimeMillis() - startTime;
             System.out.println("Slab Took: " + time / 1e3 + "s");

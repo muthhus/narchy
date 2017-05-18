@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.insightfullogic.slab.Allocator;
-
 public class GameEventScenarioTest {
 
 	@Test
@@ -48,13 +46,13 @@ public class GameEventScenarioTest {
 	public void resizing() {
 		Allocator<GameEvent> eventAllocator = Allocator.of(GameEvent.class);
 		GameEvent event = eventAllocator.allocate(1);
-		assertEquals(1, event.getNumberOfObjects());
+		assertEquals(1, event.numObjects());
 
 		try {
 			event.setStrength(99);
 
 			event.resize(2);
-			assertEquals(2, event.getNumberOfObjects());
+			assertEquals(2, event.numObjects());
 
 			event.move(1);
 			event.setStrength(1000);

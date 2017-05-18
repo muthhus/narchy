@@ -26,13 +26,13 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 500;
+        int time = 1500;
 
         //Global.DEBUG = true;
 
         TestNAR tester = test();
 
-        tester.log();
+        //tester.log();
 
         //(({tom},{sky})-->likes).  <{tom} --> cat>. <({tom},{sky}) --> likes>. <(cat,[blue]) --> likes>?
 

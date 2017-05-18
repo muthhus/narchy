@@ -68,14 +68,12 @@ abstract public class DerivedTask extends ImmutableTask {
         return false;
     }
 
-    @Override
     @Nullable
     public final Task getParentTask() {
         Premise p = this.premise;
         return p != null ? p.task : null;
     }
 
-    @Override
     @Nullable
     public final Task getParentBelief() {
         Premise p = this.premise;

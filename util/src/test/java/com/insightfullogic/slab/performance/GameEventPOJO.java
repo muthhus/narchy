@@ -49,7 +49,7 @@ public class GameEventPOJO implements GameEvent {
 		throw new UnsupportedOperationException();
 	}
 
-    public int getNumberOfObjects() {
+    public int numObjects() {
         // TODO Auto-generated method stub
         return 0;
     }

@@ -1,6 +1,7 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
+import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.index.term.AppendProtoCompound;
@@ -19,11 +20,11 @@ public class CachedTermIndex extends StaticTermIndex {
 
     final static Logger logger = LoggerFactory.getLogger(nars.term.util.CachedTermIndex.class);
 
-    protected final HijackMemoize<ProtoCompound, Term> terms = new HijackMemoize<>(
+    protected static final HijackMemoize<ProtoCompound, Term> terms = new HijackMemoize<>(
             256 * 1024, 3,
             (C) -> {
                 try {
-                    return super.the(C.op(), C.dt(), C.subterms());
+                    return $.terms.the(C.op(), C.dt(), C.subterms());
                 } catch (InvalidTermException e) {
                     if (Param.DEBUG_EXTRA)
                         logger.error("{}", e);

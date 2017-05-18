@@ -175,9 +175,6 @@ public class TermIOTest {
         assertEquals("(0,0)=. ", map("x"));
     }
 
-    @Test public void testByteMappingAtomInt() throws IOException, Narsese.NarseseException {
-        assertEquals("(0,0)=`i ", map("1"));
-    }
 
     @Test public void testByteMappingInh() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)=--> (1,2)=. (1,6)=. ", map("a:b"));

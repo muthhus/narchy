@@ -30,7 +30,8 @@ public class CommandTest {
         assertTrue(t.isCommand());
         assertEquals("c(x);", t.toString());
 
-        n.input(t).run(1);
+        n.input(t);
+        n.run(1);
 
         assertTrue(invoked.get());
 

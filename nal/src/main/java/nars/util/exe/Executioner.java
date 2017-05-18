@@ -1,6 +1,7 @@
 package nars.util.exe;
 
 import nars.NAR;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -81,6 +82,7 @@ abstract public class Executioner implements Executor {
         run(command);
     }
 
+    abstract public void run(@NotNull Task input);
 }
 
 //package nars.nar.exe;

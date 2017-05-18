@@ -1,7 +1,11 @@
 package nars.task;
 
+import nars.NAR;
 import nars.Task;
+import nars.concept.Concept;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.util.InvalidTermException;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +37,11 @@ public class AnswerTask extends ImmutableTask {
         return false;
     }
 
+
+    @Override
+    public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+        //super.eval(n);
+    }
 
 
 

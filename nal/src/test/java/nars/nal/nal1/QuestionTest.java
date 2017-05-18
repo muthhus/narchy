@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestionTest {
 
-    final int withinCycles = 64;
+    final int withinCycles = 128;
 
     @Test
     public void whQuestionUnifyQueryVar() throws Narsese.NarseseException {
@@ -134,7 +134,7 @@ public class QuestionTest {
     @Test public void questionDrivesInference() {
 
         final int[] dims = {4, 3};
-        final int timelimit = 2000;
+        final int timelimit = 3000;
 
         TaskStatistics withTasks = new TaskStatistics();
         TaskStatistics withoutTasks = new TaskStatistics();
@@ -142,7 +142,7 @@ public class QuestionTest {
         DoubleSummaryStatistics withOutTime = new DoubleSummaryStatistics();
 
         IntFunction<NAR> narProvider = (seed) -> {
-            NAR d = new Default(512);
+            NAR d = new Default(1024);
             d.random().setSeed(seed);
             d.nal(4);
             return d;

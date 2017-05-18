@@ -220,7 +220,7 @@ public class IRCAgent extends IRC {
     @Deprecated @NotNull
     public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int threads) {
 
-        MultiThreadExecutor exe = new MultiThreadExecutor(threads);
+        MultiThreadExecutor exe = new MultiThreadExecutor(threads, 2);
 
         Default nar = new Default(activeConcepts,
 

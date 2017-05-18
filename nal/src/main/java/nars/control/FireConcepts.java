@@ -36,7 +36,7 @@ import static jcog.bag.Bag.BagCursorAction.Stop;
 /**
  * controls an active focus of concepts
  */
-abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
+abstract public class FireConcepts implements Runnable {
 
     static final float BATCHING_GRANULARITY_DIVISOR = 3; //additional dividing factor to increase granularity
 
@@ -89,7 +89,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
         int premiseCost = Param.BeliefMatchTTL;
         int linkSampleCost = 1;
-        int derivedTaskCost = 2;
+        int derivedTaskCost = 3;
 
         Random rng = nar.random();
 
@@ -222,26 +222,27 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 
             @Override
             public void derive(Task x) {
-                buffer.merge(x, x, (prev, next) -> {
-                    PriMerge.avg.merge(prev, next);
-                    return prev;
-                });
+//                buffer.merge(x, x, (prev, next) -> {
+//                    PriMerge.avg.merge(prev, next);
+//                    return prev;
+//                });
+                nar.input(x);
             }
 
-            void commit(/*int derivations*/) {
-                if (!buffer.isEmpty()) {
-                    //int mPerDeriv = maxInputTasksPerDerivation.intValue();
-                    //int max = mPerDeriv * derivations;
-                    //if (mPerDeriv == -1 || buffer.size() <= max) {
-                        nar.input(buffer.values());
-                    //} else {
-                    //    nar.input(top(buffer, max));
-                    //}
-
-
-                    buffer.clear();
-                }
-            }
+//            void commit(/*int derivations*/) {
+//                if (!buffer.isEmpty()) {
+//                    //int mPerDeriv = maxInputTasksPerDerivation.intValue();
+//                    //int max = mPerDeriv * derivations;
+//                    //if (mPerDeriv == -1 || buffer.size() <= max) {
+//                        nar.input(buffer.values());
+//                    //} else {
+//                    //    nar.input(top(buffer, max));
+//                    //}
+//
+//
+//                    buffer.clear();
+//                }
+//            }
         }
 
         static Iterable<Task> top(Map<Task, Task> m, int max) {
@@ -301,12 +302,7 @@ abstract public class FireConcepts implements Consumer<DerivedTask>, Runnable {
 //                startTTL, sampled[0], priDecayFactor, dd.buffer.size()
 //            );
 
-            dd.commit();
-        }
-
-        @Override
-        public void accept(DerivedTask derivedTask) {
-            nar.input(derivedTask);
+            //dd.commit();
         }
 
     }

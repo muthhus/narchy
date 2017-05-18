@@ -72,7 +72,7 @@ public enum PremiseBuilder { ;
                 Task match;
                 //if (task.isQuestOrQuestion()) {
                     long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
-                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, beliefConcept, nar);
+                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept)beliefConcept, nar);
 //                } else {
 //                    long when = task.start();
 //                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);

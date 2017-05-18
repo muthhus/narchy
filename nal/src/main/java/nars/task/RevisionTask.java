@@ -62,57 +62,48 @@ public class RevisionTask extends AnswerTask {
 //
 
 
-    /**
-     * According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links
-     */
-    @Override
-    public void eval(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-
-        //TODO reimplement again
-
-        float resultPri = pri();
-        if (resultPri != resultPri) {
-            return;
-        }
-
-        Task parentNewBelief = getParentTask();
-        if (parentNewBelief == null) {
-            return;
-        }
-
-        Task parentOldBelief = getParentBelief();
-        if (parentOldBelief == null) {
-            return;
-        }
-
-        float newBeliefContribution;
-        if (parentNewBelief.isBeliefOrGoal()) {
-            //int dur = n.dur();
-            float newBeliefConf = parentNewBelief.evi();
-            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi());
-        } else {
-            //question/quest
-            newBeliefContribution = 0.5f;
-        }
-
-
-        //Balance Tasks
-        BudgetFunctions.balancePri(
-                parentNewBelief.priority(), parentOldBelief.priority(),
-                resultPri,
-                newBeliefContribution);
-
-        //Balance Tasklinks
-        TaskConcept cn = concept(n);
-        Bag<Task, PLink<Task>> tasklinks = cn.tasklinks();
-        BudgetFunctions.balancePri(
-                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
-                resultPri,
-                newBeliefContribution);
-
-
-
-    }
+//    /**
+//     * According to the relative improvement in truth quality of the revision, de-prioritize the premise tasks and associated links
+//     */
+//    @Override
+//    public void eval(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+//
+//        //TODO reimplement again
+//
+//        float resultPri = pri();
+//        if (resultPri != resultPri) {
+//            return;
+//        }
+//
+//
+//        float newBeliefContribution;
+//        if (parentNewBelief.isBeliefOrGoal()) {
+//            //int dur = n.dur();
+//            float newBeliefConf = parentNewBelief.evi();
+//            newBeliefContribution = newBeliefConf / (newBeliefConf + parentOldBelief.evi());
+//        } else {
+//            //question/quest
+//            newBeliefContribution = 0.5f;
+//        }
+//
+//
+//        //Balance Tasks
+//        BudgetFunctions.balancePri(
+//                parentNewBelief.priority(), parentOldBelief.priority(),
+//                resultPri,
+//                newBeliefContribution);
+//
+//        //Balance Tasklinks
+//        TaskConcept cn = concept(n);
+//        Bag<Task, PLink<Task>> tasklinks = cn.tasklinks();
+//        BudgetFunctions.balancePri(
+//                tasklinks.get(parentNewBelief), tasklinks.get(parentOldBelief),
+//                resultPri,
+//                newBeliefContribution);
+//
+//
+//
+//    }
 
 //    private void weaken(Task parent) {
 //        if (parent.isDeleted())

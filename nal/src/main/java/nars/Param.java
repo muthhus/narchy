@@ -74,15 +74,15 @@ public abstract class Param  {
      */
     public static final int STAMP_CAPACITY = 12;
 
-    public final static int UnificationStackMax = 32;
-    public static final int MaxMatchConstraintsPerVariable = 6;
-    public static final int MaxUnificationVariableStack = 2; //how many rewrites a variable is allowed
+    public final static int UnificationStackMax = 128;
+    public static final int UnificationConstraintsMax = 6;
+    public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 20;
+    public final static int BeliefMatchTTL = 14;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 8;
-    public final static int UnificationTTLMin = BeliefMatchTTL * 4;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 10;
+    public final static int UnificationTTLMin = BeliefMatchTTL * 2;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
 

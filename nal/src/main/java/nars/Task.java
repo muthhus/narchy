@@ -171,16 +171,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         sb.append("\n  ");
 
 
-        Task pt = task.getParentTask();
-        if (pt != null) {
-            //sb.append("  PARENT ");
-            proof(pt, indent + 1, sb);
-        }
+        if (task instanceof DerivedTask) {
+            Task pt = ((DerivedTask)task).getParentTask();
+            if (pt != null) {
+                //sb.append("  PARENT ");
+                proof(pt, indent + 1, sb);
+            }
 
-        Task pb = task.getParentBelief();
-        if (pb != null) {
-            //sb.append("  BELIEF ");
-            proof(pb, indent + 1, sb);
+            Task pb = ((DerivedTask)task).getParentBelief();
+            if (pb != null) {
+                //sb.append("  BELIEF ");
+                proof(pb, indent + 1, sb);
+            }
         }
     }
 
@@ -650,15 +652,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         return term().sub(i);
     }
 
-    @Nullable
-    default Task getParentTask() {
-        return null;
-    }
 
-    @Nullable
-    default Task getParentBelief() {
-        return null;
-    }
 
     default boolean cyclic() {
         return Stamp.isCyclic(stamp());
@@ -920,7 +914,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
         else return s - t;
     }
 
-    default void eval(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+    default void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
         float inputPri = this.priSafe(-1);
         if (inputPri < 0)
@@ -948,7 +942,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, Priority
 
                     delete(); //transfer control to clone
 
-                    inputY.eval(n);
+                    inputY.run(n);
 
                     return;
                 }

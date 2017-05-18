@@ -70,7 +70,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, Concept beliefConcept, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, TaskConcept beliefConcept, NAR nar) {
             return null;
         }
 
@@ -231,7 +231,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, Concept beliefConcept, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
 
 
         Task answer = match(when, now, dur, question, template, false);
@@ -267,7 +267,9 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             }
         }
 
-        if (novel && question.isQuestOrQuestion() && question.concept(nar).equals(beliefConcept)) {
+        if (novel && question.isQuestOrQuestion() &&
+                nar.conceptTerm(question.term()).equals(beliefConcept)
+            ) {
             nar.input(answer);
         }
 

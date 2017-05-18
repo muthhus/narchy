@@ -1,9 +1,12 @@
 package nars.task;
 
+import com.insightfullogic.slab.Allocator;
+import com.insightfullogic.slab.Cursor;
 import nars.*;
 import nars.concept.TaskConcept;
 import nars.nar.Default;
 import nars.nar.Terminal;
+import nars.term.Compound;
 import nars.truth.DiscreteTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -110,19 +113,21 @@ public class TaskTest {
     public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
         Default d = new Default(100);
+        //d.log();
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");
 
         long[] ev = {1, 2};
         d.eventTaskProcess.on(t -> {
-            if (t.getParentBelief()!=null && !t.cyclic())
+
+            if (t instanceof DerivedTask && ((DerivedTask)t).getParentBelief()!=null && !t.cyclic())
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()), ev, t.stamp());
 
             //System.out.println(t);
         });
 
-        d.run(64);
+        d.run(256);
 
 
     }
@@ -134,4 +139,18 @@ public class TaskTest {
         System.out.println(c);
         assertNotNull(c);
     }
+
+//    interface SlabTask extends Task, Cursor {
+//
+//        public byte getTerm();
+//        public void setTerm(byte[] t);
+//    }
+//
+//    @Test public void testSlabTask() {
+//        Allocator<SlabTask> tasks = Allocator.of(SlabTask.class);
+//        SlabTask x = tasks.allocate(1024);
+//        x.move(0);
+//
+//
+//    }
 }

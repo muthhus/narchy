@@ -262,58 +262,6 @@ public class IRCNLP extends IRC {
     }
 
 
-    @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int conceptsPerFrame) {
-
-        MultiThreadExecutor exe = new MultiThreadExecutor(3);
-
-        Default nar = new Default(activeConcepts,
-
-                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
-                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
-
-                new RealTime.DS(true).durSeconds(1f),
-                exe
-        );
-
-
-        //        //Multi nar = new Multi(3,512,
-//        Default nar = new Default(2048,
-//                conceptsPerCycle, 2, 2, rng,
-//                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-//                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64*1024, 3)
-//
-//                , new FrameClock(), exe);
-
-
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-
-        float p = 1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.6f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
-
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
-
-        nar.DEFAULT_QUESTION_QUALITY = 0.5f;
-        nar.DEFAULT_QUEST_QUALITY = 0.5f;
-
-        nar.confMin.setValue(0.01f);
-        nar.termVolumeMax.setValue(64);
-        //nar.linkFeedbackRate.setValue(0.005f);
-
-
-        MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 8, true, 3);
-        //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
-
-        //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        new Inperience(nar, 0.25f, 8);
-
-        nar.loopPeriodMS(framesPerSecond);
-
-        return nar;
-    }
 
     public static void main(String[] args) throws Exception {
 

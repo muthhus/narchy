@@ -5,6 +5,8 @@ import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+
 import static jcog.Util.*;
 
 /**
@@ -12,20 +14,54 @@ import static jcog.Util.*;
  */
 public interface Priority extends Prioritized {
 
-    /**common instance for a 'Deleted budget'.*/
+    /**
+     * common instance for a 'Deleted budget'.
+     */
     Priority Deleted = new ROBudget(Float.NaN);
 
-    /** common instance for a 'full budget'.*/
+    /**
+     * common instance for a 'full budget'.
+     */
     Priority One = new ROBudget(1f);
 
-    /** common instance for a 'half budget'.*/
+    /**
+     * common instance for a 'half budget'.
+     */
     Priority Half = new ROBudget(0.5f);
 
-    /** common instance for a 'zero budget'.*/
+    /**
+     * common instance for a 'zero budget'.
+     */
     Priority Zero = new ROBudget(0);
 
-    /** default minimum difference necessary to indicate a significant modification in budget float number components */
-    float EPSILON = 0.0001f;
+    /**
+     * default minimum difference necessary to indicate a significant modification in budget float number components
+     */
+    float EPSILON = 0.00001f;
+
+    /** ascending order */
+    Comparator<? extends Priority> COMPARATOR = (Priority a, Priority b) -> {
+        if (a == b) return 0;
+
+        float ap = a.priSafe(-1);
+        float bp = b.priSafe(-1);
+//        if (a.equals(b)) {
+//            a.priMax(bp);
+//            b.priMax(ap); //max merge budgets
+//            return 0;
+//        }
+        int q = Float.compare(ap, bp);
+        if (q == 0) {
+            //equal priority but different tasks
+            int h = Integer.compare(a.hashCode(), b.hashCode());
+            if (h == 0) {
+                //if still not equal, then use system identiy
+                return Integer.compare(System.identityHashCode(a), System.identityHashCode(b));
+            }
+            return h;
+        }
+        return q;
+    };
 
 
     static String toString(@NotNull Priority b) {
@@ -43,21 +79,26 @@ public interface Priority extends Prioritized {
 
         sb.append('$')
                 .append(priorityString);
-                //.append(Op.BUDGET_VALUE_MARK);
+        //.append(Op.BUDGET_VALUE_MARK);
 
-        return  sb;
+        return sb;
     }
 
     @NotNull
     static Ansi.Color budgetSummaryColor(@NotNull Prioritized tv) {
-        int s = (int)Math.floor(tv.priSafe(0) *5);
+        int s = (int) Math.floor(tv.priSafe(0) * 5);
         switch (s) {
-            default: return Ansi.Color.DEFAULT;
+            default:
+                return Ansi.Color.DEFAULT;
 
-            case 1: return Ansi.Color.MAGENTA;
-            case 2: return Ansi.Color.GREEN;
-            case 3: return Ansi.Color.YELLOW;
-            case 4: return Ansi.Color.RED;
+            case 1:
+                return Ansi.Color.MAGENTA;
+            case 2:
+                return Ansi.Color.GREEN;
+            case 3:
+                return Ansi.Color.YELLOW;
+            case 4:
+                return Ansi.Color.RED;
 
         }
     }
@@ -69,7 +110,7 @@ public interface Priority extends Prioritized {
 
     default float priAdd(float toAdd) {
         float e = priSafe(-1);
-        if (e!=e) {
+        if (e != e) {
             if (toAdd > 0) e = 0;  //adding to deleted resurrects it to pri=0 before adding
             else return Float.NaN; //subtracting from deleted has no effect
         }
@@ -96,7 +137,8 @@ public interface Priority extends Prioritized {
         }
     }
 
-    @Override @NotNull
+    @Override
+    @NotNull
     default Priority priority() {
         return this;
     }
@@ -117,10 +159,10 @@ public interface Priority extends Prioritized {
 
         float before = priSafe(0);
         float next = priAdd(toAdd);
-        float delta = next-before;
+        float delta = next - before;
         float excess = toAdd - delta;
 
-        if (pressurized!=null)
+        if (pressurized != null)
             pressurized[0] += delta;
 
         return excess;
@@ -180,7 +222,9 @@ public interface Priority extends Prioritized {
 //        }
 //    }
 
-    /** returns null if already deleted */
+    /**
+     * returns null if already deleted
+     */
     @Nullable Priority clone();
 
 
@@ -190,11 +234,11 @@ public interface Priority extends Prioritized {
      * @return String representation of the value with 2-digit accuracy
      */
     @NotNull
-    default Appendable toBudgetStringExternal()  {
+    default Appendable toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
-    default @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb)  {
+    default @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb) {
         return Priority.toStringBuilder(sb, Texts.n2(pri()));
     }
 
@@ -203,7 +247,8 @@ public interface Priority extends Prioritized {
         return toBudgetStringExternal().toString();
     }
 
-    @NotNull default String getBudgetString() {
+    @NotNull
+    default String getBudgetString() {
         return toString(this);
     }
 
@@ -212,12 +257,14 @@ public interface Priority extends Prioritized {
         normalizePri(min, range, 1f);
     }
 
-    /** normalizes the current value to within: min..(range+min), (range=max-min) */
+    /**
+     * normalizes the current value to within: min..(range+min), (range=max-min)
+     */
     default void normalizePri(float min, float range, float lerp) {
         float p = priSafe(-1);
         if (p < 0) return; //dont normalize if deleted
 
-        priLerp((p - min)/range, lerp );
+        priLerp((p - min) / range, lerp);
     }
 
 //    void orPriority(float v);

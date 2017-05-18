@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.Op.VAR_PATTERN;
-import static nars.Param.MaxMatchConstraintsPerVariable;
+import static nars.Param.UnificationConstraintsMax;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -79,7 +79,7 @@ public abstract class Unify implements Termutator, Subst {
 
         this.versioning = versioning;
 
-        xy = new ConstrainedVersionMap(versioning, Param.MaxUnificationVariableStack);
+        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackMax);
 
     }
 
@@ -276,7 +276,7 @@ public abstract class Unify implements Termutator, Subst {
     final class ConstrainedVersionedTerm extends Versioned<Term> {
 
 
-        final Versioned<MatchConstraint> constraints = new Versioned(versioning, MaxMatchConstraintsPerVariable);
+        final Versioned<MatchConstraint> constraints = new Versioned(versioning, UnificationConstraintsMax);
 
 //        /**
 //         * divide constraints into two classes: fast and slow,
@@ -285,7 +285,7 @@ public abstract class Unify implements Termutator, Subst {
 //        Versioned<MatchConstraint> fastConstraints = null;
 
         ConstrainedVersionedTerm() {
-            super(versioning, Param.MaxUnificationVariableStack);
+            super(versioning, Param.UnificationVariableStackMax);
         }
 
         @Nullable
