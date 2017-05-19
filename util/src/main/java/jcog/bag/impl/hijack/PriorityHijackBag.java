@@ -13,6 +13,11 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
     public PriorityHijackBag(int reprobes) {
         super(reprobes);
     }
+    public PriorityHijackBag(int cap, int reprobes) {
+        this(reprobes);
+        setCapacity(cap);
+    }
+
 
     @Override
     protected V merge(@NotNull V existing, @NotNull V incoming, float scale) {

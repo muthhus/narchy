@@ -34,7 +34,7 @@ public class CurveBag<X> extends ArrayBag<X> {
     @NotNull
     @Override
     public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
-        sample(each, -1);
+        sample(each, -1, false);
         return this;
     }
 

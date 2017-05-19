@@ -165,7 +165,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     }
 
     @Override
-    public void value(Termed c, float scale) {
+    public void value(@NotNull Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
         if (inPri * scale >= Priority.EPSILON) {

@@ -32,7 +32,10 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
         super(reprobes);
         this.merge = merge;
     }
-
+    public DefaultHijackBag(int cap, PriMerge merge, int reprobes) {
+        this(merge, reprobes);
+        setCapacity(cap);
+    }
 
     @Override
     protected Consumer<PLink<K>> forget(float avgToBeRemoved) {

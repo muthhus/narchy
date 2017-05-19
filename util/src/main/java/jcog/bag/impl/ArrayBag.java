@@ -292,8 +292,8 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      */
     @NotNull
     @Override
-    public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
-        sample(each, 0);
+    public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each, boolean pop) {
+        sample(each, 0, pop);
         return this;
     }
 
@@ -302,7 +302,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      * @param each
      * @param startingIndex if negative, a random starting location is used
      */
-    protected void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<X>> each, int startingIndex) {
+    protected void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<X>> each, int startingIndex, boolean pop) {
         int i = startingIndex;
         if (i < 0) {
             int s = size();
@@ -318,9 +318,17 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             if (i >= s) i = 0;
             PLink<X> x = get(i++);
 
-            if (x != null && (next = each.next(x)).remove) {
-                if (remove(key(x))!=null)
+            if (x != null/*.remove*/) {
+                if (pop) {
+                    x = remove(key(x));
+                    if (x==null)
+                        continue;
                     modified = true;
+                }
+
+                next = each.next(x);
+                /*if (remove(key(x))!=null)
+                    modified = true;*/
             }
         }
 

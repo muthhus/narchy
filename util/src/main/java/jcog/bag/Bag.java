@@ -27,16 +27,17 @@ import static jcog.bag.Bag.BagCursorAction.Next;
 public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     enum BagCursorAction {
-        Next(false, false),
-        Remove(true, false),
-        Stop(false, true),
-        RemoveAndStop(true, true);
+        Next(/*false, */false),
+        //Remove(true, false),
+        Stop(/*false, */true)
+        //RemoveAndStop(true, true)
+        ;
 
-        public boolean remove;
+        //public boolean remove;
         public boolean stop;
 
-        BagCursorAction(boolean remove, boolean stop) {
-            this.remove = remove;
+        BagCursorAction(/*boolean remove, */boolean stop) {
+            //this.remove = remove;
             this.stop = stop;
         }
     }
@@ -110,7 +111,8 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     /* sample the bag, optionally removing each visited element as decided by the visitor's
      * return value */
-    @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each);
+    @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each, boolean pop);
+    default @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) { return sample(each, false); }
 
     default List<V> sampleToList(int n) {
         if (n == 0)
@@ -167,9 +169,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return sample(max, Next, each);
     }
 
-    default Bag<K, V> pop(int max, Consumer<? super V> each) {
-        return sample(max, BagCursorAction.Remove, each);
-    }
 
     /**
      * convenience macro
@@ -563,7 +562,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
         @NotNull
         @Override
-        public Bag sample(@NotNull Bag.@NotNull BagCursor each) {
+        public Bag sample(@NotNull Bag.@NotNull BagCursor each, boolean pop) {
             return this;
         }
 

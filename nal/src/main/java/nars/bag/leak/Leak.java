@@ -85,11 +85,11 @@ public class Leak<X, Y> {
                             float spe = spent[0] + cost;
                             if (spe < budget) {
                                 spent[0] = spe;
-                                return Bag.BagCursorAction.Remove; //continue
+                                return Bag.BagCursorAction.Next; //continue
                             } else {
-                                return Bag.BagCursorAction.RemoveAndStop;
+                                return Bag.BagCursorAction.Stop;
                             }
-                        });
+                        }, true);
 
                         if (spent[0] > 0) {
                             this.lastLeak = now; //only set time if some cost was spent

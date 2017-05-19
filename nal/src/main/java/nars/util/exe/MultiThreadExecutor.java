@@ -3,8 +3,12 @@ package nars.util.exe;
 import jcog.AffinityExecutor;
 import jcog.Texts;
 import jcog.Util;
+import jcog.bag.Bag;
 import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.event.On;
+import jcog.pri.PForget;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
@@ -19,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 
@@ -35,8 +40,27 @@ public class MultiThreadExecutor extends Executioner {
     //private final ArrayBlockingQueue<Runnable> passive;
     private final ForkJoinPool passive;
 
-    final int maxActive = 1024;
-    final ArrayBag<ITask> active = new ArrayBag(maxActive, PriMerge.avg, new ConcurrentHashMap<>(maxActive));
+    final int maxActive = 4096;
+    final PriorityHijackBag<ITask,ITask> active = new PriorityHijackBag<ITask, ITask>(maxActive, 3) {
+        @Override
+        protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, float scale) {
+//            existing.priMax(incoming.priSafe(0)*scale);
+//            return existing;
+            return super.merge(existing, incoming, scale);
+        }
+
+        @Override
+        protected Consumer<ITask> forget(float rate) {
+            return new PForget(rate);
+        }
+
+        @NotNull
+        @Override
+        public ITask key(ITask value) {
+            return value;
+        }
+    };
+    //final ArrayBag<ITask> active = new ArrayBag(maxActive, PriMerge.avg, new ConcurrentHashMap<>(maxActive));
     //final ConcurrentSkipListSet<ITask> active = new ConcurrentSkipListSet(Priority.COMPARATOR);
 
     private final AffinityExecutor activeExec;
@@ -60,7 +84,7 @@ public class MultiThreadExecutor extends Executioner {
             runLater(() -> t.run(nar));
         } else {
             input.increment();
-            if (active.put(new RawPLink(t, p), 1f, null) != null) {
+            if (active.put(t, 1f, null) != null) {
                 forgot.increment();
 
 //                int p = numActive.incrementAndGet();
@@ -166,21 +190,22 @@ public class MultiThreadExecutor extends Executioner {
         activeExec.work(() -> { //worker thread
 
             int pauses = 0;
+
             while (true) {
                 try {
 
-                    PLink<ITask> next = active.remove(true); //highest, because the comparator is descending
-                    if (next == null) {
+                    active.sample((next)-> {
+                        executed.increment();
+                        next.run(nar);
+                        return Bag.BagCursorAction.Next;
+                    }, true);
+
+                    if (active.isEmpty()) {
                         pause(pauses++);
                         continue;
                     } else {
                         pauses = 0;
                     }
-
-                    //numActive.decrementAndGet();
-                    executed.increment();
-
-                    next.get().run(nar);
 
                 } catch (Throwable e) {
                     logger.error("{}", e);
@@ -277,7 +302,19 @@ public class MultiThreadExecutor extends Executioner {
 //            pause(waitCycles++);
 //        }
 
-        active.commit(null);
+        active.commit();
+
+
+        Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
+        if (vv != null) {
+            for (int i = 0; ; ) {
+                Consumer c = vv[i++];
+                if (c == null) break; //null terminator hit
+
+                //nar.exe.run(c); //use nar.exe because this executor may be wrapped in something else that we want this to pass through, ie. instrumentor
+                run(c);
+            }
+        }
 
         if (Param.DEBUG) {
             System.out.println(
@@ -290,17 +327,6 @@ public class MultiThreadExecutor extends Executioner {
                     //+ passive
             );
             System.out.println(activeProfile());
-        }
-
-        Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
-        if (vv != null) {
-            for (int i = 0; ; ) {
-                Consumer c = vv[i++];
-                if (c == null) break; //null terminator hit
-
-                //nar.exe.run(c); //use nar.exe because this executor may be wrapped in something else that we want this to pass through, ie. instrumentor
-                run(c);
-            }
         }
     }
 

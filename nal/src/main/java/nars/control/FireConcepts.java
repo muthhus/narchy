@@ -233,7 +233,7 @@ public class FireConcepts implements Runnable {
 
             curTTL[0] -= ttlMax;
             return curTTL[0] > 0 ? Next : Stop;
-        });
+        }, true);
 
 
     }

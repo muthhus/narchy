@@ -16,14 +16,14 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam = true;
 
-    public final FloatParam ballSpeed = new FloatParam(3f, 0.1f, 6f);
-    public final FloatParam paddleSpeed = new FloatParam(1f, 0.1f, 3f);
+    public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
+    public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
     final int visW = 32;
-    final int visH = 16;
+    final int visH = 32;
 
     //final int afterlife = 60;
 
@@ -59,7 +59,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
