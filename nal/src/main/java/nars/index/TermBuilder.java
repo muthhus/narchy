@@ -874,14 +874,15 @@ public abstract class TermBuilder {
         }
 
 
+
         //factor out any common subterms iff concurrent
         if (concurrent(dt)) {
 
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((!(pu instanceof Variable) && (subject.equals(pu) || subject.containsRecursively(pu))) ||
-                (!(su instanceof Variable) && (predicate.equals(su) || predicate.containsRecursively(su))) )
+            if ((!(pu instanceof Variable) && pu.varPattern()==0 && (subject.equals(pu) || subject.contains(pu))) ||
+                (!(su instanceof Variable) && su.varPattern()==0 && (predicate.equals(su) || predicate.contains(su))) )
                     //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 

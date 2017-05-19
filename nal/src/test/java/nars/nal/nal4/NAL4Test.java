@@ -25,7 +25,7 @@ import static nars.time.Tense.ETERNAL;
  //     <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
 
  */
-@RunWith(Parameterized.class)
+@Ignore @RunWith(Parameterized.class)
 public class NAL4Test extends AbstractNALTest {
 
 
@@ -39,14 +39,14 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    @Ignore public void structural_transformation1()  {
+     public void structural_transformation1()  {
         TestNAR t = test();
         t.believe("<(acid,base) --> reaction>",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,base)>", 1.0f, 0.9f); //en("Acid can react with base.");
         t.mustBelieve(CYCLES, "<base --> (/,reaction,acid,_)>", 1.0f, 0.9f); //en("A base is something that has a reaction with an acid.");
     }
     @Test
-    @Ignore public void structural_transformation1_DepVar()  {
+     public void structural_transformation1_DepVar()  {
         TestNAR t = test();
         t.believe("reaction(acid,#1)",1.0f,0.9f); //en("An acid and a base can have a reaction.");
         t.mustBelieve(CYCLES, "<acid --> (/,reaction,_,#1)>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -55,7 +55,7 @@ public class NAL4Test extends AbstractNALTest {
 
 
     @Test
-     @Ignore public void structural_transformation2()  {
+      public void structural_transformation2()  {
         TestNAR tester = test();
         tester.believe("<acid --> (/,reaction,_,base)>",1.0f,0.9f); //en("Acid can react with base.");
         tester.mustBelieve(CYCLES, "<(acid,base) --> reaction>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -63,7 +63,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    @Ignore public void structural_transformation3()  {
+     public void structural_transformation3()  {
         TestNAR tester = test();
         tester.believe("<base --> (/,reaction,acid,_)>",1.0f,0.9f); //en("A base is something that has a reaction with an acid.");
         tester.mustBelieve(CYCLES*2, "<(acid,base) --> reaction>", 1.0f, 0.9f); //en("Acid can react with base.");
@@ -71,7 +71,7 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    @Ignore public void structural_transformation4()  {
+     public void structural_transformation4()  {
         TestNAR tester = test();
         tester.believe("<neutralization --> (acid,base)>",1.0f,0.9f); //en("Neutralization is a relation between an acid and a base. ");
         tester.mustBelieve(CYCLES, "<(\\,neutralization,_,base) --> acid>", 1.0f, 0.9f); //en("Something that can neutralize a base is an acid.");
@@ -80,7 +80,7 @@ public class NAL4Test extends AbstractNALTest {
 
     //PROBABLY NOT CORRECT
 //    @Test
-//    @Ignore public void structural_transformation4_extended()  {
+//     public void structural_transformation4_extended()  {
 //        TestNAR tester = test();
 //        tester.believe("<neutralization --> (substance,acid,base)>",1.0f,0.9f);
 //        tester.mustBelieve(CYCLES, "<(\\,neutralization,_,acid,base) --> substance>.", 1.0f, 0.9f);
@@ -90,7 +90,7 @@ public class NAL4Test extends AbstractNALTest {
 
 
     @Test
-    @Ignore public void structural_transformation5()  {
+     public void structural_transformation5()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,_,base) --> acid>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Neutralization is a relation between an acid and a base.");
@@ -98,20 +98,20 @@ public class NAL4Test extends AbstractNALTest {
 
     //PROBABLY NOT CORRECT
     @Test
-    @Ignore public void structural_transformation5_extended()  {
+     public void structural_transformation5_extended()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,_,base) --> acid>",1.0f,0.9f);
         tester.mustBelieve(CYCLES*2, "<neutralization --> (substance,acid,base)>", 1.0f, 0.9f);
     }
 
     @Test
-    @Ignore public void structural_transformation5_extended2c() {
+     public void structural_transformation5_extended2c() {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,_,acid,base,reaction) --> substance>", 1.0f, 0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
     @Test
-    @Ignore public void structural_transformation5_extended2a()  {
+     public void structural_transformation5_extended2a()  {
         TestNAR tester = test();
         //tester.log();
         tester.believe("<(\\,neutralization,substance,_,base,reaction) --> acid>",1.0f,0.9f);
@@ -119,21 +119,21 @@ public class NAL4Test extends AbstractNALTest {
     }
 
     @Test
-    @Ignore public void structural_transformation5_extended2b()  {
+     public void structural_transformation5_extended2b()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,_,reaction) --> base>",1.0f,0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test
-    @Ignore public void structural_transformation5_extended2d()  {
+     public void structural_transformation5_extended2d()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,substance,acid,base,_) --> reaction>",1.0f,0.9f);
         tester.mustBelieve(CYCLES, "<neutralization --> (substance,acid,base,reaction)>", 1.0f, 0.9f);
     }
 
     @Test
-    @Ignore public void structural_transformation6()  {
+     public void structural_transformation6()  {
         TestNAR tester = test();
         tester.believe("<(\\,neutralization,acid,_) --> base>",1.0f,0.9f); //en("Something that can neutralize a base is an acid.");
         tester.mustBelieve(CYCLES, "<neutralization --> (acid,base)>", 1.0f, 0.9f); //en("Something that can be neutralized by an acid is a base.");
@@ -235,40 +235,9 @@ public class NAL4Test extends AbstractNALTest {
                 .mustBelieve(CYCLES, "<(/,neutralization,liquid,base,_) --> (/,neutralization,liquid,soda,_)>", 1.0f, 0.81f); //en("What can neutraliz base can react with base.");
     }
 
-    @Test public void testCompositionFromProductInh() throws nars.Narsese.NarseseException {
-        //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-//        Default d = new Default() {
-//            @Override
-//            public Deriver newDeriver() {
-//                try {
-//                    return TrieDeriver.get(
-//                        new PremiseRuleSet(PremiseRuleSet.parse(
-//                            "((%A..+) --> %Z), (%X --> %Y), task(\"?\") |- ((%A..+) --> substitute((%A..+),%X,%Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)\n")));
-//                } catch (Narsese.NarseseException e) {
-//                    e.printStackTrace();
-//                    return null;
-//                }
-//            }
-//
-//        };
-//        tester = test(d)
-        test()
-                .log()
-                .believe("(soda --> acid)",1.0f,0.9f)
-                .ask("((drink,soda) --> ?death)")
-                .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);
-    }
-
-    @Test public void testCompositionFromProductSim() throws nars.Narsese.NarseseException {
-        test()
-                .believe("(soda <-> deadly)",1.0f,0.9f)
-                .ask("((soda,food) <-> #x)")
-                .mustBelieve(CYCLES, "((soda,food) <-> (deadly,food))", 1.0f, 0.81f);
-    }
 
 
-
-    @Ignore @Test public void testRecursionForce1() {
+     @Test public void testRecursionForce1() {
         //    ((X,Z) --> Y), X |- ((X,Z)-->((/,Y,_,Z),Z)), (Belief:StructuralDeduction, Desire:StructuralDeduction)
         TestNAR t = test();
 
@@ -303,7 +272,7 @@ public class NAL4Test extends AbstractNALTest {
 //    }
 
 
-    @Ignore @Test public void missingEdgeCase3() {
+     @Test public void missingEdgeCase3() {
         //((<(%1) --> %2>, %1), (<%1 --> (/, %2, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
         //  ((<(p1) --> p2>, p1), (<p1 --> (/, p2, _)>, (<Identity --> Truth>, <Identity --> Desire>)))
         RuleTest.get(test(),
@@ -320,7 +289,7 @@ public class NAL4Test extends AbstractNALTest {
 //                1.0f, 1.0f, 0.9f, 0.9f);
 //    }
 
-    @Ignore @Test public void missingEdgeCase5() {
+     @Test public void missingEdgeCase5() {
         //((<%1 --> (%2)>, %2), (<(\, %1, _) --> %2>, (<Identity --> Truth>, <Identity --> Desire>)))
         RuleTest.get(test(),
                 "<p1 --> (belief:p2)>.", "belief:p2.",
@@ -329,32 +298,6 @@ public class NAL4Test extends AbstractNALTest {
     }
 
 
-    @Test public void testIntersectionOfProductSubterms1() {
-        test()
-                .believe("f(x)",1.0f,0.9f)
-                .believe("f(y)",1.0f,0.9f)
-                .mustBelieve(CYCLES, "f:((x)&(y))", 1.0f, 0.81f);
-    }
-    @Test public void testIntersectionOfProductSubterms2() {
-        test()
-                .believe("f(x,z)",1.0f,0.9f)
-                .believe("f(y,z)",1.0f,0.9f)
-                .mustBelieve(CYCLES*16, "f:((x,z)&(y,z))", 1.0f, 0.81f);
-    }
 
 
-    @Test public void testNeqComRecursiveConstraint() {
-
-        /*
-        SHOULD NOT HAPPEN:
-        $.02;.09$ ((o-(i-happy))-->happy). 497⋈527 %.55;.18% {497⋈527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÄ;æ0IáËÑþKÉ;æ0IáËÑþKÌ} (((%1-->%2),(%1-->%3),neqCom(%2,%3)),((%3-->%2),((Abduction-->Belief),(Weak-->Goal),(Backward-->Permute))))
-            $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
-            $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
-        */
-        test()
-                .log()
-                .believe("happy(L)", 1f, 0.9f)
-                .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
-                .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);
-    }
 }
