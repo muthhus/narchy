@@ -1,23 +1,29 @@
 package spacegraph.render;
 
+import com.jogamp.common.os.Platform;
 import com.jogamp.nativewindow.WindowClosingProtocol;
 import com.jogamp.newt.event.*;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 import com.jogamp.opengl.glu.GLU;
+import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import jcog.Util;
 import jcog.meter.event.PeriodMeter;
+import jogamp.opengl.FPSCounterImpl;
+import nars.util.Loop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
@@ -27,7 +33,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     final static int FPS_IDEAL = 30;
     public static final int FPS_MIN = 20; //min acceptable FPS
 
-    protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
+
+    //protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
+    protected static final GameAnimatorControl a = new GameAnimatorControl(FPS_IDEAL);
 
     static {
         a.start();
@@ -294,6 +302,202 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
 
+    /* from: Jake2's */
+    public static class GameAnimatorControl extends AnimatorBase {
+        final FPSCounterImpl fpsCounter;
+        private final Loop loop;
+        private boolean pauseIssued;
+        private boolean quitIssued;
+        public boolean isAnimating;
+        private List<GLAutoDrawable> toDraw = new CopyOnWriteArrayList<>();
+
+        GameAnimatorControl(float initialFPS) {
+            super();
+            final boolean isARM = Platform.CPUFamily.ARM == Platform.getCPUFamily();
+            fpsCounter = new FPSCounterImpl();
+            fpsCounter.setUpdateFPSFrames(isARM ? 60 : 4 * 60, System.err);
+            this.loop = new Loop(initialFPS) {
+
+
+                public boolean justStarted = true;
+
+                @Override
+                public boolean next() {
+
+                    UncaughtAnimatorException caughtException = null;
+
+                    if (justStarted) {
+                        justStarted = false;
+                        synchronized (GameAnimatorControl.this) {
+                            animThread = Thread.currentThread();
+                            if (DEBUG) {
+                                System.err.println("FPSAnimator start/resume:" + Thread.currentThread() + ": " + toString());
+                            }
+                            isAnimating = true;
+                            if (drawablesEmpty) {
+                                pauseIssued = true; // isAnimating:=false @ pause below
+                            } else {
+                                pauseIssued = false;
+                                setDrawablesExclCtxState(exclusiveContext); // may re-enable exclusive context
+                            }
+                            GameAnimatorControl.this.notifyAll(); // Wakes up 'waitForStartedCondition' sync -and resume from pause or drawablesEmpty
+                            if (DEBUG) {
+                                System.err.println("FPSAnimator P1:" + Thread.currentThread() + ": " + toString());
+                            }
+                        }
+                    }
+                    if (!pauseIssued && !quitIssued) { // RUN
+                        try {
+                            display();
+                        } catch (final UncaughtAnimatorException dre) {
+                            caughtException = dre;
+                            quitIssued = true;
+                        }
+                    } else if (pauseIssued && !quitIssued) { // PAUSE
+//                        if (DEBUG) {
+//                            System.err.println("FPSAnimator pausing: " + alreadyPaused + ", " + Thread.currentThread() + ": " + toString());
+//                        }
+                        //this.cancel();
+
+//                        if (!alreadyPaused) { // PAUSE
+//                            alreadyPaused = true;
+                        if (exclusiveContext && !drawablesEmpty) {
+                            setDrawablesExclCtxState(false);
+                            try {
+                                display(); // propagate exclusive context -> off!
+                            } catch (final UncaughtAnimatorException dre) {
+                                caughtException = dre;
+                                dre.printStackTrace();
+//                                    stopIssued = true;
+                            }
+                        }
+                        if (null == caughtException) {
+                            synchronized (GameAnimatorControl.this) {
+                                if (DEBUG) {
+                                    System.err.println("FPSAnimator pause " + Thread.currentThread() + ": " + toString());
+                                }
+                                isAnimating = false;
+                                GameAnimatorControl.this.notifyAll();
+                            }
+                        }
+                    }
+                    return true;
+
+                }
+            };
+
+
+//                    if (stopIssued) { // STOP incl. immediate exception handling of 'displayCaught'
+//                        if (DEBUG) {
+//                            System.err.println("FPSAnimator stopping: " + alreadyStopped + ", " + Thread.currentThread() + ": " + toString());
+//                        }
+//                        this.cancel();
+//
+//                        if (!alreadyStopped) {
+//                            alreadyStopped = true;
+//                            if (exclusiveContext && !drawablesEmpty) {
+//                                setDrawablesExclCtxState(false);
+//                                try {
+//                                    display(); // propagate exclusive context -> off!
+//                                } catch (final UncaughtAnimatorException dre) {
+//                                    if (null == caughtException) {
+//                                        caughtException = dre;
+//                                    } else {
+//                                        System.err.println("FPSAnimator.setExclusiveContextThread: caught: " + dre.getMessage());
+//                                        dre.printStackTrace();
+//                                    }
+//                                }
+//                            }
+//                            boolean flushGLRunnables = false;
+//                            boolean throwCaughtException = false;
+//                            synchronized (FPSAnimator.this) {
+//                                if (DEBUG) {
+//                                    System.err.println("FPSAnimator stop " + Thread.currentThread() + ": " + toString());
+//                                    if (null != caughtException) {
+//                                        System.err.println("Animator caught: " + caughtException.getMessage());
+//                                        caughtException.printStackTrace();
+//                                    }
+//                                }
+//                                isAnimating = false;
+//                                if (null != caughtException) {
+//                                    flushGLRunnables = true;
+//                                    throwCaughtException = !handleUncaughtException(caughtException);
+//                                }
+//                                animThread = null;
+//                                GameAnimatorControl.this.notifyAll();
+//                            }
+//                            if (flushGLRunnables) {
+//                                flushGLRunnables();
+//                            }
+//                            if (throwCaughtException) {
+//                                throw caughtException;
+//                            }
+//                        }
+//
+//                        //if (impl!=null && !drawablesEmpty)
+//                        //  display();
+//                        return true;
+
+
+            setIgnoreExceptions(true);
+
+            setPrintExceptions(true);
+
+            animThread = loop.thread;
+            //setExclusiveContext(loop.thread);
+        }
+
+        @Override
+        protected String getBaseName(String prefix) {
+            return prefix;
+        }
+
+        @Override
+        public final boolean start() {
+            return false;
+        }
+
+        @Override
+        public final boolean stop() {
+            quitIssued = true;
+            return true;
+        }
+
+
+        @Override
+        public final boolean pause() {
+//            if( DEBUG ) {
+//                System.err.println("GLCtx Pause Anim: "+Thread.currentThread().getName());
+//                Thread.dumpStack();
+//            }
+            pauseIssued = true;
+            return true;
+        }
+
+        @Override
+        public final boolean resume() {
+            pauseIssued = false;
+            return true;
+        }
+
+        @Override
+        public final boolean isStarted() {
+            //return null != window;
+            return true;
+        }
+
+        @Override
+        public final boolean isAnimating() {
+            return !pauseIssued; // null != window && !shouldPause;
+        }
+
+        @Override
+        public final boolean isPaused() {
+            return pauseIssued;
+        }
+
+
+    }
 
     private static class MyFPSAnimator extends FPSAnimator {
 

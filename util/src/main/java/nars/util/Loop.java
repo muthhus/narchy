@@ -6,7 +6,6 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
-import static nars.time.Tense.DTERNAL;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -20,14 +19,14 @@ abstract public class Loop implements Runnable {
      * sleep mode delay time
      */
     @NotNull
-    protected final Thread thread;
+    public final Thread thread;
     protected final int windowLength = 4;
 
     protected long afterTime;
     protected boolean stopping;
     protected boolean stopped;
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
-    private int periodMS = DTERNAL;
+    private int periodMS = -1;
 
     @Override
     public String toString() {
