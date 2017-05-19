@@ -18,6 +18,7 @@ import nars.op.stm.STMTemporalLinkage;
 import nars.premise.PreferSimpleAndPolarized;
 import nars.time.FrameTime;
 import nars.time.Time;
+import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +57,7 @@ public class Default extends NAR {
         this(activeConcepts,
             new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new FrameTime(),
-            new SynchronousExecutor());
+            new BufferedSynchronousExecutor());
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
@@ -80,8 +81,7 @@ public class Default extends NAR {
                 //:
                 new FireConcepts(focus, this);
 
-
-        deriver.rate.setValue(Param.UnificationTTLMax * 5);
+        deriver.rate.setValue(15);
     }
 
     public Deriver newDeriver() {

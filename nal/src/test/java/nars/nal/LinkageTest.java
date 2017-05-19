@@ -93,7 +93,6 @@ public class LinkageTest extends AbstractNALTest {
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, byte punc, @NotNull String spremise2) throws Exception {
 
-        int frames = 5;
 
         NAR nar = test().nar;
 
@@ -114,7 +113,8 @@ public class LinkageTest extends AbstractNALTest {
         String t2 = getTask(punc, premise2);
         nar.input(t2);
 
-        //nar.run(frames);
+
+        nar.run(5);
 
         //List<String> fails = new ArrayList();
 

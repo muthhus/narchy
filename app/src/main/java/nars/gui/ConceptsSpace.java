@@ -159,7 +159,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
         //n.focus.activationRate.setValue(0.05f);
 
-        n.loopFPS(16f);
+        n.loopFPS(2f);
 
         n.input("(x:a ==> x:b).",
                 "(x:b ==> x:c).",

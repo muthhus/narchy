@@ -43,12 +43,7 @@ import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
- * A task to be processed, consists of a Sentence and a BudgetValue.
- * A task references its parent and an optional causal factor (usually an Operation instance).  These are implemented as WeakReference to allow forgetting via the
- * garbage collection process.  Otherwise, Task ancestry would grow unbounded,
- * violating the assumption of insufficient resources (AIKR).
- * <p>
- * TODO decide if the Sentence fields need to be Reference<> also
+ * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
 public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
@@ -99,7 +94,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             } else {
                 //nearest endpoint of the interval
                 if (dur > 0) {
-                    cw = TruthPolation.evidenceDecay(cw, dur, Math.min(Math.abs(a - when), Math.abs(z - when)));
+                    cw = TruthPolation.evidenceDecay(cw, dur, a!=z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a-when) );
                 } else {
                     cw = 0;
                 }
