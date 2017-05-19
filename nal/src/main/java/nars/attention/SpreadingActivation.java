@@ -93,6 +93,9 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     @Override
     public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
+        this.origin = nar.concept(value);
+        if (origin == null)
+            return;
 
         this.momentum = nar.momentum.floatValue();
         spread = activationMapThreadLocal.get();
@@ -100,7 +103,6 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         this.nar = nar;
         this.inPri = value.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
 
-        this.origin = nar.concept(value);
         this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
         this.maxDepth = levels((Compound)originTerm);

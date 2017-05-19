@@ -427,6 +427,8 @@ public class TemporalTest {
 
         Concept cc = cb.get($(abpill)).get(); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
+        cc.beliefs().print();
+
         //test belief match interpolated a result
         assertEquals(correctMerge, cc.beliefs().match(0, n.time(), this.n.dur(), null, true).term().toString());
 

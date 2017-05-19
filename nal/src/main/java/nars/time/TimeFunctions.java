@@ -951,7 +951,7 @@ public interface TimeFunctions {
                     new Term[]{$.negIf(newPresub, neg), derived.sub(1)})
             ));
         }
-        if (post && derived.sub(1) instanceof Compound) {
+        if (post && derived.sub(1) instanceof Compound && derived.sub(1).size()==2) {
 
             Compound postSub = (Compound) derived.sub(1);
             boolean neg = postSub.op() == NEG;

@@ -531,7 +531,10 @@ public abstract class TermBuilder {
         } else {
             //NON-COMMUTIVE
 
-            assert (n == 2);
+            //assert (n == 2);
+            if (n!=2) {
+                throw new InvalidTermException(CONJ, u, "invalid non-commutive conjunction");
+            }
 
             Term a = u[0];
             Term b = u[1];

@@ -1,10 +1,12 @@
 package nars.experiment.recog2d;
 
+import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.CompoundConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 
 import java.util.LinkedHashMap;
@@ -18,7 +20,7 @@ import java.util.stream.IntStream;
 public class Outputs {
 
     public double errorSum() {
-        return out.values().stream().mapToDouble(x -> x.error).map(x -> x==x ? x : 1f).sum();
+        return out.values().stream().mapToDouble(x -> x.error).map(x -> x == x ? x : 1f).sum();
     }
 
     static class Neuron {
@@ -39,7 +41,7 @@ public class Outputs {
         }
 
         public void expect(float expected) {
-            this.expected = expected ;
+            this.expected = expected;
             update();
         }
 
@@ -52,14 +54,14 @@ public class Outputs {
         protected void update() {
             float a = this.actual;
             float e = this.expected;
-            if (e!=e) {
+            if (e != e) {
                 this.error = Float.NaN;
             } else if (a != a) {
                 this.error = 1f;
             } else {
-                this.error = ( Math.abs(a - e) )
-                        //* ( this.actualConf )
-                        ;
+                this.error = (Math.abs(a - e))
+                //* ( this.actualConf )
+                ;
             }
         }
     }
@@ -79,14 +81,14 @@ public class Outputs {
     }
 
     float[] sized(float[] output) {
-        if (output == null || output.length!=states) {
+        if (output == null || output.length != states) {
             output = new float[states];
         }
         return output;
     }
 
 
-    final LinkedHashMap<CompoundConcept,Neuron> out;
+    final LinkedHashMap<CompoundConcept, Neuron> out;
     CompoundConcept[] outVector;
 
     final int states;
@@ -96,7 +98,7 @@ public class Outputs {
     boolean verify = false;
 
 
-    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a, float goalInfluence) {
+    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a, FloatToFloatFunction transferFunction) {
         this.nar = a.nar;
         this.states = maxStates;
         this.out = new LinkedHashMap<>(maxStates);
@@ -113,16 +115,19 @@ public class Outputs {
 //                                //return null;
 //                            }
 //
-                            //return $.t(ee, a.alpha() );
+                        //return $.t(ee, a.alpha() );
 //                            //return null;
 //                        }
 
 //                        if (b!=null && d!=null) {
 //                            return d.confMult(0.5f + 0.5f * Math.abs(d.freq()-b.freq()));
 //                        } else {
-                            //return d!=null ? d.confWeightMult(0.5f) : null;
+                        //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        return d;
+                        if (d != null)
+                            return $.t(transferFunction.valueOf(d.freq()), d.conf());
+                        else
+                            return null;
                         //return d!=null ? new PreciseTruth(d.freq(), d.conf()goalInfluence.d.eviMult(goalInfluence, a.nar.dur()) : null;
                     });
                 }
@@ -138,7 +143,6 @@ public class Outputs {
 
         ).peek(c -> out.put(c, new Neuron()))
                 .toArray(CompoundConcept[]::new);
-
 
 
         a.nar.onCycle(nn -> {
@@ -181,15 +185,15 @@ public class Outputs {
     void expect(IntToFloatFunction stateValue) {
         //long now = nar.time();
         for (int i = 0; i < states; i++)
-            out.get(outVector[i]).expect( stateValue.valueOf(i));
+            out.get(outVector[i]).expect(stateValue.valueOf(i));
     }
 
     public void expect(int onlyStateToBeOn) {
         float offValue =
                 0f;
-                //0.5f - (1f/states)*0.5f;
-                //1f/states * 0.5f;
-                //0.5f;
+        //0.5f - (1f/states)*0.5f;
+        //1f/states * 0.5f;
+        //0.5f;
 
         expect(ii -> ii == onlyStateToBeOn ? 1f : offValue);
     }

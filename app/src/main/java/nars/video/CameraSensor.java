@@ -87,7 +87,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private static Int2Function<Compound> RadixProduct(Term root, int width, int height, int radix) {
         return (x, y) ->
-                $.inh(
+                //$.inh(
                         //$.inh(
 
 
@@ -97,12 +97,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                                 $.p(zipCoords(coord(x, width), coord(y, height))) :
                                 //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                 //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                $.p($.the(x), $.the(y)),
+                                $.p($.the(x), $.the(y))
 
-                        root
+                       // ,root
 
 
-                );
+               // )
+        ;
     }
 
     private static Term[] zipCoords(@NotNull Term[] x, @NotNull Term[] y) {
@@ -241,7 +242,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                if (y < h-1) s.add( concept(x, y+1) );
 //
 //                return TermVector.the(s);
-            this.templates = new PixelNeighborsManhattanRandom(subterms(),2,  x, y, w, h);
+            this.templates = new PixelNeighborsManhattanRandom(subterms(), x, y, w, h, 2);
         }
 
         @Override

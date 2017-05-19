@@ -20,6 +20,8 @@ import nars.video.Blink;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
@@ -64,7 +66,7 @@ public class Recog2D extends NAgentX {
     final int maxImages = 3;
     static int durFPS = 10;
     int imagePeriod = 164;
-    float goalInfluence = 0.5f; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
+    FloatToFloatFunction goalInfluence = (x) -> x > 0.5f ? 1 : 0; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -113,11 +115,11 @@ public class Recog2D extends NAgentX {
                 //$.the("zoom")
                 //)
                 ,
-                new Blink(new Scale(() -> canvas, w, h), 0.8f));
+                /*new Blink*/(new Scale(() -> canvas, w, h)/*, 0.8f*/));
 
         //nar.log();
 
-        outs = new Outputs(ii -> (Compound) $.inst(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> (Compound) $.inh(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
@@ -305,11 +307,11 @@ public class Recog2D extends NAgentX {
     public static void main(String[] arg) throws Narsese.NarseseException {
         Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
                 3,
-                new RealTime.DSHalf(true).durFPS(durFPS)));
+                new RealTime.DS(true).durFPS(2)));
 
 
         NAgentX.chart(a);
-        a.runRT(30);
+        a.runRT(5);
     }
 
     public static class Training {

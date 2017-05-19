@@ -22,8 +22,8 @@ public class Arkancide extends NAgentX {
     public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 32;
-    final int visH = 32;
+    final int visW = 48;
+    final int visH = 20;
 
     //final int afterlife = 60;
 

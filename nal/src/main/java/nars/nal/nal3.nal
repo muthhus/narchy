@@ -16,9 +16,9 @@
     //(M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (S - P)), (Belief:Difference)
 
 //raw product composition
-//    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
-//    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union)
-//    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference)
+    (A..+), (B..+) |- ((A..+) | (B..+)), (Belief:Intersection)
+    (A..+), (B..+) |- ((A..+) & (B..+)), (Belief:Union)
+    (A..+), (B..+) |- ((A..+) ~ (B..+)), (Belief:Difference)
 //raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
