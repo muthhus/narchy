@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.Deletes;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
@@ -67,8 +68,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-                //new PLinkHijackBag(0, 2);
-                new ArrayBag<>(0, PriMerge.avg, new HashMap());
+                new PLinkHijackBag(0, 2);
+                //new ArrayBag<>(0, PriMerge.avg, new HashMap());
 
 
 //        for (int i = 0; i < edges; i++)
@@ -134,6 +135,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             if (newCap > 0) {
 
                 edges.forEach(x -> x.get().clear());
+                edges.commit(); //forget
 
                 //phase 1: collect
                 c.tasklinks().forEach(this);
@@ -397,7 +399,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             cw.scale(l, w, h);
 
 
-            float density = 2f;
+            float density = 6f;
             if (cw.body != null)
                 cw.body.setMass(l * w * h * density);
 

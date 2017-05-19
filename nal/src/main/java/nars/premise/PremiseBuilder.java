@@ -10,6 +10,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.FireConcepts;
 import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
 import nars.table.BeliefTable;
 import nars.task.AbstractTask;
 import nars.task.BinaryTask;
@@ -29,14 +30,10 @@ import static nars.util.UtilityFunctions.aveAri;
 
 
 public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
-    private final PLink<Task> taskLink;
-    private final PLink<Term> termLink;
 
 
-    public PremiseBuilder(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink, float pri) {
-        super(tasklink, termlink, pri);
-        this.termLink = termlink;
-        this.taskLink = tasklink;
+    public PremiseBuilder(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink) {
+        super(tasklink, termlink, 0);
     }
 
     /**
@@ -55,9 +52,10 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
     @Override
     public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
-        Term beliefTerm = termLink.get();
+        Term beliefTerm = getTwo().get();
         Task belief = null;
 
+        PLink<Task> taskLink = getOne();
         Task task = taskLink.get();
 
         if (beliefTerm instanceof Compound) {
@@ -138,8 +136,13 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
 
-        nar.input(new DerivePremise(new Premise(task, beliefTerm, belief, pri)));
+        nar.input(new DerivePremise(new Premise(task, beliefTerm, belief,
+            //pri
+        this.pri() * pri
+        )));
     }
+
+
 
 
     static class DerivePremise extends UnaryTask<Premise> {

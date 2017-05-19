@@ -1,5 +1,6 @@
 package nars.task;
 
+import nars.derive.Deriver;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -17,4 +18,11 @@ abstract public class BinaryTask<X, Y> extends UnaryTask<Pair<X, Y>> {
         super(value, pri);
     }
 
+    public final X getOne() {
+        return value.getOne();
+    }
+
+    public final Y getTwo() {
+        return value.getTwo();
+    }
 }

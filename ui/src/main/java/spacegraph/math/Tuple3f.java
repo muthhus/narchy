@@ -674,6 +674,10 @@ public abstract class Tuple3f implements java.io.Serializable, Cloneable {
         return bb;
     }
 
+    public boolean isFinite() {
+        return Float.isFinite(x) && Float.isFinite(y) && Float.isFinite(z);
+    }
+
 
 //    /**
 //     * Get the <i>x</i> coordinate.

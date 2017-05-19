@@ -5,11 +5,9 @@
  */
 package lbmq;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
+import jcog.list.FasterList;
+
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -95,13 +93,15 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
 
     private final LinkedList<PriorityGroup> priorityGroups = new LinkedList<PriorityGroup>();
 
+
+
     /**
      * Set of sub-queues with the same priority
      */
     private class PriorityGroup {
 
         final int priority;
-        final ArrayList<SubQueue> queues = new ArrayList<SubQueue>(0);
+        final List<SubQueue> queues = new FasterList<SubQueue>(0);
 
         PriorityGroup(int priority) {
             this.priority = priority;
@@ -186,6 +186,13 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             } while (nextIdx != startIdx);
             return null;
         }
+    }
+
+    public void clear() {
+        subQueues.values().forEach(SubQueue::clear);
+    }
+    public boolean offer(K pi, E x) {
+        return subQueues.get(pi).offer(x);
     }
 
     /**

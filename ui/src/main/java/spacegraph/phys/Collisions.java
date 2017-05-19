@@ -514,7 +514,7 @@ public abstract class Collisions<X> {
 		v3 collisionObjectAabbMin = v(), collisionObjectAabbMax = v();
 		float[] hitLambda = new float[1];
 
-		Transform tmpTrans = new Transform();
+		//Transform tmpTrans = new Transform();
 
 		List<Collidable> objs = collidables();
 		for (Collidable collidable : objs) {
@@ -536,6 +536,9 @@ public abstract class Collisions<X> {
 					Transform worldTransform = collidable.worldTransform;
 
 					shape.getAabb(worldTransform, collisionObjectAabbMin, collisionObjectAabbMax);
+
+					if (!collisionObjectAabbMin.isFinite() && collisionObjectAabbMax.isFinite())
+						continue;
 
 					hitLambda[0] = resultCallback.closestHitFraction;
 

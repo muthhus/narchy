@@ -62,11 +62,11 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         if (truth!=null) { //belief and goal:
             float polarityFactor = this.polarityFactor.floatValue();
             p *= (1f-polarityFactor) + polarityFactor * truth.polarization();
-        } /*else {
-            p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-        }*/
+        } else {
+            //p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
+            p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
+        }
 
-        p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
 
 
         p *= puncFactor(punc).floatValue();

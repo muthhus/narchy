@@ -22,7 +22,9 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
 import static jcog.bag.Bag.BagCursorAction.Stop;
@@ -40,9 +42,11 @@ public class FireConcepts implements Runnable {
 
 
     /**
-     * in TTL per cycle
+     * in total priority per cycle, however
+     * it is actually sum(1 + concept priority)
+     * so that 0 priority concepts consume something
      */
-    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (16 * 1024));
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (1024));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -68,33 +72,22 @@ public class FireConcepts implements Runnable {
 
     public class ConceptFire extends UnaryTask<Concept> {
 
-        /** a reducing factor for assigning priority to this concept firing task.
-         *  if it uses the priority directly then it competes for execution against
-         *  tasks themselves. one reason this is probably necessary is that in terms of
-         *  feedback, the firing of a concept can produce many tasks which should
-         *  themselves have more chance to survive than another firing which produces tasks
-         *  and so on
-         */
-        final static float ACTIVATION_FACTOR = 1f;
 
         public ConceptFire(Concept c, float pri) {
-            super(c, pri * ACTIVATION_FACTOR);
+            super(c, pri);
         }
 
-        public int ttlMax() {
-            float pri = pri();
-            if (pri!=pri) //deleted
-                return -1;
-            return Util.lerp(pri/ACTIVATION_FACTOR, Param.UnificationTTLMax, Param.UnificationTTLMin);
-        }
 
         @Override
         public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
 
-            int ttl = ttlMax();
-            if (ttl <= 0)
-                return; //??
+            float pri = this.pri;
+
+            if (pri!=pri)
+                return;
+
+            int ttl = Util.lerp(pri, Param.FireTTLMax, Param.FireTTLMin);
 
             Concept c = value;
 
@@ -109,6 +102,8 @@ public class FireConcepts implements Runnable {
 
 
 
+
+            Set<PremiseBuilder> premises = new HashSet();
 
             /**
              * this implements a pair of roulette wheel random selectors
@@ -138,14 +133,21 @@ public class FireConcepts implements Runnable {
                     termLinkPri = c.termlinks().normalizeMinMax(termlink.priSafe(0));
                 }
 
-                if (ttl <= premiseCost)
-                    break; //not enough remaining to create premise
-
-                nar.input(new PremiseBuilder(tasklink, termlink, pri));
+                premises.add(new PremiseBuilder(tasklink, termlink));
 
                 ttl -= premiseCost; //failure of premise generation still causes cost
             }
 
+            //divide priority among the premises
+            int num = premises.size();
+            if (num > 0) {
+                float subPri = pri / num;
+                premises.forEach(p -> {
+                    p.setPri(subPri);
+                    nar.input(p);
+                });
+
+            }
         }
 
     }
@@ -174,7 +176,7 @@ public class FireConcepts implements Runnable {
         if (((ConceptBagFocus) this.source).active.commit(null).size() == 0)
             return; //no concepts
 
-        final int[] curTTL = {(int) Math.ceil(rate.floatValue() * (1f - load))};
+        final float[] curTTL = { (rate.floatValue() * (1f - load))};
         if (curTTL[0] == 0)
             return; //idle
 
@@ -190,16 +192,16 @@ public class FireConcepts implements Runnable {
         final int[] fired = {0};
         csrc.active.sample(pc -> {
 
-            ConceptFire cf = new ConceptFire(pc.get(), pc.priSafe(0));
+            float priFired = pc.priSafe(0);
+
+            ConceptFire cf = new ConceptFire(pc.get(), priFired);
             fired[0]++;
             nar.input(cf);
 
             pc.priMult(priDecayFactor);
-            int ttlMax = cf.ttlMax();
-            if (ttlMax < 0)
-                ttlMax = MISFIRE_COST;
 
-            curTTL[0] -= ttlMax;
+
+            curTTL[0] -= (1f + priFired);
             return curTTL[0] > 0 ? Next : Stop;
         }, false);
 

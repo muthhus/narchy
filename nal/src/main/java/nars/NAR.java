@@ -1397,14 +1397,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return this;
     }
 
-    public void input(@NotNull Iterable<Task> tasks) {
+    public void input(@NotNull Iterable<? extends ITask> tasks) {
         tasks.forEach(x -> {
             if (x != null)
                 input(x);
         });
     }
 
-    public final void input(@NotNull Stream<Task> taskStream) {
+    public final void input(@NotNull Stream<? extends ITask> taskStream) {
         taskStream.filter(Objects::nonNull).forEach(this::input);
     }
 

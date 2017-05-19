@@ -89,8 +89,8 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         @Override
         public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
             value.get().getTwo()
-                    .hide();
-                    //.delete(space.dyn);
+                    //.hide();
+                    .delete(space.dyn);
         }
     };
 

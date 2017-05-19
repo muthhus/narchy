@@ -3,15 +3,8 @@ package nars.util.exe;
 import jcog.AffinityExecutor;
 import jcog.Texts;
 import jcog.Util;
-import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.event.On;
-import jcog.pri.PForget;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Param;
 import nars.task.ITask;
@@ -21,9 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 
@@ -37,31 +28,9 @@ public class MultiThreadExecutor extends Executioner {
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
 
-    //private final ArrayBlockingQueue<Runnable> passive;
+
     private final ForkJoinPool passive;
 
-    final int maxActive = 1 * 1024;
-    final PriorityHijackBag<ITask,ITask> active = new PriorityHijackBag<ITask, ITask>(maxActive, 3) {
-        @Override
-        protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, float scale) {
-//            existing.priMax(incoming.priSafe(0)*scale);
-//            return existing;
-            return super.merge(existing, incoming, scale);
-        }
-
-        @Override
-        protected Consumer<ITask> forget(float rate) {
-            return new PForget(rate);
-        }
-
-        @NotNull
-        @Override
-        public ITask key(ITask value) {
-            return value;
-        }
-    };
-    //final ArrayBag<ITask> active = new ArrayBag(maxActive, PriMerge.avg, new ConcurrentHashMap<>(maxActive));
-    //final ConcurrentSkipListSet<ITask> active = new ConcurrentSkipListSet(Priority.COMPARATOR);
 
     private final AffinityExecutor activeExec;
 
@@ -70,6 +39,10 @@ public class MultiThreadExecutor extends Executioner {
 
     private On onReset;
 
+    final TaskBag active =
+            //new HijackITaskBag();
+            new LBMQTaskBag(1024);
+
     //    final AtomicInteger numActive = new AtomicInteger(); //because skiplist size() is slow
     final LongAdder input = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
 
@@ -77,14 +50,14 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public void run(@NotNull ITask t) {
         float p = t.pri();
-        if (p!=p) //deleted
+        if (p != p) //deleted
             return;
 
         if (t.punc() == COMMAND) {
             runLater(() -> t.run(nar));
         } else {
             input.increment();
-            if (active.put(t, 1f, null) != null) {
+            if (active.add(t)) {
                 forgot.increment();
 
 //                int p = numActive.incrementAndGet();
@@ -194,18 +167,16 @@ public class MultiThreadExecutor extends Executioner {
             while (true) {
                 try {
 
-                    active.sample((next)-> {
+                    ITask x = active.next();
+                    if (x != null) {
                         executed.increment();
-                        next.run(nar);
-                        return Bag.BagCursorAction.Next;
-                    }, true);
-
-                    if (active.isEmpty()) {
-                        pause(pauses++);
-                        continue;
-                    } else {
+                        x.run(nar);
                         pauses = 0;
+                    } else {
+                        pause(pauses++);
                     }
+
+
 
                 } catch (Throwable e) {
                     logger.error("{}", e);
@@ -278,7 +249,7 @@ public class MultiThreadExecutor extends Executioner {
     @Override
     public final float load() {
         //ForkJoinPool.commonPool().getActiveThreadCount()
-        return ((float)active.size())/maxActive;
+        return active.load();
         //return 1f - ((float) passive.remainingCapacity()) / passive.capacity();
 
 //        int remaining = (int) ring.remainingCapacity();
@@ -302,8 +273,7 @@ public class MultiThreadExecutor extends Executioner {
             pause(waitCycles++);
         }
 
-        active.commit(null);
-
+        active.commit();
 
         Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
         if (vv != null) {
@@ -332,7 +302,7 @@ public class MultiThreadExecutor extends Executioner {
 
     private HashBag<String> activeProfile() {
         HashBag<String> h = new HashBag();
-        active.forEachKey(x -> {
+        active.forEach(x -> {
             String key;
             if (x instanceof NALTask) {
                 key = Character.toString((char) ((NALTask) x).punc);

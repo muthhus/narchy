@@ -519,24 +519,30 @@ abstract public class NAgent implements NSense, NAct {
         private final NAR nar;
         private final Timer timer;
         final AtomicBoolean busy = new AtomicBoolean(false);
+        private long last;
 
         public Periodic(NAR nar, Timer t, float fps, Runnable task) {
             //fps.setValue(initialFPS);
             this.timer = t;
             this.task = task;
             this.nar = nar;
+            this.last = nar.time();
 
             t.schedule(this, 0, Math.round(1000f / fps));
         }
 
         @Override
         public void run() {
+
+            if (nar.time() == this.last)
+                return; //hasn't proceeded to next cycle
+
             if (!busy.compareAndSet(false, true)) {
                 return; //black-out, the last frame didnt even finish yet
             }
 
-
             nar.runLater(()->{
+                last = nar.time();
                 try {
                     task.run();
                 } finally {

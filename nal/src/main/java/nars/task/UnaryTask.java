@@ -19,7 +19,6 @@ abstract public class UnaryTask<X> extends AbstractTask {
         this.hash = Util.hashCombine(getClass().hashCode(), value.hashCode());
     }
 
-
     @Override
     public final @NotNull String toString() {
         return getClass().getSimpleName() + "(\"" + value + "\")";
@@ -27,15 +26,9 @@ abstract public class UnaryTask<X> extends AbstractTask {
 
     @Override
     public final boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-
-        if (obj!=null && (obj.getClass() == getClass()) && ((nars.task.UnaryTask) obj).value.equals(value)) {
-            //optional: merge??
-            return true;
-        }
-
-        return false;
+        return (this == obj)
+            ||
+        hash == obj.hashCode() && ((obj instanceof UnaryTask) && ((UnaryTask) obj).value.equals(value));
     }
 
     @Override
