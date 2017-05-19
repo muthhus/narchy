@@ -39,6 +39,7 @@ import java.util.function.BiConsumer;
 import static java.util.Collections.addAll;
 import static nars.$.*;
 import static nars.Op.CONJ;
+import static nars.Op.PROD;
 import static nars.Op.VAR_PATTERN;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
@@ -140,7 +141,7 @@ public class PremiseRule extends GenericCompound {
     }
 
     public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
-        super(Op.PROD, TermVector.the(premises, result));
+        super(PROD, TermVector.the(premises, result));
     }
 
 
@@ -227,10 +228,13 @@ public class PremiseRule extends GenericCompound {
 
         put("PatternOp1", rank--);
         put("PatternOp0", rank--);
+        put(TaskBeliefOp.class, rank--);
 
         put(TaskPunctuation.class, rank--);
 
+
         put(events.class, rank--);
+
         put(SubTermStructure.class, rank--);
 
         put(TaskPositive.class, rank--); //includes both positive or negative
@@ -264,6 +268,7 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
         if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
         if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
+        if (b.getClass() == TaskBeliefOp.class) return TaskBeliefOp.class;
 
 //        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
@@ -644,6 +649,14 @@ public class PremiseRule extends GenericCompound {
                         case "positive":
                             pres.add(BeliefPositive.thePos);
                             break;
+
+                        //HACK do somethign other than duplciate this with the "task" select below, and also generalize to all ops
+                         case "\"*\"":
+                            pres.add(new TaskBeliefOp(PROD, false, true));
+                            break;
+                        case "\"&&\"":
+                            pres.add(new TaskBeliefOp(CONJ, false, true));
+                            break;
                     }
                     break;
 
@@ -675,9 +688,18 @@ public class PremiseRule extends GenericCompound {
                             pres.add(TaskPunctuation.Goal);
                             taskPunc = '!';
                             break;
+
+                        case "\"*\"":
+                            pres.add(new TaskBeliefOp(PROD, true, false));
+                            break;
+                        case "\"&&\"":
+                            pres.add(new TaskBeliefOp(CONJ, true, false));
+                            break;
+
                         case "any":
                             taskPunc = ' ';
                             break;
+
                         default:
                             throw new RuntimeException("Unknown task punctuation type: " + XString);
                     }
