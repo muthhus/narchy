@@ -395,8 +395,8 @@ public class Arkanoid extends JFrame implements KeyListener {
 		//}
 
 
-		//SwingUtilities.invokeLater(this::repaint);
-		repaint();
+		SwingUtilities.invokeLater(this::repaint);
+		//repaint();
 
         return score;
 	}

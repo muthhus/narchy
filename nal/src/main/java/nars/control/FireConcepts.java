@@ -165,31 +165,32 @@ public class FireConcepts implements Runnable {
     public void run() {
 
         float load =
-                0f;
-                //nar.exe.load();
+                //0f;
+                nar.exe.load();
 //            if (load > 0.9f) {
 //                logger.error("overload {}", load);
 //                return;
 //            }
 
         ConceptBagFocus csrc = (ConceptBagFocus) source;
-        if (((ConceptBagFocus) this.source).active.commit(null).size() == 0)
+        if (((ConceptBagFocus) this.source).active.commit().size() == 0)
             return; //no concepts
 
         final float[] curTTL = { (rate.floatValue() * (1f - load))};
         if (curTTL[0] == 0)
             return; //idle
 
-        float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
-        float mass = ((HijackBag) csrc.active).mass;
-        float priDecayFactor =
-                //1f - (((float)csrc.active.size()) / csrc.active.capacity());
-                Util.unitize(
-                        1f - mass / (mass + idealMass)
-                );
+//        float idealMass = 0.5f /* perfect avg if full */ * csrc.active.capacity();
+//        float mass = ((HijackBag) csrc.active).mass;
+//        float priDecayFactor =
+//                //1f - (((float)csrc.active.size()) / csrc.active.capacity());
+//                Util.unitize(
+//                        1f - mass / (mass + idealMass)
+//                );
 
 
         final int[] fired = {0};
+
         csrc.active.sample(pc -> {
 
             float priFired = pc.priSafe(0);
@@ -198,7 +199,7 @@ public class FireConcepts implements Runnable {
             fired[0]++;
             nar.input(cf);
 
-            pc.priMult(priDecayFactor);
+            //pc.priMult(priDecayFactor);
 
 
             curTTL[0] -= (1f + priFired);

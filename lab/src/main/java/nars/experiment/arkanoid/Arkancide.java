@@ -16,14 +16,14 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 48;
-    final int visH = 20;
+    final int visW = 32;
+    final int visH = 16;
 
     //final int afterlife = 60;
 
@@ -35,7 +35,7 @@ public class Arkancide extends NAgentX {
     private float prevScore;
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);

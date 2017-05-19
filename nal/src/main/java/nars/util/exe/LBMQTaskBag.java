@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 public class LBMQTaskBag extends TaskBag {
 
-    final int GRANULARITY = 10;
+    final int GRANULARITY = 4;
     final LinkedBlockingMultiQueue<Integer, ITask> q;
     final Set<ITask> active;
 

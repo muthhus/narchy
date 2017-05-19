@@ -16,7 +16,7 @@ import static nars.Op.*;
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
-    public final FloatParam polarityFactor = new FloatParam(0.75f, 0f, 1f);
+    public final FloatParam polarityFactor = new FloatParam(1f, 0f, 1f);
 
     public final FloatParam belief = new FloatParam(1f, 0f, 2f);
     public final FloatParam goal = new FloatParam(1f, 0f, 2f);
