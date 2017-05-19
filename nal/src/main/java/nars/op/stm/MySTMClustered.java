@@ -119,7 +119,9 @@ public class MySTMClustered extends STMClustered {
             //clusters where all terms occurr simultaneously at precisely the same time
             //cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
 
-            cluster((int)Math.max(0, (inputsPerFrame * (1f-nar.exe.load()))), minGroupSize, maxGroupSize);
+            cluster((int)Math.max(0, (inputsPerFrame
+                    //* (1f-nar.exe.load())
+            )), minGroupSize, maxGroupSize);
 
             //clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
             //if (maxGroupSize != 2)

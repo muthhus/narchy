@@ -32,7 +32,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      */
     public final DoubleAdder pressure = new DoubleAdder();
 
-    float mass;
+    public float mass;
 
     private final AtomicBoolean unsorted = new AtomicBoolean(false);
 
@@ -422,18 +422,18 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         if (update != null || checkCapacity)
             update(update, checkCapacity);
 
-        if (update != null) {
-            float mass = 0;
-            synchronized (items) {
-                int iii = size();
-                for (int i = 0; i < iii; i++) {
-                    PLink x = get(i);
-                    if (x != null)
-                        mass += x.priSafe(0);
-                }
+
+        float mass = 0;
+        synchronized (items) {
+            int iii = size();
+            for (int i = 0; i < iii; i++) {
+                PLink x = get(i);
+                if (x != null)
+                    mass += x.priSafe(0);
             }
-            this.mass = mass;
         }
+        this.mass = mass;
+
 
     }
 

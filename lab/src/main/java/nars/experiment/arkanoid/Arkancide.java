@@ -35,7 +35,7 @@ public class Arkancide extends NAgentX {
     private float prevScore;
 
     public static void main(String[] args) {
-        Param.DEBUG = false;
+        Param.DEBUG = true;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
@@ -59,7 +59,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 20);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {

@@ -1,7 +1,9 @@
 package nars.task;
 
+import jcog.Util;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
+import nars.attention.SpreadingActivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,4 +24,5 @@ abstract public class AbstractTask extends Pri implements ITask {
     public @NotNull String toString() {
         return super.toString() + " " + getClass().getSimpleName();
     }
+
 }

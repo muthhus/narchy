@@ -15,14 +15,12 @@ import nars.premise.Derivation;
 import nars.premise.DerivationBudgeting;
 import nars.premise.Premise;
 import nars.premise.PremiseBuilder;
-import nars.task.AbstractTask;
+import nars.task.UnaryTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
 import static jcog.bag.Bag.BagCursorAction.Stop;
@@ -48,7 +46,7 @@ public class FireConcepts implements Runnable {
     /**
      * in TTL per cycle
      */
-    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (256 * 1024));
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (16 * 1024));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);
@@ -72,37 +70,41 @@ public class FireConcepts implements Runnable {
 //        }
 //    }
 
-    public class ConceptFire extends AbstractTask {
+    public class ConceptFire extends UnaryTask<Concept> {
 
-        private final Concept c;
+        /** a reducing factor for assigning priority to this concept firing task.
+         *  if it uses the priority directly then it competes for execution against
+         *  tasks themselves. one reason this is probably necessary is that in terms of
+         *  feedback, the firing of a concept can produce many tasks which should
+         *  themselves have more chance to survive than another firing which produces tasks
+         *  and so on
+         */
+        final static float ACTIVATION_FACTOR = 1f/10f;
 
-
-        public ConceptFire(Concept concept, float pri) {
-            super(pri);
-            this.c = concept;
+        public ConceptFire(Concept c, float pri) {
+            super(c, pri * ACTIVATION_FACTOR);
         }
 
         public int ttlMax() {
             float pri = pri();
             if (pri!=pri) //deleted
                 return -1;
-            return Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin);
+            return Util.lerp(pri/ACTIVATION_FACTOR, Param.UnificationTTLMax, Param.UnificationTTLMin);
         }
 
         @Override
         public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
+
             int ttl = ttlMax();
             if (ttl <= 0)
                 return; //??
 
+            Concept c = value;
 
             c.tasklinks().commit();//.normalize(0.1f);
             c.termlinks().commit();//.normalize(0.1f);
             nar.terms.commit(c);
-
-
-
 
 
             @Nullable PLink<Task> tasklink = null;
@@ -192,7 +194,8 @@ public class FireConcepts implements Runnable {
     @Override
     public void run() {
 
-        float load = 0f;
+        float load =
+                0f;
                 //nar.exe.load();
 //            if (load > 0.9f) {
 //                logger.error("overload {}", load);

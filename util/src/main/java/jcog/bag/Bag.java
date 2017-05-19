@@ -346,7 +346,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     //@Override abstract public void forEach(final Consumer<? super V> action);
     default float priSum() {
         float[] total = {0};
-        forEach(v -> total[0] += priSafe(v, 0));
+        forEach(v -> total[0] = total[0] + priSafe(v, 0));
         return total[0];
     }
 

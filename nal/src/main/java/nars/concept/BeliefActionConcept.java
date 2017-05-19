@@ -37,16 +37,21 @@ public class BeliefActionConcept extends ActionConcept {
     public Task apply(NAR nar) {
 
         int dur = nar.dur();
-        Truth belief = beliefIntegrated.commitAverage();
+        long now = nar.time();
+
+        Truth belief =
+                belief(now, dur);
+                //beliefIntegrated.commitAverage();
         action.accept(belief);
 
-        Truth goal = goalIntegrated.commitAverage();
+        Truth goal =
+                goal(now, dur);
+                //goalIntegrated.commitAverage();
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
             DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
-                long now = nar.time();
                 return new NALTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
             }
         }

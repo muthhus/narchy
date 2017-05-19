@@ -89,7 +89,7 @@ public class SoNAR extends TimerTask {
         this.audio = audio;
 
 
-        real.scheduleAtFixedRate(this, 0, updatePeriodMS);
+        real.schedule(this, 0, updatePeriodMS);
 
 //        Granulize ts =
 //                new Granulize(sample("/tmp/awake.wav"), 0.25f, 0.9f)

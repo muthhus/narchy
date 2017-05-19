@@ -973,7 +973,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             }
 
-            n.input( new SpreadingActivation(accepted, c, n, 1f) );
+            n.input( new SpreadingActivation(accepted) );
 
         } else {
 

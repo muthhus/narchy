@@ -10,6 +10,7 @@ import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.task.TruthPolation;
+import nars.task.UnaryTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
@@ -17,6 +18,7 @@ import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
@@ -29,36 +31,40 @@ import static nars.time.Tense.ETERNAL;
 /**
  * activation from a point source to its subterm components (termlink templates)
  */
-public class SpreadingActivation extends Activation<Task> implements ObjectFloatProcedure<Termed> {
+public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatProcedure<Termed> {
 
 
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    @Deprecated private final int maxDepth; //TODO subtract from this then it wont need stored
+    @Deprecated private int maxDepth; //TODO subtract from this then it wont need stored
 
 
+
+    @NotNull
+    transient protected Concept origin;
+    final MutableFloat linkOverflow = new MutableFloat(0);
 
     /**
      * cached for fast access
      */
-    transient final int dur;
+    transient int dur;
 
     /**
      * priority value of input at input, cached for fast access
      */
-    transient final float inPri;
+    transient float inPri;
 
     /**
      * cached
      */
-    transient final Term originTerm;
+    transient Term originTerm;
 
 
     /**
      * momentum > 0.5 means parents preserve more of the priority than sharing with children
      */
-    final float momentum;
+    float momentum;
 
     /**
      * values closer to zero mean atom tasklink activation is less filtered by time;
@@ -74,32 +80,31 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
     private static final float TERMLINK_BALANCE = 0.5f;
 
     transient private ObjectFloatHashMap<Termed> spread;
+    private NAR nar;
 
 
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, @NotNull Concept origin, @NotNull NAR nar, float scale) {
-        super(in, origin, nar);
+    public SpreadingActivation(@NotNull Task in) {
+        super(in, in.priSafe(0));
+    }
+
+    @Override
+    public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
 
         this.momentum = nar.momentum.floatValue();
+        spread = activationMapThreadLocal.get();
+        dur = nar.dur();
+        this.nar = nar;
+        this.inPri = value.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
 
-        this.inPri = in.priSafe(0) * scale; // * in.qua(); //activate concept by the priority times the quality
-        this.dur = nar.dur();
-
+        this.origin = nar.concept(value);
         this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
         this.maxDepth = levels((Compound)originTerm);
 
-
-
-    }
-
-    @Override
-    public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-
-        spread = activationMapThreadLocal.get();
         try {
 
             link(origin, 1f, 0);
@@ -234,8 +239,8 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
             float subActivation = ((1f - momentum) * scale) / (n);
             //final float[] change = {0};
 
-            long inStart = in.start();
-            long inEnd = in.end();
+            long inStart = value.start();
+            long inEnd = value.end();
 
             float[] additionalPressure = {0};
             tlinks.forEach((b) -> {
@@ -326,7 +331,7 @@ public class SpreadingActivation extends Activation<Task> implements ObjectFloat
 
         rcpt.tasklinks().put(
                 //new RawPLink(in, pri),
-                new PLinkUntilDeleted(in, pri),
+                new PLinkUntilDeleted(value, pri),
                 scale, null);
 
     }

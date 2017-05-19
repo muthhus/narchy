@@ -50,11 +50,13 @@ public class GoalActionConcept extends ActionConcept {
 //        } else {
 //            tdb = tdg = null;
 //        }
+        int dur = nar.dur();
+        long now = nar.time();
 
         return feedback.set(term(),
                 this.motor.motor(
-                        beliefIntegrated.commitAverage(),
-                        goalIntegrated.commitAverage()),
+                        belief(now, dur),
+                        goal(now, dur)),
                 nar.time::nextStamp,
                 nar);
     }

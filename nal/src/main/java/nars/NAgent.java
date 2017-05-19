@@ -515,24 +515,35 @@ abstract public class NAgent implements NSense, NAct {
     public static class Periodic extends TimerTask {
 
         //private final FloatParam fps = new FloatParam(0);
-        private final Runnable run;
+        private final Runnable task;
         private final NAR nar;
-        //final AtomicBoolean busy = new AtomicBoolean(false);
+        private final Timer timer;
+        final AtomicBoolean busy = new AtomicBoolean(false);
 
-        public Periodic(NAR nar, Timer t, float fps, Runnable run) {
+        public Periodic(NAR nar, Timer t, float fps, Runnable task) {
             //fps.setValue(initialFPS);
-            this.run = run;
+            this.timer = t;
+            this.task = task;
             this.nar = nar;
-            t.scheduleAtFixedRate(this, 0, Math.round(1000f / fps));
+
+            t.schedule(this, 0, Math.round(1000f / fps));
         }
 
         @Override
         public void run() {
-//            if (!busy.compareAndSet(false, true)) {
-//                return; //black-out, the last frame didnt even finish yet
-//            }
+            if (!busy.compareAndSet(false, true)) {
+                return; //black-out, the last frame didnt even finish yet
+            }
 
-            nar.runLater(run);
+
+            nar.runLater(()->{
+                try {
+                    task.run();
+                } finally {
+                    busy.set(false);
+                }
+            });
+
         }
 
 
@@ -577,7 +588,7 @@ abstract public class NAgent implements NSense, NAct {
             a.goals().forEach(x -> {
                 if (!(x instanceof ActionConcept.CuriosityTask)) {
                     //System.out.println(x.proof());
-                    m[0] += x.evi(now, dur);
+                    m[0] = m[0] + x.evi(now, dur);
                 }
             });
         }
