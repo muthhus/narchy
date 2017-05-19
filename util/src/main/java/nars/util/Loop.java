@@ -22,7 +22,7 @@ abstract public class Loop implements Runnable {
     public final Thread thread;
     protected final int windowLength = 4;
 
-    protected long afterTime;
+    protected long prevTime;
     protected boolean stopping;
     protected boolean stopped;
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
@@ -80,12 +80,9 @@ abstract public class Loop implements Runnable {
     @Override
     public final void run() {
 
-        afterTime = System.currentTimeMillis();
+        prevTime = System.currentTimeMillis();
 
         while (!stopping) {
-
-            //this.prevTime = Util.pauseLockUntil(prevTime + periodMS);
-            long prevPrevTime = this.afterTime;
 
             long beforeTime = System.currentTimeMillis();
 
@@ -105,19 +102,24 @@ abstract public class Loop implements Runnable {
 
 
             //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
-            this.afterTime = System.currentTimeMillis();
+            this.prevTime = beforeTime;
             //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
 
-            long frameTime = afterTime - prevPrevTime;
+            long afterTime = System.currentTimeMillis();
+            long frameTime = afterTime - beforeTime;
 
-            long delayable = (beforeTime + periodMS) - afterTime;
+            long delayable = (periodMS - ((long)this.frameTime.getMean()));
+            this.frameTime.addValue(frameTime);
+
+                // (beforeTime + periodMS) - prevTime
             if (delayable > 0) {
                 //logger.info("delay {}", delayable);
                 //Util.pause(delayable);
                 Util.sleep(delayable);
+            } else {
+                Thread.yield(); //at least yield
             }
 
-            this.frameTime.addValue(frameTime);
 
         }
 

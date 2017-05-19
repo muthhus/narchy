@@ -324,7 +324,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                 @Override
                 public boolean next() {
 
-                    UncaughtAnimatorException caughtException = null;
 
                     if (justStarted) {
                         justStarted = false;
@@ -350,8 +349,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                         try {
                             display();
                         } catch (final UncaughtAnimatorException dre) {
-                            caughtException = dre;
                             quitIssued = true;
+                            dre.printStackTrace();
                         }
                     } else if (pauseIssued && !quitIssued) { // PAUSE
 //                        if (DEBUG) {
@@ -366,20 +365,19 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                             try {
                                 display(); // propagate exclusive context -> off!
                             } catch (final UncaughtAnimatorException dre) {
-                                caughtException = dre;
                                 dre.printStackTrace();
 //                                    stopIssued = true;
                             }
                         }
-                        if (null == caughtException) {
-                            synchronized (GameAnimatorControl.this) {
-                                if (DEBUG) {
-                                    System.err.println("FPSAnimator pause " + Thread.currentThread() + ": " + toString());
-                                }
-                                isAnimating = false;
-                                GameAnimatorControl.this.notifyAll();
-                            }
-                        }
+//                        if (null == caughtException) {
+//                            synchronized (GameAnimatorControl.this) {
+//                                if (DEBUG) {
+//                                    System.err.println("FPSAnimator pause " + Thread.currentThread() + ": " + toString());
+//                                }
+//                                isAnimating = false;
+//                                GameAnimatorControl.this.notifyAll();
+//                            }
+//                        }
                     }
                     return true;
 

@@ -20,6 +20,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
+import nars.util.Loop;
 import nars.util.data.Mix;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -30,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -102,6 +102,8 @@ abstract public class NAgent implements NSense, NAct {
      * range: -1..+1, mapped directly to the 0..1.0 frequency range
      */
     public float reward;
+    private Loop senseAndMotorLoop;
+    private Loop predictLoop;
 
     public NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -481,80 +483,25 @@ abstract public class NAgent implements NSense, NAct {
         return this;
     }
 
-    public Pair<NARLoop, Timer> runRT(float fps) {
+    public NARLoop runRT(float fps) {
         return runRT(fps, -1);
     }
 
-    final AtomicReference<Timer> timer = new AtomicReference(null);
+
 
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
-    public Pair<NARLoop, Timer> runRT(float fps, long stopTime) {
-
+    public NARLoop runRT(float fps, long stopTime) {
         init();
 
-        Timer t = timer.updateAndGet((x)-> x==null ? new Timer() : x);
-        nar.eventReset.onWeak(nn->{
-            t.cancel();
-        });
+        NARLoop loop = nar.loop();
 
-        Pair<NARLoop, Timer> p = Tuples.pair(nar.loop(), t);
-        //p.getOne().join();
+        this.senseAndMotorLoop = nar.exe.loop(fps, this::senseAndMotor);
+        this.predictLoop = nar.exe.loop(fps/2f, this::predict);
 
-
-
-        new Periodic(nar, t, fps, this::senseAndMotor);
-        new Periodic(nar, t, fps/2f, this::predict);
-
-
-        return p;
-
+        return loop;
     }
-
-    public static class Periodic extends TimerTask {
-
-        //private final FloatParam fps = new FloatParam(0);
-        private final Runnable task;
-        private final NAR nar;
-        private final Timer timer;
-        final AtomicBoolean busy = new AtomicBoolean(false);
-        private long last;
-
-        public Periodic(NAR nar, Timer t, float fps, Runnable task) {
-            //fps.setValue(initialFPS);
-            this.timer = t;
-            this.task = task;
-            this.nar = nar;
-            this.last = nar.time();
-
-            t.schedule(this, 0, Math.round(1000f / fps));
-        }
-
-        @Override
-        public void run() {
-
-            if (nar.time() == this.last)
-                return; //hasn't proceeded to next cycle
-
-            if (!busy.compareAndSet(false, true)) {
-                return; //black-out, the last frame didnt even finish yet
-            }
-
-            nar.runLater(()->{
-                last = nar.time();
-                try {
-                    task.run();
-                } finally {
-                    busy.set(false);
-                }
-            });
-
-        }
-
-
-    }
-
 
     protected Stream<Task> predictions(long now) {
 

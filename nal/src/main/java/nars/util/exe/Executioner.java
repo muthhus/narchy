@@ -3,10 +3,13 @@ package nars.util.exe;
 import nars.NAR;
 import nars.Task;
 import nars.task.ITask;
+import nars.util.Loop;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Timer;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -84,6 +87,48 @@ abstract public class Executioner implements Executor {
     }
 
     abstract public void run(@NotNull ITask input);
+
+    public Loop loop(float fps /* initial */, Runnable repeated) {
+        return new Periodic(fps, repeated);
+    }
+
+    public class Periodic extends Loop {
+
+        //private final FloatParam fps = new FloatParam(0);
+        private final Runnable task;
+        final AtomicBoolean busy = new AtomicBoolean(false);
+        private long last;
+
+        public Periodic(float fps, Runnable task) {
+            super(fps);
+            this.task = task;
+            this.last = nar.time();
+        }
+
+        @Override
+        public boolean next() {
+            if (nar.time() == this.last)
+                return true; //hasn't proceeded to next cycle
+
+            if (!busy.compareAndSet(false, true)) {
+                return true; //black-out, the last frame didnt even finish yet
+            }
+
+            //nar.runLater(()->{
+                last = nar.time();
+                try {
+                    task.run();
+                } finally {
+                    busy.set(false);
+                }
+            //});
+
+            return true;
+        }
+
+
+    }
+
 }
 
 //package nars.nar.exe;
