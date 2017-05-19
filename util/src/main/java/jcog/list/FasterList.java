@@ -4,6 +4,7 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.utility.ArrayIterate;
+import org.eclipse.collections.impl.utility.internal.InternalArrayIterate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,6 +114,17 @@ public class FasterList<X> extends FastList<X> {
 //        return true;
 //    }
 
+    @Override
+    public int indexOf(@NotNull Object object) {
+        //return InternalArrayIterate.indexOf(this.items, this.size, object);
+        int s = size;
+        X[] items = this.items;
+        for (int i = 0; i < s; i++) {
+            if (object.equals(items[i]))
+                return i;
+        }
+        return -1;
+    }
 
     /**
      * use with caution.

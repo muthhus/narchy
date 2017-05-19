@@ -375,8 +375,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     public static class ConceptVis2 implements ConceptVis {
 
-        final float minSize = 5f;
-        final float maxSize = 30f;
+        final float minSize = 2f;
+        final float maxSize = 10f;
 
         @Override
         public void apply(ConceptWidget cw, Term tt) {

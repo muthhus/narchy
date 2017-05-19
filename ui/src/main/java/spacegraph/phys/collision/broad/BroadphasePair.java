@@ -57,10 +57,13 @@ public class BroadphasePair {
 	}
 	
 	public boolean equals(BroadphasePair p) {
-		return (pProxy0 == p.pProxy0 && pProxy1 == p.pProxy1);
+		return this == p || (pProxy0 == p.pProxy0 && pProxy1 == p.pProxy1);
 	}
 	
 	public static final Comparator<BroadphasePair> broadphasePairSortPredicate = (a, b) -> {
+		if (a == b)
+			return 0;
+
         // JAVA TODO:
         Broadphasing a0 = a.pProxy0;
         Broadphasing b0 = b.pProxy0;

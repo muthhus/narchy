@@ -22,6 +22,8 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 import static jcog.bag.Bag.BagCursorAction.Next;
 import static jcog.bag.Bag.BagCursorAction.Stop;
 
@@ -31,12 +33,6 @@ import static jcog.bag.Bag.BagCursorAction.Stop;
  */
 public class FireConcepts implements Runnable {
 
-
-    public final DerivationBudgeting budgeting;
-    public final Deriver deriver;
-
-
-    private final ThreadLocal<FireConcepts.DirectDerivation> derivation;
 
     final int MISFIRE_COST = 1;
     int premiseCost = 1;
@@ -79,7 +75,7 @@ public class FireConcepts implements Runnable {
          *  themselves have more chance to survive than another firing which produces tasks
          *  and so on
          */
-        final static float ACTIVATION_FACTOR = 1f/10f;
+        final static float ACTIVATION_FACTOR = 1f;
 
         public ConceptFire(Concept c, float pri) {
             super(c, pri * ACTIVATION_FACTOR);
@@ -112,7 +108,6 @@ public class FireConcepts implements Runnable {
             float taskLinkPri = -1f, termLinkPri = -1f;
 
 
-            FireConcepts.DirectDerivation d = derivation.get();
 
 
             /**
@@ -123,20 +118,19 @@ public class FireConcepts implements Runnable {
              * the probabilistic selection sequence and doesnt affect derivation
              * budgeting directly.
              */
-            d.restartA();
+            Random rng = nar.random();
             while (ttl > 0) {
-                if (tasklink == null || (d.random.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+                if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                     tasklink = c.tasklinks().sample();
                     ttl -= linkSampleCost;
                     if (tasklink == null)
                         break;
 
                     taskLinkPri = c.tasklinks().normalizeMinMax(tasklink.priSafe(0));
-                    d.restartB(tasklink.get());
                 }
 
 
-                if (termlink == null || (d.random.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+                if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                     termlink = c.termlinks().sample();
                     ttl -= linkSampleCost;
                     if (termlink == null)
@@ -147,48 +141,22 @@ public class FireConcepts implements Runnable {
                 if (ttl <= premiseCost)
                     break; //not enough remaining to create premise
 
-                Premise p = PremiseBuilder.premise(c, tasklink, termlink, d.time, nar, -1f);
+                nar.input(new PremiseBuilder(tasklink, termlink, pri));
+
                 ttl -= premiseCost; //failure of premise generation still causes cost
-
-                if (p != null) {
-
-                    int start = ttl;
-
-
-                    int ttlRemain = deriver.run(d, p, ttl);
-                    assert (start >= ttlRemain);
-
-                    ttl -= (start - ttlRemain);
-                    if (ttl <= 0) break;
-
-//                    int nextDerivedTasks = d.buffer.size();
-//                    int numDerived = nextDerivedTasks - derivedTasks;
-//                    ttl -= numDerived * derivedTaskCost;
-//                    derivedTasks = nextDerivedTasks;
-
-                }
             }
-
 
         }
 
     }
 
 
-    public FireConcepts(@NotNull Focus source, Deriver dderiver, DerivationBudgeting bbudgeting, NAR nar) {
-
-        this.deriver = dderiver;
-        this.budgeting = bbudgeting;
+    public FireConcepts(@NotNull Focus source, NAR nar) {
 
         this.nar = nar;
         this.source = source;
-
-        this.derivation =
-                ThreadLocal.withInitial(() ->
-                        new FireConcepts.DirectDerivation(budgeting, nar)
-                );
-
         this.on = nar.onCycle(this);
+
     }
 
     @Override
@@ -239,11 +207,11 @@ public class FireConcepts implements Runnable {
     }
 
 
-    private static class DirectDerivation extends Derivation {
+    public static class DirectDerivation extends Derivation {
 
 
-        public DirectDerivation(DerivationBudgeting b, NAR nar) {
-            super(nar, b);
+        public DirectDerivation(DerivationBudgeting b) {
+            super(b);
         }
 
         @Override

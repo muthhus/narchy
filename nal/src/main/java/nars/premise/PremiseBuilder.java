@@ -1,5 +1,6 @@
 package nars.premise;
 
+import jcog.Util;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.Param;
@@ -7,10 +8,18 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.control.FireConcepts;
+import nars.derive.DefaultDeriver;
 import nars.table.BeliefTable;
+import nars.task.AbstractTask;
+import nars.task.BinaryTask;
+import nars.task.UnaryTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
+import nars.term.util.InvalidTermException;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,11 +28,19 @@ import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
 
-public enum PremiseBuilder { ;
+public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
+    private final PLink<Task> taskLink;
+    private final PLink<Term> termLink;
 
+
+    public PremiseBuilder(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink, float pri) {
+        super(tasklink, termlink, pri);
+        this.termLink = termlink;
+        this.taskLink = tasklink;
+    }
 
     /**
-     * resolves the most relevant belief of a given term/concept
+     * resolve the most relevant belief of a given term/concept
      * <p>
      * patham9 project-eternalize
      * patham9 depending on 4 cases
@@ -35,8 +52,8 @@ public enum PremiseBuilder { ;
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
      */
-    @Nullable
-    public static Premise premise(@NotNull Concept concept, PLink<Task> taskLink, PLink<Term> termLink, long now, NAR nar, float priMin) {
+    @Override
+    public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
         Term beliefTerm = termLink.get();
         Task belief = null;
@@ -70,6 +87,7 @@ public enum PremiseBuilder { ;
                 int dur = nar.dur();
 
                 Task match;
+                long now = nar.time();
                 //if (task.isQuestOrQuestion()) {
                     long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept)beliefConcept, nar);
@@ -106,7 +124,7 @@ public enum PremiseBuilder { ;
         //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
         if (taskPri != taskPri)
-            return null; //task deleted
+            return; //task deleted
 
         float pri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
@@ -114,15 +132,56 @@ public enum PremiseBuilder { ;
                 //or
                     (taskPri, beliefPriority);
 
-        if (pri < priMin)
-            return null;
 
         //aveAri(taskLinkBudget.pri(), termLinkBudget.pri());
         //nar.conceptPriority(c);
 
 
 
-        return new Premise(task, beliefTerm, belief, pri);
+        nar.input(new DerivePremise(new Premise(task, beliefTerm, belief, pri)));
+    }
+
+
+    static class DerivePremise extends UnaryTask<Premise> {
+
+        static final DerivationBudgeting defaultBudgeting = new PreferSimpleAndPolarized();
+        static final ThreadLocal<FireConcepts.DirectDerivation> derivation =
+                ThreadLocal.withInitial(() ->
+                        new FireConcepts.DirectDerivation(defaultBudgeting)
+                );
+
+        public DerivePremise(Premise premise) {
+            super(premise, premise.pri());
+        }
+
+        @Override
+        public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+
+
+            FireConcepts.DirectDerivation d = derivation.get();
+
+            d.nar = n;
+            d.index = n.terms;
+            d.random = n.random();
+
+            d.restartA();
+            d.restartB(value.task);
+            d.restartC(value, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
+
+            DefaultDeriver.the.test(d);
+
+//                    assert (start >= ttlRemain);
+//
+//                    ttl -= (start - ttlRemain);
+//                    if (ttl <= 0) break;
+
+//                    int nextDerivedTasks = d.buffer.size();
+//                    int numDerived = nextDerivedTasks - derivedTasks;
+//                    ttl -= numDerived * derivedTaskCost;
+//                    derivedTasks = nextDerivedTasks;
+
+
+        }
     }
 
     static void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {

@@ -35,19 +35,7 @@ public interface Deriver extends Predicate<Derivation> {
         return TrieDeriver.get(PremiseRuleSet.rules(true, path));
     }
 
-    /** returns ttl remaining */
-    default int run(Derivation d, Premise p, int ttl) {
 
-        try {
-            d.restartC(p, ttl);
-            test(d);
-        } catch (Throwable t) {
-            //if (Param.DEBUG)
-                logger.error("{}", t);
-        }
-
-        return d.versioning.ttl;
-    }
 
     //    @NotNull
 //    static Deriver[] get(String... paths) {

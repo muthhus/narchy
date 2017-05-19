@@ -78,7 +78,7 @@ public class Default extends NAR {
         deriver = //exe.concurrent() ?
                 //new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
                 //:
-                new FireConcepts(focus, newDeriver(), derivationBudgeting, this);
+                new FireConcepts(focus, this);
 
 
         deriver.rate.setValue(Param.UnificationTTLMax * 5);

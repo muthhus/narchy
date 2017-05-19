@@ -88,7 +88,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     }) {
         @Override
         public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
-            value.get().getTwo().delete(space.dyn);
+            value.get().getTwo()
+                    .hide();
+                    //.delete(space.dyn);
         }
     };
 
@@ -175,7 +177,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 128, 1, 8) {
+        NARSpace cs = new ConceptsSpace(n, 128, 1, 5) {
 //            @Override
 //            protected boolean include(Term term) {
 //

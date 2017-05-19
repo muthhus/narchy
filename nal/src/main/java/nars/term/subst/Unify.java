@@ -45,7 +45,7 @@ public abstract class Unify implements Termutator, Subst {
     public final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     @NotNull
-    public final Random random;
+    public Random random;
 
     @NotNull
     public final Op type;
@@ -57,7 +57,7 @@ public abstract class Unify implements Termutator, Subst {
     public final Versioning versioning;
 
     @NotNull
-    public final TermIndex index;
+    public TermIndex index;
 
     @NotNull
     public final VersionMap<Term, Term> xy;
