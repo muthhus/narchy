@@ -37,9 +37,9 @@ public class Pri implements Priority {
     @Nullable
     @Deprecated @Override
     public Priority clone() {
-        throw new UnsupportedOperationException();
-//        float p = pri;
-//        return p != p /* deleted? */ ? null : new Pri(p);
+//        throw new UnsupportedOperationException();
+        float p = pri;
+        return p != p /* deleted? */ ? null : new Pri(p);
     }
 
     /**

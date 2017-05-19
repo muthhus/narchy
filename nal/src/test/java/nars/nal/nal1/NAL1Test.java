@@ -90,7 +90,6 @@ public class NAL1Test extends AbstractNALTest {
 //        //.en("chess is a type of competition.");
 
         test()
-                
                 .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
                 .mustBelieve(CYCLES, "<chess --> sport>", 1f, 0.42f)

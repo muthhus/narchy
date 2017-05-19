@@ -82,7 +82,7 @@ public abstract class Param  {
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTLMax = BeliefMatchTTL * 10;
-    public final static int UnificationTTLMin = BeliefMatchTTL * 2;
+    public final static int UnificationTTLMin = BeliefMatchTTL * 3;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
 

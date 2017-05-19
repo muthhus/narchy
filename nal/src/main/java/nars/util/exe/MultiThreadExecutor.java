@@ -40,7 +40,7 @@ public class MultiThreadExecutor extends Executioner {
     //private final ArrayBlockingQueue<Runnable> passive;
     private final ForkJoinPool passive;
 
-    final int maxActive = 4096;
+    final int maxActive = 1 * 1024;
     final PriorityHijackBag<ITask,ITask> active = new PriorityHijackBag<ITask, ITask>(maxActive, 3) {
         @Override
         protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, float scale) {
@@ -297,12 +297,12 @@ public class MultiThreadExecutor extends Executioner {
     public void cycle(@NotNull NAR nar) {
 
 
-//        int waitCycles = 0;
-//        while (!passive.isQuiescent()) {
-//            pause(waitCycles++);
-//        }
+        int waitCycles = 0;
+        while (!passive.isQuiescent()) {
+            pause(waitCycles++);
+        }
 
-        active.commit();
+        active.commit(null);
 
 
         Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
