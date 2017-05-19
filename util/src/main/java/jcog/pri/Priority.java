@@ -183,9 +183,9 @@ public interface Priority extends Prioritized {
 
     @NotNull
     default Priority priMult(float factor) {
-        //float p = priSafe(0);
-        float p = notNaN(pri());
-        setPri(p * notNaNOrNeg(factor));
+        float p = pri();
+        if (p==p)
+            setPri(p * notNaNOrNeg(factor));
         return this;
     }
 

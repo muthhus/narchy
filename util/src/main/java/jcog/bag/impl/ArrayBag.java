@@ -533,6 +533,15 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
 
+    public @Nullable PLink<X> remove(boolean topOrBottom) {
+        @Nullable PLink<X> x = topOrBottom ? top() : bottom();
+        if (x!=null) {
+            remove(key(x));
+            return x;
+        }
+        return null;
+    }
+
     private int removeDeleted(@NotNull List<PLink> trash, int minRemoved) {
 
         SortedArray<PLink<X>> items = this.items;

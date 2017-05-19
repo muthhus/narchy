@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
@@ -167,7 +168,7 @@ public class NARio extends NAgentX {
     public static void main(String[] args) {
 
 
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
         NAR nar = runRT((NAR n) -> {
 
@@ -207,7 +208,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 10);
+        }, 20);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

@@ -96,7 +96,7 @@ abstract public class NAgentX extends NAgent {
                 DSHalf(true)
                 .durFPS(fps);
         Default nar =
-                NARBuilder.newMultiThreadNAR(-1, clock, true);
+                NARBuilder.newMultiThreadNAR(2, clock, true);
 
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);

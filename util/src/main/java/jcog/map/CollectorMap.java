@@ -24,11 +24,11 @@ public abstract class CollectorMap<K, V> {
 
     @Nullable
     abstract public K key(@NotNull V v);
-
-    @Override
-    public String toString() {
-        return map.toString();
-    }
+//
+//    @Override
+//    public String toString() {
+//        return map.toString();
+//    }
 
     /**
      * returns an object that stores the items so that it can be synchronized upon
