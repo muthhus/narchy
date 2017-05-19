@@ -39,7 +39,7 @@ public class FireConcepts implements Runnable {
     private final ThreadLocal<FireConcepts.DirectDerivation> derivation;
 
     final int MISFIRE_COST = 1;
-    int premiseCost = Param.BeliefMatchTTL;
+    int premiseCost = 1;
     int linkSampleCost = 1;
 
 

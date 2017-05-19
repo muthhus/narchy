@@ -1096,6 +1096,7 @@ public class NAL7Test extends AbstractNALTest {
             $.12;.81$ ((b-->#1) &&+3 (#1-->d)). 2⋈5 %1.0;.81% {2⋈5: 6;7} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfterOrEternal),neqAndCom(%1,%2)),(varIntro((%1 &&+- %2)),((Intersection-->Belief))))
         */
         test()
+                .log()
                 .inputAt(1, "(a). :|:")
                 .inputAt(2, "((b) &&+3 (d)). :|:")
                 .mustBelieve(cycles, "(((a) &&+1 (b)) &&+3 (d))", 1f, 0.81f, 1, 5)

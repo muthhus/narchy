@@ -81,7 +81,7 @@ public class Default extends NAR {
                 new FireConcepts(focus, newDeriver(), derivationBudgeting, this);
 
 
-        deriver.rate.setValue(Param.UnificationTTLMax * 10);
+        deriver.rate.setValue(Param.UnificationTTLMax * 5);
     }
 
     public Deriver newDeriver() {

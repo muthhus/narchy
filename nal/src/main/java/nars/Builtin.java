@@ -115,9 +115,10 @@ public class Builtin {
          * TODO move the type restriction to another functor to wrap this
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
-            Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
-            if (c == null || c.op() != CONJ || !concurrent(c.dt()))
+            if (t.op() != CONJ)
                 return False;
+
+            Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
 
             int size = c.size();
 

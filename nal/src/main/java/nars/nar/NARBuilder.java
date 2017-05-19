@@ -231,7 +231,7 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, BELIEF, 3, true, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 128, BELIEF, 3, false, 16);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, false, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

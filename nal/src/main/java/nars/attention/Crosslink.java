@@ -26,10 +26,11 @@ public class Crosslink {
         if (tgtConcept == null || tgtConcept.equals(srcConcept))
             return; //null or same concept
 
+        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));
+        srcConcept.tasklinks().put( new RawPLink(tgtTask, scaleTgtSrc));
 
-
-        tgtConcept.tasklinks().put( new RawPLink(srcTask, srcTask.priSafe(0)), scaleSrcTgt, null );
-        srcConcept.tasklinks().put( new RawPLink(tgtTask, tgtTask.priSafe(0)), scaleTgtSrc, null );
+//        tgtConcept.termlinks().put( new RawPLink(srcConcept, scaleSrcTgt));
+//        srcConcept.termlinks().put( new RawPLink(tgtConcept, scaleTgtSrc));
 
 //        new SpreadingActivation(srcTask, scaleSrcTgt, tgtConcept, activation, nar);
 //        new SpreadingActivation(tgtTask, scaleTgtSrc, srcConcept, activation, nar);

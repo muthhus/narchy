@@ -5,8 +5,9 @@
      //structural decompose any component of a conjunction.
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
 
-     (&&,X,A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-       (&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     C, X, time(decomposeTaskSubset) |- dropAnyConj(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        //TODO add a conj() guard to fast fail
+        //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
      ((&&,X,A..+) &&+- Z), Z, time(decomposeTaskComponents) |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
      (Z &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
