@@ -3,7 +3,6 @@ package nars.table;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.task.AnswerTask;
 import nars.term.Compound;

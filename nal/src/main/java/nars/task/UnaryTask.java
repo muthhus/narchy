@@ -2,8 +2,6 @@ package nars.task;
 
 import jcog.Texts;
 import jcog.Util;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 
 /**

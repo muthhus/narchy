@@ -10,9 +10,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.FireConcepts;
 import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.table.BeliefTable;
-import nars.task.AbstractTask;
 import nars.task.BinaryTask;
 import nars.task.UnaryTask;
 import nars.task.util.InvalidTaskException;
@@ -20,7 +18,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
 import nars.term.util.InvalidTermException;
-import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

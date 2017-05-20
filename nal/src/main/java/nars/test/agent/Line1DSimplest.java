@@ -60,7 +60,7 @@ public class Line1DSimplest extends NAgent {
                     return true;
 
             }
-            return false;
+            return true;
         });
 //        out = actionBipolar(O, v -> {
 //            float current = this.o.floatValue();

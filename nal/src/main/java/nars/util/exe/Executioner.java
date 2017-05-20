@@ -1,13 +1,11 @@
 package nars.util.exe;
 
 import nars.NAR;
-import nars.Task;
 import nars.task.ITask;
 import nars.util.Loop;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Timer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;

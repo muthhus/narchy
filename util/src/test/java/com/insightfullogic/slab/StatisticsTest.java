@@ -1,10 +1,9 @@
 package com.insightfullogic.slab;
 
-import static org.junit.Assert.assertEquals;
-
+import com.insightfullogic.slab.stats.AllocationListener;
 import org.junit.Test;
 
-import com.insightfullogic.slab.stats.AllocationListener;
+import static org.junit.Assert.assertEquals;
 
 public class StatisticsTest {
 

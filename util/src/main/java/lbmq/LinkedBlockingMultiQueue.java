@@ -8,11 +8,11 @@ package lbmq;
 import jcog.list.FasterList;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An optionally-bounded blocking "multi-queue" based on linked nodes. A multi-queue is actually a set of queues that

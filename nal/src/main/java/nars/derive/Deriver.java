@@ -2,7 +2,6 @@ package nars.derive;
 
 import nars.derive.rule.PremiseRuleSet;
 import nars.premise.Derivation;
-import nars.premise.Premise;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

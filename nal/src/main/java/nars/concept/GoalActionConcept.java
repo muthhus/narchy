@@ -26,6 +26,7 @@ public class GoalActionConcept extends ActionConcept {
 
         resolution = n.truthResolution;
         this.feedback = new Signal(BELIEF, resolution);
+        feedback.pri(()->n.priorityDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create

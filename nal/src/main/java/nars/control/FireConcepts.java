@@ -1,7 +1,6 @@
 package nars.control;
 
 import jcog.Util;
-import jcog.bag.impl.HijackBag;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.PLink;
@@ -10,10 +9,8 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.derive.Deriver;
 import nars.premise.Derivation;
 import nars.premise.DerivationBudgeting;
-import nars.premise.Premise;
 import nars.premise.PremiseBuilder;
 import nars.task.UnaryTask;
 import nars.task.util.InvalidTaskException;
@@ -46,7 +43,7 @@ public class FireConcepts implements Runnable {
      * it is actually sum(1 + concept priority)
      * so that 0 priority concepts consume something
      */
-    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (1024));
+    public final @NotNull FloatParam rate = new FloatParam((Param.UnificationTTLMax * 1), 0f, (512));
 
     //    public final MutableInteger derivationsInputPerCycle;
 //    this.derivationsInputPerCycle = new MutableInteger(Param.TASKS_INPUT_PER_CYCLE_MAX);

@@ -33,13 +33,13 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(initialCapacity);
     }
 
-    @Override
-    public Task add(@NotNull Task x) {
-        if (x instanceof AnswerTask) {
-            return x; //dont store interpolations/answers/projections etc
-        }
-        return super.add(x);
-    }
+//    @Override
+//    public Task add(@NotNull Task x) {
+//        if (x instanceof AnswerTask) {
+//            return x; //dont store interpolations/answers/projections etc
+//        }
+//        return super.add(x);
+//    }
 
 
 //    @Override

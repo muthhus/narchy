@@ -38,9 +38,7 @@ import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
-import static nars.Op.CONJ;
-import static nars.Op.PROD;
-import static nars.Op.VAR_PATTERN;
+import static nars.Op.*;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;
 import static nars.time.Tense.DTERNAL;

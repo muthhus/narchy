@@ -11,7 +11,6 @@ import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.BufferedSynchronousExecutor;
-import nars.util.exe.SynchronousExecutor;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;

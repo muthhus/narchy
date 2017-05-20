@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  */
 public class PForget<X extends Priority> implements Consumer<X> {
 
-    public static final float DEFAULT_TEMP = 0.25f;
+    public static final float DEFAULT_TEMP = 0.5f;
     public final float avgToBeRemoved;
 
     public PForget(float avgToBeRemoved) {

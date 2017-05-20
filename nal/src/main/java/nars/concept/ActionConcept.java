@@ -7,7 +7,6 @@ import nars.table.EternalTable;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.truth.TruthAccumulator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

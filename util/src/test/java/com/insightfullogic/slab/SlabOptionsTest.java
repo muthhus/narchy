@@ -1,8 +1,8 @@
 package com.insightfullogic.slab;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class SlabOptionsTest {
 

@@ -48,6 +48,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
     public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatParam resolution) {
         super(BELIEF, resolution);
 
+        pri(()->n.priorityDefault(BELIEF));
         this.term = t;
         this.value = value;
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;

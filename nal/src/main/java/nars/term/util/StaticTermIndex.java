@@ -1,22 +1,13 @@
 package nars.term.util;
 
-import jcog.bag.impl.hijack.HijackMemoize;
-import nars.Op;
-import nars.Param;
 import nars.conceptualize.ConceptBuilder;
-import nars.index.term.AppendProtoCompound;
-import nars.index.term.ProtoCompound;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.function.Consumer;
-
-import static nars.Op.False;
 
 /**
  * note: has an internal cache by extending the MaplikeTermIndex

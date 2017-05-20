@@ -5,7 +5,6 @@ import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.PLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.Param;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;
@@ -20,7 +19,6 @@ import nars.time.FrameTime;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
-import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

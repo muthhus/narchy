@@ -306,12 +306,12 @@ public class Recog2D extends NAgentX {
 
     public static void main(String[] arg) throws Narsese.NarseseException {
         Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
-                3,
-                new RealTime.DS(true).durFPS(2)));
+                1,
+                new RealTime.DS(true).durFPS(1)));
 
 
         NAgentX.chart(a);
-        a.runRT(15);
+        a.runRT(1);
     }
 
     public static class Training {

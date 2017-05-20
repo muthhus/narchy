@@ -2,9 +2,6 @@ package com.insightfullogic.slab;
 
 import org.junit.Test;
 
-import com.insightfullogic.slab.Allocator;
-import com.insightfullogic.slab.InvalidSizeException;
-
 public class InvalidIndexTest {
 
 	@Test(expected=InvalidSizeException.class)

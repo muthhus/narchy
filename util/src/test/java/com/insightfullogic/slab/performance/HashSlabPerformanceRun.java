@@ -1,11 +1,11 @@
 package com.insightfullogic.slab.performance;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.insightfullogic.slab.Allocator;
 import com.insightfullogic.slab.Cursor;
 import com.insightfullogic.slab.lib.HashSlab;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HashSlabPerformanceRun {
 

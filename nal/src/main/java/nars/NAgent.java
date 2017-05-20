@@ -22,14 +22,14 @@ import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Loop;
 import nars.util.data.Mix;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -89,7 +89,7 @@ abstract public class NAgent implements NSense, NAct {
     public final FloatParam curiosityConf;
     public final FloatParam curiosityProb;
 
-    public final List<Task> predictors = newArrayList();
+    public final List<Task> p = newArrayList();
 
 
     public boolean trace = false;
@@ -325,7 +325,7 @@ abstract public class NAgent implements NSense, NAct {
 
         int dur = nar.dur();
 
-        predictors.add(
+        p.add(
                 goal(happiness,
                         t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
                         //ETERNAL
@@ -363,7 +363,12 @@ abstract public class NAgent implements NSense, NAct {
 //                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
 //        );
 
-//                    question(impl($.varQuery(1), happiness), ETERNAL)
+        p.add(
+            question(seq($.varQuery(1), dur, happiness),
+                now)
+                //ETERNAL)
+        );
+
 
 //        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
 //        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
@@ -371,7 +376,7 @@ abstract public class NAgent implements NSense, NAct {
         for (Concept a : actions) {
             Term action = a.term();
 
-            ((FasterList) predictors).addAll(
+            ((FasterList) p).addAll(
 
 //                    quest((Compound) (action.term()),
 //                            now),
@@ -386,8 +391,13 @@ abstract public class NAgent implements NSense, NAct {
                     //question(seq(action, dur, happiness), now),
                     //question(seq(neg(action), dur, happiness), now),
 
-                    question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now)
+                    question(seq(action, dur, happiness), now),
+                    question(seq(neg(action), dur, happiness), now),
+
+                    question(seq(action, dur, $.varQuery(1)), now),
+                    question(seq(neg(action), dur, $.varQuery(1)), now)
+
+
 //                    question(impl(conj(varQuery(0),action), dur, happiness), now),
 //                    question(impl(conj(varQuery(0),neg(action)), dur, happiness), now)
 
@@ -474,6 +484,8 @@ abstract public class NAgent implements NSense, NAct {
             }
 
             senseAndMotor();
+            predict();
+
             if (frameRemain[0]-- == 0)
                 stop();
         });
@@ -512,11 +524,11 @@ abstract public class NAgent implements NSense, NAct {
 
         //long frameDelta = now-prev;
 
-        int num = predictors.size();
+        int num = p.size();
 
         long next = now + nar.dur()/2;
 
-        return predictors.stream().map(x -> {
+        return p.stream().map(x -> {
             if (x != null) {
                 Task y = predict(x, next, horizon);
 //                if (x != y && x!=null) {

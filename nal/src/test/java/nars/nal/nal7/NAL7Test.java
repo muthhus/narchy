@@ -375,6 +375,7 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
         test()
+                .log()
                 .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
@@ -691,7 +692,6 @@ public class NAL7Test extends AbstractNALTest {
         /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
            (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
         test()
-
                 .input("(p ==>+1 m).")
                 .input("(s ==>+4 m).")
                 .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
@@ -878,7 +878,7 @@ public class NAL7Test extends AbstractNALTest {
                 .dur(2)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(1, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 1)
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.77f, 1)
         ;
     }
 
@@ -892,7 +892,7 @@ public class NAL7Test extends AbstractNALTest {
             //.log()
             .inputAt(0, "(x --> a). :|:")
             .inputAt(3, "(y --> a). :|:")
-            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.31f, 3)
+            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 3)
         ;
     }
 

@@ -2,8 +2,8 @@ package lbmq;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This interface captures the "head side" of the {@link BlockingQueue} interface

@@ -1,8 +1,6 @@
 package nars.util.exe;
 
-import com.google.common.collect.MinMaxPriorityQueue;
 import nars.NAR;
-import nars.Task;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 

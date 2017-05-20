@@ -1,15 +1,7 @@
 package nars.task;
 
-import jcog.bag.Bag;
-import jcog.pri.PLink;
-import nars.NAR;
 import nars.Task;
-import nars.budget.BudgetFunctions;
-import nars.concept.Concept;
-import nars.concept.TaskConcept;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.util.InvalidTermException;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

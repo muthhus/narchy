@@ -1,7 +1,5 @@
 package com.insightfullogic.slab;
 
-import com.insightfullogic.slab.Cursor;
-
 public interface GameEvent extends Cursor {
 
     public int getId();

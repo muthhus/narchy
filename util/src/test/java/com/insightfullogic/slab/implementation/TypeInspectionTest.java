@@ -1,17 +1,16 @@
 package com.insightfullogic.slab.implementation;
 
-import static com.insightfullogic.slab.implementation.Primitive.LONG;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.insightfullogic.slab.GameEvent;
+import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.junit.Test;
-
-import com.insightfullogic.slab.GameEvent;
+import static com.insightfullogic.slab.implementation.Primitive.LONG;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TypeInspectionTest {
     

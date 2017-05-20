@@ -52,7 +52,7 @@ public interface NARBuilder {
         //exe = new InstrumentedExecutor(exe, 8);
 
 
-        final int reprobes = 4;
+        final int reprobes = 3;
 
         //Multi nar = new Multi(3,512,
         DefaultConceptBuilder cb = new DefaultConceptBuilder(
@@ -207,14 +207,14 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(40 * threads);
+        nar.deriver.rate.setValue(30 * threads);
 
-        nar.termVolumeMax.setValue(64);
+        nar.termVolumeMax.setValue(72);
 
-        nar.beliefConfidence(0.85f);
-        nar.goalConfidence(0.75f);
+        nar.beliefConfidence(0.9f);
+        nar.goalConfidence(0.9f);
 
-        float p = 0.5f;
+        float p = 1f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
         nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
@@ -233,7 +233,7 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 128, BELIEF, 3, false, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, false, 16);
         //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, false, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",

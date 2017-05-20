@@ -120,13 +120,21 @@ public class Line1D {
 
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
 
-        NAR n = new Default();
+        Default n = new Default();
+
+        n.log();
+
         n.time.dur(4);
-        n.termVolumeMax.setValue(24);
+        n.deriver.rate.setValue(1f);
 
+        n.termVolumeMax.setValue(24);
+        n.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        n.DEFAULT_GOAL_PRIORITY = 1f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         Line1DSimplest a = new Line1DSimplest(n);
         //Line1DTrainer trainer = new Line1DTrainer(a);

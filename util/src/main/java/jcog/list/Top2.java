@@ -1,6 +1,5 @@
 package jcog.list;
 
-import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
 import java.util.function.Consumer;

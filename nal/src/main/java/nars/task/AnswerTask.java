@@ -25,25 +25,13 @@ public class AnswerTask extends NALTask {
 
     public AnswerTask(@NotNull Compound term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {
         this(term, aBelief.punc(), conclusion, creationTime, start, end, Stamp.zip(aBelief.stamp(), bBelief.stamp(), evidenceBalance));
-
-        //this.aBelief = null; aBelief;
-        //this.bBelief = null; //bBelief;
     }
-
 
 
     @Override
     public final boolean isInput() {
         return false;
     }
-
-
-    @Override
-    public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-        //super.eval(n);
-    }
-
-
 
 
 //    @Override

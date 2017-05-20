@@ -1,6 +1,5 @@
 package nars.derive.meta.op;
 
-import nars.$;
 import nars.Op;
 import nars.derive.meta.AbstractPred;
 import nars.derive.meta.AtomicPred;

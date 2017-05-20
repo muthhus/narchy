@@ -188,7 +188,7 @@ public class Arkancide extends NAgentX {
         float nextScore = noid.next();
         float reward = Math.max(-1f, Math.min(1f, nextScore - prevScore));
         this.prevScore = nextScore;
-        if (reward == 0) return Float.NaN;
+        //if (reward == 0) return Float.NaN;
         return reward;
     }
 

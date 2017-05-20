@@ -1,12 +1,9 @@
 package nars.task;
 
-import com.insightfullogic.slab.Allocator;
-import com.insightfullogic.slab.Cursor;
 import nars.*;
 import nars.concept.TaskConcept;
 import nars.nar.Default;
 import nars.nar.Terminal;
-import nars.term.Compound;
 import nars.truth.DiscreteTruth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

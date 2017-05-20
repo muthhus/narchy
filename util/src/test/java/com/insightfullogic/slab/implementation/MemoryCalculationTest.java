@@ -1,12 +1,11 @@
 package com.insightfullogic.slab.implementation;
 
+import com.insightfullogic.slab.SlabOptions;
+import org.junit.Test;
+
 import static com.insightfullogic.slab.implementation.MemoryCalculation.calculateAddress;
 import static com.insightfullogic.slab.implementation.MemoryCalculation.calculateAllocation;
 import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
-import com.insightfullogic.slab.SlabOptions;
 
 public class MemoryCalculationTest {
     

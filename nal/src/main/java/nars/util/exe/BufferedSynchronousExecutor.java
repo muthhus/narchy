@@ -1,13 +1,12 @@
 package nars.util.exe;
 
-import com.google.common.collect.Sets;
 import nars.$;
 import nars.NAR;
-import nars.premise.PremiseBuilder;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates

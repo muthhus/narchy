@@ -5,9 +5,8 @@
  */
 package lbmq;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static org.junit.Assert.*;
+import junit.framework.AssertionFailedError;
+import org.junit.After;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -22,9 +21,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.After;
-
-import junit.framework.AssertionFailedError;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static org.junit.Assert.*;
 
 /**
  * Base class for the LinkedBlockingMultiQueue tests. Defines some constants, utility methods and classes, as well as a
