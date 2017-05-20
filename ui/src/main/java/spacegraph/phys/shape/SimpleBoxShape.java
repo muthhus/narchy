@@ -41,6 +41,8 @@ import spacegraph.phys.math.Transform;
  */
 public class SimpleBoxShape extends PolyhedralConvexShape {
 
+	private float radius;
+
 	public SimpleBoxShape(v3 boxHalfExtents) {
 		this(boxHalfExtents.x*2f, boxHalfExtents.y*2f, boxHalfExtents.z*2f);
 	}
@@ -51,17 +53,31 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 		setMargin(0f);
 
 		//VectorUtil.mul(implicitShapeDimensions, boxHalfExtents, localScaling);
-		implicitShapeDimensions.set(w/2f, h/2f, d/2f); //localscaling is by default 1,1,1 anyway
+		size(w,h,d); //localscaling is by default 1,1,1 anyway
 
 		/*float m = getMargin();
 
 		implicitShapeDimensions.add(-m, -m, -m);*/
 	}
 
-
+	@Override
+	public float getBoundingRadius() {
+		return radius;
+	}
 
 	public void size(float x, float y, float z) {
 		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
+		updateRadius();
+	}
+
+	@Override
+	public void setLocalScaling(v3 scaling) {
+		super.setLocalScaling(scaling);
+		updateRadius();
+	}
+
+	private void updateRadius() {
+		radius = implicitShapeDimensions.length() * localScaling.length();
 	}
 
 	public v3 getHalfExtentsWithMargin(v3 out) {
@@ -74,6 +90,7 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 
 		return halfExtents;
 	}
+
 
 	public final v3 getHalfExtentsWithoutMargin(v3 out) {
 		out.set(implicitShapeDimensions); // changed in Bullet 2.63: assume the scaling and margin are included

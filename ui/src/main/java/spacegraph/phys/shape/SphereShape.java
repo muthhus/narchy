@@ -44,6 +44,11 @@ public class SphereShape extends ConvexInternalShape {
 	}
 
 	@Override
+	public float getBoundingRadius() {
+		return implicitShapeDimensions.x;
+	}
+
+	@Override
 	public v3 localGetSupportingVertexWithoutMargin(v3 vec, v3 out) {
 		out.set(0f, 0f, 0f);
 		return out;

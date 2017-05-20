@@ -165,5 +165,5 @@ public abstract class CollisionShape {
 	public Object getUserPointer() {
 		return userPointer;
 	}
-	
+
 }

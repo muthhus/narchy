@@ -8,11 +8,15 @@ import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
+import nars.op.stm.MySTMClustered;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Time;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * Created by me on 3/21/17.
@@ -26,15 +30,23 @@ public class FZero extends NAgentX {
     public static void main(String[] args) throws Narsese.NarseseException {
 
         float fps = 10f;
-        Time clock = new RealTime.DSHalf(true).durFPS(fps);
+        Time clock = new RealTime.DSHalf(true).durFPS(fps*2);
 
 //        Default n = NARBuilder.newMultiThreadNAR(
 //                4,
 //                clock
 //                        , true);
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        n.beliefConfidence(0.95f);
+        n.goalConfidence(0.9f);
+        n.termVolumeMax.setValue(48);
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
         n.addNAR(1024);
+        n.addNAR(512);
         n.addNAR(256);
+        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 16);
+        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 16);
 
         FZero a = new FZero(n);
         a.trace = true;

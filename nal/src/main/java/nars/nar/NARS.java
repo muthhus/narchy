@@ -16,16 +16,13 @@ import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
-import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -42,7 +39,7 @@ public class NARS extends NAR {
 
     private static final float SYNC_HZ_DEFAULT = 30f;
 
-    final List<NAR> nar = $.newArrayList();
+    final List<NAR> sub = $.newArrayList();
     private final List<On> observers = $.newArrayList();
     int num;
 
@@ -61,7 +58,7 @@ public class NARS extends NAR {
         int remain = num;
         int start = random().nextInt(remain);
         while (remain-- > 0) {
-            NAR target = this.nar.get(start); //random distribution TODO abstract to other striping policies
+            NAR target = this.sub.get(start); //random distribution TODO abstract to other striping policies
             if (target.exe.run(x))
                 break; //accepted
         }
@@ -75,8 +72,8 @@ public class NARS extends NAR {
         synchronized (terms) {
             assert (!running());
             NAR x = n.build(time, terms, random());
-            nar.add(x);
-            num = nar.size();
+            sub.add(x);
+            num = sub.size();
             observers.add(x.eventTaskProcess.on(eventTaskProcess::emit)); //proxy
         }
     }
@@ -104,13 +101,30 @@ public class NARS extends NAR {
 
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(time, new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, e), rng, e);
+        super(time, new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e), rng, e);
     }
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
         this(time, rng,
             new MultiThreadExecutor(0, passiveThreads) {
             //new SynchronousExecutor() {
+
+                @Override
+                public void run(@NotNull Consumer<NAR> r) {
+                    //NARS.this.run(r);
+
+                    List<NAR> subs = ((NARS) nar).sub;
+                    int which = nar.random().nextInt(subs.size());
+                    subs.get(which).exe.run(r);
+
+                    //runLater(()->r.accept(nar));
+                }
+
+                @Override
+                public boolean run(@NotNull ITask t) {
+                    throw new UnsupportedOperationException("should be intercepted by class NARS");
+                }
+
                 @Override
                 public boolean concurrent() {
                     return true;
@@ -136,9 +150,9 @@ public class NARS extends NAR {
 
             assert (!running());
 
-            int num = nar.size();
+            int num = sub.size();
 
-            setFocus(new CompoundFocus(nar));
+            setFocus(new CompoundFocus(sub));
 
             this.loops = $.newArrayList(num);
             all(n -> loops.add(new NARLoop(n)));
@@ -169,7 +183,7 @@ public class NARS extends NAR {
     }
 
     public void all(Consumer<NAR> n) {
-        nar.forEach(n);
+        sub.forEach(n);
     }
 
     public static void main(String[] args) {
@@ -204,7 +218,7 @@ public class NARS extends NAR {
 
             m.put("now", new Date());
 
-            for (NAR n : nar) {
+            for (NAR n : sub) {
                 m.put(n.self() + "_emotion", n.emotion.summary());
             }
             if (loops != null) {

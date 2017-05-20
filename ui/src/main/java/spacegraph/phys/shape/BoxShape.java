@@ -53,7 +53,7 @@ public class BoxShape extends SimpleBoxShape {
 	@Override
     public void size(float x, float y, float z) {
 		setMargin(0f); //is margin helpful?
-		implicitShapeDimensions.set(x/2f, y/2f, z/2f);
+		super.size(x, y, z);
 	}
 
 	@Override

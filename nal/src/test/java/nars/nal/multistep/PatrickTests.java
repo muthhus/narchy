@@ -208,7 +208,6 @@ public class PatrickTests extends AbstractNALTest {
         n.termVolumeMax.setValue(60);
         n.DEFAULT_BELIEF_PRIORITY = 0.05f;
         n.DEFAULT_QUESTION_PRIORITY = 0.9f;
-        n.DEFAULT_QUESTION_QUALITY = 0.9f;
 
         n.input("<#x --> P>. %0.0;0.25%"); //assume that unless pixel isnt specified then it's black
 

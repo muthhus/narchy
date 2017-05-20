@@ -204,16 +204,17 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         gl.glEnable(GL_POINT_SMOOTH);
         gl.glEnable(GL_LINE_SMOOTH);
         gl.glEnable(GL_POLYGON_SMOOTH);
-        gl.glEnable(GL2.GL_MULTISAMPLE);
+        //gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glShadeModel(GL_SMOOTH);
 
+
         gl.glHint(GL_LINE_SMOOTH_HINT,
-                //GL_NICEST
-                GL_FASTEST);
+                GL_NICEST);
+                //GL_FASTEST);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT,
-                //GL_NICEST
-                GL_FASTEST);
+                GL_NICEST);
+                //GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -244,15 +245,13 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
         //gl.glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
         //gl.glBlendEquationSeparate(GL_FUNC_ADD, GL_FUNC_ADD);
 
-        //gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST); // Really Nice Perspective Calculations
-
         //loadGLTexture(gl);
 
 //        gleem.start(Vec3f.Y_AXIS, window);
 //        gleem.attach(new DefaultHandleBoxManip(gleem).translate(0, 0, 0));
         // JAU
-        //gl.glEnable(gl.GL_CULL_FACE);
-        //gl.glCullFace(gl.GL_BACK);
+//        gl.glEnable(gl.GL_CULL_FACE);
+//        gl.glCullFace(gl.GL_BACK);
 
     }
 

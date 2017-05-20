@@ -74,14 +74,17 @@ public class GoalActionConcept extends ActionConcept {
             //inject curiosity
             float nextCurious =
                     //nar.random().nextFloat();
-                    ((float)Math.sin(nar.time() / (period * (2 * Math.PI) * nar.dur())) + 1f)/2f;
+                    ((float)Math.sin(now / (period * (2 * Math.PI) * dur)) + 1f)/2f;
 
-            Truth ct = $.t(nextCurious,
-                    nar.confDefault(GOAL) * 0.5f);
-            if (goal == null) {
-                goal = ct;
-            } else {
-                goal = Revision.revise(goal, ct);
+            float cc = nar.confDefault(GOAL) - (goal!=null ? goal.conf() : 0);
+            if (cc > 0) {
+                Truth ct = $.t(nextCurious,
+                        cc);
+                if (goal == null) {
+                    goal = ct;
+                } else {
+                    goal = Revision.revise(goal, ct);
+                }
             }
         }
 

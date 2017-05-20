@@ -83,7 +83,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
         Dynamic x = super.newBody(collidesWithOthersLikeThis);
 
 
-        //int zOffset = -10;
         final float initDistanceEpsilon = 50f;
         final float initImpulseEpsilon = 0.25f;
 
@@ -97,7 +96,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                 SpaceGraph.r(initImpulseEpsilon),
                 SpaceGraph.r(initImpulseEpsilon)));
 
-        x.setDamping(0.25f, 0.85f);
         return x;
     }
 
@@ -142,11 +140,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                 c.termlinks().forEach(this);
 
                 float priSum = edges.priSum();
-                edges.commit(x -> {
-                    x.get().update(priSum);
-                });
 
                 conceptVis.apply(this, key);
+
+
+                edges.commit(x -> {
+                    x.get().update( ConceptWidget.this, priSum);
+                });
+
             }
 
 
@@ -301,7 +302,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             return hash;
         }
 
-        public void update(float conceptEdgePriSum) {
+        public void update(ConceptWidget src, float conceptEdgePriSum) {
 
             float edgeSum = (termlinkPri + tasklinkPri);
 
@@ -336,13 +337,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                         //0.1f + 0.9f * ff.pri(); //0.9f;
                         0.1f + 0.8f * edgeProp;
 
-                this.attraction = 0.1f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0.1f + 2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
-            this.attractionDist = 1f; //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+
+            this.attractionDist = src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
 
         @Override
@@ -399,9 +401,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             cw.scale(l, w, h);
 
 
+
             float density = 6f;
-            if (cw.body != null)
+            if (cw.body != null) {
                 cw.body.setMass(l * w * h * density);
+                cw.body.setDamping(0.9f, 0.9f);
+            }
 
 //            Draw.hsb(
 //                    (tt.op().ordinal() / 16f),
