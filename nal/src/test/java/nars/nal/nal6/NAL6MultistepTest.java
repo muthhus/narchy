@@ -51,19 +51,19 @@ public class NAL6MultistepTest {
                 "(earthquake)?"
         );
 
-        Concept burglary = d.concept("(burglary)");
-        Concept earthquake = d.concept("(earthquake)");
 
+        Concept burglary = null, earthquake = null;
         for (int i = 0; i < 5; i++) {
-            // burglary.print();  earthquake.print();
             //long now = d.time();
             d.run(100);
+            burglary = d.concept("(burglary)");
+            earthquake = d.concept("(earthquake)");            // burglary.print();  earthquake.print();
             System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
         assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0).freq(), 0.4f /* approximate */);
-        assertEquals(0.31f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
+        assertEquals(0.18f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
     }
 
 
@@ -93,14 +93,14 @@ public class NAL6MultistepTest {
                 "(earthquake)?"
         );
 
-        Concept burglary = d.concept("(burglary)");
-        Concept earthquake = d.concept("(earthquake)");
-
+        Concept burglary = null, earthquake = null;
         for (int i = 0; i < 5; i++) {
             // burglary.print();  earthquake.print();
             //long now = d.time();
-            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0));
             d.run(100);
+            burglary = d.concept("(burglary)");
+            earthquake = d.concept("(earthquake)");            // burglary.print();  earthquake.print();
+            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%

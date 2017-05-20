@@ -3,6 +3,7 @@ package nars.util.exe;
 import com.google.common.collect.Sets;
 import nars.$;
 import nars.NAR;
+import nars.premise.PremiseBuilder;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,9 +47,15 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
                });
             });
             prepending.clear();
-            pending.values().forEach(super::run);
+            pending.values().forEach(this::actuallyRun);
             pending.clear();
         }
+    }
+
+    protected void actuallyRun(@NotNull ITask input) {
+//        if (input instanceof PremiseBuilder.DerivePremise)
+//            System.out.println(input);
+        super.run(input);
     }
 
     @Override

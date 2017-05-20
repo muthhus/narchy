@@ -28,12 +28,6 @@ import static nars.experiment.tetris.impl.TetrisState.*;
  */
 public class Tetris extends NAgentX implements Bitmap2D {
 
-    //    static final Executioner exe =
-//            //new SingleThreadExecutioner();
-////            new MultiThreadExecutioner(2, 1024*8);
-//            new MultiThreadExecutioner(3, 1024*8);
-
-
     public final FloatParam timePerFall = new FloatParam(4f, 1f, 32f);
 
     public static final int tetris_width = 8;
@@ -514,7 +508,8 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         Time clock = new RealTime.DSHalf(true).durFPS(10f);
         NAR n =
-                NARBuilder.newMultiThreadNAR(3, clock);
+                NARBuilder.newMultiThreadNAR(1, clock);
+
 
         Tetris a = new MyTetris(n);
         a.trace = true;

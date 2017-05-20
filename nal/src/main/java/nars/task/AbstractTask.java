@@ -20,9 +20,9 @@ abstract public class AbstractTask extends Pri implements ITask {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public @NotNull String toString() {
+
+    abstract public @NotNull String toString();/* {
         return super.toString() + " " + getClass().getSimpleName();
-    }
+    }*/
 
 }

@@ -86,13 +86,15 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
                 Task match;
                 long now = nar.time();
-                //if (task.isQuestOrQuestion()) {
+                if (task.isQuestOrQuestion()) {
+                    //answer projects to the question time
                     long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept)beliefConcept, nar);
-//                } else {
-//                    long when = task.start();
-//                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
-//                }
+                } else {
+                    //should not project the matched belief
+                    long when = task.start();
+                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
+                }
 
                 if (match != null) {
                     if (match.isBelief() /* not Goal */) {
@@ -145,7 +147,7 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
 
-    static class DerivePremise extends UnaryTask<Premise> {
+    public static class DerivePremise extends UnaryTask<Premise> {
 
         static final DerivationBudgeting defaultBudgeting = new PreferSimpleAndPolarized();
         static final ThreadLocal<FireConcepts.DirectDerivation> derivation =

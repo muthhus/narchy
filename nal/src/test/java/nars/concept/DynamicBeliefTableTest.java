@@ -147,7 +147,7 @@ public class DynamicBeliefTableTest {
     @Test public void testDynamicProductImageExtensional() throws Narsese.NarseseException {
         NAR n = new Default();
 
-        n.believe($("f(x,y)"), (long)0, 1f, 0.9f);
+        n.believe($("f(x,y)"), (long)0, 1f, 0.9f).run(1);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"));
         int dur = n.dur();
@@ -178,7 +178,7 @@ public class DynamicBeliefTableTest {
         int dur = 9;
         n.time.dur(dur);
 
-        n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f);
+        n.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f).run(1);
 
         CompoundConcept prod = (CompoundConcept) n.concept($("(f-->(x, y))"));
         Truth t = prod.belief(0, dur);

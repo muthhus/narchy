@@ -10,6 +10,7 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
+import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.SynchronousExecutor;
 import org.junit.Test;
 
@@ -80,7 +81,7 @@ public class InterNARTest {
     private static Default newNAR() {
         return new Default(1024,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
-                new RealTime.DSHalf(), new SynchronousExecutor());
+                new RealTime.DSHalf(true), new BufferedSynchronousExecutor());
     }
 
     @Test

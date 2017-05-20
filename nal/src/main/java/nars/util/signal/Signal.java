@@ -124,11 +124,11 @@ public class Signal {
      * TODO revise
      */
     protected float deltaFactor(@Nullable Truthed a, Truth b) {
-        //return 1f;
+        return 1f;
 
-        if (a == null)
+        /*if (a == null)
             return 1f;
-        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));
+        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));*/
     }
 
     @NotNull

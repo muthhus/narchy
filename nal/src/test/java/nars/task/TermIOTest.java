@@ -149,7 +149,7 @@ public class TermIOTest {
         out.println("NAR tasks serialized: " + x.length + " bytes");
 
         NAR b = new Default()
-                        .inputBinary(new ByteArrayInputStream(x))
+                        .inputBinary(new ByteArrayInputStream(x)).run(1)
                         //.next()
                         //.forEachConceptTask(true,true,true,true, out::println)
                         //.forEachConcept(System.out::println)

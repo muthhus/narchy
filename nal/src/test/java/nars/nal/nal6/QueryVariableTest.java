@@ -57,7 +57,7 @@ public class QueryVariableTest {
 
 
         Default nar = new Default();
-        nar.log();
+        //nar.log();
         Compound beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.ask(question, Tense.ETERNAL, (q,a)-> {

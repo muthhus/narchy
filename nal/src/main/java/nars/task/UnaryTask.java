@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.Texts;
 import jcog.Util;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -21,7 +22,7 @@ abstract public class UnaryTask<X> extends AbstractTask {
 
     @Override
     public final @NotNull String toString() {
-        return getClass().getSimpleName() + "(\"" + value + "\")";
+        return "$" + Texts.n4(pri) + " " + getClass().getSimpleName() + "(\"" + value + "\")";
     }
 
     @Override

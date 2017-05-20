@@ -224,7 +224,7 @@ public class RevisionTest {
     @Test public void testRevision2EternalImpl() throws Narsese.NarseseException {
         NAR n = newNAR(3)
             .input("(x ==> y). %1.0;0.9%",
-                   "(x ==> y). %0.0;0.9%" );
+                   "(x ==> y). %0.0;0.9%" ).run(1);
         Task t = n.concept("(x ==> y)").beliefs().matchEternal();
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);
@@ -234,7 +234,7 @@ public class RevisionTest {
     @Test public void testRevision2TemporalImpl() throws Narsese.NarseseException {
         NAR n = newNAR(3)
                 .input("(x ==> y). :|: %1.0;0.9%",
-                       "(x ==> y). :|: %0.0;0.9%" );
+                       "(x ==> y). :|: %0.0;0.9%" ).run(1);
         Truth t = n.concept("(x ==> y)").belief(0, 1);
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);

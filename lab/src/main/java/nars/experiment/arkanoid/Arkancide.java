@@ -35,7 +35,7 @@ public class Arkancide extends NAgentX {
     private float prevScore;
 
     public static void main(String[] args) {
-        Param.DEBUG = true;
+        Param.DEBUG = false;
 
         //runRT(Arkancide::new);
         //nRT(Arkancide::new, 25, 5);
@@ -80,7 +80,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super($.seti(Atomic.the("noid")), nar);
+        super((Atomic.the("noid")), nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 
@@ -105,17 +105,17 @@ public class Arkancide extends NAgentX {
         float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
-            CameraSensor cc = senseCamera("[noid]", noid, visW, visH);
+            CameraSensor cc = senseCamera("noid", noid, visW, visH);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         }
         if (numeric) {
-            SensorConcept a = senseNumber("[noid]:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept b = senseNumber("[noid]:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            SensorConcept c = senseNumber("[noid]:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
-            SensorConcept d = senseNumber("[noid]:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
-            SensorConcept e = senseNumber("[noid]:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
+            SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
+            SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
             //experimental cheat
 //            nar.input("--(paddle-ball):x! :|:",

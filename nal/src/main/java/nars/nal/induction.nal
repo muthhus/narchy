@@ -1,7 +1,7 @@
 //General Induction and Temporal Induction
 //  When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
 
-//<=>
+//==>
     A, B, time(raw), task(positive), task("."), time(dtEvents),                             notImplEqui(A), notImplEqui(B) |- (A ==>+- B), (Belief:Induction)
     A, B, time(raw), task(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),     notImplEqui(A), notImplEqui(B) |- varIntro((A ==>+- B)), (Belief:Induction)
         A, B, time(raw), task(negative), task("."), time(dtEvents),                          notImplEqui(A), notImplEqui(B) |- ((--,%A) ==>+- B), (Belief:InductionN)

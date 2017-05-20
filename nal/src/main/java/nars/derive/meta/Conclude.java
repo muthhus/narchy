@@ -235,7 +235,7 @@ public final class Conclude extends AbstractPred<Derivation> {
             byte concPunc = d.concPunc;
             @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, concPunc, d.index);
             if (c3n != null) {
-                if (c3n.getTwo())
+                if (c3n.getTwo() && truth!=null)
                     truth = truth.negated();
 
                 long start = occ[0];
