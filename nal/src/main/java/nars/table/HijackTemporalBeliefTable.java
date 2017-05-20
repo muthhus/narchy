@@ -66,8 +66,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
         if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;
-        if (existing instanceof ActionConcept.CuriosityTask)
-            return true;
 
         float exPri = existing.pri();
         if (exPri!=exPri)

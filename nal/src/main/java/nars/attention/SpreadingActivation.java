@@ -332,15 +332,14 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     void tasklink(Concept rcpt, float pri, float scale) {
 
         rcpt.tasklinks().put(
-                //new RawPLink(in, pri),
+                //new RawPLink(value, pri),
                 new PLinkUntilDeleted(value, pri),
                 scale, null);
 
     }
 
     void termlink(Concept recipient, Term target, float pri, float scale) {
-
-            recipient.termlinks().put(new RawPLink(target, pri), scale, linkOverflow);
+        recipient.termlinks().put(new RawPLink(target, pri), scale, linkOverflow);
     }
 
 

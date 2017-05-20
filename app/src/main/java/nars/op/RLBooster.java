@@ -35,7 +35,7 @@ public class RLBooster implements Consumer<NAgent> {
                 //0.5f;
                 env.nar.confMin.floatValue() * 2f;
 
-        env.curiosityProb.setValue(0f);
+        env.curiosity().setValue(0f);
 
         List<SensorConcept> sc = $.newArrayList();
         env.sense(env.nar, 0).forEach(x -> {

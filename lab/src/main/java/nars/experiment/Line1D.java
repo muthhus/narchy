@@ -52,7 +52,7 @@ public class Line1D {
 
             n.onTask(x -> {
                 if (step > trainingRounds && x.isGoal() && !x.isInput()
-                        && !(x instanceof ActionConcept.CuriosityTask)
+
                     //&& x.term().equals(a.out.term())
                         ) {
                     current.add(x);
@@ -83,10 +83,9 @@ public class Line1D {
                     if (step < trainingRounds) {
                         //completionThreshold += n.dur(); //increase completion threshold
                     } else {
-                        if (a.curiosityProb.floatValue() > 0)
+                        if (a.curiosity.floatValue() > 0)
                             System.err.println("TRAINING FINISHED - DISABLING CURIOSITY");
-                        a.curiosityProb.setValue(0f); //disable curiosity
-                        a.curiosityConf.setValue(0f);
+                        a.curiosity.setValue(0f); //disable curiosity
                     }
                 } else {
 
@@ -130,11 +129,11 @@ public class Line1D {
         n.time.dur(4);
         //n.deriver.rate.setValue(1f);
 
-        n.termVolumeMax.setValue(32);
-        n.DEFAULT_BELIEF_PRIORITY = 1f;
+        n.termVolumeMax.setValue(16);
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
         n.DEFAULT_GOAL_PRIORITY = 1f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.5f;
-        n.DEFAULT_QUEST_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         Line1DSimplest a = new Line1DSimplest(n);
         //Line1DTrainer trainer = new Line1DTrainer(a);

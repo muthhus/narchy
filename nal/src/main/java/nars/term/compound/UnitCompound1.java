@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -39,6 +40,11 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //        return hash;
 //    }
 
+
+    @Override
+    public @NotNull Term unneg() {
+        return op == NEG ? the : this;
+    }
 
     @Override
     public int structure() {

@@ -137,7 +137,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     @Override
-    default public Term unneg() {
+    default public Term unneg() { //probably rarely called; UnitCompound1 should be used for NEG's
         if (op() == NEG) {
             Term x = sub(0);
             if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is

@@ -28,10 +28,10 @@ public class BeliefActionConcept extends ActionConcept {
         this.action = action;
     }
 
-    @Override
-    public @Nullable Task curiosity(float conf, long next, NAR nar) {
-        return ActionConcept.curiosity(term(), BELIEF, conf, next, nar);
-    }
+//    @Override
+//    public @Nullable Task curiosity(float conf, long next, NAR nar) {
+//        return ActionConcept.curiosity(term(), BELIEF, conf, next, nar);
+//    }
 
     @Override
     public Task apply(NAR nar) {

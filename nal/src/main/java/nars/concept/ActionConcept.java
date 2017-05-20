@@ -22,26 +22,26 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         n.onCycle(this);
     }
 
-    public static class CuriosityTask extends GeneratedTask {
+//    @Deprecated public static class CuriosityTask extends GeneratedTask {
+//
+//        public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
+//            super(term, punc, truth, creation, start, end, stamp);
+//        }
+//    }
 
-        public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {
-            super(term, punc, truth, creation, start, end, stamp);
-        }
-    }
-
-    public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
-        long now = nar.time();
-        CuriosityTask t = new CuriosityTask(term, punc,
-                $.t(nar.random().nextFloat(), conf),
-                now,
-                next,
-            next + nar.dur(),
-                new long[] { nar.time.nextStamp() }
-        );
-        t.budget( nar );
-        return t;
-
-    }
+//    public static CuriosityTask curiosity(Compound term, byte punc, float conf, long next, NAR nar) {
+//        long now = nar.time();
+//        CuriosityTask t = new CuriosityTask(term, punc,
+//                $.t(nar.random().nextFloat(), conf),
+//                now,
+//                next,
+//            next + nar.dur(),
+//                new long[] { nar.time.nextStamp() }
+//        );
+//        t.budget( nar );
+//        return t;
+//
+//    }
 
     @Override
     public void accept(NAR nar) {
@@ -54,8 +54,8 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
     }
 
 
-    /** produces a curiosity exploratoin task */
-    @Nullable public abstract Task curiosity(float conf, long next, NAR nar);
+//    /** produces a curiosity exploratoin task */
+//    @Nullable public abstract Task curiosity(float conf, long next, NAR nar);
 
 
     /** determines the feedback belief when desire or belief has changed in a MotorConcept

@@ -41,8 +41,8 @@ public class MetaAgent extends NAgent {
 //        actionLerp(p("curiConf"), (c) -> {
 //            agent.curiosityConf.setValue(Util.unitize(c));
 //        }, -0.02f /* non-zero deadzone */, 0.25f);
-        actionLerp(p("curiProb"), (c) -> {
-            agent.curiosityProb.setValue(Util.unitize(c));
+        actionLerp(p("curi"), (c) -> {
+            agent.curiosity().setValue(Util.unitize(c));
         }, -0.02f /* non-zero deadzone */, 0.1f);
 
         actionLerp(p("activationRate"), (c) -> {

@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.Util;
+import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.term.Compound;
@@ -28,6 +29,9 @@ public interface NAct {
 
     NAR nar();
 
+    /** master curiosity factor, for all actions */
+    FloatParam curiosity();
+
     /**
      * latches to either one of 2 states until it shifts to the other one. suitable for representing
      * push-buttons like keyboard keys. by default with no desire the state is off.  the 'on' and 'off'
@@ -36,7 +40,7 @@ public interface NAct {
      */
     @Nullable
     default ActionConcept actionToggle(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
-        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
         });
@@ -46,7 +50,7 @@ public interface NAct {
 
     /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
     @Nullable default ActionConcept actionTogglePWM(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
-        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             float df = d != null ? d.freq() : 0.5f;
             boolean corrupt = nar().random().nextFloat() > Math.abs(df - 0.5f) * 2f;
 
@@ -86,7 +90,7 @@ public interface NAct {
     @Nullable
     default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
 
-        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             float deadZoneFreq =
                      1f/6;
                     // 1f/4;
@@ -140,7 +144,7 @@ public interface NAct {
     default ActionConcept actionTriStatePWM(@NotNull Compound s, @NotNull IntConsumer i) {
 
 
-        ActionConcept m = new GoalActionConcept(s, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
 
 
             int ii;
@@ -216,7 +220,7 @@ public interface NAct {
         final long[] reset = {Tense.ETERNAL}; //last enable time
         final int[] state = {0}; // 0: unknown, -1: false, +1: true
 
-        ActionConcept m = new GoalActionConcept(term, nar(), (b, d) -> {
+        ActionConcept m = new GoalActionConcept(term, this, (b, d) -> {
 
             boolean next = d != null && d.freq() >= 0.5f;
 
@@ -273,7 +277,7 @@ public interface NAct {
 
     @NotNull
     default ActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
-        ActionConcept m = new GoalActionConcept(s, nar(), update);
+        ActionConcept m = new GoalActionConcept(s, this, update);
         actions().add(m);
         return m;
     }

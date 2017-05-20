@@ -169,7 +169,7 @@ public interface NSense {
 
     default SensorConcept senseNumber(@NotNull Compound id, FloatSupplier v) {
         SensorConcept c = new SensorConcept(id, nar(), v,
-                (x) -> t(x, nar().confDefault(Op.BELIEF))
+                (x) -> t(Util.unitize(x), nar().confDefault(Op.BELIEF))
         );
         sensors().add(c);
         return c;

@@ -49,11 +49,17 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
     @Override
     public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
+        PLink<Task> taskLink = getOne();
+        Task task = taskLink.get();
+        float taskPri = task.pri();
+        if (taskPri != taskPri)
+            return; //task deleted
+
+
         Term beliefTerm = getTwo().get();
         Task belief = null;
 
-        PLink<Task> taskLink = getOne();
-        Task task = taskLink.get();
+
 
         if (beliefTerm instanceof Compound) {
 
@@ -113,15 +119,11 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
         //combine either the task or the tasklink. this makes tasks more competitive allowing the priority reduction to be applied to either the task (in belief table) or the tasklink's ordinary forgetting
-        float taskPri =
-                task.pri();
         //taskLinkCopy.pri();
         //Math.max(task.priSafe(0), taskLinkCopy.priSafe(0));
         //taskLinkCopy.pri();
         //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
-        if (taskPri != taskPri)
-            return; //task deleted
 
         float pri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max

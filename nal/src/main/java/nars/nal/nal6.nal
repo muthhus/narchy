@@ -116,7 +116,7 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
     B, (C && A), time(belief, C, A), task(positive), task("!") |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
-    B, (C && (--,%A)), task(negative), time(belief, C, A), task("!") |- (--,subIfUnifiesAny(C,A,B,strict)), (Goal:StrongN)
+    B, (C && (--,%A)), task(negative), time(belief, C, A), task("!") |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
         //B, (C && A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
         //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 

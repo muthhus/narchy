@@ -223,7 +223,7 @@ public class Line1DSimplestTest {
 
         //a.trace = true;
         a.init();
-        a.curiosityConf.setValue(0.25);
+        a.curiosity.setValue(0.25);
         //a.predictorProbability = 1.0f;
 
 

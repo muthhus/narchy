@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -86,8 +85,8 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * action exploration rate; analogous to epsilon in QLearning
      */
-    public final FloatParam curiosityConf;
-    public final FloatParam curiosityProb;
+    public final FloatParam curiosity;
+
 
     public final List<Task> p = newArrayList();
 
@@ -143,13 +142,18 @@ abstract public class NAgent implements NSense, NAct {
             }
         };
 
-        curiosityConf = new FloatParam( 0.10f);
-        curiosityProb = new FloatParam( 0.10f);
+        curiosity = new FloatParam( 0.10f);
+
 
         this.sense = nar.mix.stream(id + " sensor");
         this.ambition = nar.mix.stream(id + " ambition");
         this.predict = nar.mix.stream(id + " predict");
         this.motor = nar.mix.stream(id + " motor");
+    }
+
+    @Override
+    public FloatParam curiosity() {
+        return curiosity;
     }
 
     @NotNull
@@ -243,7 +247,7 @@ abstract public class NAgent implements NSense, NAct {
             ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
 
             motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
-            motor.input(curious(next), nar::input);
+            //motor.input(curious(next), nar::input);
 
             sense.input(sense(nar, next), nar::input);
 
@@ -268,25 +272,25 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    protected Stream<Task> curious(long next) {
-        float conf = curiosityConf.floatValue();
-        float confMin = nar.confMin.floatValue();
-        if (conf < confMin)
-            return Stream.empty();
-
-        float curiPerMotor = curiosityProb.floatValue() / actions.size();
-        return actions.stream().map(action -> {
-
-            if (nar.random().nextFloat() < curiPerMotor) {
-                return action.curiosity(conf, next, nar);
-            }/* else {
-                nar.activate(action, 1f);
-            }*/
-            return null;
-
-        }).filter(Objects::nonNull);
-
-    }
+//    protected Stream<Task> curious(long next) {
+//        float conf = curiosityConf.floatValue();
+//        float confMin = nar.confMin.floatValue();
+//        if (conf < confMin)
+//            return Stream.empty();
+//
+//        float curiPerMotor = curiosityProb.floatValue() / actions.size();
+//        return actions.stream().map(action -> {
+//
+//            if (nar.random().nextFloat() < curiPerMotor) {
+//                return action.curiosity(conf, next, nar);
+//            }/* else {
+//                nar.activate(action, 1f);
+//            }*/
+//            return null;
+//
+//        }).filter(Objects::nonNull);
+//
+//    }
 
 
     @NotNull
@@ -529,9 +533,8 @@ abstract public class NAgent implements NSense, NAct {
 
         //long frameDelta = now-prev;
 
-        int num = p.size();
 
-        long next = now + nar.dur()/2;
+        long next = now + dur/2;
 
         return p.stream().map(x -> {
             if (x != null) {
@@ -554,12 +557,11 @@ abstract public class NAgent implements NSense, NAct {
         final float[] m = {0};
         int n = actions.size();
         int dur = nar.dur();
+        long now = nar.time();
         for (ActionConcept a : actions) {
             a.goals().forEach(x -> {
-                if (!(x instanceof ActionConcept.CuriosityTask)) {
-                    //System.out.println(x.proof());
-                    m[0] = m[0] + x.evi(now, dur);
-                }
+                //System.out.println(x.proof());
+                m[0] += x.evi(now, dur);
             });
         }
         float dex = w2c(m[0] / n);
@@ -573,7 +575,10 @@ abstract public class NAgent implements NSense, NAct {
         if (t.start() != ETERNAL) {
 
             //only shift for questions
-            long shift = horizon > 0 && t.isQuestOrQuestion() ? nar.random().nextInt(horizon) : 0;
+            long shift = //horizon > 0 && t.isQuestOrQuestion() ?
+                    nar.random().nextInt(horizon)
+                    //: 0
+            ;
 
             long range = t.end() - t.start();
             //System.out.println(now + " " + nar.time() + " -> " + next + "+" + shift + " = " + (next+shift));

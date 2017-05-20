@@ -1,9 +1,13 @@
 package nars.concept;
 
 import jcog.data.FloatParam;
+import nars.$;
 import nars.NAR;
+import nars.NAct;
 import nars.Task;
+import nars.task.Revision;
 import nars.term.Compound;
+import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,11 +23,17 @@ public class GoalActionConcept extends ActionConcept {
 
     public final FloatParam resolution;
     private final Signal feedback;
+    private final FloatParam curiosity;
 
 
-    public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, @NotNull MotorFunction motor) {
+    public GoalActionConcept(@NotNull Compound term, @NotNull NAct act, @NotNull MotorFunction motor) {
+        this(term, act.nar(), act.curiosity(), motor);
+    }
+
+    public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
         super(term, n);
 
+        this.curiosity = curiosity;
         resolution = n.truthResolution;
         this.feedback = new Signal(BELIEF, resolution);
         feedback.pri(()->n.priorityDefault(GOAL));
@@ -33,10 +43,12 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
-    @Override
-    public @Nullable Task curiosity(float conf, long next, NAR nar) {
-        return curiosity(term(), GOAL, conf, next, nar);
-    }
+//    @Override
+//    public @Nullable Task curiosity(float conf, long next, NAR nar) {
+//
+//        //return curiosity(term(), GOAL, conf, next, nar);
+//        return null;
+//    }
 
 
     @Override
@@ -54,10 +66,29 @@ public class GoalActionConcept extends ActionConcept {
         int dur = nar.dur();
         long now = nar.time();
 
+        Truth goal = goal(now, dur);
+
+        float period = 2;
+        float cur = curiosity.floatValue();
+        if (nar.random().nextFloat() < cur) {
+            //inject curiosity
+            float nextCurious =
+                    //nar.random().nextFloat();
+                    ((float)Math.sin(nar.time() / (period * (2 * Math.PI) * nar.dur())) + 1f)/2f;
+
+            Truth ct = $.t(nextCurious,
+                    nar.confDefault(GOAL) * 0.5f);
+            if (goal == null) {
+                goal = ct;
+            } else {
+                goal = Revision.revise(goal, ct);
+            }
+        }
+
         return feedback.set(term(),
                 this.motor.motor(
                         belief(now, dur),
-                        goal(now, dur)),
+                        goal),
                 nar.time::nextStamp,
                 nar);
     }
