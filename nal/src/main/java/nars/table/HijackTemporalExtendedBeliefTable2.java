@@ -61,7 +61,7 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
         if (b == null)
             return a;
 
-        return Revision.revise(a,b);
+        return Revision.revise(a, b);
     }
 
     @Nullable Truth historicTruth(long when, int dur, int limit) {
@@ -72,7 +72,8 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
             return t.size() < limit;
         });
         switch (t.size()) {
-            case 0: return null;
+            case 0:
+                return null;
             default:
                 return TruthPolation.truth(null, when, dur, t);
         }
@@ -108,9 +109,36 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
 
             ressurect(x);
 
-            int toRemove = history.size() + 1 - historicCapacity;
-            for (int i = 0; i < toRemove; i++)
-                removeOldest(/*toRemove*/);
+            List<Task> removing = $.newArrayList();
+
+            history.read(h -> {
+
+                int toRemove = history.size() + 1 - historicCapacity;
+                for (int i = 0; i < toRemove; i++) {
+
+                    //after each one is removed, call super.remove(x)
+                    Node<Task> n = h.getRoot();
+
+                    long min = n.bounds().min().coord(0);
+
+                    n.intersecting(new RectLong1D(min), (t) -> {
+                        removing.add(t);
+                        return false;
+                    });
+
+
+                }
+            });
+
+            if (!removing.isEmpty()) {
+                history.removeAll(removing);
+                for (Task x1 : removing) {
+                    if (x1 == null)
+                        break;
+
+                    super.onRemoved(x1);
+                }
+            }
 
 //            synchronized (history) {
 //                int toRemove = ;
@@ -128,34 +156,6 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
         }
     }
 
-
-    private void removeOldest(/*int num*/) {
-
-        Task[] found = new Task[1];
-
-        //after each one is removed, call super.remove(x)
-        history.read(h -> {
-            Node<Task> n = h.getRoot();
-            long min = n.bounds().min().coord(0);
-
-            n.intersecting(new RectLong1D(min), (t) -> {
-                found[0] = t;
-                return false;
-            });
-
-
-        });
-
-        for (Task x : found) {
-            if (x == null)
-                break;
-
-            boolean removed = history.remove(x);
-            assert (removed);
-
-            super.onRemoved(x);
-        }
-    }
 
     /**
      * whether a given task should be stored in this

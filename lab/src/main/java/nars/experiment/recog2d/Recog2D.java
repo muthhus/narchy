@@ -64,8 +64,8 @@ public class Recog2D extends NAgentX {
 
     int image;
     final int maxImages = 3;
-    static int durFPS = 10;
-    int imagePeriod = 164;
+
+    int imagePeriod = 50;
     FloatToFloatFunction goalInfluence = (x) -> x > 0.5f ? 1 : 0; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
@@ -311,7 +311,7 @@ public class Recog2D extends NAgentX {
 
 
         NAgentX.chart(a);
-        a.runRT(5);
+        a.runRT(15);
     }
 
     public static class Training {

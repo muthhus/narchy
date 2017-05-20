@@ -40,7 +40,7 @@ public interface Priority extends Prioritized {
     float EPSILON = 0.00001f;
 
     /** ascending order */
-    Comparator<? extends Priority> COMPARATOR = (Priority a, Priority b) -> {
+    Comparator<? super Priority> COMPARATOR = (Priority a, Priority b) -> {
         if (a == b) return 0;
 
         float ap = a.priSafe(-1);

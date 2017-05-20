@@ -57,7 +57,7 @@ public abstract class MaplikeTermIndex extends CachedTermIndex {
 
     @Override
     public @NotNull String summary() {
-        return "CACHE build=" + terms.summary()
+        return "CACHE term=" + terms.summary()
                 //+ " normalize=" + normalize.summary()
                 ;
     }

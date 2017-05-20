@@ -26,6 +26,7 @@ import jcog.tree.rtree.split.LinearSplitLeaf;
 import jcog.tree.rtree.split.QuadraticSplitLeaf;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -49,6 +50,7 @@ public class RTree<T> implements Spatialized<T> {
     private final int mMax;
     private final Function<T,HyperRect> spatialize;
     private final Split splitType;
+    @NotNull
     private Node<T> root;
     private int entryCount;
 
@@ -196,7 +198,7 @@ public class RTree<T> implements Spatialized<T> {
         return getClass().getSimpleName() + "[size=" + size() + "]";
     }
 
-    public Node<T> getRoot() {
+    @NotNull public Node<T> getRoot() {
         return this.root;
     }
 
@@ -228,7 +230,7 @@ public class RTree<T> implements Spatialized<T> {
             }
         },;
 
-        abstract public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m);
+        @NotNull abstract public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m);
 
     }
 }

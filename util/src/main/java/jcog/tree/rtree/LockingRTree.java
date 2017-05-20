@@ -88,6 +88,15 @@ public class LockingRTree<T> implements Spatialized<T> {
             writeLock.unlock();
         }
     }
+    public void removeAll(Iterable<? extends T> t) {
+        writeLock.lock();
+        try {
+            t.forEach(this::remove);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
 
     public void read(Consumer<RTree<T>> x) {
         readLock.lock();

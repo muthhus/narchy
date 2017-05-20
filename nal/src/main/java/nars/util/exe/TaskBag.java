@@ -11,7 +11,8 @@ import java.util.function.Consumer;
  */
 abstract public class TaskBag {
 
-    abstract public boolean add(@NotNull ITask x);
+    /** returns a removed task, or null if nothing removed */
+    abstract public ITask put(@NotNull ITask x);
 
     @Nullable
     abstract public ITask next();
@@ -24,6 +25,6 @@ abstract public class TaskBag {
 
     abstract public float load();
 
-    abstract public void forEach(Consumer<ITask> t);
+    abstract public void forEach(Consumer<? super ITask> t);
 
 }

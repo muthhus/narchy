@@ -94,12 +94,6 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.1</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
-        <dependency>
-            <groupId>com.conversantmedia</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>1.2.10</version>
-        </dependency>
 
         <dependency>
             <!-- https://vimeo.com/12165742 -->

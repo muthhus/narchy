@@ -41,14 +41,14 @@ public interface Node<T> {
     /**
      * @return Rect - the bounding rectangle for this node
      */
-    HyperRect bounds();
+    @NotNull HyperRect bounds();
 
     /**
      * Add t to the index
      *
      * @param t - value to add to index
      */
-    Node<T> add(T t);
+    @NotNull Node<T> add(T t);
 
     /**
      * Remove t from the index

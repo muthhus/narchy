@@ -41,7 +41,9 @@ public class MultiThreadExecutor extends Executioner {
 
     final TaskBag active =
             //new HijackITaskBag();
-            new LBMQTaskBag(2 * 1024);
+            //new LBMQTaskBag(2 * 1024);
+            new UniquePriorityQueue.MinMaxTaskBag(8 * 1024);
+
 
     //    final AtomicInteger numActive = new AtomicInteger(); //because skiplist size() is slow
     final LongAdder input = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
@@ -57,7 +59,8 @@ public class MultiThreadExecutor extends Executioner {
             runLater(() -> t.run(nar));
         } else {
             input.increment();
-            if (active.add(t)) {
+            ITask removed = active.put(t);
+            if (removed!=null) {
                 forgot.increment();
 
 //                int p = numActive.incrementAndGet();
@@ -170,7 +173,11 @@ public class MultiThreadExecutor extends Executioner {
                     ITask x = active.next();
                     if (x != null) {
                         executed.increment();
-                        x.run(nar);
+                        try {
+                            x.run(nar);
+                        } catch (Throwable t) {
+                            logger.error("{} {}", x, t);
+                        }
                         pauses = 0;
                     } else {
                         pause(pauses++);
@@ -313,6 +320,7 @@ public class MultiThreadExecutor extends Executioner {
         });
         return h;
     }
+
 
 
 //

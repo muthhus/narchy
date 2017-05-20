@@ -124,8 +124,8 @@ public class Line1D {
 
 
         NAR n = new Default();
-        n.time.dur(32);
-        n.termVolumeMax.setValue(16);
+        n.time.dur(4);
+        n.termVolumeMax.setValue(24);
 
 
         Line1DSimplest a = new Line1DSimplest(n);
