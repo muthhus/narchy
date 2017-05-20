@@ -199,7 +199,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         this.emotion = new Emotion();
 
-        if (terms.nar==null) //dont reinitialize if already initialized, for sharing
+        if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
 
         restart();
@@ -557,8 +557,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-
-
 //    private boolean executable(Task input) {
 //        if (input.isCommand())
 //            return true;
@@ -871,7 +869,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * Exits an iteration loop if running
      */
     public void stop() {
-        exe.stop();
+        synchronized (exe) {
+            if (loop != null) {
+                loop.stop();
+                loop = null;
+            }
+            exe.stop();
+        }
     }
 
     /**
@@ -1012,20 +1016,20 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * creates a new loop which runs at max speed
      */
     @NotNull
-    public NARLoop loop() {
-        return loopPeriodMS(0);
+    public NARLoop start() {
+        return startPeriodMS(0);
     }
 
     @NotNull
-    public NARLoop loopFPS(float initialFPS) {
+    public final NARLoop startFPS(float initialFPS) {
         if (initialFPS < 0)
-            return loopPeriodMS((int) -1); //pause
+            return startPeriodMS((int) -1); //pause
 
         if (initialFPS == 0)
-            return loopPeriodMS((int) 0); //infinite
+            return startPeriodMS((int) 0); //infinite
 
         float millisecPerFrame = 1000.0f / initialFPS;
-        return loopPeriodMS((int) millisecPerFrame);
+        return startPeriodMS((int) millisecPerFrame);
     }
 
     /**
@@ -1034,7 +1038,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * @param initialFramePeriodMS in milliseconds
      */
     @NotNull
-    public NARLoop loopPeriodMS(int initialFramePeriodMS) {
+    public NARLoop startPeriodMS(int initialFramePeriodMS) {
 
         synchronized (exe) {
 
@@ -1239,8 +1243,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     }
 
-    /** returns the canonical Concept term for any given Term, or null if it is unconceptualizable */
-    @Nullable public Term conceptTerm(@NotNull Term term) {
+    /**
+     * returns the canonical Concept term for any given Term, or null if it is unconceptualizable
+     */
+    @Nullable
+    public Term conceptTerm(@NotNull Term term) {
 
         if (term instanceof Variable) {
             return null;
@@ -1404,14 +1411,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @NotNull
     public final Concept on(@NotNull Concept c) {
 
-        //TODO make this a lambda atomic procedure that is passed to the concept index to update it
-        synchronized (terms) {
-            Concept existing = concept(c.term());
-            if ((existing != null) && (existing != c))
-                throw new RuntimeException("concept already indexed for term: " + c.term());
+        Concept existing = concept(c.term());
+        if ((existing != null) && (existing != c))
+            throw new RuntimeException("concept already indexed for term: " + c.term());
 
-            terms.set(c);
-        }
+        terms.set(c);
 
         return c;
     }

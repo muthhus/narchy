@@ -84,7 +84,8 @@ abstract public class Executioner implements Executor {
         runLater(whenIGetAroundToIt);
     }
 
-    abstract public void run(@NotNull ITask input);
+    /** returns whether the input was accepted */
+    abstract public boolean run(@NotNull ITask input);
 
     public Loop loop(float fps /* initial */, Runnable repeated) {
         return new Periodic(fps, repeated);
@@ -112,14 +113,14 @@ abstract public class Executioner implements Executor {
                 return true; //black-out, the last frame didnt even finish yet
             }
 
-            //nar.runLater(()->{
+            runLater(()->{
                 last = nar.time();
                 try {
                     task.run();
                 } finally {
                     busy.set(false);
                 }
-            //});
+            });
 
             return true;
         }

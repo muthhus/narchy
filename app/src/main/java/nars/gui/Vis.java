@@ -196,6 +196,10 @@ public class Vis {
         return new EmotionPlot(plotHistory, a);
     }
 
+    public static Label label(Object x) {
+        return label(x.toString());
+    }
+    
     public static Label label(String text) {
         return new Label(text);
     }
@@ -231,7 +235,7 @@ public class Vis {
 //                            }
 //                        }
 
-                        new Flatten()
+                        //new Flatten()
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);

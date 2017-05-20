@@ -1,68 +1,69 @@
 package nars.control;
 
-import com.google.common.collect.Iterators;
-import jcog.bag.Bag;
-import jcog.list.SynchronizedArrayList;
+import com.google.common.collect.Iterables;
+import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import nars.Focus;
+import nars.NAR;
 import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 
 public class CompoundFocus implements Focus {
 
-    final List<Focus> sub = new SynchronizedArrayList<>(Focus.class);
+    public final FloatParam activationRate = new FloatParam(1f);
 
-    public CompoundFocus(Focus... c) {
-        sub.addAll(Arrays.asList(c));
+    final Focus[] sub;
+    final Iterable<PLink<Concept>> iter;
+
+
+
+    public CompoundFocus(List<? extends NAR> ii) {
+        sub = new Focus[ii.size()];
+        for (int i = 0; i < sub.length; i++)
+            sub[i] = ii.get(i).focus();
+        iter = sub.length > 1 ? Iterables.concat(sub) : sub[0];
     }
 
     @Override
     public PLink<Concept> activate(Concept term, float priToAdd) {
 
-        for (int i = 0, controlSize = sub.size(); i < controlSize; i++) {
-            sub.get(i).activate(term, priToAdd);
+        float p = priToAdd * activationRate.floatValue() / sub.length;
+        for (Focus c : sub) {
+            c.activate(term, p);
         }
 
         //TODO collect an aggregate PLink
-        throw new UnsupportedOperationException("TODO");
+        return null;
     }
 
 
-    @Override
-    public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> c) {
-        throw new UnsupportedOperationException("TODO");
-    }
-
-    @Override
-    public float pri(@NotNull Termed termed) {
+    @Override public float pri(@NotNull Termed termed) {
         float p = 0;
-        for (int i = 0, controlSize = sub.size(); i < controlSize; i++) {
-            Focus c = sub.get(i);
-            p += c.pri(termed);
+        int missed = 0;
+        for (Focus c : sub) {
+            float pp = c.pri(termed);
+            if (pp==pp) {
+                p += pp;
+            } else {
+                missed++;
+            }
         }
-        return p;
+
+        int num = sub.length;
+        if (missed == num)
+            return Float.NaN;
+
+        return p/num; //average
     }
 
     @Override
     public Iterable<PLink<Concept>> concepts() {
-        int s = sub.size();
-        switch (s) {
-            case 0:
-                return Collections.emptyList();
-            case 1:
-                return sub.get(0).concepts(); //avoids the concatenated iterator default case
-            default:
-                return () -> {
-                    return Iterators.concat(Iterators.transform(sub.iterator(),
-                            c -> c.concepts().iterator()));
-                };
-        }
+        return iter;
     }
 
 }

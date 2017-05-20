@@ -16,11 +16,9 @@ import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.truth.Truth;
-import nars.video.Blink;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
@@ -311,7 +309,7 @@ public class Recog2D extends NAgentX {
 
 
         NAgentX.chart(a);
-        a.runRT(1);
+        a.startRT(1);
     }
 
     public static class Training {

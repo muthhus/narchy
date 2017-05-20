@@ -1,16 +1,17 @@
 package nars.experiment.tetris;
 
+import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.nar.NARBuilder;
-import nars.task.util.TaskStatistics;
+import nars.index.term.map.CaffeineIndex;
+import nars.nar.NARS;
 import nars.term.atom.Atomic;
-import nars.time.FrameTime;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.truth.Truth;
@@ -18,7 +19,7 @@ import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
 import spacegraph.widget.meter.MatrixView;
 
-import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
@@ -121,11 +122,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
 
 
-
         senseCamera("tetris", pixels = new CameraSensor(Atomic.the("tetris"), this, this));
 
 
-        actions(nar, state, actions);
+        actions(state);
 
         state.reset();
 
@@ -184,23 +184,31 @@ public class Tetris extends NAgentX implements Bitmap2D {
     }
 
 
-    public void actions(NAR nar, TetrisState state, List<ActionConcept> actions) throws Narsese.NarseseException {
+    public void actions(TetrisState state) throws Narsese.NarseseException {
 
 
-
-
-        actionTriState($("tetris:x"), (i) ->{
-           switch (i) {
-               case -1: state.take_action(LEFT); break;
-               case 0: break;
-               case +1: state.take_action(RIGHT); break;
-           }
-        });
-        actionTriState($("tetris:rotate"), (i) ->{
+        actionTriState($("tetris:x"), (i) -> {
             switch (i) {
-                case -1: state.take_action(CCW); break;
-                case 0: break;
-                case +1: state.take_action(CW); break;
+                case -1:
+                    state.take_action(LEFT);
+                    break;
+                case 0:
+                    break;
+                case +1:
+                    state.take_action(RIGHT);
+                    break;
+            }
+        });
+        actionTriState($("tetris:rotate"), (i) -> {
+            switch (i) {
+                case -1:
+                    state.take_action(CCW);
+                    break;
+                case 0:
+                    break;
+                case +1:
+                    state.take_action(CW);
+                    break;
             }
         });
 
@@ -453,8 +461,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //    }
 
 
-
-
     @Override
     public float act() {
 
@@ -507,24 +513,36 @@ public class Tetris extends NAgentX implements Bitmap2D {
         //Param.DEBUG = true;
 
         Time clock = new RealTime.DSHalf(true).durFPS(10f);
-        NAR n =
-                NARBuilder.newMultiThreadNAR(1, clock);
-
+//        NAR n =
+//                NARBuilder.newMultiThreadNAR(1, clock);
+        NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        n.addNAR(512);
+        n.addNAR(256);
+        n.addNAR(128);
+        n.addNAR(64);
 
         Tetris a = new MyTetris(n);
         a.trace = true;
 
-
         NAgentX.chart(a);
-        a.runRT(10, 100000);
 
-        //nar.index.print(System.out);
-        n.forEachTask(System.out::println);
+        a.startRT(10);
 
-        //NAR.printActiveTasks(nar, true);
-        //NAR.printActiveTasks(nar, false);
-        n.printConceptStatistics();
-        new TaskStatistics().add(n).print();
+        for (int i = 0; i < 10000; i++) {
+            System.out.println(((NARS)n).stats());
+            Util.sleep(500);
+        }
+
+        n.stop();
+        a.stop();
+
+//        //nar.index.print(System.out);
+//        n.forEachTask(System.out::println);
+//
+//        //NAR.printActiveTasks(nar, true);
+//        //NAR.printActiveTasks(nar, false);
+//        n.printConceptStatistics();
+//        new TaskStatistics().add(n).print();
 
 
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
@@ -682,7 +700,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            m.termVolumeMax.setValue(24);
 
 
-
 //        MetaAgent metaT = new MetaAgent(a
 //                //,m
 //
@@ -699,7 +716,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
-
 
 
         //a.trace = true;
@@ -730,7 +746,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            }
 
 
-
 //        NARController meta = new NARController(nar, loop, t);
 //
 //        newControlWindow(Lists.newArrayList(
@@ -738,9 +753,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //                newBeliefChart(meta, 200)
 //
 //        ));
-
-
-
 
 
         //NAR.printTasks(meta.nar, true);
@@ -786,8 +798,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
             return b != null ? b.conf() : 0;
         };
     }
-
-
 
 
     public static class MyTetris extends Tetris {

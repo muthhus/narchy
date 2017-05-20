@@ -48,7 +48,7 @@ public class SynchronousExecutor extends Executioner {
     }
 
     @Override
-    public final void runLater(@NotNull Runnable r) {
+    public void runLater(@NotNull Runnable r) {
         //pending.add/*Last*/(r);
 
         //try {
@@ -59,8 +59,9 @@ public class SynchronousExecutor extends Executioner {
     }
 
 
-    @Override public void run(@NotNull ITask input) {
+    @Override public boolean run(@NotNull ITask input) {
         input.run(nar);
+        return true;
     }
 
 }

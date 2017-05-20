@@ -1,13 +1,12 @@
 package nars.nar;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.event.On;
 import jcog.random.XorShift128PlusRandom;
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
-import nars.Narsese;
+import nars.*;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.CompoundFocus;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -15,6 +14,8 @@ import nars.test.DeductiveMeshTest;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.Executioner;
+import nars.util.exe.MultiThreadExecutor;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,28 +26,44 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
- * cluster of NAR's
+ * recursive cluster of NAR's
+<sseehh> any hierarchy can be defined including nars within nars within nars
+<sseehh> each nar runs in its own thread
+<sseehh> they share concepts
+<sseehh> but not the importance of concepts
+<sseehh> each one has its own concept attention
+<sseehh> link attention is currently shared but ill consider if this needs changing
  */
 public class NARS extends NAR {
 
+    private static final float SYNC_HZ_DEFAULT = 30f;
+
     final List<NAR> nar = $.newArrayList();
-    private List<On> observers = $.newArrayList();
+    private final List<On> observers = $.newArrayList();
+    int num;
 
-    private ExecutorService pool;
+    private ThreadPoolExecutor pool;
     private List<NARLoop> loops;
-
 
     @Override
     public void input(ITask... t) {
 
-        assert (!nar.isEmpty());
+        //assert (!nar.isEmpty());
+        for (ITask x : t)
+            dispatch(x);
+    }
 
-        for (ITask x : t) {
-            NAR target = this.nar.get(random().nextInt(this.nar.size())); //random distribution TODO abstract to other striping policies
-            target.input(x);
+    public void dispatch(ITask x) {
+        int remain = num;
+        int start = random().nextInt(remain);
+        while (remain-- > 0) {
+            NAR target = this.nar.get(start); //random distribution TODO abstract to other striping policies
+            if (target.exe.run(x))
+                break; //accepted
         }
     }
 
@@ -59,6 +76,7 @@ public class NARS extends NAR {
             assert (!running());
             NAR x = n.build(time, terms, random());
             nar.add(x);
+            num = nar.size();
             observers.add(x.eventTaskProcess.on(eventTaskProcess::emit)); //proxy
         }
     }
@@ -66,42 +84,87 @@ public class NARS extends NAR {
     /** default implementation convenience method */
     public void addNAR(int concepts) {
         addNAR((time, terms, rng) ->
-            new Default(concepts, rng, terms, time, new BufferedSynchronousExecutor())
+            new Default(concepts, rng, terms, time, new SubExecutor(1024))
         );
     }
 
+    class SubExecutor extends BufferedSynchronousExecutor {
+        public SubExecutor(int inputQueueCapacity) {
+            super(
+                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
+            );
+        }
 
-    public NARS(@NotNull Time time, @NotNull TermIndex terms, @NotNull Random rng) {
-        super(time, terms, rng, new SynchronousExecutor() {
+        @Override
+        public void runLater(@NotNull Runnable r) {
+            exe.runLater(r); //use the common threadpool
+        }
+    }
+
+
+
+    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
+        super(time, new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, e), rng, e);
+    }
+
+    public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
+        this(time, rng,
+            new MultiThreadExecutor(0, passiveThreads) {
+            //new SynchronousExecutor() {
                 @Override
                 public boolean concurrent() {
                     return true;
                 }
             });
-
     }
+
+
 
     public boolean running() {
-        return this.pool != null;
+        return this.loop != null;
     }
 
-    public void start() {
+
+    @Override
+    public @NotNull NARLoop start() {
+        return startFPS(SYNC_HZ_DEFAULT);
+    }
+
+    @Override
+    public NARLoop startPeriodMS(int period) {
         synchronized (terms) {
+
             assert (!running());
-            this.pool = Executors.newFixedThreadPool(nar.size());
-            this.loops = $.newArrayList();
+
+            int num = nar.size();
+
+            setFocus(new CompoundFocus(nar));
+
+            this.loops = $.newArrayList(num);
             all(n -> loops.add(new NARLoop(n)));
+
+            this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
+            this.pool.prestartAllCoreThreads();
             loops.forEach(pool::execute);
         }
+
+        return super.startPeriodMS(period);
     }
 
+    @Override
     public void stop() {
         synchronized (terms) {
-            assert (running());
-            all(NAR::stop);
+            if (!running())
+                return;
+
+            super.stop();
+
+            loops.forEach(NARLoop::stop);
+            this.loops = null;
+
             this.pool.shutdownNow();
             this.pool = null;
-            this.loops = null;
+
         }
     }
 
@@ -109,16 +172,17 @@ public class NARS extends NAR {
         nar.forEach(n);
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
+    public static void main(String[] args) {
 
         NARS n = new NARS(
                 new RealTime.DSHalf(true),
-                new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, ForkJoinPool.commonPool()),
-                new XorShift128PlusRandom(1));
+                new XorShift128PlusRandom(1), 2);
 
 
-        n.addNAR(1024);
-        n.addNAR(1024);
+        n.addNAR(512);
+        n.addNAR(512);
+        n.addNAR(128);
+        n.addNAR(128);
 
         //n.log();
 
@@ -134,7 +198,7 @@ public class NARS extends NAR {
         n.stop();
     }
 
-    private TreeMap<String,Object> stats() {
+    public TreeMap<String,Object> stats() {
         synchronized (terms) {
             TreeMap<String, Object> m = new TreeMap();
 

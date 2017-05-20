@@ -5,6 +5,7 @@ import nars.derive.rule.PremiseRule;
 import nars.index.term.TermIndex;
 import nars.op.DepIndepVarIntroduction;
 import nars.premise.Derivation;
+import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -232,8 +233,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                 c2v = c2;
             }
 
-            byte concPunc = d.concPunc;
-            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, concPunc, d.index);
+            byte punc = d.concPunc;
+            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, punc, d.index);
             if (c3n != null) {
                 if (c3n.getTwo() && truth!=null)
                     truth = truth.negated();
@@ -241,8 +242,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                 long start = occ[0];
                 long end = occ[1];
 
-                Compound c3 = c3n.getOne();
-                float priority = d.budgeting.budget(d, c3, truth, concPunc, start, end);
+                Compound C = c3n.getOne();
+                float priority = d.budgeting.budget(d, C, truth, punc, start, end);
 
                 if (priority == priority) {
 
@@ -251,9 +252,9 @@ public final class Conclude extends AbstractPred<Derivation> {
                     }
 
                     DerivedTask t =
-                            new DerivedTask.DefaultDerivedTask(
-                                    c3, truth, concPunc,
-                                    d.concEvidence, d, d.time, start, end);
+                            Param.DEBUG ?
+                                new DebugDerivedTask( C, punc, truth, d, start, end) :
+                                new DerivedTask( C, punc, truth, d, start, end);
 
                     t.setPri(priority);
 

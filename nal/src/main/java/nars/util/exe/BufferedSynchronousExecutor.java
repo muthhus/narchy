@@ -1,20 +1,31 @@
 package nars.util.exe;
 
-import nars.$;
 import nars.NAR;
 import nars.task.ITask;
+import nars.task.NALTask;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayDeque;
 import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.Queue;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates
  */
 public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
-    final List<ITask> prepending = $.newArrayList();
-    final LinkedHashMap<ITask,ITask> pending = new LinkedHashMap();
+    final Queue<ITask> q;
+    final LinkedHashMap<ITask, ITask> pending = new LinkedHashMap();
+
+
+    public BufferedSynchronousExecutor() {
+        this(new ArrayDeque<>());
+    }
+
+    public BufferedSynchronousExecutor(Queue<ITask> q) {
+        this.q = q;
+    }
 
     @Override
     public void cycle(@NotNull NAR nar) {
@@ -38,14 +49,18 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
 //    }
 
     private void flush() {
-        if (!prepending.isEmpty()) {
-            prepending.forEach(x -> {
-               pending.merge(x, x, (p, X) -> {
-                  p.priAdd(X.priSafe(0));
-                  return p;
-               });
-            });
-            prepending.clear();
+        if (!q.isEmpty()) {
+            ITask x;
+            while (null != (x = q.poll())) {
+                pending.merge(x, x, (p, X) -> {
+                    if (p == X)
+                        return p; //does this occurr?
+
+                    p.priAdd(X.priSafe(0));
+
+                    return p;
+                });
+            }
             pending.values().forEach(this::actuallyRun);
             pending.clear();
         }
@@ -58,8 +73,8 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     }
 
     @Override
-    public void run(@NotNull ITask input) {
-        prepending.add(input);
+    public boolean run(@NotNull ITask input) {
+        return q.offer(input);
     }
 
 }

@@ -267,7 +267,7 @@ public class IRCAgent extends IRC {
         //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
         new Inperience(nar, 0.4f, 8);
 
-        nar.loopPeriodMS(framesPerSecond);
+        nar.startPeriodMS(framesPerSecond);
 
         return nar;
     }

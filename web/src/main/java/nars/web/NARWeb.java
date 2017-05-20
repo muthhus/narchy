@@ -69,7 +69,7 @@ public class NARWeb extends WebServer {
 
 
         AtomicDouble fps = new AtomicDouble(5f);
-        AtomicReference<NARLoop> l = new AtomicReference<>(nar.loopFPS(fps.floatValue()));
+        AtomicReference<NARLoop> l = new AtomicReference<>(nar.startFPS(fps.floatValue()));
 
         InterNAR net = new InterNAR(nar, 8, port);
 
@@ -112,6 +112,6 @@ public class NARWeb extends WebServer {
     }
 
     public static void start(NAR nar, AtomicReference<NARLoop> l, float nextFPS) {
-        l.set(nar.loopFPS(nextFPS));
+        l.set(nar.startFPS(nextFPS));
     }
 }

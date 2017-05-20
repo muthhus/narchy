@@ -46,10 +46,6 @@ public class BudgetFairnessTest {
                 return c.activate(term, priToAdd);
             }
 
-            @Override
-            public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> e) {
-                c.sample(e);
-            }
 
             @Override
             public float pri(@NotNull Termed concept) {

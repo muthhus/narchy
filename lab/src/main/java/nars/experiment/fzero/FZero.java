@@ -2,12 +2,15 @@ package nars.experiment.fzero;
 
 import jcog.Util;
 import jcog.math.FloatNormalized;
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
+import nars.time.Time;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,17 +20,25 @@ import org.jetbrains.annotations.NotNull;
 public class FZero extends NAgentX {
 
 
+
     private final FZeroGame fz;
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(
-                4,
-                new RealTime.DSHalf(true)
-                        .durFPS(20f), true);
+
+        float fps = 10f;
+        Time clock = new RealTime.DSHalf(true).durFPS(fps);
+
+//        Default n = NARBuilder.newMultiThreadNAR(
+//                4,
+//                clock
+//                        , true);
+        NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        n.addNAR(1024);
+        n.addNAR(256);
 
         FZero a = new FZero(n);
         a.trace = true;
-        a.runRT(20f);
+        a.startRT(fps);
 
 
         NAgentX.chart(a);

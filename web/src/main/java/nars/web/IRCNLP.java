@@ -8,16 +8,11 @@ import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
-import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
 import nars.term.Compound;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -30,8 +25,6 @@ import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-
-import static nars.Op.BELIEF;
 
 /**
  * $0.9;0.9;0.99$
@@ -411,7 +404,7 @@ public class IRCNLP extends IRC {
 
         );
 
-        n.loop();
+        n.start();
 
         bot.start();
 

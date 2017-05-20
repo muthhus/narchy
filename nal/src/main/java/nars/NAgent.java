@@ -499,12 +499,12 @@ abstract public class NAgent implements NSense, NAct {
                 stop();
         });
 
-        nar.loop().join();
+        nar.start().join();
 
         return this;
     }
 
-    public NARLoop runRT(float fps) {
+    public NARLoop startRT(float fps) {
         return runRT(fps, -1);
     }
 
@@ -516,7 +516,7 @@ abstract public class NAgent implements NSense, NAct {
     public NARLoop runRT(float fps, long stopTime) {
         init();
 
-        NARLoop loop = nar.loop();
+        NARLoop loop = nar.startFPS(fps);
 
         this.senseAndMotorLoop = nar.exe.loop(fps, this::senseAndMotor);
         this.predictLoop = nar.exe.loop(fps/2f, this::predict);

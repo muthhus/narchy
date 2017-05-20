@@ -14,12 +14,11 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task>, Consumer<NAR> {
+public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task> {
 
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
-        n.onCycle(this);
     }
 
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {
@@ -42,10 +41,6 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 //        return t;
 //
 //    }
-
-    @Override
-    public void accept(NAR nar) {
-    }
 
 
     @Override

@@ -76,6 +76,7 @@ public class Builtin {
      * generate all NAR-contextualized functors
      */
     public static void load(NAR nar) {
+
         nar.on(new DepIndepVarIntroduction.VarIntro(nar));
 
 

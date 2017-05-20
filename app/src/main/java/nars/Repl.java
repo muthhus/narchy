@@ -66,7 +66,7 @@ public class Repl {
 
         nar.logBudgetMin(new PrintStream(reader.getTerminal().output()), 0.1f);
         nar.cycle();
-        NARLoop loop = nar.loopFPS(20f);
+        NARLoop loop = nar.startFPS(20f);
 
 
         reader.setOpt(LineReader.Option.AUTO_FRESH_LINE);

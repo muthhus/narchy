@@ -34,8 +34,6 @@ public interface Focus extends Iterable<PLink<Concept>> {
         return concepts().iterator();
     }
 
-    void sample(@NotNull Bag.BagCursor<? super PLink<Concept>> c);
-
     Focus NULL_FOCUS = new Focus() {
 
         @Override
@@ -52,11 +50,6 @@ public interface Focus extends Iterable<PLink<Concept>> {
         @Override
         public Iterable<PLink<Concept>> concepts() {
             return Collections.emptyList();
-        }
-
-        @Override
-        public void sample(@NotNull Bag.@NotNull BagCursor<? super PLink<Concept>> c) {
-
         }
     };
 

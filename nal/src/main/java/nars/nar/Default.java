@@ -38,7 +38,6 @@ public class Default extends NAR {
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
-    final Random rng = new XorShift128PlusRandom(1);
     public final FireConcepts deriver;
 
     @Deprecated

@@ -94,7 +94,7 @@ public class Pacman extends NAgentX {
                         .durFPS(5f), true);
 
         Pacman a = new Pacman(n);
-        a.runRT(5f);
+        a.startRT(5f);
 
 
         NAgentX.chart(a);

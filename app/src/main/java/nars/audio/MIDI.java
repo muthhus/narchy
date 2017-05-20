@@ -78,7 +78,7 @@ public class MIDI {
             protected float act() {
                 return 0;
             }
-        }.runRT(5f);
+        }.startRT(5f);
 
         //d.loop();
 

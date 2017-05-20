@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
 
@@ -146,11 +147,14 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton( "nar", () -> nar ),
                     new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
                     new WindowButton( "focus", nar::focus),
-                    new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
-                    new WindowButton( "deriverFilter", () -> ((Default)nar).budgeting ),
+                    nar instanceof Default ?
+                            grid(
+                                new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
+                                new WindowButton( "deriverFilter", () -> ((Default)nar).budgeting )
+                            ) : label(nar.getClass()),
+
                     new WindowButton( "mix", () -> {
-                        Default d = (Default) nar;
-                        return new MixBoard(d, d.mix);
+                        return new MixBoard(nar, nar.mix);
                     })
                 ),
 
@@ -204,7 +208,7 @@ abstract public class NAgentX extends NAgent {
                     }),
                             //"tasks", ()-> taskChart,
                     new WindowButton( "conceptGraph", ()->
-                            Vis.conceptsWindow3D(nar,128, 6) )
+                            Vis.conceptsWindow3D(nar,128, 4) )
                 )
             ), 900, 600);
         });

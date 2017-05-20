@@ -50,10 +50,10 @@ public class MultiThreadExecutor extends Executioner {
 
 
     @Override
-    public void run(@NotNull ITask t) {
+    public boolean run(@NotNull ITask t) {
         float p = t.pri();
         if (p != p) //deleted
-            return;
+            return true;
 
         if (t.punc() == COMMAND) {
             runLater(() -> t.run(nar));
@@ -80,6 +80,7 @@ public class MultiThreadExecutor extends Executioner {
 //                }
             }
         }
+        return true;
     }
 
     protected void forget(PLink<ITask> task) {

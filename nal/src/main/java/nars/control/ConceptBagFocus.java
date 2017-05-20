@@ -59,11 +59,6 @@ public class ConceptBagFocus implements Focus {
         return active; //HACK here it is purposefully being ambiguous about the type whether it is Termed or more specifically Concept
     }
 
-    @Override
-    public void sample(Bag.BagCursor<? super PLink<Concept>> c) {
-        active.sample(c);
-    }
-
 
     //    static final class BudgetSavings extends RawBudget {
 //        public final long savedAt;

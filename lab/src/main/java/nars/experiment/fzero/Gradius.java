@@ -87,7 +87,7 @@ public class Gradius extends NAgentX {
                         .durFPS(10f), true);
 
         Gradius a = new Gradius(n);
-        a.runRT(10f);
+        a.startRT(10f);
 
 
         NAgentX.chart(a);
