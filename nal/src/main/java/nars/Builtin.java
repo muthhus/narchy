@@ -113,6 +113,8 @@ public class Builtin {
         /** remove an element from a commutive conjunction, at random, and try re-creating
          * the compound. wont necessarily work in all situations.
          * TODO move the type restriction to another functor to wrap this
+         *
+         * this also filter a single variable (depvar) from being a result
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
             if (t.op() != CONJ)
@@ -123,13 +125,17 @@ public class Builtin {
             int size = c.size();
 
             Term[] x = c.toArray();
+            Term result;
             if (size == 2) {
                 int n = nar.random().nextInt(2);
-                return Term.falseIfNull(x[n]);
+                result = Term.falseIfNull(x[n]);
             } else {
                 Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
-                return Term.falseIfNull(nar.terms.the(c.op(), c.dt(), y));
+                result = Term.falseIfNull(nar.terms.the(c.op(), c.dt(), y));
             }
+            if (result instanceof Variable)
+                return False;
+            return result;
         }));
 
         nar.on("assertEquals", (Operator) (op, args, nn) -> {

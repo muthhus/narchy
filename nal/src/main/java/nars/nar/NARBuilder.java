@@ -28,6 +28,7 @@ import java.util.function.BiFunction;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * Created by me on 12/27/16.
@@ -233,8 +234,8 @@ public interface NARBuilder {
 
         //NARTune tune = new NARTune(nar);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, false, 16);
-        //MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, false, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 16);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 //        Abbreviation abbr = new Abbreviation(nar, "the",
 //                4, 16,

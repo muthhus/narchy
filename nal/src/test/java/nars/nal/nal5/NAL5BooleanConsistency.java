@@ -2,6 +2,7 @@ package nars.nal.nal5;
 
 import nars.$;
 import nars.Narsese;
+import nars.Param;
 import nars.Task;
 import nars.derive.Deriver;
 import nars.nar.Default;
@@ -20,7 +21,7 @@ public class NAL5BooleanConsistency {
     @Test
     public void testSAT2() throws Narsese.NarseseException {
 
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
         float confthresh = 0.1f;
 
@@ -36,6 +37,7 @@ public class NAL5BooleanConsistency {
 //                        return e;
 //                    }
                 };
+                d.nal(6);
 
                 //d.log();
 
@@ -62,7 +64,7 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(512);
+                d.run(2048);
 
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {

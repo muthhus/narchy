@@ -7,6 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.ActionConcept;
 import nars.nar.Default;
+import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
 
 import java.util.LinkedHashSet;
@@ -52,14 +53,13 @@ public class Line1D {
             n.onTask(x -> {
                 if (step > trainingRounds && x.isGoal() && !x.isInput()
                         && !(x instanceof ActionConcept.CuriosityTask)
-                        //&& x.term().equals(a.out.term())
-                ) {
+                    //&& x.term().equals(a.out.term())
+                        ) {
                     current.add(x);
                 }
             });
 
             a.onFrame((z) -> {
-
 
 
                 //System.out.println(a.reward);
@@ -120,7 +120,7 @@ public class Line1D {
 
 
     public static void main(String[] args) {
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
 
         Default n = new Default();
@@ -128,7 +128,7 @@ public class Line1D {
         //n.log();
 
         n.time.dur(4);
-        n.deriver.rate.setValue(1f);
+        //n.deriver.rate.setValue(1f);
 
         n.termVolumeMax.setValue(32);
         n.DEFAULT_BELIEF_PRIORITY = 1f;
@@ -151,7 +151,11 @@ public class Line1D {
 
         });
 
-
+        n.onTask(t -> {
+            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
+                System.err.println(t.proof());
+            }
+        });
         NAgentX.chart(a);
 
         a.runCycles(5000000);

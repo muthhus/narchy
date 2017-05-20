@@ -816,24 +816,23 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 case 1:
                     return u.unify(sub(0), Y.sub(0));
 
-                case 2: {
-
-                    int i = u.random.nextBoolean() ? 0 : 1;
-                    if (u.unify(sub(i), Y.sub(i))) {
-                        i = 1 - i;
-                        return u.unify(sub(i), Y.sub(i));
-                    } else {
-                        return false;
-                    }
-                }
+//                case 2: {
+//
+//                    int i = u.random.nextInt(1);
+//                    if (u.unify(sub(i), Y.sub(i))) {
+//                        i = 1 - i;
+//                        return u.unify(sub(i), Y.sub(i));
+//                    } else {
+//                        return false;
+//                    }
+//                }
 
                 default: {
                     //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
 
                     //begin at random offset to shuffle the order of the match sequence
-                    int j = u.random.nextInt() % s;
-                    if (j < 0) j = -j;
-                    for (int i = s; i > 0; i--) {
+                    int j = u.random.nextInt(s);
+                    for (int i = 0; i < s; i++) {
                         if (!u.unify(sub(j), Y.sub(j)))
                             return false;
                         if (++j == s)

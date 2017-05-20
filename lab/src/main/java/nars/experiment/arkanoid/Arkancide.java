@@ -3,10 +3,10 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
-import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -46,7 +46,7 @@ public class Arkancide extends NAgentX {
 
             try {
                 a = new Arkancide(n, cam, numeric);
-                a.trace = true;
+                //a.trace = true;
                 //((RealTime)a.nar.time).durSeconds(0.05f);
                 //a.nar.log();
 
@@ -59,7 +59,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 20);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -93,16 +93,14 @@ public class Arkancide extends NAgentX {
             }
         };
 
-//        Param.DEBUG = true;
-//        nar.onTask(t -> {
-//            if (t instanceof DerivedTask && t.isGoal())
-//                System.err.println(t.proof());
-//        });
+
+        Param.DEBUG = true;
+
 
         maxPaddleSpeed = 10 * noid.BALL_VELOCITY;
 
-        float resX = Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
             CameraSensor cc = senseCamera("noid", noid, visW, visH);
@@ -113,9 +111,10 @@ public class Arkancide extends NAgentX {
         if (numeric) {
             SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            SensorConcept ab = senseNumber("noid:dx", (() -> (Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
-            SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
-            SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
+            //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
+            //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
             //experimental cheat
 //            nar.input("--(paddle-ball):x! :|:",
@@ -123,9 +122,14 @@ public class Arkancide extends NAgentX {
 //            );
 
             SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{a, b, c, d, e}),
+                    Lists.newArrayList(new Term[]{ab, a, b, c}),
                     nar), 600, 600);
-
+            nar.onTask(t -> {
+                if (t instanceof DerivedTask && t.isGoal()) {
+                    if (t.term().equals(ab))
+                        System.err.println(t.proof());
+                }
+            });
         }
 
         /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
@@ -139,7 +143,7 @@ public class Arkancide extends NAgentX {
 
             float dx = paddleSpeed.floatValue() * maxPaddleSpeed *
                     v;
-                    //Util.sigmoidSymmetric(v, 6);
+            //Util.sigmoidSymmetric(v, 6);
 
             noid.paddle.move(dx);
             //System.out.println(v + " "  + dx + " -> " + noid.paddle.x);

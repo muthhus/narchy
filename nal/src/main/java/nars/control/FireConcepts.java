@@ -1,13 +1,11 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.PLink;
-import nars.Focus;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.DerivationBudgeting;
@@ -21,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -88,21 +87,18 @@ public class FireConcepts implements Runnable {
 
             int ttl = Util.lerp(pri, Param.FireTTLMax, Param.FireTTLMin);
 
-            Concept c = value;
+            final Concept c = value;
 
-            c.tasklinks().commit();//.normalize(0.1f);
-            c.termlinks().commit();//.normalize(0.1f);
-            nar.terms.commit(c);
-
+            final Bag<Task, PLink<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
+            final Bag<Term, PLink<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
+            //nar.terms.commit(c);
 
             @Nullable PLink<Task> tasklink = null;
             @Nullable PLink<Term> termlink = null;
             float taskLinkPri = -1f, termLinkPri = -1f;
 
-
-
-
-            Set<PremiseBuilder> premises = new HashSet();
+            List<PremiseBuilder> premises = $.newArrayList();
+            //also maybe Set is appropriate here
 
             /**
              * this implements a pair of roulette wheel random selectors
@@ -115,21 +111,21 @@ public class FireConcepts implements Runnable {
             Random rng = nar.random();
             while (ttl > 0) {
                 if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                    tasklink = c.tasklinks().sample();
+                    tasklink = tasklinks.sample();
                     ttl -= linkSampleCost;
                     if (tasklink == null)
                         break;
 
-                    taskLinkPri = c.tasklinks().normalizeMinMax(tasklink.priSafe(0));
+                    taskLinkPri = tasklinks.normalizeMinMax(tasklink.priSafe(0));
                 }
 
 
                 if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                    termlink = c.termlinks().sample();
+                    termlink = termlinks.sample();
                     ttl -= linkSampleCost;
                     if (termlink == null)
                         break;
-                    termLinkPri = c.termlinks().normalizeMinMax(termlink.priSafe(0));
+                    termLinkPri = termlinks.normalizeMinMax(termlink.priSafe(0));
                 }
 
                 premises.add(new PremiseBuilder(tasklink, termlink));
@@ -140,7 +136,7 @@ public class FireConcepts implements Runnable {
             //divide priority among the premises
             int num = premises.size();
             if (num > 0) {
-                float subPri = pri;// / num;
+                float subPri = pri / num;
                 premises.forEach(p -> {
                     p.setPri(subPri);
                     nar.input(p);
