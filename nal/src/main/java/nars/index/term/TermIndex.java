@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.Builtin;
 import nars.NAR;
 import nars.Narsese;
 import nars.Op;
@@ -35,7 +36,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
-    protected NAR nar;
+    public NAR nar;
 
 
 
@@ -87,6 +88,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     public void start(NAR nar) {
         this.nar = nar;
+
+        for (Concept t : Builtin.statik)
+            set(t);
+
+        Builtin.load( nar );
+
         conceptBuilder().start(nar);
     }
 

@@ -31,11 +31,11 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
         flush();
     }
 
-    @Override
-    public void stop() {
-        flush();
-        super.stop();
-    }
+//    @Override
+//    public void stop() {
+//        flush();
+//        super.stop();
+//    }
 
     private void flush() {
         if (!prepending.isEmpty()) {

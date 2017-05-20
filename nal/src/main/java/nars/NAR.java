@@ -199,23 +199,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         this.emotion = new Emotion();
 
-        terms.start(this);
-
-//        eventError.on(e -> {
-//            if (e instanceof Throwable) {
-//                Throwable ex = (Throwable) e;
-//
-//                //TODO move this to a specific impl of error reaction:
-//                ex.printStackTrace();
-//
-//                if (Param.DEBUG && Param.EXIT_ON_EXCEPTION) {
-//                    //throw the exception to the next lower stack catcher, or cause program exit if none exists
-//                    throw new RuntimeException(ex);
-//                }
-//            } else {
-//                logger.error(e.toString());
-//            }
-//        });
+        if (terms.nar==null) //dont reinitialize if already initialized, for sharing
+            terms.start(this);
 
         restart();
     }
@@ -235,8 +220,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
             clear();
 
-            terms.clear();
-
             restart();
 
         }
@@ -253,11 +236,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * initialization and post-reset procedure
      */
     protected void restart() {
-
-        for (Concept t : Builtin.statik)
-            on(t);
-
-        Builtin.load(this);
 
         time.clear();
 
@@ -279,6 +257,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.self = self;
     }
 
+    @NotNull
+    public Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
+        return inputAndGet(Narsese.the().task(taskText, this));
+    }
 
     /**
      * parses and forms a Task from a string but doesnt input it
@@ -306,10 +288,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return terms.term(t);
     }
 
-    @Override
-    public final NAR nar() {
-        return this;
-    }
 
     /**
      * gets a concept if it exists, or returns null if it does not
@@ -570,37 +548,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         });
     }
 
-    public final void input(@NotNull Task... t) {
-        for (Task x : t)
-            input(x);
-    }
-
     /**
-     * exposes the memory to an input, derived, or immediate task.
-     * the memory then delegates it to its controller
-     * <p>
-     * returns the Concept (non-null) if the task was processed
-     * if the task was a command, it will return false even if executed
+     * main task entry point
      */
-    public final void input(@NotNull ITask input) {
-
-        //try {
-
-            exe.run(input);
-
-
-//        } catch (Concept.InvalidConceptException | InvalidTermException | InvalidTaskException e) {
-//
-//            input.delete();
-//
-//            emotion.eror(input.volume());
-//
-//            //input.feedback(null, Float.NaN, Float.NaN, this);
-//            if (Param.DEBUG)
-//                logger.warn("task process: {} {}", e, this);
-//        }
-
+    public void input(@NotNull ITask... t) {
+        for (ITask x : t)
+            exe.run(x);
     }
+
+
 
 
 //    private boolean executable(Task input) {
@@ -914,7 +870,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * Exits an iteration loop if running
      */
-    public final void stop() {
+    public void stop() {
         exe.stop();
     }
 
@@ -1186,7 +1142,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * TODO use a scheduling using r-tree
      */
-    public void inputAt(long when, @NotNull Task... x) {
+    public void inputAt(long when, @NotNull ITask... x) {
         long now = time();
         if (when < now) {
             //past

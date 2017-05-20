@@ -27,7 +27,7 @@ public class Builtin {
     //TODO: http://software-lab.de/doc/ref.html#fun
     //TODO: https://openreview.net/pdf?id=ByldLrqlx (section F)
 
-    static final Concept[] statik = {
+    public static final Concept[] statik = {
 
             new intersect(),
             new differ(),

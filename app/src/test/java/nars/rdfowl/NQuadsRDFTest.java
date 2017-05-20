@@ -38,7 +38,7 @@ public class NQuadsRDFTest {
         //Multi nar = new Multi(3,512,
         Executioner e = new SynchronousExecutor();
         Default n = new Default(1024,
-                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, false, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
                 new FrameTime(), e
         );

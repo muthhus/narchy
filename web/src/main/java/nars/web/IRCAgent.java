@@ -224,7 +224,7 @@ public class IRCAgent extends IRC {
 
         Default nar = new Default(activeConcepts,
 
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, exe),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
 
                 new RealTime.DSHalf().durSeconds(0.1f),

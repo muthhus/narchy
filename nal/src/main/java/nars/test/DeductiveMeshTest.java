@@ -27,7 +27,7 @@ public class DeductiveMeshTest {
 
 
 
-    public DeductiveMeshTest(@NotNull NAR n, @NotNull int[] dims) {
+    public DeductiveMeshTest(@NotNull NAR n, @NotNull int... dims) {
         this(n, dims, -1);
     }
 
@@ -45,7 +45,7 @@ public class DeductiveMeshTest {
         coords = $.newArrayList();
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
-                Compound c = c(x, y);
+                //Compound c = c(x, y);
 
                 if (x > y) {
                     if (x > 0)

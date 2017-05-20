@@ -57,7 +57,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     };
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, boolean soft, @Nullable Executor exe) {
+    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, @Nullable Executor exe) {
         this(conceptBuilder, capacity, -1, exe);
     }
 

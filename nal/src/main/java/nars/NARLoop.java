@@ -15,36 +15,28 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class NARLoop extends Loop {
 
-    private static final Logger logger = getLogger(NARLoop.class);
-
 
     @NotNull
     public final NAR nar;
 
 
-    //private boolean running;
-
-
-    /**
-     * average desired cpu percentage
-     */
-    //public final MutableFloat priority = new MutableFloat(1f);
     private static final int framesPerLoop = 1;
+    private long cycles = 0;
 
 
-
+    /** starts paused; thread is not automatically created */
+    public NARLoop(@NotNull NAR n) {
+        super(n.self() + ":loop");
+        nar = n;
+    }
 
     /**
      * @param n
      * @param initialPeriod
      */
     public NARLoop(@NotNull NAR n, int initialPeriod) {
-        super(n.self() + ":loop");
-
-        nar = n;
-
+        this(n);
         start(initialPeriod);
-
     }
 
 
@@ -52,6 +44,7 @@ public class NARLoop extends Loop {
     public final boolean next() {
         if (nar.exe.isRunning()) {
             nar.run(framesPerLoop);
+            cycles++;
             return true;
         } else {
             return false;
@@ -59,4 +52,7 @@ public class NARLoop extends Loop {
     }
 
 
+    public long cycleCount() {
+        return cycles;
+    }
 }

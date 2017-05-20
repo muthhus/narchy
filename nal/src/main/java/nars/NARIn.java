@@ -1,5 +1,6 @@
 package nars;
 
+import nars.task.ITask;
 import nars.task.LambdaQuestionTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -14,12 +15,11 @@ import java.util.function.Consumer;
  */
 public interface NARIn {
 
+    void input(ITask... t);
 
-    void input(Task... t);
-
-    <T extends Term> T term(@NotNull String t) throws Narsese.NarseseException;
-
-    NAR nar();
+    default <T extends Term> T term(@NotNull String t) throws Narsese.NarseseException {
+        return $.terms.term(t);
+    }
 
     @Nullable
     default Task ask(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
@@ -43,10 +43,6 @@ public interface NARIn {
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
-    @NotNull
-    default Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
-        return inputAndGet(Narsese.the().task(taskText, nar()));
-    }
 
     @NotNull default <T extends Task> T inputAndGet(@NotNull T t) {
         input(t);

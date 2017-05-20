@@ -79,7 +79,7 @@ public class InterNARTest {
 
     private static Default newNAR() {
         return new Default(1024,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024, false, null),
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024, null),
                 new RealTime.DSHalf(true), new BufferedSynchronousExecutor());
     }
 

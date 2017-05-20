@@ -204,7 +204,7 @@ public class Line1DContinuous extends NAgent {
                 new SynchronousExecutor();
 
         Default nar = new Default(1024,
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, false, exe),
+                new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, exe),
                 new FrameTime(), exe
         );
         nar.termVolumeMax.set(32);
