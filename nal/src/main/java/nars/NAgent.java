@@ -378,8 +378,8 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) p).addAll(
 
-//                    quest((Compound) (action.term()),
-//                            now),
+                    quest((Compound) (action.term()),now+dur),
+
 //                            //ETERNAL)
 
                     //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
@@ -460,6 +460,11 @@ abstract public class NAgent implements NSense, NAct {
 
 
         //System.out.println(Joiner.on('\n').join(predictors));
+    }
+
+    public SensorConcept randomSensor() {
+        //quest(parallel((Compound) (action.term()), randomSensor()), now+dur),
+        return sensors.get(nar.random().nextInt(sensors.size()));
     }
 
 

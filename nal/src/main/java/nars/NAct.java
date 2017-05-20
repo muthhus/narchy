@@ -300,7 +300,9 @@ public interface NAct {
     default ActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d != null) {
-                float conf = nar().confDefault(BELIEF); //d.conf()
+                float conf =
+                        //nar().confDefault(BELIEF);
+                        d.conf();
                 float f = d.freq();
                 if (update.accept(f)) {
                     return $.t(f, conf);

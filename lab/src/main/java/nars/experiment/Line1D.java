@@ -125,16 +125,16 @@ public class Line1D {
 
         Default n = new Default();
 
-        n.log();
+        //n.log();
 
         n.time.dur(4);
         n.deriver.rate.setValue(1f);
 
-        n.termVolumeMax.setValue(24);
-        n.DEFAULT_BELIEF_PRIORITY = 0.25f;
+        n.termVolumeMax.setValue(32);
+        n.DEFAULT_BELIEF_PRIORITY = 1f;
         n.DEFAULT_GOAL_PRIORITY = 1f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        n.DEFAULT_QUEST_PRIORITY = 0.1f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        n.DEFAULT_QUEST_PRIORITY = 0.5f;
 
         Line1DSimplest a = new Line1DSimplest(n);
         //Line1DTrainer trainer = new Line1DTrainer(a);
@@ -144,7 +144,7 @@ public class Line1D {
 //ImplicationBooster.implAccelerator(a);
         a.onFrame((z) -> {
             a.target(
-                    (float) (0.5f * (Math.sin(n.time() / 500f) + 1f))
+                    (float) (0.5f * (Math.sin(n.time() / 1000f) + 1f))
                     //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                     //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
             );

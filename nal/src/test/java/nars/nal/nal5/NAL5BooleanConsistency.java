@@ -24,17 +24,17 @@ public class NAL5BooleanConsistency {
 
         float confthresh = 0.1f;
 
-        final Deriver e = Deriver.get(
-                "induction.nal", "nal6.nal"
-        );
+//        final Deriver e = Deriver.get(
+//                "induction.nal", "nal6.nal"
+//        );
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
                 Default d = new Default(1024) {
-                    @Override
-                    public Deriver newDeriver() {
-                        return e;
-                    }
+//                    @Override
+//                    public Deriver newDeriver() {
+//                        return e;
+//                    }
                 };
 
                 //d.log();

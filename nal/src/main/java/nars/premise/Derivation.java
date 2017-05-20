@@ -33,7 +33,7 @@ import static nars.time.Tense.ETERNAL;
 abstract public class Derivation extends Unify implements TermContext {
 
     @NotNull public NAR nar;
-    @NotNull public final DerivationBudgeting budgeting;
+    @NotNull public DerivationBudgeting budgeting;
     public float truthResolution;
     public float confMin;
 
@@ -111,11 +111,9 @@ abstract public class Derivation extends Unify implements TermContext {
 
 
 
-    /** if using this, must set: nar, index, random */
-    public Derivation(DerivationBudgeting b) {
+    /** if using this, must set: nar, index, random, DerivationBudgeting */
+    public Derivation() {
         super(null, VAR_PATTERN, null, Param.UnificationStackMax, 0);
-
-        this.budgeting = b;
 
         _substitute = new substitute(this) {
             @Override public boolean equals(Object u) { return this == u; }
@@ -147,8 +145,13 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
 
-    /** concept-scope */
-    @NotNull public void restartA() {
+    /** concept-scope
+     * @param n*/
+    @NotNull public void restartA(NAR n) {
+        this.nar = n;
+        this.index = n.terms;
+        this.budgeting = n.budgeting;
+        this.random = n.random();
         this.time = nar.time();
         this.dur = nar.dur();
         this.truthResolution = nar.truthResolution.floatValue();

@@ -146,11 +146,8 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
     public static class DerivePremise extends UnaryTask<Premise> {
 
-        static final DerivationBudgeting defaultBudgeting = new PreferSimpleAndPolarized();
         static final ThreadLocal<FireConcepts.DirectDerivation> derivation =
-                ThreadLocal.withInitial(() ->
-                        new FireConcepts.DirectDerivation(defaultBudgeting)
-                );
+                ThreadLocal.withInitial(FireConcepts.DirectDerivation::new);
 
         public DerivePremise(Premise premise) {
             super(premise, premise.pri());
@@ -159,14 +156,9 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
         @Override
         public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
 
-
             FireConcepts.DirectDerivation d = derivation.get();
 
-            d.nar = n;
-            d.index = n.terms;
-            d.random = n.random();
-
-            d.restartA();
+            d.restartA(n);
             d.restartB(value.task);
             d.restartC(value, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
 

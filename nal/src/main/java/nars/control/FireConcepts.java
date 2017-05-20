@@ -11,6 +11,7 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.premise.Derivation;
 import nars.premise.DerivationBudgeting;
+import nars.premise.PreferSimpleAndPolarized;
 import nars.premise.PremiseBuilder;
 import nars.task.UnaryTask;
 import nars.task.util.InvalidTaskException;
@@ -31,6 +32,7 @@ import static jcog.bag.Bag.BagCursorAction.Stop;
  * fires sampled active focus concepts
  */
 public class FireConcepts implements Runnable {
+
 
 
     final int MISFIRE_COST = 1;
@@ -138,12 +140,11 @@ public class FireConcepts implements Runnable {
             //divide priority among the premises
             int num = premises.size();
             if (num > 0) {
-                float subPri = pri / num;
+                float subPri = pri;// / num;
                 premises.forEach(p -> {
                     p.setPri(subPri);
                     nar.input(p);
                 });
-
             }
         }
 
@@ -207,12 +208,7 @@ public class FireConcepts implements Runnable {
     }
 
 
-    public static class DirectDerivation extends Derivation {
-
-
-        public DirectDerivation(DerivationBudgeting b) {
-            super(b);
-        }
+    public static final class DirectDerivation extends Derivation {
 
         @Override
         public void derive(Task x) {

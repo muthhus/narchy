@@ -42,14 +42,14 @@ public class MatchConstraintTest {
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
         new TestNAR(new Default() {
-            @Override
-            public Deriver newDeriver() {
-                try {
-                    return TrieDeriver.get("(M --> P), (M --> S), task(\".\"), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)");
-                } catch (Narsese.NarseseException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+//            @Override
+//            public Deriver newDeriver() {
+//                try {
+//                    return TrieDeriver.get("(M --> P), (M --> S), task(\".\"), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)");
+//                } catch (Narsese.NarseseException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
         })
                 .log()
                 .believe("happy(L)", 1f, 0.9f)
@@ -66,11 +66,11 @@ public class MatchConstraintTest {
             $.04;.43$ ((((L)~(i|(L)))|(L))-->happy). 1876 %.10;.21% {1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrm;êbaîCóòrÏ} Dynamic
         */
         new TestNAR(new Default() {
-            @Override
-            public Deriver newDeriver() {
-                return null;
-                //return TrieDeriver.get("what is it");
-            }
+//            @Override
+//            public Deriver newDeriver() {
+//                return null;
+//                //return TrieDeriver.get("what is it");
+//            }
         })
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("(((i)|(L))-->happy)", 1f, 0.9f)

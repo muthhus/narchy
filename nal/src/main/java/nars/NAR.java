@@ -15,6 +15,8 @@ import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
+import nars.premise.DerivationBudgeting;
+import nars.premise.PreferSimpleAndPolarized;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -89,6 +91,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
+
+    public final DerivationBudgeting budgeting = new PreferSimpleAndPolarized();
 
     @NotNull
     public final transient Emotion emotion;

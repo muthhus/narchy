@@ -147,7 +147,7 @@ abstract public class NAgentX extends NAgent {
                     new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
                     new WindowButton( "focus", nar::focus),
                     new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
-                    new WindowButton( "deriverFilter", () -> ((Default)nar).derivationBudgeting ),
+                    new WindowButton( "deriverFilter", () -> ((Default)nar).budgeting ),
                     new WindowButton( "mix", () -> {
                         Default d = (Default) nar;
                         return new MixBoard(d, d.mix);

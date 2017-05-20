@@ -14,6 +14,7 @@ import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
+import nars.premise.DerivationBudgeting;
 import nars.premise.PreferSimpleAndPolarized;
 import nars.time.FrameTime;
 import nars.time.Time;
@@ -31,20 +32,14 @@ public class Default extends NAR {
 
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
-    public final FireConcepts deriver;
-
-
-
-    public final PreferSimpleAndPolarized derivationBudgeting;
 
     public final ConceptBagFocus focus;
-
-    static final Deriver defaultDeriver = DefaultDeriver.the;
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
     final Random rng = new XorShift128PlusRandom(1);
+    public final FireConcepts deriver;
 
     @Deprecated
     public Default() {
@@ -72,7 +67,6 @@ public class Default extends NAR {
         this.focus = f;
         setFocus(f);
 
-        derivationBudgeting = newDerivationBudgeting();
 
         deriver = //exe.concurrent() ?
                 //new FireConcepts.FireConceptsBuffered(newPremiseBuilder(), this)
@@ -80,15 +74,6 @@ public class Default extends NAR {
                 new FireConcepts(focus, this);
 
         deriver.rate.setValue(15);
-    }
-
-    public Deriver newDeriver() {
-        return defaultDeriver;
-    }
-
-
-    public PreferSimpleAndPolarized newDerivationBudgeting() {
-        return new PreferSimpleAndPolarized();
     }
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {

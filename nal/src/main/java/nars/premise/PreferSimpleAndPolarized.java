@@ -16,7 +16,8 @@ import static nars.Op.*;
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
-    public final FloatParam polarityFactor = new FloatParam(1f, 0f, 1f);
+    /**  polarity (includes conf) vs. complexity balance */
+    public final FloatParam polarityVsComplexity = new FloatParam(0.5f, 0f, 1f);
 
     public final FloatParam belief = new FloatParam(1f, 0f, 2f);
     public final FloatParam goal = new FloatParam(1f, 0f, 2f);
@@ -60,8 +61,9 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         float p = d.premise.pri();
 
         if (truth!=null) { //belief and goal:
-            float polarityFactor = this.polarityFactor.floatValue();
-            p *= (1f-polarityFactor) + polarityFactor * truth.polarization();
+            float polarityFactor = this.polarityVsComplexity.floatValue();
+            p *= (1f-polarityFactor) * complexityFactorRelative(conclusion, punc, d.task, d.belief) +
+                 (polarityFactor) * truth.polarization();
         } else {
             //p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
             p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
