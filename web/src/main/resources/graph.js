@@ -24,7 +24,8 @@ class LFU extends Map {
         el.parent = next;
         var now = Date.now();
         el.atime = now;
-        if (this.halflife && now - this.lastDecay >= this.halflife) this.decay(now);
+        if (this.halflife && now - this.lastDecay >= this.halflife)
+            this.decay(now);
         this.atime = now;
         return el.data;
     }
@@ -84,6 +85,7 @@ class LFU extends Map {
                 this.evict();
             } catch (e) {
                 console.error(e);
+                break;
             }
         }
 
@@ -92,7 +94,9 @@ class LFU extends Map {
         if (!cur || cur.weight !== 1) {
             cur = this.entry(1, this.head, cur);
         }
-        cur.items.add(key);
+        if (!cur.items.add(key)) {
+            console.error('duplicate', key);
+        }
 
 
         super.set(key, { //TODO store this as a 3 element tuple
@@ -108,8 +112,8 @@ class LFU extends Map {
         var el = super.get(key);
         if (!el)
             return;
-        this.delete(key);
         this.removeFromParent(el.parent, key);
+        this.delete(key);
         return el.data;
     }
 
@@ -129,8 +133,7 @@ class LFU extends Map {
             const victim = this.remove(least);
             if (victim) {
                 this.evicted(least, victim);
-            } else {
-                throw new Error("null victim");
+                return;
             }
         } else {
             throw new Error("Cannot find an element to evict - please report issue");
@@ -139,9 +142,12 @@ class LFU extends Map {
 
     next() {
         if (this.head.next) {
-            const items = this.head.next.items;
-            if (items.size > 0)
-                return items.keys().next().value;
+            var next = this.head.next; //its either head.next or just head
+            while (next.items.size === 0) {
+                next = next.next;
+            }
+
+            return next.items.keys().next().value;
         }
         return null;
     }
@@ -215,16 +221,22 @@ class LFUGraph extends LFU {
 
         for (const tgt of n.o.keys()) {
             const tgtNode = this.get(tgt);
-            if (tgtNode) //not sure why if ever this would return null
-                tgtNode.i.remove(nid);
+            if (tgtNode) { //not sure why if ever this would return null
+                const e = tgtNode.i.remove(nid);
+                this.edgeRemoved(nid, tgt, e);
+            }
         }
         delete n.o;
         for (const src of n.i.keys()) {
             const srcNode = this.get(src);
-            if (srcNode) //not sure why if ever this would return null
-                srcNode.o.remove(nid);
+            if (srcNode) { //not sure why if ever this would return null
+                const e = srcNode.o.remove(nid);
+                this.edgeRemoved(src, nid, e);
+            }
         }
         delete n.i;
+
+
     }
 
     nodeAdded(nid, n) { }
@@ -235,6 +247,10 @@ class LFUGraph extends LFU {
     edge(src, tgt, edgeSupplier) {
         if (src == tgt)
             return null; //no self-loop
+
+        if (edgeSupplier === null) {
+            //TODO handle delete this way
+        }
 
         const T = this.node(tgt, edgeSupplier);
         if (!T)
@@ -247,10 +263,11 @@ class LFUGraph extends LFU {
         const ST = S.o.get(tgt);
         if (ST) {
             return ST;
-        } else if (edgeSupplier) {
+        } else if (edgeSupplier && S.o && T.i) {
             const newST = (typeof edgeSupplier === "function") ?  edgeSupplier() : edgeSupplier;
             S.o.set(tgt, newST);
             T.i.set(src, newST);
+            this.edgeAdded(src, tgt, newST);
             return newST;
         } else {
             return null;

@@ -152,17 +152,20 @@ class SpaceGraph {
 
         if (enable && !obj.focusSteal) {
             eve.bind(obj, 'mouseover', () => {
+
+                //TODO do this ONLY after testing that nothing else has been picked in front of it
+
                 //console.info('mouseover', elementGL.style.pointerEvents);
-                that.controls.enabled = false;
-                that.dragControls.enabled = false;
-                that.elementGL.style.pointerEvents = 'none';
+                //that.controls.enabled = false;
+                //that.dragControls.enabled = false;
+                //that.elementGL.style.pointerEvents = 'none';
                 return true;
             });
 
             eve.bind(obj, 'mouseout', () => {
-                that.controls.enabled = true;
-                that.dragControls.enabled = true;
-                that.elementGL.style.pointerEvents = 'inherit';
+                //that.controls.enabled = true;
+                //that.dragControls.enabled = true;
+                //that.elementGL.style.pointerEvents = 'inherit';
                 //console.info('mouseout', elementGL.style.pointerEvents);
                 return true;
             });
@@ -196,7 +199,7 @@ class SpaceGraph {
 
     remove(object) {
         if (object.draggable) {
-            this.draggable.splice(object);
+            this.draggable.splice(this.draggable.indexOf(object), 1);
             delete object.draggable;
         }
         if (object.focusSteal) {
@@ -216,6 +219,7 @@ class SpaceGraph {
             if (n.spatial)
                 throw "spatial field already present";
 
+            //TODO supplied builder
             n.spatial = that.addIcon(nid);
         };
 
@@ -227,6 +231,21 @@ class SpaceGraph {
             }
         };
 
+        g.edgeAdded = function(src, target, e) {
+            //console.log('added', src, target, e);
+
+            //TODO supplied builder
+            e.spatial = that.addIcon(src + target);
+        };
+
+        g.edgeRemoved = function(src, target, e) {
+            //console.log('removed', src, target, e);
+            const s = e.spatial;
+            if (s) {
+                that.remove(s);
+                delete e.spatial;
+            }
+        };
 
         return g;
     }

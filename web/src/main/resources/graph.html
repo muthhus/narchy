@@ -93,10 +93,14 @@
 //    console.log(g);
 
 
+    var i = 0;
     setInterval(()=>{
-
-        g.node('x' + Math.random(), true);
-    }, 5200);
+        g.node('x' + (i++), true);
+        if (i > 1) {
+            g.edge('x' + (i-1), 'x' + (i), 'e' + i);
+            g.edge('x0', 'x' + (i), 'e' + i);
+        }
+    }, 1000);
 
 
 
