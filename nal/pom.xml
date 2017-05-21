@@ -47,12 +47,12 @@
             <version>1.19</version>
             <scope>test</scope>
         </dependency>
-<!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
-<dependency>
-    <groupId>com.conversantmedia</groupId>
-    <artifactId>disruptor</artifactId>
-    <version>1.2.10</version>
-</dependency>
+        <!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
+        <dependency>
+            <groupId>com.conversantmedia</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>1.2.10</version>
+        </dependency>
 
         <!--<dependency>-->
         <!--<groupId>org.jacoco</groupId>-->
@@ -107,6 +107,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
+        <dependency>
+            <groupId>org.roaringbitmap</groupId>
+            <artifactId>RoaringBitmap</artifactId>
+            <version>0.6.44</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/net.byteseek/byteseek -->
         <dependency>

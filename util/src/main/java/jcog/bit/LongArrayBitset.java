@@ -7,10 +7,10 @@ import java.util.Arrays;
  * implementation does not check for index bounds nor expand the bitset size if
  * the specified index is greater than the size.
  */
-public class AwesomeBitSet {
+public class LongArrayBitset {
 	final long[] data;
 
-	public AwesomeBitSet(long bits) {
+	public LongArrayBitset(long bits) {
 		this(new long[(int) Math.ceil((double) bits / Long.SIZE)]);
 	}
 
@@ -19,7 +19,7 @@ public class AwesomeBitSet {
 	 * 
 	 * @param data
 	 */
-	public AwesomeBitSet(long[] data) {
+	public LongArrayBitset(long[] data) {
         assert data.length > 0;
         this.data = data;
     }
@@ -61,7 +61,7 @@ public class AwesomeBitSet {
 	/**
 	 * Combines the two BitArrays using bitwise OR.
 	 */
-	public void putAll(AwesomeBitSet array) {
+	public void putAll(LongArrayBitset array) {
         assert data.length == array.data.length :
                 "BitArrays must be of equal length (" + data.length + "!= " + array.data.length + ')';
         for (int i = 0; i < data.length; i++) {

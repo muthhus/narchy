@@ -15,7 +15,7 @@
  */
 package jcog.bloom;
 
-import jcog.bit.AwesomeBitSet;
+import jcog.bit.LongArrayBitset;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class ByteBloomFilter {
     private static final double DEFAULT_FPP = 0.05;
-    private AwesomeBitSet bitSet;
+    private LongArrayBitset bitSet;
     private final int m;
     private final int k;
     private final double fpp;
@@ -61,7 +61,7 @@ public class ByteBloomFilter {
         n = maxNumEntries;
         m = optimalNumOfBits(maxNumEntries, fpp);
         k = optimalNumOfHashFunctions(maxNumEntries, m);
-        bitSet = new AwesomeBitSet(m);
+        bitSet = new LongArrayBitset(m);
     }
 
     // deserialize bloomfilter. see serialize() for the format.
@@ -72,7 +72,7 @@ public class ByteBloomFilter {
         for (int i = 0; i < bitSet.size(); i++) {
             data[i] = bitSet.get(i);
         }
-        this.bitSet = new AwesomeBitSet(data);
+        this.bitSet = new LongArrayBitset(data);
     }
 
     public void clear() {
@@ -105,7 +105,7 @@ public class ByteBloomFilter {
 
         int k = this.k;
         int m = this.m;
-        AwesomeBitSet bits = bitSet;
+        LongArrayBitset bits = bitSet;
 
         for (int i = 1; i <= k; i++) {
             int combinedHash = combineHash(hash1, hash2, i);
@@ -131,7 +131,7 @@ public class ByteBloomFilter {
 
         int k = this.k;
         int m = this.m;
-        AwesomeBitSet bits = bitSet;
+        LongArrayBitset bits = bitSet;
 
         for (int i = 1; i <= k; i++) {
             int combinedHash = combineHash(hash1, hash2, i);

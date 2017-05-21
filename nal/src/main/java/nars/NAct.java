@@ -127,10 +127,10 @@ public interface NAct {
             }
 
             return accepted ?
-                    //d!=null ?
                     $.t(f,
-                            //d!=null ? d.conf() : nar().confMin.floatValue()
-                            nar().confDefault(BELIEF)
+                            d!=null ? d.conf() :
+                                //nar().confMin.floatValue()
+                                nar().confDefault(BELIEF)
                     )
                     : null
                     ;
