@@ -32,7 +32,10 @@ public class Pri implements Priority {
         setPri(p);
     }
 
-
+    @Override
+    public final @NotNull Priority priority() {
+        return this;
+    }
 
     @Nullable
     @Deprecated @Override

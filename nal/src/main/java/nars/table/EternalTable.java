@@ -193,8 +193,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 break;
 
             if (x.equals(newBelief)) {
-                if (x != newBelief)
-                    PriMerge.max(x, newBelief.priority());
+                if (x != newBelief) {
+                    x.priAdd(newBelief.priSafe(0));
+                    //PriMerge.max(x, newBelief.priority());
+                }
                 return x;
             }
 

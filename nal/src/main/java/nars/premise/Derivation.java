@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
+import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -274,7 +275,7 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
     /** called by conclusion */
-    abstract public void derive(Task t);
+    abstract public void derive(DerivedTask t);
 
   /** set in Solve once these (3) conclusion parameters have been determined */
     public void truth(Truth truth, byte punc, long[] evidence) {

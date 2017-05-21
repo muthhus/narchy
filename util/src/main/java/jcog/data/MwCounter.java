@@ -20,6 +20,10 @@ public final class MwCounter  {
 
     private volatile long value;
 
+    public MwCounter() {
+        this(0);
+    }
+
     public MwCounter(long initialValue) {
         this.value = initialValue;
     }
@@ -29,6 +33,9 @@ public final class MwCounter  {
         return value;
     }
 
+    public long getThenZero() {
+        return COUNTER.getAndSet(this, 0);
+    }
 
     public long inc() {
         return COUNTER.incrementAndGet(this);
@@ -45,6 +52,9 @@ public final class MwCounter  {
                 + "value=" + value
                 + '}';
     }
+
+
+
 
 //    /**
 //     * Creates a new MwCounter with 0 as its initial value.

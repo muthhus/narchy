@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
-import nars.time.FrameTime;
+import nars.time.CycleTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
 import org.junit.Ignore;
@@ -40,7 +40,7 @@ public class NQuadsRDFTest {
         Default n = new Default(1024,
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
-                new FrameTime(), e
+                new CycleTime(), e
         );
 
         File output = new File("/tmp/onto.nal");

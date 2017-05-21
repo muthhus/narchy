@@ -56,7 +56,9 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
                     if (p == X)
                         return p; //does this occurr?
 
-                    p.priAdd(X.priSafe(0));
+
+                    p.merge(X);
+
 
                     return p;
                 });

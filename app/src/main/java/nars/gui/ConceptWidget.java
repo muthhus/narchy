@@ -337,14 +337,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                         //0.1f + 0.9f * ff.pri(); //0.9f;
                         0.1f + 0.8f * edgeProp;
 
-                this.attraction = 0.1f + 2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attraction = 0f + 2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;
             }
 
 
-            this.attractionDist = src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
         }
 
         @Override

@@ -9,14 +9,10 @@ import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptBagFocus;
 import nars.control.FireConcepts;
-import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
-import nars.premise.DerivationBudgeting;
-import nars.premise.PreferSimpleAndPolarized;
-import nars.time.FrameTime;
+import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
@@ -47,8 +43,8 @@ public class Default extends NAR {
 
     public Default(int activeConcepts) {
         this(activeConcepts,
-            new DefaultTermTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
-            new FrameTime(),
+            new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
+            new CycleTime(),
             new BufferedSynchronousExecutor());
     }
 
@@ -90,9 +86,9 @@ public class Default extends NAR {
     /**
      * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution
      */
-    public static class DefaultTermTermIndex extends MapTermIndex {
+    public static class DefaultTermIndex extends MapTermIndex {
 
-        public DefaultTermTermIndex(int capacity) {
+        public DefaultTermIndex(int capacity) {
             super(
                     new DefaultConceptBuilder(),
                     new HashMap<>(capacity),

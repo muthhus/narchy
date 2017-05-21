@@ -54,9 +54,8 @@ import static spacegraph.layout.Grid.*;
 public class Vis {
 
 
-
     public static ConsoleTerminal newInputEditor() {
-        return new ConsoleTerminal(new TerminalUI(20,5));
+        return new ConsoleTerminal(new TerminalUI(20, 5));
     }
 
     public static Grid beliefCharts(int window, NAR nar, Object... x) {
@@ -95,7 +94,7 @@ public class Vis {
 
     public static Surface budgetHistogram(NAR nar, int bins) {
         if (nar instanceof Default) {
-            return budgetHistogram((Iterable)nar.focus().concepts(), bins);
+            return budgetHistogram((Iterable) nar.focus().concepts(), bins);
         } else { //if (nar instance)
             //return budgetHistogram(((Default2)nar).active, bins);
             return grid(); //TODO
@@ -109,9 +108,9 @@ public class Vis {
         return col(
                 Vis.pane("Concept Priority Distribution (0..1)",
                         new HistogramChart(
-                            () -> Bag.priHistogram(bag, d),
-                            new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
-                        )
+                                () -> Bag.priHistogram(bag, d),
+                                new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))
+                )
 //                Vis.pane("Concept Volume",
 //                        new HistogramChart(
 //                                () -> Bag.priHistogram(bag, d),
@@ -199,7 +198,7 @@ public class Vis {
     public static Label label(Object x) {
         return label(x.toString());
     }
-    
+
     public static Label label(String text) {
         return new Label(text);
     }
@@ -343,7 +342,8 @@ public class Vis {
                 }
             }
 
-            @Override protected float send(Task t) {
+            @Override
+            protected float send(Task t) {
                 if (t.pri() >= priMin.floatValue()) {
                     try {
                         t.appendTo(term);
@@ -371,17 +371,21 @@ public class Vis {
 
             float a = attraction.floatValue();
 
-            for (Collidable c : objects) {
+            for (int i = 0, objectsSize = objects.size(); i < objectsSize; i++) {
+                Collidable c = objects.get(i);
 
                 Spatial A = ((Spatial) c.data());
                 if (A instanceof ConceptWidget) {
                     ((ConceptWidget) A).edges.forEachKey(e -> {
 
-                        ConceptWidget B = e.target;
+                        float attraction = e.attraction;
+                        if (attraction > 0) {
+                            ConceptWidget B = e.target;
 
-                        if ((B.body != null)) {
+                            if ((B.body != null)) {
 
-                            attract(c, B.body, a * e.attraction, e.attractionDist);
+                                attract(c, B.body, a * attraction, e.attractionDist);
+                            }
                         }
 
                     });
@@ -503,7 +507,7 @@ public class Vis {
             plot2 = new Plot2D(plotHistory, Plot2D.Line);
             plot3 = new Plot2D(plotHistory, Plot2D.Line);
             plot4 = new Plot2D(plotHistory, Plot2D.Line);
-            set( plot1, plot2, plot3, plot4 );
+            set(plot1, plot2, plot3, plot4);
 
             //plot1.add("Conf", nar.emotion.confident::getSum);
             plot2.add("Busy", nar.emotion.busyVol::getSum);
@@ -512,7 +516,7 @@ public class Vis {
             plot1.add("Dex", a::dexterity, 0f, 1f);
 
             //plot4.add("Hapy", a.happy, 0f, 1f);
-            plot4.add("Hapy", ()->a.reward, -1f, 1f);
+            plot4.add("Hapy", () -> a.reward, -1f, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);
 //            plot4.add("Sad", nar.emotion.sad::getSum);
@@ -564,7 +568,7 @@ public class Vis {
 
         @Override
         public void stop() {
-            if (on!=null)
+            if (on != null)
                 on.off();
         }
 

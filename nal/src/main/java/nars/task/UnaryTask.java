@@ -24,13 +24,6 @@ abstract public class UnaryTask<X> extends AbstractTask {
     }
 
     @Override
-    public final boolean equals(Object obj) {
-        return (this == obj)
-            ||
-        hash == obj.hashCode() && ((obj instanceof UnaryTask) && ((UnaryTask) obj).value.equals(value));
-    }
-
-    @Override
     public final int hashCode() {
         return hash;
     }

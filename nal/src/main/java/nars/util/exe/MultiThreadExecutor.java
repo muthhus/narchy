@@ -3,6 +3,7 @@ package nars.util.exe;
 import jcog.AffinityExecutor;
 import jcog.Texts;
 import jcog.Util;
+import jcog.data.MwCounter;
 import jcog.event.On;
 import jcog.pri.PLink;
 import nars.NAR;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 
 import static nars.Op.COMMAND;
@@ -46,7 +46,7 @@ public class MultiThreadExecutor extends Executioner {
 
 
     //    final AtomicInteger numActive = new AtomicInteger(); //because skiplist size() is slow
-    final LongAdder input = new LongAdder(), forgot = new LongAdder(), executed = new LongAdder();
+    final MwCounter input = new MwCounter(), forgot = new MwCounter(), executed = new MwCounter();
 
 
     @Override
@@ -58,10 +58,10 @@ public class MultiThreadExecutor extends Executioner {
         if (t.punc() == COMMAND) {
             runLater(() -> t.run(nar));
         } else {
-            input.increment();
+            input.inc();
             ITask removed = active.put(t);
             if (removed!=null) {
-                forgot.increment();
+                forgot.inc();
 
 //                int p = numActive.incrementAndGet();
 //                if (p > maxActive) {
@@ -173,7 +173,7 @@ public class MultiThreadExecutor extends Executioner {
 
                     ITask x = active.next();
                     if (x != null) {
-                        executed.increment();
+                        executed.inc();
                         try {
                             x.run(nar);
                         } catch (Throwable t) {
@@ -297,9 +297,9 @@ public class MultiThreadExecutor extends Executioner {
         if (Param.DEBUG) {
             System.out.println(
                     Texts.n4(load()) + " load, " +
-                            input.sumThenReset() + " input, " +
-                            executed.sumThenReset() + " executed, " +
-                            forgot.sumThenReset() + " forgot, " +
+                            input.getThenZero() + " input, " +
+                            executed.getThenZero() + " executed, " +
+                            forgot.getThenZero() + " forgot, " +
                             active.size() + " active, "
 
                     //+ passive

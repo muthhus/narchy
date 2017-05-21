@@ -2,10 +2,7 @@ package nars.util.exe;
 
 import jcog.pri.Priority;
 import nars.NAR;
-import nars.concept.Concept;
 import nars.task.ITask;
-import nars.task.util.InvalidTaskException;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,8 +15,8 @@ public class ProxyTask<T extends ITask> implements ITask {
     }
 
     @Override
-    public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-        the.run(n);
+    public ITask[] run(NAR n) {
+        return the.run(n);
     }
 
     @Override

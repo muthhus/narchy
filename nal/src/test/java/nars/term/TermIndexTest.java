@@ -79,7 +79,7 @@ public class TermIndexTest {
 //    }
     @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
-                new Default.DefaultTermTermIndex(1024)
+                new Default.DefaultTermIndex(1024)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

@@ -17,7 +17,6 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.*;
@@ -903,11 +902,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
     @Override
-    default void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+    default ITask[] run(NAR n) {
 
-        float inputPri = this.priSafe(-1);
-        if (inputPri < 0)
-            return; //deleted
+        float inputPri = this.pri();
+        if (inputPri != inputPri)
+            return null; //deleted
 
         n.emotion.busy(inputPri, this.volume());
 
@@ -933,14 +932,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
                     inputY.run(n);
 
-                    return;
+                    return null;
                 }
             }
         }
 
         if (isCommand()) {
             execute(this, n);
-            return; //done
+            return null; //done
         }
 
 //        if (n.time instanceof FrameTime) {
@@ -951,7 +950,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         TaskConcept c = concept(n, true);
         if (c == null) {
             delete();
-            return;
+            return null;
         }
 
         Task accepted = c.process(this, n);
@@ -968,7 +967,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             }
 
-            n.input( new SpreadingActivation(accepted) );
+            return new ITask[] {  new SpreadingActivation(accepted) };
 
         } else {
 
@@ -978,7 +977,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         }
 
-
+        return null;
     }
 
 

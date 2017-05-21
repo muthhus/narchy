@@ -9,14 +9,13 @@ import nars.Task;
 import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.task.ITask;
 import nars.task.TruthPolation;
 import nars.task.UnaryTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -91,11 +90,11 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     }
 
     @Override
-    public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+    public ITask[] run(NAR nar) {
 
         this.origin = nar.concept(value);
         if (origin == null)
-            return;
+            return null;
 
         this.momentum = nar.momentum.floatValue();
         spread = activationMapThreadLocal.get();
@@ -117,6 +116,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         } finally {
             spread.clear();
         }
+
+        return null;
     }
 
     public static int levels(@NotNull Compound host) {

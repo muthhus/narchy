@@ -50,7 +50,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) throws Narsese.NarseseException {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new Default.DefaultTermTermIndex(1024);
+            TermIndex index = new Default.DefaultTermIndex(1024);
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

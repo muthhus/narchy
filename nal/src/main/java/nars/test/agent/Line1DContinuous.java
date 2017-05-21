@@ -11,7 +11,7 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.term.atom.Atomic;
-import nars.time.FrameTime;
+import nars.time.CycleTime;
 import nars.util.exe.Executioner;
 import nars.util.exe.SynchronousExecutor;
 
@@ -205,7 +205,7 @@ public class Line1DContinuous extends NAgent {
 
         Default nar = new Default(1024,
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, exe),
-                new FrameTime(), exe
+                new CycleTime(), exe
         );
         nar.termVolumeMax.set(32);
 

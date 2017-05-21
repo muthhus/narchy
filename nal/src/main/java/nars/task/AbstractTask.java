@@ -14,10 +14,18 @@ abstract public class AbstractTask extends Pri implements ITask {
     }
 
     @Override
-    public @Nullable Priority clone() {
-        throw new UnsupportedOperationException();
+    public final boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof ITask && hashCode() == obj.hashCode()) {
+            ITask that = (ITask) obj;
+            Object thatKey = that.key();
+            if (thatKey != that && key().equals(thatKey))
+                return true;
+        }
+        return false;
     }
 
+    abstract public int hashCode();
 
     abstract public @NotNull String toString();/* {
         return super.toString() + " " + getClass().getSimpleName();

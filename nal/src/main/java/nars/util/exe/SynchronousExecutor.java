@@ -3,6 +3,7 @@ package nars.util.exe;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -60,7 +61,11 @@ public class SynchronousExecutor extends Executioner {
 
 
     @Override public boolean run(@NotNull ITask input) {
-        input.run(nar);
+        ITask[] next = input.run(nar);
+        if (next!=null) {
+            for (ITask x : next)
+                run(x);
+        }
         return true;
     }
 

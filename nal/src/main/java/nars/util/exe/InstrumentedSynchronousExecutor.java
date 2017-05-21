@@ -3,16 +3,10 @@ package nars.util.exe;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.concept.Concept;
 import nars.nar.Default;
 import nars.task.ITask;
-import nars.task.util.InvalidTaskException;
-import nars.term.util.InvalidTermException;
 import nars.time.CycleTime;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /** instruments tasks for tracking causal factors, as a precursor for full feedback system */
 public class InstrumentedSynchronousExecutor extends BufferedSynchronousExecutor {
@@ -37,8 +31,8 @@ public class InstrumentedSynchronousExecutor extends BufferedSynchronousExecutor
         }
 
         @Override
-        public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-            super.run(n);
+        public ITask[] run(NAR n) {
+            return super.run(n);
         }
 
         @Override

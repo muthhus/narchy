@@ -24,13 +24,13 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(50, 0, 100);
+    public final FloatParam repel = new FloatParam(40, 0, 100);
     public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
 
 
 
     /** speed at which center correction is applied */
-    float centerSpeed = 0.5f;
+    float centerSpeed = 0.25f;
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -94,7 +94,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             cz /= -n;
 
             v3 correction = v3.v(cx, cy, cz);
-            if (correction.length() > centerSpeed)
+            if (correction.lengthSquared() > centerSpeed*centerSpeed)
                 correction.normalize(centerSpeed);
 
             for (int i = 0, objectsSize = n; i < objectsSize; i++) {

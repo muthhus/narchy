@@ -2,6 +2,7 @@ package jcog.bag.impl.hijack;
 
 import jcog.Texts;
 import jcog.bag.impl.HijackBag;
+import jcog.data.MwCounter;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
@@ -18,7 +19,6 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -33,11 +33,11 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
     final Function<K, V> func;
 
-    public final LongAdder
-            hit = new LongAdder(),  //existing item retrieved
-            miss = new LongAdder(),  //a new item inserted that has not existed
-            reject = new LongAdder(), //item prevented from insertion by existing items
-            evict = new LongAdder(); //removal of existing item on insertion of new item
+    public final MwCounter
+            hit = new MwCounter(),  //existing item retrieved
+            miss = new MwCounter(),  //a new item inserted that has not existed
+            reject = new MwCounter(), //item prevented from insertion by existing items
+            evict = new MwCounter(); //removal of existing item on insertion of new item
 
     //hit + miss + reject = total insertions
 
@@ -51,10 +51,10 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
     public float statReset(ObjectLongProcedure<String> eachStat) {
         //eachStat.accept("S" /* size */, size() );
         long H, M, R, E;
-        eachStat.accept("H" /* hit */, H = hit.sumThenReset());
-        eachStat.accept("M" /* miss */, M = miss.sumThenReset());
-        eachStat.accept("R" /* reject */, R = reject.sumThenReset());
-        eachStat.accept("E" /* evict */, E = evict.sumThenReset());
+        eachStat.accept("H" /* hit */, H = hit.getThenZero());
+        eachStat.accept("M" /* miss */, M = miss.getThenZero());
+        eachStat.accept("R" /* reject */, R = reject.getThenZero());
+        eachStat.accept("E" /* evict */, E = evict.getThenZero());
         return (H / ((float) (H + M + R + E)));
     }
 
@@ -93,7 +93,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
         PLink<Pair<K, V>> exists = get(k);
         if (exists != null) {
             exists.priAdd(CACHE_HIT_BOOST);
-            hit.increment();
+            hit.inc();
             return exists.get().getTwo();
         }
         return null;
@@ -115,9 +115,9 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
         if (v == null) {
             v = func.apply(k);
             if (put(new RawPLink<>(Tuples.pair(k, v), value(k))) != null) {
-                miss.increment();
+                miss.inc();
             } else {
-                reject.increment();
+                reject.inc();
             }
         }
         return v;
@@ -148,7 +148,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
     @Override
     public void onRemoved(@NotNull PLink<Pair<K, V>> value) {
-        evict.increment();
+        evict.inc();
     }
 
     /**

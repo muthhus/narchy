@@ -68,15 +68,22 @@ public class GoalActionConcept extends ActionConcept {
 
         Truth goal = goal(now, dur);
 
-        float period = 2;
+        float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
         if (nar.random().nextFloat() < cur) {
             //inject curiosity
             float nextCurious =
                     //nar.random().nextFloat();
-                    ((float)Math.sin(now / (period * (2 * Math.PI) * dur)) + 1f)/2f;
+                    ((float)Math.sin(
+                        hashCode() /* for phase shift */
+                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
-            float cc = nar.confDefault(GOAL) - (goal!=null ? goal.conf() : 0);
+            float curiConf =
+                    //nar.confDefault(GOAL);
+                    nar.confMin.floatValue() * 2f;
+
+            float cc =
+                    curiConf - (goal!=null ? goal.conf() : 0);
             if (cc > 0) {
                 Truth ct = $.t(nextCurious,
                         cc);

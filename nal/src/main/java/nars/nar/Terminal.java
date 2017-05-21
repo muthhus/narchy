@@ -2,7 +2,7 @@ package nars.nar;
 
 import jcog.random.XORShiftRandom;
 import nars.NAR;
-import nars.time.FrameTime;
+import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.SynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -22,11 +22,11 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity) {
-        this(capacity, new XORShiftRandom(1), new FrameTime());
+        this(capacity, new XORShiftRandom(1), new CycleTime());
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(time, new Default.DefaultTermTermIndex(capacity), random, new SynchronousExecutor());
+        super(time, new Default.DefaultTermIndex(capacity), random, new SynchronousExecutor());
     }
 
 }

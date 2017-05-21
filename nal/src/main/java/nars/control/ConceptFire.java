@@ -8,10 +8,10 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.premise.Premise;
+import nars.task.ITask;
 import nars.task.UnaryTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Term;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,13 +30,10 @@ public class ConceptFire extends UnaryTask<Concept> {
 
 
     @Override
-    public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
-
-
+    public ITask[] run(NAR nar) {
         float pri = this.pri;
-
         if (pri!=pri)
-            return;
+            return null;
 
         int ttl = Util.lerp(pri, Param.FireTTLMax, Param.FireTTLMin);
 
@@ -90,10 +87,12 @@ public class ConceptFire extends UnaryTask<Concept> {
         int num = premises.size();
         if (num > 0) {
             float subPri = pri / num;
-            premises.forEach(p -> {
+            ITask[] pp = premises.toArray(new ITask[num]);
+            for (ITask p : pp)
                 p.setPri(subPri);
-                nar.input(p);
-            });
+            return pp;
+        } else {
+            return null;
         }
     }
 

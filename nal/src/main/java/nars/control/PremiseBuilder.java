@@ -1,4 +1,4 @@
-package nars.premise;
+package nars.control;
 
 import jcog.Util;
 import jcog.pri.PLink;
@@ -8,16 +8,16 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
-import nars.control.FireConcepts;
 import nars.derive.DefaultDeriver;
+import nars.premise.Premise;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
+import nars.task.DerivedTask;
+import nars.task.ITask;
 import nars.task.UnaryTask;
-import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,13 +47,13 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
      * patham9 its using the result of higher confidence
      */
     @Override
-    public void run(NAR nar) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+    public ITask[] run(NAR nar) {
 
         PLink<Task> taskLink = getOne();
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri)
-            return; //task deleted
+            return null; //task deleted
 
 
         Term beliefTerm = getTwo().get();
@@ -137,10 +137,10 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
 
-        nar.input(new DerivePremise(new Premise(task, beliefTerm, belief,
+        return new ITask[] { new DerivePremise(new Premise(task, beliefTerm, belief,
             //pri
         this.pri() * pri
-        )));
+        )) };
     }
 
 
@@ -148,23 +148,29 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
     public static class DerivePremise extends UnaryTask<Premise> {
 
-        static final ThreadLocal<FireConcepts.DirectDerivation> derivation =
-                ThreadLocal.withInitial(FireConcepts.DirectDerivation::new);
+        static final ThreadLocal<BufferedDerivation> derivation =
+                ThreadLocal.withInitial(BufferedDerivation::new);
 
         public DerivePremise(Premise premise) {
             super(premise, premise.pri());
         }
 
         @Override
-        public void run(NAR n) throws Concept.InvalidConceptException, InvalidTermException, InvalidTaskException {
+        public ITask[] run(NAR n) {
 
-            FireConcepts.DirectDerivation d = derivation.get();
+            BufferedDerivation d = derivation.get();
+
+            assert(d.buffer.isEmpty());
 
             d.restartA(n);
             d.restartB(value.task);
             d.restartC(value, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
 
             DefaultDeriver.the.test(d);
+
+            return d.flush();
+
+
 
 //                    assert (start >= ttlRemain);
 //

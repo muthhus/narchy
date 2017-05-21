@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicLong;
 
 /** increments time on each frame */
-public class FrameTime implements Time {
+public class CycleTime implements Time {
 
     private final AtomicLong nextStamp = new AtomicLong(0);
 
@@ -15,12 +15,12 @@ public class FrameTime implements Time {
     int dur;
 
 
-    FrameTime(int dt, int dur) {
+    CycleTime(int dt, int dur) {
         this.dt = dt;
         this.dur = dur;
     }
 
-    public FrameTime() {
+    public CycleTime() {
         this(1, 1);
     }
 
@@ -30,7 +30,7 @@ public class FrameTime implements Time {
     }
 
     @Override
-    public FrameTime dur(int d) {
+    public CycleTime dur(int d) {
         this.dur = d;
         return this;
     }
