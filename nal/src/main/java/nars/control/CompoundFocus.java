@@ -9,7 +9,6 @@ import nars.concept.Concept;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 

@@ -1,7 +1,6 @@
 package nars.table;
 
 import jcog.data.sorted.SortedArray;
-import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;

@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.premise.Premise;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;

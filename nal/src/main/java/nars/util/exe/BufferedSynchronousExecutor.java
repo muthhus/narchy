@@ -2,13 +2,9 @@ package nars.util.exe;
 
 import nars.NAR;
 import nars.task.ITask;
-import nars.task.NALTask;
-import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates
@@ -16,7 +12,7 @@ import java.util.Queue;
 public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
     final Queue<ITask> q;
-    final LinkedHashMap<ITask, ITask> pending = new LinkedHashMap();
+    final Map<ITask, ITask> pending = new LinkedHashMap();
 
 
     public BufferedSynchronousExecutor() {
@@ -57,10 +53,7 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
                         return p; //does this occurr?
 
 
-                    p.merge(X);
-
-
-                    return p;
+                    return p.merge(X);
                 });
             }
             pending.values().forEach(this::actuallyRun);

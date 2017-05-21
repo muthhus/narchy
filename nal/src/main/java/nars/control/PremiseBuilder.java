@@ -12,7 +12,6 @@ import nars.derive.DefaultDeriver;
 import nars.premise.Premise;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
-import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Compound;

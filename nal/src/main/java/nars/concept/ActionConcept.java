@@ -1,16 +1,13 @@
 package nars.concept;
 
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.table.EternalTable;
-import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 

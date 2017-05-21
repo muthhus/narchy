@@ -7,8 +7,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
-import nars.concept.ActionConcept;
-import nars.task.AnswerTask;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.TruthPolation;

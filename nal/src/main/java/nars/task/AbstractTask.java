@@ -1,9 +1,7 @@
 package nars.task;
 
 import jcog.pri.Pri;
-import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 abstract public class AbstractTask extends Pri implements ITask {

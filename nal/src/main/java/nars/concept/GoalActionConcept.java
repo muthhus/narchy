@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;

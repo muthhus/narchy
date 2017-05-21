@@ -4,7 +4,6 @@ import nars.$;
 import nars.Narsese;
 import nars.Param;
 import nars.Task;
-import nars.derive.Deriver;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;

@@ -24,10 +24,12 @@ public class InstrumentedSynchronousExecutor extends BufferedSynchronousExecutor
         }
 
         @Override
-        public void merge(ITask incoming) {
-            super.merge(incoming);
+        public ITask merge(ITask incoming) {
+            ITask next = super.merge(incoming);
+            assert(next==this);
             if (incoming instanceof InstrumentedTask)
                 log += " " + ((InstrumentedTask) incoming).log;
+            return this;
         }
 
         @Override

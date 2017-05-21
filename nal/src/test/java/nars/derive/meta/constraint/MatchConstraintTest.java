@@ -1,8 +1,5 @@
 package nars.derive.meta.constraint;
 
-import nars.Narsese;
-import nars.derive.Deriver;
-import nars.derive.TrieDeriver;
 import nars.nal.AbstractNALTest;
 import nars.nar.Default;
 import nars.test.TestNAR;

@@ -2,8 +2,9 @@ package nars.control;
 
 import jcog.data.FloatParam;
 import jcog.event.On;
-import nars.*;
-import nars.premise.Derivation;
+import nars.Focus;
+import nars.NAR;
+import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
 import static jcog.bag.Bag.BagCursorAction.Next;

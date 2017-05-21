@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.bag.Bag;
 import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.term.Termed;

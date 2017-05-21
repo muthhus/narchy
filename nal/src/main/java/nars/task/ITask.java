@@ -2,9 +2,6 @@ package nars.task;
 
 import jcog.pri.Priority;
 import nars.NAR;
-import nars.concept.Concept;
-import nars.task.util.InvalidTaskException;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +29,9 @@ public interface ITask extends Priority {
         return this;
     }
 
-    default void merge(ITask incoming) {
+    default ITask merge(ITask incoming) {
         priAdd(incoming.priSafe(0));
+        return this;
     }
 
     @Override

@@ -2,9 +2,6 @@ package nars;
 
 import nars.util.Loop;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * self managed set of processes which run a NAR
