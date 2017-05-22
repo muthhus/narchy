@@ -472,34 +472,30 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    @Deprecated public NAgent runCycles(final int totalCycles) {
+    public NAgent runCycles(final int totalCycles) {
         return runCycles(nar.dur(), totalCycles);
     }
 
     /**
      * synchronous execution
      */
-    @Deprecated public NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
+    public synchronized NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
 
         init();
 
-        final int[] frameRemain = {totalFrames};
-        nar.onCycle((n) -> {
-
+        @NotNull On active = nar.onCycle((n) -> {
             long lastNow = this.now;
             long now = nar.time();
-            if (now - lastNow < cyclesPerFrame) {
-                return; //only execute at most one agent frame per duration
+            if (now - lastNow >= cyclesPerFrame) {
+                //only execute at most one agent frame per duration
+                senseAndMotor();
+                predict();
             }
-
-            senseAndMotor();
-            predict();
-
-            if (frameRemain[0]-- == 0)
-                stop();
         });
 
-        nar.start().join();
+        nar.run(totalFrames);
+
+        active.off();
 
         return this;
     }

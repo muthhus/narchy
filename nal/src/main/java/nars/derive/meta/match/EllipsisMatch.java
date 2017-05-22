@@ -98,7 +98,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     @NotNull
     @Override
     public Op op() {
-        return Op.SUBTERMS;
+        return Op.PROD;
     }
 
     @Override

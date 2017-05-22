@@ -128,7 +128,8 @@ public enum Op {
     /**
      * for ellipsis, when seen as a term
      */
-    SUBTERMS("...", 1, OpType.Other);
+    //SUBTERMS("...", 1, OpType.Other)
+    ;
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL, Op.EQUI);
 

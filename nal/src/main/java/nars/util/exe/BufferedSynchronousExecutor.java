@@ -62,8 +62,6 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     }
 
     protected void actuallyRun(@NotNull ITask input) {
-//        if (input instanceof PremiseBuilder.DerivePremise)
-//            System.out.println(input);
         super.run(input);
     }
 

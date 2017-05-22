@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.NAgentX;
 import nars.Param;
 import nars.Task;
-import nars.concept.ActionConcept;
 import nars.nar.Default;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
@@ -141,6 +140,13 @@ public class Line1D {
         //new RLBooster(a, new HaiQAgent());
 
 //ImplicationBooster.implAccelerator(a);
+
+        n.onTask(t -> {
+            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
+                System.err.println(t.proof());
+            }
+        });
+
         a.onFrame((z) -> {
             a.target(
                     (float) (0.5f * (Math.sin(n.time() / 1000f) + 1f))
@@ -148,12 +154,6 @@ public class Line1D {
                     //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
             );
 
-        });
-
-        n.onTask(t -> {
-            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
-                System.err.println(t.proof());
-            }
         });
         NAgentX.chart(a);
 

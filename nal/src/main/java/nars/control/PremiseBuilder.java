@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.Param;
@@ -8,12 +7,10 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
-import nars.derive.DefaultDeriver;
 import nars.premise.Premise;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
 import nars.task.ITask;
-import nars.task.UnaryTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
@@ -142,48 +139,6 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
         )) };
     }
 
-
-
-
-    public static class DerivePremise extends UnaryTask<Premise> {
-
-        static final ThreadLocal<BufferedDerivation> derivation =
-                ThreadLocal.withInitial(BufferedDerivation::new);
-
-        public DerivePremise(Premise premise) {
-            super(premise, premise.pri());
-        }
-
-        @Override
-        public ITask[] run(NAR n) {
-
-            BufferedDerivation d = derivation.get();
-
-            assert(d.buffer.isEmpty());
-
-            d.restartA(n);
-            d.restartB(value.task);
-            d.restartC(value, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
-
-            DefaultDeriver.the.test(d);
-
-            return d.flush();
-
-
-
-//                    assert (start >= ttlRemain);
-//
-//                    ttl -= (start - ttlRemain);
-//                    if (ttl <= 0) break;
-
-//                    int nextDerivedTasks = d.buffer.size();
-//                    int numDerived = nextDerivedTasks - derivedTasks;
-//                    ttl -= numDerived * derivedTaskCost;
-//                    derivedTasks = nextDerivedTasks;
-
-
-        }
-    }
 
     static void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {
 
