@@ -30,7 +30,7 @@ public class FZero extends NAgentX {
     public static void main(String[] args) throws Narsese.NarseseException {
 
         float fps = 10f;
-        Time clock = new RealTime.DSHalf(true).durFPS(fps*2);
+        Time clock = new RealTime.DSHalf(true).durFPS(fps/4f);
 
 //        Default n = NARBuilder.newMultiThreadNAR(
 //                4,

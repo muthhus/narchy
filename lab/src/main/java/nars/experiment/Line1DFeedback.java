@@ -13,14 +13,17 @@ public class Line1DFeedback {
         FeedbackSynchronousExecutor exe = new FeedbackSynchronousExecutor();
         Default n = new Default(128, new Default.DefaultTermIndex(128), new CycleTime(),
                 exe);
-        exe.goalAdd(exe.classify(n.task("(o-->L)?")), -0.5f );
-        exe.goalAdd(exe.classify(n.task("(o-->L). %1.0;0.1%")), -0.25f );
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.1%")));
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.1%")));
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.9%")));
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.9%")));
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.5%")));
-        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.5%")));
+        exe.goal.set(0.5f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)?")), 0f );
+        exe.goalAdd(exe.classify(n.task("(((((happy-->L)--> #1) &&+8760 (#1 --> (happy-->L))) && #1) && #1).")), 0f); //too complex
+        exe.goalAdd(exe.classify(n.task("(o-->L). %1.0;0.1%")), 0.25f );
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.9%")), 1f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.9%")), 1f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.5%")), 0.75f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.5%")), 0.75f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %1.0;0.1%")), 0.5f);
+        exe.goalAdd(exe.classify(n.task("(o-->L)! %0.0;0.1%")), 0.5f);
+
         exe.goalNormalize();
 
         //n.log();
@@ -56,6 +59,6 @@ public class Line1DFeedback {
 
         n.log();
 
-        a.runCycles(10000);
+        a.runCycles(100000);
     }
 }

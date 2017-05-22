@@ -42,30 +42,30 @@ public interface NAct {
     default ActionConcept actionToggle(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
         ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
-            return toggle(on, off, next);
+            return toggle(on, off, next, d!=null ? d.conf() : nar().confMin.floatValue());
         });
         actions().add(m);
         return m;
     }
 
-    /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
-    @Nullable default ActionConcept actionTogglePWM(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
-        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
-            float df = d != null ? d.freq() : 0.5f;
-            boolean corrupt = nar().random().nextFloat() > Math.abs(df - 0.5f) * 2f;
-
-            boolean next = df > 0.5f;
-            if (corrupt) next = !next;
-
-            return toggle(on, off, next);
-        });
-
-        actions().add(m);
-        return m;
-    }
+//    /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
+//    @Nullable default ActionConcept actionTogglePWM(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
+//        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+//            float df = d != null ? d.freq() : 0.5f;
+//            boolean corrupt = nar().random().nextFloat() > Math.abs(df - 0.5f) * 2f;
+//
+//            boolean next = df > 0.5f;
+//            if (corrupt) next = !next;
+//
+//            return toggle(on, off, next);
+//        });
+//
+//        actions().add(m);
+//        return m;
+//    }
 
     @Nullable
-    default Truth toggle(@NotNull Runnable on, @NotNull Runnable off, boolean next) {
+    default Truth toggle(@NotNull Runnable on, @NotNull Runnable off, boolean next, float conf) {
         float freq;
         if (next) {
             freq = +1;
@@ -75,7 +75,9 @@ public interface NAct {
             off.run();
         }
 
-        return $.t(freq, nar().confDefault(BELIEF) /*d.conf()*/);
+        return $.t(freq,
+                conf);
+                //nar().confDefault(BELIEF) /*d.conf()*/);
     }
 
     /**
@@ -129,8 +131,8 @@ public interface NAct {
             return accepted ?
                     $.t(f,
                             d!=null ? d.conf() :
-                                //nar().confMin.floatValue()
-                                nar().confDefault(BELIEF)
+                                nar().confMin.floatValue()
+                                //nar().confDefault(BELIEF)
                     )
                     : null
                     ;

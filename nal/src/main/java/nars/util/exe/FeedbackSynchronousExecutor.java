@@ -11,6 +11,7 @@ import nars.control.DerivePremise;
 import nars.nar.Default;
 import nars.premise.Premise;
 import nars.task.ITask;
+import nars.term.Termed;
 import nars.test.agent.Line1DSimplest;
 import nars.time.CycleTime;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -27,18 +28,57 @@ import static nars.Op.*;
  */
 public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
 
-    final static int CLASSES = 36; //TODO calculate based on active classifiers
+    final static int IN_CLASSES = 80; //TODO calculate based on active classifiers
+    final static int OUT_CLASSES = IN_CLASSES/2;
 
-    private static final float TRAFFIC_DECAY = 0.5f;
+    private static final float TRAFFIC_DECAY = 0.9f;
 
-    /** between 0 and 1, lower means filter is stronger */
+    /**
+     * between 0 and 1, lower means filter is stronger
+     */
     public static final float priRetained = 0.1f;
 
-    final BlockRealMatrix traffic = new BlockRealMatrix(CLASSES, CLASSES);
-    final ArrayRealVector goal = new ArrayRealVector(CLASSES);
+    final BlockRealMatrix traffic = new BlockRealMatrix(OUT_CLASSES, IN_CLASSES);
+    public final ArrayRealVector goal = new ArrayRealVector(OUT_CLASSES);
     private RealVector filter = null;
 
     public final RecycledSummaryStatistics saving = new RecycledSummaryStatistics();
+
+    @Override
+    public boolean run(@NotNull ITask input) {
+        if (input instanceof DerivePremise) {
+            if (filter != null) {
+                    final float[] eu = {0};
+                classify((Premise)((DerivePremise)input).premise()).forEach((int i) -> {
+                    eu[0] += filter.getEntry(i);
+                });
+                float estimatedUtility = eu[0];
+
+            }
+
+        }
+//        if (input instanceof Task) {
+//            if (filter != null) {
+//
+//                //dot product: estimated utility towards goal
+//                final float[] eu = {0};
+//                classify((Task)input).forEach((int i) -> {
+//                    eu[0] += filter.getEntry(i);
+//                });
+//
+//                float estimatedUtility = eu[0];
+//                float s = filter(input, estimatedUtility);
+//                this.saving.accept(s);
+//                if (estimatedUtility >= 0) {
+//                    super.run(input);
+//                } else {
+//                    //System.out.println("culled: " + output);
+//                    return false;
+//                }
+//            }
+//        }
+        return super.run(input);
+    }
 
     @Override
     protected void actuallyRun(@NotNull ITask input) {
@@ -55,31 +95,16 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
                 for (ITask output : outputs) {
                     RoaringBitmap oo = classify((Task) output);
                     learn(input.pri() * output.pri(), c, oo);
-                    if (filter != null) {
-
-                        //dot product: estimated utility towards goal
-                        final float[] eu = {0};
-                        oo.forEach((int i) -> {
-                            eu[0] += goal.getEntry(i);
-                        });
-
-                        float estimatedUtility = eu[0];
-                        float s = filter(output, estimatedUtility);
-                        this.saving.accept(s);
-                        if (estimatedUtility >= 0) {
-                            run(output);
-                        } else {
-                            //System.out.println("culled: " + output);
-                        }
-                    }
-                }
-            } else {
-                for (ITask output : outputs) {
-                    run(output);
                 }
             }
+
+            for (ITask output : outputs) {
+                run(output);
+            }
+
         }
     }
+
 
     private float filter(ITask output, float estimatedUtility) {
         if (estimatedUtility < 0) {
@@ -93,18 +118,18 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
                 //System.out.println(Texts.n4(estimatedUtility) + " est " + output);
                 output.priMult(priRetained + (1f - priRetained) * estimatedUtility);
                 saving = pre - output.pri();
-                return saving/pre;
+                return saving / pre;
             }
         }
         return 0;
     }
 
-    private int classify(RoaringBitmap b, Task n, int offset) {
+    private int classify(RoaringBitmap b, Termed n, int offset) {
 
         int o = offset;
 
-        if (n != null) {
-            switch (n.punc()) {
+        if (n instanceof Task) {
+            switch (((Task) n).punc()) {
                 case BELIEF:
                     b.add(o + 0);
                     break;
@@ -122,11 +147,12 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
         o += 4;
 
         final int truthBins = 3;
-        if (n != null) {
-            if (n.isBeliefOrGoal()) {
-                int conf = Util.bin(n.conf(), truthBins);
+        if (n instanceof Task) {
+            Task tn = (Task) n;
+            if (tn.isBeliefOrGoal()) {
+                int conf = Util.bin(tn.conf(), truthBins);
                 b.add(o + conf);
-                int freq = Util.bin(n.freq(), truthBins);
+                int freq = Util.bin(tn.freq(), truthBins);
                 b.add(o + truthBins + freq);
             }
         }
@@ -135,6 +161,18 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
         int opBins = Op.values().length;
         b.add(o + n.term().op().ordinal());
         o += opBins;
+
+        int vol = n.volume();
+        if (vol < 3) {
+            b.add(o + 0);
+        } else if (vol < 6) {
+            b.add(o + 1);
+        } else if (vol < 12) {
+            b.add(o + 2);
+        } else {
+            b.add(o + 3);
+        }
+        o += 4;
 
         //TODO sub-structures
 
@@ -151,11 +189,14 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
         RoaringBitmap r = new RoaringBitmap();
 
         int j = classify(r, input.task, 0);
-        Task b = input.belief;
-        if (b != null) {
-            //j = classify(r, b, j);
-            classify(r, b, 0);
+        Termed b = input.belief;
+        if (b == null) {
+            b = input.beliefTerm();
         }
+
+        j = classify(r, b, j);
+        //classify(r, b, 0);
+
         return r;
     }
 
@@ -164,7 +205,7 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
         //System.out.println(nar.time() + ": " + ii + " -> " + output  + " (" + oo + ")");
         ii.forEach((int i) -> {
             oo.forEach((int o) -> {
-                traffic.addToEntry(i, o, p);
+                traffic.addToEntry(o, i, p);
             });
         });
     }
@@ -184,7 +225,7 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
     }
 
     public void goalNormalize() {
-        double n = goal.getNorm();
+        double n = goal.getL1Norm();
         if (n > 0)
             goal.mapMultiplyToSelf(1f / n);
     }
@@ -193,12 +234,13 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
 
 
         filter = traffic.preMultiply(goal);
-        double norm = filter.getNorm();
-        if (norm > 0)
+        double norm = filter.getL1Norm();
+        if (norm > 0) {
             filter.mapMultiplyToSelf(1f / norm);
-
-        mult(traffic, TRAFFIC_DECAY);
-
+            mult(traffic, TRAFFIC_DECAY);
+        } else {
+            filter = null;
+        }
         return filter;
     }
 
@@ -211,7 +253,7 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
     }
 
     public static void print(RealMatrix exe) {
-        for (int i = 0; i < CLASSES; i++)
+        for (int i = 0; i < IN_CLASSES; i++)
             System.out.println(Texts.n4(exe.getRow(i)));
     }
 

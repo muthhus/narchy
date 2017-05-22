@@ -35,7 +35,7 @@ public class GoalActionConcept extends ActionConcept {
         this.curiosity = curiosity;
         resolution = n.truthResolution;
         this.feedback = new Signal(BELIEF, resolution);
-        feedback.pri(()->n.priorityDefault(GOAL));
+        feedback.pri(() -> n.priorityDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -67,23 +67,26 @@ public class GoalActionConcept extends ActionConcept {
 
         Truth goal = goal(now, dur);
 
-        float curiPeriod = 2; //TODO vary this
+        //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
         if (nar.random().nextFloat() < cur) {
             //inject curiosity
-            float nextCurious =
-                    //nar.random().nextFloat();
-                    ((float)Math.sin(
-                        hashCode() /* for phase shift */
-                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
             float curiConf =
                     //nar.confDefault(GOAL);
-                    nar.confMin.floatValue() * 2f;
+                    nar.confMin.floatValue() * 5f;
 
-            float cc =
-                    curiConf - (goal!=null ? goal.conf() : 0);
+            float cc = curiConf;
+                    //curiConf - (goal != null ? goal.conf() : 0);
             if (cc > 0) {
+
+                float nextCurious =
+                        nar.random().nextFloat();
+//                    ((float)Math.sin(
+//                        hashCode() /* for phase shift */
+//                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
+
+
                 Truth ct = $.t(nextCurious,
                         cc);
                 if (goal == null) {
@@ -103,11 +106,8 @@ public class GoalActionConcept extends ActionConcept {
     }
 
 
-
-
     @NotNull
     private MotorFunction motor;
-
 
 
 //    Truth[] linkTruth(long when, long now, float minConf) {
