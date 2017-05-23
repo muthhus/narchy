@@ -45,7 +45,7 @@ public class UDPeer extends UDP {
         System.setProperty("java.net.preferIPv6Addresses", "true");
     }
 
-    private final Logger logger;
+    protected final Logger logger;
 
 
     public final HashMapTagSet can = new HashMapTagSet("C");
