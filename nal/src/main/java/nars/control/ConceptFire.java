@@ -85,15 +85,11 @@ public class ConceptFire extends UnaryTask<Concept> {
         int num = premises.size();
         if (num > 0) {
             ITask[] pp = premises.toArray(new ITask[num]);
-//            //divide priority among the premises
-//            float subPri = pri / num;
-//            for (ITask p : pp)
-//                p.setPri(subPri);
+            //divide priority among the premises
+            float subPri = pri / num;
+            for (ITask p : pp)
+                p.setPri(subPri);
 
-            //equal chance
-            for (ITask p : pp) {
-                p.setPri(pri);
-            }
             return pp;
         } else {
             return null;

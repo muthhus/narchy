@@ -92,7 +92,7 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
                 } else {
                     //should not project the matched belief
                     long when = task.start();
-                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true);
+                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
                 }
 
                 if (match != null) {

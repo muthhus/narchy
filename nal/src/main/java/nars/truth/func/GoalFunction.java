@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Op;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.NotNull;
@@ -143,6 +144,12 @@ public enum GoalFunction implements TruthOperator {
         @Nullable
         @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return ((B == null) || (T == null)) ? null : union(T, B, minConf);
+        }
+    },
+
+    StructuralIntersection() {
+        @Override public @Nullable Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
+            return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
         }
     },
 

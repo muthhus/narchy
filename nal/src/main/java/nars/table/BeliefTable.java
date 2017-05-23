@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.time.Tense.ETERNAL;
@@ -53,7 +54,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap) {
+        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap, Random rng) {
             return null;
         }
 
@@ -154,22 +155,22 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     @Nullable Task add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
 
-    @Nullable default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap) {
-        return match(when, now, dur, against, null, noOverlap);
+    default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap, Random rng) {
+        return match(when, now, dur, against, null, noOverlap, rng);
     }
 
-    @Nullable Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap);
+    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, Random rng);
 
     @Nullable default Task match(long when, long now, int dur) {
-        return match(when, now, dur, null, true);
+        return match(when, now, dur, null, true, ThreadLocalRandom.current() /* HACK */);
     }
 
     @Nullable default Task match(long when, int dur) {
         return match(when, when, dur);
     }
 
-    @Nullable default Task matchEternal() {
-        return match(ETERNAL, ETERNAL, 0, null, false);
+    @Deprecated @Nullable default Task matchEternal() {
+        return match(ETERNAL, ETERNAL, 0, null, false, null);
     }
 
 
@@ -233,7 +234,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
 
 
-        Task answer = match(when, now, dur, question, template, false);
+        Task answer = match(when, now, dur, question, template, false, nar.random());
         if (answer == null || answer.isDeleted())
             return null;
 

@@ -30,6 +30,7 @@ import static org.junit.Assert.*;
 @RunWith(Parameterized.class)
 public class LinkageTest extends AbstractNALTest {
 
+    int runCycles = 5;
 
     public LinkageTest(Supplier<NAR> b) { super(b); }
 
@@ -109,12 +110,9 @@ public class LinkageTest extends AbstractNALTest {
         assertEquals(nar.term(spremise2), premise2);
 
         String t1 = getTask(punc, premise1);
-        nar.input(t1);
         String t2 = getTask(punc, premise2);
-        nar.input(t2);
 
-
-        nar.run(5);
+        nar.input(t1, t2).run(runCycles);
 
         //List<String> fails = new ArrayList();
 

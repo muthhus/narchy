@@ -94,11 +94,13 @@ abstract public class substituteIfUnifies extends Functor {
         Term x = a.sub(1);
         Term y = a.sub(2);
 
-        if (x.equals(y))
-            return input; //unification would occurr but no changes would result
-
         boolean strict = a.subEquals(3, substitute.STRICT);
         Term failureTerm = strict ? False : input;
+
+        if (x.equals(y))
+            return strict ? False : input; //unification would occurr but no changes would result
+
+
 
 //        if (y.equals(input))
 //            return failureTerm;

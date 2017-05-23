@@ -103,16 +103,13 @@ public class Revision {
     }
 
 
-    @Nullable
-    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose) {
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose, Random rng) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
         float bw = b.evi();
 
         float aProp = aw / (aw + bw);
-
-        Random rng = ThreadLocalRandom.current(); //DEPRECATED TODO pass rng as parameter up through methods
 
         boolean negated = false;
         Compound cc = null;

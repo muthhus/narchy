@@ -887,9 +887,11 @@ public class PremiseRule extends GenericCompound {
                             return null;
                         int occShift = p.beliefTerm.subtermTime(yr);
                         if (occShift != DTERNAL)
-                            occReturn[0] += occShift;
+                            occReturn[0] += occShift - yr.dtRange();
                     } else {
                         if (!temporal) {
+                            return derived;
+                        } else {
                             return null; //uncomputable temporal basis
                         }
                     }

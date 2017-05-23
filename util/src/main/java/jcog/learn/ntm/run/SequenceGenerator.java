@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class SequenceGenerator
 {
-    public static final Random rng = new XorShift128PlusRandom(8L);
+    static final Random rng = new XorShift128PlusRandom(8L);
 
     public static TrainingSequence generateSequenceSawtooth(int length, int vectorSize) {
         length = length*2+2; //to be consistent with the WTF sequence below

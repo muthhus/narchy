@@ -30,6 +30,7 @@ public class InterNARTest {
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
         final int CONNECTION_TIME = 50;
+            int postCycles = 24;
 
         Param.ANSWER_REPORTING = false;
 
@@ -58,7 +59,6 @@ public class InterNARTest {
 
             Util.pause(CONNECTION_TIME);
 
-            int postCycles = 16;
             for (int i = 0; i < postCycles; i++) {
                 a.run(1);
                 b.run(1);

@@ -87,20 +87,20 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, (C ==> A), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
 //    B, (C ==> A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionN, Goal:DeductionN)
 //        B, (C ==> A), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
-    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Belief:Analogy, Goal:Deduction)
-    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyPN, Goal:DeductionPN)
-    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B,strict)), (Belief:AnalogyN, Goal:DeductionN)
-    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(belief, C, A) |- subIfUnifiesAny(C,A,B,strict), (Belief:AnalogyNN, Goal:DeductionNN)
+    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C, A) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyPN, Goal:DeductionPN)
+    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyN, Goal:DeductionN)
+    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(belief, C, A) |- subIfUnifiesAny(C,A,B), (Belief:AnalogyNN, Goal:DeductionNN)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
@@ -109,14 +109,14 @@
             //     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
     //answering
-    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), Y, Z,strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z,strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
-    Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z,strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
+    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    Z, (X==>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), time(belief, C, A), task(positive), task("!") |- subIfUnifiesAny(C,A,B,strict), (Goal:Strong)
-    B, (C && (--,%A)), task(negative), time(belief, C, A), task("!") |- subIfUnifiesAny(C,A,B,strict), (Goal:StrongN)
+    B, (C && A), time(belief, C, A), task(positive), task("!") |- subIfUnifiesAny(C,A,B), (Goal:Strong)
+    B, (C && (--,%A)), task(negative), time(belief, C, A), task("!") |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
         //B, (C && A), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
         //B, (C && (--,%A)), time(decomposeBeliefLate) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 
@@ -125,11 +125,11 @@
 //// multi-conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
 //Inference about the pre/postconditions
 
-    Y, ((&&,X,A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:Deduction)
-    Y, ((&&,(--,%X),A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y,strict), (Belief:DeductionN)
+    Y, ((&&,X,A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
+    Y, ((&&,(--,%X),A..+) ==> B), task("."), time(dtBeliefExact) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:DeductionN)
 
-    Y, (B ==> (&&,X,A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:Deduction)
-    Y, (B ==> (&&,(--,%X),A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y,strict), (Belief:DeductionN)
+    Y, (B ==> (&&,X,A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:Deduction)
+    Y, (B ==> (&&,(--,%X),A..+)), task("."), time(dtBeliefExact) |- subIfUnifiesAny((B ==>+- (&&,A..+)),X,Y), (Belief:DeductionN)
 
 //// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case

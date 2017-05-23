@@ -247,7 +247,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                 if (priority == priority) {
 
-                    if (end < start) { //why?
+                    if (start!=ETERNAL && end < start) { //why?
                         long s = start; start = end; end = s; //swap
                     }
 

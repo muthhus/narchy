@@ -14,8 +14,8 @@
         ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         ((--,%Z) &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:Strong)
-        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B,strict), (Goal:StrongPN)
+     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
+        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
 
      //X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
      //   X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()
@@ -30,7 +30,7 @@
      //(&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
      //   (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
 
-     B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B,strict), (Belief:AnonymousAnalogy)
+     B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B), (Belief:AnonymousAnalogy)
                 //,Goal:Deduction
                 //Goal:Goduction)
 
@@ -59,10 +59,12 @@
 
 
 //substitutionViaSimilarity
-     X, (B<->C), neqCom(X,C), neq(X,B) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Strong)
+     X, (B<->C), neqCom(X,C) |- subIfUnifiesAny(C,B,X), (Belief:Intersection, Goal:Strong)
 
 //needs special temporal handling to shift occurrence time of result if the <=> has a non-zero non-eternal dt
-     X, (B<=>C), neqCom(X,C), neq(X,B), time(beliefDTSimultaneous) |- substitute(X,B,C,strict), (Belief:Intersection, Goal:Strong)
+     X, (B<=>C), task(positive), neqCom(X,C), time(beliefDTSimultaneous) |- subIfUnifiesAny(C,B,X), (Belief:Intersection, Goal:Strong)
+     X, (B<=>C), task(negative), neqCom(X,C), time(beliefDTSimultaneous) |- subIfUnifiesAny((--,%C),B,X), (Belief:IntersectionN, Goal:StrongN)
+
 
 //INVALID:
 //desire spreading by similarity (was: Goal:Intersection)
@@ -94,6 +96,7 @@
 //Similarity to Inheritance
 
     (S --> P), (S <-> P),                   task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
+    (S --> P), (S <-> P),                   task("@") |- (S --> P),   (Goal:StructuralIntersection, Punctuation:Goal)
     (S ==> P), (S <=> P), time(dtCombine),  task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
 
 //NAL2:

@@ -35,9 +35,9 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        Default d = new Default();
+        Default n = new Default();
         //d.log();
-        d.input(
+        n.input(
                 "(burglary). %0.7;0.9%",
                 "(earthquake). %0.2;0.9%",
                 "(p_alarm1). %0.9;0.9%",
@@ -55,15 +55,15 @@ public class NAL6MultistepTest {
         Concept burglary = null, earthquake = null;
         for (int i = 0; i < 5; i++) {
             //long now = d.time();
-            d.run(100);
-            burglary = d.concept("(burglary)");
-            earthquake = d.concept("(earthquake)");            // burglary.print();  earthquake.print();
+            n.run(100);
+            burglary = n.concept("(burglary)");
+            earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
             System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
-        assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0).freq(), 0.4f /* approximate */);
-        assertEquals(0.18f, earthquake.belief(Tense.ETERNAL,0).freq(), 0.1f /* approximate */);
+        assertEquals(0.99f, n.beliefTruth(burglary, Tense.ETERNAL).freq(), 0.4f /* approximate */);
+        assertEquals(0.31f, n.beliefTruth(earthquake,Tense.ETERNAL).freq(), 0.1f /* approximate */);
     }
 
 

@@ -14,6 +14,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
@@ -34,8 +35,8 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
     }
 
     @Override
-    public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
-        Task t = super.match(when, now, dur, against);
+    public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
+        Task t = super.match(when, now, dur, against, rng);
 
         Task h = historicTask(when, dur);
         if (h != null) {

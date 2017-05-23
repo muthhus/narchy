@@ -625,8 +625,8 @@ public class NAL8Test extends AbstractNALTest {
     public void subgoal_1_abd()  {
         TestNAR tester = test();
 
-        tester.input("[opened]:{t001}. :|:");
-        tester.input("((hold(SELF,{t002}) &&+5 ( at(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).");
+        tester.input("opened:{t001}. :|:");
+        tester.input("((hold(SELF,{t002}) &&+5 ( at(SELF,{t001}) &&+5 open({t001}))) ==>+5 opened:{t001}).");
 
         tester.mustBelieve(cycles, "( hold(SELF,{t002}) &&+5 ( at(SELF,{t001}) &&+5 open({t001})))",
                 1.0f, 0.45f,
@@ -1137,7 +1137,8 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .input("(happy)!")
                 .input("((happy) <=>+0 ((--,(x))&&(--,(out)))).")
-                .mustDesire(cycles, "((--,(x))&&(--,(out)))", 1f, 0.81f);
+                //.mustDesire(cycles, "((--,(x))&&(--,(out)))", 1f, 0.81f);
+                .mustDesire(cycles, "((--,(x)) &| (--,(out)))", 1f, 0.81f);
     }
     @Test public void testGoalEquivComponentNeg() {
         test()

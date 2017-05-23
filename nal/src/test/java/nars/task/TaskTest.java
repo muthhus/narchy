@@ -109,6 +109,7 @@ public class TaskTest {
     @Test
     public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
+        Param.DEBUG = true;
         Default d = new Default(100);
         //d.log();
         d.nal(2);
@@ -121,7 +122,8 @@ public class TaskTest {
                 assertArrayEquals("all double-premise derived terms have this evidence: "
                         + t + ": " + Arrays.toString(ev) + "!=" + Arrays.toString(t.stamp()), ev, t.stamp());
 
-            //System.out.println(t);
+            System.out.println(t.proof());
+
         });
 
         d.run(256);

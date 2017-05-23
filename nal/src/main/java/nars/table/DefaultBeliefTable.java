@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.time.Tense.ETERNAL;
@@ -96,9 +97,8 @@ public class DefaultBeliefTable implements BeliefTable {
     /**
      * get the most relevant belief/goal with respect to a specific time.
      */
-    @Nullable
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap) {
+    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, Random rng) {
 
         final Task ete = eternal.strongest();
         if (when == ETERNAL) {
@@ -111,7 +111,7 @@ public class DefaultBeliefTable implements BeliefTable {
             if (when == ETERNAL)
                 when = now;
 
-            Task tmp = temporal.match(when, now, dur, against);
+            Task tmp = temporal.match(when, now, dur, against, rng);
 
             if (tmp == null) {
                 return ete;

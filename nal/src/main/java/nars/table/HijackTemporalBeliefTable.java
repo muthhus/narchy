@@ -17,6 +17,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 import static java.lang.Math.abs;
 import static jcog.math.Interval.intersectLength;
 
@@ -457,8 +459,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     /**
      * t is the target time of the new merged task
      */
-    @Nullable
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin) {
+    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
 
 
         Interval ai = new Interval(a.start(), a.end());
@@ -491,7 +492,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
             if (t != null) {
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
-                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true);
+                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, rng);
             }
         }
 
@@ -501,9 +502,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
 
-    @Nullable
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against) {
+    public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
 
         //return maxBy(evidence(when, now, dur));
 
@@ -512,7 +512,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = merge(a, s.b, now, a.conf());
+        Task c = merge(a, s.b, now, a.conf(), rng);
         return c != null ? c : a;
     }
 

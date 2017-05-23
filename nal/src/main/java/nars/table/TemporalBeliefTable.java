@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -19,7 +20,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** finds the strongest match to the specified parameters. Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
-    @Nullable Task match(long when, long now, int dur, @Nullable Task against);
+    Task match(long when, long now, int dur, @Nullable Task against, Random rng);
 
     Truth truth(long when, int dur, EternalTable eternal);
 
@@ -66,7 +67,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
+        public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
             return null;
         }
 

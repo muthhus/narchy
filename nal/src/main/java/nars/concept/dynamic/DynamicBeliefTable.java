@@ -12,6 +12,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+
 /**
  * Created by me on 12/4/16.
  */
@@ -123,7 +125,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //    }
 
     @Override
-    public @Nullable Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap) {
+    public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
         if (template == null) {
             Compound dct = dynamicConcept.term();
             template = dynamicConcept.nar.terms.retemporalize(dct); //TODO move this somewhere else where it can use the NAR's index
@@ -139,7 +141,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         Task y = generate(template, when);
 
         //try {
-        Task x = super.match(when, now, dur, target, template, noOverlap);
+        Task x = super.match(when, now, dur, target, template, noOverlap, rng);
 //        } catch (InvalidTaskException e) {
 //            if (Param.DEBUG_EXTRA) {
 //                System.err.println(e);

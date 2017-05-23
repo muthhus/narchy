@@ -96,8 +96,6 @@ public class FireConcepts implements Runnable {
             fired[0]++;
             nar.input(cf);
 
-            //pc.priMult(priDecayFactor);
-
 
             curTTL[0] -= (1f + priFired);
             return curTTL[0] > 0 ? Next : Stop;

@@ -6,6 +6,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 /**
@@ -28,8 +29,8 @@ abstract public class HijackTemporalExtendedBeliefTable extends HijackTemporalBe
 
 
     @Override
-    public @Nullable Task match(long when, long now, int dur, @Nullable Task against) {
-        Task t = super.match(when, now, dur, against);
+    public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
+        Task t = super.match(when, now, dur, against, rng);
 
             Task h = matchHistory(when);
             if (h != null) {
