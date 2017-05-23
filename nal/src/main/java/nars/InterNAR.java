@@ -76,9 +76,12 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     }
 
     @Override
-    public synchronized void stop() {
-        out.stop();
-        super.stop();
+    public synchronized boolean stop() {
+        if (super.stop()) {
+            out.stop();
+            return true;
+        }
+        return false;
     }
 
     //        @Override

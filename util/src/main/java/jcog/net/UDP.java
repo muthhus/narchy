@@ -70,7 +70,6 @@ public class UDP  {
 
         this.thread = new Thread(this::recv);
 
-        logger.info("{} started {} {} {} {}", this, in, in.getLocalSocketAddress(), in.getInetAddress(), in.getRemoteSocketAddress());
 
         thread.start();
     }
@@ -79,6 +78,7 @@ public class UDP  {
     protected void recv() {
         byte[] receiveData = new byte[MAX_PACKET_SIZE];
 
+        logger.info("{} started {} {} {} {}", this, in, in.getLocalSocketAddress(), in.getInetAddress(), in.getRemoteSocketAddress());
         onStart();
 
         try {
@@ -116,12 +116,14 @@ public class UDP  {
 
     }
 
-    public synchronized void stop() {
+    public synchronized boolean stop() {
         if (running) {
             running = false;
             thread.stop();
             in.close();
+            return true;
         }
+        return false;
     }
 
     public boolean out(String data, String host, int port)  {

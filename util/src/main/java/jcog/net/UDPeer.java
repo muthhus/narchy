@@ -181,6 +181,15 @@ public class UDPeer extends UDP {
         }
     }
 
+    @Override
+    public synchronized boolean stop() {
+        if (super.stop()) {
+            them.clear();
+            return true;
+        }
+        return false;
+    }
+
     public boolean seen(Msg o, float pri) {
         RawPLink p = new RawPLink(o, pri);
 
