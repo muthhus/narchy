@@ -43,6 +43,12 @@ public class HashMapTagSet implements TagSet, Serializable {
         this.data = new ConcurrentHashMap<>();
     }
 
+    public void add(float priDividedAmong, String... tags) {
+        float each = priDividedAmong / tags.length;
+        for (String t : tags)
+            add(t, each);
+    }
+
     @Override
     public String toString() {
         return id + "=" + data.toString();

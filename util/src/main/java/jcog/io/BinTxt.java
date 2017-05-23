@@ -190,7 +190,7 @@ public class BinTxt {
         return result.toString();
     }
 
-    public static CharSequence toString(long l) {
+    public static String toString(long l) {
         return toString(l, maxBase);
     }
 

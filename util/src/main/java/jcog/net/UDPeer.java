@@ -100,7 +100,7 @@ public class UDPeer extends UDP {
         while ((me = ThreadLocalRandom.current().nextInt()) == UNKNOWN_ID) ;
         this.me = me;
 
-        this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + "." + me);
+        this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + ":" + name());
 
         them = new HijackBag<Integer, UDProfile>(4) {
 
@@ -241,7 +241,11 @@ public class UDPeer extends UDP {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '(' + BinTxt.toString(me) + ')';
+        return getClass().getSimpleName() + '(' + name() + ')';
+    }
+
+    public String name() {
+        return BinTxt.toString(me);
     }
 
     @Override
@@ -307,7 +311,8 @@ public class UDPeer extends UDP {
                             default:
                                 return;
                         }
-                        logger.info("{} attn {}", you.id, h);
+                        if (logger.isDebugEnabled())
+                            logger.debug("{} attn {}", you.name(), h);
                     }
                 }
                 break;
@@ -756,7 +761,7 @@ public class UDPeer extends UDP {
 
         @Override
         public String toString() {
-            return id + "{" +
+            return name() + "{" +
                     "addr=" + addr +
                     ", ping=" + latency +
                     ", can=" + can +
@@ -765,6 +770,9 @@ public class UDPeer extends UDP {
         }
 
 
+        public String name() {
+            return BinTxt.toString(id);
+        }
     }
 
 
