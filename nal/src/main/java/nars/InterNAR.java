@@ -15,7 +15,7 @@ import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static jcog.net.UDPeer.Command.BELIEVE;
+import static jcog.net.UDPeer.Command.TELL;
 
 /**
  * InterNAR P2P Network Interface for a NAR
@@ -47,7 +47,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                         if (x!=null) {
                             @Nullable byte[] msg = IO.taskToBytes(x);
                             if (msg != null) {
-                                if (believe(msg, ttl(x), true) > 0) {
+                                if (tell(msg, ttl(x), true) > 0) {
                                     return 1;
                                 }
                             }
@@ -92,7 +92,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 //        }
 
     @Override
-    protected void onBelief(UDPeer.UDProfile connected, Msg m) {
+    protected void onTell(UDPeer.UDProfile connected, Msg m) {
 
         Task x = IO.taskFromBytes(m.data(), nar.terms);
         if (x!=null) {
@@ -118,7 +118,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
             if (answer!=null) {
                 @Nullable byte[] a = IO.taskToBytes(answer);
                 if (a != null) {
-                    Msg aa = new Msg(BELIEVE.id, ttl(answer), me, null, a);
+                    Msg aa = new Msg(TELL.id, ttl(answer), me, null, a);
                     if (!seen(aa, 1f))
                         send(aa, q.origin());
                 }

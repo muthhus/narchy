@@ -40,7 +40,7 @@ public abstract class UDPNetworkSimulation {
 
         Util.sleep(2000);
 
-        peers[0].believe("hi", (byte)4);
+        peers[0].tell("hi", (byte)4);
 
 
         Util.sleep(10000);
@@ -77,7 +77,7 @@ public abstract class UDPNetworkSimulation {
         }
 
         @Override
-        protected void onBelief(@Nullable UDPeer.UDProfile connected, @NotNull UDPeer.Msg m) {
+        protected void onTell(@Nullable UDPeer.UDProfile connected, @NotNull UDPeer.Msg m) {
             System.out.println(me + " receive: " + m);
         }
     }

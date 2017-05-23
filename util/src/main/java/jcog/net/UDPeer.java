@@ -189,16 +189,16 @@ public class UDPeer extends UDP {
         return seen.put(p) != p; //what about if it returns null
     }
 
-    public void believe(String msg, int ttl) {
-        believe(msg.getBytes(UTF8), ttl);
+    public void tell(String msg, int ttl) {
+        tell(msg.getBytes(UTF8), ttl);
     }
 
-    public void believe(byte[] msg, int ttl) {
-        believe(msg, ttl, false);
+    public void tell(byte[] msg, int ttl) {
+        tell(msg, ttl, false);
     }
 
-    public int believe(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return say(new Msg(BELIEVE.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
+    public int tell(byte[] msg, int ttl, boolean onlyIfNotSeen) {
+        return say(new Msg(TELL.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
     }
 
     /**
@@ -290,9 +290,9 @@ public class UDPeer extends UDP {
             case WHO:
                 m.dataAddresses(this::ping);
                 break;
-            case BELIEVE:
+            case TELL:
                 //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
-                onBelief(you, m);
+                onTell(you, m);
                 break;
             case ATTN:
                 if (you != null) {
@@ -336,7 +336,7 @@ public class UDPeer extends UDP {
         }
     }
 
-    protected void onBelief(@Nullable UDProfile connected, @NotNull Msg m) {
+    protected void onTell(@Nullable UDProfile connected, @NotNull Msg m) {
 
     }
 
@@ -439,7 +439,9 @@ public class UDPeer extends UDP {
         /**
          * share a belief claim
          */
-        BELIEVE('b'),;
+        TELL('t'),
+
+        ;
 
         public final byte id;
 
@@ -457,8 +459,8 @@ public class UDPeer extends UDP {
                     return PONG;
                 case 'w':
                     return WHO;
-                case 'b':
-                    return BELIEVE;
+                case 't':
+                    return TELL;
                 case 'a':
                     return ATTN;
             }
