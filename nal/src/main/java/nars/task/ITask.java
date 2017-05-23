@@ -24,19 +24,9 @@ public interface ITask extends Priority {
         return false;
     }
 
-    /** id key */
-    default Object key() {
-        return this;
-    }
-
     default ITask merge(ITask incoming) {
         priAdd(incoming.priSafe(0));
         return this;
     }
 
-    @Override
-    @NotNull
-    default Priority priority() {
-        throw new UnsupportedOperationException("impl in subclasses");
-    }
 }

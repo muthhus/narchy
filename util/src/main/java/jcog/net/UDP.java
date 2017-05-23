@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * generic UDP server & utilities
@@ -25,7 +26,7 @@ public class UDP  {
 
     protected final DatagramSocket in;
     public final Thread thread;
-    protected boolean running = true;
+    final AtomicBoolean running = new AtomicBoolean(true);
     private static final Logger logger = LoggerFactory.getLogger(UDP.class);
 
     private static final InetAddress local = new InetSocketAddress(0).getAddress();
@@ -35,6 +36,7 @@ public class UDP  {
     private final int port;
 
     private int updatePeriodMS = 250;
+    private long lastUpdate;
 
     public UDP(String host, int port) throws SocketException, UnknownHostException {
         this(InetAddress.getByName(host), port);
@@ -67,15 +69,17 @@ public class UDP  {
         in.setSendBufferSize(DEFAULT_socket_BUFFER_SIZE);
         in.setReceiveBufferSize(DEFAULT_socket_BUFFER_SIZE);
         this.port = port;
+        this.lastUpdate = System.currentTimeMillis();
 
         this.thread = new Thread(this::recv);
-
-
-        thread.start();
     }
 
 
-    protected void recv() {
+    public synchronized void start() {
+        thread.start();
+    }
+
+    protected synchronized void recv() {
         byte[] receiveData = new byte[MAX_PACKET_SIZE];
 
         logger.info("{} started {} {} {} {}", this, in, in.getLocalSocketAddress(), in.getInetAddress(), in.getRemoteSocketAddress());
@@ -89,20 +93,28 @@ public class UDP  {
 
         DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
 
-        while (running) {
+        while (running.get()) {
             try {
 
                 try {
                     in.receive(p);
                     in(p, Arrays.copyOfRange(p.getData(), p.getOffset(), p.getLength()));
-                } catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException ignored) {
                     //this is expected
+                    if (in.isClosed())
+                        break;
                 }
 
-                update();
+                long now = System.currentTimeMillis();
+                if (now - lastUpdate >= updatePeriodMS) {
+                    lastUpdate = now;
+                    update();
+                }
 
             } catch (Exception e) {
                 logger.error("{}", e);
+                if (in.isClosed())
+                    break;
             }
         }
     }
@@ -116,9 +128,8 @@ public class UDP  {
 
     }
 
-    public synchronized boolean stop() {
-        if (running) {
-            running = false;
+    public boolean stop() {
+        if (running.compareAndSet(true, false)) {
             thread.stop();
             in.close();
             return true;

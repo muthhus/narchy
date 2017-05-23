@@ -34,9 +34,10 @@ public class JsUDPServer<A> extends UDPServer<JsUDPServer<A>.JsSession> {
 
     public JsUDPServer(int port, Supplier<A> apiBuilder) throws SocketException {
         this(port, (udp, a) -> apiBuilder.get());
+        start();
     }
 
-    public JsUDPServer(int port, BiFunction<UDP, InetSocketAddress, A> apiBuilder) throws SocketException {
+    JsUDPServer(int port, BiFunction<UDP, InetSocketAddress, A> apiBuilder) throws SocketException {
         super(port);
         this.apiBuilder = apiBuilder;
     }

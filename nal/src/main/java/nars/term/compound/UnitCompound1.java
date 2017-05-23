@@ -80,7 +80,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         Compound t = (Compound) that;
 
         //TODO if this is a NEG then size and dt can be assumed
-        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && (t.dt() == DTERNAL) && equalTo(t);
+        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ the.equals(t.sub(0));
     }
 
 
@@ -196,7 +196,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         public boolean equals(Object obj) {
             if (this == obj) return true;
 
-            if (obj instanceof TermContainer) {
+            if (obj instanceof Compound) {
                 TermContainer t = (TermContainer) obj;
                 if (t.hashCode() == hashCode()) {
                     int ss = size();

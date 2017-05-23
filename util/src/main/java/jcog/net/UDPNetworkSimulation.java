@@ -40,7 +40,7 @@ public abstract class UDPNetworkSimulation {
 
         Util.sleep(2000);
 
-        peers[0].tell("hi", (byte)4);
+        peers[0].tellSome("hi", (byte)4);
 
 
         Util.sleep(10000);

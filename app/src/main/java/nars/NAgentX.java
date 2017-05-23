@@ -11,7 +11,6 @@ import nars.gui.HistogramChart;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
-import nars.nar.NARBuilder;
 import nars.nar.NARS;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;

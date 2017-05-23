@@ -3,14 +3,12 @@ package nars.nar;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.event.On;
-import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.CompoundFocus;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -111,7 +109,7 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 512 * 1024, 3),
-                new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
     }
 

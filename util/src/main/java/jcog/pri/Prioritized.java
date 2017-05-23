@@ -27,10 +27,11 @@ public interface Prioritized extends Deletes {
      * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
     boolean delete();
 
-    default boolean isDeleted() {
-        float p = pri();
-        return p!=p; //fast NaN check
-    }
+    boolean isDeleted();
+//    default boolean isDeleted() {
+//        float p = pri();
+//        return p!=p; //fast NaN check
+//    }
 
     @NotNull
     Priority priority();

@@ -142,6 +142,8 @@ public class UDPeer extends UDP {
         them.setCapacity(PEERS_CAPACITY);
 
         seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4);
+
+        start();
     }
 
     protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
@@ -154,7 +156,7 @@ public class UDPeer extends UDP {
      * TODO handle oversized message
      * @return how many sent
      */
-    public int say(Msg o, float pri, boolean onlyIfNotSeen) {
+    public int tellSome(Msg o, float pri, boolean onlyIfNotSeen) {
 
         if (them.isEmpty() || pri <= 0) {
             //System.err.println(this + " without any peers to broadcast");
@@ -182,7 +184,7 @@ public class UDPeer extends UDP {
     }
 
     @Override
-    public synchronized boolean stop() {
+    public boolean stop() {
         if (super.stop()) {
             them.clear();
             return true;
@@ -198,16 +200,16 @@ public class UDPeer extends UDP {
         return seen.put(p) != p; //what about if it returns null
     }
 
-    public void tell(String msg, int ttl) {
-        tell(msg.getBytes(UTF8), ttl);
+    public void tellSome(String msg, int ttl) {
+        tellSome(msg.getBytes(UTF8), ttl);
     }
 
-    public void tell(byte[] msg, int ttl) {
-        tell(msg, ttl, false);
+    public void tellSome(byte[] msg, int ttl) {
+        tellSome(msg, ttl, false);
     }
 
-    public int tell(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return say(new Msg(TELL.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
+    public int tellSome(byte[] msg, int ttl, boolean onlyIfNotSeen) {
+        return tellSome(new Msg(TELL.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
     }
 
     /**
@@ -244,7 +246,7 @@ public class UDPeer extends UDP {
     }
 
     protected void say(HashMapTagSet set) {
-        say(new Msg(ATTN.id, DEFAULT_ATTN_TTL, me, null,
+        tellSome(new Msg(ATTN.id, DEFAULT_ATTN_TTL, me, null,
                 set.toBytes()), 1f, false);
     }
 
@@ -341,7 +343,7 @@ public class UDPeer extends UDP {
 
 
         if (survives) {
-            say(m, pri, false /* did a test locally already */);
+            tellSome(m, pri, false /* did a test locally already */);
         }
     }
 

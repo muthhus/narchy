@@ -158,7 +158,8 @@ public class MultiThreadExecutor extends Executioner {
         this.concurrency = activeThreads + passiveThreads;
 
         this.passive =
-                new ForkJoinPool(passiveThreads, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true);
+                new ForkJoinPool(passiveThreads);
+                    //, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true
 //                new ThreadPoolExecutor(passiveThreads, passiveThreads,
 //                        1, TimeUnit.MINUTES, passive);
         //passiveExec.prestartAllCoreThreads();

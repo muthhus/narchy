@@ -1,14 +1,11 @@
 package nars.web;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.AppenderBase;
+
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import jcog.byt.DynByteSeq;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.op.Command;
 import spacegraph.web.WebsocketService;
 
 import java.io.IOException;
@@ -24,24 +21,24 @@ public class NarseseIOService extends WebsocketService  {
 
     final LeakOut output;
 
-    final AppenderBase appender;
+//    final AppenderBase appender;
 
     public NarseseIOService(NAR n) {
         super();
         this.nar = n;
 
         //((ch.qos.logback.classic.Logger)NAR.logger)
-        $.LOG.addAppender(appender = new AppenderBase() {
-
-            @Override
-            protected void append(Object eventObject) {
-                if (((ILoggingEvent)eventObject).getLevel().isGreaterOrEqual(Level.INFO))
-                    output.accept(Command.logTask($.quote(((ILoggingEvent) eventObject).getLoggerName() + ", " + eventObject.toString())));
-
-            }
-        });
-
-        appender.start();
+//        $.LOG.addAppender(appender = new AppenderBase() {
+//
+//            @Override
+//            protected void append(Object eventObject) {
+//                if (((ILoggingEvent)eventObject).getLevel().isGreaterOrEqual(Level.INFO))
+//                    output.accept(Command.logTask($.quote(((ILoggingEvent) eventObject).getLoggerName() + ", " + eventObject.toString())));
+//
+//            }
+//        });
+//
+//        appender.start();
 
         output = new LeakOut(n, 16, 1f) {
             @Override protected float send(Task task) {

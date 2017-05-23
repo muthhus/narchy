@@ -26,7 +26,7 @@ public class NTMSequenceLearningTest {
     }
 
 
-    public static class RunSequenceLearner extends SequenceLearner {
+    static class RunSequenceLearner extends SequenceLearner {
 
         /** print every frame in all sequences, in the order they are trained */
         boolean printSequences;

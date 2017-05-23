@@ -33,6 +33,12 @@ public class Pri implements Priority {
     }
 
     @Override
+    public boolean isDeleted() {
+        float p = pri;
+        return p!=p; //fast NaN check
+    }
+
+    @Override
     public final @NotNull Priority priority() {
         return this;
     }

@@ -196,7 +196,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                 V p = map.get(i); //probed value 'p'
 
-                if (p != null && equals(key(p), k)) { //existing, should only occurr at most ONCE in this loop
+                if (p != null && k.equals(key(p))) { //existing, should only occurr at most ONCE in this loop
                     switch (mode) {
 
                         case GET:
@@ -326,13 +326,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     protected boolean replace(float incoming, float existing) {
         return hijackSoftmax(incoming, existing, random());
-    }
-
-    /**
-     * can override in subclasses for custom equality test
-     */
-    protected boolean equals(K known, Object incoming) {
-        return incoming.equals(known);
     }
 
     @Nullable

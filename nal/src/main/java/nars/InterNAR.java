@@ -47,7 +47,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                         if (x!=null) {
                             @Nullable byte[] msg = IO.taskToBytes(x);
                             if (msg != null) {
-                                if (tell(msg, ttl(x), true) > 0) {
+                                if (tellSome(msg, ttl(x), true) > 0) {
                                     return 1;
                                 }
                             }
@@ -76,7 +76,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     }
 
     @Override
-    public synchronized boolean stop() {
+    public boolean stop() {
         if (super.stop()) {
             out.stop();
             return true;
