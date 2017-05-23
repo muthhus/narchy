@@ -140,7 +140,7 @@ abstract public class NAgentX extends NAgent {
 
     public static void chart(NAgentX a) {
         NAR nar = a.nar;
-        a.nar.runLater(() -> {
+        //a.nar.runLater(() -> {
             window( grid(
 
                 grid(
@@ -211,7 +211,7 @@ abstract public class NAgentX extends NAgent {
                             Vis.conceptsWindow3D(nar,128, 4) )
                 )
             ), 900, 600);
-        });
+       // });
     }
 
     public static void chart(NAgent a) {

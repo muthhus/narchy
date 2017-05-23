@@ -28,7 +28,7 @@ public class FZero extends NAgentX {
     public static void main(String[] args) throws Narsese.NarseseException {
 
         float fps = 10f;
-        Time clock = new RealTime.DSHalf(true).durFPS(fps/4f);
+        Time clock = new RealTime.DSHalf(true).durFPS(fps);
 
 //        Default n = NARBuilder.newMultiThreadNAR(
 //                4,
@@ -42,7 +42,6 @@ public class FZero extends NAgentX {
         n.DEFAULT_QUEST_PRIORITY = 0.25f;
         n.addNAR(1024);
         n.addNAR(512);
-        n.addNAR(256);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 16);
         MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 16);
 

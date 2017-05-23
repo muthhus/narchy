@@ -54,14 +54,6 @@ public class GoalActionConcept extends ActionConcept {
     public Task apply(NAR nar) {
 
 
-//        Truth tdb, tdg;
-//        if (Param.ACTION_CONCEPT_LINK_TRUTH) {
-//            Truth[] td = linkTruth(now, now, nar.confMin.floatValue());
-//            tdb = td[0]; //NOT NECESSARY, SHOULD ONLY RELY ON THE FEEDBACK THIS ACTIONCONCEPT GENERATES ITSELF
-//            tdg = td[1];
-//        } else {
-//            tdb = tdg = null;
-//        }
         int dur = nar.dur();
         long now = nar.time();
 

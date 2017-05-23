@@ -264,6 +264,12 @@ abstract public class NAgent implements NSense, NAct {
 
     protected void predict() {
         predict.input(predictions(now), nar::input);
+
+        if (sensors.size() > 0) {
+            actions.forEach(a ->
+                    predict.input(quest($.parallel(randomSensor(), a), now + nar.dur()), nar::input)
+            );
+        }
     }
 
     /** provides the stream of the environment's next sensory percept tasks */
@@ -392,8 +398,8 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-                    //question(seq(action, dur, happiness), now),
-                    //question(seq(neg(action), dur, happiness), now),
+                    question(impl(action, dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now),
 
                     question(seq(action, dur, happiness), now),
                     question(seq(neg(action), dur, happiness), now),

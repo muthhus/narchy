@@ -40,10 +40,11 @@ public class Mix<K, P extends Prioritized>  {
             return x;
         }
 
-//        public final void input(P x, Consumer<P> target) {
-//            target.accept(apply(x));
-//        }
+
         public final void input(Stream<P> x, Consumer<Stream<P>> target) {
+            target.accept(apply(x));
+        }
+        public final void input(P x, Consumer<P> target) {
             target.accept(apply(x));
         }
 
