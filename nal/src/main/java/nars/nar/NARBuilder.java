@@ -210,16 +210,11 @@ public interface NARBuilder {
 
         nar.deriver.rate.setValue(30 * threads);
 
-        nar.termVolumeMax.setValue(72);
 
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
 
-        float p = 1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+
 
         nar.focus.activationRate.setValue(
                 1f
@@ -230,7 +225,12 @@ public interface NARBuilder {
 
         nar.confMin.setValue(0.01f);
         nar.truthResolution.setValue(0.01f);
-
+        float p = 1f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+        nar.termVolumeMax.setValue(72);
 
         //NARTune tune = new NARTune(nar);
 

@@ -94,7 +94,6 @@ public class Arkancide extends NAgentX {
         };
 
 
-        Param.DEBUG = true;
 
 
         maxPaddleSpeed = 10 * noid.BALL_VELOCITY;
@@ -139,15 +138,8 @@ public class Arkancide extends NAgentX {
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
         Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
-        actionBipolar(paddleControl, (v) -> {
-
-            float dx = paddleSpeed.floatValue() * maxPaddleSpeed *
-                    v;
-            //Util.sigmoidSymmetric(v, 6);
-
-            noid.paddle.move(dx);
-            //System.out.println(v + " "  + dx + " -> " + noid.paddle.x);
-            return true;
+        actionUnipolarTransfer(paddleControl, (v) -> {
+            return noid.paddle.moveTo(v, maxPaddleSpeed*2);
         });
 
 //        Param.DEBUG = true;

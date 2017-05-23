@@ -125,14 +125,14 @@ public class Line1D {
 
         //n.log();
 
-        n.time.dur(4);
-        //n.deriver.rate.setValue(1f);
+        n.time.dur(16);
+        n.deriver.rate.setValue(10f);
 
-        n.termVolumeMax.setValue(16);
+        n.termVolumeMax.setValue(24);
         n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 1f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        n.DEFAULT_QUEST_PRIORITY = 0.1f;
+        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
 
         Line1DSimplest a = new Line1DSimplest(n);
         //Line1DTrainer trainer = new Line1DTrainer(a);

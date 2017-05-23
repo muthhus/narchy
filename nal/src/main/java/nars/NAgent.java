@@ -216,7 +216,6 @@ abstract public class NAgent implements NSense, NAct {
     final AtomicBoolean busy = new AtomicBoolean(false);
 
 
-    /** predict() is not called here, do that separately, probably at a higher framerate than the sensorimotor loop */
     protected void senseAndMotor() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
@@ -520,8 +519,10 @@ abstract public class NAgent implements NSense, NAct {
 
         NARLoop loop = nar.startFPS(fps);
 
-        this.senseAndMotorLoop = nar.exe.loop(fps, this::senseAndMotor);
-        this.predictLoop = nar.exe.loop(fps/2f, this::predict);
+        this.senseAndMotorLoop = nar.exe.loop(fps,()->{
+            senseAndMotor();
+            predict();
+        });
 
         return loop;
     }
@@ -651,7 +652,9 @@ abstract public class NAgent implements NSense, NAct {
 
         term = nar.terms.normalize(term);
 
-        return new NALTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
+        NALTask t = new NALTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
+        t.setPri(nar.priorityDefault(punct));
+        return t;
     }
 
     public final float alpha() {

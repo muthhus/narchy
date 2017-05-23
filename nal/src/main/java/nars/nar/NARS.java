@@ -3,12 +3,14 @@ package nars.nar;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.event.On;
+import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.CompoundFocus;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -30,12 +32,12 @@ import java.util.function.Consumer;
 
 /**
  * recursive cluster of NAR's
-<sseehh> any hierarchy can be defined including nars within nars within nars
-<sseehh> each nar runs in its own thread
-<sseehh> they share concepts
-<sseehh> but not the importance of concepts
-<sseehh> each one has its own concept attention
-<sseehh> link attention is currently shared but ill consider if this needs changing
+ * <sseehh> any hierarchy can be defined including nars within nars within nars
+ * <sseehh> each nar runs in its own thread
+ * <sseehh> they share concepts
+ * <sseehh> but not the importance of concepts
+ * <sseehh> each one has its own concept attention
+ * <sseehh> link attention is currently shared but ill consider if this needs changing
  */
 public class NARS extends NAR {
 
@@ -66,7 +68,8 @@ public class NARS extends NAR {
         }
     }
 
-    @FunctionalInterface  public interface NARSSupplier {
+    @FunctionalInterface
+    public interface NARSSupplier {
         NAR build(Time time, TermIndex terms, Random rng);
     }
 
@@ -80,17 +83,19 @@ public class NARS extends NAR {
         }
     }
 
-    /** default implementation convenience method */
+    /**
+     * default implementation convenience method
+     */
     public void addNAR(int concepts) {
         addNAR((time, terms, rng) ->
-            new Default(concepts, rng, terms, time, new SubExecutor(1024))
+                new Default(concepts, rng, terms, time, new SubExecutor(1024))
         );
     }
 
     class SubExecutor extends BufferedSynchronousExecutor {
         public SubExecutor(int inputQueueCapacity) {
             super(
-                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
+                    new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
             );
         }
 
@@ -101,39 +106,40 @@ public class NARS extends NAR {
     }
 
 
-
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(time, new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e), rng, e);
+        super(time,
+                new HijackTermIndex(new DefaultConceptBuilder(), 512 * 1024, 3),
+                //new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, e),
+                rng, e);
     }
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
         this(time, rng,
-            new MultiThreadExecutor(0, passiveThreads) {
-            //new SynchronousExecutor() {
+                new MultiThreadExecutor(0, passiveThreads) {
+                    //new SynchronousExecutor() {
 
-                @Override
-                public void run(@NotNull Consumer<NAR> r) {
-                    //NARS.this.run(r);
+                    @Override
+                    public void run(@NotNull Consumer<NAR> r) {
+                        //NARS.this.run(r);
 
-                    List<NAR> subs = ((NARS) nar).sub;
-                    int which = nar.random().nextInt(subs.size());
-                    subs.get(which).exe.run(r);
+                        List<NAR> subs = ((NARS) nar).sub;
+                        int which = nar.random().nextInt(subs.size());
+                        subs.get(which).exe.run(r);
 
-                    //runLater(()->r.accept(nar));
-                }
+                        //runLater(()->r.accept(nar));
+                    }
 
-                @Override
-                public boolean run(@NotNull ITask t) {
-                    throw new UnsupportedOperationException("should be intercepted by class NARS");
-                }
+                    @Override
+                    public boolean run(@NotNull ITask t) {
+                        throw new UnsupportedOperationException("should be intercepted by class NARS");
+                    }
 
-                @Override
-                public boolean concurrent() {
-                    return true;
-                }
-            });
+                    @Override
+                    public boolean concurrent() {
+                        return true;
+                    }
+                });
     }
-
 
 
     public boolean running() {
@@ -214,7 +220,7 @@ public class NARS extends NAR {
         n.stop();
     }
 
-    public TreeMap<String,Object> stats() {
+    public TreeMap<String, Object> stats() {
         synchronized (terms) {
             TreeMap<String, Object> m = new TreeMap();
 

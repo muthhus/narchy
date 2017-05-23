@@ -65,11 +65,12 @@ public class GoalActionConcept extends ActionConcept {
             //inject curiosity
 
             float curiConf =
-                    //nar.confDefault(GOAL);
-                    nar.confMin.floatValue() * 5f;
+                    nar.confDefault(GOAL)/2f;
+                    //nar.confMin.floatValue() * 5f;
 
-            float cc = curiConf;
-                    //curiConf - (goal != null ? goal.conf() : 0);
+            float cc =
+                    //curiConf;
+                    curiConf - (goal != null ? goal.conf() : 0);
             if (cc > 0) {
 
                 float nextCurious =

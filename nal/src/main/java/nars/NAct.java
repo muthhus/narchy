@@ -7,6 +7,7 @@ import nars.concept.GoalActionConcept;
 import nars.term.Compound;
 import nars.time.Tense;
 import nars.truth.Truth;
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
@@ -318,6 +319,21 @@ public interface NAct {
                 }
             }
             return null;
+        });
+    }
+
+    @NotNull
+    default ActionConcept actionUnipolarTransfer(@NotNull Compound s, @NotNull FloatToFloatFunction update) {
+        return action(s, (b, d) -> {
+            if (d != null) {
+                float conf = d.conf();
+                float f = d.freq();
+                f = Util.unitize(update.valueOf(f));
+                if (f == f) {
+                    return $.t(f, conf);
+                }
+            }
+            return b;
         });
     }
 

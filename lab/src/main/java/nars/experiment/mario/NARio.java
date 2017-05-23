@@ -154,7 +154,8 @@ public class NARio extends NAgentX {
         lastCoins = coins;
 
         float vx = this.vx.asFloat();
-        if (vx > 0.5f /* in range 0..1.0 */)
+
+        if (vx > 0.6f /* in range 0..1.0 */)
             reward += MoveRight.floatValue();
 
         reward -= Depress.floatValue();
@@ -208,7 +209,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 20);
+        }, 10);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

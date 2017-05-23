@@ -4,6 +4,7 @@ import jcog.bag.Bag;
 import jcog.bag.util.Bagregate;
 import jcog.data.FloatParam;
 import jcog.event.On;
+import jcog.random.XorShift128PlusRandom;
 import nars.concept.Concept;
 import nars.gui.BagChart;
 import nars.gui.HistogramChart;
@@ -11,6 +12,8 @@ import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.nar.NARS;
+import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Time;
@@ -29,6 +32,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
@@ -96,8 +101,26 @@ abstract public class NAgentX extends NAgent {
         Time clock = new RealTime.
                 DSHalf(true)
                 .durFPS(fps);
-        Default nar =
-                NARBuilder.newMultiThreadNAR(1, clock, true);
+//        Default nar =
+//                NARBuilder.newMultiThreadNAR(1, clock, true);
+        NARS nar = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        nar.confMin.setValue(0.02f);
+        nar.truthResolution.setValue(0.02f);
+        float p = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
+        nar.termVolumeMax.setValue(48);
+
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, false, 16);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
+
+
+        int threads = 3;
+        for (int i = 0; i < threads; i++) {
+            nar.addNAR(512);
+        }
 
         //NAR nar = newNAR();
         //NAR nar = newAlann(durFrames/fps);
