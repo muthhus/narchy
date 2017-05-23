@@ -7,9 +7,7 @@ import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
 import nars.concept.SensorConcept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.index.term.map.CaffeineIndex;
 import nars.nar.NARS;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
@@ -18,8 +16,6 @@ import nars.truth.Truth;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
 import spacegraph.widget.meter.MatrixView;
-
-import java.util.concurrent.ForkJoinPool;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;

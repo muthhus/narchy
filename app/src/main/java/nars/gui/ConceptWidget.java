@@ -3,11 +3,9 @@ package nars.gui;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.Deletes;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import nars.$;
 import nars.Task;
 import nars.budget.PLinkUntilDeleted;
@@ -28,7 +26,6 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
-import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static jcog.Util.or;

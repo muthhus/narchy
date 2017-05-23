@@ -5,8 +5,6 @@ import jcog.math.FloatNormalized;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.SensorConcept;
-import nars.nar.Default;
-import nars.nar.NARBuilder;
 import nars.nar.NARS;
 import nars.op.stm.MySTMClustered;
 import nars.term.atom.Atomic;

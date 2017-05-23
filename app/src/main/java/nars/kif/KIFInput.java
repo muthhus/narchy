@@ -16,18 +16,12 @@
  */
 package nars.kif;
 
-import nars.*;
-import nars.derive.TrieDeriver;
-import nars.derive.rule.PremiseRule;
-import nars.derive.rule.PremiseRuleSet;
-import nars.nar.Default;
-import nars.nar.Terminal;
-import nars.premise.Derivation;
-import nars.premise.PreferSimpleAndPolarized;
-import nars.premise.Premise;
+import nars.$;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.subst.MapSubst;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.set.MutableSet;

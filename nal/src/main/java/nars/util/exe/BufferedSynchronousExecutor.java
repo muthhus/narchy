@@ -4,7 +4,10 @@ import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Queue;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates
@@ -67,7 +70,10 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
     @Override
     public boolean run(@NotNull ITask input) {
-        return q.offer(input);
+//        if (input.pri() >= Priority.EPSILON)
+            return q.offer(input);
+//        else
+//            return true;
     }
 
 }

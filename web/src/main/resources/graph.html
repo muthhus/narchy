@@ -76,7 +76,7 @@
     b.position.y = 350;
 
 
-    const g = s.addGraph(new LFUGraph(3));
+    const g = s.addGraph(new LFUGraph(16,10));
 //    try {
 //        g.node('x' + Math.random(), true);
 //        g.node('x' + Math.random(), true);
@@ -97,10 +97,11 @@
     setInterval(()=>{
         g.node('x' + (i++), true);
         if (i > 1) {
-            g.edge('x' + (i-1), 'x' + (i), 'e' + i);
-            g.edge('x0', 'x' + (i), 'e' + i);
+            const prev = 'x' + (i-1);
+            const next = 'x' + (i);
+            g.edge(prev, next, {id: 'e' + i });
         }
-    }, 1000);
+    }, 100);
 
 
 

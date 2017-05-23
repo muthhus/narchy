@@ -76,7 +76,7 @@ class LFU extends Map {
 
         var now = Date.now();
 
-        while (this.size+1 > this.cap) {
+        while (this.size + 1 > this.cap) {
             if (this.halflife && now - this.lastDecay >= this.halflife) {
                 this.decay(now);
             }
@@ -133,7 +133,6 @@ class LFU extends Map {
             const victim = this.remove(least);
             if (victim) {
                 this.evicted(least, victim);
-                return;
             }
         } else {
             throw new Error("Cannot find an element to evict - please report issue");
@@ -192,11 +191,10 @@ class Node {
 }
 
 
-
 class LFUGraph extends LFU {
 
-    constructor(maxNodes) {
-        super(maxNodes);
+    constructor(maxNodes, halflife) {
+        super(maxNodes, halflife);
     }
 
     node(nid, createIfMissing) {
@@ -211,52 +209,68 @@ class LFUGraph extends LFU {
     }
 
     nodeIfPresent(nodeID) {
-        return this.entry(nodeID, false);
+        return this.get(nodeID);
     }
 
     evicted(nid, n) {
         super.evicted(nid, n);
 
+        for (var tgtNode of n.o.keys()) {
+            //tgtNode = tgtNode.data;
+            //console.log('evict', nid, n, tgtNode);
+            tgtNode = this.get(tgtNode);
+
+                const e = tgtNode.i.remove(nid);
+                if (e)
+                    this.edgeRemoved(n, tgtNode, e);
+
+        }
+
+        for (var srcNode of n.i.keys()) {
+            //srcNode = srcNode.data;
+            //console.log('evict', nid, n, this.get(srcNode));
+            srcNode = this.get(srcNode);
+
+                const e = srcNode.o.remove(nid);
+                if (e)
+                    this.edgeRemoved(srcNode, n, e);
+
+        }
+
         this.nodeRemoved(nid, n);
 
-        for (const tgt of n.o.keys()) {
-            const tgtNode = this.get(tgt);
-            if (tgtNode) { //not sure why if ever this would return null
-                const e = tgtNode.i.remove(nid);
-                this.edgeRemoved(nid, tgt, e);
-            }
-        }
         delete n.o;
-        for (const src of n.i.keys()) {
-            const srcNode = this.get(src);
-            if (srcNode) { //not sure why if ever this would return null
-                const e = srcNode.o.remove(nid);
-                this.edgeRemoved(src, nid, e);
-            }
-        }
         delete n.i;
 
 
     }
 
-    nodeAdded(nid, n) { }
-    nodeRemoved(nid, n) { }
-    edgeAdded(srcID, tgtID, e) { }
-    edgeRemoved(srcID, tgtID, e) { }
+    nodeAdded(nid, n) {
+    }
+
+    nodeRemoved(nid, n) {
+    }
+
+    edgeAdded(src, tgt, e) {
+    }
+
+    edgeRemoved(src, tgt, e) {
+    }
 
     edge(src, tgt, edgeSupplier) {
         if (src == tgt)
             return null; //no self-loop
 
-        if (edgeSupplier === null) {
+        if (!edgeSupplier) {
             //TODO handle delete this way
+            throw new Error("edge delete not impl yet");
         }
 
         const T = this.node(tgt, edgeSupplier);
         if (!T)
             return null;
 
-        const S = this.node(src, edgeSupplier /* if edgeSupplier provided, create a node if missing */);
+        const S = this.node(src, edgeSupplier);
         if (!S)
             return null;
 
@@ -264,10 +278,10 @@ class LFUGraph extends LFU {
         if (ST) {
             return ST;
         } else if (edgeSupplier && S.o && T.i) {
-            const newST = (typeof edgeSupplier === "function") ?  edgeSupplier() : edgeSupplier;
+            const newST = (typeof edgeSupplier === "function") ? edgeSupplier() : edgeSupplier;
             S.o.set(tgt, newST);
             T.i.set(src, newST);
-            this.edgeAdded(src, tgt, newST);
+            this.edgeAdded(S, T, newST);
             return newST;
         } else {
             return null;
@@ -303,18 +317,17 @@ class LFUGraph extends LFU {
     }
 
     edgeList() {
-        var x =  [ ];
+        var x = [];
         this.forEachEdge((vid, v, eid, e) => {
-            x.push( [vid, eid ] );
+            x.push([vid, eid]);
         });
         return x;
     }
 
 
-
 }
 
-(function(exports){
+(function (exports) {
 
     exports.LFUGraph = LFUGraph;
 

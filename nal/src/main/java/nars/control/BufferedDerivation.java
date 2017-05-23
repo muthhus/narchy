@@ -3,13 +3,10 @@ package nars.control;
 import nars.premise.Derivation;
 import nars.task.DerivedTask;
 import nars.task.ITask;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.BiFunction;
 
 public final class BufferedDerivation extends Derivation implements BiFunction<ITask, ITask, ITask> {

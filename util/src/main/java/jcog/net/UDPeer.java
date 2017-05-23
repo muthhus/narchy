@@ -41,8 +41,6 @@ import static jcog.net.UDPeer.Command.*;
  */
 public class UDPeer extends UDP {
 
-
-
     static {
         System.setProperty("java.net.preferIPv6Addresses", "true");
     }
@@ -56,12 +54,15 @@ public class UDPeer extends UDP {
     public final Bag<Integer, UDProfile> them;
     public final PLinkHijackBag<Msg> seen;
 
-
-    //TODO use a 128+ bit identifier. ethereumj uses 512bits
+    /**
+     * TODO use a variable size identifier, 32+ bit. ethereumj uses 512bits.
+     * smaller id's will work better for closed networks with a known population
+     */
     public final int me;
     static final int UNKNOWN_ID = Integer.MIN_VALUE;
 
-    private static final FloatParam SHARE_PEER_NEEDS = new FloatParam(0.5f);
+    /** rate of sharing peer needs */
+    private static final FloatParam empathy = new FloatParam(0.5f);
 
     private static final byte DEFAULT_PING_TTL = 2;
     private static final byte DEFAULT_ATTN_TTL = DEFAULT_PING_TTL;
@@ -301,7 +302,7 @@ public class UDPeer extends UDP {
                                 break;
                             case "N":
                                 you.need = h;
-                                need(h, SHARE_PEER_NEEDS.floatValue());
+                                need(h, empathy.floatValue());
                                 break;
                             default:
                                 return;
