@@ -241,7 +241,6 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0 /* shifted to present */)
                 .mustNotOutput(cycles, "(S)", GOAL, 0f, 0.5f, 0f, 1f, 0)
                 .mustNotOutput(cycles, "(S)", GOAL, 0, 0.5f, 0f, 1f, -5)
-                .mustNotOutput(cycles, "(R)", GOAL, 0)
         ;
     }
 
@@ -582,6 +581,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void temporal_goal_detachment_3_valid()  {
         test()
+                .log()
                 .input("(use)! :|:")
                 .inputAt(2, "( (hold) &&+5 (use) ).") //should be decomposed by the goal task
                 .mustDesire(cycles, "(hold)", 1f, 0.81f, 0)
@@ -1193,7 +1193,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.04f /*0.45f*/, 13)
+                .mustDesire(cycles, "(out)", 1f, 0.26f /*0.45f*/, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
     }
     @Test public void testPredictiveImplicationTemporalTemporalNeg() {

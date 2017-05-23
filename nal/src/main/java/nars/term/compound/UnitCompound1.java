@@ -110,7 +110,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public boolean impossibleSubTermVolume(int otherTermVolume) {
-        return the.impossibleSubTermVolume(otherTermVolume);
+        return otherTermVolume > the.volume() /* volume() -  size() */;
     }
 
     @Override

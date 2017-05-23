@@ -9,6 +9,7 @@
         //TODO add a conj() guard to fast fail
         //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
+
      ((&&,X,A..+) &&+- Z), Z, time(decomposeTaskComponents) |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
      (Z &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
@@ -30,7 +31,8 @@
      //(&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
      //   (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
 
-     B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B), (Belief:AnonymousAnalogy)
+
+     //B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B), (Belief:AnonymousAnalogy)
                 //,Goal:Deduction
                 //Goal:Goduction)
 

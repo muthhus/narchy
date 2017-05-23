@@ -87,9 +87,11 @@ public class NARS extends NAR {
      * default implementation convenience method
      */
     public void addNAR(int concepts) {
-        addNAR((time, terms, rng) ->
-                new Default(concepts, rng, terms, time, new SubExecutor(1024))
-        );
+        addNAR((time, terms, rng) -> {
+            Default d = new Default(concepts, rng, terms, time, new SubExecutor(2048));
+            d.deriver.rate.setValue(5);
+            return d;
+        });
     }
 
     class SubExecutor extends BufferedSynchronousExecutor {
@@ -108,8 +110,8 @@ public class NARS extends NAR {
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                new HijackTermIndex(new DefaultConceptBuilder(), 512 * 1024, 3),
-                //new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, e),
+                //new HijackTermIndex(new DefaultConceptBuilder(), 512 * 1024, 3),
+                new CaffeineIndex(new DefaultConceptBuilder(), 512 * 1024, e),
                 rng, e);
     }
 

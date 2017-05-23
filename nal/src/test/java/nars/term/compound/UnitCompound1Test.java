@@ -15,8 +15,7 @@ import static junit.framework.TestCase.assertNotSame;
 import static nars.Op.NEG;
 import static nars.Op.PROD;
 import static nars.time.Tense.DTERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 11/16/16.
@@ -83,10 +82,16 @@ public class UnitCompound1Test {
         assertEquals(g.volume(), u.volume());
     }
 
-    @Test public void testRecursiveContains() throws Narsese.NarseseException {
+    @Test
+    public void testRecursiveContains() throws Narsese.NarseseException {
         Term s = $.$("(--,(x))");
         Term p = $.$("((--,(x)) &&+0 (--,(y)))");
         assertTrue(p.contains(s));
         assertTrue(p.containsRecursively(s));
+    }
+
+    @Test
+    public void testImpossibleSubterm() throws Narsese.NarseseException {
+        assertFalse($.$("(--,(x))").impossibleSubTerm($.$("(x)")));
     }
 }
