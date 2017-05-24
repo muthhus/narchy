@@ -90,6 +90,7 @@ public enum $ {
 
     final static Escaper quoteEscaper = Escapers.builder().addEscape('\"', "\\\"").build();
 
+
     @NotNull
     public static Atomic quote(@NotNull Object text) {
         String s = text.toString();

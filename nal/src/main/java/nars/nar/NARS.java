@@ -204,10 +204,8 @@ public class NARS extends NAR {
                 new XorShift128PlusRandom(1), 2);
 
 
-        n.addNAR(512);
-        n.addNAR(512);
-        n.addNAR(128);
-        n.addNAR(128);
+        n.addNAR(2048);
+        n.addNAR(2048);
 
         //n.log();
 

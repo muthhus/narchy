@@ -187,7 +187,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         float p = inPri;
         float pScaled = p * scale;
         if (pScaled >= Priority.EPSILON) {
-            activations.add(new ConceptFire((Concept) c, pScaled));
+            if (c instanceof Concept)
+                activations.add(new ConceptFire((Concept) c, pScaled));
         }
 
         if (pScaled >= Priority.EPSILON) {

@@ -6,10 +6,13 @@ import jcog.data.sorted.SortedArray;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+
+import static nars.Op.COMMAND;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates
@@ -35,7 +38,7 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
      */
     public final FloatParam maxExecutionsPerCycle = new FloatParam(-1);
-    private SortedArray<ITask> sorted;
+    //private SortedArray<ITask> sorted;
 
     public BufferedSynchronousExecutorHijack(int capacity) {
         super();
@@ -77,27 +80,34 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
             return;
 
         try {
-            if (pending.isEmpty())
+            int ps = pending.size();
+            if (ps == 0)
                 return;
 
-            int toExe = maxExecutionsPerCycle.intValue();
-            int ps = pending.size();
-            if (toExe < 0 || toExe > ps) {
-                pending.pop(pending.capacity(), this::actuallyRun); //must visit all (capacity), not just size
-            } else {
-                //sort
-                if (sorted == null || sorted.capacity() != (toExe + 1)) {
-                    sorted = new SortedArray<ITask>(new ITask[toExe + 1]);
-                }
-                pending.pop(pending.capacity(), s -> {
-                    sorted.add(s, Prioritized::oneMinusPri);
-                    if (sorted.size() > toExe)
-                        sorted.removeLast();
-                });
-                assert (sorted.size() == toExe);
-                sorted.forEach(this::actuallyRun);
-            }
+            boolean t = this.trace;
+            if (t)
+                pending.print();
 
+            int toExe = maxExecutionsPerCycle.intValue();
+            if (toExe < 0)
+                toExe = pending.capacity();
+
+            pending.sample(toExe, this::actuallyRun);
+//            } else {
+//                //sort
+//                if (sorted == null || sorted.capacity() != (toExe + 1)) {
+//                    sorted = new SortedArray<ITask>(new ITask[toExe + 1]);
+//                }
+//                pending.sample(pending.capacity(), s -> {
+//                    sorted.add(s, Prioritized::oneMinusPri);
+//                    if (sorted.size() > toExe)
+//                        sorted.removeLast();
+//                });
+//                assert (sorted.size() == toExe);
+//                sorted.forEach(this::actuallyRun);
+//            }
+
+            pending.commit();
 
         } finally {
             busy.set(false);
@@ -110,7 +120,11 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
     @Override
     public boolean run(@NotNull ITask input) {
-        return pending.put(input)!=null;
+        if (input.punc() == COMMAND) {
+            return super.run(input); //commands executed immediately
+        } else {
+            return pending.put(input) != null;
+        }
     }
 
 }

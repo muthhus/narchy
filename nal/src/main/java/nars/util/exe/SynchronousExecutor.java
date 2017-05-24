@@ -1,6 +1,7 @@
 package nars.util.exe;
 
 import nars.NAR;
+import nars.Param;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,14 @@ import java.util.function.Consumer;
  */
 public class SynchronousExecutor extends Executioner {
 
+
+    protected boolean trace;
+
+    @Override
+    public void start(NAR nar) {
+        this.trace = Param.TRACE;
+        super.start(nar);
+    }
 
     @Override
     public int concurrency() {
@@ -41,13 +50,11 @@ public class SynchronousExecutor extends Executioner {
     @Override
     public boolean run(@NotNull ITask input) {
         ITask[] next = input.run(nar);
-        if (next != null) {
-            for (ITask x : next) {
-                if (x == null)
+        if (next != null)
+            for (ITask x : next)
+                if (x == null || !run(x))
                     break;
-                run(x);
-            }
-        }
+
         return true;
     }
 

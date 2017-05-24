@@ -13,15 +13,17 @@ import org.jetbrains.annotations.NotNull;
 public final class AnswerBag extends ArrayBag<Task> {
 
     private final NAR nar;
+    private final Task question;
 
-    public AnswerBag(@NotNull NAR nar) {
+    public AnswerBag(@NotNull NAR nar, Task question) {
         super(PriMerge.max, new SynchronizedHashMap<>(1));
         this.nar = nar;
+        this.question = question;
     }
 
     @Override
     public void onAdded(@NotNull PLink<Task> x) {
         if (Param.ANSWER_REPORTING)
-            Command.log(nar, this.toString() + "  " + x.get().toString());
+            Command.log(nar, question + "  " + x.get().toString());
     }
 }

@@ -17,6 +17,14 @@ import static nars.Op.*;
 public abstract class Param  {
 
 
+    /**
+     * use this for advanced error checking, at the expense of lower performance.
+     * it is enabled for unit tests automatically regardless of the value here.
+     */
+    public static boolean DEBUG;
+    public static boolean TRACE;
+
+
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
      * typically a NAR instance's 'compoundVolumeMax' parameter will be lower than this */
     public static final int COMPOUND_VOLUME_MAX = 127;
@@ -31,6 +39,7 @@ public abstract class Param  {
 
     /** max retries for termpolation to produce a valid task content result during revision */
     public static final int MAX_TERMPOLATE_RETRIES = 2;
+
 
 
     /** determines if an input goal or command operation task executes */
@@ -91,12 +100,6 @@ public abstract class Param  {
 
 
     public static int DEFAULT_NAL_LEVEL = 8;
-
-    /**
-     * use this for advanced error checking, at the expense of lower performance.
-     * it is enabled for unit tests automatically regardless of the value here.
-     */
-    public static boolean DEBUG;
 
 
     /** additional pedantic warnings */

@@ -1179,19 +1179,19 @@ public abstract class TermBuilder {
     }
 
     public Atomic the(Number o) {
-        if (o instanceof Byte) return the(o.intValue());
-        if (o instanceof Short) return the(o.intValue());
-        if (o instanceof Integer) return the(o.intValue());
-
-        if (o instanceof Long) {
-            if (((int) o) == o.longValue())
-                return the(o.intValue()); //use the integer form since it will be IntTerm
-            else
-                return Atomic.the(Long.toString((long) o));
-        }
-
-        if ((o instanceof Float) || (o instanceof Double))
-            return the(o.floatValue());
+//        if (o instanceof Byte) return the(o.intValue());
+//        if (o instanceof Short) return the(o.intValue());
+//        if (o instanceof Integer) return the(o.intValue());
+//
+//        if (o instanceof Long) {
+//            if (((int) o) == o.longValue())
+//                return the(o.intValue());
+//            else
+//                return Atomic.the(Long.toString((long) o));
+//        }
+//
+//        if ((o instanceof Float) || (o instanceof Double))
+//            return the(o.floatValue());
 
         return Atomic.the(o.toString());
     }

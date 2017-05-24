@@ -1,6 +1,7 @@
 package nars.nal.nal1;
 
 import nars.NAR;
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Test;
@@ -71,7 +72,8 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void deduction()  {
 
-        test().believe("<bird --> animal>")
+        test().log().
+                believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
                 .es("bird es un tipo de animal.")
                 .de("bird ist eine art des animal.");*/
@@ -80,8 +82,14 @@ public class NAL1Test extends AbstractNALTest {
                 .mustBelieve(CYCLES, "<robin --> animal>", 0.81f);
     }
 
+//    static {
+//        Param.TRACE = true;
+//    }
+
+
     @Test
     public void abduction()  {
+
 
         //                .believe("<sport --> competition>")
 //                .believe("<chess --> competition>", 0.90f, Global.DEFAULT_JUDGMENT_CONFIDENCE)

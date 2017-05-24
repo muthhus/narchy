@@ -58,10 +58,10 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
     }
 
     public static Task logTask(@NotNull Term content) {
-        return logTask(content, ETERNAL);
+        return logTask(ETERNAL, content);
     }
 
-    static Task logTask(@NotNull Term content, long when) {
+    static Task logTask(long when, @NotNull Term... content) {
         return Command.task(LOG_FUNCTOR, when, content );
     }
 
@@ -69,8 +69,8 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
         return Command.task($.func(func, args), now);
     }
 
-    public static void log(NAR nar, @NotNull String msg) {
-        nar.input( Command.logTask($.quote(msg), nar.time()) );
+    public static void log(NAR nar, @NotNull String... msg) {
+        nar.input( Command.logTask(nar.time(), $.the(msg)) );
     }
 
 

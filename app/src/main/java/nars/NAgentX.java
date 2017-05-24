@@ -12,6 +12,7 @@ import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARS;
+import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.RealTime;
@@ -114,23 +115,17 @@ abstract public class NAgentX extends NAgent {
 
         MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 8);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 8);
+        Inperience inp = new Inperience(nar, 0.05f, 16);
 
         int threads = 3;
         for (int i = 0; i < threads; i++) {
-            nar.addNAR(384);
+            nar.addNAR(2048);
         }
-
-        //NAR nar = newNAR();
-        //NAR nar = newAlann(durFrames/fps);
 
         NAgent a = init.apply(nar);
         //a.trace = true;
 
-        if (a instanceof NAgentX)
-            chart((NAgentX)a);
-        else
-            chart(a);
-
+        chart(a);
 
         a.runRT(fps, endTime);
 
