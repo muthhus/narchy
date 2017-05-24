@@ -10,6 +10,7 @@ import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.test.DeductiveMeshTest;
 import nars.time.RealTime;
@@ -83,16 +84,15 @@ public class NARS extends NAR {
      */
     public void addNAR(int capacity) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(capacity);
+            SubExecutor e = new SubExecutor(capacity, 0.25f);
             Default d = new Default(rng, terms, time, e);
-            e.maxExecutionsPerCycle.setValue(capacity/2);
             return d;
         });
     }
 
      class SubExecutor extends BufferedSynchronousExecutorHijack {
-        public SubExecutor(int inputQueueCapacity) {
-            super( inputQueueCapacity );
+        public SubExecutor(int inputQueueCapacity, float exePct) {
+            super( inputQueueCapacity, exePct );
         }
 
 
@@ -105,15 +105,15 @@ public class NARS extends NAR {
 
         @Override
         public void runLater(@NotNull Runnable r) {
-            exe.runLater(r); //use the common threadpool
+            pool.execute(r); //use the common threadpool
         }
     }
 
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                new HijackTermIndex(new DefaultConceptBuilder(), 256 * 1024, 3),
-                //new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                //new HijackTermIndex(new DefaultConceptBuilder(), 256 * 1024, 3),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
     }
 

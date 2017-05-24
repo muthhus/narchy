@@ -2,13 +2,13 @@ package nars.util.exe;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
-import jcog.data.sorted.SortedArray;
-import jcog.pri.Prioritized;
+import jcog.pri.Pri;
+import nars.$;
 import nars.NAR;
 import nars.task.ITask;
-import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -19,7 +19,22 @@ import static nars.Op.COMMAND;
  */
 public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
-    final PriorityHijackBag<ITask, ITask> pending = new PriorityHijackBag<ITask, ITask>(3) {
+
+
+    /**
+     * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
+     * interpreted as its integer value, although currently it is FloatParam
+     */
+    public final FloatParam exePerCycleMax = new FloatParam(-1);
+
+    /** temporary collection of tasks to remove after sampling */
+    private final List<ITask> toRemove = $.newArrayList();
+
+    /** amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure) */
+    private float forgetEachPri;
+
+    /** active tasks */
+    final PriorityHijackBag<ITask, ITask> active = new PriorityHijackBag<>(4) {
         @Override
         protected final Consumer<ITask> forget(float rate) {
             return null;
@@ -33,16 +48,14 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
         }
     };
 
-
-    /**
-     * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
-     */
-    public final FloatParam maxExecutionsPerCycle = new FloatParam(-1);
-    //private SortedArray<ITask> sorted;
-
     public BufferedSynchronousExecutorHijack(int capacity) {
         super();
-        pending.capacity(capacity);
+        active.capacity(capacity);
+    }
+
+    public BufferedSynchronousExecutorHijack(int capacity, float executedPerCycle) {
+        this(capacity);
+        exePerCycleMax.setValue(Math.ceil(capacity * executedPerCycle));
     }
 
     @Override
@@ -75,24 +88,37 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
     AtomicBoolean busy = new AtomicBoolean(false);
 
+
     private void flush() {
         if (!busy.compareAndSet(false, true))
             return;
 
         try {
-            int ps = pending.size();
+            int ps = active.size();
             if (ps == 0)
                 return;
 
             boolean t = this.trace;
             if (t)
-                pending.print();
+                active.print();
 
-            int toExe = maxExecutionsPerCycle.intValue();
+            int toExe = exePerCycleMax.intValue();
             if (toExe < 0)
-                toExe = pending.capacity();
+                toExe = active.capacity();
 
-            pending.sample(toExe, this::actuallyRun);
+
+            toExe = Math.min(ps, toExe);
+
+            float pAvg = active.depressurize() / toExe;
+            this.forgetEachPri = pAvg > Pri.EPSILON ? pAvg : 0;
+
+            active.sample(toExe, this::actuallyRun);
+
+            if (!toRemove.isEmpty()) {
+                toRemove.forEach(active::remove);
+                toRemove.clear();
+            }
+
 //            } else {
 //                //sort
 //                if (sorted == null || sorted.capacity() != (toExe + 1)) {
@@ -107,23 +133,31 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 //                sorted.forEach(this::actuallyRun);
 //            }
 
-            pending.commit();
 
         } finally {
             busy.set(false);
         }
     }
 
-    protected void actuallyRun(@NotNull ITask input) {
-        super.run(input);
+    private void actuallyRun(ITask x) {
+        try {
+            super.run(x);
+            if (forgetEachPri > 0)
+                x.priSub(forgetEachPri);
+        } catch (Throwable e) {
+            nar.logger.error("{} {}", x, e);
+            toRemove.add(x); //TODO add to a 'bad' bag?
+            x.delete();
+        }
     }
+
 
     @Override
     public boolean run(@NotNull ITask input) {
         if (input.punc() == COMMAND) {
             return super.run(input); //commands executed immediately
         } else {
-            return pending.put(input) != null;
+            return active.put(input) != null;
         }
     }
 

@@ -38,7 +38,7 @@ public class Default extends NAR {
         this(
             new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new BufferedSynchronousExecutorHijack(activeConcepts));
+            new BufferedSynchronousExecutorHijack(activeConcepts, 0.5f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;

@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
@@ -41,7 +42,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     public final int reprobes;
     public transient final AtomicReference<AtomicReferenceArray<V>> map;
 
-    public final DoubleAdder pressure = new DoubleAdder();
+    public final AtomicDouble pressure = new AtomicDouble();
 
     public float mass;
     private float min;
@@ -77,7 +78,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public void pressurize(float f) {
-        pressure.add(f);
+        pressure.addAndGet(f);
     }
 
     public static <Y> void forEach(@NotNull AtomicReferenceArray<Y> map, @NotNull Predicate<Y> accept, @NotNull Consumer<? super Y> e) {
@@ -448,11 +449,15 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
 
+    public float depressurize() {
+        return (float)pressure.getAndSet(0);
+    }
+
     @Override
     @Deprecated
     public Bag<K, V> commit() {
 
-        double p = this.pressure.sumThenReset();
+        float p = depressurize();
         int s = size();
 
         return commit(
