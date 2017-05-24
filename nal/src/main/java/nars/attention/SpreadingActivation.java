@@ -10,6 +10,7 @@ import nars.Task;
 import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.control.ConceptFire;
 import nars.task.ITask;
 import nars.task.TruthPolation;
@@ -43,24 +44,13 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
 
     @NotNull
-    transient protected Concept origin;
+    transient protected TaskConcept origin;
     final MutableFloat linkOverflow = new MutableFloat(0);
 
     /**
      * cached for fast access
      */
     transient int dur;
-
-    /**
-     * priority value of input at input, cached for fast access
-     */
-    transient float inPri;
-
-    /**
-     * cached
-     */
-    transient Term originTerm;
-
 
     /**
      * momentum > 0.5 means parents preserve more of the priority than sharing with children
@@ -88,28 +78,21 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in) {
+    public SpreadingActivation(@NotNull Task in, @NotNull TaskConcept c) {
         super(in, in.priSafe(0));
+        this.origin = c;
     }
 
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        Concept origin = id.concept(nar);
-        if (origin == null)
-            return null;
-
-        this.origin = origin;
-
         this.momentum = nar.momentum.floatValue();
-        spread = activationMapThreadLocal.get();
         dur = nar.dur();
         this.nar = nar;
-        this.inPri = id.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
 
-        this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
+        this.maxDepth = levels(origin);
 
-        this.maxDepth = levels((Compound) originTerm);
+        spread = activationMapThreadLocal.get();
 
         ITask[] a = null;
         try {
@@ -184,7 +167,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     public void value(@NotNull Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        float p = inPri;
+        float p = pri;
         float pScaled = p * scale;
         if (pScaled >= Priority.EPSILON) {
             if (c instanceof Concept)
@@ -341,7 +324,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             termlink(origin, rcptTerm, tlForward, scale);
 
         if (rcpt instanceof Concept && tlReverse > 0)
-            termlink((Concept) rcpt, originTerm, tlReverse, scale);
+            termlink((Concept) rcpt, origin, tlReverse, scale);
 
     }
 

@@ -70,7 +70,7 @@ public class DeductiveChainTest  {
         Param.DEBUG = false;
 
         for (int length = 3; length < 10; length++) {
-            Default n = new Default(1024);
+            Default n = new Default();
             n.nal(6);
             test(n, length, 1000*length, inh);
         }

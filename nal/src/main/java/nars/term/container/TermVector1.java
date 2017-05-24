@@ -7,6 +7,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public boolean equalTerms(@NotNull Term[] c) {
-        return false;
+        return c.length == 1 && sub.equals(c[0]);
     }
 
     @NotNull
@@ -66,6 +67,10 @@ public class TermVector1 implements TermContainer {
         return i == 0 && sub.op() == o;
     }
 
+    @Override
+    public @Nullable boolean subEquals(int i, @NotNull Term x) {
+        return i == 0 && sub.equals(x);
+    }
 
     /** vol and complexity are reported as if they were already part of an enclosing Compound */
     @Override public int volume() {

@@ -27,9 +27,9 @@ public class AppendProtoCompound implements ProtoCompound {
     public final int dt;
 
     @NotNull private Term[] subs = Term.EmptyArray;
-    int size;
 
-    private int hash;
+    int size;
+    int hash;
 
 
 
@@ -74,16 +74,19 @@ public class AppendProtoCompound implements ProtoCompound {
 
     /** safe for use during final build step */
     @Override public Term[] subterms() {
-        if (subs.length == size) {
-            return subs; //dont reallocate it's just fine to share
+        int s = this.size;
+        @NotNull Term[] ss = this.subs;
+        if (ss.length == s) {
+            return ss; //dont reallocate it's just fine to share
         } else {
-            return subs = Arrays.copyOfRange(subs, 0, size);
+            return this.subs = Arrays.copyOfRange(ss, 0, s);
         }
     }
 
     @Override public boolean AND(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
-            if (x == null) break;
+            if (x == null)
+                break;
             if (t.test(x)) return false;
         }
         return true;
@@ -91,7 +94,8 @@ public class AppendProtoCompound implements ProtoCompound {
 
     @Override public boolean OR(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
-            if (x == null) break;
+            if (x == null)
+                break;
             if (t.test(x)) return true;
         }
         return false;
@@ -114,15 +118,14 @@ public class AppendProtoCompound implements ProtoCompound {
     }
 
     public void addAll(@NotNull Term[] u) {
-        for (Term x : u) {
+        for (Term x : u)
             add(x);
-        }
     }
 
     @Override
     public boolean equals(Object obj) {
-        AppendProtoCompound f = (AppendProtoCompound) obj;
-        return f.hash == hash && f.op == op && f.dt == dt && Arrays.equals(subs, f.subs);
+        AppendProtoCompound x = (AppendProtoCompound) obj;
+        return x.hash == hash && x.op == op && x.dt == dt && Util.equalArraysDirect(subs, x.subs);
     }
 
     @Override

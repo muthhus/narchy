@@ -99,7 +99,7 @@ public class DeductiveMeshTest {
 
 
 
-        Default n = new Default(1024);
+        Default n = new Default();
         //n.nal(5);
         n.logBudgetMin(System.out, 0.1f);
 

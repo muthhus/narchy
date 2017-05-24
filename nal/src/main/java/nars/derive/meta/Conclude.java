@@ -256,6 +256,10 @@ public final class Conclude extends AbstractPred<Derivation> {
                                 new DebugDerivedTask( C, punc, truth, d, start, end) :
                                 new DerivedTask( C, punc, truth, d, start, end);
 
+                    if (t.equals(d.task) || t.equals(d.belief)) {
+                        return; //created a duplicate of the task
+                    }
+
                     t.setPri(priority);
 
                     if (Param.DEBUG)

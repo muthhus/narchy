@@ -307,7 +307,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     }
 
     default boolean active(@NotNull V key) {
-        return priSafe(key, -1) >= 0;
+        float x = pri(key);
+        return (x==x);
+        //return priSafe(key, -1) >= 0;
     }
 
     default float priSafeOrZero(@NotNull V key) {

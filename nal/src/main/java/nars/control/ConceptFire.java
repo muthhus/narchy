@@ -48,7 +48,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         @Nullable PLink<Term> termlink = null;
         float taskLinkPri = -1f, termLinkPri = -1f;
 
-        List<PremiseBuilder> premises = $.newArrayList();
+        List<Hypothesis> premises = $.newArrayList();
         //also maybe Set is appropriate here
 
         float taskMargin = 1f/(1+tasklinks.size());
@@ -82,7 +82,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 termLinkPri = Util.clamp(termlinks.normalizeMinMax(termlink.priSafe(0)), termMargin, 1f-termMargin);
             }
 
-            premises.add(new PremiseBuilder(tasklink, termlink));
+            premises.add(new Hypothesis(tasklink, termlink));
 
             ttl -= premiseCost; //failure of premise generation still causes cost
         }

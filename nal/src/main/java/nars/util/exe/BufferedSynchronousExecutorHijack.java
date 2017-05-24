@@ -97,6 +97,11 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
     AtomicBoolean busy = new AtomicBoolean(false);
 
 
+    @Override
+    public void forEach(Consumer<ITask> each) {
+        active.forEachKey(each);
+    }
+
     private void flush() {
         if (!busy.compareAndSet(false, true))
             return;
@@ -153,14 +158,15 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
             //super.run(x);
 
             ITask[] next = x.run(nar);
+
+            if (forgetEachPri > 0)
+                x.priSub(forgetEachPri);
+
             if (next != null)
                 for (ITask y : next)
                     if (y == null || !run(y))
                         break;
 
-
-            if (forgetEachPri > 0 && !((x instanceof NALTask) && (!x.isInput())))
-                x.priSub(forgetEachPri);
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, e.getMessage());
             toRemove.add(x); //TODO add to a 'bad' bag?

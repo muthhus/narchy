@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.pri.PLink;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
@@ -20,11 +21,10 @@ import org.jetbrains.annotations.Nullable;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
+/** precursor and bulider of premises */
+public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
 
-public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
-
-
-    public PremiseBuilder(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink) {
+    public Hypothesis(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink) {
         super(tasklink, termlink, 0);
     }
 
@@ -45,6 +45,7 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
     public ITask[] run(NAR nar) {
 
         PLink<Task> taskLink = getOne();
+
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri)
@@ -64,8 +65,13 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
                     beliefTerm.equals(taskTerm);
                     //Terms.equalAtemporally(task.term(), (beliefTerm));
 
+            boolean reUnified = false;
             if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
-                beliefTerm = unify(taskTerm, (Compound) beliefTerm, nar);
+                Term unified = unify(taskTerm, (Compound) beliefTerm, nar);
+                if (unified!=null) {
+                    beliefTerm = unified;
+                    reUnified = true;
+                }
             }
 
             Concept beliefConcept = nar.concept(beliefTerm);
@@ -97,8 +103,9 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
                         belief = match;
                     }
 
-                    if (task.isQuestOrQuestion() /*&& beliefIsTask*/) {
-                        answer(taskLink, match, nar);
+                    if ((task.isQuestion() && match.isBelief()) || (task.isQuest() && match.isGoal()))  {
+                        if (reUnified || (nar.conceptTerm(match.term()).equals(nar.conceptTerm(taskTerm))))
+                            answer(taskLink, match, nar);
                     }
                 }
             }
@@ -175,20 +182,22 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
     }
 
 
-    /** unify any (and only) query variables
-     * present in the 'a' term with any non-query terms in the 'q' term */
-    @NotNull private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+    /** unify any (and only) query variables which may be present in
+     * the 'a' term with any non-query terms in the 'q' term
+     * returns non-null if unification succeeded and resulted in a transformed 'a' term
+     * */
+    @Nullable private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
         if (q.op() != a.op())
-            return a; //fast-fail: no chance
+            return null; //fast-fail: no chance
 
-        final Compound[] result = { a };
-        new UnifySubst(null, nar, (aa) -> {
+        final Compound[] result = { null };
+        new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
             if (aa instanceof Compound) {
 
                 aa = aa.eval(nar.terms);
 
-                if (!aa.equals(result[0])) {
+                if (!aa.equals(a)) {
                     result[0] = ((Compound) aa);
                     return false; //only this match
                 }

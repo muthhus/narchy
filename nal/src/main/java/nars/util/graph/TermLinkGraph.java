@@ -19,6 +19,7 @@ import java.util.Set;
 /**
  * Generates a graph of a set of Concept's TermLinks. Each TermLink is an edge,
  * and the set of unique Concepts and Terms linked are the vertices.
+ * TODO use guava graph impl
  */
 public class TermLinkGraph extends DirectedPseudograph<Termed, Termed> {
 

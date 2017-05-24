@@ -1,19 +1,14 @@
 package nars.nar;
 
 import jcog.AffinityExecutor;
-import jcog.Util;
 import jcog.event.On;
-import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
-import nars.test.DeductiveMeshTest;
-import nars.time.RealTime;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
@@ -165,7 +160,7 @@ public class NARS extends NAR {
             int num = sub.size();
 
             this.loops = $.newArrayList(num);
-            all(n -> loops.add(new NARLoop(n)));
+            sub.forEach(n -> loops.add(new NARLoop(n)));
 
             //this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
             //this.pool.prestartAllCoreThreads();
@@ -193,34 +188,6 @@ public class NARS extends NAR {
         }
     }
 
-    public void all(Consumer<NAR> n) {
-        sub.forEach(n);
-    }
-
-    public static void main(String[] args) {
-
-        NARS n = new NARS(
-                new RealTime.DSHalf(true),
-                new XorShift128PlusRandom(1), 2);
-
-
-        n.addNAR(2048);
-        n.addNAR(2048);
-
-        //n.log();
-
-        new DeductiveMeshTest(n, 5, 5);
-
-        n.start();
-
-        for (int i = 0; i < 10; i++) {
-            System.out.println(n.stats());
-            Util.sleep(500);
-        }
-
-        n.stop();
-    }
-
     public TreeMap<String, Object> stats() {
         synchronized (terms) {
             TreeMap<String, Object> m = new TreeMap();
@@ -241,5 +208,29 @@ public class NARS extends NAR {
         }
     }
 
+//    public static void main(String[] args) {
+//
+//        NARS n = new NARS(
+//                new RealTime.DSHalf(true),
+//                new XorShift128PlusRandom(1), 2);
+//
+//
+//        n.addNAR(2048);
+//        n.addNAR(2048);
+//
+//        //n.log();
+//
+//        new DeductiveMeshTest(n, 5, 5);
+//
+//        n.start();
+//
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(n.stats());
+//            Util.sleep(500);
+//        }
+//
+//        n.stop();
+//    }
+//
 
 }

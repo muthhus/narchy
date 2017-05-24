@@ -164,7 +164,7 @@ public class PatrickTests extends AbstractNALTest {
         the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
          */
 
-        Default n = new Default(1024);
+        Default n = new Default();
         n.DEFAULT_BELIEF_PRIORITY = 0.01f;
         n.termVolumeMax.setValue(16);
 

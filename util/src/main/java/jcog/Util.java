@@ -191,6 +191,7 @@ public enum Util {
         }
     }
 
+
     public static boolean equalsNullAware(Object obj1, Object obj2) {
         if (obj1 == null) {
             return obj2 == null;
@@ -1585,5 +1586,17 @@ public enum Util {
     }
 
 
+    /** doesnt do null tests */
+    public static boolean equalArraysDirect(Object[] a, Object[] b) {
+        int len = a.length;
+        if (b.length != len)
+            return false;
 
+        for (int i=0; i<len; i++) {
+            if (!a[i].equals(b[i]))
+                return false;
+        }
+
+        return true;
+    }
 }

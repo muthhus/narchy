@@ -143,7 +143,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         if (term && !a.term().equals(b.term()))
             return false;
 
-        return !(punctuation && (a.punc() != b.punc()));
+        return !punctuation || a.punc() == b.punc();
     }
 
 
@@ -952,7 +952,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             }
 
-            return new ITask[] {  new SpreadingActivation(accepted) };
+            return new ITask[] {  new SpreadingActivation(accepted, c) };
 
         } else {
 
