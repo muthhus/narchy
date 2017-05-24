@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class ConceptFire extends UnaryTask<Concept> {
 
-    static final int MISFIRE_COST = 1;
+    //static final int MISFIRE_COST = 1;
     static final int premiseCost = 1;
     static final int linkSampleCost = 1;
 
@@ -40,7 +40,7 @@ public class ConceptFire extends UnaryTask<Concept> {
 
         final Bag<Task, PLink<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
         final Bag<Term, PLink<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
-        //nar.terms.commit(c);
+        nar.terms.commit(c); //index cache update
 
         @Nullable PLink<Task> tasklink = null;
         @Nullable PLink<Term> termlink = null;
@@ -48,6 +48,9 @@ public class ConceptFire extends UnaryTask<Concept> {
 
         List<PremiseBuilder> premises = $.newArrayList();
         //also maybe Set is appropriate here
+
+        float taskMargin = 1f/(1+tasklinks.size());
+        float termMargin = 1f/(1+termlinks.size());
 
         /**
          * this implements a pair of roulette wheel random selectors
@@ -65,7 +68,7 @@ public class ConceptFire extends UnaryTask<Concept> {
                 if (tasklink == null)
                     break;
 
-                taskLinkPri = tasklinks.normalizeMinMax(tasklink.priSafe(0));
+                taskLinkPri = Util.clamp(tasklinks.normalizeMinMax(tasklink.priSafe(0)), taskMargin, 1f-taskMargin);
             }
 
 
@@ -74,7 +77,7 @@ public class ConceptFire extends UnaryTask<Concept> {
                 ttl -= linkSampleCost;
                 if (termlink == null)
                     break;
-                termLinkPri = termlinks.normalizeMinMax(termlink.priSafe(0));
+                termLinkPri = Util.clamp(termlinks.normalizeMinMax(termlink.priSafe(0)), termMargin, 1f-termMargin);
             }
 
             premises.add(new PremiseBuilder(tasklink, termlink));
