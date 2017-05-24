@@ -4,9 +4,17 @@
  */
 package nars.premise;
 
-import jcog.pri.Pri;
+import jcog.Util;
+import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.control.BufferedDerivation;
+import nars.derive.DefaultDeriver;
+import nars.task.BinaryTask;
+import nars.task.ITask;
 import nars.term.Term;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,43 +25,45 @@ import org.jetbrains.annotations.Nullable;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends Pri {
+public class Premise extends BinaryTask<Pair<Task,Term>,Task> {
 
-    //private static final Logger logger = LoggerFactory.getLogger(Premise.class);
-
-    @NotNull
-    public final Task task;
-
-    @NotNull
-    public final Term term;
-
-    @Nullable
-    public final Task belief;
-
-    /*@NotNull
-    public final Termed concept;*/
+    static final ThreadLocal<BufferedDerivation> derivation =
+            ThreadLocal.withInitial(BufferedDerivation::new);
 
     public Premise(@NotNull Task taskLink,
                    @NotNull Term termLink,
                    @Nullable Task belief, float pri) {
-
-        super(pri);
-
-        //this.concept = concept;
-
-        this.task = taskLink;
-
-        if (belief!=null && belief.equals(task))
-            belief = null;
-
-        //use the belief's term and not the termlink because it is more specific if:
-        // a) it contains temporal information that can be used in temporalization
-        // b) a variable in the termlink was matched
-        this.term = (this.belief = belief) != null ? belief.term() : termLink;
-
-        //this.conceptLink = conceptLink;
+        super(Tuples.pair(taskLink, termLink), belief, pri);
+    }
 
 
+    @NotNull
+    public final Term beliefTerm() {
+        Task belief = belief();
+        return (belief != null) ? belief.term() : getOne().getTwo();
+    }
+
+    public final Task belief() {
+        return getTwo();
+    }
+
+    public Task task() {
+        return getOne().getOne();
+    }
+
+    @Override
+    public ITask[] run(NAR n) {
+        BufferedDerivation d = derivation.get();
+
+        d.buffer.clear(); //should be clear but just in case
+
+        d.restartA(n);
+        d.restartB(task());
+        d.restartC(this, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
+
+        DefaultDeriver.the.test(d);
+
+        return d.flush();
     }
 
 
@@ -106,18 +116,13 @@ public class Premise extends Pri {
 
 
 
-    @NotNull
-    public final Term beliefTerm() {
-        return belief == null ? term : belief.term();
-    }
 
 
-
-    @NotNull
-    @Override
-    public String toString() {
-        return task + " | " + term + " | " + (belief != null ? belief : "");
-    }
+//    @NotNull
+//    @Override
+//    public String toString() {
+//        return task + " | " + term + " | " + (belief != null ? belief : "");
+//    }
 
 
 //    /** true if both task and (non-null) belief are temporal events */
@@ -149,26 +154,26 @@ public class Premise extends Pri {
 //        return c.tasklinks().get(task);
 //    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Premise)) return false;
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (!(o instanceof Premise)) return false;
+//
+//        Premise premise = (Premise) o;
+//
+//        if (!task.equals(premise.task)) return false;
+//        if (!term.equals(premise.term)) return false;
+//        return belief != null ? belief.equals(premise.belief) : premise.belief == null;
+//
+//    }
 
-        Premise premise = (Premise) o;
-
-        if (!task.equals(premise.task)) return false;
-        if (!term.equals(premise.term)) return false;
-        return belief != null ? belief.equals(premise.belief) : premise.belief == null;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 1;
-        result = 31 * result + task.hashCode();
-        result = 31 * result + term.hashCode();
-        result = 31 * result + (belief != null ? belief.hashCode() : 0);
-        return result;
-    }
+//    @Override
+//    public int hashCode() {
+//        int result = 1;
+//        result = 31 * result + task.hashCode();
+//        result = 31 * result + term.hashCode();
+//        result = 31 * result + (belief != null ? belief.hashCode() : 0);
+//        return result;
+//    }
 
 }

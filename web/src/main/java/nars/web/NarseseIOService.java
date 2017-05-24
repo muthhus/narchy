@@ -4,7 +4,10 @@ package nars.web;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
 import jcog.byt.DynByteSeq;
-import nars.*;
+import nars.IO;
+import nars.NAR;
+import nars.Narsese;
+import nars.Task;
 import nars.bag.leak.LeakOut;
 import spacegraph.web.WebsocketService;
 

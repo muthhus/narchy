@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.concept.Concept;
+import nars.control.ConceptFire;
 import nars.nar.Default;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
@@ -28,7 +29,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public static final float UPDATE_RATE = 0.5f;
     public final NAR nar;
     public final int maxEdgesPerNodeMin, maxEdgesPerNodeMax;
-    final Bagregate<Concept> bag;
+    final Bagregate<ConceptFire> bag;
     private final int maxNodes;
     public long now;
     public int dur;
@@ -37,7 +38,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 //    }
 
-    public ConceptsSpace(NAR nar, Iterable<PLink<Concept>> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public ConceptsSpace(NAR nar, Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super();
         this.nar = nar;
         this.maxNodes = maxNodes;
@@ -45,17 +46,17 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
         bag = new Bagregate<>(concepts, maxNodes + bufferedNodes, UPDATE_RATE) {
             @Override
-            protected boolean include(Concept x) {
+            protected boolean include(ConceptFire x) {
                 return ConceptsSpace.this.include(x.term());
             }
 
             @Override
-            public void onAdded(PLink<Concept> conceptPLink) {
+            public void onAdded(PLink<ConceptFire> conceptPLink) {
 
             }
 
             @Override
-            public void onRemoved(@NotNull PLink<Concept> value) {
+            public void onRemoved(@NotNull PLink<ConceptFire> value) {
                 widgetRemove(value.get());
             }
         };
@@ -67,7 +68,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     protected void get(Collection<ConceptWidget> displayNext) {
 
         bag.update();
-        bag.forEach(maxNodes, (PLink<Concept> concept) ->
+        bag.forEach(maxNodes, (PLink<ConceptFire> concept) ->
             displayNext.add( widgetGetOrCreate(concept))
             //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
         );
@@ -81,13 +82,13 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //            System.out.println(displayNext.iterator().next());
     }
 
-    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
+    public final HijackMemoize<ConceptFire,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
         ConceptWidget y = new ConceptWidget(c);
-        y.concept = c;
+        y.concept = c.get();
         return y;
     }) {
         @Override
-        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
+        public void onRemoved(@NotNull PLink<Pair<ConceptFire, ConceptWidget>> value) {
             value.get().getTwo()
                     //.hide();
                     .delete(space.dyn);
@@ -98,7 +99,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         return new ConceptWidget.TermEdge(to.getTwo());
     });
 
-    void widgetRemove(Concept concept) {
+    void widgetRemove(ConceptFire concept) {
         @Nullable ConceptWidget cw = widgets.getIfPresent(concept);
         if (cw != null) {
             cw.hide();
@@ -114,13 +115,13 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //    }
 
 
-    ConceptWidget widgetGetOrCreate(PLink<Concept> clink) {
+    ConceptWidget widgetGetOrCreate(PLink<ConceptFire> clink) {
         ConceptWidget cw = widgetGetOrCreate(clink.get());
         cw.pri = clink.priSafe(0);
         return cw;
     }
 
-    ConceptWidget widgetGetOrCreate(Concept concept) {
+    ConceptWidget widgetGetOrCreate(ConceptFire concept) {
         ConceptWidget cw = widgets.apply(concept);
         cw.activate();
         return cw;

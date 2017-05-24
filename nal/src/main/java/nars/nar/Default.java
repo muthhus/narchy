@@ -9,7 +9,6 @@ import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.CycleTime;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
 import org.jetbrains.annotations.NotNull;
@@ -31,14 +30,14 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(1024);
+        this(256);
     }
 
     public Default(int activeConcepts) {
         this(
             new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new BufferedSynchronousExecutorHijack(activeConcepts, 0.5f));
+            new BufferedSynchronousExecutorHijack(activeConcepts, 1f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;

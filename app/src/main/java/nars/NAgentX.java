@@ -1,13 +1,8 @@
 package nars;
 
-import jcog.bag.Bag;
-import jcog.bag.util.Bagregate;
 import jcog.data.FloatParam;
-import jcog.event.On;
 import jcog.random.XorShift128PlusRandom;
-import nars.concept.Concept;
 import nars.gui.BagChart;
-import nars.gui.HistogramChart;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -21,8 +16,8 @@ import nars.truth.Truth;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
-import spacegraph.math.Color3f;
-import spacegraph.widget.meta.ReflectionSurface;
+import spacegraph.layout.Grid;
+import spacegraph.layout.VSplit;
 import spacegraph.widget.meta.WindowButton;
 
 import java.awt.*;
@@ -32,17 +27,19 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static java.util.stream.Collectors.toList;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
+import static spacegraph.layout.Grid.row;
 
 /**
  * Extensions to NAgent interface:
- *
- *      --chart output (spacegraph)
- *      --cameras (Swing and OpenGL)
+ * <p>
+ * --chart output (spacegraph)
+ * --cameras (Swing and OpenGL)
  */
 abstract public class NAgentX extends NAgent {
 
@@ -51,6 +48,7 @@ abstract public class NAgentX extends NAgent {
     public NAgentX(String id, NAR nar) {
         super(id, nar);
     }
+
     public NAgentX(Term id, NAR nar) {
         super(id, nar);
     }
@@ -103,33 +101,87 @@ abstract public class NAgentX extends NAgent {
                 .durFPS(fps);
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
-        NARS nar = new NARS(clock, new XorShift128PlusRandom(1), 2);
-        nar.confMin.setValue(0.01f);
-        nar.truthResolution.setValue(0.01f);
-        float p = 0.5f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
-        nar.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
-        nar.termVolumeMax.setValue(48);
+        NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        n.confMin.setValue(0.01f);
+        n.truthResolution.setValue(0.01f);
+        float p = 0.1f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        n.DEFAULT_GOAL_PRIORITY = 1f * p;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f * p;
+        n.termVolumeMax.setValue(48);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 8);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(nar, 0.05f, 16);
+        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
+        Inperience inp = new Inperience(n, 0.01f, 16);
 
         int threads = 3;
         for (int i = 0; i < threads; i++) {
-            nar.addNAR(2048);
+            n.addNAR(2048);
         }
 
-        NAgent a = init.apply(nar);
+        NAgent a = init.apply(n);
         //a.trace = true;
 
-        chart(a);
 
         a.runRT(fps, endTime);
 
-        return nar;
+        chart(a);
+        chart(n, a);
+
+        return n;
+    }
+
+    private static void chart(NARS n, NAgent a) {
+        window(new NARSView(n, a), 600, 600);
+    }
+
+    public static class NARSView extends VSplit<Surface, Grid<BagChart>> {
+
+
+        public NARSView(NARS n, NAgent a) {
+            super(
+                Vis.reflect(n),
+                row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
+            );
+//                (n.sub.stream().map(c -> {
+//                int capacity = 128;
+//                return new BagChart<ITask>(
+//                        //new Bagregate<>(
+//                                ((BufferedSynchronousExecutorHijack) c.exe).active
+//                          //      ,capacity*2,
+//                            //    0.9f
+//                        //)
+//                        ,capacity) {
+//
+//                    @Override
+//                    public void accept(ITask x, ItemVis<ITask> y) {
+//                        float p = Math.max(x.priSafe(0), Pri.EPSILON);
+//                        float r = 0, g = 0, b = 0;
+//                        int hash = x.hashCode();
+//                        switch (Math.abs(hash) % 3) {
+//                            case 0: r = p/2f; break;
+//                            case 1: g = p/2f; break;
+//                            case 2: b = p/2f; break;
+//                        }
+//                        switch (Math.abs(2837493 ^ hash) % 3) {
+//                            case 0: r += p/2f; break;
+//                            case 1: g += p/2f; break;
+//                            case 2: b += p/2f; break;
+//                        }
+//
+//                        y.update(p, r, g, b);
+//                    }
+//                };
+//            }).collect(toList()))); //, 0.5f);
+            a.onFrame(x -> update());
+        }
+
+        protected void update() {
+//            /*bottom().*/forEach(x -> {
+//                x.update();
+//            });
+        }
     }
 
     //    public static NAR newAlann(int dur) {
@@ -157,44 +209,44 @@ abstract public class NAgentX extends NAgent {
     public static void chart(NAgent a) {
         NAR nar = a.nar;
         a.nar.runLater(() -> {
-            window( grid(
+            window(grid(
 
-                grid(
-                    new WindowButton( "nar", () -> nar ),
-                    new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
-                    //new WindowButton( "focus", nar::focus),
-                    nar instanceof Default ?
-                            grid(
-                                //new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
-                                new WindowButton( "deriverFilter", () -> ((Default)nar).budgeting )
-                            ) : label(nar.getClass()),
+                    grid(
+                            new WindowButton("nar", () -> nar),
+                            new WindowButton("emotion", () -> Vis.emotionPlots(a, 256)),
+                            //new WindowButton( "focus", nar::focus),
+                            nar instanceof Default ?
+                                    grid(
+                                            //new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
+                                            new WindowButton("deriverFilter", () -> ((Default) nar).budgeting)
+                                    ) : label(nar.getClass()),
 
-                    new WindowButton( "mix", () -> {
-                        return new MixBoard(nar, nar.mix);
-                    })
-                ),
+                            new WindowButton("mix", () -> {
+                                return new MixBoard(nar, nar.mix);
+                            })
+                    ),
 
-                grid(
-                    new WindowButton( "log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f)) ),
-                    new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
-                ),
+                    grid(
+                            new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
+                            new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
+                    ),
 
-                grid(
-                    Vis.beliefCharts(16, nar, a.happy),
-                    new WindowButton( "agent", () -> (a) ),
-                    new WindowButton( "action", () -> Vis.beliefCharts(100, a.actions, a.nar ) ),
-                    new WindowButton( "predict", () -> Vis.beliefCharts(100, a.p, a.nar ) ),
-                        //"agentActions",
-                        //"agentPredict",
+                    grid(
+                            Vis.beliefCharts(16, nar, a.happy),
+                            new WindowButton("agent", () -> (a)),
+                            new WindowButton("action", () -> Vis.beliefCharts(100, a.actions, a.nar)),
+                            new WindowButton("predict", () -> Vis.beliefCharts(100, a.p, a.nar)),
+                            //"agentActions",
+                            //"agentPredict",
 
-                    a instanceof NAgentX ?
-                        new WindowButton( "vision", () -> grid(((NAgentX)a).cam.values().stream().map(cs ->
+                            a instanceof NAgentX ?
+                                    new WindowButton("vision", () -> grid(((NAgentX) a).cam.values().stream().map(cs ->
                                             new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
                                             .toArray(Surface[]::new))
                                     ) : grid()
-                ),
+                    ),
 
-                grid(
+                    grid(
 //                    new WindowButton( "conceptBudget",
 //                            ()->{
 //
@@ -220,17 +272,21 @@ abstract public class NAgentX extends NAgent {
 
 //                    new WindowButton( "conceptTreeMap", () -> {
 //
-//                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 128, 0.5f), 128, nar);
+//                        BagChart tc = new Vis.ConceptBagChart(new Bagregate(
+//                                ((NARS)a.nar).sub.stream().flatMap(x ->
+//                                        (((BufferedSynchronousExecutorHijack)(x.exe)).active.stream().map(
+//                                    y -> (y instanceof ConceptFire) ? ((ConceptFire)y) : null
+//                                ).filter(Objects::nonNull)), 128, 0.5f), 128, nar);
 //
 //                        return tc;
-//                    }),
+//                    })
 
                             //"tasks", ()-> taskChart,
 
 //                    new WindowButton( "conceptGraph", ()->
 //                            Vis.conceptsWindow3D(nar,128, 4) )
 
-                )
+                    )
             ), 900, 600);
         });
     }
@@ -307,7 +363,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {
-        return senseCamera(id.toString(), new CameraSensor( id, bc, this ));
+        return senseCamera(id.toString(), new CameraSensor(id, bc, this));
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {

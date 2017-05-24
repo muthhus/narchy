@@ -10,40 +10,41 @@ import spacegraph.math.v3;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * Created by me on 7/20/16.
  */
- public class Layout extends Surface {
+ public class Layout<S extends Surface> extends Surface {
 
-    public List<Surface> children;
+    public List<? extends S> children;
 
     protected boolean clipTouchBounds = true;
 
-    public Layout(Surface... children) {
+    public Layout(S... children) {
         this(Lists.newArrayList(children));
     }
 
-    public Layout(List<Surface> children) {
+    public Layout(List<? extends S> children) {
         set(children);
     }
 
 
     @Override
-    public List<Surface> children() {
+    public List<? extends S> children() {
         return children;
     }
 
-    public final void set(Surface... s) {
+    public final void set(S... s) {
         set(Lists.newArrayList(s));
     }
 
-    public void set(@NotNull List<Surface> next) {
+    public Layout<S> set(@NotNull List<? extends S> next) {
         synchronized (scaleLocal) {
 
             if (!Objects.equals(this.children, next)) {
 
-                List<Surface> existing = this.children;
+                List<? extends S> existing = this.children;
                 if (existing != null) {
                     for (Surface x : existing)
                         if (!next.contains(x)) {
@@ -64,6 +65,7 @@ import java.util.Objects;
                 layout();
             }
         }
+        return this;
     }
 
     private void add(Surface x) {
@@ -163,4 +165,9 @@ import java.util.Objects;
         }
         return false;
     }
+
+    public void forEach(Consumer<S> o) {
+        children.forEach(o::accept);
+    }
+
 }

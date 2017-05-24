@@ -39,7 +39,7 @@ public class NARS extends NAR {
 
     private static final float SYNC_HZ_DEFAULT = 30f;
 
-    final List<NAR> sub = $.newArrayList();
+    public final List<NAR> sub = $.newArrayList();
     private final List<On> observers = $.newArrayList();
     int num;
 
@@ -84,7 +84,7 @@ public class NARS extends NAR {
      */
     public void addNAR(int capacity) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(capacity, 0.25f);
+            SubExecutor e = new SubExecutor(capacity, 0.5f);
             Default d = new Default(rng, terms, time, e);
             return d;
         });

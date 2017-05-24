@@ -162,6 +162,13 @@ abstract public class Derivation extends Unify implements TermContext {
     /** tasklink scope */
     @NotNull public void restartB(@NotNull Task task) {
 
+        if (task.equals(this.task)) {
+            if (this.task!=task) {
+                //merge budgets?
+                this.task.setPri(task);
+            }
+            return;
+        }
 
         this.task = task;
 
@@ -183,15 +190,7 @@ abstract public class Derivation extends Unify implements TermContext {
 
         assert(ttl >= 0);
 
-
-//        if (now()!=0)
-//            throw new RuntimeException("not cleared");
-
-//        if (xy.size()!=3)
-//            System.err.println("WTF");
-
         revert(0);
-//
 
         //remove common variable entries because they will just consume memory if retained as empty
         xy.map.entrySet().removeIf(e -> {
@@ -200,12 +199,6 @@ abstract public class Derivation extends Unify implements TermContext {
             else
                 return false;
         });
-//        if (xy.size()!=0) { //HACK TODO fix
-//            xy.map.clear();
-//            //throw new RuntimeException("not cleared");
-//        }
-        //xy.map.clear();
-
 
         this.concTruth = null;
         this.concPunc = 0;
@@ -223,14 +216,10 @@ abstract public class Derivation extends Unify implements TermContext {
 
         this.versioning.setTTL(ttl);
 
-
         this.premise = p;
 
-
-        assert(this.task!=null); //        if (this.task == null) restart(nar.time(), p.task);
-
-        Task belief;
-        this.belief = belief = p.belief;
+        Task belief = p.belief();
+        this.belief = belief;
         this.beliefTerm = p.beliefTerm();
         if (beliefTerm.op()==NEG) {
             throw new RuntimeException("negated belief term");

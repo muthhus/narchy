@@ -130,10 +130,10 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
 
-        return new ITask[] { new DerivePremise(new Premise(task, beliefTerm, belief,
-            pri
-            //this.pri() * pri
-        )) };
+        return new ITask[] { new Premise(task, beliefTerm, belief,
+            //pri
+            this.pri() * pri
+        ) };
     }
 
 

@@ -10,7 +10,6 @@ import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.concept.Concept;
-import nars.nar.Default;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -46,7 +45,8 @@ import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static spacegraph.layout.Grid.*;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.row;
 
 /**
  * SpaceGraph-based visualization utilities for NAR analysis
@@ -395,7 +395,7 @@ public class Vis {
         }
     }
 
-    public static class ConceptBagChart extends BagChart<Concept> implements Consumer<NAR> {
+    public static class ConceptBagChart extends BagChart<PLink<Concept>> implements Consumer<NAR> {
 
         private final On on;
         long now;
@@ -421,7 +421,7 @@ public class Vis {
         }
 
         @Override
-        public void update(double width, double height, Iterable<PLink<Concept>> children, BiConsumer<PLink<Concept>, ItemVis<PLink<Concept>>> update) {
+        public void update(double width, double height, Iterable<? extends PLink<Concept>> children, BiConsumer<PLink<Concept>, ItemVis<PLink<Concept>>> update) {
             long now = nar.time();
             if (now == this.now)
                 return;
@@ -498,9 +498,13 @@ public class Vis {
         Plot2D plot4;
 
         public EmotionPlot(int plotHistory, NAgent a) {
+            this(plotHistory, a, a.nar);
+        }
+
+        public EmotionPlot(int plotHistory, NAgent a, NAR x) {
             super(Grid.VERTICAL);
 
-            NAR nar = a.nar;
+            NAR nar = x;
 
             this.plotHistory = plotHistory;
             plot1 = new Plot2D(plotHistory, Plot2D.Line);

@@ -19,12 +19,12 @@ public class DebugDerivedTask extends DerivedTask {
 
     @Nullable
     public final Task getParentTask() {
-        return this.premise.task;
+        return this.premise.task();
     }
 
     @Nullable
     public final Task getParentBelief() {
-        return this.premise.belief;
+        return this.premise.belief();
     }
 
 }

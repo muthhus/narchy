@@ -40,13 +40,10 @@ public class TreeChart<X> extends Surface {
 	final Cache<X,ItemVis<X>> cache;
 
 	public TreeChart() {
-		this(0,0, null);
-	}
-
-
-	public TreeChart(double width, double height, BiConsumer<X,ItemVis<X>> apply, X... i ) {
 		cache = Caffeine.newBuilder().maximumSize(1024).build();
 	}
+
+
 
 	@Override
 	protected void paint(GL2 gl) {
@@ -59,12 +56,12 @@ public class TreeChart<X> extends Surface {
 		}
 	}
 
-	public void update(double width, double height, Iterable<X> children, BiConsumer<X, ItemVis<X>> update) {
+	public void update(double width, double height, Iterable<? extends X> children, BiConsumer<X, ItemVis<X>> update) {
 		update(width, height, children, update, i -> new ItemVis<>(i, i.toString()));
 	}
 
 
-	public void update(double width, double height, Iterable<X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
+	public void update(double width, double height, Iterable<? extends X> nextChildren, BiConsumer<X, ItemVis<X>> update, Function<X, ItemVis<X>> itemBuilder) {
 		this.width = width;
 		this.height = height;
 		left = 0.0;
@@ -301,10 +298,7 @@ public class TreeChart<X> extends Surface {
             this.label = label;
         }
 
-        public void update(float weight) {
-            this.area = weight;
-            this.r = -1;
-        }
+
 
     //    public void update(X item, String label, float weight) {
     //        this.item = item;

@@ -1200,7 +1200,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.05f /*0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.35f /*0.81f*/, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 

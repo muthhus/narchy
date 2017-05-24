@@ -2,10 +2,12 @@ package nars.util.exe;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
+import jcog.pri.PForget;
 import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -20,26 +22,32 @@ import static nars.Op.COMMAND;
 public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
 
-
     /**
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
      * interpreted as its integer value, although currently it is FloatParam
      */
     public final FloatParam exePerCycleMax = new FloatParam(-1);
 
-    /** temporary collection of tasks to remove after sampling */
+    /**
+     * temporary collection of tasks to remove after sampling
+     */
     private final List<ITask> toRemove = $.newArrayList();
 
-    /** amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure) */
+    /**
+     * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
+     */
     private float forgetEachPri;
 
-    /** active tasks */
-    final PriorityHijackBag<ITask, ITask> active = new PriorityHijackBag<>(4) {
+    /**
+     * active tasks
+     */
+    public final PriorityHijackBag<ITask, ITask> active = new PriorityHijackBag<>(4) {
         @Override
         protected final Consumer<ITask> forget(float rate) {
             return null;
             //return new PForget(rate);
         }
+
 
         @NotNull
         @Override
@@ -107,9 +115,10 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
                 toExe = active.capacity();
 
 
-            toExe = Math.min(ps, toExe);
+//            toExe = Math.min(ps, toExe);
 
-            float pAvg = active.depressurize() / toExe;
+            float eFrac = ((float)toExe) / ps;
+            float pAvg = (PForget.DEFAULT_TEMP) * active.depressurize(eFrac) / toExe;
             this.forgetEachPri = pAvg > Pri.EPSILON ? pAvg : 0;
 
             active.sample(toExe, this::actuallyRun);
@@ -141,13 +150,20 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
     private void actuallyRun(ITask x) {
         try {
-            super.run(x);
-            if (forgetEachPri > 0)
+            //super.run(x);
+
+            ITask[] next = x.run(nar);
+            if (next != null)
+                for (ITask y : next)
+                    if (y == null || !run(y))
+                        break;
+
+
+            if (forgetEachPri > 0 && !((x instanceof NALTask) && (!x.isInput())))
                 x.priSub(forgetEachPri);
         } catch (Throwable e) {
-            nar.logger.error("{} {}", x, e);
+            NAR.logger.error("{} {}", x, e.getMessage());
             toRemove.add(x); //TODO add to a 'bad' bag?
-            x.delete();
         }
     }
 
@@ -155,7 +171,8 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
     @Override
     public boolean run(@NotNull ITask input) {
         if (input.punc() == COMMAND) {
-            return super.run(input); //commands executed immediately
+            actuallyRun(input); //commands executed immediately
+            return true;
         } else {
             return active.put(input) != null;
         }

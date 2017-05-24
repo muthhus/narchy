@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.IntFunction;
 
 /**
  * {@link SortedList_1x4} is a decorator which decorates {@link List}. Keep in

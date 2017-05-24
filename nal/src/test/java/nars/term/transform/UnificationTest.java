@@ -1,15 +1,13 @@
 package nars.term.transform;
 
 import nars.*;
-import nars.concept.Concept;
 import nars.index.term.PatternTermIndex;
 import nars.nar.Default;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.subst.Unify;
 import nars.test.TestNAR;
-import nars.util.graph.TermLinkGraph;
 import nars.util.signal.RuleTest;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
@@ -28,12 +26,13 @@ import static org.junit.Assert.*;
 public class UnificationTest {
 
     private TestNAR t;
+    final static int cycles = 10;
 
     @Before
     public void start() {
         t = new TestNAR(
-                new Terminal()
-                //new Default() //TODO return to using Terminal as a demo of its minimal functionality
+                //new Terminal()
+                new Default() //TODO return to using Terminal as a demo of its minimal functionality
         );
     }
 
@@ -50,7 +49,7 @@ public class UnificationTest {
         NAR nar = test.nar;
 
 
-        Term t1;
+        Termed t1;
 
         try {
 
@@ -58,17 +57,17 @@ public class UnificationTest {
 
                 //special handling
                 final PatternTermIndex pi = new PatternTermIndex();
-                t1 = pi.get(pi.term(s1), true).term();
+                t1 = pi.get(pi.term(s1), true);
 
             } else {
                 nar.question(s1);
-                t1 = nar.concept(s1).term();
+                t1 = nar.conceptualize(nar.term(s1));
             }
             nar.question(s2);
-            nar.run(2);
+            nar.run(cycles);
 
 
-            Term t2 = nar.concept(s2).term();
+            Termed t2 = nar.concept(s2);
             Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
             Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
 
@@ -81,7 +80,7 @@ public class UnificationTest {
 
             AtomicBoolean subbed = new AtomicBoolean(false);
 
-            final Term finalT = t1;
+            final Termed finalT = t1;
             Unify sub = new Unify($.terms, type,
                     nar.random(), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
@@ -123,7 +122,7 @@ public class UnificationTest {
                     return false;
                 }
             };
-            sub.unifyAll(t1, t2);
+            sub.unifyAll(t1.term(), t2.term());
 
 
             assertEquals(shouldSub, subbed.get());
@@ -878,31 +877,31 @@ public class UnificationTest {
         n.nal(6);
 
         new TestNAR(n)
-                .believe('<' + subj + ' ' + relation + ' ' + pred + '>')
+                .believe('(' + subj + ' ' + relation + ' ' + pred + ')')
                 .believe(belief)
-                .mustBelieve(16, concl, 0.81f);
+                .mustBelieve(4, concl, 0.81f);
         //.next()
         //.run(1).assertTermLinkGraphConnectivity();
 
     }
 
-    @Test
-    public void testIndVarConnectivity() throws Narsese.NarseseException {
-
-        String c = "(<$x --> bird> ==> <$x --> animal>).";
-
-        NAR n = new Default();
-        n.nal(6);
-
-        n.input(c);
-        n.run(1);
-
-        //n.forEachActiveConcept(x -> x.get().print());
-
-        TermLinkGraph g = new TermLinkGraph(n);
-        assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());
-
-    }
+//    @Test
+//    public void testIndVarConnectivity() throws Narsese.NarseseException {
+//
+//        String c = "(<$x --> bird> ==> <$x --> animal>).";
+//
+//        NAR n = new Default();
+//        n.nal(6);
+//
+//        n.input(c);
+//        n.run(1);
+//
+//        //n.forEachActiveConcept(x -> x.get().print());
+//
+//        TermLinkGraph g = new TermLinkGraph(n);
+//        assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());
+//
+//    }
 
     /**
      * this case is unrealistic as far as appearing in rules but it would be nice to get working

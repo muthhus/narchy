@@ -89,10 +89,10 @@ public class NARWeb extends WebServer {
             start(nar, l, nextFPS);
         });
         nar.on("stat", (o, t, n) -> {
-            NARLoop ll = nar.loop;
 
             Map<String,Object> stat = new TreeMap();
-            stat.put("cpu",ll!=null ? ll.toString() : "paused");
+            //NARLoop ll = nar.loop;
+            //stat.put("cpu",ll!=null ? ll.toString() : "paused");
             stat.put("mem", nar.terms.summary());
             stat.put("emo", nar.emotion.summary());
             stat.put("net", net.summary());

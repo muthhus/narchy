@@ -16,7 +16,7 @@ import static jcog.Util.lerp;
     aspect ratio=+inf: col (x)
                  else: grid( %x, %(ratio * x) )
  */
-public class Grid extends Layout {
+public class Grid<S extends Surface> extends Layout<S> {
 
 
     public static final float HORIZONTAL = 0f;
@@ -26,21 +26,21 @@ public class Grid extends Layout {
     float margin = 0.05f;
     float gridAspect = Float.NaN;
 
-    public Grid(Surface... children) {
+    public Grid(S... children) {
         this(SQUARE, children);
     }
 
-    public Grid(List<Surface> children) {
+    public Grid(List<? extends S> children) {
         this(SQUARE, children);
     }
 
-    public Grid(float aspect, Surface... children) {
+    public Grid(float aspect, S... children) {
         super();
         this.gridAspect = (aspect);
         set(children);
     }
 
-    public Grid(float aspect, List<Surface> children) {
+    public Grid(float aspect, List<? extends S> children) {
         super();
         this.gridAspect = (aspect);
         set(children);

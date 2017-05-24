@@ -1,7 +1,5 @@
 package jcog.learn;
 
-import jcog.Util;
-
 /**
  * lowest common denominator reinforcement learning agent interface
  */

@@ -2,13 +2,13 @@ package jcog.bag.util;
 
 import jcog.bag.impl.ArrayBag;
 import jcog.data.FloatParam;
-import jcog.pri.PLink;
 import jcog.pri.PriMerge;
+import jcog.pri.Prioritized;
 import jcog.pri.RawPLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -16,14 +16,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * resulting in containing effectively the integrated / moving average values of the input bag
  * TODO make a PLink version of ArrayBag since quality is not used here
  */
-public class Bagregate<X> extends ArrayBag<X> {
+public class Bagregate<X extends Prioritized> extends ArrayBag<X> {
 
-    private final Iterable<PLink<X>> src;
+    private final Iterable<X> src;
     private final MutableFloat scale;
     final AtomicBoolean busy = new AtomicBoolean();
 
-    public Bagregate(@NotNull Iterable<PLink<X>> src, int capacity, float scale) {
-        super(capacity, PriMerge.avg, new ConcurrentHashMap<>(capacity));
+    public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
+        super(capacity, PriMerge.avg, new HashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);
@@ -36,21 +36,18 @@ public class Bagregate<X> extends ArrayBag<X> {
 
         try {
 
-            commit();
 
             float scale = this.scale.floatValue();
 
-            src.forEach(p -> {
-                X x = p.get();
+            src.forEach(x -> {
                 if (include(x)) {
-                    float pri = p.pri();
+                    float pri = x.pri();
                     if (pri==pri)
                         put(new RawPLink(x, pri), scale, null);
                 }
             });
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+            commit();
+
         } finally {
             busy.set(false);
         }

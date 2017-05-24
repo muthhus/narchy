@@ -155,7 +155,7 @@ public class Surface {
         gl.glPopMatrix();
     }
 
-    public List<Surface> children() {
+    public List<? extends Surface> children() {
         return Collections.emptyList();
     }
 

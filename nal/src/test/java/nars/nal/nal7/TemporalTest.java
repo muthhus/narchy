@@ -1,8 +1,5 @@
 package nars.nal.nal7;
 
-import com.google.common.base.Joiner;
-import jcog.bag.Bag;
-import jcog.pri.PLink;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
@@ -23,7 +20,6 @@ import org.junit.Test;
 
 import java.util.TreeSet;
 
-import static com.google.common.collect.Iterables.size;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.time.Tense.DTERNAL;

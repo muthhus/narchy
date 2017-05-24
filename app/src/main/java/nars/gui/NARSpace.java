@@ -2,7 +2,6 @@ package nars.gui;
 
 import jcog.event.On;
 import jcog.list.FasterList;
-import nars.NAR;
 import nars.term.Term;
 import spacegraph.Active;
 import spacegraph.SpaceGraph;

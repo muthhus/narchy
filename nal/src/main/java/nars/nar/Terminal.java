@@ -4,7 +4,7 @@ import jcog.random.XORShiftRandom;
 import nars.NAR;
 import nars.time.CycleTime;
 import nars.time.Time;
-import nars.util.exe.SynchronousExecutor;
+import nars.util.exe.BufferedSynchronousExecutorHijack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -26,7 +26,7 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(time, new Default.DefaultTermIndex(capacity), random, new SynchronousExecutor());
+        super(time, new Default.DefaultTermIndex(capacity), random, new BufferedSynchronousExecutorHijack(capacity));
     }
 
 }

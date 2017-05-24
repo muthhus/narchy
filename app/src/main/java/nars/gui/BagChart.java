@@ -1,13 +1,8 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
-import jcog.pri.PLink;
-import nars.Narsese;
-import nars.concept.Concept;
-import nars.nar.Default;
+import jcog.pri.Prioritized;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import spacegraph.SpaceGraph;
 import spacegraph.widget.meter.TreeChart;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,17 +11,16 @@ import java.util.function.BiConsumer;
 /**
  * Created by me on 6/29/16.
  */
-public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink<X>, TreeChart.ItemVis<PLink<X>>> {
+abstract public class BagChart<X extends Prioritized> extends TreeChart<X> implements BiConsumer<X, TreeChart.ItemVis<X>> {
 
     final AtomicBoolean busy = new AtomicBoolean(false);
-    private final @NotNull Iterable<PLink<X>> input;
+    public final @NotNull Iterable<? extends X> input;
 
     public void update() {
         if (busy.compareAndSet(false, true)) {
             try {
-                update(1f, 1f, input, this, i -> {
-                    @Nullable X ii = i.get();
-                    return ii != null ? newItem(i) : null;
+                update(1f, 1f, input, this, ii -> {
+                    return ii != null ? newItem(ii) : null;
                 });
             } finally {
                 busy.set(false);
@@ -34,8 +28,8 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
         }
     }
 
-    @NotNull protected ItemVis<PLink<X>> newItem(@NotNull PLink<X> i) {
-        return new ItemVis<>(i, label(i.get(), 24));
+    @NotNull protected ItemVis<X> newItem(@NotNull X i) {
+        return new ItemVis<>(i, label(i, 24));
     }
 
 
@@ -44,7 +38,7 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 //        this(b, -1);
 //    }
 
-    public BagChart(@NotNull Iterable<PLink<X>> b, int limit) {
+    public BagChart(@NotNull Iterable<X> b, int limit) {
         super();
         this.input = b;
         this.limit = limit;
@@ -53,9 +47,10 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
 
     @Override
     protected void paint(GL2 gl) {
-        busy.set(true);
-        super.paint(gl);
-        busy.set(false);
+        if (busy.compareAndSet(false,true)) {
+            super.paint(gl);
+            busy.set(false);
+        }
     }
 
 
@@ -66,9 +61,9 @@ public class BagChart<X> extends TreeChart<PLink<X>> implements BiConsumer<PLink
         return s;
     }
 
-    @Override
-    public void accept(PLink<X> x, ItemVis<PLink<X>> y) {
-        float p = x.pri();
-        y.update(0, p, 0, 1f);
-    }
+//    @Override
+//    public void accept(X x, ItemVis<X> y) {
+//        float p = x.priSafe(0);
+//        y.update(p, p, 0, 1f);
+//    }
 }

@@ -7,13 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.leak.Leak;
 import nars.bag.leak.LeakOut;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
-import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
-import nars.time.RealTime;
-import nars.util.exe.BufferedSynchronousExecutorHijack;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -23,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
 import java.util.function.Consumer;
-
-import static nars.Op.BELIEF;
 
 /**
  * $0.9;0.9;0.99$

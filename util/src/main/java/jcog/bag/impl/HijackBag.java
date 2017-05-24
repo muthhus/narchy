@@ -1,10 +1,12 @@
 package jcog.bag.impl;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
 import jcog.pri.PForget;
+import jcog.pri.Pri;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +15,6 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -448,6 +449,15 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
     }
 
+
+    public float depressurize(float frac) {
+        frac = Util.unitize(frac);
+        float p = depressurize();
+        float pF = frac * p;
+        if (pF > Pri.EPSILON)
+            pressure.addAndGet(p - pF); //restore the unused amount
+        return pF;
+    }
 
     public float depressurize() {
         return (float)pressure.getAndSet(0);

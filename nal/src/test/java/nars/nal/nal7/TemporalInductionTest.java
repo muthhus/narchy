@@ -1,6 +1,5 @@
 package nars.nal.nal7;
 
-import com.google.common.collect.Iterables;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;

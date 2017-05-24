@@ -116,7 +116,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     int level;
 
 
-    public NARLoop loop;
+    protected NARLoop loop;
 
     public final Mix<Object, Task> mix = new Mix();
 

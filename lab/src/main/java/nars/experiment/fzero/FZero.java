@@ -2,19 +2,10 @@ package nars.experiment.fzero;
 
 import jcog.Util;
 import jcog.math.FloatNormalized;
-import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.concept.SensorConcept;
-import nars.nar.NARS;
-import nars.op.stm.MySTMClustered;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
-import nars.time.Time;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 
 /**
  * Created by me on 3/21/17.

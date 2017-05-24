@@ -1346,8 +1346,8 @@ public interface TimeFunctions {
 
 
     public static long occurrenceTarget(Premise p, @NotNull OccurrenceSolver s) {
-        long tOcc = p.task.start();
-        Task b = p.belief;
+        long tOcc = p.task().start();
+        Task b = p.belief();
         if (b == null) {
             return tOcc;
         } else {

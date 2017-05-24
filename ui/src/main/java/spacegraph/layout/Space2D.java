@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 2D space of shapes, which can be managed and interacted with
  */
-public class Space2D extends Layout {
+public class Space2D<S extends Surface> extends Layout<S> {
 
 
     public float repelSpeed = 0.1f;
@@ -23,7 +23,7 @@ public class Space2D extends Layout {
     private final float attractDist = 1f;
 
 
-    public Space2D(List<Surface> content) {
+    public Space2D(List<? extends S> content) {
         super();
         set(content);
     }
@@ -43,12 +43,11 @@ public class Space2D extends Layout {
         float sx = 1f; //scaleLocal.x;// * globalScale.x;
         float sy = 1f; //scaleLocal.y;// * globalScale.y;
 
-        List<Surface> l = children;
+        List<? extends S> l = children;
         int lSize = l.size();
         float lSizeSqrt = (float)Math.sqrt(lSize);
         for (int i = 0; i < lSize; i++) {
-            Surface s = children.get(i);
-            s.scale((sx*0.75f)/lSizeSqrt, (sy*0.75f)/lSizeSqrt);
+            l.get(i).scale((sx*0.75f)/lSizeSqrt, (sy*0.75f)/lSizeSqrt);
         }
 
 

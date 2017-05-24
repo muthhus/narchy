@@ -1,20 +1,10 @@
 package nars.experiment;
 
 import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.Param;
-import nars.experiment.arkanoid.Arkancide;
-import nars.experiment.tetris.Tetris;
 import nars.nar.Default;
-import nars.op.RLBooster;
 import nars.test.agent.Line1DSimplest;
-import spacegraph.widget.meter.MatrixView;
-import spacegraph.widget.meter.MatrixViewRGB;
-
-import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.grid;
 
 public class Line1DQ {
 
