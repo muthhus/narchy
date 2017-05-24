@@ -106,14 +106,14 @@ public class UDPeer extends UDP {
 
             @Override
             public void onAdded(UDProfile p) {
-                logger.debug("{} connect {}", UDPeer.this, p);
-                UDPeer.this.onAddRemove(p, true);
+                logger.debug("connect {}",  p);
+                onAddRemove(p, true);
             }
 
             @Override
             public void onRemoved(@NotNull UDPeer.UDProfile p) {
-                logger.debug("{} disconnect {}", UDPeer.this, p);
-                UDPeer.this.onAddRemove(p, false);
+                logger.debug("disconnect {}", p);
+                onAddRemove(p, false);
             }
 
             @Override
@@ -209,7 +209,10 @@ public class UDPeer extends UDP {
     }
 
     public int tellSome(byte[] msg, int ttl, boolean onlyIfNotSeen) {
-        return tellSome(new Msg(TELL.id, (byte) ttl, me, null, msg), 1f, onlyIfNotSeen);
+        Msg x = new Msg(TELL.id, (byte) ttl, me, null, msg);
+        int y = tellSome(x, 1f, onlyIfNotSeen);
+        seen(x, 1f);
+        return y;
     }
 
     /**
