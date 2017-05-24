@@ -91,6 +91,8 @@ public class SortedArray<E> implements Iterable<E> {
 
 
 
+
+
     /**
      * set the size as a quick way to remove null entries from the end
      */
@@ -137,24 +139,6 @@ public class SortedArray<E> implements Iterable<E> {
 //     */
 //    private final SearchType sortType;
 
-
-    /**
-     * constructor
-     *
-     * @param list     decorated List
-     * @param inverted if true the sorted order will be inverted, the list will be
-     *                 sorted in descending order
-     * @param preSort  if true the the list, which is the parameter in the
-     *                 constructor will be sorted, before it will be decorated
-     */
-    @Deprecated  public static <E> SortedArray<E> get(final IntFunction<E[]> builder) {
-        return new SortedArray<>() {
-            @Override
-            protected E[] newArray(int oldSize) {
-                return builder.apply(grow(oldSize));
-            }
-        };
-    }
 
 
     public SortedArray() {
@@ -208,7 +192,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public void addLinear(E element, int s, FloatFunction<E> cmp) {
         E[] l = this.list;
-        if (l.length > 0) {
+        if (s > 0 && l.length > 0) {
             float elementRank = cmp.floatValueOf(element);
             for (int i = 0; i < s; i++) {
                 final E current = l[i];
@@ -231,7 +215,7 @@ public class SortedArray<E> implements Iterable<E> {
         int s = this.size;
         E[] l = this.list;
         if (l.length == s) {
-            E[] newList = newArray(s);
+            E[] newList = newArray(Math.max(l.length, s));
             System.arraycopy(l, 0, newList, 0, s);
             this.list = l = newList;
         }
@@ -288,6 +272,10 @@ public class SortedArray<E> implements Iterable<E> {
         //throw new UnsupportedOperationException();
         int s = size();
         return (s == 0) ? Collections.emptyIterator() : new ArrayIterator(list, 0, s);
+    }
+
+    public int capacity() {
+        return list.length;
     }
 
 

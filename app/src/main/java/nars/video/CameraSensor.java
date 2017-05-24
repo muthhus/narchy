@@ -1,6 +1,5 @@
 package nars.video;
 
-import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -72,7 +71,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
 
-    private final FloatToObjectFunction<Truth> brightnessTruth = (v) -> $.t(Util.round(v, resolution), conf);
+    private final FloatToObjectFunction<Truth> brightnessTruth = (v) -> $.t(v, conf);
 
     public static Int2Function<Compound> XY(Term root, int width, int height) {
         return (x, y) -> {
@@ -172,10 +171,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        return r;
 //    }
 
-    public CameraSensor setResolution(float resolution) {
+    public CameraSensor resolution(float resolution) {
         this.resolution = resolution;
-//        pixels.forEach(p -> {
-//        });
+        pixels.forEach(p -> p.resolution(resolution));
         return this;
     }
 
@@ -242,7 +240,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                if (y < h-1) s.add( concept(x, y+1) );
 //
 //                return TermVector.the(s);
-            this.templates = new PixelNeighborsManhattanRandom(subterms(), x, y, w, h, 2);
+            this.templates = new PixelNeighborsXYRandom(subterms(), x, y, w, h, 2);
         }
 
         @Override
@@ -300,7 +298,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         }
     }
 
-    private class PixelNeighborsManhattanRandom implements TermContainer {
+    private class PixelNeighborsXYRandom implements TermContainer {
 
         private final int x;
         private final int y;
@@ -309,7 +307,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         private final TermContainer subs;
         private final int extra;
 
-        public PixelNeighborsManhattanRandom(TermContainer subs, int x, int y, int w, int h, int extra) {
+        public PixelNeighborsXYRandom(TermContainer subs, int x, int y, int w, int h, int extra) {
             this.subs = subs;
             this.extra = extra;
             this.x = x;

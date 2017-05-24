@@ -37,7 +37,7 @@ public class Pacman extends NAgentX {
                 senseCamera("(G,c" + cm.name() + ")",
                         camScale.filter(cm)
                 )
-                        .setResolution(0.5f);
+                        .resolution(0.5f);
             }
 
         actionTriState($.inh(Atomic.the("x"), id), (dh) -> {

@@ -10,12 +10,13 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * uses affinity locking to pin new threads to their own unique, stable CPU core/hyperthread etc
  */
-public class AffinityExecutor {
+public class AffinityExecutor implements Executor {
 
     private static final Logger logger = LoggerFactory.getLogger(AffinityExecutor.class);
 
@@ -26,6 +27,14 @@ public class AffinityExecutor {
         this.id = id;
     }
 
+    @Override
+    public final void execute(@NotNull Runnable command) {
+        execute(command, 1);
+    }
+
+    public final void shutdownNow() {
+        stop();
+    }
 
     final class AffinityThread extends Thread {
 
@@ -63,17 +72,19 @@ public class AffinityExecutor {
         }
     }
 
-    public final void work(Runnable worker, int count) {
+
+    public final void execute(Runnable worker, int count) {
         synchronized (threads) {
-            assert (threads.isEmpty());
+            //assert (threads.isEmpty());
 
             for (int i = 0; i < count; i++) {
-                threads.add(
-                    new AffinityThread(id + "_" + serial.getAndIncrement(),
-                        worker));
+                AffinityThread at = new AffinityThread(
+                    id + "_" + serial.getAndIncrement(),
+                        worker);
+                threads.add(at);
+                at.start();
             }
 
-            threads.forEach(Thread::start);
         }
     }
 

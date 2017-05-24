@@ -33,7 +33,7 @@ public class Gradius extends NAgentX {
             senseCamera("(G,c" + cm.name() + ")",
                     camScale.filter(cm)
             )
-                    .setResolution(0.2f);
+                    .resolution(0.2f);
         }
 
         actionToggle($.inh(Atomic.the("fire"),id),

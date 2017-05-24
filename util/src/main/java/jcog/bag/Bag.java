@@ -114,12 +114,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each, boolean pop);
     default @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) { return sample(each, false); }
 
-    default List<V> sampleToList(int n) {
+    default List<V> copyToList(int n) {
         if (n == 0)
             return Collections.emptyList();
 
         List<V> l = new FasterList(n);
-        sample(n, Next, x -> {
+        sample(n, x -> {
             l.add(x);
         });
         return l;
@@ -162,29 +162,27 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         });
     }
 
-    /**
-     * convenience macro
-     */
+
     default Bag<K, V> sample(int max, Consumer<? super V> each) {
-        return sample(max, Next, each);
+        return sampleOrPop(false, max, each);
     }
 
+    default Bag<K, V> pop(int max, Consumer<? super V> each) {
+        return sampleOrPop(true, max, each);
+    }
 
-    /**
-     * convenience macro
-     */
-    default Bag<K, V> sample(int max, BagCursorAction action, Consumer<? super V> each) {
+    default Bag<K, V> sampleOrPop(boolean sampleOrPop, int max, Consumer<? super V> each) {
         final int[] count = {max};
         return sample((x) -> {
             each.accept(x);
-            return ((count[0]--) > 0) ? action : Bag.BagCursorAction.Stop;
-        });
+            return ((count[0]--) > 0) ? Next : Bag.BagCursorAction.Stop;
+        }, sampleOrPop);
     }
-
     @Nullable
     default V maxBy(FloatFunction<V> rank) {
         final float[] best = {Float.NEGATIVE_INFINITY};
         final Object[] which = new Object[1];
+        //TODO if (y>=best[0]) collect several if they are of equal rank, then choose randomly. better yet make this a feature of Bag
         forEach(x -> {
             float y = rank.floatValueOf(x);
             if (y > best[0]) {

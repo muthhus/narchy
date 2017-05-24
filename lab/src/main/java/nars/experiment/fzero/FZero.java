@@ -60,7 +60,7 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         senseCamera("fz", () -> fz.image, 32, 24)
-                .setResolution(0.01f);
+                .resolution(0.01f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (r) -> {

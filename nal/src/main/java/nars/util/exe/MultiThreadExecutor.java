@@ -165,7 +165,7 @@ public class MultiThreadExecutor extends Executioner {
         //passiveExec.prestartAllCoreThreads();
 
         this.activeExec = new AffinityExecutor("exe");
-        activeExec.work(() -> { //worker thread
+        activeExec.execute(() -> { //worker thread
 
             int pauses = 0;
 

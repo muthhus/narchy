@@ -43,7 +43,8 @@ public interface NAct {
     default ActionConcept actionToggle(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
         ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
-            return toggle(on, off, next, d!=null ? d.conf() : nar().confMin.floatValue());
+            float conf = d != null ? d.conf() : nar().confMin.floatValue();
+            return toggle(on, off, next, conf);
         });
         actions().add(m);
 
@@ -101,6 +102,7 @@ public interface NAct {
                      1f/6;
                     // 1f/4;
             //1f/3f;
+
 
             int ii;
             if (d == null) {

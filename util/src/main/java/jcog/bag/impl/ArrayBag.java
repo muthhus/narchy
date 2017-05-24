@@ -487,14 +487,15 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     protected void sort() {
         int s = size();
         if (s > 1) {
+            int[] stack = new int[sortSize(s) /* estimate */];
             synchronized (items) {
-                qsort(new int[sortSize(s) /* estimate */], items.array(), 0 /*dirtyStart - 1*/, (s - 1));
+                qsort(stack, items.array(), 0 /*dirtyStart - 1*/, (s - 1));
             }
         }
     }
 
     static int sortSize(int s) {
-        //estimate, probably some ~log2(size) relationship
+        //TODO get a better calculation; this is an estimate, probably some ~log2(size) relationship
         if (s < 16)
             return 4;
         if (s < 64)

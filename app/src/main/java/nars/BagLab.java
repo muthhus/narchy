@@ -150,7 +150,7 @@ public class BagLab  {
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
 
-            bag.sample(batchSize, sampling, (v) -> {
+            bag.sample(batchSize, (v) -> {
                 //System.out.println(h + " " + v);
                 sampled.add(v);
             });

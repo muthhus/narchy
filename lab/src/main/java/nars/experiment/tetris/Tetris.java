@@ -119,7 +119,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
         senseCamera("tetris", pixels = new CameraSensor(Atomic.the("tetris"), this, this));
-
+        pixels.resolution(0.1f);
 
         actions(state);
 

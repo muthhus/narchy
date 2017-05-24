@@ -103,8 +103,8 @@ abstract public class NAgentX extends NAgent {
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
         NARS nar = new NARS(clock, new XorShift128PlusRandom(1), 2);
-        nar.confMin.setValue(0.02f);
-        nar.truthResolution.setValue(0.02f);
+        nar.confMin.setValue(0.01f);
+        nar.truthResolution.setValue(0.01f);
         float p = 0.5f;
         nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         nar.DEFAULT_GOAL_PRIORITY = 1f * p;
@@ -116,7 +116,7 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 
-        int threads = 3;
+        int threads = 2;
         for (int i = 0; i < threads; i++) {
             nar.addNAR(512);
         }

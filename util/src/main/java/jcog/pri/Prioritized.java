@@ -47,6 +47,10 @@ public interface Prioritized extends Deletes {
         return Util.equals(priSafe(-1), t.priSafe(-1), epsilon);
     }
 
+    /** useful for sorting */
+    static float oneMinusPri(Prioritized p) {
+        return 1f - p.pri();
+    }
 
 
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {

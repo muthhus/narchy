@@ -98,11 +98,11 @@ public class Signal {
 
 
                 t = task(term, nextTruth,
-                    (now+last)/2, now,
+                    last, now,
                         previous, stamper.getAsLong(), nar);
             }
 
-            t.priMax(pri.asFloat() * deltaFactor(previous, t.truth()));
+            t.priMax(pri.asFloat()); // * deltaFactor(previous, t.truth()));
 
 
             return (this.current = t);
@@ -120,17 +120,17 @@ public class Signal {
         return s;
     }
 
-    /**
-     * factor to reduce priority for similar truth value
-     * TODO revise
-     */
-    protected float deltaFactor(@Nullable Truthed a, Truth b) {
-        return 1f;
-
-        /*if (a == null)
-            return 1f;
-        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));*/
-    }
+//    /**
+//     * factor to reduce priority for similar truth value
+//     * TODO revise
+//     */
+//    protected float deltaFactor(@Nullable Truthed a, Truth b) {
+//        return 1f;
+//
+//        /*if (a == null)
+//            return 1f;
+//        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));*/
+//    }
 
     @NotNull
     public Signal pri(FloatSupplier p) {

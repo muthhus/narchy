@@ -1,6 +1,8 @@
 package nars.nar;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
+import jcog.AffinityExecutor;
 import jcog.Util;
 import jcog.event.On;
 import jcog.random.XorShift128PlusRandom;
@@ -16,6 +18,7 @@ import nars.test.DeductiveMeshTest;
 import nars.time.RealTime;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +27,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -45,7 +46,7 @@ public class NARS extends NAR {
     private final List<On> observers = $.newArrayList();
     int num;
 
-    private ThreadPoolExecutor pool;
+    private AffinityExecutor pool;
     private List<NARLoop> loops;
 
     @Override
@@ -86,18 +87,25 @@ public class NARS extends NAR {
      */
     public void addNAR(int concepts) {
         addNAR((time, terms, rng) -> {
-            Default d = new Default(concepts, rng, terms, time, new SubExecutor(2048));
-            d.deriver.rate.setValue(5);
+            SubExecutor e = new SubExecutor(512);
+            Default d = new Default(concepts, rng, terms, time, e);
+            d.deriver.rate.setValue(2);
+            e.maxExecutionsPerCycle.setValue(64);
             return d;
         });
     }
 
-    class SubExecutor extends BufferedSynchronousExecutor {
+     class SubExecutor extends BufferedSynchronousExecutorHijack {
         public SubExecutor(int inputQueueCapacity) {
-            super(
-                    new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
-            );
+            super( inputQueueCapacity );
         }
+
+//    class SubExecutor extends BufferedSynchronousExecutor {
+//        public SubExecutor(int inputQueueCapacity) {
+//            super(
+//                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
+//            );
+//        }
 
         @Override
         public void runLater(@NotNull Runnable r) {
@@ -120,13 +128,13 @@ public class NARS extends NAR {
 
                     @Override
                     public void run(@NotNull Consumer<NAR> r) {
-                        //NARS.this.run(r);
 
-                        List<NAR> subs = ((NARS) nar).sub;
-                        int which = nar.random().nextInt(subs.size());
-                        subs.get(which).exe.run(r);
+                        //run in sub thread
+//                        List<NAR> subs = ((NARS) nar).sub;
+//                        int which = nar.random().nextInt(subs.size());
+//                        subs.get(which).exe.run(r);
 
-                        //runLater(()->r.accept(nar));
+                        runLater(() -> r.accept(nar)); //passive
                     }
 
                     @Override
@@ -165,8 +173,9 @@ public class NARS extends NAR {
             this.loops = $.newArrayList(num);
             all(n -> loops.add(new NARLoop(n)));
 
-            this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
-            this.pool.prestartAllCoreThreads();
+            //this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
+            //this.pool.prestartAllCoreThreads();
+            this.pool = new AffinityExecutor(self().toString());
             loops.forEach(pool::execute);
         }
 

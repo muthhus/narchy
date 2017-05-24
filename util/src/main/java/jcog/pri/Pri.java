@@ -2,6 +2,7 @@ package jcog.pri;
 
 
 import jcog.Util;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,5 +112,7 @@ public class Pri implements Priority {
         return this;
     }
 
+
+    public static final FloatFunction<? extends Pri> floatValue = Pri::pri;
 
 }

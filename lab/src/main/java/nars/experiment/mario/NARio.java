@@ -74,7 +74,7 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.setResolution(0.1f);
+        sc.resolution(0.1f);
         sc.pri(0.5f);
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);

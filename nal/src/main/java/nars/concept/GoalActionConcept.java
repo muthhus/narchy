@@ -1,5 +1,6 @@
 package nars.concept;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.*;
 import nars.table.EternalTable;
@@ -25,6 +26,9 @@ public class GoalActionConcept extends ActionConcept {
     private final FloatParam curiosity;
 
 
+    @NotNull
+    private MotorFunction motor;
+
     public GoalActionConcept(@NotNull Compound term, @NotNull NAct act, @NotNull MotorFunction motor) {
         this(term, act.nar(), act.curiosity(), motor);
     }
@@ -41,17 +45,6 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
-
-
-
-    //    @Override
-//    public @Nullable Task curiosity(float conf, long next, NAR nar) {
-//
-//        //return curiosity(term(), GOAL, conf, next, nar);
-//        return null;
-//    }
-
-
     @Override
     public Task apply(NAR nar) {
 
@@ -67,8 +60,9 @@ public class GoalActionConcept extends ActionConcept {
             //inject curiosity
 
             float curiConf =
-                    nar.confDefault(GOAL)/2f;
-                    //nar.confMin.floatValue() * 5f;
+                    //nar.confDefault(GOAL)/2f;
+                    nar.confDefault(GOAL);
+                    //nar.confMin.floatValue()*2f;
 
             float cc =
                     //curiConf;
@@ -76,14 +70,13 @@ public class GoalActionConcept extends ActionConcept {
             if (cc > 0) {
 
                 float nextCurious =
-                        nar.random().nextFloat();
+                      Util.round(nar.random().nextFloat(), resolution.floatValue());
 //                    ((float)Math.sin(
 //                        hashCode() /* for phase shift */
 //                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
 
-                Truth ct = $.t(nextCurious,
-                        cc);
+                Truth ct = $.t(nextCurious, cc);
                 if (goal == null) {
                     goal = ct;
                 } else {
@@ -92,17 +85,19 @@ public class GoalActionConcept extends ActionConcept {
             }
         }
 
+
+        Truth belief = belief(now, dur);
+
+        if (goal == null) goal = belief; //use belief state, if exists (latch)
+
         return feedback.set(term(),
                 this.motor.motor(
-                        belief(now, dur),
+                        belief,
                         goal),
                 nar.time::nextStamp,
                 nar);
     }
 
-
-    @NotNull
-    private MotorFunction motor;
 
 
 //    Truth[] linkTruth(long when, long now, float minConf) {

@@ -1,5 +1,7 @@
 package nars.util.exe;
 
+import jcog.bag.Bag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.data.sorted.SortedArray;
 import jcog.pri.Prioritized;
@@ -7,19 +9,30 @@ import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+
+import static jcog.bag.Bag.BagCursorAction.Next;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates
  */
-public class BufferedSynchronousExecutor extends SynchronousExecutor {
+public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 
-    final Queue<ITask> q;
-    final Map<ITask, ITask> pending = new LinkedHashMap();
+    final PriorityHijackBag<ITask, ITask> pending = new PriorityHijackBag<ITask, ITask>(3) {
+        @Override
+        protected final Consumer<ITask> forget(float rate) {
+            return null;
+            //return new PForget(rate);
+        }
+
+        @NotNull
+        @Override
+        public final ITask key(ITask value) {
+            return value;
+        }
+    };
+
 
     /**
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
@@ -27,17 +40,14 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     public final FloatParam maxExecutionsPerCycle = new FloatParam(-1);
     private SortedArray<ITask> sorted;
 
-    public BufferedSynchronousExecutor() {
-        this(new ArrayDeque<>());
-    }
-
-    public BufferedSynchronousExecutor(Queue<ITask> q) {
-        this.q = q;
+    public BufferedSynchronousExecutorHijack(int capacity) {
+        super();
+        pending.capacity(capacity);
     }
 
     @Override
     public void cycle(@NotNull NAR nar) {
-        flush();
+        //flush();
 
         super.cycle(nar);
 
@@ -63,35 +73,23 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
             return;
 
         try {
-            if (q.isEmpty())
+            if (pending.isEmpty())
                 return;
 
-            ITask x;
-            while (null != (x = q.poll())) {
-                pending.merge(x, x, (p, X) -> {
-                    if (p == X)
-                        return p; //does this occurr?
-                    return p.merge(X);
-                });
-            }
-
             int toExe = maxExecutionsPerCycle.intValue();
-            if (toExe < 0 || toExe > pending.size()) {
-                pending.values().forEach(this::actuallyRun);
-                pending.clear();
-
+            int ps = pending.size();
+            if (toExe < 0 || toExe > ps) {
+                pending.pop(pending.capacity(), this::actuallyRun); //must visit all (capacity), not just size
             } else {
                 //sort
                 if (sorted == null || sorted.capacity() != (toExe + 1)) {
                     sorted = new SortedArray<ITask>(new ITask[toExe + 1]);
                 }
-
-                pending.values().forEach(s -> {
+                pending.pop(pending.capacity(), s -> {
                     sorted.add(s, Prioritized::oneMinusPri);
                     if (sorted.size() > toExe)
                         sorted.removeLast();
                 });
-                pending.clear();
                 assert (sorted.size() == toExe);
                 sorted.forEach(this::actuallyRun);
             }
@@ -108,13 +106,7 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
     @Override
     public boolean run(@NotNull ITask input) {
-        boolean b = q.offer(input);
-        if (!b) {
-            //try once more, removing the next item (FIFO)
-            ITask removed = q.poll();
-            return q.offer(input);
-        }
-        return true;
+        return pending.put(input)!=null;
     }
 
 }
