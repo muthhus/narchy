@@ -16,7 +16,55 @@ import java.util.LinkedHashSet;
  */
 public class Line1D {
 
-    public static class Line1DTrainer {
+
+
+    public static void main(String[] args) {
+        Param.DEBUG = true;
+
+
+        Default n = new Default();
+
+        //n.log();
+
+        n.time.dur(16);
+        n.deriver.rate.setValue(10f);
+
+        n.termVolumeMax.setValue(24);
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
+
+        Line1DSimplest a = new Line1DSimplest(n);
+        //Line1DTrainer trainer = new Line1DTrainer(a);
+
+        //new RLBooster(a, new HaiQAgent());
+
+        //ImplicationBooster.implAccelerator(a);
+
+        n.onTask(t -> {
+            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
+                System.err.println(t.proof());
+            }
+        });
+
+        a.onFrame((z) -> {
+            a.target(
+                    (float) (0.5f * (Math.sin(n.time() / 1000f) + 1f))
+                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                    //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
+            );
+
+        });
+        NAgentX.chart(a);
+
+        a.runCycles(5000000);
+
+
+    }
+
+
+        public static class Line1DTrainer {
 
         public static final int trainingRounds = 20;
         private float lastReward;
@@ -108,57 +156,6 @@ public class Line1D {
                 current.clear();
             });
         }
-
-    }
-
-
-    public Line1D() {
-
-    }
-
-
-    public static void main(String[] args) {
-        Param.DEBUG = true;
-
-
-        Default n = new Default();
-
-        //n.log();
-
-        n.time.dur(16);
-        n.deriver.rate.setValue(10f);
-
-        n.termVolumeMax.setValue(24);
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 0.5f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f;
-
-        Line1DSimplest a = new Line1DSimplest(n);
-        //Line1DTrainer trainer = new Line1DTrainer(a);
-
-        //new RLBooster(a, new HaiQAgent());
-
-//ImplicationBooster.implAccelerator(a);
-
-        n.onTask(t -> {
-            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
-                System.err.println(t.proof());
-            }
-        });
-
-        a.onFrame((z) -> {
-            a.target(
-                    (float) (0.5f * (Math.sin(n.time() / 1000f) + 1f))
-                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
-                    //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
-            );
-
-        });
-        NAgentX.chart(a);
-
-        a.runCycles(5000000);
-
 
     }
 

@@ -106,13 +106,16 @@ public class Line1DSimplest extends NAgent {
 
     @Override
     protected float act() {
-        if (o != o)
-            return Float.NaN;
+//        if (o != o)
+//            return Float.NaN;
 
         float dist = Math.abs(i.floatValue() - o.floatValue());
+        dist = (float)(Math.sqrt(dist)); //more challenging
 
         //return (1f - dist); //unipolar, 0..1.0
-        return (((1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
+        float r = (((1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
+        return r;
+
         //return ((Util.sqr(1f - dist) - 0.5f) * 2f); //bipolar, normalized to -1..+1
     }
 

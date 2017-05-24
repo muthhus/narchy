@@ -32,7 +32,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     @NotNull
     public final ScalarSignal sensor;
-    private final FloatParam resolution;
     private FloatSupplier signal;
     protected float currentValue = Float.NaN;
 
@@ -45,7 +44,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
 
-        this.resolution = new FloatParam(n.truthResolution.floatValue());
+        this.resolution.setValue(n.truthResolution.floatValue());
+
         this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
             @Override
             protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {

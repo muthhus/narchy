@@ -1,15 +1,16 @@
 package nars.concept;
 
 import jcog.data.FloatParam;
-import nars.$;
-import nars.NAR;
-import nars.NAct;
-import nars.Task;
+import nars.*;
+import nars.table.EternalTable;
+import nars.table.HijackTemporalExtendedBeliefTable2;
+import nars.table.TemporalBeliefTable;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
@@ -20,7 +21,6 @@ import static nars.Op.GOAL;
  */
 public class GoalActionConcept extends ActionConcept {
 
-    public final FloatParam resolution;
     private final Signal feedback;
     private final FloatParam curiosity;
 
@@ -33,7 +33,6 @@ public class GoalActionConcept extends ActionConcept {
         super(term, n);
 
         this.curiosity = curiosity;
-        resolution = n.truthResolution;
         this.feedback = new Signal(BELIEF, resolution);
         feedback.pri(() -> n.priorityDefault(GOAL));
 
@@ -42,7 +41,10 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
-//    @Override
+
+
+
+    //    @Override
 //    public @Nullable Task curiosity(float conf, long next, NAR nar) {
 //
 //        //return curiosity(term(), GOAL, conf, next, nar);

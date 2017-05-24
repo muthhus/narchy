@@ -3,6 +3,8 @@ package jcog.learn.ql;
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.function.BiFunction;
 
@@ -11,9 +13,11 @@ import java.util.function.BiFunction;
  */
 public class HaiQAgent extends HaiQ {
 
+    public static final Logger logger = LoggerFactory.getLogger(HaiQAgent.class);
+
     //Hsom...
-    final static float perceptionAlpha = 0.01f;
-    @NotNull Autoencoder ae;
+    final static float perceptionAlpha = 0.05f;
+    public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
     float perceptionNoise = 0.01f;
     float perceptionCorruption = 0.0f;
@@ -21,7 +25,7 @@ public class HaiQAgent extends HaiQ {
 
     public HaiQAgent() {
         this((inputs, outputs) ->
-                (int) Math.ceil(/*Math.sqrt*/((1+inputs*2)*(1+outputs))));
+                (int) Math.ceil(/*Math.sqrt*/((1+inputs)*(1+outputs))));
     }
 
     public HaiQAgent(BiFunction<Integer,Integer,Integer> numStates) {
@@ -32,6 +36,7 @@ public class HaiQAgent extends HaiQ {
     @Override
     public void start(int inputs, int outputs) {
         int states = numStates.apply(inputs, outputs);
+        logger.info("start {} -> {} -> {}", inputs, states, outputs);
         ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         super.start(states, outputs);
     }

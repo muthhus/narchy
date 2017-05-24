@@ -27,7 +27,7 @@ public class RLBooster implements Consumer<NAgent> {
     final int inD, outD;
     private final List<SensorConcept> in;
 
-    public RLBooster(NAgent env, Agent rl) {
+    public RLBooster(NAgent env, Agent rl, int actionDiscretization) {
         this.env = env;
         this.rl = rl;
 
@@ -51,24 +51,24 @@ public class RLBooster implements Consumer<NAgent> {
 
         input = new float[inD];
 
-        final float[] actionValues = {+1f, 0.5f, 0f};
+        boolean nothingAction = false; //reserve 0 for nothing
 
-        this.outD = 1 /* nothing */ + env.actions.size() * actionValues.length /* pos/neg for each action */;
+        this.outD = (nothingAction ? 1 : 0) /* nothing */ + env.actions.size() * actionDiscretization /* pos/neg for each action */;
         this.output = new Runnable[outD];
 
-        int i = +1; //reserve 0 for nothing
-        output[0] = () -> {
-        };
-
+        int i = 0;
+        if (nothingAction) {
+            output[i++] = () -> {            };
+        }
 
         logger.info("{} {} in={} out={}", rl, env, inD, outD);
         rl.start(inD, outD);
 
         for (ActionConcept a : env.actions) {
-            for (float polarity : actionValues) {
+            for (int j = 0; j < actionDiscretization; j++) {
+                float value = ((float)j) / (actionDiscretization-1);
                 output[i++] = () -> {
-                    env.nar.goal(a, Tense.Present, polarity,
-                            conf);
+                    env.nar.goal(a, Tense.Present, value, conf);
                 };
             }
         }

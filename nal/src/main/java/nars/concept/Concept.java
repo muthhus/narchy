@@ -191,12 +191,14 @@ public interface Concept extends Termed {
 
 
 
-    @Nullable
+    /** use NAR.beliefTruth(Term|String, when) */
+    @Deprecated @Nullable
     default Truth belief(long when, long now, int dur) {
         return beliefs().truth(when, now, dur);
     }
 
-    @Nullable
+    /** use NAR.goalTruth(Term|String, when) */
+    @Deprecated @Nullable
     default Truth goal(long when, long now, int dur) {
         return goals().truth(when, now, dur);
     }
@@ -204,13 +206,13 @@ public interface Concept extends Termed {
     /** use NAR.beliefTruth(Term|String, when) */
     @Deprecated @Nullable
     default Truth belief(long when, int dur) {
-        return beliefs().truth(when, dur);
+        return belief(when, when, dur);
     }
 
     /** use NAR.goalTruth(Term|String, when) */
     @Deprecated @Nullable
     default Truth goal(long when, int dur) {
-        return goals().truth(when, dur);
+        return goal(when, when, dur);
     }
 
 //    @Nullable

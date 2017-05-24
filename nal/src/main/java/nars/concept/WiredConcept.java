@@ -1,11 +1,16 @@
 package nars.concept;
 
+import jcog.data.FloatParam;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.table.EternalTable;
 import nars.table.HijackTemporalExtendedBeliefTable2;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into
@@ -25,12 +30,13 @@ import org.jetbrains.annotations.NotNull;
  * */
 public abstract class WiredConcept extends TaskConcept implements PermanentConcept {
 
-
-
+    public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
 
     public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
+        resolution.setValue(n.truthResolution);
         n.on(this);
+
     }
 
 
@@ -40,7 +46,19 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         return this;
     }
 
-    @Override
+//    @Override
+//    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+//        return
+//            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
+//            new HijackTemporalExtendedBeliefTable2(tCap, tCap*4) {
+//                @Override
+//                protected boolean include(Task t) {
+//                    return true;
+//                    //return t instanceof SignalTask || t.isGoal();
+//                }
+//            };
+//    }
+       @Override
     public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
         return
             //new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
@@ -49,6 +67,12 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
                 protected boolean include(Task t) {
                     return true;
                     //return t instanceof SignalTask || t.isGoal();
+                }
+
+                @Override
+                public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
+                    Truth tt = super.truth(when, dur, eternal);
+                    return tt!=null ? tt.ditherFreq(resolution.floatValue()) : null;
                 }
             };
     }

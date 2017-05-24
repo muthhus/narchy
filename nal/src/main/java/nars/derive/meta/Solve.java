@@ -72,7 +72,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 ))==null)
                     return false;
 
-                if ((t = t.dither(m.truthResolution, confMin, m.nar.derivedEvidenceGain.asFloat()))==null)
+                if ((t = t.ditherFreqConf(m.truthResolution, confMin, m.nar.derivedEvidenceGain.asFloat()))==null)
                     return false;
 
                 break;

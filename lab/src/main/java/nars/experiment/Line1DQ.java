@@ -1,0 +1,80 @@
+package nars.experiment;
+
+import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
+import nars.NAgentX;
+import nars.Narsese;
+import nars.Param;
+import nars.experiment.arkanoid.Arkancide;
+import nars.experiment.tetris.Tetris;
+import nars.nar.Default;
+import nars.op.RLBooster;
+import nars.test.agent.Line1DSimplest;
+import spacegraph.widget.meter.MatrixView;
+import spacegraph.widget.meter.MatrixViewRGB;
+
+import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.grid;
+
+public class Line1DQ {
+
+
+    public static void main(String[] args) throws Narsese.NarseseException {
+        //Param.DEBUG = true;
+
+        Default n = new Default();
+        //n.log();
+        n.time.dur(5);
+        n.deriver.rate.setValue(10);
+
+        Line1DSimplest a = new Line1DSimplest(n);
+        a.curiosity.setValue(0.01f);
+
+        a.onFrame((z) -> {
+            a.target(
+                    Util.unitize(
+                        //(float) (0.5f * (Math.sin(n.time() / 50f) + 1f))
+                        (Math.abs(3484 ^ n.time()/200) % 11)/10.0f
+                        //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f))) *
+                        //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
+                    )
+            );
+        });
+
+        //Arkancide a = new Arkancide(n, false, true);
+        //Tetris a = new Tetris(n, 6, 10, 4);
+
+        //a.onFrame(x -> Util.sleep(1));
+        //a.trace = true;
+
+        //Line1DTrainer trainer = new Line1DTrainer(a);
+
+
+        //new RLBooster(a, new HaiQAgent(), 2); n.deriver.rate.setValue(0); a.curiosity.setValue(0f);
+
+        NAgentX.chart(a);
+
+//        int h = q.ae.W[0].length;
+//        int w = q.ae.W.length;
+//        window( grid(
+//                new MatrixView(w, h, MatrixView.arrayRenderer(q.ae.W)),
+//                new MatrixView(w, 1, MatrixView.arrayRenderer(q.ae.y)),
+//                new MatrixView(w, 1, MatrixView.arrayRenderer(q.ae.z))
+//        ), 500, 500);
+
+        float grandTotal = 0;
+        for (int i = 0; i < 100; i++) {
+            int period = 1000;
+            a.runCycles(period);
+            float nextReward = a.rewardSum;
+            System.out.println(nextReward + " total reward, " + nextReward / period + " avg per cycle");
+            grandTotal += nextReward;
+            a.rewardSum = 0;
+        }
+        System.err.println(" grand total = " + grandTotal);
+
+
+    }
+
+
+}

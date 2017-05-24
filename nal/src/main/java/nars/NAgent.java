@@ -98,7 +98,7 @@ abstract public class NAgent implements NSense, NAct {
     public float rewardSum = 0;
 
     /**
-     * range: -1..+1, mapped directly to the 0..1.0 frequency range
+     * range: -1..+1
      */
     public float reward;
     private Loop senseAndMotorLoop;

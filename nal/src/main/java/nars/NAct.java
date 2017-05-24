@@ -46,6 +46,9 @@ public interface NAct {
             return toggle(on, off, next, d!=null ? d.conf() : nar().confMin.floatValue());
         });
         actions().add(m);
+
+        m.resolution.setValue(1f);
+
         return m;
     }
 
@@ -93,7 +96,7 @@ public interface NAct {
     @Nullable
     default ActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
 
-        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             float deadZoneFreq =
                      1f/6;
                     // 1f/4;
@@ -138,8 +141,10 @@ public interface NAct {
                     : null
                     ;
         });
+        m.resolution.setValue(0.5f);
 
         actions().add(m);
+
         return m;
     }
 

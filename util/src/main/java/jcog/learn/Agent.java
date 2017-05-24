@@ -11,11 +11,11 @@ public interface Agent {
 
     int act(float reward, float[] nextObservation);
 
-    default int act(double reward, double... nextObservation) {
-        float[] f = Util.toFloat(nextObservation);
-
-        return act((float)reward, f);
-    }
+//    default int act(double reward, double... nextObservation) {
+//        float[] f = Util.toFloat(nextObservation);
+//
+//        return act((float)reward, f);
+//    }
 
     default String summary() {
         return "";

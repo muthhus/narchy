@@ -3,6 +3,7 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
@@ -19,11 +20,11 @@ public class Arkancide extends NAgentX {
     static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
-    public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
+    //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 32;
-    final int visH = 16;
+    final int visW = 16;
+    final int visH = 8;
 
     //final int afterlife = 60;
 
@@ -59,7 +60,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -96,7 +97,7 @@ public class Arkancide extends NAgentX {
 
 
 
-        maxPaddleSpeed = 10 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 20 * noid.BALL_VELOCITY;
 
         float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
@@ -112,8 +113,8 @@ public class Arkancide extends NAgentX {
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
             SensorConcept ab = senseNumber("noid:dx", (() -> (Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
-            //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
-            //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
+            SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX));
+            SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY));
 
             //experimental cheat
 //            nar.input("--(paddle-ball):x! :|:",
@@ -121,7 +122,7 @@ public class Arkancide extends NAgentX {
 //            );
 
             SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{ab, a, b, c}),
+                    Lists.newArrayList(new Term[]{ab, a, b, c, d, e}),
                     nar), 600, 600);
             nar.onTask(t -> {
                 if (t instanceof DerivedTask && t.isGoal()) {
@@ -139,7 +140,7 @@ public class Arkancide extends NAgentX {
         }));*/
         Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
         actionUnipolarTransfer(paddleControl, (v) -> {
-            return noid.paddle.moveTo(v, maxPaddleSpeed*2);
+            return noid.paddle.moveTo(v, maxPaddleSpeed);
         });
 
 //        Param.DEBUG = true;

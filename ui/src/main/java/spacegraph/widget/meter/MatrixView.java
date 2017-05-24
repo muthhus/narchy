@@ -1,25 +1,36 @@
 package spacegraph.widget.meter;
 
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
+import java.nio.ByteBuffer;
+
 /**
  * Created by me on 7/29/16.
  */
 public class MatrixView extends Widget {
 
-    private static final Logger logger = LoggerFactory.getLogger(MatrixView.class);
+
 
     private final int w;
     private final int h;
     private final ViewFunction2D view;
 
+
     public static ViewFunction2D arrayRenderer(float[][] ww) {
         return (x, y, gl) -> {
             float v = ww[x][y];
+            Draw.colorPolarized(gl, v);
+            return 0;
+        };
+    }
+    public static ViewFunction2D arrayRenderer(float[] w) {
+        return (x, y, gl) -> {
+            float v = w[y];
             Draw.colorPolarized(gl, v);
             return 0;
         };
@@ -34,7 +45,8 @@ public class MatrixView extends Widget {
         float update(float x, GL2 gl);
     }
 
-    @FunctionalInterface public interface ViewFunction2D {
+    @FunctionalInterface
+    public interface ViewFunction2D {
         /**
          * updates the GL state for each visited matrix cell (ex: gl.glColor...)
          * before a rectangle is drawn at the returned z-offset
@@ -43,23 +55,23 @@ public class MatrixView extends Widget {
     }
 
     protected MatrixView(int w, int h) {
-        this.w = w;
-        this.h = h;
-        this.view = (ViewFunction2D)this;
+        this(w, h, null);
     }
 
-    public MatrixView(int w, int h, ViewFunction2D view) {
-        this.w = w;
-        this.h = h;
-        this.view = view;
-    }
 
     public MatrixView(float[] d, ViewFunction1D view) {
         this(d, 1, view);
     }
 
+
+    public MatrixView(int w, int h, ViewFunction2D view) {
+        this.w = w;
+        this.h = h;
+        this.view = view != null ? view : ((ViewFunction2D) this);
+    }
+
     public MatrixView(float[] d, int stride, ViewFunction1D view) {
-        this((int)Math.floor(((float)d.length)/stride), stride, (x, y, gl) -> {
+        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update(d[i], gl);
@@ -68,18 +80,18 @@ public class MatrixView extends Widget {
         });
 
     }
+
     public MatrixView(double[] d, int stride, ViewFunction1D view) {
-        this((int)Math.floor(((float)d.length)/stride), stride, (x, y, gl) -> {
+        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
             int i = y * stride + x;
             if (i < d.length)
-                return view.update((float)d[i], gl);
+                return view.update((float) d[i], gl);
             else
                 return Float.NaN;
         });
     }
 
 
-    @Override
     protected void paintComponent(GL2 gl) {
 
         float h = this.h;
@@ -87,6 +99,7 @@ public class MatrixView extends Widget {
 
         if ((w == 0) || (h == 0))
             return;
+
 
         float dw = 1f / w;
         float dh = 1f / h;
@@ -96,9 +109,9 @@ public class MatrixView extends Widget {
             for (int x = 0; x < w; x++) {
 
                 //try {
-                    float dz = view.update(x, y, gl);
-                    if (dz == dz)
-                        Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
+                float dz = view.update(x, y, gl);
+                if (dz == dz)
+                    Draw.rect(gl, x * dw, 1f - (y + 1) * dh, dw, dh, dz);
                 /*} catch (Exception e) {
                     logger.error(" {}",e);
                     return;

@@ -231,7 +231,10 @@ public class MySTMClustered extends STMClustered {
 
                             Task m = new GeneratedTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-                            m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()), false));
+                            m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()),
+                                    //false
+                                    true
+                            ));
                             return m;
 
                         }

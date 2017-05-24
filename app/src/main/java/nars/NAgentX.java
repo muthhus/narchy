@@ -112,7 +112,7 @@ abstract public class NAgentX extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
         nar.termVolumeMax.setValue(48);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, false, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 16);
         MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
 
 
@@ -162,7 +162,7 @@ abstract public class NAgentX extends NAgent {
 
     public static void chart(NAgentX a) {
         NAR nar = a.nar;
-        //a.nar.runLater(() -> {
+        a.nar.runLater(() -> {
             window( grid(
 
                 grid(
@@ -233,7 +233,7 @@ abstract public class NAgentX extends NAgent {
                             Vis.conceptsWindow3D(nar,128, 4) )
                 )
             ), 900, 600);
-       // });
+        });
     }
 
     public static void chart(NAgent a) {
@@ -254,6 +254,7 @@ abstract public class NAgentX extends NAgent {
                             tc,
 
 
+                            Vis.beliefCharts(100, a.actions, a.nar ),
                             //budgetHistogram(d, 16),
 
                             //Vis.agentActions(a, 50),
