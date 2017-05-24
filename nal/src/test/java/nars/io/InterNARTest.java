@@ -106,9 +106,8 @@ public class InterNARTest {
         }, (ai, bi) -> {
 
 
-            String question = "(?x --> y)?";
             try {
-                ai.nar.ask(question);
+                ai.nar.input("(?x --> y)?");
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }
@@ -144,7 +143,7 @@ public class InterNARTest {
 
 
             try {
-                bi.nar.ask("(a --> d)");
+                bi.nar.question("(a --> d)");
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }

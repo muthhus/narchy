@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import static com.google.common.collect.Iterators.singletonIterator;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
@@ -43,7 +44,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public @NotNull Term unneg() {
-        return op == NEG ? the : this;
+        return op == NEG ? sub : this;
     }
 
     @Override
@@ -53,7 +54,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public void init(@NotNull int[] meta) {
-        the.init(meta);
+        sub.init(meta);
         meta[4]++; //for wrapping it
         meta[5] |= op().bit;
     }
@@ -79,8 +80,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         Compound t = (Compound) that;
 
-        //TODO if this is a NEG then size and dt can be assumed
-        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ the.equals(t.sub(0));
+        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ sub.equals(t.sub(0));
     }
 
 
@@ -103,25 +103,24 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public boolean isTemporal() {
-        return the.isTemporal();
+        return sub.isTemporal();
     }
-
 
 
     @Override
     public boolean impossibleSubTermVolume(int otherTermVolume) {
-        return otherTermVolume > the.volume() /* volume() -  size() */;
+        return otherTermVolume > sub.volume() /* volume() -  size() */;
     }
 
     @Override
     public boolean isNormalized() {
-        return the.isNormalized();
+        return sub.isNormalized();
     }
 
     @Override
     public void setNormalized() {
-        if (the instanceof Compound)
-            ((Compound) the).setNormalized();
+        if (sub instanceof Compound)
+            ((Compound) sub).setNormalized();
     }
 
     @Override
@@ -138,27 +137,27 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         @Override
         public boolean isTemporal() {
-            return c.isTemporal();
+            return c.sub.isTemporal();
         }
 
         @Override
         public int vars() {
-            return c.vars();
+            return c.sub.vars();
         }
 
         @Override
         public int varQuery() {
-            return c.varQuery();
+            return c.sub.varQuery();
         }
 
         @Override
         public int varDep() {
-            return c.varDep();
+            return c.sub.varDep();
         }
 
         @Override
         public int varIndep() {
-            return c.varIndep();
+            return c.sub.varIndep();
         }
 
         @Override
@@ -169,7 +168,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         @Override
         public int structure() {
-            return c.the.structure();
+            return c.sub.structure();
         }
 
         @Override
@@ -184,7 +183,8 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         @Override
         public @NotNull Term sub(int i) {
-            return c.sub(i);
+            assert(i == 0);
+            return c.sub;
         }
 
         @Override
@@ -196,18 +196,10 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         public boolean equals(Object obj) {
             if (this == obj) return true;
 
-            if (obj instanceof Compound) {
+            if (obj instanceof TermContainer) {
                 TermContainer t = (TermContainer) obj;
-                if (t.hashCode() == hashCode()) {
-                    int ss = size();
-                    if (t.size() == ss) {
-                        for (int i = 0; i < ss; i++) {
-                            if (!sub(i).equals(t.sub(i)))
-                                return false;
-                        }
-
-                        return true;
-                    }
+                if (t.size() == 1) {
+                    return c.sub.equals(t.sub(0));
                 }
             }
             return false;
@@ -215,19 +207,19 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
         @Override
         public void forEach(Consumer<? super Term> action, int start, int stop) {
-            for (int i = start; i < stop; i++)
-                action.accept(c.sub(i));
+            assert(start == 0 && stop == 1);
+            action.accept(c.sub);
         }
 
         @NotNull
         @Override
         public Iterator<Term> iterator() {
-            return c.iterator();
+            return singletonIterator(c.sub);
         }
 
         @Override
         public int size() {
-            return c.size();
+            return 1;
         }
     }
 }

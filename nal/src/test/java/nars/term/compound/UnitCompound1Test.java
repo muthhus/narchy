@@ -62,8 +62,8 @@ public class UnitCompound1Test {
         Atomic x = Atomic.the("x");
 
         Compound u = $.neg(x);
-        System.out.println(u);
-        System.out.println(u.sub(0));
+//        System.out.println(u);
+//        System.out.println(u.sub(0));
         assertEquals(UnitCompound1.class, u.getClass());
 
         GenericCompound g = new GenericCompound(NEG, DTERNAL, TermVector.the(x));
@@ -72,7 +72,10 @@ public class UnitCompound1Test {
         assertEquals(g, u);
         assertEquals(u, u);
         assertEquals(g, g);
+        assertEquals(u.size(), g.size());
+        assertEquals(u.dt(), g.dt());
         assertEquals(u.subterms(), g.subterms());
+        assertEquals(g.subterms(), u.subterms()); //reverse
         assertEquals(u.hashCode(), g.hashCode());
         assertEquals(u.hashCodeSubTerms(), g.hashCodeSubTerms());
         assertEquals(u.toString(), g.toString());

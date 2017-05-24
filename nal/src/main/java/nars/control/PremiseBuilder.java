@@ -66,9 +66,7 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
                     //Terms.equalAtemporally(task.term(), (beliefTerm));
 
             if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
-                assert(beliefTerm.op()!=NEG);
                 beliefTerm = unify(taskTerm, (Compound) beliefTerm, nar);
-                assert(beliefTerm.op()!=NEG);
             }
 
             Concept beliefConcept = nar.concept(beliefTerm);
@@ -144,12 +142,12 @@ public class PremiseBuilder extends BinaryTask<PLink<Task>,PLink<Term>> {
 
         @Nullable Task answered = question.get().onAnswered(match, nar);
 
-        if (answered != null && !answered.isDeleted()) {
+        if (answered != null) {
 
             //transfer budget from question to answer
             //float qBefore = taskBudget.priSafe(0);
             //float aBefore = answered.priSafe(0);
-            BudgetFunctions.transferPri(question, answered.priority(),
+            BudgetFunctions.transferPri(question, answered,
                     answered.conf()
                     //(1f - taskBudget.qua())
                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost

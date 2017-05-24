@@ -60,10 +60,10 @@ public class UnificationTest {
                 t1 = pi.get(pi.term(s1), true).term();
 
             } else {
-                nar.ask(s1);
+                nar.question(s1);
                 t1 = nar.concept(s1).term();
             }
-            nar.ask(s2);
+            nar.question(s2);
             nar.run(2);
 
 

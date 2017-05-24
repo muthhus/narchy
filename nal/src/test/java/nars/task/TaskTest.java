@@ -19,7 +19,6 @@ import static org.junit.Assert.*;
 public class TaskTest {
 
 
-    public static final Terminal tt = new Terminal();
 
     @Test public void testTruthHash16Plus16Bit() {
         //for TRUTH EPSILON 0.01:
@@ -84,7 +83,7 @@ public class TaskTest {
 
     public void inputTwoUniqueTasks(@NotNull NAR n) throws Narsese.NarseseException {
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
 
         Task x = n.inputAndGet("<a --> b>.");
         assertArrayEquals(new long[]{1}, x.stamp());
@@ -109,7 +108,7 @@ public class TaskTest {
     @Test
     public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
-        Param.DEBUG = true;
+        //Param.DEBUG = true;
         Default d = new Default(100);
         //d.log();
         d.nal(2);
@@ -132,24 +131,11 @@ public class TaskTest {
     }
 
     @Test public void testValid() throws Narsese.NarseseException {
+        Terminal tt = new Terminal();
         Task t = $.task("((&&,#1,(#1 &&+0 #3),(#2 &&+0 #3),(#2 &&+0 (toothbrush-->here))) ==>+0 lighter(I,toothbrush))", BELIEF, 1f, 0.9f).apply(tt);
         assertNotNull(t);
         TaskConcept c = t.concept(tt,true);
-        System.out.println(c);
         assertNotNull(c);
     }
 
-//    interface SlabTask extends Task, Cursor {
-//
-//        public byte getTerm();
-//        public void setTerm(byte[] t);
-//    }
-//
-//    @Test public void testSlabTask() {
-//        Allocator<SlabTask> tasks = Allocator.of(SlabTask.class);
-//        SlabTask x = tasks.allocate(1024);
-//        x.move(0);
-//
-//
-//    }
 }

@@ -462,7 +462,7 @@ public class TestNAR {
 
 
     public TestNAR ask(@NotNull String termString) throws Narsese.NarseseException {
-        nar.ask(termString);
+        nar.question(termString);
         return this;
     }
     public TestNAR quest(@NotNull String termString) throws Narsese.NarseseException {

@@ -24,27 +24,26 @@ public class ArrayTermVector extends TermVector {
          this.terms = terms;
     }
 
-    /**
-     * size should already be known equal
-     */
     @Override
-    public final boolean equalTerms(@NotNull TermContainer c) {
+    public final boolean equals(@NotNull Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof TermContainer)) return false;
+
+        TermContainer c = (TermContainer) obj;
+        if (hash!=c.hashCodeSubTerms())
+            return false;
 
         int s = terms.length;
-        if (s !=c.size())
+        if (s != c.size())
             return false;
         for (int i = 0; i < s; i++) {
-            Term y = c.sub(i);
-            Term x = terms[i];
-
-            if (x == y) {
-                //continue;
-            } else if (!x.equals(y)) {
+            if (!terms[i].equals(c.sub(i))) {
                 return false;
-            } else {
+            }
+            /*else {
                 //share the ref
                 terms[i] = y;
-            }
+            }*/
         }
         return true;
     }

@@ -170,12 +170,12 @@ public abstract class TermVector implements TermContainer {
 
 
     @Override
-    public final boolean equals(@NotNull Object obj) {
-        return
-            (this == obj)
-            ||
-            ((hash == obj.hashCode()) && (obj instanceof TermContainer) && equivalent((TermContainer)obj));
-    }
+    abstract public boolean equals(@NotNull Object obj);
+//        return
+//            (this == obj)
+//            ||
+//            (obj instanceof TermContainer) && equalTerms((TermContainer)obj);
+//    }
 
 
 

@@ -18,15 +18,15 @@ import java.util.function.Predicate;
  */
 public class TermVector1 implements TermContainer {
 
-    public final Term the;
+    public final Term sub;
 
-    public TermVector1(Term the) {
-        this.the = the;
+    public TermVector1(Term sub) {
+        this.sub = sub;
     }
 
     @Override
     public int hashCode() {
-        return Util.hashCombine(the.hashCode(), 1); //HACK consistent with Terms.hash(..)
+        return Util.hashCombine(sub.hashCode(), 1); //HACK consistent with Terms.hash(..)
     }
 
 
@@ -34,44 +34,52 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public boolean equals(@NotNull Object obj) {
-        return
-                (this == obj)
-                        ||
-                ((obj instanceof TermContainer) && equalTo((TermContainer)obj));
+        if (this == obj) return true;
+        if (obj instanceof TermContainer) {
+            TermContainer t = (TermContainer) obj;
+            if (t.size()==1 && sub.equals(t.sub(0)))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean equalTerms(@NotNull Term[] c) {
+        return false;
     }
 
     @NotNull
     @Override
     public Term[] toArray() {
-        return new Term[] {  the };
+        return new Term[] {sub};
     }
 
     @Override
     public final @NotNull Term sub(int i) {
         if (i!=0)
             throw new ArrayIndexOutOfBoundsException();
-        return the;
+        return sub;
     }
 
     @Override
     public boolean subIs(int i, Op o) {
-        return i == 0 && the.op() == o;
+        return i == 0 && sub.op() == o;
     }
 
 
     /** vol and complexity are reported as if they were already part of an enclosing Compound */
     @Override public int volume() {
-        return the.volume() + 1;
+        return sub.volume() + 1;
     }
 
     /** vol and complexity are reported as if they were already part of an enclosing Compound */
     @Override public int complexity() {
-        return the.complexity() + 1;
+        return sub.complexity() + 1;
     }
 
     @Override
     public int structure() {
-        return the.structure();
+        return sub.structure();
     }
 
     @Override
@@ -80,18 +88,18 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override @NotNull public Set<Term> toSet() {
-        return Sets.mutable.of(the);
+        return Sets.mutable.of(sub);
     }
 
     @NotNull
     @Override
     public String toString() {
-        return "(" + the + ')';
+        return "(" + sub + ')';
     }
 
     @Override
     public Iterator<Term> iterator() {
-        return Iterators.singletonIterator(the);
+        return Iterators.singletonIterator(sub);
     }
 
 //    @NotNull
@@ -127,7 +135,7 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action) {
-        action.accept(the);
+        action.accept(sub);
     }
 
 //    @Override public boolean equalTo(@NotNull TermContainer b) {
@@ -139,40 +147,40 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public boolean contains(@NotNull Termlike t) {
-        return the.equals(t);
+        return sub.equals(t);
     }
 
     @Override
-    public boolean OR(@NotNull Predicate<Term> p) { return p.test(the);    }
+    public boolean OR(@NotNull Predicate<Term> p) { return p.test(sub);    }
 
     @Override
     public boolean AND(@NotNull Predicate<Term> p) {
-        return p.test(the);
+        return p.test(sub);
     }
 
     @Override
     public int varIndep() {
-        return the.varIndep();
+        return sub.varIndep();
     }
 
     @Override
     public int varDep() {
-        return the.varDep();
+        return sub.varDep();
     }
 
     @Override
     public int varQuery() {
-        return the.varQuery();
+        return sub.varQuery();
     }
 
     @Override
     public int varPattern() {
-        return the.varPattern();
+        return sub.varPattern();
     }
 
     @Override
     public int vars() {
-        return the.vars();
+        return sub.vars();
     }
 
 

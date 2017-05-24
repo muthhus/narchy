@@ -17,9 +17,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * generic UDP server & utilities
  */
-public class UDP  {
+public class UDP {
 
-    /** in bytes */
+    /**
+     * in bytes
+     */
     static final int MAX_PACKET_SIZE = 4096;
 
     static final int DEFAULT_socket_BUFFER_SIZE = 1024 * 1024;
@@ -32,7 +34,6 @@ public class UDP  {
     private static final InetAddress local = new InetSocketAddress(0).getAddress();
 
 
-
     private final int port;
 
     private int updatePeriodMS = 250;
@@ -43,10 +44,10 @@ public class UDP  {
     }
 
     public UDP(int port) throws SocketException {
-        this((InetAddress)null, port);
+        this((InetAddress) null, port);
     }
 
-    public UDP()  {
+    public UDP() {
         DatagramSocket iin;
         try {
             iin = new DatagramSocket();
@@ -64,7 +65,7 @@ public class UDP  {
     }
 
     public UDP(@Nullable InetAddress a, int port) throws SocketException {
-        in = a!=null ? new DatagramSocket(port, a) : new DatagramSocket(port);
+        in = a != null ? new DatagramSocket(port, a) : new DatagramSocket(port);
         in.setTrafficClass(0x10 /*IPTOS_LOWDELAY*/); //https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setTrafficClass-int-
         in.setSendBufferSize(DEFAULT_socket_BUFFER_SIZE);
         in.setReceiveBufferSize(DEFAULT_socket_BUFFER_SIZE);
@@ -119,7 +120,9 @@ public class UDP  {
         }
     }
 
-    /** implementation's synchronous updates */
+    /**
+     * implementation's synchronous updates
+     */
     protected void update() {
 
     }
@@ -137,7 +140,7 @@ public class UDP  {
         return false;
     }
 
-    public boolean out(String data, String host, int port)  {
+    public boolean out(String data, String host, int port) {
         try {
             return out(data.getBytes(), host, port);
         } catch (UnknownHostException e) {
@@ -152,22 +155,22 @@ public class UDP  {
     }
 
     public boolean out(byte[] data, int port) {
-        return outBytes(data, new InetSocketAddress(local, port) );
+        return outBytes(data, new InetSocketAddress(local, port));
     }
 
     public boolean out(byte[] data, String host, int port) throws UnknownHostException {
-        return outBytes(data, new InetSocketAddress(InetAddress.getByName(host), port) );
+        return outBytes(data, new InetSocketAddress(InetAddress.getByName(host), port));
     }
 
     public boolean outJSON(Object x, String host, int port) throws UnknownHostException {
-        return outJSON(x, new InetSocketAddress(InetAddress.getByName(host), port)  );
+        return outJSON(x, new InetSocketAddress(InetAddress.getByName(host), port));
     }
 
     public boolean outJSON(Object x, int port) throws UnknownHostException {
-        return outJSON(x, new InetSocketAddress(local, port)  );
+        return outJSON(x, new InetSocketAddress(local, port));
     }
 
-    public boolean outJSON(Object x, InetSocketAddress addr)  {
+    public boolean outJSON(Object x, InetSocketAddress addr) {
         //DynByteSeq dyn = new DynByteSeq(MAX_PACKET_SIZE); //TODO wont work with the current hacked UTF output
 
 //        ByteArrayDataOutput dyn = ByteStreams.newDataOutput();
@@ -187,22 +190,22 @@ public class UDP  {
     final static Charset UTF8 = Charset.forName("UTF8");
 
 
-    final static ThreadLocal<DatagramPacket> packet = ThreadLocal.withInitial(()->{
+    final static ThreadLocal<DatagramPacket> packet = ThreadLocal.withInitial(() -> {
         return new DatagramPacket(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 0);
     });
 
     public boolean outBytes(byte[] data, InetSocketAddress to) {
+        //DatagramPacket sendPacket = new DatagramPacket(data, data.length, to);
+
+        DatagramPacket sendPacket = packet.get();
+        sendPacket.setData(data, 0, data.length);
+        sendPacket.setSocketAddress(to);
+
         try {
-
-            //DatagramPacket sendPacket = new DatagramPacket(data, data.length, to);
-
-            DatagramPacket sendPacket = packet.get();
-            sendPacket.setData(data, 0, data.length);
-            sendPacket.setSocketAddress(to);
             in.send(sendPacket);
             return true;
         } catch (IOException e) {
-            logger.error("{}", e);
+            logger.error("{}", in, e.getMessage());
             return false;
         }
     }

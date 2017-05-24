@@ -22,17 +22,17 @@ public interface NARIn {
     }
 
     @Nullable
-    default Task ask(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
-        return ask(term(questionTerm), occ, eachAnswer);
+    default Task question(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
+        return question(term(questionTerm), occ, eachAnswer);
     }
 
     @Nullable
-    default Task ask(@NotNull Compound term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
-        return ask(term, occ, Op.QUESTION, eachAnswer);
+    default Task question(@NotNull Compound term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
+        return question(term, occ, Op.QUESTION, eachAnswer);
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    default LambdaQuestionTask question(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }

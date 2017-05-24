@@ -17,21 +17,12 @@ abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;
 
-    public boolean isRunning() {
-        return nar!=null;
-    }
-
     public void start(NAR nar) {
-        //if (this.nar == null) {
-            this.nar = nar;
-//        } else {
-//            throw new RuntimeException("already started");
-//        }
+        this.nar = nar;
     }
 
-    /** needs to set nar to null */
     public void stop() {
-        this.nar = null;
+
     }
 
     abstract public void cycle(@NotNull NAR nar);

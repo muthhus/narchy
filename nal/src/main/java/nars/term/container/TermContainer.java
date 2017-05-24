@@ -312,42 +312,33 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return b instanceof TermContainer && TermContainer.equals(a, (TermContainer)b);
 //    }
 
-    /**
-     * should be called only from equals()
-     */
-    default boolean equalTo(@NotNull TermContainer b) {
-        return this == b || ((hashCode() == b.hashCode()) &&
-                //(structure() == b.structure()) &&
-                //(volume() == b.volume()) &&
-                (equalTerms(b)));
-    }
 
 
-    /**
-     * size should already be known equal
-     */
-    default boolean equalTerms(@NotNull TermContainer c) {
-        int s = size();
-        if (s !=c.size())
-            return false;
-        for (int i = 0; i < s; i++) {
-            if (!sub(i).equals(c.sub(i)))
-                return false;
-        }
-        return true;
-    }
+//    boolean equalTerms(@NotNull TermContainer c);
+//    default boolean equalTerms(@NotNull TermContainer c) {
+//        int s = size();
+//        if (s !=c.size())
+//            return false;
+//        for (int i = 0; i < s; i++) {
+//            if (!sub(i).equals(c.sub(i))) {
+//                sub(i).equals(c.sub(i));
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
-    default boolean equalTerms(@NotNull List<Term> c) {
-        int s = size();
-        if (s !=c.size())
-            return false;
-        for (int i = 0; i < s; i++) {
-            if (!sub(i).equals(c.get(i)))
-                return false;
-        }
-        return true;
-    }
-    default boolean equalTerms(@NotNull Term... c) {
+//    default boolean equalTerms(@NotNull List<Term> c) {
+//        int s = size();
+//        if (s !=c.size())
+//            return false;
+//        for (int i = 0; i < s; i++) {
+//            if (!sub(i).equals(c.get(i)))
+//                return false;
+//        }
+//        return true;
+//    }
+    default boolean equalTerms(@NotNull Term[] c) {
         int s = size();
         if (s !=c.length)
             return false;
@@ -557,9 +548,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return false;
 //    }
 
-    default boolean equivalent(@NotNull TermContainer sub) {
-        return (hashCodeSubTerms() == sub.hashCodeSubTerms()) && equalTerms(sub);
-    }
 
     /** allows the subterms to hold a different hashcode than hashCode when comparing subterms */
     default int hashCodeSubTerms() {

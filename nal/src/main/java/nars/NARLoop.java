@@ -21,7 +21,9 @@ public class NARLoop extends Loop {
     private long cycles = 0;
 
 
-    /** starts paused; thread is not automatically created */
+    /**
+     * starts paused; thread is not automatically created
+     */
     public NARLoop(@NotNull NAR n) {
         super(n.self() + ":loop");
         nar = n;
@@ -39,13 +41,9 @@ public class NARLoop extends Loop {
 
     @Override
     public final boolean next() {
-        if (nar.exe.isRunning()) {
-            nar.run(framesPerLoop);
-            cycles++;
-            return true;
-        } else {
-            return false;
-        }
+        nar.run(framesPerLoop);
+        cycles++;
+        return true;
     }
 
 

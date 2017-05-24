@@ -63,7 +63,7 @@ public class QuestTest {
     }
 
     public void question(NAR nar, AtomicBoolean valid) throws Narsese.NarseseException {
-        nar.ask($("a:?b@"), ETERNAL, QUEST, (q,a) -> {
+        nar.question($("a:?b@"), ETERNAL, QUEST, (q, a) -> {
             //System.out.println("answer: " + a);
             //System.out.println(" " + a.getLog());
             if (a.toString().contains("(b-->a)!"))

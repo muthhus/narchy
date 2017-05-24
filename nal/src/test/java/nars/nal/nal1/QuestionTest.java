@@ -58,7 +58,7 @@ public class QuestionTest {
 
         nar
                 .believe(belief, 1.0f, 0.9f)
-                .ask(question, ETERNAL,(q,a) -> {
+                .question(question, ETERNAL,(q, a) -> {
                     if (a.punc() == '.' && a.term().equals(expectedSolutionTerm))
                         ok.incrementAndGet();
                 });

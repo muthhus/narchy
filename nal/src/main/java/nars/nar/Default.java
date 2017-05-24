@@ -68,7 +68,7 @@ public class Default extends NAR {
                 //:
                 new FireConcepts(focus, this);
 
-        deriver.rate.setValue(15);
+        deriver.rate.setValue(20);
     }
 
     public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {

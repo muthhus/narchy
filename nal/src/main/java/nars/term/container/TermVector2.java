@@ -39,6 +39,19 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
+    public boolean equals(@NotNull Object obj) {
+        if (this == obj) return true;
+        if (obj instanceof TermContainer) {
+            if (hash == obj.hashCode()) {
+                TermContainer t = (TermContainer) obj;
+                if (t.size() == 2 && x.equals(t.sub(0)) && y.equals(t.sub(1)))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public int size() {
         return 2;
     }

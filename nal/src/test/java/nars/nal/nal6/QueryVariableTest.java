@@ -60,7 +60,7 @@ public class QueryVariableTest {
         //nar.log();
         Compound beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
-        nar.ask(question, Tense.ETERNAL, (q,a)-> {
+        nar.question(question, Tense.ETERNAL, (q, a)-> {
             if (a.term().equals(beliefTerm)) {
                 valid.set(true);
                 q.delete();
@@ -89,7 +89,7 @@ public class QueryVariableTest {
                         "<b --> a>. %1.0;0.5%")
                 .run(cyclesBeforeQuestion)
                 .stopIf(b::get)
-                .ask(question, ETERNAL, (q, a) -> {
+                .question(question, ETERNAL, (q, a) -> {
                     if (!a.isDeleted())
                         b.set(true);
                 });

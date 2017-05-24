@@ -28,7 +28,6 @@ public class MultiThreadExecutor extends Executioner {
     private static final Logger logger = LoggerFactory.getLogger(MultiThreadExecutor.class);
 
 
-
     private final ForkJoinPool passive;
 
 
@@ -60,7 +59,7 @@ public class MultiThreadExecutor extends Executioner {
         } else {
             input.inc();
             ITask removed = active.put(t);
-            if (removed!=null) {
+            if (removed != null) {
                 forgot.inc();
 
 //                int p = numActive.incrementAndGet();
@@ -159,7 +158,7 @@ public class MultiThreadExecutor extends Executioner {
 
         this.passive =
                 new ForkJoinPool(passiveThreads);
-                    //, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true
+        //, ForkJoinPool.defaultForkJoinWorkerThreadFactory, null, true
 //                new ThreadPoolExecutor(passiveThreads, passiveThreads,
 //                        1, TimeUnit.MINUTES, passive);
         //passiveExec.prestartAllCoreThreads();
@@ -184,7 +183,6 @@ public class MultiThreadExecutor extends Executioner {
                     } else {
                         pause(pauses++);
                     }
-
 
 
                 } catch (Throwable e) {
@@ -223,11 +221,9 @@ public class MultiThreadExecutor extends Executioner {
 //            exe.work(worker, threads);
 
             onReset = nar.eventReset.on((n) -> {
-                if (isRunning()) {
-                    synchronized (nar) {
-                        stop();
-                        start(n);
-                    }
+                synchronized (nar) {
+                    stop();
+                    start(n);
                 }
             });
 
@@ -322,7 +318,6 @@ public class MultiThreadExecutor extends Executioner {
         });
         return h;
     }
-
 
 
 //

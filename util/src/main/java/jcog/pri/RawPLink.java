@@ -3,6 +3,8 @@ package jcog.pri;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
 /**
  * Created by me on 2/17/17.
  */
@@ -22,13 +24,13 @@ public class RawPLink<X> extends Pri implements PLink<X> {
     }
 
     @Override
-    final public boolean equals(@NotNull Object that) {
+    public boolean equals(@NotNull Object that) {
         return ((this == that) || this.id.equals(that)) ||
-                ((that instanceof PLink) && id.equals(((PLink) that).get()));
+                ((that instanceof Supplier) && id.equals(((Supplier) that).get()));
     }
 
     @Override
-    final public int hashCode() {
+    public int hashCode() {
         return id.hashCode();
     }
 

@@ -22,7 +22,7 @@ public class NAL5BooleanConsistency {
 
         Param.DEBUG = true;
 
-        float confthresh = 0.1f;
+        float confthresh = 0.01f;
 
 //        final Deriver e = Deriver.get(
 //                "induction.nal", "nal6.nal"
@@ -30,12 +30,7 @@ public class NAL5BooleanConsistency {
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
-                Default d = new Default(1024) {
-//                    @Override
-//                    public Deriver newDeriver() {
-//                        return e;
-//                    }
-                };
+                Default d = new Default(512);
                 d.nal(6);
 
                 //d.log();
@@ -45,7 +40,7 @@ public class NAL5BooleanConsistency {
                         "(x-->(0,1))",
                         "(x-->(1,0))",
                         "(x-->(1,1))"};
-                String expected = "(x --> (" + i + "," + j + "))";
+                //String expected = "(x --> (" + i + "," + j + "))";
 
                 d.believe( "( (--(x-->i) && --(x-->j)) ==> " + outcomes[0] + ")");
                 d.believe( "( (--(x-->i) && (x-->j)) ==> " + outcomes[1] + ")");
@@ -63,7 +58,7 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(2048);
+                d.run(4048);
 
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {

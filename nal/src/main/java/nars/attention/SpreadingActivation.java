@@ -90,17 +90,19 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     }
 
     @Override
-    public ITask[] run(NAR nar) {
+    public ITask[] run(@NotNull NAR nar) {
 
-        this.origin = nar.concept(value);
+        Concept origin= id.concept(nar);
         if (origin == null)
             return null;
+
+        this.origin = origin;
 
         this.momentum = nar.momentum.floatValue();
         spread = activationMapThreadLocal.get();
         dur = nar.dur();
         this.nar = nar;
-        this.inPri = value.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
+        this.inPri = id.priSafe(0); // * in.qua(); //activate concept by the priority times the quality
 
         this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
@@ -242,8 +244,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             float subActivation = ((1f - momentum) * scale) / (n);
             //final float[] change = {0};
 
-            long inStart = value.start();
-            long inEnd = value.end();
+            long inStart = id.start();
+            long inEnd = id.end();
 
             float[] additionalPressure = {0};
             tlinks.forEach((b) -> {
@@ -334,7 +336,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         rcpt.tasklinks().put(
                 //new RawPLink(value, pri),
-                new PLinkUntilDeleted(value, pri),
+                new PLinkUntilDeleted(id, pri),
                 scale, null);
 
     }

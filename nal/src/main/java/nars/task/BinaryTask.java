@@ -18,10 +18,10 @@ abstract public class BinaryTask<X, Y> extends UnaryTask<Pair<X, Y>> {
     }
 
     public final X getOne() {
-        return value.getOne();
+        return id.getOne();
     }
 
     public final Y getTwo() {
-        return value.getTwo();
+        return id.getTwo();
     }
 }

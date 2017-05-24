@@ -148,11 +148,9 @@ public class GenericCompound implements Compound {
             return false;
         }
 
-        if (hash!=that.hashCode())
-            return false;
-
-        //return subterms.equals(cthat.subterms()) &&
         return
+                (hash==that.hashCode())
+                &&
                 (op == cthat.op())
                 &&
                 (dt == cthat.dt())

@@ -309,7 +309,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * ask question
      */
     @NotNull
-    public void ask(@NotNull String termString) throws NarseseException {
+    public void question(@NotNull String termString) throws NarseseException {
         //TODO remove '?' if it is attached at end
         question(term(termString));
     }
@@ -324,25 +324,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public Task quest(@NotNull Compound c) {
         return que(c, QUEST);
     }
-
-//    /**
-//     * ask quest
-//     */
-//    @Nullable
-//    public Task askShould(@NotNull String questString) throws NarseseException {
-//        Term c = term(questString);
-//        if (c instanceof Compound)
-//            return askShould((Compound) c);
-//        return null;
-//    }
-//
-//    /**
-//     * ask quest
-//     */
-//    @NotNull
-//    public Task askShould(@NotNull Compound quest) {
-//        return ask(quest, QUEST);
-//    }
 
     @Nullable
     public Task goal(@NotNull String goalTermString, @NotNull Tense tense, float freq, float conf) throws NarseseException {

@@ -107,7 +107,20 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
 
     @Override
     public boolean equals(Object obj) {
-        return obj == this || equalTo(((TermContainer) obj));
+        if (this == obj) return true;
+        if (!(obj instanceof TermContainer)) return false;
+
+        TermContainer c = (TermContainer) obj;
+
+        int s = size();
+        if (s != c.size())
+            return false;
+        for (int i = 0; i < s; i++) {
+            if (!sub(i).equals(c.sub(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

@@ -2,9 +2,6 @@ package nars;
 
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
-import jcog.map.SynchronizedHashMap;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
 import nars.attention.SpreadingActivation;
@@ -13,6 +10,7 @@ import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.task.*;
+import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
@@ -32,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
@@ -375,27 +374,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      */
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
-        if (Param.ANSWER_REPORTING && isInput()) {
+        if (isInput()) {
             TaskConcept concept = concept(nar);
             if (concept != null) {
-
                 ArrayBag<Task> answers = concept.computeIfAbsent(Op.QUESTION, () ->
-                        new ArrayBag<>(PriMerge.max,
-                                new SynchronizedHashMap<>()).capacity(Param.MAX_INPUT_ANSWERS)
-                );
+                        new AnswerBag(nar).capacity(Param.MAX_INPUT_ANSWERS));
+                answers.commit();
+
                 float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
-
-                RawPLink<Task> input = new RawPLink<>(answer, confEffective * 1f);
-                PLink<Task> insertion = answers.put(input);
-                if (insertion == input) {
-                    answers.commit();
-                } else {
-                    return this; //skip reporting, duplicate or otherwise uninsertionable
-                }
+                answers.put(new RawPLink<>(answer, confEffective * 1f));
             }
-
-            //do even for unconceptualized questions:
-            Command.log(nar, this.toString() + "  " + answer.toString());
 
         }
 
@@ -1081,4 +1069,5 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             return null;
 
     }
+
 }

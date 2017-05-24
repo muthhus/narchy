@@ -36,7 +36,7 @@ public class ConceptFire extends UnaryTask<Concept> {
 
         int ttl = Util.lerp(pri, Param.FireTTLMax, Param.FireTTLMin);
 
-        final Concept c = value;
+        final Concept c = id;
 
         final Bag<Task, PLink<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
         final Bag<Term, PLink<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);

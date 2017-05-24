@@ -162,7 +162,7 @@ public class PremiseRuleTest {
                     PremiseRule.rule("(A --> B), (B --> C), neq(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward, Permute:Swap)")
             );
             assertNotNull(s);
-            //System.out.println(Joiner.on('\n').join(s));
+            System.out.println(Joiner.on('\n').join(s));
 
             //total variations from the one input:
             assertEquals(4 /* negations */, s.size());

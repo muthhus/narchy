@@ -17,7 +17,7 @@ public class DerivePremise extends UnaryTask<Premise> {
         super(premise, premise.pri());
     }
 
-    public Premise premise() { return value; }
+    public Premise premise() { return id; }
 
     @Override
     public ITask[] run(NAR n) {
@@ -27,8 +27,8 @@ public class DerivePremise extends UnaryTask<Premise> {
         d.buffer.clear(); //should be clear but just in case
 
         d.restartA(n);
-        d.restartB(value.task);
-        d.restartC(value, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
+        d.restartB(id.task);
+        d.restartC(id, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
 
         DefaultDeriver.the.test(d);
 

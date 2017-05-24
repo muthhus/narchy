@@ -17,6 +17,10 @@ public final class SynchronizedHashMap<K, V> extends HashMap<K, V> {
         super();
     }
 
+    public SynchronizedHashMap(int cap) {
+        super(cap);
+    }
+
     public SynchronizedHashMap(int cap, float loadFactor) {
         super(cap, loadFactor);
     }

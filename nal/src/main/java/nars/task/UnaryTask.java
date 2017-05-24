@@ -2,22 +2,20 @@ package nars.task;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.pri.Pri;
+import jcog.pri.RawPLink;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * task which is identified by one value parameter, and the class type itself
  */
-abstract public class UnaryTask<X> extends Pri implements ITask {
+abstract public class UnaryTask<X> extends RawPLink<X> implements ITask {
 
-    @NotNull
-    public final X value;
+
     private final int hash;
 
-    public UnaryTask(@NotNull X value, float pri) {
-        super(pri);
-        this.value = value;
-        this.hash = Util.hashCombine(getClass().hashCode(), value.hashCode());
+    public UnaryTask(@NotNull X id, float pri) {
+        super(id, pri);
+        this.hash = Util.hashCombine(getClass().hashCode(), id.hashCode());
     }
 
 
@@ -26,13 +24,13 @@ abstract public class UnaryTask<X> extends Pri implements ITask {
         return
             (this == obj)
                 ||
-            ((obj instanceof UnaryTask) && value.equals(((UnaryTask) obj).value));
+            (hash == obj.hashCode()) && ((obj.getClass() == getClass()) && id.equals(((UnaryTask) obj).id));
     }
 
 
     @Override
     public final @NotNull String toString() {
-        return "$" + Texts.n4(pri) + " " + getClass().getSimpleName() + "(\"" + value + "\")";
+        return "$" + Texts.n4(pri) + " " + getClass().getSimpleName() + "(\"" + id + "\")";
     }
 
     @Override

@@ -1,6 +1,7 @@
 package nars.task;
 
 import jcog.bag.impl.ArrayBag;
+import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import nars.NAR;
 import nars.Task;
@@ -42,19 +43,18 @@ public class LambdaQuestionTask extends NALTask {
     }
 
     protected ArrayBag<Task> newBag(int history) {
-        return new ArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history));
+        return new ArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history)) {
+            @Override
+            public void onAdded(@NotNull PLink<Task> t) {
+                eachAnswer.accept(LambdaQuestionTask.this, t.get());
+            }
+        };
     }
 
     @Override
     public Task onAnswered(Task answer, NAR nar) {
         //answer = super.onAnswered(answer, nar);
-
-        boolean novel = !answers.contains(answer);
         answers.put(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
-        if (novel) {
-            eachAnswer.accept(this, answer);
-        }
-
         return answer;
     }
 }
