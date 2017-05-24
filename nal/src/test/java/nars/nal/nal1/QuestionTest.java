@@ -54,7 +54,7 @@ public class QuestionTest {
 
         NAR nar = new Default();
         //nar.nal(1);
-        nar.log();
+        //nar.log();
 
         nar
                 .believe(belief, 1.0f, 0.9f)
@@ -133,8 +133,8 @@ public class QuestionTest {
     /** tests whether the use of a question guides inference as measured by the speed to reach a specific conclusion */
     @Test public void questionDrivesInference() {
 
-        final int[] dims = {4, 3};
-        final int timelimit = 3000;
+        final int[] dims = {3, 2};
+        final int timelimit = 1000;
 
         TaskStatistics withTasks = new TaskStatistics();
         TaskStatistics withoutTasks = new TaskStatistics();
@@ -145,6 +145,7 @@ public class QuestionTest {
             NAR d = new Default();
             d.random().setSeed(seed);
             d.nal(4);
+            d.termVolumeMax.setValue(24);
             return d;
         };
 

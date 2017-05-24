@@ -104,8 +104,7 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
                     }
 
                     if ((task.isQuestion() && match.isBelief()) || (task.isQuest() && match.isGoal()))  {
-                        if (reUnified || (nar.conceptTerm(match.term()).equals(nar.conceptTerm(taskTerm))))
-                            answer(taskLink, match, nar);
+                            tryAnswer(reUnified, taskLink, match, nar);
                     }
                 }
             }
@@ -125,7 +124,7 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
         //aveAri(taskLinkCopy.pri(), task.priSafe(0));
 
 
-        float pri = beliefPriority != beliefPriority ? taskPri :
+        float priFromTasks = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
                 aveAri
                 //or
@@ -138,15 +137,24 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
 
 
         return new ITask[] { new Premise(task, beliefTerm, belief,
-            //pri
-            this.pri() * pri
+            priFromTasks
+            //pri() * priFromTasks //<-- this can reduce it too much
         ) };
     }
 
 
-    static void answer(PLink<Task> question /* or quest */, @NotNull Task match, NAR nar) {
+    static boolean tryAnswer(boolean reUnified, PLink<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
+        Compound questionTerm = question.get().term();
+        Compound answerTerm = answer.term();
+        if (!reUnified && !nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
+            //see if belief unifies with task (in reverse of previous unify)
+            if (questionTerm.varQuery()==0 || (unify(answerTerm, questionTerm, nar)==null)) {
+                return false;
+            }
+        }
 
-        @Nullable Task answered = question.get().onAnswered(match, nar);
+
+        @Nullable Task answered = question.get().onAnswered(answer, nar);
 
         if (answered != null) {
 
@@ -158,6 +166,8 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
                     //(1f - taskBudget.qua())
                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
             );
+
+            return true;
 
             //BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
 
@@ -179,6 +189,7 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
                 }
                 */
         }
+        return false;
     }
 
 
