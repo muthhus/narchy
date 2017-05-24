@@ -79,7 +79,7 @@ public interface NARBuilder {
 
         int activeConcepts = 1024;
 
-        Default nar = new Default(activeConcepts,
+        Default nar = new Default(
 
                 //new HijackTermIndex(cb, maxConcepts, reprobes)
 
@@ -208,18 +208,8 @@ public interface NARBuilder {
 //
         };
 
-        nar.deriver.rate.setValue(30 * threads);
-
-
         nar.beliefConfidence(0.9f);
         nar.goalConfidence(0.9f);
-
-
-
-        nar.focus.activationRate.setValue(
-                1f
-               // 2f/Math.sqrt(activeConcepts)
-        );
 
         //nar.stmLinkage.capacity.set(0);
 

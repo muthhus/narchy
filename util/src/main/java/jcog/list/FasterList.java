@@ -53,17 +53,17 @@ public class FasterList<X> extends FastList<X> {
         super(x);
     }
 
-    /**
-     * quickly remove the final elements without nulling them by setting the size pointer
-     * this directly manipulates the 'size' value that the list uses to add new items at. use with caution
-     * if index==-1, then size will be zero, similar to calling clear(),
-     * except the array items will not be null
-     * <p>
-     * returns the next value
-     */
-    public final void popTo(int index) {
-        this.size = index + 1;
-    }
+//    /**
+//     * quickly remove the final elements without nulling them by setting the size pointer
+//     * this directly manipulates the 'size' value that the list uses to add new items at. use with caution
+//     * if index==-1, then size will be zero, similar to calling clear(),
+//     * except the array items will not be null
+//     * <p>
+//     * returns the next value
+//     */
+//    public final void popTo(int index) {
+//        this.size = index + 1;
+//    }
 
 
     @Override

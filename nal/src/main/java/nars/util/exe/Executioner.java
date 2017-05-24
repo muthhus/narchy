@@ -40,6 +40,8 @@ abstract public class Executioner implements Executor {
     }
 
 
+    /** visits any pending tasks */
+    abstract public void forEach(Consumer<ITask> each);
 
 
     /** default impl: */

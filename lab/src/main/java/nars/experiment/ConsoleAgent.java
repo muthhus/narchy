@@ -272,7 +272,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         @Override
         protected boolean setBackgroundColor(GL2 gl, TextCharacter c, int col, int row) {
-            float cc = nar.pri( terms[col][row] );
+            float cc = 1f; //nar.pri( terms[col][row] );
             if (cc == cc) {
                 float s = 0.3f * cc;
                 gl.glColor4f(s, 0, 0, 0.95f);

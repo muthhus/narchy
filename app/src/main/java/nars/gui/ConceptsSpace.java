@@ -33,17 +33,17 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     public long now;
     public int dur;
 
-    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
-        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
-    }
+//    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+//        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
+//    }
 
-    public ConceptsSpace(NAR nar, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
-        super(nar);
+    public ConceptsSpace(NAR nar, Iterable<PLink<Concept>> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+        super();
         this.nar = nar;
         this.maxNodes = maxNodes;
         this.maxEdgesPerNodeMin = maxEdgesPerNodeMin;
         this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
-        bag = new Bagregate<>(nar.focus().concepts(), maxNodes + bufferedNodes, UPDATE_RATE) {
+        bag = new Bagregate<>(concepts, maxNodes + bufferedNodes, UPDATE_RATE) {
             @Override
             protected boolean include(Concept x) {
                 return ConceptsSpace.this.include(x.term());
@@ -129,9 +129,6 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
     @Override
     protected void update() {
-        this.now = nar.time();
-        this.dur = nar.dur();
-
         super.update();
 
         active.forEach(c -> c.commit(this));
@@ -177,7 +174,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
 
-        NARSpace cs = new ConceptsSpace(n, 128, 1, 5) {
+        NARSpace cs = new ConceptsSpace(n,  null /* TODO */,128, 128, 1, 5) {
 //            @Override
 //            protected boolean include(Term term) {
 //

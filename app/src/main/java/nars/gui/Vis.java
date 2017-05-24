@@ -92,14 +92,14 @@ public class Vis {
 //        return tc;
 //    }
 
-    public static Surface budgetHistogram(NAR nar, int bins) {
-        if (nar instanceof Default) {
-            return budgetHistogram((Iterable) nar.focus().concepts(), bins);
-        } else { //if (nar instance)
-            //return budgetHistogram(((Default2)nar).active, bins);
-            return grid(); //TODO
-        }
-    }
+//    public static Surface budgetHistogram(NAR nar, int bins) {
+//        if (nar instanceof Default) {
+//            return budgetHistogram((Iterable) nar.focus().concepts(), bins);
+//        } else { //if (nar instance)
+//            //return budgetHistogram(((Default2)nar).active, bins);
+//            return grid(); //TODO
+//        }
+//    }
 
     public static Surface budgetHistogram(Iterable<PLink> bag, int bins) {
         //new SpaceGraph().add(new Facial(
@@ -214,51 +214,51 @@ public class Vis {
         return new LabeledPane(k, s);
     }
 
-    public static SpaceGraph<Term> conceptsWindow3D(NAR nar, int maxNodes, int maxEdges) {
-
-
-        NARSpace n = new ConceptsSpace(nar, maxNodes, 1, maxEdges);
-
-
-        SpaceGraph<Term> s = new SpaceGraph(
-
-                n.with(
-//                        new SpaceTransform<Term>() {
-//                            @Override
-//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
-//                                float cDepth = -9f;
-//                                src.forEach(s -> {
-//                                    ((SimpleSpatial)s).moveZ(
-//                                            s.key.volume() * cDepth, 0.05f );
-//                                });
-//                            }
-//                        }
-
-                        //new Flatten()
-//                        new Flatten() {
-//                            protected void locate(SimpleSpatial s, v3 f) {
-//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-//                            }
-//                        }
-
-
-                        //new Spiral()
-//                        //new FastOrganicLayout()
-                )
-        ) {
-//            @Override
-//            protected void initLighting() {
-//                //no
-//            }
-        };
-
-        s.dyn.addBroadConstraint(new MyForceDirected());
-
-        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
-
-        return s;
-
-    }
+//    public static SpaceGraph<Term> conceptsWindow3D(NAR nar, int maxNodes, int maxEdges) {
+//
+//
+//        NARSpace n = new ConceptsSpace(nar, maxNodes, 1, maxEdges);
+//
+//
+//        SpaceGraph<Term> s = new SpaceGraph(
+//
+//                n.with(
+////                        new SpaceTransform<Term>() {
+////                            @Override
+////                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
+////                                float cDepth = -9f;
+////                                src.forEach(s -> {
+////                                    ((SimpleSpatial)s).moveZ(
+////                                            s.key.volume() * cDepth, 0.05f );
+////                                });
+////                            }
+////                        }
+//
+//                        new Flatten()
+////                        new Flatten() {
+////                            protected void locate(SimpleSpatial s, v3 f) {
+////                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
+////                            }
+////                        }
+//
+//
+//                        //new Spiral()
+////                        //new FastOrganicLayout()
+//                )
+//        ) {
+////            @Override
+////            protected void initLighting() {
+////                //no
+////            }
+//        };
+//
+//        s.dyn.addBroadConstraint(new MyForceDirected());
+//
+//        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
+//
+//        return s;
+//
+//    }
 
 //    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
 //        return conceptsWindow(new ConceptsSpace(nar, maxNodes, 1, maxEdges));

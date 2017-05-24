@@ -37,7 +37,7 @@ public class NQuadsRDFTest {
 
         //Multi nar = new Multi(3,512,
         Executioner e = new SynchronousExecutor();
-        Default n = new Default(1024,
+        Default n = new Default(
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
                 new CycleTime(), e
@@ -64,7 +64,7 @@ public class NQuadsRDFTest {
 //        });
 
         n.run(1);
-        n.focus.active.clear();
+        //n.focus.active.clear();
         n.log();
         n.input("$0.9$ (Bacteria <-> Pharmacy)?");
 

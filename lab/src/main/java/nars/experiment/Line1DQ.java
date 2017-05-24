@@ -25,7 +25,6 @@ public class Line1DQ {
         Default n = new Default();
         //n.log();
         n.time.dur(5);
-        n.deriver.rate.setValue(10);
 
         Line1DSimplest a = new Line1DSimplest(n);
         a.curiosity.setValue(0.01f);

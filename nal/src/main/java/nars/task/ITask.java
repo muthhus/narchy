@@ -14,6 +14,7 @@ public interface ITask extends Priority {
         return 0;
     }
 
+    /** the first null in the returned array should break the iteration because it means its the end of the list (all following it should also be null) */
     @Nullable ITask[] run(@NotNull NAR n);
 
     default Priority clone() {

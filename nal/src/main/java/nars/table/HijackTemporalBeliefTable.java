@@ -1,7 +1,6 @@
 package nars.table;
 
 import jcog.list.FasterList;
-import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;

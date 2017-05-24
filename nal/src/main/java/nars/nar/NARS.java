@@ -1,7 +1,5 @@
 package nars.nar;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
-import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
 import jcog.AffinityExecutor;
 import jcog.Util;
 import jcog.event.On;
@@ -10,15 +8,12 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.CompoundFocus;
 import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.test.DeductiveMeshTest;
 import nars.time.RealTime;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
@@ -86,12 +81,11 @@ public class NARS extends NAR {
     /**
      * default implementation convenience method
      */
-    public void addNAR(int concepts) {
+    public void addNAR(int capacity) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(256);
-            Default d = new Default(concepts, rng, terms, time, e);
-            d.deriver.rate.setValue(10);
-            e.maxExecutionsPerCycle.setValue(128);
+            SubExecutor e = new SubExecutor(capacity);
+            Default d = new Default(rng, terms, time, e);
+            e.maxExecutionsPerCycle.setValue(capacity/2);
             return d;
         });
     }
@@ -169,8 +163,6 @@ public class NARS extends NAR {
             assert (!running());
 
             int num = sub.size();
-
-            setFocus(new CompoundFocus(sub));
 
             this.loops = $.newArrayList(num);
             all(n -> loops.add(new NARLoop(n)));

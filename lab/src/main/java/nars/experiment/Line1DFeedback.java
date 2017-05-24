@@ -11,7 +11,7 @@ public class Line1DFeedback {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         FeedbackSynchronousExecutor exe = new FeedbackSynchronousExecutor();
-        Default n = new Default(128, new Default.DefaultTermIndex(128), new CycleTime(),
+        Default n = new Default(new Default.DefaultTermIndex(128), new CycleTime(),
                 exe);
         exe.goal.set(0.5f);
         exe.goalAdd(exe.classify(n.task("(o-->L)?")), 0f );

@@ -49,6 +49,11 @@ public class MultiThreadExecutor extends Executioner {
 
 
     @Override
+    public void forEach(Consumer<ITask> each) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean run(@NotNull ITask t) {
         float p = t.pri();
         if (p != p) //deleted
@@ -152,7 +157,9 @@ public class MultiThreadExecutor extends Executioner {
 //        }
 //    }
 
-    public MultiThreadExecutor(int activeThreads, int passiveThreads) {
+    public MultiThreadExecutor(@Deprecated int activeThreads, int passiveThreads) {
+
+        assert(activeThreads == 0); //HACK TODO cleanup
 
         this.concurrency = activeThreads + passiveThreads;
 

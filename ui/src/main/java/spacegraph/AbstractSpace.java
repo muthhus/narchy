@@ -50,7 +50,7 @@ abstract public class AbstractSpace<X, Y>  {
         if (busy.compareAndSet(false, true)) {
             try {
                 long last = this.now;
-                this.dt = (this.now = now()) - last;
+                this.dt = (this.now = System.currentTimeMillis()) - last;
                 proc.run();
             } finally {
                 busy.set(false);

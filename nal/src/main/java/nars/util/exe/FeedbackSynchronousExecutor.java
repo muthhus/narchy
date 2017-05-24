@@ -93,12 +93,14 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
                 if (outputs.length > 1)
                     c.trim();
                 for (ITask output : outputs) {
+                    if (output == null) break;
                     RoaringBitmap oo = classify((Task) output);
                     learn(input.pri() * output.pri(), c, oo);
                 }
             }
 
             for (ITask output : outputs) {
+                if (output == null) break;
                 run(output);
             }
 
@@ -259,7 +261,7 @@ public class FeedbackSynchronousExecutor extends BufferedSynchronousExecutor {
 
     public static void main(String[] args) throws Narsese.NarseseException {
         FeedbackSynchronousExecutor exe = new FeedbackSynchronousExecutor();
-        Default n = new Default(128, new Default.DefaultTermIndex(128), new CycleTime(),
+        Default n = new Default(new Default.DefaultTermIndex(128), new CycleTime(),
                 exe);
 
         Line1DSimplest l = new Line1DSimplest(n);

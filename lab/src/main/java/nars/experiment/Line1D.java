@@ -27,7 +27,6 @@ public class Line1D {
         //n.log();
 
         n.time.dur(16);
-        n.deriver.rate.setValue(10f);
 
         n.termVolumeMax.setValue(24);
         n.DEFAULT_BELIEF_PRIORITY = 0.5f;

@@ -1,6 +1,5 @@
 package nars.util.exe;
 
-import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.data.sorted.SortedArray;
@@ -11,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import static jcog.bag.Bag.BagCursorAction.Next;
 
 /**
  * Buffers all executions between each cycle in order to remove duplicates

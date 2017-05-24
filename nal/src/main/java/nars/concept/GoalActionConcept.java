@@ -2,17 +2,15 @@ package nars.concept;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.*;
-import nars.table.EternalTable;
-import nars.table.HijackTemporalExtendedBeliefTable2;
-import nars.table.TemporalBeliefTable;
-import nars.task.NALTask;
+import nars.$;
+import nars.NAR;
+import nars.NAct;
+import nars.Task;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.stream.Stream;

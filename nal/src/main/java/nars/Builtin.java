@@ -1,7 +1,5 @@
 package nars;
 
-import jcog.Texts;
-import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
@@ -176,37 +174,36 @@ public class Builtin {
         });
 
 
-        nar.on("top", (Operator) (op, args, n) -> {
-            Iterable<PLink<Concept>> ii = n.focus().concepts();
-
-            int MAX_RESULT_LENGTH = 250;
-            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
-
-            if (args.length > 0 && args[0] instanceof Atom) {
-                String query = $.unquote(args[0]).toLowerCase();
-                for (PLink<Concept> bc : ii) {
-                    String bs = bc.get().toString();
-                    String cs = bs.toLowerCase();
-                    if (cs.contains(query)) {
-                        b.append(bs).append("  ");
-                        if (b.length() > MAX_RESULT_LENGTH)
-                            break;
-                    }
-
-                }
-            } else {
-                for (PLink<Concept> bc : ii) {
-                    b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
-                    if (b.length() > MAX_RESULT_LENGTH)
-                        break;
-                }
-            }
-
-            Command.log(n, b.toString());
-            //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
-
-        });
-
+//        nar.on("top", (Operator) (op, args, n) -> {
+//
+//
+//            int MAX_RESULT_LENGTH = 250;
+//            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
+//
+//            if (args.length > 0 && args[0] instanceof Atom) {
+//                String query = $.unquote(args[0]).toLowerCase();
+//                n.forEachActiveConcept(bc -> {
+//                    String bs = bc.toString();
+//                    String cs = bs.toLowerCase();
+//                    if (cs.contains(query)) {
+//                        b.append(bs).append("  ");
+//                        if (b.length() > MAX_RESULT_LENGTH)
+//                            break;
+//                    }
+//                });
+//            } else {
+//                for (PLink<Concept> bc : ii) {
+//                    b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
+//                    if (b.length() > MAX_RESULT_LENGTH)
+//                        break;
+//                }
+//            }
+//
+//            Command.log(n, b.toString());
+//            //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
+//
+//        });
+//
 
 //            /** slice(<compound>,<selector>)
 //            selector :-

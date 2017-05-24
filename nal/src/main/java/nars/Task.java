@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
@@ -918,9 +917,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
                     delete(); //transfer control to clone
 
-                    inputY.run(n);
-
-                    return null;
+                    return inputY.run(n);
                 }
             }
         }

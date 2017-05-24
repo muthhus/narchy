@@ -24,9 +24,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
     private On on;
 
-    private NAR nar;
     protected SpaceGraph<X> space;
-    private long lastTime = Long.MIN_VALUE;
 
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);
@@ -38,9 +36,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
 
 
-    public NARSpace(NAR nar) {
+    public NARSpace() {
         super();
-        this.nar = nar;
 
 //        nar.onCycle(x -> {
 //            updateIfNotBusy(this::update);
@@ -51,11 +48,8 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public boolean animate(float dt) {
 
-        long now = nar.time();
-        if (now !=lastTime) {
-            lastTime = now;
             updateIfNotBusy(this::update);
-        }
+
 
         return true;
     }
@@ -78,10 +72,6 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     }
 
 
-    @Override
-    public long now() {
-        return nar.time();
-    }
 
     @Override
     public void start(SpaceGraph space) {

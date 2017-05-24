@@ -9,6 +9,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.test.TestNAR;
+import nars.util.graph.TermLinkGraph;
 import nars.util.signal.RuleTest;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
@@ -896,10 +897,10 @@ public class UnificationTest {
         n.input(c);
         n.run(1);
 
-        n.forEachActiveConcept(Concept::print);
+        //n.forEachActiveConcept(x -> x.get().print());
 
-//        TermLinkGraph g = new TermLinkGraph(n);
-//        assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());
+        TermLinkGraph g = new TermLinkGraph(n);
+        assertTrue("termlinks form a fully connected graph:\n" + g, g.isConnected());
 
     }
 

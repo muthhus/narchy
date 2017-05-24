@@ -132,16 +132,16 @@ public class ImplicationBooster {
 
                                 if (tt != null) {
 
-                                    float activation = w2c(s.edgeValue(subj, pred));
-                                    if (activation >= Priority.EPSILON) {
-                                        Concept csubj = n.concept(subj);
-                                        if (csubj != null)
-                                            n.activate(csubj, activation);
-
-                                        Concept cpred = n.concept(pred);
-                                        if (cpred != null)
-                                            n.activate(cpred, activation);
-                                    }
+                                    //float activation = w2c(s.edgeValue(subj, pred));
+//                                    if (activation >= Priority.EPSILON) {
+//                                        Concept csubj = n.concept(subj);
+//                                        if (csubj != null)
+//                                            n.activate(csubj, activation);
+//
+//                                        Concept cpred = n.concept(pred);
+//                                        if (cpred != null)
+//                                            n.activate(cpred, activation);
+//                                    }
 
                                     add(adjusts, tt, freq, c);
 

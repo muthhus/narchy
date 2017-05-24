@@ -234,7 +234,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
         n.forEachActiveConcept(c -> {
 
             //graphize.preLevel(this, p);
-            if (!filter.includeConcept(c)) {
+            if (!filter.includeConcept(c.get())) {
                 return;
             }
 

@@ -49,7 +49,7 @@ public class TemporalInductionTest {
         n.input("a:b. %0.0|0.9%");
         n.run(1);
 
-        n.forEachActiveConcept(Concept::print);
+        //n.forEachActiveConcept(Concept::print);
 
         Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
@@ -78,7 +78,7 @@ public class TemporalInductionTest {
         n.input("(a ==>+5 b). %1.0;0.6%");
         n.run(1);
 
-        n.forEachActiveConcept(Concept::print);
+        //n.forEachActiveConcept(Concept::print);
 
         //Concept c = n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top().toStringWithoutBudget());
@@ -116,7 +116,7 @@ public class TemporalInductionTest {
         d.run(200);
 
         //everything should be inducted by now:
-        int numConcepts = Iterables.size(d.focus().concepts());
+        int before = d.terms.size();
         int numBeliefs = getBeliefCount(d);
 
         //System.out.println(numConcepts + " " + numBeliefs);
@@ -124,7 +124,8 @@ public class TemporalInductionTest {
         d.run(60);
 
         //# unique concepts unchanged:
-        assertEquals(numConcepts, Iterables.size(d.focus().concepts()));
+        int after = d.terms.size();
+        assertEquals(before, after);
         assertEquals(numBeliefs, getBeliefCount(d));
 
     }

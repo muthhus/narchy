@@ -159,7 +159,7 @@ abstract public class NAgentX extends NAgent {
 //    }
 
 
-    public static void chart(NAgentX a) {
+    public static void chart(NAgent a) {
         NAR nar = a.nar;
         a.nar.runLater(() -> {
             window( grid(
@@ -167,10 +167,10 @@ abstract public class NAgentX extends NAgent {
                 grid(
                     new WindowButton( "nar", () -> nar ),
                     new WindowButton( "emotion", () -> Vis.emotionPlots(a, 256) ),
-                    new WindowButton( "focus", nar::focus),
+                    //new WindowButton( "focus", nar::focus),
                     nar instanceof Default ?
                             grid(
-                                new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
+                                //new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
                                 new WindowButton( "deriverFilter", () -> ((Default)nar).budgeting )
                             ) : label(nar.getClass()),
 
@@ -192,81 +192,86 @@ abstract public class NAgentX extends NAgent {
                         //"agentActions",
                         //"agentPredict",
 
-                    new WindowButton( "vision", () -> grid(a.cam.values().stream().map(cs ->
-                                        new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
-                                        .toArray(Surface[]::new))
-                                )
+                    a instanceof NAgentX ?
+                        new WindowButton( "vision", () -> grid(((NAgentX)a).cam.values().stream().map(cs ->
+                                            new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
+                                            .toArray(Surface[]::new))
+                                    ) : grid()
                 ),
 
                 grid(
-                    new WindowButton( "conceptBudget",
-                            ()->{
+//                    new WindowButton( "conceptBudget",
+//                            ()->{
+//
+//                                double[] d = new double[32];
+//                                return new HistogramChart(
+//                                        ()->d,
+//                                        //()->h.uniformProb(32, 0, 1.0)
+//                                        new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
+//
+//                                    On on = a.onFrame((r) -> {
+//                                        Bag.priHistogram(r.nar.focus().concepts(), d);
+//                                    });
+//
+//                                    @Override
+//                                    public Surface hide() {
+//                                        on.off();
+//                                        return this;
+//                                    }
+//                                };
+//                            }
+//                        //Vis.budgetHistogram(nar, 64)
+//                    ),
 
-                                double[] d = new double[32];
-                                return new HistogramChart(
-                                        ()->d,
-                                        //()->h.uniformProb(32, 0, 1.0)
-                                        new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.25f)) {
+//                    new WindowButton( "conceptTreeMap", () -> {
+//
+//                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 128, 0.5f), 128, nar);
+//
+//                        return tc;
+//                    }),
 
-                                    On on = a.onFrame((r) -> {
-                                        Bag.priHistogram(r.nar.focus().concepts(), d);
-                                    });
-
-                                    @Override
-                                    public Surface hide() {
-                                        on.off();
-                                        return this;
-                                    }
-                                };
-                            }
-                        //Vis.budgetHistogram(nar, 64)
-                    ),
-                    new WindowButton( "conceptTreeMap", () -> {
-
-                        BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 128, 0.5f), 128, nar);
-
-                        return tc;
-                    }),
                             //"tasks", ()-> taskChart,
-                    new WindowButton( "conceptGraph", ()->
-                            Vis.conceptsWindow3D(nar,128, 4) )
+
+//                    new WindowButton( "conceptGraph", ()->
+//                            Vis.conceptsWindow3D(nar,128, 4) )
+
                 )
             ), 900, 600);
         });
     }
 
-    public static void chart(NAgent a) {
-
-        a.nar.runLater(() -> {
-
-            //Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
-
-            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 32, 0.5f), 32, a.nar);
-
-
-            window(
-                    grid(
-                            new ReflectionSurface<>(a),
-
-                            Vis.emotionPlots(a, 256),
-
-                            tc,
-
-
-                            Vis.beliefCharts(100, a.actions, a.nar ),
-                            //budgetHistogram(d, 16),
-
-                            //Vis.agentActions(a, 50),
-                            //Vis.beliefCharts(400, a.predictors, a.nar),
-                            new ReflectionSurface<>(a.nar),
-
-                            Vis.budgetHistogram(a.nar, 24)
-                            /*Vis.conceptLinePlot(nar,
-                                    Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
-                                    2000)*/
-                    ), 1200, 900);
-        });
-    }
+//    public static void chart(NAgent a) {
+//
+//        a.nar.runLater(() -> {
+//
+//            //Vis.conceptsWindow3D(a.nar, 64, 12).show(1000, 800);
+////
+////            BagChart<Concept> tc = new Vis.ConceptBagChart(new Bagregate(a.nar.focus().concepts(), 32, 0.5f), 32, a.nar);
+////
+//
+//            window(
+//                    grid(
+//                            new ReflectionSurface<>(a),
+//
+//                            Vis.emotionPlots(a, 256),
+//
+//                            //tc,
+//
+//
+//                            Vis.beliefCharts(100, a.actions, a.nar ),
+//                            //budgetHistogram(d, 16),
+//
+//                            //Vis.agentActions(a, 50),
+//                            //Vis.beliefCharts(400, a.predictors, a.nar),
+//                            new ReflectionSurface<>(a.nar),
+//
+//                            Vis.budgetHistogram(a.nar, 24)
+//                            /*Vis.conceptLinePlot(nar,
+//                                    Iterables.concat(a.actions, Lists.newArrayList(a.happy, a.joy)),
+//                                    2000)*/
+//                    ), 1200, 900);
+//        });
+//    }
 
     /**
      * pixelTruth defaults to linear monochrome brightness -> frequency

@@ -154,7 +154,6 @@ public class NARTest {
         Concept ca = n.concept(a2);
         assertTrue(ca != null);
 
-        assertEquals(true, !n.focus.active.isEmpty());
 
     }
 }

@@ -1,13 +1,11 @@
 package nars.concept;
 
-import jcog.data.FloatParam;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.table.EternalTable;
-import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

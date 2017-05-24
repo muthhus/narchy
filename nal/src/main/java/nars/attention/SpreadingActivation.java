@@ -1,6 +1,7 @@
 package nars.attention;
 
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
@@ -9,6 +10,7 @@ import nars.Task;
 import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
+import nars.control.ConceptFire;
 import nars.task.ITask;
 import nars.task.TruthPolation;
 import nars.task.UnaryTask;
@@ -36,8 +38,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
             ThreadLocal.withInitial(ObjectFloatHashMap::new);
 
-    @Deprecated private int maxDepth; //TODO subtract from this then it wont need stored
-
+    @Deprecated
+    private int maxDepth; //TODO subtract from this then it wont need stored
 
 
     @NotNull
@@ -80,6 +82,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
     transient private ObjectFloatHashMap<Termed> spread;
     private NAR nar;
+    private FasterList<ITask> activations;
 
 
     /**
@@ -92,7 +95,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        Concept origin= id.concept(nar);
+        Concept origin = id.concept(nar);
         if (origin == null)
             return null;
 
@@ -106,20 +109,28 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         this.originTerm = this.origin.term();// instanceof Compound ? nar.pre(originTerm) : originTerm;
 
-        this.maxDepth = levels((Compound)originTerm);
+        this.maxDepth = levels((Compound) originTerm);
 
+        ITask[] a = null;
         try {
 
             link(origin, 1f, 0);
 
-            spread.forEachKeyValue(this);
+            int ss = spread.size();
+            if (ss > 0) {
+                this.activations = new FasterList(0, a = new ITask[ss]);
+                this.spread.forEachKeyValue(this);
+                this.activations = null;
+            }
 
             nar.emotion.stress(linkOverflow);
+
+
         } finally {
             spread.clear();
         }
 
-        return null;
+        return a;
     }
 
     public static int levels(@NotNull Compound host) {
@@ -173,18 +184,19 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     public void value(@NotNull Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        if (inPri * scale >= Priority.EPSILON) {
-            nar.activate(c, inPri * scale);
+        float p = inPri;
+        float pScaled = p * scale;
+        if (pScaled >= Priority.EPSILON) {
+            activations.add(new ConceptFire((Concept) c, pScaled));
         }
 
-        float linkPri = inPri;
-        if (linkPri * scale >= Priority.EPSILON) {
+        if (pScaled >= Priority.EPSILON) {
 
 
-            termBidi(c, linkPri * TERMLINK_BALANCE, linkPri * (1f - TERMLINK_BALANCE), scale);
+            termBidi(c, p * TERMLINK_BALANCE, p * (1f - TERMLINK_BALANCE), scale);
 
             if (c instanceof Concept) {
-                tasklink((Concept) c, linkPri, scale);
+                tasklink((Concept) c, p, scale);
                 //            if (c instanceof AtomConcept) {
                 //                activateAtom((AtomConcept) c, scale);
                 //            }

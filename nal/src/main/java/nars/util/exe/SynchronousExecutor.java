@@ -33,13 +33,20 @@ public class SynchronousExecutor extends Executioner {
         r.run();
     }
 
+    @Override
+    public void forEach(Consumer<ITask> each) {
+        //nothing
+    }
 
     @Override
     public boolean run(@NotNull ITask input) {
         ITask[] next = input.run(nar);
         if (next != null) {
-            for (ITask x : next)
+            for (ITask x : next) {
+                if (x == null)
+                    break;
                 run(x);
+            }
         }
         return true;
     }

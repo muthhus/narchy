@@ -33,7 +33,6 @@ public class SATStream {
 
         d.run(10360);
 
-        d.focus.active.print();
 
         //d.dumpConcepts("/tmp/x.txt");
 

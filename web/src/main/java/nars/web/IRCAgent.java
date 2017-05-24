@@ -13,7 +13,7 @@ import nars.nar.Default;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.time.RealTime;
-import nars.util.exe.MultiThreadExecutor;
+import nars.util.exe.BufferedSynchronousExecutorHijack;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -214,67 +214,12 @@ public class IRCAgent extends IRC {
     }
 
 
-
-
-
-    @Deprecated @NotNull
-    public static Default newRealtimeNAR(int activeConcepts, int framesPerSecond, int threads) {
-
-        MultiThreadExecutor exe = new MultiThreadExecutor(threads, 2);
-
-        Default nar = new Default(activeConcepts,
-
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, exe),
-                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 400000, 64 * 1024, 3),
-
-                new RealTime.DSHalf().durSeconds(0.1f),
-                exe
-        );
-
-
-        int volMax = 64;
-
-//        //Multi nar = new Multi(3,512,
-//        Default nar = new Default(2048,
-//                conceptsPerCycle, 2, 2, rng,
-//                //new CaffeineIndex(new DefaultConceptBuilder(rng), 1024*1024, volMax/2, false, exe)
-//                new TreeIndex.L1TreeIndex(new DefaultConceptBuilder(new XORShiftRandom(3)), 400000, 64*1024, 3)
-//
-//                , new FrameClock(), exe);
-
-
-        nar.beliefConfidence(0.9f);
-        nar.goalConfidence(0.9f);
-
-        float p = 1f;
-        nar.DEFAULT_BELIEF_PRIORITY = 0.8f * p;
-        nar.DEFAULT_GOAL_PRIORITY = 0.8f * p;
-
-        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
-        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
-
-
-        nar.confMin.setValue(0.01f);
-        nar.termVolumeMax.setValue(volMax);
-        //nar.linkFeedbackRate.setValue(0.005f);
-
-
-        MySTMClustered stm = new MySTMClustered(nar, 32, BELIEF, 8, true, 3);
-        //MySTMClustered stm2 = new MySTMClustered(nar, 32, '.', 2, true, 2);
-
-        //new Abbreviation(nar, "_", 3, 12, 0.001f, 8);
-        new Inperience(nar, 0.4f, 8);
-
-        nar.startPeriodMS(framesPerSecond);
-
-        return nar;
-    }
-
     public static void main(String[] args) throws Exception {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = newRealtimeNAR(1024, 25, 2);
+        @NotNull Default n = new Default(); //TODO
+                //newRealtimeNAR(1024, 25, 2);
 
 
 //        Control c = n.getControl();

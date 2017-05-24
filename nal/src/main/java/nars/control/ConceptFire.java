@@ -11,12 +11,14 @@ import nars.concept.Concept;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
+import nars.term.Termed;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Random;
 
-public class ConceptFire extends UnaryTask<Concept> {
+public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     //static final int MISFIRE_COST = 1;
     static final int premiseCost = 1;
@@ -97,6 +99,12 @@ public class ConceptFire extends UnaryTask<Concept> {
         } else {
             return null;
         }
+    }
+
+    @NotNull
+    @Override
+    public final Term term() {
+        return id.term();
     }
 
 }

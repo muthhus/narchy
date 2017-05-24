@@ -12,6 +12,7 @@ import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
+import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
@@ -103,9 +104,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     @NotNull
     public final TermIndex terms;
-
-
-    private Focus focus = Focus.NULL_FOCUS;
 
 
     @NotNull
@@ -244,9 +242,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public void setFocus(Focus focus) {
-        this.focus = focus;
-    }
+
 
 
     public void setSelf(String self) {
@@ -1270,8 +1266,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     @Nullable
-    public NAR forEachActiveConcept(@NotNull Consumer<Concept> recip) {
-        focus().concepts().forEach(n -> recip.accept((Concept) n.get()));
+    public NAR forEachActiveConcept(@NotNull Consumer<ConceptFire> recip) {
+        exe.forEach(t -> {
+           if (t instanceof ConceptFire) {
+                recip.accept(((ConceptFire)t));
+           }
+        });
         return this;
     }
 
@@ -1361,19 +1361,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final boolean equals(Object obj) {
         //TODO compare any other stateful values from NAR class in addition to Memory
         return this == obj;
-    }
-
-    @Nullable
-    public PLink<Concept> activate(Termed c, float priToAdd) {
-        @Nullable Concept cc = conceptualize(c);
-        return (cc != null) ? focus.activate(cc, priToAdd) : null;
-    }
-
-    /**
-     * @return current priority of the named concept, or NaN if concept isnt active
-     */
-    public float pri(@NotNull Termed termed) {
-        return focus.pri(termed);
     }
 
     @NotNull
@@ -1549,10 +1536,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     public final Atom self() {
         return self;
-    }
-
-    public Focus focus() {
-        return focus;
     }
 
 
