@@ -245,7 +245,7 @@ abstract public class NAgent implements NSense, NAct {
 
             ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
 
-            motor.input(actions.stream().map(a -> a.apply(nar)), nar::input);
+            motor.input(actions.stream().flatMap(a -> a.apply(nar)), nar::input);
             //motor.input(curious(next), nar::input);
 
             sense.input(sense(nar, next), nar::input);
@@ -265,9 +265,12 @@ abstract public class NAgent implements NSense, NAct {
         predict.input(predictions(now), nar::input);
 
         if (sensors.size() > 0) {
-            actions.forEach(a ->
-                    predict.input(quest($.parallel(randomSensor(), a), now + nar.dur()), nar::input)
-            );
+            actions.forEach(a -> {
+                for (Compound t : new Compound[] {
+                        $.impl(a, randomSensor()),
+                        $.impl($.neg(a), randomSensor())} )
+                    predict.input(question(t, now + nar.dur()), nar::input);
+            });
         }
     }
 
@@ -622,7 +625,7 @@ abstract public class NAgent implements NSense, NAct {
 
 
     public Task goal(@NotNull Compound term, Truth truth, long when) {
-        return prediction(term, GOAL, truth, when, when);
+        return prediction(term, GOAL, truth, when, when + nar.dur());
     }
 
     public Task goal(@NotNull Compound term, Truth truth, long start, long end) {
@@ -630,7 +633,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public Task question(@NotNull Compound term, long when) {
-        return prediction(term, QUESTION, null, when, when);
+        return prediction(term, QUESTION, null, when, when + nar.dur());
     }
 
     public Task quest(@NotNull Compound term, long when) {
@@ -652,7 +655,7 @@ abstract public class NAgent implements NSense, NAct {
 
         term = nar.terms.normalize(term);
 
-        NALTask t = new NALTask(term, punct, tFinal, nar.time(), start, end, new long[]{nar.time.nextStamp()});
+        NALTask t = new NALTask(term, punct, tFinal, now, start, end, new long[]{nar.time.nextStamp()});
         t.setPri(nar.priorityDefault(punct));
         return t;
     }

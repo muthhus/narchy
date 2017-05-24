@@ -112,13 +112,12 @@ abstract public class NAgentX extends NAgent {
         nar.DEFAULT_QUEST_PRIORITY = 0.25f * p;
         nar.termVolumeMax.setValue(48);
 
-        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 16);
-        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
+        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 8);
+        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 8);
 
-
-        int threads = 2;
+        int threads = 3;
         for (int i = 0; i < threads; i++) {
-            nar.addNAR(512);
+            nar.addNAR(384);
         }
 
         //NAR nar = newNAR();

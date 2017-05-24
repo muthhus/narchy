@@ -37,7 +37,7 @@ public class SynchronousExecutor extends Executioner {
         nar.eventCycleStart.emit(nar);
 
         if (stopping) {
-            nar = null;
+            this.nar = null;
             stopping = false;
         }
     }

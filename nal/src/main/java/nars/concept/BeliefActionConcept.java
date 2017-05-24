@@ -9,6 +9,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
 
@@ -33,7 +34,7 @@ public class BeliefActionConcept extends ActionConcept {
 //    }
 
     @Override
-    public Task apply(NAR nar) {
+    public Stream<Task> apply(NAR nar) {
 
         int dur = nar.dur();
         long now = nar.time();
@@ -51,12 +52,12 @@ public class BeliefActionConcept extends ActionConcept {
             float rate = 1f;
             DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
-                return new NALTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()});
+                return Stream.of(new NALTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()}));
             }
         }
 
 
-        return null;
+        return Stream.empty();
     }
 
 

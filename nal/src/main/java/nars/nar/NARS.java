@@ -11,6 +11,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.CompoundFocus;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -87,10 +88,10 @@ public class NARS extends NAR {
      */
     public void addNAR(int concepts) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(512);
+            SubExecutor e = new SubExecutor(256);
             Default d = new Default(concepts, rng, terms, time, e);
-            d.deriver.rate.setValue(2);
-            e.maxExecutionsPerCycle.setValue(64);
+            d.deriver.rate.setValue(10);
+            e.maxExecutionsPerCycle.setValue(128);
             return d;
         });
     }
@@ -100,7 +101,8 @@ public class NARS extends NAR {
             super( inputQueueCapacity );
         }
 
-//    class SubExecutor extends BufferedSynchronousExecutor {
+
+         //    class SubExecutor extends BufferedSynchronousExecutor {
 //        public SubExecutor(int inputQueueCapacity) {
 //            super(
 //                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
@@ -116,8 +118,8 @@ public class NARS extends NAR {
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                //new HijackTermIndex(new DefaultConceptBuilder(), 512 * 1024, 3),
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                new HijackTermIndex(new DefaultConceptBuilder(), 256 * 1024, 3),
+                //new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
     }
 

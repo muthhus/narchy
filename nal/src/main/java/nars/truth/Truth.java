@@ -184,7 +184,7 @@ public interface Truth extends Truthed {
         return new PreciseTruth(1f - freq(), conf());
     }
 
-    default boolean equals(@Nullable  Truth x, float tolerance) {
+    default boolean equals(@Nullable  Truthed x, float tolerance) {
         return x!=null && Util.equals(freq(), x.freq(), tolerance) && Util.equals(conf(), x.conf(), tolerance);
     }
 

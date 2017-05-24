@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
 public abstract class MaplikeTermIndex extends CachedTermIndex {
 
-    final static Logger logger = LoggerFactory.getLogger(MaplikeTermIndex.class);
+    //final static Logger logger = LoggerFactory.getLogger(MaplikeTermIndex.class);
 
     @NotNull
     protected final ConceptBuilder conceptBuilder;

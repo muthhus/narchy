@@ -9,9 +9,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 
-public abstract class ActionConcept extends WiredConcept implements Function<NAR,Task> {
+public abstract class ActionConcept extends WiredConcept implements Function<NAR,Stream<Task>> {
 
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {

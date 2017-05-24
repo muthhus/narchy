@@ -41,7 +41,13 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
         super.cycle(nar);
 
+        flush(); //<- ? why does this have to be done twice
+    }
+
+    @Override
+    public void stop() {
         flush();
+        super.stop();
     }
 
     @Override

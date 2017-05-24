@@ -21,8 +21,6 @@ import static nars.Op.GOAL;
  */
 public class FZero extends NAgentX {
 
-
-
     private final FZeroGame fz;
 
     public static void main(String[] args) throws Narsese.NarseseException {
@@ -60,17 +58,17 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         senseCamera("fz", () -> fz.image, 32, 24)
-                .resolution(0.01f);
+                .resolution(0.15f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (r) -> {
             fz.vehicleMetrics[0][6] += (r*r*r) * 1f;
             return true;
-        });
+        }).resolution.setValue(0.1f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
             fz.playerAngle += (r*r*r) * 0.15f;
             return true;
-        });
+        }).resolution.setValue(0.1f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
@@ -82,12 +80,12 @@ public class FZero extends NAgentX {
 //            }
 //        });
 
-        senseNumberDifference($.inh(Atomic.the("joy"), id), happy);
-        SensorConcept sensorConcept1 = senseNumberDifference($.inh(Atomic.the("angVel"), id), () -> (float) fz.playerAngle);
-        SensorConcept sensorConcept = senseNumberDifference($.inh(Atomic.the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]);
-        senseNumberBi($.inh(Atomic.the("rot"), id), new FloatNormalized(() ->
-                (float) (MathUtils.normalizeAngle(fz.playerAngle % (2 * 3.14f), 0) / Math.PI)
-        ));
+        senseNumberDifference($.inh(Atomic.the("joy"), id), happy).resolution.setValue(0.2f);
+        senseNumberDifference($.inh(Atomic.the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.1f);
+        senseNumberDifference($.inh(Atomic.the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.1f);
+        senseNumber($.inh(Atomic.the("ang"), id), new FloatNormalized(() ->
+                (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
+        ).resolution(0.1f);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

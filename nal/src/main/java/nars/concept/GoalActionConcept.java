@@ -6,12 +6,16 @@ import nars.*;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalExtendedBeliefTable2;
 import nars.table.TemporalBeliefTable;
+import nars.task.NALTask;
 import nars.task.Revision;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
@@ -22,7 +26,7 @@ import static nars.Op.GOAL;
  */
 public class GoalActionConcept extends ActionConcept {
 
-    private final Signal feedback;
+    private final Signal feedback, feedbackGoal;
     private final FloatParam curiosity;
 
 
@@ -37,8 +41,8 @@ public class GoalActionConcept extends ActionConcept {
         super(term, n);
 
         this.curiosity = curiosity;
-        this.feedback = new Signal(BELIEF, resolution);
-        feedback.pri(() -> n.priorityDefault(GOAL));
+        this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
+        this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -46,7 +50,7 @@ public class GoalActionConcept extends ActionConcept {
     }
 
     @Override
-    public Task apply(NAR nar) {
+    public Stream<Task> apply(NAR nar) {
 
 
         int dur = nar.dur();
@@ -88,14 +92,25 @@ public class GoalActionConcept extends ActionConcept {
 
         Truth belief = belief(now, dur);
 
-        if (goal == null) goal = belief; //use belief state, if exists (latch)
+        //HACK try to improve this
+        //if (goal == null) goal = belief; //use belief state, if exists (latch)
+        boolean kickstart;
+        if (((goal == null) || (goal.conf() < nar.confMin.floatValue())) && (feedback.current!=null)) {
+            goal = $.t(feedback.current.truth.freq, nar.confMin.floatValue()); //if null, use the last feedback value (latch)
+            kickstart = true;
+        } else {
+            kickstart = false;
+        }
 
-        return feedback.set(term(),
-                this.motor.motor(
-                        belief,
-                        goal),
-                nar.time::nextStamp,
-                nar);
+        Truth fbt = this.motor.motor(belief, goal);
+
+        Task fb = fbt!=null ? feedback.set(this, fbt, nar) : feedback.current;
+
+        //HACK insert shadow goal
+        Task fg = (goal!=null && kickstart) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.set(this, null, nar);
+
+
+        return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 
 

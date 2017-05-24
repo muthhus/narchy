@@ -55,6 +55,13 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
     }
 
     @Override
+    public void stop() {
+        flush();
+        super.stop();
+    }
+
+
+    @Override
     public void start(NAR nar) {
         super.start(nar);
         flush();

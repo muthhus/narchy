@@ -49,7 +49,11 @@ public class Signal {
     }
 
 
-    public Task set(Compound term, Truth nextTruth, LongSupplier stamper, NAR nar) {
+    public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, NAR nar) {
+        return set(term, nextTruth, nar.time::nextStamp, nar);
+    }
+
+    public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
 
 
         long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
@@ -97,7 +101,7 @@ public class Signal {
             } else {
 
 
-                t = task(term, nextTruth,
+                t = task(term, nextTruth.truth(),
                     last, now,
                         previous, stamper.getAsLong(), nar);
             }

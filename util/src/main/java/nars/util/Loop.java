@@ -84,40 +84,43 @@ abstract public class Loop implements Runnable {
 
         while (!stopping) {
 
-            long beforeTime = System.currentTimeMillis();
 
-            //try {
+            final int periodMS = this.periodMS;
 
-            if (!next())
-                break;
+            long beforeTime = periodMS > 0 ? System.currentTimeMillis() : -1;
 
-//            } catch (Throwable e) {
-//                logger.error("{}", e);
-//                /*nar.eventError.emit(e);
-//                if (Param.DEBUG) {
-//                    stop();
-//                    break;
-//                }*/
-//            }
+            try {
+
+                if (!next())
+                    break;
+
+            } catch (Throwable e) {
+                logger.error("{}", e);
+                /*nar.eventError.emit(e);
+                if (Param.DEBUG) {
+                    stop();
+                    break;
+                }*/
+            }
 
 
-            //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
-            this.prevTime = beforeTime;
-            //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
+            if (periodMS > 0) {
+                //if we have a set period time, delay as appropriate otherwise continue immediately with the next cycle
+                this.prevTime = beforeTime;
+                //periodMS <= 0 ? System.currentTimeMillis() : Util.pauseWaitUntil(prevPrevTime + periodMS);
 
-            long afterTime = System.currentTimeMillis();
-            long frameTime = afterTime - beforeTime;
+                long afterTime = System.currentTimeMillis();
+                long frameTime = afterTime - beforeTime;
 
-            long delayable = (periodMS - ((long)this.frameTime.getMean()));
-            this.frameTime.addValue(frameTime);
+                long delayable = (periodMS - ((long) this.frameTime.getMean()));
+                this.frameTime.addValue(frameTime);
 
                 // (beforeTime + periodMS) - prevTime
-            if (delayable > 0) {
-                //logger.info("delay {}", delayable);
-                //Util.pause(delayable);
-                Util.sleep(delayable);
-            } else {
-                Thread.yield(); //at least yield
+                if (delayable > 0) {
+                    //logger.info("delay {}", delayable);
+                    //Util.pause(delayable);
+                    Util.sleep(delayable);
+                }
             }
 
 

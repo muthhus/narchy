@@ -281,13 +281,13 @@ public interface NAct {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default ActionConcept action(@NotNull String s, @NotNull GoalActionConcept.MotorFunction update) throws Narsese.NarseseException {
+    default GoalActionConcept action(@NotNull String s, @NotNull GoalActionConcept.MotorFunction update) throws Narsese.NarseseException {
         return action($.$(s), update);
     }
 
     @NotNull
-    default ActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
-        ActionConcept m = new GoalActionConcept(s, this, update);
+    default GoalActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
+        GoalActionConcept m = new GoalActionConcept(s, this, update);
         actions().add(m);
         return m;
     }
@@ -300,7 +300,7 @@ public interface NAct {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default ActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
+    default GoalActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return actionUnipolar(s, (f) -> {
             float y = (f - 0.5f) * 2f;
             return update.accept(y);
@@ -311,7 +311,7 @@ public interface NAct {
      * update function receives a value in 0..1.0 corresponding directly to the present goal frequency
      */
     @NotNull
-    default ActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
+    default GoalActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatPredicate update) {
         return action(s, (b, d) -> {
             if (d != null) {
                 float conf =

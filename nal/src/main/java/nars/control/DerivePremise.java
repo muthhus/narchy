@@ -24,7 +24,7 @@ public class DerivePremise extends UnaryTask<Premise> {
 
         BufferedDerivation d = derivation.get();
 
-        assert(d.buffer.isEmpty());
+        d.buffer.clear(); //should be clear but just in case
 
         d.restartA(n);
         d.restartB(value.task);

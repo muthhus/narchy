@@ -11,8 +11,7 @@ import java.util.function.BiFunction;
 
 public final class BufferedDerivation extends Derivation implements BiFunction<ITask, ITask, ITask> {
 
-    final Map<ITask,ITask> buffer =
-            new LinkedHashMap();
+    final Map<ITask,ITask> buffer =new LinkedHashMap();
 
     @Override
     public ITask apply(ITask prev, ITask next) {
