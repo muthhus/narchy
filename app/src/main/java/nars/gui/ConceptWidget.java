@@ -332,10 +332,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
-                        0.1f + 0.8f * edgeProp;
+                        0.1f + 0.25f * edgeProp;
 
-                this.attraction = 0f + 2f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 0f + 4f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 0.05f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;
@@ -399,7 +399,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 
 
-            float density = 6f;
+            float density = 0.5f;
             if (cw.body != null) {
                 cw.body.setMass(l * w * h * density);
                 cw.body.setDamping(0.9f, 0.9f);

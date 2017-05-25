@@ -53,7 +53,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_unification3()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<<$x --> swan> ==> <$x --> bird>>", 1.00f, 0.80f); //en("If something is a swan, then it is a bird.");
         tester.believe("<<$y --> swan> ==> <$y --> swimmer>>", 0.80f, 0.9f); //en("If something is a swan, then it is a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,<$1 --> bird>,<$1 --> swimmer>)>", 0.80f, 0.72f); //en("I believe that if something is a swan, then usually, it is both a bird and a swimmer.");
@@ -84,7 +84,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_unification5()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<(&&,<$x --> flyer>,<$x --> [chirping]>) ==> <$x --> bird>>"); //en("If something can fly and chirp, then it is a bird.");
         tester.believe("<<$y --> [withWings]> ==> <$y --> flyer>>"); //en("If something has wings, then it can fly.");
         tester.mustBelieve(cycles, "<(&&,<$1 --> [chirping]>,<$1 --> [withWings]>) ==> <$1 --> bird>>", 1.00f, 0.81f); //en("If something can chirp and has wings, then it is a bird.");
@@ -330,7 +330,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void multiple_variables_introduction()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<<$x --> key> ==> open($x,{lock1})>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
@@ -457,7 +457,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test /** TODO verify */
     public void abduction_with_variable_elimination_negated()  {
         test()
-                .log()
+                //.log()
                 .believe("(open($1,lock1) ==> ($1 --> key))", 1.00f, 0.90f) //en("whatever opens lock1 is a key");
                 ///tester.believe("<<lock1 --> (/,open,$1,_)> ==> <$1 --> key>>", 1.00f, 0.90f); //en("whatever opens lock1 is a key");
                 .believe("(((--,(#1 --> lock)) && open($2,#1)) ==> ($2 --> key))", 1.00f, 0.90f) //en("there is NOT a lock with the property that when opened by something, this something is a key");
@@ -494,7 +494,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk
     public void strong_elimination()  {
         TestNAR tester = test();
-        tester.log();
+        //tester.log();
         tester.believe("<(&&,<($a,is,cat) --> test>,<($a,is,$b) --> sentence>) ==> <$a --> $b>>");
         tester.believe("<(tim,is,cat) --> test>");
         tester.mustBelieve(cycles*2, "<<(tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
@@ -559,7 +559,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test public void testImplSpecificNeg() {
         // B, (C ==> A), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
         test()
-            .log()
+            //.log()
             .believe("--(($x) ==> ($x,y))")
             .believe("(y)")
             .mustBelieve(cycles, "(y,y)", 0f, 0.81f)

@@ -25,19 +25,19 @@ public class Default extends NAR {
 
 
 
-    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 2);
+    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 1);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
     @Deprecated
     public Default() {
-        this(256);
+        this(512);
     }
 
     public Default(int activeConcepts) {
         this(
             new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new BufferedSynchronousExecutorHijack(activeConcepts, 1f));
+            new BufferedSynchronousExecutorHijack(activeConcepts, 0.5f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;

@@ -1,5 +1,6 @@
 package nars.gui;
 
+import com.google.common.collect.Iterables;
 import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.bag.util.Bagregate;
 import jcog.pri.PLink;
@@ -10,14 +11,20 @@ import nars.concept.Concept;
 import nars.control.ConceptFire;
 import nars.nar.Default;
 import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.util.exe.BufferedSynchronousExecutorHijack;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
+import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
+import spacegraph.widget.button.ToggleButton;
 
 import java.util.Collection;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.gui.Vis.MyForceDirected;
 import static nars.gui.Vis.reflect;
@@ -27,6 +34,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
 
     public static final float UPDATE_RATE = 0.5f;
+
     public final NAR nar;
     public final int maxEdgesPerNodeMin, maxEdgesPerNodeMax;
     final Bagregate<ConceptFire> bag;
@@ -38,7 +46,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 //    }
 
-    public ConceptsSpace(NAR nar, Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public ConceptsSpace(NAR nar, @NotNull Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super();
         this.nar = nar;
         this.maxNodes = maxNodes;
@@ -82,13 +90,13 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //            System.out.println(displayNext.iterator().next());
     }
 
-    public final HijackMemoize<ConceptFire,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
+    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
         ConceptWidget y = new ConceptWidget(c);
-        y.concept = c.get();
+        y.concept = c;
         return y;
     }) {
         @Override
-        public void onRemoved(@NotNull PLink<Pair<ConceptFire, ConceptWidget>> value) {
+        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
             value.get().getTwo()
                     //.hide();
                     .delete(space.dyn);
@@ -100,7 +108,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     });
 
     void widgetRemove(ConceptFire concept) {
-        @Nullable ConceptWidget cw = widgets.getIfPresent(concept);
+        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
         if (cw != null) {
             cw.hide();
         }
@@ -122,7 +130,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
     }
 
     ConceptWidget widgetGetOrCreate(ConceptFire concept) {
-        ConceptWidget cw = widgets.apply(concept);
+        ConceptWidget cw = widgets.apply(concept.get());
         cw.activate();
         return cw;
     }
@@ -140,7 +148,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Param.DEBUG = false;
 
-        Default n = new Default(512);
+        Default n = new Default(30);
         //Default n = NARBuilder.newMultiThreadNAR(1, new RealTime.DSHalf(true).durSeconds(0.05f));
         //n.nal(1);
 //        n.termVolumeMax.setValue(7f);
@@ -157,31 +165,42 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //n.mix.stream("Derive").setValue(0.005f); //quiet derivation
         //n.focus.activationRate.setValue(0.05f);
 
-        n.startFPS(10f);
 
-        n.input("(x:a ==> x:b).",
-                "(x:b ==> x:c).",
-                "(x:c ==> x:d).",
-                "(x:d ==> x:e).",
-                "(x:e ==> x:f)."
+        for (int i = 1; i < 10; i++)
+            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
+
+        n.startFPS(1f);
+
+
+//                "(x:a ==> x:b).",
+//                "(x:b ==> x:c).",
+//                "(x:c ==> x:d).",
+//                "(x:d ==> x:e).",
+//                "(x:e ==> x:f)."
 //                "(x:f ==> x:g).",
 //                "(x:g ==> x:h)."
 
-                );
 //        for (int i = 0; i < 10; i++) {
 //            n.inputAt(i * 5 , i % 2 == 0 ? "x:c! :|:" : "--x:c! :|:");
 //        }
 
 
         //new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
+        final AtomicBoolean atomsEnabled = new AtomicBoolean(false);
 
-        NARSpace cs = new ConceptsSpace(n,  null /* TODO */,128, 128, 1, 5) {
-//            @Override
-//            protected boolean include(Term term) {
-//
+        NARSpace cs = new ConceptsSpace(n,
+                ()->(((BufferedSynchronousExecutorHijack) (n.exe)).active)
+                        .stream()
+                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .filter(Objects::nonNull)
+                        .iterator()
+                /* TODO */,128, 192, 2, 5) {
+            @Override
+            protected boolean include(Term x) {
+                return atomsEnabled.get() || !(x instanceof Atomic);
 //                return term instanceof Compound &&
 //                        term.complexity()==3 && term.toString().endsWith("-->x)");
-//            }
+            }
         };
 
 
@@ -217,7 +236,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //            }
         };
 
-        s.dyn.addBroadConstraint(new MyForceDirected());
+        MyForceDirected fd = new MyForceDirected();
+        fd.repel.setValue(1);
+        s.dyn.addBroadConstraint(fd);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 
@@ -232,7 +253,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         SpaceGraph.window(
             col(
-                reflect( new CycleView(n) ),
+                reflect(fd),
+                new CheckBox("Atoms", atomsEnabled),
+                //reflect( new CycleView(n) ),
                 new PushButton("+", () -> {
                     try {
                         n.input("x:h! :|:");

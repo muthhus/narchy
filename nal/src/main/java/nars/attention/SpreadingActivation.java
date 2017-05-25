@@ -2,6 +2,7 @@ package nars.attention;
 
 import jcog.bag.Bag;
 import jcog.list.FasterList;
+import jcog.map.SaneObjectFloatHashMap;
 import jcog.pri.PLink;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
@@ -35,16 +36,18 @@ import static nars.time.Tense.ETERNAL;
  */
 public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatProcedure<Termed> {
 
+    static final ThreadLocal<ObjectFloatHashMap<Termed>> activationsSmall =
+            ThreadLocal.withInitial(() -> new SaneObjectFloatHashMap<>(16));
 
-    static final ThreadLocal<ObjectFloatHashMap<Termed>> activationMapThreadLocal =
-            ThreadLocal.withInitial(ObjectFloatHashMap::new);
+    static final ThreadLocal<ObjectFloatHashMap<Termed>> activationsLarge =
+            ThreadLocal.withInitial(() -> new SaneObjectFloatHashMap<>(64));
 
     @Deprecated
     private int maxDepth; //TODO subtract from this then it wont need stored
 
 
-    @NotNull
-    transient protected TaskConcept origin;
+    transient final protected TaskConcept origin;
+
     final MutableFloat linkOverflow = new MutableFloat(0);
 
     /**
@@ -71,46 +74,64 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     private static final float TERMLINK_BALANCE = 0.5f;
 
     transient private ObjectFloatHashMap<Termed> spread;
-    private NAR nar;
-    private FasterList<ITask> activations;
+    transient private NAR nar;
+    transient private FasterList<ITask> activations;
+
+    /** priority of the task, which will differ from the priority of the activation.
+     * we want to activate with the task's current priority regardless how low the priority of this
+     * activation becomes.*/
+    transient private float taskPri;
 
 
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task in, @NotNull TaskConcept c) {
-        super(in, in.priSafe(0));
+    public SpreadingActivation(@NotNull Task t, @NotNull TaskConcept c) {
+        super(t, t.priSafe(0));
         this.origin = c;
     }
 
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
+        this.taskPri = id.pri();
+        if (taskPri!=taskPri)
+            return null;
+
+
         this.momentum = nar.momentum.floatValue();
-        dur = nar.dur();
+        this.dur = nar.dur();
         this.nar = nar;
 
         this.maxDepth = levels(origin);
 
-        spread = activationMapThreadLocal.get();
-
         ITask[] a = null;
+
+        /* HEURISTIC estimate */
+        spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
+        assert(spread.isEmpty());
+
+        int ss = 0;
         try {
 
             link(origin, 1f, 0);
-
-            int ss = spread.size();
-            if (ss > 0) {
-                this.activations = new FasterList(0, a = new ITask[ss]);
-                this.spread.forEachKeyValue(this);
-                this.activations = null;
-            }
-
             nar.emotion.stress(linkOverflow);
 
+            ss = spread.size();
+            if (ss > 0) {
+                this.activations = new FasterList<>(0, a = new ITask[ss]);
+                this.spread.forEachKeyValue(this);
+            }
 
         } finally {
-            spread.clear();
+            if (ss > 0) {
+                this.spread.clear(); //makes sure it clear
+
+                //GC relief
+                this.spread = null;
+                this.activations = null;
+                this.nar = null;
+            }
         }
 
         return a;
@@ -167,7 +188,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     public void value(@NotNull Termed c, float scale) {
         //System.out.println("\t" + k + " " + v);
 
-        float p = pri;
+        float p = taskPri;
         float pScaled = p * scale;
         if (pScaled >= Priority.EPSILON) {
             if (c instanceof Concept)

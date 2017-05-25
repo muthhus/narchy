@@ -74,7 +74,7 @@ public final class STMTemporalLinkage extends STM {
             int s = stm.size();
             if (s > 0) {
                 queued = $.newArrayList(s);
-                int numExtra = Math.max(0, (s + 1) - stmCapacity);
+                int numExtra = Math.max(0, (s) - stmCapacity);
 
                 Iterator<Task> ss = stm.iterator();
                 while (ss.hasNext()) {

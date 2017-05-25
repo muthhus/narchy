@@ -24,8 +24,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(40, 0, 100);
-    public final FloatParam attraction = new FloatParam(0.001f, 0, 5);
+    public final FloatParam repel = new FloatParam(4, 0, 10);
+    public final FloatParam attraction = new FloatParam(0.1f, 0, 2.5f);
 
 
 
@@ -59,8 +59,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         float r = 400;
         boundsMin = v(-r, -r, -r);
         boundsMax = v(+r, +r, +r);
-        maxRepelDist = r*2.5f;
-
+        maxRepelDist = r*0.25f;
     }
 
 
@@ -109,11 +108,10 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     protected void batch(List<Collidable> l) {
 
         float speed = repel.floatValue();
-        v3 t = v();
         for (int i = 0, lSize = l.size(); i < lSize; i++) {
             Collidable x = l.get(i);
             for (int j = i + 1; j < lSize; j++) {
-                repel(x, l.get(j), speed, maxRepelDist, t);
+                repel(x, l.get(j), speed, maxRepelDist);
             }
 
         }
@@ -126,50 +124,47 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         v3 delta = v();
         delta.sub(yp.transform(), xp.transform());
 
-
         float len = delta.normalize();
         if (!Float.isFinite(len))
             return;
 
-        //len -= idealDistRads * Math.max(xp.radius(), yp.radius());
-        //if (len <= 0)
-            //return;
+        len -= idealDistRads;
+        if (len <= 0)
+            return;
 
 
         //v3 delta2 = v(delta);
 
-        delta.scale((speed * (xp.mass() /* + yp.mass()*/) ) * len );
+        delta.scale((speed / (xp.mass() /* + yp.mass()*/) ) * len );
         ((Dynamic) x).impulse(delta);
 //        delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
 //        ((Dynamic) y).impulse(delta2);
 
     }
 
-    private static void repel(Collidable x, Collidable y, float speed, float maxDist, v3 delta) {
+    private static void repel(Collidable x, Collidable y, float speed, float maxDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
+        v3 delta = v();
         delta.sub(xp.transform(), yp.transform());
 
         float len = delta.normalize();
-
-        //len -= (xp.radius() + yp.radius());
-
-        if (len >= maxDist)
+        len -= (xp.radius() + yp.radius());
+        if (len < 0)
+            len = 0;
+        else if (len >= maxDist)
             return;
-        else {
-            len = Math.max(0, len);
-        }
 
-        float base = speed / ( Util.sqr( 1 + len ));
+        float base = speed / ( 1 + Util.sqr( len ));
 
         {
-            float s = xp.mass() * base;
+            float s = /*xp.mass() * */ base;
             ((Dynamic) x).impulse(delta.x * s, delta.y * s, delta.z * s);
         }
 
         {
-            float s = -yp.mass() * base;
+            float s = -/*yp.mass() **/ base;
             ((Dynamic) y).impulse(delta.x * s, delta.y * s, delta.z * s);
         }
 
