@@ -123,7 +123,7 @@ public class BufferedSynchronousExecutorHijack extends SynchronousExecutor {
 //            toExe = Math.min(ps, toExe);
 
             float eFrac = ((float)toExe) / ps;
-            float pAvg = (PForget.DEFAULT_TEMP) * active.depressurize(eFrac) / toExe;
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * active.depressurize(eFrac) / toExe;
             this.forgetEachPri = pAvg > Pri.EPSILON ? pAvg : 0;
 
             active.sample(toExe, this::actuallyRun);

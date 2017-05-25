@@ -394,7 +394,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             float nodeScale = (float) (minSize + Math.sqrt(ec) * maxSize);//1f + 2f * p;
             float l = nodeScale * 1.618f;
             float w = nodeScale;
-            float h = nodeScale / (1.618f * 2);
+            float h = 1; //nodeScale / (1.618f * 2);
             cw.scale(l, w, h);
 
 

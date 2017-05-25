@@ -148,7 +148,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Param.DEBUG = false;
 
-        Default n = new Default(30);
+        Default n = new Default(20);
         //Default n = NARBuilder.newMultiThreadNAR(1, new RealTime.DSHalf(true).durSeconds(0.05f));
         //n.nal(1);
 //        n.termVolumeMax.setValue(7f);
@@ -166,10 +166,6 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //n.focus.activationRate.setValue(0.05f);
 
 
-        for (int i = 1; i < 10; i++)
-            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
-
-        n.startFPS(1f);
 
 
 //                "(x:a ==> x:b).",
@@ -194,7 +190,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */,128, 192, 2, 5) {
+                /* TODO */,128, 192, 2, 7) {
             @Override
             protected boolean include(Term x) {
                 return atomsEnabled.get() || !(x instanceof Atomic);
@@ -276,6 +272,10 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         //n.log();
         //n.loop(2f);
 
+        for (int i = 1; i < 24; i++)
+            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
+
+        n.startFPS(3f);
 
 
         //n.input("(a-->b).", "(b-->c).","(c-->d).");

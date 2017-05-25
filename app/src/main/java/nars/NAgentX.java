@@ -115,9 +115,9 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 16);
 
-        int threads = 3;
+        int threads = 4;
         for (int i = 0; i < threads; i++) {
-            n.addNAR(2048);
+            n.addNAR(256);
         }
 
         NAgent a = init.apply(n);
