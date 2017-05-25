@@ -19,7 +19,7 @@ public abstract class UDPNetworkSimulation {
 
     UDPeer[] peers;
 
-    public UDPNetworkSimulation(int size) throws SocketException, UnknownHostException {
+    public UDPNetworkSimulation(int size) throws SocketException {
         int port = 10000;
 
         peers = new  UDPeer[size];
@@ -59,7 +59,7 @@ public abstract class UDPNetworkSimulation {
 
     private class MyUDPeer extends UDPeer {
 
-        public MyUDPeer(int port, int i) throws SocketException, UnknownHostException {
+        public MyUDPeer(int port, int i) throws SocketException {
             super(port + i);
         }
 

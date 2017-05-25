@@ -65,7 +65,7 @@ abstract public class Loop implements Runnable {
         return thread.get() != null;
     }
 
-    protected final void setFPS(float fps) {
+    public final void setFPS(float fps) {
         setPeriodMS((int) (1000f / fps));
     }
 
@@ -97,6 +97,10 @@ abstract public class Loop implements Runnable {
 
     /** for subclass overriding; called from the looping thread */
     protected void onStart() {
+
+    }
+    /** for subclass overriding; called from the looping thread */
+    protected void onStop() {
 
     }
 
@@ -155,6 +159,8 @@ abstract public class Loop implements Runnable {
         }
 
         stop();
+
+        onStop();
     }
 
 

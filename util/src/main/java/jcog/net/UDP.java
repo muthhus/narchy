@@ -27,7 +27,6 @@ public class UDP extends Loop {
 
     public final Thread recvThread;
 
-    final AtomicBoolean running = new AtomicBoolean();
     private static final Logger logger = LoggerFactory.getLogger(UDP.class);
 
     private static final InetAddress local = new InetSocketAddress(0).getAddress();
@@ -76,32 +75,17 @@ public class UDP extends Loop {
     }
 
 
-    public void start() {
-        if (!running.compareAndSet(false, true))
-            return;
-
-        logger.info("{} start {} {} {} {}", this, in, in.getLocalSocketAddress(), in.getRemoteSocketAddress(), in.getInetAddress());
-
-        setPeriodMS(updatePeriodMS);
-
-        recvThread.start();
-
-        onStart();
-    }
 
     @Override
-    public void stop() {
-        if (running.compareAndSet(true, false)) {
-            logger.info("{} stop", this);
-            super.stop();
-            in.close();
-            recvThread.interrupt();
-        }
+    protected void onStop() {
+        in.close();
+        recvThread.interrupt();
     }
+
 
     protected void recv() {
 
-        while (running.get()) {
+        while (isRunning()) {
             try {
 
                 byte[] receiveData = new byte[MAX_PACKET_SIZE];
@@ -111,15 +95,14 @@ public class UDP extends Loop {
                 in(p, receiveData);
 
             } catch (Throwable e) {
-                if (!running.get() || !in.isClosed()) {
+                if (in.isClosed()) {
+                    stop();
                     break;
                 } else {
                     logger.warn("{}", e);
                 }
             }
         }
-
-        stop();
 
     }
 
@@ -128,7 +111,7 @@ public class UDP extends Loop {
     }
 
     protected void onStart() {
-
+        recvThread.start();
     }
 
 

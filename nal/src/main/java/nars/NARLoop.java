@@ -7,8 +7,6 @@ import org.jetbrains.annotations.NotNull;
  * self managed set of processes which run a NAR
  * as a loop at a certain frequency.
  * TODO extract the hft core reservation to a subclass and put that in the app module, along with the hft dependency
- * <p>
- * mostly replaced by Executioner's
  */
 public class NARLoop extends Loop {
 

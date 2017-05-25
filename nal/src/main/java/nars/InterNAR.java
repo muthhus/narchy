@@ -68,7 +68,6 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                 super.in(t, each);
             }
         };
-        logger.info("start");
     }
 
     private static byte ttl(Task x) {
@@ -77,6 +76,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
     @Override
     public void stop() {
+        super.stop();
         out.stop();
     }
 
@@ -100,6 +100,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
                 x = new LambdaQuestionTask(x, 8, nar, this);
                 x.meta(Msg.class, m);
             }
+            x.budget(nar);
 
             //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
             nar.input(x);

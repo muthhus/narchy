@@ -7,12 +7,14 @@ import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.BufferedSynchronousExecutorHijack;
 import org.junit.Test;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
@@ -46,8 +48,10 @@ public class InterNARTest {
             a.run(1); b.run(1);
 
             InterNAR ai = new InterNAR(a, 1, nextPort.incrementAndGet());
-
             InterNAR bi = new InterNAR(b, 1, nextPort.incrementAndGet());
+
+            ai.setFPS(4f);
+            bi.setFPS(4f);
 
             Util.pause(CONNECTION_TIME);
 
@@ -67,8 +71,8 @@ public class InterNARTest {
             Util.pause(CONNECTION_TIME);
 
             ai.stop();
-            a.stop();
             bi.stop();
+            a.stop();
             b.stop();
 
         } catch (Exception e) {
@@ -79,8 +83,10 @@ public class InterNARTest {
 
     private static Default newNAR() {
         return new Default(
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024, null),
-                new RealTime.DSHalf(true), new BufferedSynchronousExecutor());
+                new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
+                new RealTime.DSHalf(true),
+                new BufferedSynchronousExecutorHijack(128)
+        );
     }
 
     @Test

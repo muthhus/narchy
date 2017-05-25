@@ -106,13 +106,13 @@ public class UDPeer extends UDP {
 
             @Override
             public void onAdded(UDProfile p) {
-                logger.debug("connect {}",  p);
+                logger.info("connect {}",  p);
                 onAddRemove(p, true);
             }
 
             @Override
             public void onRemoved(@NotNull UDPeer.UDProfile p) {
-                logger.debug("disconnect {}", p);
+                logger.info("disconnect {}", p);
                 onAddRemove(p, false);
             }
 
@@ -204,7 +204,7 @@ public class UDPeer extends UDP {
     /**
      * send to a specific known recipient
      */
-    protected void send(Msg o, InetSocketAddress to) {
+    protected void send(@NotNull Msg o, @NotNull InetSocketAddress to) {
 //        InetSocketAddress a = o.origin();
 //        if (a != null && a.equals(to))
 //            return;
@@ -641,21 +641,25 @@ public class UDPeer extends UDP {
          * the payload as a long
          */
         public long dataLong(int offset) {
-            if (dataLength() < (offset + 8))
-                throw new RuntimeException("unexpected payload");
+            byte[] b = this.bytes;
+            if (b.length < offset + 8)
+                throw new RuntimeException("missing 64-bit payload");
 
+            offset += DATA_START_BYTE;
             return Longs.fromBytes(
-                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++],
-                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++]
+                b[offset++], b[offset++], b[offset++], b[offset++],
+                b[offset++], b[offset++], b[offset++], b[offset++]
             );
         }
 
         public int dataInt(int offset, int ifMissing) {
-            if (dataLength() < (offset + 4))
+            byte[] b = this.bytes;
+            if (b.length < offset + 4)
                 return ifMissing;
 
+            offset += DATA_START_BYTE;
             return Ints.fromBytes(
-                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++]
+                b[offset++], b[offset++], b[offset++], b[offset++]
             );
         }
 
