@@ -108,12 +108,6 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
-        <dependency>
-            <groupId>org.roaringbitmap</groupId>
-            <artifactId>RoaringBitmap</artifactId>
-            <version>0.6.44</version>
-        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/net.byteseek/byteseek -->
