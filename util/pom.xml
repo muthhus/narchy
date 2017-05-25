@@ -86,7 +86,7 @@
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>jackson-dataformat-msgpack</artifactId>
-            <version>0.8.12</version>
+            <version>0.8.13</version>
         </dependency>
 
         <dependency>
@@ -99,7 +99,7 @@
             <!-- https://vimeo.com/12165742 -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>22.0-rc1</version>
+            <version>22.0</version>
         </dependency>
 
 
@@ -356,12 +356,12 @@
         <!--</dependency>-->
 
 
-        <dependency>
-            <groupId>com.google.truth</groupId>
-            <version>0.32</version>
-            <artifactId>truth</artifactId>
-            <scope>test</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.truth</groupId>-->
+            <!--<version>0.32</version>-->
+            <!--<artifactId>truth</artifactId>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
 
 
     </dependencies>
