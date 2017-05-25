@@ -142,7 +142,7 @@ public class NARS extends NAR {
 
 
     public boolean running() {
-        return this.loop != null;
+        return this.loop.isRunning();
     }
 
 
@@ -152,7 +152,7 @@ public class NARS extends NAR {
     }
 
     @Override
-    public NARLoop startPeriodMS(int period) {
+    public NARLoop startPeriodMS(int ms) {
         synchronized (terms) {
 
             assert (!running());
@@ -160,7 +160,11 @@ public class NARS extends NAR {
             int num = sub.size();
 
             this.loops = $.newArrayList(num);
-            sub.forEach(n -> loops.add(new NARLoop(n)));
+            sub.forEach(n -> {
+                NARLoop l = new NARLoop(n);
+                l.prePeriodMS(0); //preset for infinite loop
+                loops.add(l);
+            });
 
             //this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
             //this.pool.prestartAllCoreThreads();
@@ -168,7 +172,7 @@ public class NARS extends NAR {
             loops.forEach(pool::execute);
         }
 
-        return super.startPeriodMS(period);
+        return super.startPeriodMS(ms);
     }
 
     @Override

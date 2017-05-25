@@ -117,7 +117,7 @@ abstract public class NAgent implements NSense, NAct {
         this.id = id;
         this.nar = nar;
 
-        this.now = nar.time();
+        this.now = ETERNAL; //not started
 
         this.happy = new SensorConcept(
                 id == null ? p("happy") : $.inh( Atomic.the("happy"), id),
@@ -219,14 +219,6 @@ abstract public class NAgent implements NSense, NAct {
     protected void senseAndMotor() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
 
-        if (!busy.compareAndSet(false, true)) {
-            return; //black-out, the last frame didnt even finish yet
-        }
-
-        try {
-
-            this.now = nar.time();
-
 
             float r = reward = act();
             if (r == r) {
@@ -239,7 +231,7 @@ abstract public class NAgent implements NSense, NAct {
             //        if (load < 1) {
 
 
-            long next = now + nar.dur()/2
+            long next = now + nar.dur()
                     //+(dur * 3 / 2);
                     ;
 
@@ -255,9 +247,6 @@ abstract public class NAgent implements NSense, NAct {
             if (trace)
                 logger.info(summary());
 
-        } finally {
-            busy.set(false);
-        }
 
     }
 
@@ -484,6 +473,9 @@ abstract public class NAgent implements NSense, NAct {
         return runCycles(nar.dur(), totalCycles);
     }
 
+    protected void next() {
+
+}
     /**
      * synchronous execution
      */
@@ -493,7 +485,7 @@ abstract public class NAgent implements NSense, NAct {
 
         @NotNull On active = nar.onCycle((n) -> {
             long lastNow = this.now;
-            long now = nar.time();
+            long now = this.now = nar.time();
             if (now - lastNow >= cyclesPerFrame) {
                 //only execute at most one agent frame per duration
                 senseAndMotor();
@@ -523,6 +515,7 @@ abstract public class NAgent implements NSense, NAct {
         NARLoop loop = nar.startFPS(fps);
 
         this.senseAndMotorLoop = nar.exe.loop(fps,()->{
+            this.now = nar.time();
             senseAndMotor();
             predict();
         });
@@ -564,8 +557,8 @@ abstract public class NAgent implements NSense, NAct {
         int n = actions.size();
         int dur = nar.dur();
         long now = nar.time();
-        for (ActionConcept a : actions) {
-            a.goals().forEach(x -> {
+        for (int i = 0; i < n; i++) {
+            actions.get(i).goals().forEach(x -> {
                 //System.out.println(x.proof());
                 m[0] += x.evi(now, dur);
             });
@@ -587,7 +580,6 @@ abstract public class NAgent implements NSense, NAct {
             ;
 
             long range = t.end() - t.start();
-            //System.out.println(now + " " + nar.time() + " -> " + next + "+" + shift + " = " + (next+shift));
             result = prediction(t.term(), t.punc(), t.truth(), next + shift, next + shift + range);
 
         } else if (t.isDeleted()) {

@@ -309,7 +309,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         private boolean pauseIssued;
         private boolean quitIssued;
         public boolean isAnimating;
-        private List<GLAutoDrawable> toDraw = new CopyOnWriteArrayList<>();
 
         GameAnimatorControl(float initialFPS) {
             super();
@@ -321,17 +320,20 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
                 public boolean justStarted = true;
 
+
+                @Override
+                protected void onStart() {
+                    animThread = Thread.currentThread();
+                }
+
                 @Override
                 public boolean next() {
 
 
                     if (justStarted) {
                         justStarted = false;
-                        synchronized (GameAnimatorControl.this) {
-                            animThread = Thread.currentThread();
-                            if (DEBUG) {
-                                System.err.println("FPSAnimator start/resume:" + Thread.currentThread() + ": " + toString());
-                            }
+                        {
+
                             isAnimating = true;
                             if (drawablesEmpty) {
                                 pauseIssued = true; // isAnimating:=false @ pause below
@@ -339,10 +341,8 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                                 pauseIssued = false;
                                 setDrawablesExclCtxState(exclusiveContext); // may re-enable exclusive context
                             }
-                            GameAnimatorControl.this.notifyAll(); // Wakes up 'waitForStartedCondition' sync -and resume from pause or drawablesEmpty
-                            if (DEBUG) {
-                                System.err.println("FPSAnimator P1:" + Thread.currentThread() + ": " + toString());
-                            }
+                            //GameAnimatorControl.this.notifyAll(); // Wakes up 'waitForStartedCondition' sync -and resume from pause or drawablesEmpty
+
                         }
                     }
                     if (!pauseIssued && !quitIssued) { // RUN
@@ -441,7 +441,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
             setPrintExceptions(true);
 
-            animThread = loop.thread;
+            animThread = loop.thread();
             //setExclusiveContext(loop.thread);
         }
 
@@ -533,7 +533,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         }
 
 
-        protected synchronized void updateFPS() {
+        protected void updateFPS() {
             //logger.info("{}", MyFPSAnimator.this);
 
             int currentFPS = getFPS();

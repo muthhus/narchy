@@ -94,10 +94,10 @@ public class UDPeer extends UDP {
                 port);*/
         //this.meBytes = bytes(me);
 
-        this.rng = new XorShift128PlusRandom(ThreadLocalRandom.current().nextLong());
+        this.rng = new XorShift128PlusRandom(System.currentTimeMillis());
 
         int me;
-        while ((me = ThreadLocalRandom.current().nextInt()) == UNKNOWN_ID) ;
+        while ((me = rng.nextInt()) == UNKNOWN_ID) ;
         this.me = me;
 
         this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + ":" + name());
@@ -143,7 +143,6 @@ public class UDPeer extends UDP {
 
         seen = new PLinkHijackBag<>(SEEN_CAPACITY, 4);
 
-        start();
     }
 
     protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
@@ -168,9 +167,6 @@ public class UDPeer extends UDP {
 
             byte[] bytes = o.array();
 
-
-
-
             final int[] remain = {them.size()};
             them.sample((to) -> {
                 if (o.id() != to.id && (pri >= 1 || rng.nextFloat() <= pri)) {
@@ -184,24 +180,14 @@ public class UDPeer extends UDP {
     }
 
     @Override
-    public boolean stop() {
-        if (super.stop()) {
-            them.clear();
-            return true;
-        }
-        return false;
+    public void stop() {
+        super.stop();
+        them.clear();
     }
 
     public boolean seen(Msg o, float pri) {
-        RawPLink p = new RawPLink(o, pri);
-
-
-
-        return seen.put(p) != p; //what about if it returns null
-    }
-
-    public void tellSome(String msg, int ttl) {
-        tellSome(msg.getBytes(UTF8), ttl);
+        RawPLink<Msg> p = new RawPLink<>(o, pri);
+        return seen.put(p) != p;
     }
 
     public void tellSome(byte[] msg, int ttl) {
@@ -226,29 +212,30 @@ public class UDPeer extends UDP {
     }
 
     @Override
-    protected void update() {
+    public boolean next() {
 
         seen.commit();
 
         boolean updateNeed, updateCan;
         if (needChanged.compareAndSet(true, false)) {
             updateNeed = true;
-            say(need);
+            tellSome(need);
             onUpdateNeed();
         }
 
         if (canChanged.compareAndSet(true, false)) {
             updateCan = true;
-            say(can);
+            tellSome(can);
         }
 
+        return true;
     }
 
     protected void onUpdateNeed() {
 
     }
 
-    protected void say(HashMapTagSet set) {
+    protected void tellSome(HashMapTagSet set) {
         tellSome(new Msg(ATTN.id, DEFAULT_ATTN_TTL, me, null,
                 set.toBytes()), 1f, false);
     }
@@ -305,7 +292,6 @@ public class UDPeer extends UDP {
                 m.dataAddresses(this::ping);
                 break;
             case TELL:
-                //System.out.println(me + " recv: " + m.dataString() + " (ttl=" + m.ttl() + ")");
                 onTell(you, m);
                 break;
             case ATTN:
@@ -658,25 +644,25 @@ public class UDPeer extends UDP {
             if (dataLength() < (offset + 8))
                 throw new RuntimeException("unexpected payload");
 
-            return Longs.fromByteArray(data(offset, offset + 8));
+            return Longs.fromBytes(
+                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++],
+                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++]
+            );
         }
-
 
         public int dataInt(int offset, int ifMissing) {
             if (dataLength() < (offset + 4))
                 return ifMissing;
 
-            return Ints.fromByteArray(data(offset, offset + 4));
+            return Ints.fromBytes(
+                bytes[offset++], bytes[offset++], bytes[offset++], bytes[offset++]
+            );
         }
 
 
         public boolean originEquals(byte[] addrBytes) {
             int addrLen = addrBytes.length;
             return Arrays.equals(bytes, PORT_BYTE, PORT_BYTE + addrLen, addrBytes, 0, addrLen);
-        }
-
-        public String dataString() {
-            return new String(data(0, dataLength()));
         }
 
         final static int ADDRESS_BYTES = 16 /* ipv6 */ + 2 /* port */;

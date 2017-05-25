@@ -99,21 +99,21 @@ abstract public class Executioner implements Executor {
 
         @Override
         public boolean next() {
-            if (nar.time() == this.last)
+            if (nar.time() <= this.last)
                 return true; //hasn't proceeded to next cycle
 
             if (!busy.compareAndSet(false, true)) {
                 return true; //black-out, the last frame didnt even finish yet
             }
 
-            runLater(()->{
-                last = nar.time();
+            //runLater(()->{
                 try {
+                    last = nar.time();
                     task.run();
                 } finally {
                     busy.set(false);
                 }
-            });
+            //});
 
             return true;
         }

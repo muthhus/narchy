@@ -116,7 +116,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     int level;
 
 
-    protected NARLoop loop;
+    protected final NARLoop loop = new NARLoop(this);
 
     public final Mix<Object, Task> mix = new Mix();
 
@@ -240,9 +240,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         exe.start(this);
 
     }
-
-
-
 
 
     public void setSelf(String self) {
@@ -846,13 +843,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * Exits an iteration loop if running
      */
     public void stop() {
-        synchronized (exe) {
-            if (loop != null) {
-                loop.stop();
-                loop = null;
-            }
-            exe.stop();
-        }
+        loop.stop();
+        exe.stop();
     }
 
     /**
@@ -999,11 +991,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     @NotNull
     public final NARLoop startFPS(float initialFPS) {
-        if (initialFPS < 0)
-            return startPeriodMS((int) -1); //pause
-
-        if (initialFPS == 0)
-            return startPeriodMS((int) 0); //infinite
+        assert (initialFPS > 0);
 
         float millisecPerFrame = 1000.0f / initialFPS;
         return startPeriodMS((int) millisecPerFrame);
@@ -1012,28 +1000,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * Runs until stopped, at a given delay period between frames (0= no delay). Main loop
      *
-     * @param initialFramePeriodMS in milliseconds
+     * @param ms in milliseconds
      */
     @NotNull
-    public NARLoop startPeriodMS(int initialFramePeriodMS) {
-
-        synchronized (exe) {
-
-            NARLoop ll = this.loop;
-            if (ll != null && !ll.isStopped()) {
-                if (initialFramePeriodMS < 0) {
-                    ll.stop();
-                    this.loop = null;
-                } else {
-                    ll.setPeriodMS(initialFramePeriodMS);
-                }
-            } else if ((ll == null) || (ll.isStopped())) {
-                this.loop = ll = (initialFramePeriodMS >= 0) ? new NARLoop(this, initialFramePeriodMS) : null;
-            }
-
-            return this.loop;
-        }
-
+    public NARLoop startPeriodMS(int ms) {
+        loop.setPeriodMS(ms);
+        return loop;
     }
 
 
@@ -1268,9 +1240,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @Nullable
     public NAR forEachActiveConcept(@NotNull Consumer<ConceptFire> recip) {
         exe.forEach(t -> {
-           if (t instanceof ConceptFire) {
-                recip.accept(((ConceptFire)t));
-           }
+            if (t instanceof ConceptFire) {
+                recip.accept(((ConceptFire) t));
+            }
         });
         return this;
     }

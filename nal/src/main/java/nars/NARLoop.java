@@ -25,7 +25,7 @@ public class NARLoop extends Loop {
      * starts paused; thread is not automatically created
      */
     public NARLoop(@NotNull NAR n) {
-        super(n.self() + ":loop");
+        super();
         nar = n;
     }
 
@@ -35,7 +35,7 @@ public class NARLoop extends Loop {
      */
     public NARLoop(@NotNull NAR n, int initialPeriod) {
         this(n);
-        start(initialPeriod);
+        setPeriodMS(initialPeriod);
     }
 
 
@@ -49,5 +49,10 @@ public class NARLoop extends Loop {
 
     public long cycleCount() {
         return cycles;
+    }
+
+
+    public void prePeriodMS(int ms) {
+        periodMS.set(ms);
     }
 }

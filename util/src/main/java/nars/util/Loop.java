@@ -3,8 +3,10 @@ package nars.util;
 import jcog.Texts;
 import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -12,21 +14,23 @@ import static org.slf4j.LoggerFactory.getLogger;
  * Created by me on 10/20/16.
  */
 abstract public class Loop implements Runnable {
+
     protected static final Logger logger = getLogger(Loop.class);
 
+    public final AtomicReference<Thread> thread = new AtomicReference();
 
-    /**
-     * sleep mode delay time
-     */
-    @NotNull
-    public final Thread thread;
     protected final int windowLength = 4;
 
     protected long prevTime;
-    protected boolean stopping;
-    protected boolean stopped;
+
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
-    private int periodMS = -1;
+
+    /**
+     * < 0: paused
+     * 0: loop at full speed
+     * > 0: delay in milliseconds
+     */
+    protected final AtomicInteger periodMS = new AtomicInteger(-1);
 
     @Override
     public String toString() {
@@ -34,45 +38,67 @@ abstract public class Loop implements Runnable {
                 Texts.n4(frameTime.getMean()) + "+-" + Texts.n4(frameTime.getStandardDeviation()) + "ms avg";
     }
 
-    public Loop(@NotNull String threadName, int periodMS) {
-        this(threadName);
-        start(periodMS);
-    }
-
-    public Loop(@NotNull String threadName, float fps) {
-        this(threadName);
-        start(fps);
-    }
-
+    /**
+     * create but do not start
+     */
     public Loop() {
-        thread = new Thread(this);
+
     }
 
+    /**
+     * create and auto-start
+     */
     public Loop(float fps) {
         this();
-        start(fps);
+        setFPS(fps);
     }
 
+    /**
+     * create and auto-start
+     */
     public Loop(int periodMS) {
         this();
-        start(periodMS);
+        setPeriodMS(periodMS);
     }
 
-    public Loop(@NotNull String threadName) {
-        thread = new Thread(this, threadName);
+    public boolean isRunning() {
+        return thread.get() != null;
     }
 
-    protected final void start(float fps) {
-        start((int) (1000f / fps));
+    protected final void setFPS(float fps) {
+        setPeriodMS((int) (1000f / fps));
     }
 
-    protected void start(int period) {
-        if (setPeriodMS(period)) {
-            logger.info("start {}", thread);
-            thread.start();
+    public final boolean setPeriodMS(int nextPeriodMS) {
+        int prevPeriodMS;
+        if ((prevPeriodMS = periodMS.getAndSet(nextPeriodMS)) != nextPeriodMS) {
+            if (prevPeriodMS < 0 && nextPeriodMS >= 0) {
+                if (thread.compareAndSet(null, new Thread(this))) {
+                    thread.get().start();
+                }
+            } else if (prevPeriodMS >= 0 && nextPeriodMS < 0) {
+                Thread prevThread;
+                if ((prevThread = thread.getAndSet(null)) != null) {
+                    logger.info("stop {}", this);
+                    prevThread.stop();
+                }
+            } else if (prevPeriodMS >= 0 && nextPeriodMS >= 0) {
+                //change speed
+                logger.info("{} period={}ms", this, nextPeriodMS);
+            }
+            return true;
         }
+        return false;
     }
 
+    public void stop()  {
+        setPeriodMS(-1);
+    }
+
+    /** for subclass overriding; called from the looping thread */
+    protected void onStart() {
+
+    }
 
     /**
      * dont call this directly
@@ -80,12 +106,14 @@ abstract public class Loop implements Runnable {
     @Override
     public final void run() {
 
+        onStart();
+
+        logger.info("{} start period={}ms", this, periodMS.get());
+
         prevTime = System.currentTimeMillis();
 
-        while (!stopping) {
-
-
-            final int periodMS = this.periodMS;
+        int periodMS;
+        while ((periodMS = this.periodMS.get()) >= 0) {
 
             long beforeTime = periodMS > 0 ? System.currentTimeMillis() : -1;
 
@@ -126,9 +154,7 @@ abstract public class Loop implements Runnable {
 
         }
 
-        logger.info("stopped");
-        stopped = true;
-        stopping = false;
+        stop();
     }
 
 
@@ -136,91 +162,19 @@ abstract public class Loop implements Runnable {
 
     public void join() {
         try {
-            thread.join();
+            Thread t = thread.get();
+            if (t!=null) {
+                t.join();
+            } else {
+                throw new RuntimeException("not started");
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
 
-    public final synchronized boolean setPeriodMS(int newPeriod) {
-
-        int oldPeriod = periodMS;
-        if (oldPeriod != newPeriod) {
-
-            logger.info("period={}ms", newPeriod);
-
-            boolean paused = (isPaused());
-
-            this.periodMS = newPeriod;
-            if (paused) {
-                logger.info("waking {}", thread);
-                thread.interrupt();
-            }
-
-            return true;
-
-        }
-        return false;
-
-//        int prevPeriod = periodMS;
-//
-//        if (prevPeriod == period) return false;
-//
-//        periodMS = period;
-//
-//        if (period == -1) {
-//            logger.info("pause");
-//        } else {
-//            if (prevPeriod == -1)
-//                logger.info("resume:period={}", period);
-//            else {
-//                //dont log change in period, too noisy
-//            }
-//        }
-//
-//        //thread priority control
-//        if (thread != null) {
-//            //int pri = thread.getPriority();
-//
-//            thread.interrupt();
-//
-//        }
-//
-//
-//        return true;
-    }
-
-    public synchronized void stop() /*throws InterruptedException */ {
-
-        logger.info("stopping {}", this);
-
-        stopping = true;
-        thread.stop();
-        stopped = true;
-
-
-//        synchronized (thread) {
-//            if (stopping || stopped)
-//                throw new RuntimeException("already waiting for stop");
-//
-//            try {
-//                thread.join();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-    }
-
-    public final void pause() {
-        setPeriodMS(-1);
-    }
-
-    public boolean isPaused() {
-        return periodMS == -1;
-    }
-
-    public boolean isStopped() {
-        return stopped;
+    public Thread thread() {
+        return thread.get();
     }
 }

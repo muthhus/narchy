@@ -75,7 +75,7 @@ public class Hear extends Loop {
         tokens = msg;
         context = new Term[]{Atomic.the("hear"), $.quote(who), Op.Imdex};
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
-        start(wordDelayMS);
+        setPeriodMS(wordDelayMS);
     }
 
     protected void onReset(NAR n) {
