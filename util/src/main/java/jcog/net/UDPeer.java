@@ -527,8 +527,7 @@ public class UDPeer extends UDP {
             writeInt(id);
 
             if (origin != null) {
-                writeShort(origin.getPort());
-                write(origin.getAddress().getAddress());
+                write(bytes(origin));
             } else {
                 fillBytes((byte)0, ADDRESS_BYTES );
             }
@@ -536,7 +535,7 @@ public class UDPeer extends UDP {
 
         }
 
-        public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, byte... payload) {
+        public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, byte[] payload) {
             super(HEADER_SIZE);
             init(cmd, ttl, id, origin);
 
@@ -546,14 +545,6 @@ public class UDPeer extends UDP {
             hash = hash();
         }
 
-        public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, int payload) {
-            super(HEADER_SIZE);
-            init(cmd, ttl, id, origin);
-
-            writeInt(payload);
-
-            hash = hash();
-        }
 
         public Msg(byte cmd, byte ttl, int id, InetSocketAddress origin, long payload) {
             super(HEADER_SIZE);
@@ -677,10 +668,10 @@ public class UDPeer extends UDP {
          */
         public long dataLong(int offset) {
             byte[] b = this.bytes;
+            offset += DATA_START_BYTE;
             if (b.length < offset + 8)
                 throw new RuntimeException("missing 64-bit payload");
 
-            offset += DATA_START_BYTE;
             return Longs.fromBytes(
                 b[offset++], b[offset++], b[offset++], b[offset++],
                 b[offset++], b[offset++], b[offset++], b[offset++]
@@ -689,10 +680,10 @@ public class UDPeer extends UDP {
 
         public int dataInt(int offset, int ifMissing) {
             byte[] b = this.bytes;
+            offset += DATA_START_BYTE;
             if (b.length < offset + 4)
                 return ifMissing;
 
-            offset += DATA_START_BYTE;
             return Ints.fromBytes(
                 b[offset++], b[offset++], b[offset++], b[offset++]
             );
