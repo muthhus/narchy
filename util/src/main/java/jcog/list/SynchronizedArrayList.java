@@ -260,34 +260,5 @@ public class SynchronizedArrayList<E> extends AbstractList<E>
   public interface Match<E,K> {
     boolean isMatch(E element, K key);
   }
-  
-  public static class ArrayIterator<E> implements Iterator<E> {
-    private final E []_array;
-    int _index;
-    
-    ArrayIterator(E []array)
-    {
-      _array = array;
-    }
 
-    @Override
-    public boolean hasNext()
-    {
-      return _index < _array.length;
-    }
-
-    @Override
-    public E next()
-    {
-      if (_index < _array.length)
-        return _array[_index++];
-      else
-        return null;
-    }
-
-    @Override
-    public void remove()
-    {
-    }
-  }
 }

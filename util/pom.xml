@@ -81,6 +81,18 @@
             <artifactId>jansi</artifactId>
             <version>1.16</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/io.thekraken/grok -->
+        <dependency>
+            <groupId>io.thekraken</groupId>
+            <artifactId>grok</artifactId>
+            <version>0.1.5</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>gson</artifactId>
+                    <groupId>com.google.code.gson</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.msgpack/jackson-dataformat-msgpack -->
         <dependency>
@@ -88,18 +100,18 @@
             <artifactId>jackson-dataformat-msgpack</artifactId>
             <version>0.8.13</version>
         </dependency>
-       <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
+        <!-- https://mvnrepository.com/artifact/org.roaringbitmap/RoaringBitmap -->
         <dependency>
             <groupId>org.roaringbitmap</groupId>
             <artifactId>RoaringBitmap</artifactId>
             <version>0.6.44</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-            <version>4.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.commons</groupId>-->
+            <!--<artifactId>commons-collections4</artifactId>-->
+            <!--<version>4.1</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <!-- https://vimeo.com/12165742 -->
@@ -122,11 +134,11 @@
             <version>1.0.1</version>
         </dependency>
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
-        <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-ext</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jgrapht</groupId>-->
+            <!--<artifactId>jgrapht-ext</artifactId>-->
+            <!--<version>1.0.1</version>-->
+        <!--</dependency>-->
 
         <!--<dependency>-->
         <!--<groupId>org.codehaus.janino</groupId>-->
@@ -237,12 +249,12 @@
         <!--</dependency>-->
 
 
-        <dependency>
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.5.1</version>
+        <!--<dependency>-->
+            <!--<groupId>org.objenesis</groupId>-->
+            <!--<artifactId>objenesis</artifactId>-->
+            <!--<version>2.5.1</version>-->
 
-        </dependency>
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -363,10 +375,10 @@
 
 
         <!--<dependency>-->
-            <!--<groupId>com.google.truth</groupId>-->
-            <!--<version>0.32</version>-->
-            <!--<artifactId>truth</artifactId>-->
-            <!--<scope>test</scope>-->
+        <!--<groupId>com.google.truth</groupId>-->
+        <!--<version>0.32</version>-->
+        <!--<artifactId>truth</artifactId>-->
+        <!--<scope>test</scope>-->
         <!--</dependency>-->
 
 

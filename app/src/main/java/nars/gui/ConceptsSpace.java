@@ -1,6 +1,5 @@
 package nars.gui;
 
-import com.google.common.collect.Iterables;
 import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.bag.util.Bagregate;
 import jcog.pri.PLink;
@@ -20,7 +19,6 @@ import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
 import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
-import spacegraph.widget.button.ToggleButton;
 
 import java.util.Collection;
 import java.util.Objects;

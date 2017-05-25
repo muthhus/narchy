@@ -5,7 +5,7 @@ import nars.$;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
-import org.apache.commons.collections4.map.Flat3Map;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +50,7 @@ public abstract class VarIntroduction {
         }
 
 
-        Map<Term,Term> substs = new Flat3Map<>();
+        Map<Term,Term> substs = new UnifiedMap<>(0 /* pessimistic */);
         int o = 0;
         boolean found = false;
         for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {

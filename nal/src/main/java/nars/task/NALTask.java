@@ -10,7 +10,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import org.apache.commons.collections4.map.Flat3Map;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -224,11 +224,10 @@ public class NALTask extends Pri implements Task {
     public void meta(Object key, Object value) {
         //synchronized (this) {
         if (meta == null) {
-            //meta = new UnifiedMap(1); /* for compactness */
-            meta = new Flat3Map(); /* for compactness */
+            meta = UnifiedMap.newWithKeysValues(key,value); /* for compactness */
+        } else {
+            meta.put(key, value);
         }
-
-        meta.put(key, value);
         //}
     }
 

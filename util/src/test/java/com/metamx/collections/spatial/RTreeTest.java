@@ -28,12 +28,12 @@ import java.util.Random;
 /**
  */
 public class RTreeTest {
-    private RTree roaringtree;
+    private RTree R;
 
     @Before
     public void setUp() throws Exception {
         BitmapFactory rbf = new RoaringBitmapFactory();
-        roaringtree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, rbf), rbf);
+        R = new RTree(2, new LinearGutmanSplitStrategy(0, 50, rbf), rbf);
 
     }
 
@@ -70,11 +70,11 @@ public class RTreeTest {
 
     @Test
     public void testInsertDuplicatesNoSplitRoaring() {
-        roaringtree.insert(new float[]{1, 1}, 1);
-        roaringtree.insert(new float[]{1, 1}, 1);
-        roaringtree.insert(new float[]{1, 1}, 1);
+        R.insert(new float[]{1, 1}, 1);
+        R.insert(new float[]{1, 1}, 1);
+        R.insert(new float[]{1, 1}, 1);
 
-        Assert.assertEquals(roaringtree.root().children.size(), 3);
+        Assert.assertEquals(R.root().children.size(), 3);
     }
 
 
@@ -92,10 +92,18 @@ public class RTreeTest {
     public void testSplitOccursRoaring() {
         Random rand = new Random();
         for (int i = 0; i < 100; i++) {
-            roaringtree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
+            R.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
         }
 
-        Assert.assertTrue(roaringtree.root().children.size() > 1);
+        Assert.assertTrue(R.root().children.size() > 1);
     }
 
+    @Test
+    public void testRemoval() {
+        testSplitOccursRoaring();
+
+        RTreeUtils.print(R);
+
+
+    }
 }

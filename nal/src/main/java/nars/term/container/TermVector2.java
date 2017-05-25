@@ -1,7 +1,7 @@
 package nars.term.container;
 
+import jcog.list.ArrayIterator;
 import nars.term.Term;
-import org.apache.commons.collections4.IteratorUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -58,7 +58,7 @@ public final class TermVector2 extends TermVector {
 
     @Override
     public Iterator<Term> iterator() {
-        return IteratorUtils.arrayIterator(toArray());
+        return new ArrayIterator(toArray());
     }
 
     @Override

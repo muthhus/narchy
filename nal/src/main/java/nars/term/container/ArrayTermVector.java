@@ -1,7 +1,7 @@
 package nars.term.container;
 
+import jcog.list.ArrayIterator;
 import nars.term.Term;
-import org.apache.commons.collections4.iterators.ArrayIterator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;

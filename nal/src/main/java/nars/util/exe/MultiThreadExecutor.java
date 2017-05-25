@@ -10,7 +10,7 @@ import nars.NAR;
 import nars.Param;
 import nars.task.ITask;
 import nars.task.NALTask;
-import org.apache.commons.collections4.bag.HashBag;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

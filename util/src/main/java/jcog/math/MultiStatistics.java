@@ -3,8 +3,8 @@ package jcog.math;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections4.bag.HashBag;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import org.eclipse.collections.impl.bag.mutable.HashBag;
 
 import java.util.function.Predicate;
 

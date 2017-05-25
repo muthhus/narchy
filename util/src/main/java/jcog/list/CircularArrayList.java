@@ -1,10 +1,7 @@
 package jcog.list;
 
 import java.io.Serializable;
-import java.util.AbstractList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.RandomAccess;
+import java.util.*;
 import java.util.function.Consumer;
 
 /* High-performance Circular (Ring) Buffer. Not thread safe, and sacrifices safety for speed in other ways. */
@@ -15,6 +12,11 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
     private int head;
     private int tail;
     private int size;
+
+    public CircularArrayList(Collection<E> c) {
+        this(c.size());
+        c.addAll(this);
+    }
 
     public CircularArrayList(int capacity) {
         n = capacity;

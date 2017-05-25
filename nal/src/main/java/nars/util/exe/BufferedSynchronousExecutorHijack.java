@@ -2,12 +2,10 @@ package nars.util.exe;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
-import jcog.pri.PForget;
 import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
 import nars.task.ITask;
-import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
