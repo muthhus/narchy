@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
@@ -35,7 +36,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
      * @throws SocketException
      * @throws UnknownHostException
      */
-    public InterNAR(NAR nar, float outRate, int port) throws SocketException {
+    public InterNAR(NAR nar, float outRate, int port) throws IOException {
         super(port);
         this.nar = nar;
         this.out = new LeakOut(nar, 16, outRate) {

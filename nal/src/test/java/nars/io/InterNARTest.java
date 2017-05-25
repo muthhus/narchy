@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
@@ -31,8 +30,8 @@ public class InterNARTest {
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 50;
-            int postCycles = 24;
+        final int CONNECTION_TIME = 20;
+        int postCycles = 50;
 
         Param.ANSWER_REPORTING = false;
 
@@ -45,17 +44,17 @@ public class InterNARTest {
 
             beforeConnect.accept(a, b);
 
-            a.run(1); b.run(1);
+            a.run(2); b.run(2);
 
-            InterNAR ai = new InterNAR(a, 1, nextPort.incrementAndGet());
-            InterNAR bi = new InterNAR(b, 1, nextPort.incrementAndGet());
+            InterNAR ai = new InterNAR(a, 2, nextPort.incrementAndGet());
+            InterNAR bi = new InterNAR(b, 2, nextPort.incrementAndGet());
 
-            ai.setFPS(4f);
-            bi.setFPS(4f);
+            ai.setFPS(8f);
+            bi.setFPS(8f);
 
             Util.pause(CONNECTION_TIME);
 
-            bi.ping(ai.port());
+            bi.ping(ai.addr);
 
             Util.pause(CONNECTION_TIME);
 
@@ -70,8 +69,8 @@ public class InterNARTest {
 
             Util.pause(CONNECTION_TIME);
 
-            ai.stop();
-            bi.stop();
+//            ai.stop();
+//            bi.stop();
             a.stop();
             b.stop();
 
@@ -85,7 +84,7 @@ public class InterNARTest {
         return new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
                 new RealTime.DSHalf(true),
-                new BufferedSynchronousExecutorHijack(128)
+                new BufferedSynchronousExecutorHijack(256)
         );
     }
 
@@ -148,14 +147,14 @@ public class InterNARTest {
         }, (ai, bi) -> {
 
 
-            try {
-                bi.nar.question("(a --> d)");
-            } catch (Narsese.NarseseException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                bi.nar.question("(a --> d)");
+//            } catch (Narsese.NarseseException e) {
+//                e.printStackTrace();
+//            }
 
             try {
-                ai.nar.believe(0.5f, $("(b --> c)"), Tense.Eternal,1f,0.9f);
+                ai.nar.believe( $("(b --> c)"), Tense.Eternal,1f,0.9f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }

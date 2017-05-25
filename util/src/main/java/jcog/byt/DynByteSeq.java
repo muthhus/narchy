@@ -21,8 +21,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     public DynByteSeq(byte[] zeroCopy) {
+        this(zeroCopy, zeroCopy.length);
+    }
+
+    public DynByteSeq(byte[] zeroCopy, int len) {
         this.bytes = zeroCopy;
-        this.len = bytes.length;
+        this.len = len;
     }
 
     @Override
@@ -106,10 +110,13 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     public void compact() {
+        compact(null);
+    }
+    public void compact(byte[] forceIfSameAs) {
         int l = this.len;
         if (l > 0) {
             byte[] b = this.bytes;
-            if (b.length != l)
+            if ( b.length != l || forceIfSameAs==bytes)
                 this.bytes = Arrays.copyOfRange(b, 0, l);
         }
     }

@@ -10,32 +10,40 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
-import java.nio.charset.Charset;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 /**
  * generic UDP server & utilities
  */
 public class UDP extends Loop {
 
-    /** in bytes */
-    static final int MAX_PACKET_SIZE = 1024;
 
-    static final int DEFAULT_socket_BUFFER_SIZE = 1024 * 1024;
+    static {
+//        System.setProperty("java.net.preferIPv6Addresses",
+//            //"true"
+//            "false"
+//        );
+    }
 
-    protected final DatagramSocket in;
 
-    public final Thread recvThread;
+    /**
+     * in bytes
+     */
+    static final int MAX_PACKET_SIZE = 512;
+
+    //static final int DEFAULT_socket_BUFFER_SIZE = 64 * 1024;
 
     private static final Logger logger = LoggerFactory.getLogger(UDP.class);
 
-    private static final InetAddress local = new InetSocketAddress(0).getAddress();
+    //private static final InetAddress local = new InetSocketAddress(0).getAddress();
 
     private final int port;
-
-    private final int updatePeriodMS = 250;
-
-
+    protected final DatagramChannel c;
+    private final Selector selector;
+    public final InetSocketAddress addr;
 
 //    public UDP(String host, int port) throws SocketException, UnknownHostException {
 //        this(InetAddress.getByName(host), port);
@@ -55,19 +63,41 @@ public class UDP extends Loop {
 //    }
 
 
-    public UDP(@Nullable InetAddress a, int port) throws SocketException {
+//    public static final InetAddress WAN() {
+//        try {
+//            return InetAddress.getByName("::");
+//        } catch (UnknownHostException e) {
+//            logger.error("could not determine WAN address {}", e);
+//            return null;
+//        }
+//    }
+
+
+    public UDP(@Nullable InetAddress a, int port) throws IOException {
         super();
-        in = a != null ? new DatagramSocket(port, a) : new DatagramSocket(port);
+
+        c = DatagramChannel.open();
+        c.configureBlocking(false);
+        c.setOption(StandardSocketOptions.SO_RCVBUF, 1024 * 1024);
+        c.setOption(StandardSocketOptions.SO_SNDBUF, 1024 * 1024);
+        c.bind(new InetSocketAddress(a, port));
+        addr = (InetSocketAddress) c.getLocalAddress();
+        selector = Selector.open();
+        c.register(selector, SelectionKey.OP_READ);
+
         //in.setTrafficClass(0x10 /*IPTOS_LOWDELAY*/); //https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setTrafficClass-int-
-        in.setSoTimeout(0);
-        in.setSendBufferSize(DEFAULT_socket_BUFFER_SIZE);
-        in.setReceiveBufferSize(DEFAULT_socket_BUFFER_SIZE);
+//        in.setSoTimeout(0);
+//        in.setSendBufferSize(DEFAULT_socket_BUFFER_SIZE);
+//        in.setReceiveBufferSize(DEFAULT_socket_BUFFER_SIZE);
         this.port = port;
-        this.recvThread = new Thread(this::recv);
     }
 
-    public UDP(int port) throws SocketException {
+    public UDP(int port) throws IOException {
         this(null, port);
+    }
+
+    public UDP() throws IOException {
+        this(null, 0);
     }
 
     public int port() {
@@ -75,46 +105,78 @@ public class UDP extends Loop {
     }
 
 
-
     @Override
     protected void onStop() {
-        in.close();
-        recvThread.interrupt();
-    }
-
-
-    protected void recv() {
-
-        while (isRunning()) {
-            try {
-
-                byte[] receiveData = new byte[MAX_PACKET_SIZE];
-                DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
-                in.receive(p);
-
-                in(p, receiveData);
-
-            } catch (Throwable e) {
-                if (in.isClosed()) {
-                    stop();
-                    break;
-                } else {
-                    logger.warn("{}", e);
-                }
-            }
+        try {
+            selector.close();
+            c.close();
+        } catch (IOException e) {
+            logger.error("close {}", e);
         }
-
     }
 
-    @Override public boolean next() {
+
+//    protected void recv() {
+//
+//        while (isRunning()) {
+//            try {
+//
+//                byte[] receiveData = new byte[MAX_PACKET_SIZE];
+//                DatagramPacket p = new DatagramPacket(receiveData, receiveData.length);
+//                in.receive(p);
+//
+//                in(p, receiveData);
+//
+//            } catch (Throwable e) {
+//                if (in.isClosed()) {
+//                    stop();
+//                    break;
+//                } else {
+//                    logger.warn("{}", e);
+//                }
+//            }
+//        }
+//
+//    }
+
+
+    final ByteBuffer b = ByteBuffer.allocate(MAX_PACKET_SIZE);
+
+    @Override
+    public boolean next() {
+        try {
+
+            if (selector.selectNow() == 0)
+                return true;
+
+            selector.selectedKeys().removeIf(key -> {
+
+                if (!key.isValid() || !key.isReadable())
+                    return true;
+
+                try {
+                    b.rewind();
+                    SocketAddress from = c.receive(b);
+                    if (from!=null) {
+                        in((InetSocketAddress) from, b.array(), b.position());
+                    }
+                } catch (IOException e) {
+                    logger.error("read {}", e);
+                }
+
+                //LOGGER.log(Level.INFO, "Got {0} bytes from {1}", new Object[]{readBuffer.remaining(), sender});
+
+                return true;
+            });
+        } catch (Throwable t) {
+            logger.error("recv {}", t);
+        }
         return true;
     }
 
-    protected void onStart() {
-        recvThread.start();
+    protected SocketAddress receive(ByteBuffer byteBuffer, SelectionKey selectionKey) throws IOException {
+        return c.receive(byteBuffer);
     }
-
-
 
     @Deprecated
     public boolean out(String data, int port) {
@@ -122,15 +184,11 @@ public class UDP extends Loop {
     }
 
     public boolean out(byte[] data, int port) {
-        return outBytes(data, new InetSocketAddress(local, port));
+        return outBytes(data, new InetSocketAddress(port));
     }
 
     public boolean out(byte[] data, String host, int port) throws UnknownHostException {
         return outBytes(data, new InetSocketAddress(InetAddress.getByName(host), port));
-    }
-
-    public boolean outJSON(Object x, int port) throws UnknownHostException {
-        return outJSON(x, new InetSocketAddress(local, port));
     }
 
     public boolean outJSON(Object x, InetSocketAddress addr) {
@@ -152,32 +210,28 @@ public class UDP extends Loop {
         return outBytes(b, addr);
     }
 
-    final static Charset UTF8 = Charset.forName("UTF8");
-
 
 //    final static ThreadLocal<DatagramPacket> packet = ThreadLocal.withInitial(() -> {
 //        return new DatagramPacket(ArrayUtils.EMPTY_BYTE_ARRAY, 0, 0);
 //    });
 
     public boolean outBytes(byte[] data, InetSocketAddress to) {
-
-        DatagramPacket sendPacket = new DatagramPacket(data, data.length, to);
-        //DatagramPacket sendPacket = packet.get();
-        //sendPacket.setData(data, 0, data.length);
-        //sendPacket.setSocketAddress(to);
-
         try {
-            in.send(sendPacket);
+            c.send(ByteBuffer.wrap(data), to);
             return true;
-        } catch (IOException e) {
-            logger.error("{} {}", in, e.getMessage());
+        } catch (Exception e) {
+            logger.error("send {} {} {}", to, e.getMessage());
             return false;
         }
     }
 
-    protected void in(DatagramPacket p, byte[] data) {
+    /**
+     * override in subclasses
+     */
+    protected void in(InetSocketAddress msgOrigin, byte[] data, int position) {
 
     }
+
 
 //    static class UDPClient {
 //        public static void main(String args[]) throws Exception {

@@ -4,6 +4,7 @@ import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -19,7 +20,7 @@ public abstract class UDPNetworkSimulation {
 
     UDPeer[] peers;
 
-    public UDPNetworkSimulation(int size) throws SocketException {
+    public UDPNetworkSimulation(int size) throws IOException {
         int port = 10000;
 
         peers = new  UDPeer[size];
@@ -48,7 +49,7 @@ public abstract class UDPNetworkSimulation {
 
     }
 
-    public static void main(String[] args) throws SocketException, UnknownHostException {
+    public static void main(String[] args) throws IOException {
         new UDPNetworkSimulation(5) {
             @Override
             long delay(InetSocketAddress from, InetSocketAddress to, int length) {
@@ -59,7 +60,7 @@ public abstract class UDPNetworkSimulation {
 
     private class MyUDPeer extends UDPeer {
 
-        public MyUDPeer(int port, int i) throws SocketException {
+        public MyUDPeer(int port, int i) throws IOException {
             super(port + i);
         }
 
@@ -69,11 +70,12 @@ public abstract class UDPNetworkSimulation {
 
         @Override
         public void send(Msg o, InetSocketAddress to) {
+            //getInetAddress();
             sim.schedule(new TimerTask() {
                 @Override public void run() {
                     actuallySend(o, to);
                 }
-            }, delay((InetSocketAddress) in.getLocalSocketAddress(), to, o.length()));
+            }, delay(addr, to, o.length()));
         }
 
         @Override
