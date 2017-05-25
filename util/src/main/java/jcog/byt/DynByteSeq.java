@@ -81,6 +81,13 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         this.bytes[this.len++] = (byte) v;
     }
 
+    public void fillBytes(byte b, int next) {
+        int start = this.len;
+        this.len += next;
+        int end = this.len;
+        Arrays.fill(bytes, start, end, b);
+    }
+
 
     @Override
     public void write(@NotNull byte[] bytes)  {
@@ -142,9 +149,10 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public void writeShort(int v)  {
+
         int s = ensureSized(2);
         byte[] e = this.bytes;
-        e[s] = (byte) (v >> 8);
+        e[s] = (byte)(v >> 8);
         e[s + 1] = (byte) v;
         this.len += 2;
     }

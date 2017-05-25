@@ -1,8 +1,6 @@
 package jcog.net;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-import com.google.common.primitives.Shorts;
+import com.google.common.primitives.*;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
@@ -312,9 +310,9 @@ public class UDPeer extends UDP {
             case PING:
                 sendPong(p, m); //continue below
                 break;
-            case WHO:
-                m.dataAddresses(this::ping);
-                break;
+//            case WHO:
+//                m.dataAddresses(this::ping);
+//                break;
             case TELL:
                 onTell(you, m);
                 break;
@@ -482,8 +480,8 @@ public class UDPeer extends UDP {
                     return PING;
                 case 'p':
                     return PONG;
-                case 'w':
-                    return WHO;
+//                case 'w':
+//                    return WHO;
                 case 't':
                     return TELL;
                 case 'a':
@@ -504,6 +502,7 @@ public class UDPeer extends UDP {
         final static int DATA_START_BYTE = 24;
 
         final static int HEADER_SIZE = DATA_START_BYTE;
+        final static int ADDRESS_BYTES = 16 /* ipv6 */ + 2 /* port */;
 
         final int hash;
         private float pri;
@@ -531,9 +530,7 @@ public class UDPeer extends UDP {
                 writeShort(origin.getPort());
                 write(origin.getAddress().getAddress());
             } else {
-                writeShort(0);
-                for (int i = 0; i < ADDRESS_BYTES - 2; i++) //HACK
-                    writeByte(0);
+                fillBytes((byte)0, ADDRESS_BYTES );
             }
 
 
@@ -577,7 +574,11 @@ public class UDPeer extends UDP {
         public boolean equals(Object obj) {
             if (this == obj) return true;
             Msg m = (Msg) obj;
-            return (m.hash == hash) && m.bytes.length == bytes.length && Arrays.equals(m.bytes, 1, len, bytes, 1, len);
+            if (hash == m.hash) {
+                int len = this.len;
+                return m.len == len && Arrays.equals(m.bytes, 1, len, bytes, 1, len);
+            }
+            return false;
         }
 
         @Override
@@ -703,32 +704,31 @@ public class UDPeer extends UDP {
             return Arrays.equals(bytes, PORT_BYTE, PORT_BYTE + addrLen, addrBytes, 0, addrLen);
         }
 
-        final static int ADDRESS_BYTES = 16 /* ipv6 */ + 2 /* port */;
 
-        public void dataAddresses(Consumer<InetSocketAddress> a) {
-            int d = dataLength();
-            if (d % ORIGIN_BYTE != 0)
-                return; //corrupt
-
-            int addresses = d / ADDRESS_BYTES;
-            int o = DATA_START_BYTE;
-            for (int i = 0; i < addresses; i++) {
-                byte[] addr = Arrays.copyOfRange(bytes, o, o + 16);
-                try {
-                    InetAddress aa = InetAddress.getByAddress(addr);
-                    int port = Shorts.fromBytes(bytes[o + 16], bytes[o + 17]);
-                    a.accept(new InetSocketAddress(aa, port));
-                } catch (UnknownHostException e) {
-                    continue;
-                }
-                o += ADDRESS_BYTES;
-            }
-
-        }
+//        public void dataAddresses(Consumer<InetSocketAddress> a) {
+//            int d = dataLength();
+//            if (d % ORIGIN_BYTE != 0)
+//                return; //corrupt
+//
+//            int addresses = d / ADDRESS_BYTES;
+//            int o = DATA_START_BYTE;
+//            for (int i = 0; i < addresses; i++) {
+//                byte[] addr = Arrays.copyOfRange(bytes, o, o + 16);
+//                try {
+//                    InetAddress aa = InetAddress.getByAddress(addr);
+//                    int port = Shorts.fromBytes(bytes[o + 16], bytes[o + 17]);
+//                    a.accept(new InetSocketAddress(aa, port));
+//                } catch (UnknownHostException e) {
+//                    continue;
+//                }
+//                o += ADDRESS_BYTES;
+//            }
+//
+//        }
 
         @Nullable
         public InetSocketAddress origin() {
-            int port = Shorts.fromBytes(bytes[PORT_BYTE], bytes[PORT_BYTE + 1]);
+            int port = this.port();
             InetAddress aa = null;
             try {
                 aa = InetAddress.getByAddress(Arrays.copyOfRange(bytes, ORIGIN_BYTE, ORIGIN_BYTE + 16));
@@ -740,7 +740,7 @@ public class UDPeer extends UDP {
         }
 
         public int port() {
-            return Shorts.fromBytes(bytes[PORT_BYTE], bytes[PORT_BYTE + 1]);
+            return Shorts.fromBytes(bytes[PORT_BYTE], bytes[PORT_BYTE+1]);
         }
 
 
@@ -842,10 +842,9 @@ public class UDPeer extends UDP {
 
 
     public static byte[] bytes(InetSocketAddress addr) {
-
+        //TODO optimize - this can be done with only one allocation
         return ArrayUtils.addAll(Shorts.toByteArray((short) addr.getPort()),
                 ipv6(addr.getAddress().getAddress()));
-
     }
 
     private static byte[] ipv6(byte[] address) {

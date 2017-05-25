@@ -32,7 +32,7 @@ public class UDP extends Loop {
     /**
      * in bytes
      */
-    static final int MAX_PACKET_SIZE = 512;
+    static final int MAX_PACKET_SIZE = 1024;
 
     //static final int DEFAULT_socket_BUFFER_SIZE = 64 * 1024;
 
@@ -42,7 +42,6 @@ public class UDP extends Loop {
 
     private final int port;
     protected final DatagramChannel c;
-    private final Selector selector;
     public final InetSocketAddress addr;
 
 //    public UDP(String host, int port) throws SocketException, UnknownHostException {
@@ -82,8 +81,7 @@ public class UDP extends Loop {
         c.setOption(StandardSocketOptions.SO_SNDBUF, 1024 * 1024);
         c.bind(new InetSocketAddress(a, port));
         addr = (InetSocketAddress) c.getLocalAddress();
-        selector = Selector.open();
-        c.register(selector, SelectionKey.OP_READ);
+
 
         //in.setTrafficClass(0x10 /*IPTOS_LOWDELAY*/); //https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setTrafficClass-int-
 //        in.setSoTimeout(0);
@@ -108,7 +106,6 @@ public class UDP extends Loop {
     @Override
     protected void onStop() {
         try {
-            selector.close();
             c.close();
         } catch (IOException e) {
             logger.error("close {}", e);
@@ -146,28 +143,10 @@ public class UDP extends Loop {
     public boolean next() {
         try {
 
-            if (selector.selectNow() == 0)
-                return true;
-
-            selector.selectedKeys().removeIf(key -> {
-
-                if (!key.isValid() || !key.isReadable())
-                    return true;
-
-                try {
-                    b.rewind();
-                    SocketAddress from = c.receive(b);
-                    if (from!=null) {
-                        in((InetSocketAddress) from, b.array(), b.position());
-                    }
-                } catch (IOException e) {
-                    logger.error("read {}", e);
-                }
-
-                //LOGGER.log(Level.INFO, "Got {0} bytes from {1}", new Object[]{readBuffer.remaining(), sender});
-
-                return true;
-            });
+            SocketAddress from;
+            while ((from = c.receive(b.rewind()))!=null) {
+                in((InetSocketAddress) from, b.array(), b.position());
+            }
         } catch (Throwable t) {
             logger.error("recv {}", t);
         }

@@ -30,7 +30,7 @@ public class InterNARTest {
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 20;
+        final int CONNECTION_TIME = 100;
         int postCycles = 50;
 
         Param.ANSWER_REPORTING = false;
@@ -46,8 +46,8 @@ public class InterNARTest {
 
             a.run(2); b.run(2);
 
-            InterNAR ai = new InterNAR(a, 2, nextPort.incrementAndGet());
-            InterNAR bi = new InterNAR(b, 2, nextPort.incrementAndGet());
+            InterNAR ai = new InterNAR(a, 4, 0);
+            InterNAR bi = new InterNAR(b, 4, 0);
 
             ai.setFPS(8f);
             bi.setFPS(8f);
