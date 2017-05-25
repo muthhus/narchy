@@ -15,7 +15,6 @@ import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
