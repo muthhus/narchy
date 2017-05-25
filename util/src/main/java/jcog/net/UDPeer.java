@@ -197,10 +197,11 @@ public class UDPeer extends UDP {
     }
 
     @Override
-    public void stop() {
-        super.stop();
+    protected void onStop() {
+        super.onStop();
         them.clear();
     }
+
 
     public boolean seen(Msg o, float pri) {
         o.priAdd(pri);
