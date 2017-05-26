@@ -40,8 +40,9 @@ public class TinyTable extends BitwiseArray implements Serializable {
         I0 = new long[nrBuckets];
         IStar = new long[nrBuckets];
         A = new short[nrBuckets];
-        hash = new GreenHasher(itemsize + maxAdditionalSize, nrBuckets, 64);
-        offsets = new byte[64];
+        hash = new GreenHasher(itemsize + maxAdditionalSize, nrBuckets);
+
+        offsets = new byte[64]; //originally these were sized 64 but there must be some relation between the dimensions and these that require them larger
         chain = new byte[64];
 
     }
@@ -139,13 +140,13 @@ public class TinyTable extends BitwiseArray implements Serializable {
         removeItemFromIndex(fpaux);
 
         int bucket;
-        for (int i = fpaux.bucketId + 1; i < fpaux.bucketId + this.I0.length; i++) {
-            bucket = (i) % this.I0.length;
+        int il = this.I0.length;
+        for (int i = fpaux.bucketId + 1; i < fpaux.bucketId + il; i++) {
+            bucket = (i) % il;
             if (A[bucket] > 0) {
 
                 removeAndShrink(bucket);
                 A[bucket]--;
-                continue;
             } else {
 
                 break;
@@ -215,8 +216,7 @@ public class TinyTable extends BitwiseArray implements Serializable {
 
         while (this.size(bucketId) + this.A[bucketId] >= this.bucketCapacity) {
 
-            bucketId++;
-            bucketId = bucketId % l;
+            bucketId = (++bucketId) % l;
 
             if (r-- <= 0)
                 break;
@@ -229,7 +229,6 @@ public class TinyTable extends BitwiseArray implements Serializable {
             return;
         this.replaceMany(bucketId, 0, 0L, this.start(bucketId));
         this.A[bucketId]++;
-        return;
     }
 
 
@@ -242,8 +241,7 @@ public class TinyTable extends BitwiseArray implements Serializable {
             if (itemOffset < 0)
                 return null;
 
-            long item = this.get(bucketId, itemOffset);
-            result[i] = item;
+            result[i] = this.get(bucketId, itemOffset);
         }
         return result;
     }
@@ -266,10 +264,7 @@ public class TinyTable extends BitwiseArray implements Serializable {
 
     boolean contains(FingerPrint fpaux) {
         RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain, fpaux.chainId);
-
         return (this.find(fpaux) >= 0);
-
-
     }
 
 

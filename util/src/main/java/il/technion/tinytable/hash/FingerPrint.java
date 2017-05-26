@@ -2,8 +2,8 @@ package il.technion.tinytable.hash;
 
 
 public class FingerPrint {
-    public int bucketId;
-    public int chainId;
+    public final int bucketId;
+    public final int chainId;
     public long fingerprint;
 
     public FingerPrint(int bucketid, int chainid, long fp) {
@@ -15,13 +15,13 @@ public class FingerPrint {
 
     //Finger prints are only eaual if they differ at most at the first bit
     // the first bit is used as an index.
-    public static boolean Equals(long $1, long $2) {
+    static boolean Equals(long $1, long $2) {
 //		$1 = $1^$2;
         return (($1 ^ $2) < 2L);
     }
 
     // the item is last in chain iff it is marked by 1 on the LSB.
-    public static boolean isLast(long fingerPrint) {
+    static boolean isLast(long fingerPrint) {
 
         return ((fingerPrint & 1) == 1);
 

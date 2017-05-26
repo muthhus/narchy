@@ -1,8 +1,11 @@
 package nars;
 
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
+import jcog.bag.impl.bloom.BloomBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
@@ -32,9 +35,8 @@ public class BagLab  {
     public static final int BINS = 64;
 
     int histogramResetPeriod = 64;
-    int iteration = 0;
+    int iteration;
 
-    static final Bag.BagCursorAction sampling = Next;
 
     final Bag<Integer,PLink<Integer>> bag;
     private final List<FloatSlider> inputSliders;
@@ -65,8 +67,8 @@ public class BagLab  {
                             ()->selectionHistogram, new Color3f(0.5f, 0.25f, 0f), new Color3f(1f, 0.5f, 0.1f))),
                     Vis.pane("Bag Content Distribution (0..1)", new HistogramChart(
                             ()->bag.priHistogram(new double[10]), new Color3f(0f, 0.25f, 0.5f), new Color3f(0.1f, 0.5f, 1f)))
-                ),
-                hijackVis((HijackBag)bag)
+                )
+                //,hijackVis((HijackBag)bag)
         );
     }
 
@@ -98,11 +100,11 @@ public class BagLab  {
 
 
     public static void main(String[] arg) {
-        DefaultHijackBag<Integer> h = new DefaultHijackBag<>(
-                PriMerge.plus, 1024, 8);
+
         BagLab bagLab = new BagLab(
                 //new CurveBag(256, plusBlend, new XorShift128PlusRandom(1), new HashMap())
-                h
+                //new DefaultHijackBag<>(PriMerge.plus, 1024, 8)
+                new BloomBag<>(32, (i) -> Shorts.toByteArray(i.shortValue()))
         );
 
         SpaceGraph.window(

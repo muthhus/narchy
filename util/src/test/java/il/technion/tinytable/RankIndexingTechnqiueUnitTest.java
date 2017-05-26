@@ -22,12 +22,13 @@ public class RankIndexingTechnqiueUnitTest {
 
         Assert.assertTrue(RankIndexing.chainExist(I0[0], 4));
 
-        fpaux.chainId = 5;
+        fpaux = new FingerPrint(fpaux.bucketId, 5 /* chain */, fpaux.fingerprint);
         RankIndexing.addItem(fpaux, I0, IStar, offsets, chain);
         Assert.assertTrue(RankIndexing.chainExist(I0[0], fpaux.chainId));
         RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
         Assert.assertTrue(chain[0] == 1);
-        fpaux.chainId = 4;
+
+        fpaux = new FingerPrint(fpaux.bucketId, 4 /* chain */, fpaux.fingerprint);
         RankIndexing.getChainAndUpdateOffsets(fpaux, I0, IStar, offsets, chain);
         Assert.assertTrue(chain[0] == 0);
     }

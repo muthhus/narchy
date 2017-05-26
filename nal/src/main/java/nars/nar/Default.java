@@ -3,6 +3,7 @@ package nars.nar;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
@@ -59,8 +60,12 @@ public class Default extends NAR {
     public static class DefaultTermIndex extends MapTermIndex {
 
         public DefaultTermIndex(int capacity) {
+            this(capacity, new DefaultConceptBuilder());
+        }
+
+        public DefaultTermIndex(int capacity, ConceptBuilder cb) {
             super(
-                    new DefaultConceptBuilder(),
+                    cb,
                     new HashMap<>(capacity),
                     new HashMap<>(capacity)
                     //new ConcurrentHashMap<>(capacity),

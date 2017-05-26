@@ -19,7 +19,7 @@ public class GreenHasher {
     private final long fpMask;
     private final int bucketRange;
 
-    public GreenHasher(int fingerprintsize, int bucketrange, int chainrange) {
+    public GreenHasher(int fingerprintsize, int bucketrange) {
         this.fpSize = fingerprintsize;
         // finger print cannot be zero so you must choose a finger-print size greater than zero.
         assert (fpSize > 0);

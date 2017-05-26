@@ -1,24 +1,25 @@
 package nars.nar;
 
 import jcog.AffinityExecutor;
+import jcog.bag.Bag;
+import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
-import nars.$;
-import nars.NAR;
-import nars.NARLoop;
+import jcog.pri.PLink;
+import jcog.pri.PriMerge;
+import nars.*;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
+import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.BufferedSynchronousExecutorHijack;
 import nars.util.exe.Executioner;
 import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 /**
@@ -104,6 +105,31 @@ public class NARS extends NAR {
         }
     }
 
+    public static class ExperimentalConceptBuilder extends DefaultConceptBuilder {
+        public static final int reprobes = 3;
+        //                (
+//                new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
+//                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
+//        );
+
+            @Override
+            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
+
+                Bag<Term, PLink<Term>> termlink =
+                        new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+                //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
+
+                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+
+                return f.apply(termlink, tasklink);
+            }
+
+            @NotNull
+            @Deprecated @Override
+            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+                return new DefaultHijackBag<>(blend, reprobes);
+            }
+        }
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,

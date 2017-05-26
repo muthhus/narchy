@@ -109,7 +109,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         /* HEURISTIC estimate */
         spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
-        assert(spread.isEmpty());
+        spread.clear();
+        //assert(spread.isEmpty());
 
         int ss = 0;
         try {

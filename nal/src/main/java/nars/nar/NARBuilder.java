@@ -77,7 +77,6 @@ public interface NARBuilder {
 
         int maxConcepts = 192 * 1024;
 
-        int activeConcepts = 1024;
 
         Default nar = new Default(
 

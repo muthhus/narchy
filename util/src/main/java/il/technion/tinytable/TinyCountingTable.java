@@ -53,12 +53,12 @@ public class TinyCountingTable extends TinyTable implements Serializable {
     private void shrinkChain(int bucketId, int chainId) {
 		this.removeAndShrink(bucketId);
 		int bucket = 0;
-		for (int i = bucketId + 1; i < bucketId + this.I0.length; i++) {
-            bucket = (i) % this.I0.length;
+        int il = this.I0.length;
+        for (int i = bucketId + 1; i < bucketId + il; i++) {
+            bucket = (i) % il;
             if (A[bucket] > 0) {
                 removeAndShrink(bucket);
                 A[bucket]--;
-                continue;
             } else {
 
                 break;
@@ -159,4 +159,5 @@ public class TinyCountingTable extends TinyTable implements Serializable {
         }
 
     }
+
 }
