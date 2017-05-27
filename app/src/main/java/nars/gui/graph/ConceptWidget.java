@@ -6,9 +6,9 @@ import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.Deletes;
 import jcog.pri.PLink;
+import jcog.pri.RawPLink;
 import nars.$;
 import nars.Task;
-import nars.budget.PLinkUntilDeleted;
 import nars.concept.Concept;
 import nars.gui.ConceptIcon;
 import nars.term.Term;
@@ -29,7 +29,6 @@ import spacegraph.space.EDraw;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.or;
 import static spacegraph.math.v3.v;
 
 
@@ -66,7 +65,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
                 new PLinkHijackBag(0, 2);
-                //new ArrayBag<>(0, PriMerge.avg, new HashMap());
+        //new ArrayBag<>(0, PriMerge.avg, new HashMap());
 
 
 //        for (int i = 0; i < edges; i++)
@@ -142,7 +141,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
 
                 edges.commit(x -> {
-                    x.get().update( ConceptWidget.this, priSum);
+                    x.get().update(ConceptWidget.this, priSum);
                 });
 
             }
@@ -235,14 +234,17 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
         Termed ttt = tgt.get();
         Term tt = ttt.term();
         if (!tt.equals(key)) {
-            Concept c = space.nar.concept(tt);
-            if (c != null) {
-                ConceptWidget to = space.space.get(tt);
-                if (to != null && to.active()) {
-                    TermEdge ate = space.edges.apply(Tuples.pair(c, to));
+            ConceptWidget to = space.space.get(tt);
+            if (to != null && to.active()) {
+//                Concept c = space.nar.concept(tt);
+//                if (c != null) {
+                    TermEdge ate = space.edges.apply(Tuples.pair(to.concept, to));
                     ate.add(tgt, !(ttt instanceof Task));
-                    edges.put(new PLinkUntilDeleted(ate, pri));
-                }
+                    edges.put(
+                            //new PLinkUntilDeleted(ate, pri)
+                            new RawPLink(ate, pri)
+                    );
+//                }
             }
         }
     }
@@ -318,7 +320,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 //                    qEst = 0f;
 
 
-
                 if (edgeSum > 0) {
                     this.b = 0.1f;
                     this.r = 0.1f + 0.7f * (tasklinkPri / edgeSum);
@@ -328,11 +329,11 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                 }
 
                 //this.a = 0.1f + 0.5f * pri;
-                float edgeProp = conceptEdgePriSum > 0  ? edgeSum / conceptEdgePriSum : 0;
+                float edgeProp = conceptEdgePriSum > 0 ? edgeSum / conceptEdgePriSum : 0;
 
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
-                        0.1f + 0.25f * edgeProp;
+                        0.1f + 0.5f * edgeProp;
 
                 this.attraction = 0f + 4f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 0.05f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
@@ -397,7 +398,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             cw.scale(l, w, h);
 
 
-
             float density = 0.5f;
             if (cw.body != null) {
                 cw.body.setMass(l * w * h * density);
@@ -418,7 +418,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 //                if (goal == null) goal = zero;
 //
 //                float angle = 45 + belief.freq() * 180f + (goal.freq() - 0.5f) * 90f;
-                    //angle / 360f
+                //angle / 360f
                 Draw.colorHash(c, cw.shapeColor);// * or(belief.conf(), goal.conf()), 0.9f, cw.shapeColor);
             }
 
