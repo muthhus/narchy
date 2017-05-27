@@ -5,9 +5,7 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableGraph;
 import jcog.list.FasterList;
-import org.apache.commons.lang3.ClassUtils;
 import org.eclipse.collections.api.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -64,32 +62,52 @@ public class O {
     protected void learn(Object x) {
         assert (x != this);
         if (x instanceof Class) {
-            this.learnClass((Class) x, null);
+            a.add((Class) x);
+            //learnClass((Class) x, null);
         } else if (x instanceof O) {
-            O o = (O) x;
-            how.nodes().addAll(o.how.nodes());
-            how.edges().addAll(o.how.edges());
-            the.addAll(o.the);
-            a.addAll(o.a);
-            is.putAll(o.is);
-            the.add(x); //allow it as an instance too
+            learnAll(x);
         } else {
-            if (the.add(x)) {
-                this.learn(x.getClass());
-            }
+            learnInstance(x);
         }
     }
 
-    private <X> void learnClass(Class<X> c, @Nullable Consumer<Pair<Constructor<X>, Parameter>> wonder) {
+    private void learnInstance(Object x) {
+        if (the.add(x)) {
+//            Class<?> c = x.getClass();
+//            this.learn(c);
+
+//            ClassUtils.hierarchy(c, ClassUtils.Interfaces.INCLUDE).forEach(s -> {
+//                if (s!=c && s!=Object.class) {
+//                    how.putEdge(x, s); //superclasses assignable from instance 'x'
+//                }
+//            });
+        }
+    }
+
+    private void learnAll(Object x) {
+        O o = (O) x;
+        how.nodes().addAll(o.how.nodes());
+        how.edges().addAll(o.how.edges());
+        the.addAll(o.the);
+        a.addAll(o.a);
+        is.putAll(o.is);
+        the.add(x); //allow it as an instance too
+    }
+
+    private <X> void learnClass(Class<? extends X> c, @Nullable Consumer<Pair<Constructor, Parameter>> wonder) {
         if (c.isInterface() || c.isPrimitive() || Modifier.isAbstract(c.getModifiers()))
             return; //throw new UnsupportedOperationException("classes currently must be concrete implementations");
 
-        boolean novel = a.add(c);
-
-        if (!novel && wonder == null)
-            return; //nothing to do with this already learned type at this time
-
         how.addNode(c);
+
+//        if (novel) {
+//            ClassUtils.hierarchy(c, ClassUtils.Interfaces.INCLUDE).forEach(s -> {
+//                if (s!=c && s!=Object.class) {
+//                    a.add(s);
+//                    how.putEdge(c, s); //assignable from
+//                }
+//            });
+//        }
 
         nextConstructor:
         for (Constructor cc : c.getConstructors()) {
@@ -98,43 +116,45 @@ public class O {
 
             Parameter[] cp = cc.getParameters();
             List<Parameter> primitives = new FasterList();
-            List<Class> instances = new FasterList();
-            if (cp.length > 0) {
-                //determine if some permutation of the vocabulary fits
-                for (Parameter p : cp) {
-                    Class pt = p.getType();
-                    if (pt.isPrimitive()) {
-                        primitives.add(p);
-                    } else {
-                        //if (!how.nodes().add(pt))
-                        if (a.contains(pt))
-                            instances.add(pt);
-                        else {
-                            if (!a.contains(pt)) {
-                                if (wonder != null) {
-                                    wonder.accept(pair(cc, p));
-                                }
-                                break nextConstructor;
-                            }
-                        }
-                    }
+            List<Parameter> instances = new FasterList();
+
+            for (Parameter p : cp) {
+                Class pt = p.getType();
+                if (pt.isPrimitive()) {
+                    primitives.add(p);
+                } else {
+                    instances.add(p);
                 }
             }
-
 
             if (how.addNode(cc)) {
                 how.putEdge(cc, c);
 
                 for (Parameter p : primitives) {
-                    how.addNode(p);
                     how.putEdge(p, cc);
-                    if (wonder!=null && !is.containsKey(p))
-                        wonder.accept(pair(cc,p));
+                    if (wonder != null && !is.containsKey(p))
+                        wonder.accept(pair(cc, p));
                 }
-                for (Class i : instances) {
-                    how.putEdge(i, cc);
-                    learnClass(i, wonder);
+
+                for (Parameter p : instances) {
+                    Class i = p.getType();
+
+                    //1. find any specified instances to assign
+                    long specified = the.stream().filter(x -> i.isAssignableFrom(x.getClass())).peek(x -> {
+                        how.putEdge(x, p);
+                    }).count();
+
+                    //2. find any specified implementations to assign, and then learn recursively
+                    if (specified == 0) {
+                        specified = a.stream().filter(x -> i.isAssignableFrom(x)).peek(x -> {
+                            if (how.putEdge(x, p))
+                                learnClass(x, wonder);
+                        }).count();
+                    }
+
+                    how.putEdge(p, cc);
                 }
+
             }
 
 
@@ -143,16 +163,7 @@ public class O {
         //ConstructorUtils.invokeConstructor()
         //ClassUtils.
 
-        if (novel) {
-            how.addNode(c);
 
-//            ClassUtils.hierarchy(c, ClassUtils.Interfaces.EXCLUDE).forEach(s -> {
-//                if (s!=c && s!=Object.class) {
-//                    a.add(s);
-//                    how.putEdge(c, s); //assignable from
-//                }
-//            });
-        }
     }
 
 
@@ -165,7 +176,7 @@ public class O {
     }
 
     public static class How<X> { //implements Iterable<X> {
-        public final Set<Pair<Constructor<X>, Parameter>> wonder = new HashSet();
+        public final Set<Pair<Constructor, Parameter>> wonder = new HashSet();
         public final MutableGraph<Object> plan;
         private final Class<X> what;
 
@@ -174,20 +185,22 @@ public class O {
 
             o.learnClass(what, wonder::add);
 
-            //((ConfigurableMutableGraph) o.how).predecessors(what)
-
-            Set<Object> before = Graphs.reachableNodes(o.how, what);
+            Set<Object> before = Graphs.reachableNodes(Graphs.transpose(o.how), what);
             this.plan = Graphs.inducedSubgraph(o.how, before);
         }
 
-        /** returns the first successfully constructed possibility */
-        @Nullable public X get(/* strategy */) {
+        /**
+         * returns the first successfully constructed possibility
+         */
+        @Nullable
+        public X get(/* strategy */) {
             return get(what);
         }
 
-        @Nullable public <Y> Y get(Class<Y> y/* Strategy... */) {
+        @Nullable
+        public <Y> Y get(Class<Y> y/* Strategy... */) {
             //first layer priors
-            Set<Object> before = plan.successors(y);
+            Set<Object> before = plan.predecessors(y);
             if (before.isEmpty())
                 return null;
 
@@ -201,7 +214,7 @@ public class O {
             //Strategy 2. choose by invoking any constructors, simplest and least exceptions first
             List constructors = before.stream()
                     .filter(z -> z instanceof Constructor)
-                    .filter(c -> y.isAssignableFrom( ((Constructor)c).getDeclaringClass() ) )
+                    .filter(c -> y.isAssignableFrom(((Constructor) c).getDeclaringClass()))
                     //.sorted(x -> x.) //TODO
                     .collect(toList());
             if (!constructors.isEmpty()) {

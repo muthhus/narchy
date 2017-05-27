@@ -51,5 +51,7 @@ public class TestDerivationBudgeting {
         O.How<Default> h = o.how(Default.class);
         System.out.println(h);
 
+        h.get();
+
     }
 }
