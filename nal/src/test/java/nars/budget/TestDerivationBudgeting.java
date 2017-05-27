@@ -1,7 +1,6 @@
 package nars.budget;
 
 import jcog.O;
-import jcog.random.XORShiftRandom;
 import jcog.random.XorShift128PlusRandom;
 import nars.nar.Default;
 import nars.time.CycleTime;
@@ -30,9 +29,9 @@ public class TestDerivationBudgeting {
         System.out.println(h);
         assertNotNull(h);
 
-        assertEquals(1, h.wonder.size());
+        assertEquals(1, h.unknown.size());
 
-        @Nullable Default d = h.get();
+        //@Nullable Default d = h.get();
 
     }
 
@@ -44,14 +43,12 @@ public class TestDerivationBudgeting {
                 new Default.DefaultTermIndex(1024),
                 new XorShift128PlusRandom(1)
         );
-        System.out.println(o);
 
-        System.out.println();
 
         O.How<Default> h = o.how(Default.class);
         System.out.println(h);
 
-        h.get();
+        //h.get();
 
     }
 }
