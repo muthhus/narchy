@@ -13,7 +13,6 @@ import java.util.function.Predicate;
  */
 public class MultiStatistics<X> implements FloatObjectProcedure<X> {
 
-
     public static class Condition<X> extends RecycledSummaryStatistics {
         public final Predicate<X> filter;
         public final String id;

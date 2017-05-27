@@ -8,6 +8,7 @@ import com.jogamp.opengl.GL2;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.input.FPSLook;
 import spacegraph.input.KeyXYZ;
 import spacegraph.input.OrbMouse;
@@ -57,12 +58,9 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     public SpaceGraph(int cacheCapacity) {
         super();
 
-
         Cache<X, Spatial<X>> atoms =
                 //new NonBlockingHashMap(cacheCapacity);
                 //new ConcurrentHashMap<>(cacheCapacity);
-
-
                 Caffeine.newBuilder()
                         //.softValues().build();
                         .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
@@ -129,7 +127,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         return this;
     }
 
-    public void remove(AbstractSpace<X, ?> c) {
+    public void removeSpace(AbstractSpace<X, ?> c) {
         if (inputs.remove(c)) {
             c.stop();
         }
@@ -140,6 +138,19 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         Spatial y = atoms.get(x, materializer);
         y.activate();
         return (Y) y;
+    }
+    public @Nullable <Y extends Spatial<X>> Y get(X x) {
+        Spatial y = atoms.getIfPresent(x);
+        if (y!=null)
+            y.activate();
+        return (Y) y;
+    }
+    public void remove(X x) {
+        @NotNull Spatial<X> y = get(x);
+        if (y!=null) {
+            y.hide();
+            atoms.invalidate(x);
+        }
     }
 
 

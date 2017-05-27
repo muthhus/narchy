@@ -105,7 +105,7 @@ public class O {
 //    final Map<String, Class> is = new HashMap();
 
 
-    final MutableGraph<Object> how = GraphBuilder.
+    public final MutableGraph<Object> how = GraphBuilder.
             directed().allowsSelfLoops(false).build();
 
     protected O(Object... xx) {

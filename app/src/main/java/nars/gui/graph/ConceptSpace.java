@@ -8,8 +8,6 @@ import nars.control.ConceptFire;
 import nars.gui.NARSpace;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 
 abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
@@ -22,7 +20,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     public long now;
     public int dur;
 
-    private final ConceptWidget.ConceptVis conceptVis = new ConceptWidget.ConceptVis2();
+    protected final ConceptWidget.ConceptVis conceptVis = new ConceptWidget.ConceptVis2();
 
 //    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
@@ -35,28 +33,30 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
     }
 
-    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
-        ConceptWidget y = new ConceptWidget(c);
-        y.concept = c;
-        return y;
-    }) {
-        @Override
-        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
-            value.get().getTwo()
-                    //.hide();
-                    .delete(space.dyn);
-        }
-    };
+//    public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
+//        ConceptWidget y = new ConceptWidget(c);
+//        y.concept = c;
+//        return y;
+//    }) {
+//        @Override
+//        public void onRemoved(@NotNull PLink<Pair<Concept, ConceptWidget>> value) {
+//            value.get().getTwo()
+//                    //.hide();
+//                    .delete(space.dyn);
+//        }
+//    };
 
-    public final HijackMemoize<Pair<Concept,ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>(4096, 2, (to) -> {
+    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>(4096, 2, (to) -> {
         return new ConceptWidget.TermEdge(to.getTwo());
     });
 
     void removeNode(ConceptFire concept) {
-        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
-        if (cw != null) {
-            cw.hide();
-        }
+        space.remove(concept.term());
+
+//        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
+//        if (cw != null) {
+//            cw.hide();
+//        }
     }
 ////        cw.delete();
 ////
@@ -75,7 +75,10 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     }
 
     protected ConceptWidget nodeGetOrCreate(ConceptFire concept) {
-        ConceptWidget cw = widgets.apply(concept.get());
+        ConceptWidget cw = space.getOrAdd(concept.term(), (c) -> {
+            return new ConceptWidget(c);
+        });
+        cw.concept = concept.get();
         cw.activate();
         return cw;
     }
@@ -86,9 +89,8 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         super.update();
 
         for (int i = 0, activeSize = active.size(); i < activeSize; i++)
-            active.get(i).commit(conceptVis,this);
+            active.get(i).commit(conceptVis, this);
     }
-
 
 
 }

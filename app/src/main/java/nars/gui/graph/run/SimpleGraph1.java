@@ -33,33 +33,56 @@ import static spacegraph.layout.Grid.col;
 public class SimpleGraph1 extends ConceptSpace {
 
 
-    public SimpleGraph1(Graph g, int maxEdges) {
+    public SimpleGraph1(int maxEdges) {
         super(new Terminal(), maxEdges, maxEdges);
-        commit(g);
     }
-    List<ConceptFire> nodes = $.newArrayList();
+
+    List<ConceptFire> nodes = $.newArrayList(), next = null;
 
     protected void commit(Graph g) {
-        nodes.clear();
+        List<ConceptFire> n2 = $.newArrayList(g.nodes().size());
 
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
             c.termlinks().clear();
             g.successors(x).forEach( y -> c.termlinks().put(new RawPLink(nodeTerm(y),  1f) ));
-            nodes.add(new ConceptFire(c, 1f));
+            n2.add(new ConceptFire(c, 1f));
         });
 
+        this.next = n2;
     }
 
     @NotNull
     private Termed nodeTerm(Object x) {
-        return $.quote(x.toString());
+        return $.quote(System.identityHashCode(x) + " " + x.toString());
     }
 
     @Override
     protected void get(Collection<ConceptWidget> displayNext) {
+        if (next!=null) {
+            nodes = next;
+            next = null;
+        }
         nodes.forEach(c -> displayNext.add(nodeGetOrCreate(c)));
+    }
+
+    public synchronized SpaceGraph show(int w, int h) {
+        SpaceGraph<Term> s = new SpaceGraph(this.with(new Flatten()) );
+
+        MyForceDirected fd = new MyForceDirected();
+        s.dyn.addBroadConstraint(fd);
+
+        s.camPos(0, 0, 90).show(1300, 900);
+
+        window(
+            col(
+                reflect(fd),
+                reflect(conceptVis),
+                reflect(s)
+            ), w, h);
+
+        return s;
     }
 
     public static void main(String[] args) {
@@ -70,39 +93,9 @@ public class SimpleGraph1 extends ConceptSpace {
         g.putEdge("y", "z");
         g.putEdge("y", "w");
 
-        SimpleGraph1 cs = new SimpleGraph1(g, 10);
-
-        SpaceGraph<Term> s = new SpaceGraph(
-
-                cs.with(
-
-                        new Flatten()
-//                        new Flatten() {
-//                            protected void locate(SimpleSpatial s, v3 f) {
-//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-//                            }
-//                        }
-
-
-                        //new Spiral()
-//                        //new FastOrganicLayout()
-                )
-        );
-
-        MyForceDirected fd = new MyForceDirected();
-        s.dyn.addBroadConstraint(fd);
-
-        s
-                .camPos(0, 0, 90)
-                //.ortho( logConsole(n, 40, 10, 0.0f) )
-                .show(1300, 900);
-
-        window(
-                col(
-                    reflect(fd), reflect(s)
-                ),
-                400, 400);
-
+        SimpleGraph1 cs = new SimpleGraph1(10);
+        cs.show(800, 600);
+        cs.commit(g);
 
 
     }

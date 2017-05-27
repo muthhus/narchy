@@ -23,7 +23,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     //private final TriConsumer<NAR, SpaceGraph<Term>, List<Spatial<X>>> collect;
     private On on;
 
-    protected SpaceGraph<X> space;
+    public SpaceGraph<X> space;
 
 
     //public final MutableFloat maxPri = new MutableFloat(1.0f);

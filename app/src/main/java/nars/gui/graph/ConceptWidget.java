@@ -237,7 +237,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
         if (!tt.equals(key)) {
             Concept c = space.nar.concept(tt);
             if (c != null) {
-                ConceptWidget to = space.widgets.getIfPresent(c);
+                ConceptWidget to = space.space.get(tt);
                 if (to != null && to.active()) {
                     TermEdge ate = space.edges.apply(Tuples.pair(c, to));
                     ate.add(tgt, !(ttt instanceof Task));
