@@ -10,7 +10,7 @@ import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.BufferedSynchronousExecutorHijack;
+import nars.util.exe.BufferedSynchronousExecutor;
 import org.junit.Test;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +84,7 @@ public class InterNARTest {
         return new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
                 new RealTime.DSHalf(true),
-                new BufferedSynchronousExecutorHijack(256)
+                new BufferedSynchronousExecutor(256)
         );
     }
 

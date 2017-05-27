@@ -14,7 +14,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
 import nars.time.CycleTime;
-import nars.util.exe.BufferedSynchronousExecutorHijack;
+import nars.util.exe.BufferedSynchronousExecutor;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -151,7 +151,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 
         Default n = new Default(
                 new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
-                new CycleTime(), new BufferedSynchronousExecutorHijack(512, 0.5f));
+                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f));
 
         //Default n = NARBuilder.newMultiThreadNAR(1, new RealTime.DSHalf(true).durSeconds(0.05f));
         //n.nal(1);
@@ -189,7 +189,7 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
         final AtomicBoolean atomsEnabled = new AtomicBoolean(false);
 
         NARSpace cs = new ConceptsSpace(n,
-                ()->(((BufferedSynchronousExecutorHijack) (n.exe)).active)
+                ()->(((BufferedSynchronousExecutor) (n.exe)).active)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
@@ -279,9 +279,9 @@ public class ConceptsSpace extends NARSpace<Term, ConceptWidget> {
 //        for (int i = 1; i < 24; i++)
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
-        new DeductiveMeshTest(n, new int[] {3, 3}, 16384);
+        new DeductiveMeshTest(n, new int[] {6, 6}, 16384);
 
-        n.startFPS(3f).join();
+        n.startFPS(1f).join();
 
 
 

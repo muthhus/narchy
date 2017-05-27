@@ -1,24 +1,28 @@
 package nars.nar;
 
 import jcog.AffinityExecutor;
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NARLoop;
+import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutorHijack;
+import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -86,13 +90,13 @@ public class NARS extends NAR {
         });
     }
 
-     class SubExecutor extends BufferedSynchronousExecutorHijack {
+    class SubExecutor extends BufferedSynchronousExecutor {
         public SubExecutor(int inputQueueCapacity, float exePct) {
-            super( inputQueueCapacity, exePct );
+            super(inputQueueCapacity, exePct);
         }
 
 
-         //    class SubExecutor extends BufferedSynchronousExecutor {
+        //    class SubExecutor extends BufferedSynchronousExecutor {
 //        public SubExecutor(int inputQueueCapacity) {
 //            super(
 //                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
@@ -112,24 +116,25 @@ public class NARS extends NAR {
 //                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
 //        );
 
-            @Override
-            public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
+        @Override
+        public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
 
-                Bag<Term, PLink<Term>> termlink =
-                        new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-                //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
+            Bag<Term, PLink<Term>> termlink =
+                    new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+            //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
 
-                Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+            Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
 
-                return f.apply(termlink, tasklink);
-            }
-
-            @NotNull
-            @Deprecated @Override
-            public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
-                return new DefaultHijackBag<>(blend, reprobes);
-            }
+            return f.apply(termlink, tasklink);
         }
+
+        @NotNull
+        @Deprecated
+        @Override
+        public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+            return new DefaultHijackBag<>(blend, reprobes);
+        }
+    }
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
@@ -138,10 +143,13 @@ public class NARS extends NAR {
                 rng, e);
     }
 
+
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
         this(time, rng,
-                new MultiThreadExecutor(0, passiveThreads) {
-                    //new SynchronousExecutor() {
+                new Executioner() {
+
+                    final ForkJoinPool passive =
+                            new ForkJoinPool(passiveThreads);
 
                     @Override
                     public void run(@NotNull Consumer<NAR> r) {
@@ -155,16 +163,54 @@ public class NARS extends NAR {
                     }
 
                     @Override
+                    public void runLater(Runnable cmd) {
+                        passive.execute(cmd);
+                    }
+
+                    @Override
                     public boolean run(@NotNull ITask t) {
                         throw new UnsupportedOperationException("should be intercepted by class NARS");
+                    }
+
+                    @Override
+                    public void cycle(@NotNull NAR nar) {
+
+                        int waitCycles = 0;
+
+                        while (!passive.isQuiescent()) {
+                            Util.pauseNext(waitCycles++);
+                        }
+
+                        Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
+                        if (vv != null) {
+                            for (int i = 0; ; ) {
+                                Consumer c = vv[i++];
+                                if (c == null) break; //null terminator hit
+
+                                run(c);
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public int concurrency() {
+                        return 0; //TODO
                     }
 
                     @Override
                     public boolean concurrent() {
                         return true;
                     }
+
+                    @Override
+                    public void forEach(Consumer<ITask> each) {
+                        throw new UnsupportedOperationException();
+                    }
                 });
     }
+
+
 
 
     public boolean running() {

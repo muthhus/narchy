@@ -1127,24 +1127,22 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
     }
 
-    @NotNull
-    public NAR forEachTask(@NotNull Consumer<Task> each) {
-        forEachConcept(c -> c.forEachTask(each));
-        return this;
+    /** each concept task */
+    @NotNull public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
+        return forEachConcept(c -> c.forEachTask(each));
     }
 
     @NotNull
-    public NAR forEachTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
-        forEachConcept(c -> {
+    public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+        return forEachConcept(c -> {
             c.forEachTask(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests, each);
         });
-        return this;
     }
 
     @NotNull
-    public NAR forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
-                           boolean includeTaskLinks, int maxPerConcept,
-                           @NotNull Consumer<Task> recip) {
+    public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
+                                  boolean includeTaskLinks, int maxPerConcept,
+                                  @NotNull Consumer<Task> recip) {
         Consumer<? super PLink<Task>> action = t -> recip.accept(t.get());
         forEachConcept(c -> {
             if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
@@ -1237,14 +1235,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return term;
     }
 
-    @Nullable
-    public NAR forEachActiveConcept(@NotNull Consumer<ConceptFire> recip) {
-        exe.forEach(t -> {
+
+
+    public NAR forEachTaskActive(@NotNull Consumer<ITask> recip) {
+        exe.forEach(recip);
+        return this;
+    }
+
+    public NAR forEachConceptActive(@NotNull Consumer<ConceptFire> recip) {
+        return forEachTaskActive(t -> {
             if (t instanceof ConceptFire) {
                 recip.accept(((ConceptFire) t));
             }
         });
-        return this;
     }
 
     @NotNull
@@ -1421,7 +1424,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         MutableInteger total = new MutableInteger(0), wrote = new MutableInteger(0);
 
-        forEachTask(_x -> {
+        forEachConceptTask(_x -> {
             total.increment();
             Task x = post(_x);
             if (x.truth() != null && x.conf() < confMin.floatValue())

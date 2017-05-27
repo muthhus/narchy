@@ -58,7 +58,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream(4096);
                 DataOutput dos = new DataOutputStream(bs);
 
-                nar.forEachActiveConcept(c -> {
+                nar.forEachConceptActive(c -> {
 
                     try {
                         writeConceptSummary(dos, c);

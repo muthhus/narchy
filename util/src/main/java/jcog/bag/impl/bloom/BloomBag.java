@@ -4,7 +4,6 @@ import com.google.common.collect.Iterators;
 import il.technion.tinytable.TinyCountingTable;
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bloom.StableBloomFilter;
 import jcog.list.CircularArrayList;
 import jcog.pri.PLink;
 import jcog.pri.RawPLink;
@@ -17,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
-import static jcog.bag.Bag.BagCursorAction.Stop;
 
 /** experimental implementation backed by a TinyCountingTable and a circular array of items */
 public class BloomBag<X> implements Bag<X,PLink<X>> {

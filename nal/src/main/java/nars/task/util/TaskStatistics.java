@@ -26,7 +26,7 @@ public class TaskStatistics {
     final Frequency pri = new Frequency();
 
     public TaskStatistics add(NAR nar) {
-        nar.forEachTask(this::add);
+        nar.forEachConceptTask(this::add);
         return this;
     }
 

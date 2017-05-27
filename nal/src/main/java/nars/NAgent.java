@@ -20,7 +20,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import nars.util.Loop;
+import jcog.Loop;
 import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -603,7 +603,7 @@ abstract public class NAgent implements NSense, NAct {
     public static float varPct(NAR nar) {
         if (nar instanceof Default) {
             RecycledSummaryStatistics is = new RecycledSummaryStatistics();
-            nar.forEachActiveConcept(xx -> {
+            nar.forEachConceptActive(xx -> {
                 Term tt = xx.term();
                 float v = tt.volume();
                 int c = tt.complexity();

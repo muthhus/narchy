@@ -1359,6 +1359,24 @@ public enum Util {
         return BinTxt.toString(c);
     }
 
+
+    /**
+     * adaptive spinlock behavior
+     */
+    public static void pauseNext(int previousContiguousPauses) {
+        if (previousContiguousPauses < 2) {
+            //nothing
+        } else if (previousContiguousPauses < 4) {
+            Thread.yield();
+        } else if (previousContiguousPauses < 10) {
+            Util.sleep(0);
+        } else if (previousContiguousPauses < 20) {
+            Util.sleep(1);
+        } else {
+            Util.sleep(100);
+        }
+    }
+
     /**
      * http://www.qat.com/using-waitnotify-instead-thread-sleep-java/
      */

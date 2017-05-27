@@ -13,17 +13,15 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import jcog.Util;
 import jcog.meter.event.PeriodMeter;
 import jogamp.opengl.FPSCounterImpl;
-import nars.util.Loop;
+import jcog.Loop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.jogamp.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 

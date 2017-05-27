@@ -2,7 +2,7 @@ package nars.util.exe;
 
 import nars.NAR;
 import nars.task.ITask;
-import nars.util.Loop;
+import jcog.Loop;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

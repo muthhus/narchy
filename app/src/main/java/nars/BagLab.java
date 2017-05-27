@@ -1,14 +1,11 @@
 package nars;
 
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.bloom.BloomBag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
@@ -23,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
-import static jcog.bag.Bag.BagCursorAction.Next;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
 

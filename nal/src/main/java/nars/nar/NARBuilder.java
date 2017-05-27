@@ -15,9 +15,8 @@ import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutorHijack;
+import nars.util.exe.BufferedSynchronousExecutor;
 import nars.util.exe.Executioner;
-import nars.util.exe.MultiThreadExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +44,7 @@ public interface NARBuilder {
             threads = 1;
                     //(int) Math.ceil(Runtime.getRuntime().availableProcessors()-2);
 
-        Executioner exe = new BufferedSynchronousExecutorHijack(128);
+        Executioner exe = new BufferedSynchronousExecutor(128);
 //                threads == 1 ?
 //                        new BufferedSynchronousExecutor() :
 //                        new MultiThreadExecutor(threads,2);

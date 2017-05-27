@@ -1,7 +1,5 @@
-package nars.util;
+package jcog;
 
-import jcog.Texts;
-import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.slf4j.Logger;
 

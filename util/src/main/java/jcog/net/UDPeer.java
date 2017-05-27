@@ -1,11 +1,11 @@
 package jcog.net;
 
-import com.google.common.primitives.*;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.byt.DynByteSeq;
 import jcog.data.FloatParam;
@@ -13,7 +13,6 @@ import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.net.attn.HashMapTagSet;
 import jcog.pri.Priority;
-import jcog.pri.RawPLink;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
@@ -23,10 +22,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 

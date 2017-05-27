@@ -526,7 +526,7 @@ public class TemporalTest {
         n.run(155);
 
         TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
-        n.forEachActiveConcept(d::add);
+        n.forEachConceptActive(d::add);
 
         //2 unique impl concepts created
         assertEquals(

@@ -231,7 +231,7 @@ public class NARGraph<V,E> extends DirectedMultigraph<V,E> {
         graphize.onTime(this, n.time());
 
         //TODO support AbstractBag
-        n.forEachActiveConcept(c -> {
+        n.forEachConceptActive(c -> {
 
             //graphize.preLevel(this, p);
             if (!filter.includeConcept(c.get())) {

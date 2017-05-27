@@ -24,6 +24,6 @@ public class ActivationTest {
         n.run(15);
 
 
-        n.forEachActiveConcept(System.out::println);
+        n.forEachConceptActive(System.out::println);
     }
 }

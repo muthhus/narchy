@@ -3,7 +3,7 @@ package jcog.net;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jcog.Util;
-import nars.util.Loop;
+import jcog.Loop;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 
 /**
  * generic UDP server & utilities
