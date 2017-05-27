@@ -55,6 +55,7 @@ public class Treadmill extends AtomicIntegerArray {
         if (hash == 0) hash = 1; //reserve 0
         restart:
         while (true) {
+
             int best = -1;
             for (int i = 0; i < slots; i++) {
                 int v = get(i);
@@ -71,6 +72,7 @@ public class Treadmill extends AtomicIntegerArray {
             }
 
             //no free slots, continue spinning
+            Thread.onSpinWait();
         }
     }
 

@@ -159,9 +159,9 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                     }
 
                     @Override
-                    protected boolean replace(Object incoming, Object existing, float scale) {
+                    protected boolean replace(Object incoming, Object existing) {
                         return hijackGreedy(
-                            ((Abbr)incoming).priSafe(-1) * scale,
+                            ((Abbr)incoming).priSafe(-1),
                             ((Abbr)existing).priSafe(-1)
                         );
                     }

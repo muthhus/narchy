@@ -91,7 +91,7 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
     }
 
     @Override
-    public PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflowing) {
+    public PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflowing) {
         X c = b.get();
 
         byte[] hc = byteHash(c);

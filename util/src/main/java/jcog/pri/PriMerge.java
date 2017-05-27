@@ -26,23 +26,14 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
      *
      * @return any resultng overflow priority which was not absorbed by the target, >=0
      * */
-    float merge(Priority existing, Prioritized incoming, float incomingScale);
+    float merge(Priority existing, Prioritized incoming);
 
 
     @Nullable
     @Override
     default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming) {
-        return apply(existing, incoming, 1f);
-    }
-
-    @Nullable
-    default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming, float scale) {
-        merge(existing, incoming, scale);
+        merge(existing, incoming);
         return existing;
-    }
-
-    default float merge(Priority existing, Prioritized incoming) {
-        return merge(existing, incoming, 1f);
     }
 
     static void max(Priority existing, Priority incoming) {
@@ -66,7 +57,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
      *
      //TODO will this work for a possible negative pri value case?
      * */
-    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, float iScale, @NotNull PriMerge.PriMergeOp priMerge) {
+    static float blend(@NotNull Priority exi, @NotNull Prioritized inc, @NotNull PriMerge.PriMergeOp priMerge) {
 
         float ePri = exi.priSafe(0);
         float iPri = inc.priSafe(0);
@@ -74,16 +65,16 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
         float nextPri;
         switch (priMerge) {
             case PLUS:
-                nextPri = ePri + iPri*iScale;
+                nextPri = ePri + iPri;
                 break;
             case OR:
-                nextPri = Util.or(ePri,iPri*iScale);
+                nextPri = Util.or(ePri,iPri);
                 break;
             case MAX:
-                nextPri = Math.max(ePri, iPri*iScale);
+                nextPri = Math.max(ePri, iPri);
                 break;
             case AVG:
-                nextPri = lerp(iScale, (iPri+ePri)/2f, ePri);
+                nextPri = (iPri+ePri)/2f;
                 break;
             //TODO
             //case AND:     .. = ePri * iPri;          break;
@@ -135,27 +126,27 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
 //                currentPri + incomingPri :
 //                ((cp * currentPri) + ((1f-cp) * incomingPri)), cp);
 //    }
-
-    PriMerge errorMerge = (x, y, z) -> {
-        throw new UnsupportedOperationException();
-    };
-
-    PriMerge nullMerge = (x, y, z) -> {
-        //nothing
-        return 0f;
-    };
+//
+//    PriMerge errorMerge = (x, y, z) -> {
+//        throw new UnsupportedOperationException();
+//    };
+//
+//    PriMerge nullMerge = (x, y, z) -> {
+//        //nothing
+//        return 0f;
+//    };
 
     /** sum priority, LERP other components in proportion to the priorities */
-    PriMerge plus = (tgt, src, srcScale) -> blend(tgt, src, srcScale, PLUS);
+    PriMerge plus = (tgt, src) -> blend(tgt, src, PLUS);
 
     /** avg priority, LERP other components in proportion to the priorities */
-    PriMerge avg = (tgt, src, srcScale) -> blend(tgt, src, srcScale, AVG);
+    PriMerge avg = (tgt, src) -> blend(tgt, src, AVG);
 
 //    /** or priority, LERP other components in proportion to the priorities */
-    PriMerge or = (tgt, src, srcScale) -> blend(tgt, src, srcScale, OR);
+    PriMerge or = (tgt, src) -> blend(tgt, src, OR);
 
     //    /** or priority, LERP other components in proportion to the priorities */
-    PriMerge max = (tgt, src, srcScale) -> blend(tgt, src, srcScale, MAX);
+    PriMerge max = (tgt, src) -> blend(tgt, src, MAX);
 //
 //
 //    /** AND priority, LERP other components in proportion to the priorities */

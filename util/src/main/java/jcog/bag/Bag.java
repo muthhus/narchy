@@ -83,7 +83,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     default V put(@NotNull V x) {
-        return put(x, 1f, null);
+        return put(x, null);
     }
 
     //        @Nullable
@@ -106,7 +106,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     @Deprecated
-    V put(@NotNull V b, float scale, @Nullable MutableFloat overflowing);
+    V put(@NotNull V b, @Nullable MutableFloat overflowing);
 
 
     /* sample the bag, optionally removing each visited element as decided by the visitor's
@@ -588,7 +588,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         }
 
         @Override
-        public Object put(@NotNull Object b, float scale, @Nullable MutableFloat overflowing) {
+        public Object put(@NotNull Object b, @Nullable MutableFloat overflowing) {
             return null;
         }
 

@@ -23,8 +23,8 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
     }
 
     @Override
-    protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming, float scale) {
-        merge.merge(existing, incoming, scale); //modify existing
+    protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming) {
+        merge.merge(existing, incoming); //modify existing
         return existing;
     }
 

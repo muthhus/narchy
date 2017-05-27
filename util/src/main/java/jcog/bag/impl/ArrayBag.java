@@ -338,9 +338,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     @Override
-    public final PLink<X> put(@NotNull PLink<X> b, float scale, @Nullable MutableFloat overflow) {
+    public final PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflow) {
 
-        pressurize(b.priSafe(0) * scale);
+        pressurize(b.priSafe(0) );
 
         final boolean[] isNew = {false};
 
@@ -352,12 +352,12 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
                 //merge
                 res = existing;
 
-                o = mergeFunction.merge(existing, b, scale);
+                o = mergeFunction.merge(existing, b);
 
             } else {
                 //new
                 PLink<X> n = new RawPLink<>(b.get(), 0);
-                float oo = mergeFunction.merge(n, b, scale);
+                float oo = mergeFunction.merge(n, b);
                 float np = n.pri();
 
                 if (size() >= capacity && np < priMinFast(-1)) {

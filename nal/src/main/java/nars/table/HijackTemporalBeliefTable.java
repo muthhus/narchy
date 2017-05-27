@@ -60,8 +60,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    protected boolean replace(Task incoming, Task existing, float scaleIgnored) {
-        assert(scaleIgnored==1f);
+    protected boolean replace(Task incoming, Task existing) {
 
         if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
             return true;

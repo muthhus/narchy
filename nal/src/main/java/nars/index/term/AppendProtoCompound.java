@@ -36,8 +36,7 @@ public class AppendProtoCompound implements ProtoCompound {
     public AppendProtoCompound(Op op, int dt, @NotNull Term[] u) {
         this(op, dt, 0);
         this.subs = u;
-        this.size = u.length;
-        if (u.length > 0) {
+        if ((this.size = u.length) > 0) {
             int hash = this.hash;
             for (Term x : u)
                 hash = Util.hashCombine(x.hashCode(), hash);
@@ -85,8 +84,8 @@ public class AppendProtoCompound implements ProtoCompound {
 
     @Override public boolean AND(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
-            if (x == null)
-                break;
+            //if (x == null)
+              //  break;
             if (t.test(x)) return false;
         }
         return true;
@@ -94,8 +93,8 @@ public class AppendProtoCompound implements ProtoCompound {
 
     @Override public boolean OR(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
-            if (x == null)
-                break;
+            //if (x == null)
+              //  break;
             if (t.test(x)) return true;
         }
         return false;

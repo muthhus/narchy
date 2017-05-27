@@ -125,8 +125,8 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
 
     @Override
-    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing, float scale) {
-        if (!super.replace(incoming, existing, scale)) {
+    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing) {
+        if (!super.replace(incoming, existing)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return false;
         }

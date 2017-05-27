@@ -161,11 +161,9 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
             //transfer budget from question to answer
             //float qBefore = taskBudget.priSafe(0);
             //float aBefore = answered.priSafe(0);
-            BudgetFunctions.transferPri(question, answered,
-                    answered.conf()
+            BudgetFunctions.fund(question, answered, answered.conf(), false);
                     //(1f - taskBudget.qua())
                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
-            );
 
             return true;
 

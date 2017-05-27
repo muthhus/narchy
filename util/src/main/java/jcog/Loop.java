@@ -142,15 +142,11 @@ abstract public class Loop implements Runnable {
                 long afterTime = System.currentTimeMillis();
                 long frameTime = afterTime - beforeTime;
 
-                long delayable = (periodMS - ((long) this.frameTime.getMean()));
                 this.frameTime.addValue(frameTime);
+                Util.sleep( periodMS - ((long) this.frameTime.getMean()));
 
-                // (beforeTime + periodMS) - prevTime
-                if (delayable > 0) {
-                    //logger.info("delay {}", delayable);
-                    //Util.pause(delayable);
-                    Util.sleep(delayable);
-                }
+            } else {
+                Thread.yield();
             }
 
 

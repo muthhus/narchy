@@ -158,35 +158,35 @@ public class BagTest {
         return new XorShift128PlusRandom(1);
     }
 
-
-    public static void testScalePutHalfs(float expect, Bag<String,PLink<String>> a, float... scales) {
-        for (float s : scales) {
-            a.put(new RawPLink("x", 0.5f), s, null);
-            Assert.assertNotNull(a.get("x"));
-        }
-        a.commit(null);
-
-
-        assertEquals(expect, a.get("x").pri(), 0.01f);
-        assertEquals(expect, a.pri("x", -1), 0.01f);
-    }
-
-    public static void testScalePut2(Bag<String,PLink<String>> a) {
-
-        a.put(new RawPLink("y",0.1f));
-        assertEquals(1, a.size());
-        a.put(new RawPLink("y",0.1f), 0.5f, null);
-        assertEquals(1, a.size());
-        a.put(new RawPLink("y",0.1f), 0.25f, null);
-        assertEquals(1, a.size());
-
-        a.commit(null);
-
-        assertTrue(a.contains("y"));
-
-        assertEquals(0.1 + 0.05 + 0.025, a.pri("y", -1), 0.001f);
-
-    }
+//
+//    public static void testScalePutHalfs(float expect, Bag<String,PLink<String>> a, float... scales) {
+//        for (float s : scales) {
+//            a.put(new RawPLink("x", 0.5f), s, null);
+//            Assert.assertNotNull(a.get("x"));
+//        }
+//        a.commit(null);
+//
+//
+//        assertEquals(expect, a.get("x").pri(), 0.01f);
+//        assertEquals(expect, a.pri("x", -1), 0.01f);
+//    }
+//
+//    public static void testScalePut2(Bag<String,PLink<String>> a) {
+//
+//        a.put(new RawPLink("y",0.1f));
+//        assertEquals(1, a.size());
+//        a.put(new RawPLink("y",0.1f), 0.5f, null);
+//        assertEquals(1, a.size());
+//        a.put(new RawPLink("y",0.1f), 0.25f, null);
+//        assertEquals(1, a.size());
+//
+//        a.commit(null);
+//
+//        assertTrue(a.contains("y"));
+//
+//        assertEquals(0.1 + 0.05 + 0.025, a.pri("y", -1), 0.001f);
+//
+//    }
 
     public static void printDist(@NotNull EmpiricalDistribution f) {
         System.out.println(f.getSampleStats().toString().replace("\n", " "));

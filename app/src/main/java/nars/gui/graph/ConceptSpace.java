@@ -15,12 +15,14 @@ import org.jetbrains.annotations.Nullable;
 abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
 
-    public static final float UPDATE_RATE = 0.5f;
-
     public final NAR nar;
+
     public final int maxEdgesPerNodeMin, maxEdgesPerNodeMax;
+
     public long now;
     public int dur;
+
+    private final ConceptWidget.ConceptVis conceptVis = new ConceptWidget.ConceptVis2();
 
 //    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
@@ -32,10 +34,6 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         this.maxEdgesPerNodeMin = maxEdgesPerNodeMin;
         this.maxEdgesPerNodeMax = maxEdgesPerNodeMax;
     }
-
-
-
-
 
     public final HijackMemoize<Concept,ConceptWidget> widgets = new HijackMemoize<>(2048, 4, (c) -> {
         ConceptWidget y = new ConceptWidget(c);
@@ -87,7 +85,8 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     protected void update() {
         super.update();
 
-        active.forEach(c -> c.commit(this));
+        for (int i = 0, activeSize = active.size(); i < activeSize; i++)
+            active.get(i).commit(conceptVis,this);
     }
 
 

@@ -165,21 +165,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     @Nullable
-    private V update(Object k, @Nullable V v /* null to remove */, float scale /* -1 to remove, 0 to get only*/) {
+    private V update(Object k, @Nullable V v /* null to remove */, Mode mode) {
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
         if (c == 0)
             return null;
-
-        final Mode mode;
-        if (v != null) {
-            mode = PUT;
-        } else if (scale < 0) {
-            mode = REMOVE;
-        } else {
-            mode = GET;
-        }
 
         V toAdd = null, toRemove = null, toReturn = null;
 
@@ -209,7 +200,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             if (p == v) {
                                 toReturn = p; //identical match found, keep original
                             } else {
-                                V next = merge(p, v, scale);
+                                V next = merge(p, v);
                                 if (next != null && (next == p || map.compareAndSet(i, p, next))) {
                                     if (next != p) {
                                         toRemove = p; //replaced
@@ -247,7 +238,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
                     } else {
                             //attempt HIJACK (tm)
-                            if (replace(v, p, scale)) {
+                            if (replace(v, p)) {
                                 if (map.compareAndSet(i, p, v)) { //inserted
                                     toRemove = p;
                                     toReturn = toAdd = v;
@@ -314,7 +305,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * at a different probe location
      */
     @Nullable
-    protected abstract V merge(@NotNull V existing, @NotNull V incoming, float scale);
+    protected abstract V merge(@NotNull V existing, @NotNull V incoming);
 
     /**
      * can override in subclasses for custom replacement policy.
@@ -322,8 +313,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * <p>
      * a potential eviction can be intercepted here
      */
-    protected boolean replace(V incoming, V existing, float scale) {
-        return replace(pri(incoming) * scale, pri(existing));
+    protected boolean replace(V incoming, V existing) {
+        return replace(pri(incoming), pri(existing));
     }
 
     protected boolean replace(float incoming, float existing) {
@@ -333,7 +324,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     @Nullable
     @Override
     public V remove(@NotNull K k) {
-        return update(k, null, -1);
+        return update(k, null, REMOVE);
     }
 
     protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
@@ -352,15 +343,15 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     /**
      */
     @Override
-    public final V put(@NotNull V v, float scale, /* TODO */ @Nullable MutableFloat overflowing) {
+    public final V put(@NotNull V v,  /* TODO */ @Nullable MutableFloat overflowing) {
 
         float p = pri(v);
         if (p != p)
             return null; //already deleted
 
-        pressurize(p * scale);
+        pressurize(p);
 
-        V y = update(key(v), v, scale);
+        V y = update(key(v), v, PUT);
 
         return y;
     }
@@ -368,7 +359,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public @Nullable V get(@NotNull Object key) {
-        return update(key, null, 0);
+        return update(key, null, GET);
     }
 
     @Override

@@ -38,29 +38,29 @@ public class HijackBagTest {
 
 
 
-    @Test
-    public void testScalePutArray() {
-        testScalePutHalfs(0.5f, new ArrayBag<>(2, max, new HashMap<>(2)), 1f, 0.5f);
-        testScalePutHalfs(0.75f, new ArrayBag<>(2, plus, new HashMap<>(2)), 1f, 0.5f);
-        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
-
-    }
-    @Test
-    public void testScalePutHijaMax() {
-        //second scale has no effect being smaller than the first one
-        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 1), 1f, 0.5f);
-        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 2), 1f, 0.5f);
-
-        BagTest.testScalePutHalfs(0.75f, new DefaultHijackBag(plus, 2, 2), 1f, 0.5f);
-    }
-    @Test
-    public void testScalePutHija3() {
-        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
-    }
-    @Test
-    public void testScalePutHija4() {
-        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
-    }
+//    @Test
+//    public void testScalePutArray() {
+//        testScalePutHalfs(0.5f, new ArrayBag<>(2, max, new HashMap<>(2)), 1f, 0.5f);
+//        testScalePutHalfs(0.75f, new ArrayBag<>(2, plus, new HashMap<>(2)), 1f, 0.5f);
+//        testScalePut2(new ArrayBag(2, plus, new HashMap<>(2)));
+//
+//    }
+//    @Test
+//    public void testScalePutHijaMax() {
+//        //second scale has no effect being smaller than the first one
+//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 1), 1f, 0.5f);
+//        BagTest.testScalePutHalfs(0.5f, new DefaultHijackBag(max, 2, 2), 1f, 0.5f);
+//
+//        BagTest.testScalePutHalfs(0.75f, new DefaultHijackBag(plus, 2, 2), 1f, 0.5f);
+//    }
+//    @Test
+//    public void testScalePutHija3() {
+//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 1));
+//    }
+//    @Test
+//    public void testScalePutHija4() {
+//        BagTest.testScalePut2(new DefaultHijackBag(plus, 2, 2));
+//    }
 
     @Test
     public void testBasicInsertionRemovalHijack() {

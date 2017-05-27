@@ -43,7 +43,7 @@ public class Bagregate<X extends Prioritized> extends ArrayBag<X> {
                 if (include(x)) {
                     float pri = x.pri();
                     if (pri==pri)
-                        put(new RawPLink(x, pri), scale, null);
+                        put(new RawPLink(x, pri * scale), null);
                 }
             });
             commit();

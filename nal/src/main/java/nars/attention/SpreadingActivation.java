@@ -202,7 +202,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             termBidi(c, p * TERMLINK_BALANCE, p * (1f - TERMLINK_BALANCE), scale);
 
             if (c instanceof Concept) {
-                tasklink((Concept) c, p, scale);
+                tasklink((Concept) c, p * scale);
                 //            if (c instanceof AtomConcept) {
                 //                activateAtom((AtomConcept) c, scale);
                 //            }
@@ -343,24 +343,24 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         Term rcptTerm = rcpt.term();
 
         if (tlForward > 0)
-            termlink(origin, rcptTerm, tlForward, scale);
+            termlink(origin, rcptTerm, tlForward * scale);
 
         if (rcpt instanceof Concept && tlReverse > 0)
-            termlink((Concept) rcpt, origin, tlReverse, scale);
+            termlink((Concept) rcpt, origin, tlReverse * scale);
 
     }
 
-    void tasklink(Concept rcpt, float pri, float scale) {
+    void tasklink(Concept rcpt, float pri) {
 
         rcpt.tasklinks().put(
                 //new RawPLink(value, pri),
                 new PLinkUntilDeleted(id, pri),
-                scale, null);
+                null);
 
     }
 
-    void termlink(Concept recipient, Term target, float pri, float scale) {
-        recipient.termlinks().put(new RawPLink(target, pri), scale, linkOverflow);
+    void termlink(Concept recipient, Term target, float pri) {
+        recipient.termlinks().put(new RawPLink(target, pri), linkOverflow);
     }
 
 

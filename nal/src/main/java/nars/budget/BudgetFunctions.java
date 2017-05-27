@@ -225,6 +225,7 @@ public final class BudgetFunctions extends UtilityFunctions {
             fund(u, t, paymentProportion, copyOrTransfer);
         return u;
     }
+
     @NotNull
     public static Priority fund(float paymentProportion, boolean copyOrTransfer, Priority... src) {
         Pri u = new Pri(0f);
@@ -233,16 +234,13 @@ public final class BudgetFunctions extends UtilityFunctions {
         return u;
     }
 
-    public static void fund(Priority target, Priority source, float paymentProportion, boolean copyOrTransfer) {
+    public static void fund(Priority target, Priority source, float scale, boolean copyOrTransfer) {
         if (copyOrTransfer) {
             //COPY
-            plus.merge(target, source, paymentProportion);
+            target.priAdd(source.priSafe(0) * scale);
         } else {
             //TRANSFER
-            float before = target.priSafe(0);
-            plus.merge(target, source, paymentProportion);
-            float after = target.priSafe(0);
-            source.priAdd(-(after - before));
+            BudgetFunctions.transferPri(target, source, scale);
         }
     }
 

@@ -67,8 +67,8 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
 
     @Override
-    protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming, float scale) {
-        existing.priAdd(incoming.priSafe(0) * scale);
+    protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming) {
+        existing.priAdd( incoming.priSafe(0) );
         return existing;
     }
 

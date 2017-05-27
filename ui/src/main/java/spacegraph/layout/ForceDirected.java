@@ -5,6 +5,7 @@ import jcog.data.FloatParam;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
+import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;
@@ -24,8 +25,8 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(4, 0, 10);
-    public final FloatParam attraction = new FloatParam(4f, 0, 10f);
+    public final FloatParam repel = new FloatParam(1.5f, 0, 5f);
+    public final FloatParam attraction = new FloatParam(0.1f, 0, 2f);
 
 
 
@@ -129,14 +130,18 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
             return;
 
         len -= idealDistRads;
-        if (len <= 0)
+        if (len < 0) {
+            len*=-1;
+            speed*=-1;
+        }
+        if (len < BulletGlobals.FLT_EPSILON)
             return;
 
 
         //v3 delta2 = v(delta);
 
         //delta.scale((speed / (1 + /&xp.mass() /* + yp.mass()*/) ) * len );
-        delta.scale(len * speed );
+        delta.scale( (float)(len) * speed );
         ((Dynamic) x).impulse(delta);
         //delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
         delta.scale(-1 );

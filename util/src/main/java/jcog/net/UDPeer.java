@@ -120,7 +120,7 @@ public class UDPeer extends UDP {
             }
 
             @Override
-            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, float scale) {
+            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming) {
                 return (existing != null ? existing : incoming);
             }
 

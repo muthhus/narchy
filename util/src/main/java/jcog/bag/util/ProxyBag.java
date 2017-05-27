@@ -64,8 +64,8 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
     }
 
     @Override
-    public Y put(@NotNull Y b, float scale, @Nullable MutableFloat overflowing) {
-        return bag.put(b, scale, overflowing);
+    public Y put(@NotNull Y b, @Nullable MutableFloat overflowing) {
+        return bag.put(b, overflowing);
     }
 
 

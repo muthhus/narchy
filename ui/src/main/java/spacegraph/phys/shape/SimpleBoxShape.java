@@ -77,7 +77,7 @@ public class SimpleBoxShape extends PolyhedralConvexShape {
 	}
 
 	private void updateRadius() {
-		radius = implicitShapeDimensions.length() * localScaling.length();
+		radius = 0.5f * implicitShapeDimensions.length() * localScaling.length();
 	}
 
 	public v3 getHalfExtentsWithMargin(v3 out) {

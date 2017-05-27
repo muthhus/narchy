@@ -364,12 +364,6 @@ public enum Util {
         return h ^ (h >>> 16);
     }
 
-    /**
-     * from clojure.Util - not tested
-     */
-    public static int hashClojure(int a, int b) {
-        return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
-    }
 
     public static int hashJava(int a, int b) {
         return a * 31 + b;
@@ -379,8 +373,11 @@ public enum Util {
         return a * Util.PRIME2 + b;
     }
 
-    public static int hashCombine(int next, int current) {
-        return hashClojure(next, current);
+    /**
+     * from clojure.Util - not tested
+     */
+    public static int hashCombine(int a, int b) {
+        return a ^ (b + 0x9e3779b9 + (a << 6) + (a >> 2));
     }
 
     public static int hashCombine(int a, int b, int c) {
@@ -502,7 +499,7 @@ public enum Util {
     }
 
     public static long lerp(float factor, long max, long min) {
-        return min + Math.round((max - min) * unitize((double)factor));
+        return min + Math.round((max - min) * unitize((double) factor));
     }
 
     public static int lerp(float factor, int max, int min) {
@@ -603,9 +600,10 @@ public enum Util {
     }
 
     public static float notNaN(float x) throws NumberException {
-        if (x!=x) throw new NumberException("NaN");
+        if (x != x) throw new NumberException("NaN");
         return x;
     }
+
     public static float notNaNOrNeg(float x) throws NumberException {
         if (notNaN(x) < 0)
             throw new NumberException("Negative");
@@ -673,7 +671,7 @@ public enum Util {
     public static boolean equals(float[] a, float[] b, float epsilon) {
         if (a == b) return true;
         for (int i = 0; i < a.length; i++) {
-            if (!equals(a,b, epsilon))
+            if (!equals(a, b, epsilon))
                 return false;
         }
         return true;
@@ -1364,13 +1362,14 @@ public enum Util {
      * adaptive spinlock behavior
      */
     public static void pauseNext(int previousContiguousPauses) {
-        if (previousContiguousPauses < 2) {
+        if (previousContiguousPauses < 16) {
             //nothing
-        } else if (previousContiguousPauses < 4) {
+            Thread.onSpinWait();
+        } else if (previousContiguousPauses < 32) {
             Thread.yield();
-        } else if (previousContiguousPauses < 10) {
+        } else if (previousContiguousPauses < 64) {
             Util.sleep(0);
-        } else if (previousContiguousPauses < 20) {
+        } else if (previousContiguousPauses < 128) {
             Util.sleep(1);
         } else {
             Util.sleep(100);
@@ -1401,14 +1400,18 @@ public enum Util {
     }
 
     public static boolean sleep(long periodMS) {
-        try {
-            Thread.sleep(periodMS);
-            return true;
-        } catch (InterruptedException e) {
-            //TODO
-            //e.printStackTrace();
-            return false;
+        if (periodMS <= 0) {
+            Thread.yield();
+        } else {
+            try {
+                Thread.sleep(periodMS);
+            } catch (InterruptedException e) {
+                //TODO
+                //e.printStackTrace();
+                return false;
+            }
         }
+        return true;
     }
 
     public static int largestPowerOf2NoGreaterThan(int i) {
@@ -1578,7 +1581,9 @@ public enum Util {
     public final static ObjectMapper msgPackMapper =
             new ObjectMapper(new MessagePackFactory());//.enableDefaultTyping();
 
-    /** msgpack serialization */
+    /**
+     * msgpack serialization
+     */
     public static byte[] toBytes(Object x) throws JsonProcessingException {
         return msgPackMapper./*writerFor(c).*/writeValueAsBytes(x);
     }
@@ -1587,7 +1592,9 @@ public enum Util {
 //        return msgPackMapper./*writerFor(c).*/writeValueAsBytes(x);
 //    }
 
-    /** msgpack deserialization */
+    /**
+     * msgpack deserialization
+     */
     public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
     }
@@ -1596,21 +1603,24 @@ public enum Util {
         return msgPackMapper.valueToTree(x);
     }
 
-    /** x in -1..+1, y in -1..+1.   typical value for sharpen will be ~ >5
+    /**
+     * x in -1..+1, y in -1..+1.   typical value for sharpen will be ~ >5
      * http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoMS8oMStleHAoLTUqeCkpLTAuNSkqMiIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0xIiwiMSIsIi0xIiwiMSJdfV0-
-     * */
+     */
     public static float sigmoidSymmetric(float x, float sharpen) {
-        return (float) ((1.0/(1 + Math.exp(-sharpen*x))-0.5)*2);
+        return (float) ((1.0 / (1 + Math.exp(-sharpen * x)) - 0.5) * 2);
     }
 
 
-    /** doesnt do null tests */
+    /**
+     * doesnt do null tests
+     */
     public static boolean equalArraysDirect(Object[] a, Object[] b) {
         int len = a.length;
         if (b.length != len)
             return false;
 
-        for (int i=0; i<len; i++) {
+        for (int i = 0; i < len; i++) {
             if (!a[i].equals(b[i]))
                 return false;
         }

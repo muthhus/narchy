@@ -20,8 +20,8 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
 
 
     @Override
-    protected V merge(@NotNull V existing, @NotNull V incoming, float scale) {
-        existing.priAdd(incoming.priSafe(0) * scale);
+    protected V merge(@NotNull V existing, @NotNull V incoming) {
+        existing.priAdd(incoming.priSafe(0));
         return existing; //default to the original instance
     }
 

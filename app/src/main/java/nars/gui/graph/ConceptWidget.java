@@ -40,7 +40,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     //caches a reference to the current concept
     public Concept concept;
-    private final ConceptVis conceptVis = new ConceptVis2();
     private transient ConceptSpace space;
     public float pri = 0;
 
@@ -116,7 +115,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     final static Truth zero = $.t(0.5f, 0.01f);
 
-    public void commit(ConceptSpace space) {
+    public void commit(ConceptVis conceptVis, ConceptSpace space) {
 
         this.space = space;
 
