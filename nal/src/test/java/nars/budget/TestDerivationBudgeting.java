@@ -1,12 +1,16 @@
 package nars.budget;
 
 import jcog.O;
+import jcog.decide.Deciding;
 import jcog.random.XorShift128PlusRandom;
 import nars.nar.Default;
 import nars.time.CycleTime;
 import nars.util.exe.BufferedSynchronousExecutor;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+
+import java.lang.reflect.Parameter;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -25,11 +29,11 @@ public class TestDerivationBudgeting {
         System.out.println(o);
 
 
-        O.How<Default> h = o.how(Default.class);
+        O.Possible<Default> h = o.possible(Default.class);
         System.out.println(h);
         assertNotNull(h);
 
-        assertEquals(1, h.unknown.size());
+        //assertEquals(1, h.unknown.size());
 
         //@Nullable Default d = h.get();
 
@@ -45,9 +49,27 @@ public class TestDerivationBudgeting {
         );
 
 
-        O.How<Default> h = o.how(Default.class);
+        O.Possible<Default> h = o.possible(Default.class);
         System.out.println(h);
 
+        Default d = o.get(Default.class, new O.How() {
+
+            @Override
+            public int which(List options) {
+                return ThreadLocalRandom.current().nextInt(options.size()); //random
+            }
+
+            @Override
+            public Object value(Parameter inConstructor) {
+
+                Class<?> tt = inConstructor.getType();
+                System.out.println(inConstructor + " " + tt);
+                if (tt == int.class) {
+                    return Integer.valueOf(1);
+                }
+                return null;
+            }
+        });
         //h.get();
 
     }

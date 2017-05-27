@@ -1,21 +1,20 @@
 package jcog;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.google.common.primitives.Primitives;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.ClassUtils;
-import org.eclipse.collections.api.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.lang.model.type.PrimitiveType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.function.Consumer;
-
-import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * objenome v3 prototype
@@ -77,7 +76,7 @@ public class O {
         if (the.add(x)) {
             Class<?> c = x.getClass();
             ClassUtils.hierarchy(c, ClassUtils.Interfaces.INCLUDE).forEach(s -> {
-                if (s!=c && s!=Object.class) {
+                if (s != c && s != Object.class) {
                     how.putEdge(x, s); //superclasses assignable from instance 'x'
                 }
             });
@@ -140,17 +139,16 @@ public class O {
                     how.putEdge(p, cc);
 
                     //1. find any specified instances to assign
-                    long specified = the.stream().filter(x -> i.isAssignableFrom(x.getClass())).peek(x -> {
-                        how.putEdge(x, p);
-                    }).count();
+                    the.stream().filter(x -> i.isAssignableFrom(x.getClass())).forEach(x -> {
+                        how.putEdge(x, i);
+                    });
 
                     //2. find any specified implementations to assign, and then learn recursively
-                    if (specified == 0) {
-                        specified = a.stream().filter(i::isAssignableFrom).peek(x -> {
-                            if (how.putEdge(x, p))
-                                learnClass(x);
-                        }).count();
-                    }
+                    a.stream().filter(i::isAssignableFrom).forEach(x -> {
+                        how.putEdge(x, i);
+                        learnClass(x);
+                    });
+
 
                 }
 
@@ -170,72 +168,103 @@ public class O {
 //        return a(c, null);
 //    }
 
-    public <X> How<X> how(Class<X> c) {
-        return new How(c, this);
+    public <X> Possible<X> possible(Class<X> c) {
+        return new Possible(c, this);
     }
 
-//    public static class Constructable<X> {
-//
-//        public final ImmutableGraph<Object> known;
-//        public final Map<String,Object> unknown = new HashMap();
-//        public final Class<X> target;
-//
-//        public Constructable(Class<X> x, ImmutableGraph<Object> known) {
-//            this.target = x;
-//            this.known = known;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return "Constructable{" +
-//                    "known=" + known +
-//                    ", unknown=" + Joiner.on("\n\t\t").join(unknown.entrySet()) +
-//                    '}';
-//        }
-//
-//        public boolean get(Object disambiguationStrategy, Consumer<X> ifComplete) {
-//            if (unknown.isEmpty() && !known.edges().isEmpty()) {
-//                //follow plan
-//            }
-//            //return null;
-//            return false;
-//        }
-//    }
+    @Nullable
+    public <X> X get(@NotNull Class<X> c, @NotNull How h) {
+        Possible<X> p = possible(c);
+        if (p == null)
+            return null;
 
-    public static class How<X> { //implements Iterable<X> {
+        Map m = new HashMap();
+        if (get(c, h, p, m)) {
+            //use 'm' to construct return value
+            System.out.println(m);
+        }
+        return null;
+    }
 
-        public final HashMultimap<Constructor, Parameter> unknown = HashMultimap.create();
-        public final HashMultimap<Object, Object> known = HashMultimap.create();
+    private boolean get(@NotNull Object current, How h, Possible p, Map m) {
+
+        Set<Object> next = p.p.successors(current);
+        int s = next.size();
+        switch (s) {
+            case 0:
+                if (current instanceof Parameter) {
+                    Parameter pc = (Parameter) current;
+                    Class<?> pt = pc.getType();
+                    Object v = h.value(pc);
+                    if (v == null)
+                        return false;
+                    if (pt.isPrimitive() /* or string etc */) {
+                        if (Primitives.unwrap(v.getClass()) != pt)
+                            return false;
+                    } else {
+                        if (!pc.getType().isAssignableFrom(v.getClass()))
+                            throw new ClassCastException();
+                    }
+                    m.put(pc, v);
+                }
+                return true;
+            case 1:
+                return get(next.iterator().next(), h, p, m);
+            default:
+                if (current.getClass() == Class.class) {
+                    //choose one implementation
+                    List nn = Lists.newArrayList(next);
+                    int n = h.which(nn);
+                    if (n < 0 || n >= s)
+                        return false; //invalid choice
+                    return get(nn.get(n), h, p, m);
+                } else {
+                    return next.stream().allMatch(n -> get(n, h, p, m));
+                }
+        }
+    }
+
+
+    public interface How {
+        int which(List options);
+
+        Object value(Parameter inConstructor);
+    }
+
+    public static class Possible<X> { //implements Iterable<X> {
+
+        public final MutableGraph<Object> p = GraphBuilder.directed().allowsSelfLoops(false).build();
 
         private final Class<X> what;
         private final O o;
 
         @Override
         public String toString() {
-            return "{" +
-                    "\n  known=" + Joiner.on("\n\t\t").join(known.entries()) +
-                    "\nunknown=" + Joiner.on("\n\t\t").join(unknown.entries()) +
+            return "{" + "\n\t\t" + Joiner.on("\n\t\t").join(p.edges()) +
+                    //"\n  known=" + Joiner.on("\n\t\t").join(known.entries()) +
+                    //"\nunknown=" + Joiner.on("\n\t\t").join(unknown.entries()) +
                     '}';
         }
 
-        public How(Class<X> what, O o) {
+        public Possible(Class<X> what, O o) {
             this.what = what;
             this.o = o;
 
             solve(what);
         }
 
+
         protected boolean solve(Class<X> what) {
 
-            if (known.containsKey(what))
+            if (p.nodes().contains(what))
                 return true; //already solved
 
 
             boolean foundInstances = false;
-            for (Object z : o.the) {
+            for (Object provided : o.the) {
                 //choose from the instances if available
-                if (what.isAssignableFrom(z.getClass())) {
-                    known.put(what, z);
+                if (what.isAssignableFrom(provided.getClass())) {
+                    p.putEdge(what, provided);//, "PROVIDED");
                     foundInstances = true;
                 }
             }
@@ -253,27 +282,34 @@ public class O {
                 if (z instanceof Constructor) {
                     if (what.isAssignableFrom(((Constructor) z).getDeclaringClass())) {
                         //choose by invoking any constructors, simplest and least exceptions first
-                        Constructor cz = (Constructor) z;
+                        Constructor constructor = (Constructor) z;
 
                         boolean foundConstructor = true;
-                        for (Parameter p : cz.getParameters()) {
-                            Class pt = p.getType();
+                        for (Parameter parameter : constructor.getParameters()) {
+                            Class pt = parameter.getType();
                             if (pt.isPrimitive()) {
-                                unknown.put(cz, p);
+                                p.putEdge(constructor, parameter); //primitive parameter
                             } else if (!solve(pt)) {
                                 foundConstructor = false;
                                 break;
+                            } else {
+                                //solved
+                                p.putEdge(parameter, pt);
+                                p.putEdge(constructor, parameter); //instance parameter
                             }
                         }
                         if (foundConstructor) {
-                            known.put(what, cz);
+                            p.putEdge(what, constructor); //, "CONSTRUCT");
                             constructable = true;
                         }
                     }
                 } else if (z instanceof Class) {
                     //assert(z assignable from.. )
                     //recurse down the type hierarchy
-                    return solve((Class)z);
+                    if (solve((Class) z)) {
+                        p.putEdge(what, z);
+                        constructable = true;
+                    }
                 }
             }
 
