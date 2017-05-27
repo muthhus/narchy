@@ -16,6 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
@@ -102,7 +103,7 @@ public class O {
         assert (x != this);
         if (x instanceof Class) {
             Class xx = (Class) x;
-            if (xx.isInterface() || xx.isPrimitive() || Modifier.isAbstract(xx.getModifiers()) || !nonSys(xx))
+            if (!isConcrete(xx) || xx.isPrimitive() || !nonSys(xx))
                 throw new UnsupportedOperationException("a specified implementation must be concrete: " + xx);
             if (a.add(xx))
                 learnClass(xx);
@@ -262,6 +263,7 @@ public class O {
                 return true; //already solved
 
 
+
             boolean constructable = false;
             for (Object provided : o.the) {
                 //choose from the instances if available
@@ -325,6 +327,9 @@ public class O {
                 }
             }
 
+//            if (what.isInterface() || Modifier.isAbstract(what.getModifiers()))
+//                return false;
+
             return constructable;
         }
 
@@ -364,7 +369,7 @@ public class O {
                     //TODO argument types should be bound in argument,type pairs so they can each have unique assigned impl
                     if (current.getClass() == Class.class) {
                         //choose one implementation
-                        List nn = Lists.newArrayList(next);
+                        List nn = next.stream().filter(O::isConcrete).collect(Collectors.toList());
                         int n = h.impl(nn);
                         if (n < 0 || n >= s)
                             return false; //invalid choice
@@ -386,6 +391,17 @@ public class O {
         }
 
 
+    }
+
+    static boolean isConcrete(Object o) {
+        Class c;
+        if (o instanceof Constructor)
+            c = ((Constructor)o).getDeclaringClass();
+        else if (o instanceof Class)
+            c = (Class)o;
+        else
+            c = o.getClass();
+        return !c.isInterface() && !Modifier.isAbstract(c.getModifiers());
     }
 
 
