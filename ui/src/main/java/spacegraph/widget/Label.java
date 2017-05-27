@@ -11,8 +11,9 @@ import spacegraph.render.Draw;
 public class Label extends Surface {
 
     private String value = "";
-    float fontScale;
+    public float fontScale = 1f;
     public final Color4f color = new Color4f(1f,1f,1f,1f);
+    public float lineWidth = 3f;
 
     public Label() {
         this("");
@@ -20,7 +21,7 @@ public class Label extends Surface {
 
     public Label(String s) {
         super();
-        align(Align.Center);
+        //align(Align.Center);
         set(s);
     }
 
@@ -28,9 +29,10 @@ public class Label extends Surface {
     public void paint(GL2 gl) {
 
         color.apply(gl);
-        gl.glLineWidth(1.5f);
-        float dz = 0.1f;
-        Draw.text(gl, value(), fontScale, 1f, 0f, 0f, dz, Draw.TextAlignment.Left);
+        gl.glLineWidth(lineWidth);
+        //float dz = 0.1f;
+        Draw.text(gl, value(), fontScale, 1f, 0f, 0f, 0, Draw.TextAlignment.Left);
+
     }
 
     public void set(String newValue) {

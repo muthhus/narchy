@@ -381,7 +381,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
         @Override
         public void apply(ConceptWidget cw, Term tt) {
-            ConceptSpace space = cw.space;
             float p = cw.pri;
 
             //long now = space.now();
@@ -413,13 +412,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
             Concept c = cw.concept;
             if (c != null) {
-                Truth belief = c.belief(space.now, space.dur);
-                if (belief == null) belief = zero;
-                Truth goal = c.goal(space.now, space.dur);
-                if (goal == null) goal = zero;
-
-                float angle = 45 + belief.freq() * 180f + (goal.freq() - 0.5f) * 90f;
-                Draw.hsb(angle / 360f, 0.5f, 0.25f + 0.5f * or(belief.conf(), goal.conf()), 0.9f, cw.shapeColor);
+//                Truth belief = c.belief(space.now, space.dur);
+//                if (belief == null) belief = zero;
+//                Truth goal = c.goal(space.now, space.dur);
+//                if (goal == null) goal = zero;
+//
+//                float angle = 45 + belief.freq() * 180f + (goal.freq() - 0.5f) * 90f;
+                    //angle / 360f
+                Draw.colorHash(c, cw.shapeColor);// * or(belief.conf(), goal.conf()), 0.9f, cw.shapeColor);
             }
 
         }

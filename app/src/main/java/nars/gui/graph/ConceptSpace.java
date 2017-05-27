@@ -9,6 +9,8 @@ import nars.gui.NARSpace;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
 
+import java.util.function.Function;
+
 
 abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
@@ -20,7 +22,13 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     public long now;
     public int dur;
 
-    protected final ConceptWidget.ConceptVis conceptVis = new ConceptWidget.ConceptVis2();
+    public ConceptWidget.ConceptVis vis =
+        new ConceptWidget.ConceptVis2();
+    public Function<Term, ConceptWidget> nodeBuilder = (c) ->
+        new ConceptWidget(c);
+    public Function<ConceptWidget, ConceptWidget.TermEdge> edgeBuilder = (to) ->
+        new ConceptWidget.TermEdge(to);
+
 
 //    public ConceptsSpace(NAR nar, int maxNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
 //        this(nar, maxNodes, maxNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
@@ -46,8 +54,10 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //        }
 //    };
 
+
+
     public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>(4096, 2, (to) -> {
-        return new ConceptWidget.TermEdge(to.getTwo());
+        return edgeBuilder.apply(to.getTwo());
     });
 
     void removeNode(ConceptFire concept) {
@@ -75,9 +85,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
     }
 
     protected ConceptWidget nodeGetOrCreate(ConceptFire concept) {
-        ConceptWidget cw = space.getOrAdd(concept.term(), (c) -> {
-            return new ConceptWidget(c);
-        });
+        ConceptWidget cw = space.getOrAdd(concept.term(), nodeBuilder);
         cw.concept = concept.get();
         cw.activate();
         return cw;
@@ -89,7 +97,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         super.update();
 
         for (int i = 0, activeSize = active.size(); i < activeSize; i++)
-            active.get(i).commit(conceptVis, this);
+            active.get(i).commit(vis, this);
     }
 
 

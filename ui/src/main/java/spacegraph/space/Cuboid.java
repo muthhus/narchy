@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import spacegraph.SimpleSpatial;
 import spacegraph.Surface;
 import spacegraph.input.Finger;
-import spacegraph.math.Quat4f;
 import spacegraph.math.v2;
 import spacegraph.math.v3;
 import spacegraph.phys.Collidable;
@@ -28,7 +27,8 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     public Surface front;
     final float zOffset = 0.1f; //relative to scale
 
-    @Nullable public Finger mouseFront;
+    @Nullable
+    public Finger mouseFront;
     private v3 mousePick;
     //private float padding;
 
@@ -41,11 +41,11 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     }
 
     public Cuboid(X x, Surface front, float w, float h) {
-        this(x, front, w, h, (Math.min(w, h)/2f));
+        this(x, front, w, h, (Math.min(w, h) / 2f));
     }
 
     public Cuboid(Surface front, float w, float h, float d) {
-        this((X)front, front, w, h, d);
+        this((X) front, front, w, h, d);
     }
 
     public Cuboid(X x, Surface front, float w, float h, float d) {
@@ -54,14 +54,13 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         scale(w, h, d);
 
 
-
         setFront(front);
 
     }
 
     public void setFront(Surface front) {
         this.front = front;
-        if (front!=null) {
+        if (front != null) {
             front.start(null);
             mouseFront = null; //new Finger(this);
         } else {
@@ -81,57 +80,55 @@ public class Cuboid<X> extends SimpleSpatial<X> {
     @Override
     public Surface onTouch(Collidable body, ClosestRay r, short[] buttons, JoglPhysics space) {
 
-        if (body!=null) {
+        if (body != null) {
 
-            //rotate to match camera's orientation (billboarding)
-            Object d = body.data();
-            if (d instanceof SimpleSpatial) {
-                SimpleSpatial sd = (SimpleSpatial)d;
-                //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
-                Quat4f target = new Quat4f();
-                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
-                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
-
-                target.normalize();
-
-                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
-                sd.rotate(target, 0.2f, new Quat4f());
-                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
-            }
-
+//            //rotate to match camera's orientation (billboarding)
+//            Object d = body.data();
+//            if (d instanceof SimpleSpatial) {
+//                SimpleSpatial sd = (SimpleSpatial)d;
+//                //Quat4f target = Quat4f.angle(-space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0);
+//                Quat4f target = new Quat4f();
+//                // TODO somehow use the object's local transformation ? sd.transform().getRotation(...);
+//                target.setAngle( -space.camFwd.x, -space.camFwd.y, -space.camFwd.z, 0.01f);
+//
+//                target.normalize();
+//
+//                //System.out.print("rotating: " + sd.transform().getRotation(new Quat4f()));
+//                sd.rotate(target, 0.2f, new Quat4f());
+//                //System.out.println("  : " + sd.transform().getRotation(new Quat4f()));
+//            }
+//
             Surface s0 = super.onTouch(body, r, buttons, space);
             if (s0 != null)
                 return s0;
         }
 
 
+        if (front != null) {
+            Transform it = Transform.t(transform()).inverse();
+            v3 localPoint = it.transform(v(r.hitPointWorld));
 
-            if (front != null) {
-                Transform it = Transform.t(transform()).inverse();
-                v3 localPoint = it.transform(v(r.hitPointWorld));
+            if (body != null) {
+                SimpleBoxShape shape = (SimpleBoxShape) body.shape();
+                float frontZ = shape.z() / 2;
+                float zTolerance = frontZ / 4f;
 
-                if (body!=null) {
-                    SimpleBoxShape shape = (SimpleBoxShape) body.shape();
-                    float frontZ = shape.z() / 2;
-                    float zTolerance = frontZ / 4f;
+                if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
 
-                    if (Util.equals(localPoint.z, frontZ, zTolerance)) { //top surface only, ignore sides and back
+                    this.mousePick = r.hitPointWorld;
 
-                        this.mousePick = r.hitPointWorld;
+                    //System.out.println(localPoint + " " + thick);
+                    if (mouseFront != null)
+                        return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
+                    //return mouseFront.update(null, localPoint.x, localPoint.y, buttons);
+                }
+            } else {
 
-                        //System.out.println(localPoint + " " + thick);
-                        if (mouseFront!=null)
-                            return mouseFront.on(new v2(localPoint.x / shape.x() + 0.5f, localPoint.y / shape.y() + 0.5f), buttons);
-                        //return mouseFront.update(null, localPoint.x, localPoint.y, buttons);
-                    }
-                } else {
+                if (mouseFront.off()) {
 
-                    if (mouseFront.off()) {
-
-                    }
                 }
             }
-
+        }
 
 
         return null;
@@ -143,7 +140,7 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         super.renderRelative(gl, body);
 
 
-        if (front!=null) {
+        if (front != null) {
 
             //float p = this.padding;
 
@@ -171,12 +168,12 @@ public class Cuboid<X> extends SimpleSpatial<X> {
         super.renderAbsolute(gl);
 
         //display pick location (debugging)
-        if (mousePick!=null) {
+        if (mousePick != null) {
             gl.glPushMatrix();
             gl.glTranslatef(mousePick.x, mousePick.y, mousePick.z);
             gl.glScalef(0.25f, 0.25f, 0.25f);
             gl.glColor4f(1f, 1f, 1f, 0.5f);
-            gl.glRotated(Math.random()*360.0, Math.random()-0.5f, Math.random()-0.5f, Math.random()-0.5f);
+            gl.glRotated(Math.random() * 360.0, Math.random() - 0.5f, Math.random() - 0.5f, Math.random() - 0.5f);
             gl.glDepthMask(false);
             Draw.rect(gl, -0.5f, -0.5f, 1, 1);
             gl.glDepthMask(true);
