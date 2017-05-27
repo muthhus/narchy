@@ -31,7 +31,7 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(512);
+        this(256);
     }
 
     public Default(int activeConcepts) {

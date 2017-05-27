@@ -63,7 +63,11 @@ public class Premise extends BinaryTask<Pair<Task,Term>,Task> {
 
         DefaultDeriver.the.test(d);
 
-        return d.flush();
+        ITask[] r = d.flush();
+
+        delete(); //self-destruct
+
+        return r;
     }
 
 

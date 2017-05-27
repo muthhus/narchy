@@ -10,11 +10,14 @@ import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.concept.Concept;
+import nars.control.ConceptFire;
 import nars.gui.graph.MyForceDirected;
+import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
+import nars.util.exe.BufferedSynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.*;
@@ -213,51 +216,65 @@ public class Vis {
         return new LabeledPane(k, s);
     }
 
-//    public static SpaceGraph<Term> conceptsWindow3D(NAR nar, int maxNodes, int maxEdges) {
-//
-//
-//        NARSpace n = new ConceptsSpace(nar, maxNodes, 1, maxEdges);
-//
-//
-//        SpaceGraph<Term> s = new SpaceGraph(
-//
-//                n.with(
-////                        new SpaceTransform<Term>() {
-////                            @Override
-////                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
-////                                float cDepth = -9f;
-////                                src.forEach(s -> {
-////                                    ((SimpleSpatial)s).moveZ(
-////                                            s.key.volume() * cDepth, 0.05f );
-////                                });
-////                            }
-////                        }
-//
-//                        new Flatten()
-////                        new Flatten() {
-////                            protected void locate(SimpleSpatial s, v3 f) {
-////                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-////                            }
-////                        }
-//
-//
-//                        //new Spiral()
-////                        //new FastOrganicLayout()
-//                )
-//        ) {
-////            @Override
-////            protected void initLighting() {
-////                //no
-////            }
-//        };
-//
-//        s.dyn.addBroadConstraint(new MyForceDirected());
-//
-//        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
-//
-//        return s;
-//
-//    }
+    public static SpaceGraph<Term> conceptsWindow3D(NAR n, int maxNodes, int maxEdges) {
+
+
+        NARSpace cs = new SimpleConceptGraph1(n,
+                () -> (((BufferedSynchronousExecutor) (n.exe)).active)
+                        .stream()
+                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .filter(Objects::nonNull)
+                        .iterator()
+                /* TODO */, 128, 256, 2, 7);
+
+
+        SpaceGraph<Term> s = new SpaceGraph(
+
+                cs.with(
+//                        new SpaceTransform<Term>() {
+//                            @Override
+//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
+//                                float cDepth = -9f;
+//                                src.forEach(s -> {
+//                                    ((SimpleSpatial)s).moveZ(
+//                                            s.key.volume() * cDepth, 0.05f );
+//                                });
+//                            }
+//                        }
+
+                        new Flatten()
+//                        new Flatten() {
+//                            protected void locate(SimpleSpatial s, v3 f) {
+//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
+//                            }
+//                        }
+
+
+                        //new Spiral()
+//                        //new FastOrganicLayout()
+                )
+        );
+
+        MyForceDirected fd = new MyForceDirected();
+        s.dyn.addBroadConstraint(fd);
+
+        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
+
+
+        //Vis.conceptsWindow2D
+        s
+
+                //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
+                .camPos(0, 0, 90)
+                //.ortho( logConsole(n, 40, 10, 0.0f) )
+                .show(1300, 900);
+
+
+        //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
+
+        return s;
+
+    }
 
 //    public static SpaceGraph<Term> conceptsWindow2D(NAR nar, int maxNodes, int maxEdges) {
 //        return conceptsWindow(new ConceptsSpace(nar, maxNodes, 1, maxEdges));

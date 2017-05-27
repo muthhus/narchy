@@ -163,7 +163,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
 
-        n.startFPS(1f).join();
+        n.startFPS(10f).join();
 
 
         //n.input("(a-->b).", "(b-->c).","(c-->d).");

@@ -283,8 +283,8 @@ abstract public class NAgentX extends NAgent {
 
                             //"tasks", ()-> taskChart,
 
-//                    new WindowButton( "conceptGraph", ()->
-//                            Vis.conceptsWindow3D(nar,128, 4) )
+                    new WindowButton( "conceptGraph", ()->
+                            Vis.conceptsWindow3D(nar,128, 4) )
 
                     )
             ), 900, 600);

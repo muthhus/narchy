@@ -1,5 +1,6 @@
 package jcog.bag.impl;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
@@ -14,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.DoubleAdder;
 import java.util.function.Consumer;
 
 
@@ -30,7 +30,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     /**
      * inbound pressure sum since last commit
      */
-    public final DoubleAdder pressure = new DoubleAdder();
+    public final AtomicDouble pressure = new AtomicDouble();
 
     public float mass;
 
@@ -73,7 +73,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     @Override
     public void pressurize(float f) {
-        pressure.add(f);
+        pressure.addAndGet(f);
     }
 
     @NotNull
@@ -298,7 +298,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     /**
-     *
      * @param each
      * @param startingIndex if negative, a random starting location is used
      */
@@ -321,7 +320,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             if (x != null/*.remove*/) {
                 if (pop) {
                     x = remove(key(x));
-                    if (x==null)
+                    if (x == null)
                         continue;
                     modified = true;
                 }
@@ -340,7 +339,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflow) {
 
-        pressurize(b.priSafe(0) );
+        pressurize(b.priSafe(0));
 
         final boolean[] isNew = {false};
 
@@ -411,9 +410,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     @Deprecated
     public Bag<X, PLink<X>> commit() {
-        double p = this.pressure.sumThenReset();
+        double p = this.pressure.getAndSet(0);
         if (p > 0) {
-            return commit(PForget.forget(size(), capacity(), (float)p, mass, PForget.DEFAULT_TEMP, Priority.EPSILON, PForget::new));
+            return commit(PForget.forget(size(), capacity(), (float) p, mass, PForget.DEFAULT_TEMP, Priority.EPSILON, PForget::new));
         }
         return this;
     }
@@ -432,14 +431,14 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
 
         float mass = 0;
-        synchronized (items) {
-            int iii = size();
-            for (int i = 0; i < iii; i++) {
-                PLink x = get(i);
-                if (x != null)
-                    mass += x.priSafe(0);
-            }
+        //synchronized (items) {
+        int iii = size();
+        for (int i = 0; i < iii; i++) {
+            PLink x = get(i);
+            if (x != null)
+                mass += x.priSafe(0);
         }
+        //}
         this.mass = mass;
 
 
@@ -451,28 +450,24 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      */
     @NotNull
     protected ArrayBag<X> update(@Nullable Consumer<PLink<X>> each, boolean checkCapacity) {
+        boolean needsSort = false;
 
         synchronized (items) {
-
             if (size() > 0) {
                 if (checkCapacity)
                     if (!updateItems(null))
                         return this;
 
-                boolean needsSort;
                 if (each != null) {
                     needsSort = !updateBudget(each);
                 } else {
                     needsSort = false;
                 }
-
-
-                if (needsSort) {
-                    unsorted.set(true);
-                }
-
             }
+        }
 
+        if (needsSort) {
+            unsorted.set(true);
         }
 
         return this;
@@ -544,7 +539,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
     public @Nullable PLink<X> remove(boolean topOrBottom) {
         @Nullable PLink<X> x = topOrBottom ? top() : bottom();
-        if (x!=null) {
+        if (x != null) {
             remove(key(x));
             return x;
         }
@@ -788,7 +783,9 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         return priMinFast(0);
     }
 
-    /** doesnt ensure sorting to avoid synchronization */
+    /**
+     * doesnt ensure sorting to avoid synchronization
+     */
     float priMinFast(float ifDeleted) {
         PLink x;
         x = items.last();

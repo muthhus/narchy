@@ -4,12 +4,14 @@ import nars.$;
 import nars.Narsese;
 import nars.Param;
 import nars.Task;
+import nars.concept.Concept;
 import nars.nar.Default;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -32,7 +34,7 @@ public class NAL5BooleanConsistency {
             for (int j = 0; j < 2; j++) {
                 Default d = new Default();
                 d.nal(6);
-                d.termVolumeMax.setValue(14);
+                d.termVolumeMax.setValue(20);
 
                 //d.log();
 
@@ -64,7 +66,9 @@ public class NAL5BooleanConsistency {
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {
                     String s = outcomes[k];
-                    @Nullable Task t = d.concept(s).beliefs().match(d.time(), d.dur());
+                    Concept dc = d.concept(s);
+                    assertNotNull(dc);
+                    @Nullable Task t = dc.beliefs().match(d.time(), d.dur());
                     Truth b = t!=null ? t.truth() : null;
 
                     System.out.println("\t" + s + "\t" + b);
