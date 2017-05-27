@@ -1,4 +1,4 @@
-package nars.gui;
+package nars.gui.graph;
 
 import com.jogamp.opengl.GL2;
 import jcog.Util;
@@ -10,6 +10,7 @@ import nars.$;
 import nars.Task;
 import nars.budget.PLinkUntilDeleted;
 import nars.concept.Concept;
+import nars.gui.ConceptIcon;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -40,7 +41,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
     //caches a reference to the current concept
     public Concept concept;
     private final ConceptVis conceptVis = new ConceptVis2();
-    private transient ConceptsSpace space;
+    private transient ConceptSpace space;
     public float pri = 0;
 
 
@@ -115,7 +116,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
     final static Truth zero = $.t(0.5f, 0.01f);
 
-    public void commit(ConceptsSpace space) {
+    public void commit(ConceptSpace space) {
 
         this.space = space;
 
@@ -381,7 +382,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
         @Override
         public void apply(ConceptWidget cw, Term tt) {
-            ConceptsSpace space = cw.space;
+            ConceptSpace space = cw.space;
             float p = cw.pri;
 
             //long now = space.now();

@@ -57,6 +57,24 @@ public class O {
         return new O(xx);
     }
 
+    /** uses the default fail-safe builder */
+    @Nullable public <X> X the(@NotNull Class<X> c) {
+        return a(c, new How<>() {
+
+            @Override
+            public int impl(List choose) {
+//                if (choose.size()!=1)
+//                    throw new UnsupportedOperationException("ambiguous: " + choose);
+                return 0;
+            }
+
+            @Override
+            public Object value(Parameter inConstructor) {
+                    throw new UnsupportedOperationException("ambiguous");
+            }
+        });
+    }
+
     @Nullable
     public <X> X a(@NotNull Class<X> c, @NotNull How<X> h) {
         Possible<X> p = possible(c);

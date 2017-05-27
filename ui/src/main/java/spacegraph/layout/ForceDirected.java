@@ -25,7 +25,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
     boolean center = true;
 
     public final FloatParam repel = new FloatParam(4, 0, 10);
-    public final FloatParam attraction = new FloatParam(0.1f, 0, 2.5f);
+    public final FloatParam attraction = new FloatParam(4f, 0, 10f);
 
 
 
@@ -59,7 +59,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         float r = 400;
         boundsMin = v(-r, -r, -r);
         boundsMax = v(+r, +r, +r);
-        maxRepelDist = r*0.25f;
+        maxRepelDist = r*0.75f;
     }
 
 
@@ -135,10 +135,12 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
         //v3 delta2 = v(delta);
 
-        delta.scale((speed / (xp.mass() /* + yp.mass()*/) ) * len );
+        //delta.scale((speed / (1 + /&xp.mass() /* + yp.mass()*/) ) * len );
+        delta.scale(len * speed );
         ((Dynamic) x).impulse(delta);
-//        delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
-//        ((Dynamic) y).impulse(delta2);
+        //delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
+        delta.scale(-1 );
+        ((Dynamic) y).impulse(delta);
 
     }
 
@@ -156,7 +158,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         else if (len >= maxDist)
             return;
 
-        float base = speed / ( 1 + Util.sqr( len ));
+        float base = speed / ( 1 + ( len ));
 
         {
             float s = /*xp.mass() * */ base;

@@ -10,6 +10,7 @@ import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.concept.Concept;
+import nars.gui.graph.MyForceDirected;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
@@ -22,8 +23,6 @@ import spacegraph.layout.ForceDirected;
 import spacegraph.layout.Grid;
 import spacegraph.layout.Stacking;
 import spacegraph.math.Color3f;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.broad.Broadphase;
 import spacegraph.render.SpaceGraph2D;
 import spacegraph.space.CrosshairSurface;
 import spacegraph.widget.Label;
@@ -361,38 +360,6 @@ public class Vis {
 
     public static ReflectionSurface reflect(Object c) {
         return new ReflectionSurface(c);
-    }
-
-    protected static class MyForceDirected extends ForceDirected {
-
-        @Override
-        public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
-            super.solve(b, objects, timeStep);
-
-            float a = attraction.floatValue();
-
-            for (int i = 0, objectsSize = objects.size(); i < objectsSize; i++) {
-                Collidable c = objects.get(i);
-
-                Spatial A = ((Spatial) c.data());
-                if (A instanceof ConceptWidget) {
-                    ((ConceptWidget) A).edges.forEachKey(e -> {
-
-                        float attraction = e.attraction;
-                        if (attraction > 0) {
-                            ConceptWidget B = e.target;
-
-                            if ((B.body != null)) {
-
-                                attract(c, B.body, a * attraction, e.attractionDist);
-                            }
-                        }
-
-                    });
-                }
-
-            }
-        }
     }
 
     public static class ConceptBagChart extends BagChart<PLink<Concept>> implements Consumer<NAR> {
