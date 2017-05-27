@@ -53,13 +53,16 @@ public class Premise extends BinaryTask<Pair<Task,Term>,Task> {
 
     @Override
     public ITask[] run(NAR n) {
+        float p = this.pri;
+        if (p!=p) return null;
+
         BufferedDerivation d = derivation.get();
 
         d.buffer.clear(); //should be clear but just in case
 
         d.restartA(n);
         d.restartB(task());
-        d.restartC(this, Util.lerp(pri, Param.UnificationTTLMax, Param.UnificationTTLMin));
+        d.restartC(this, Util.lerp(p, Param.UnificationTTLMax, Param.UnificationTTLMin));
 
         DefaultDeriver.the.test(d);
 

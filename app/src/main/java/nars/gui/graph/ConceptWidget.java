@@ -398,10 +398,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             cw.scale(l, w, h);
 
 
-            float density = 0.5f;
+            float density = 10.5f;
             if (cw.body != null) {
-                cw.body.setMass(l * w * h * density);
-                cw.body.setDamping(0.9f, 0.9f);
+                cw.body.setMass(1 + l * w * h * density);
+                cw.body.setDamping(0.5f, 0.9f);
             }
 
 //            Draw.hsb(

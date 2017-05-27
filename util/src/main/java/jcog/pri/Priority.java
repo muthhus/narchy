@@ -167,6 +167,19 @@ public interface Priority extends Prioritized {
         return excess;
     }
 
+    /** returns overflow */
+    default float priAddOverflow(float toAdd) {
+        if (Math.abs(toAdd) <= EPSILON) {
+            return 0; //no change
+        }
+
+        float before = priSafe(0);
+        float next = priAdd(toAdd);
+        float delta = next - before;
+        float excess = toAdd - delta;
+
+        return excess;
+    }
 
     /**
      * Change priority value

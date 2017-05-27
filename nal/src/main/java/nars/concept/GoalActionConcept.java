@@ -79,36 +79,40 @@ public class GoalActionConcept extends ActionConcept {
 
 
                 Truth ct = $.t(nextCurious, cc);
-                if (goal == null) {
-                    goal = ct;
-                } else {
-                    goal = Revision.revise(goal, ct);
-                }
+                goal = ct; //curiosity overrides goal
+
+//                if (goal == null) {
+//                    goal = ct;
+//                } else {
+//                    goal = Revision.revise(goal, ct);
+//                }
             }
         }
 
 
         Truth belief = belief(now, dur);
 
-        //HACK try to improve this
-        //if (goal == null) goal = belief; //use belief state, if exists (latch)
-        boolean kickstart;
-        if (((goal == null) || (goal.conf() < nar.confMin.floatValue())) && (feedback.current!=null)) {
-            goal = $.t(feedback.current.truth.freq, nar.confMin.floatValue()); //if null, use the last feedback value (latch)
-            kickstart = true;
-        } else {
-            kickstart = false;
-        }
+//        //HACK try to improve this
+//        //if (goal == null) goal = belief; //use belief state, if exists (latch)
+//        boolean kickstart;
+//        if (((goal == null) || (goal.conf() < nar.confMin.floatValue())) && (feedback.current!=null)) {
+//            goal = $.t(feedback.current.truth.freq, nar.confMin.floatValue()); //if null, use the last feedback value (latch)
+//            kickstart = true;
+//        } else {
+//            kickstart = false;
+//        }
 
         Truth fbt = this.motor.motor(belief, goal);
 
         Task fb = fbt!=null ? feedback.set(this, fbt, nar) : feedback.current;
 
-        //HACK insert shadow goal
-        Task fg = (goal!=null && kickstart) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.set(this, null, nar);
+//        //HACK insert shadow goal
+        //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
 
 
-        return Stream.of(fb, fg).filter(Objects::nonNull);
+
+        return Stream.of(fb).filter(Objects::nonNull);
+        //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 
 

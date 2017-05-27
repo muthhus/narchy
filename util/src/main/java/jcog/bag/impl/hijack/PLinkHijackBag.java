@@ -3,6 +3,7 @@ package jcog.bag.impl.hijack;
 import jcog.bag.impl.HijackBag;
 import jcog.pri.PForget;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -68,7 +69,9 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
     @Override
     protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming) {
-        existing.priAdd( incoming.priSafe(0) );
+        float overflow = existing.priAddOverflow(incoming.priSafe(0) );
+        if (overflow >= Pri.EPSILON)
+            pressurize(-overflow);
         return existing;
     }
 

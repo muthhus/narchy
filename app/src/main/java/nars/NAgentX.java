@@ -104,7 +104,7 @@ abstract public class NAgentX extends NAgent {
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
-        float p = 0.1f;
+        float p = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         n.DEFAULT_GOAL_PRIORITY = 1f * p;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
@@ -117,7 +117,7 @@ abstract public class NAgentX extends NAgent {
 
         int threads = 4;
         for (int i = 0; i < threads; i++) {
-            n.addNAR(256);
+            n.addNAR(1024);
         }
 
         NAgent a = init.apply(n);

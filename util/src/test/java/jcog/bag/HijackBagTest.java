@@ -1,14 +1,12 @@
 package jcog.bag;
 
 import com.google.common.base.Joiner;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PLink;
 import jcog.pri.PriMerge;
 import jcog.pri.RawPLink;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeSet;
 

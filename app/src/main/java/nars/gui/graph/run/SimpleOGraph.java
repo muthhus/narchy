@@ -2,18 +2,10 @@ package nars.gui.graph.run;
 
 import jcog.O;
 import jcog.random.XORShiftRandom;
-import nars.concept.Concept;
-import nars.gui.graph.ConceptSpace;
-import nars.gui.graph.ConceptWidget;
 import nars.nar.Default;
-import nars.term.Term;
 import nars.time.CycleTime;
 import nars.util.exe.BufferedSynchronousExecutor;
-import spacegraph.Surface;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.ClosestRay;
-import spacegraph.render.Draw;
-import spacegraph.render.JoglPhysics;
+import org.jetbrains.annotations.Nullable;
 
 public class SimpleOGraph {
 
@@ -24,6 +16,9 @@ public class SimpleOGraph {
                 new Default.DefaultTermIndex(1024),
                 XORShiftRandom.class
         );
+        try {
+            @Nullable Default x = o.the(Default.class);
+        } catch (Exception e) { }
 
         new SimpleGraph1(15).commit(o.how).show(1200,600);
 

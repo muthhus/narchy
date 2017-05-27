@@ -17,7 +17,6 @@ import nars.util.exe.BufferedSynchronousExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
-import spacegraph.widget.button.CheckBox;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Objects;

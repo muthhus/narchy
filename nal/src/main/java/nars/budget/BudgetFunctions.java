@@ -25,8 +25,6 @@ import jcog.pri.Priority;
 import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 
-import static jcog.pri.PriMerge.plus;
-
 /**
  * Budget functions for resources allocation
  */

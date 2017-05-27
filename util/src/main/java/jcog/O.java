@@ -7,7 +7,6 @@ import com.google.common.graph.MutableGraph;
 import com.google.common.primitives.Primitives;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.ClassUtils;
-import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,8 +16,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * objenome v3 prototype
@@ -70,7 +67,8 @@ public class O {
 
             @Override
             public Object value(Parameter inConstructor) {
-                    throw new UnsupportedOperationException("ambiguous");
+                return 0;
+                //throw new UnsupportedOperationException("ambiguous");
             }
         });
     }

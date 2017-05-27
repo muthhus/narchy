@@ -28,12 +28,12 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     /**
      * temporary collection of tasks to remove after sampling
      */
-    private final List<ITask> toRemove = $.newArrayList();
+    protected final List<ITask> toRemove = $.newArrayList();
 
     /**
      * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
      */
-    private float forgetEachPri;
+    protected float forgetEachPri;
 
     /**
      * active tasks
@@ -150,7 +150,7 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
         }
     }
 
-    private void actuallyRun(ITask x) {
+    protected void actuallyRun(ITask x) {
         try {
             //super.run(x);
 

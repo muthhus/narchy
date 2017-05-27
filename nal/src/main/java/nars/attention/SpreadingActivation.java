@@ -135,6 +135,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             }
         }
 
+        delete(); //self-destruct
+
         return a;
     }
 

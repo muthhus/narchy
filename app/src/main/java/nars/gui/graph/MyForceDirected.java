@@ -1,6 +1,5 @@
 package nars.gui.graph;
 
-import nars.gui.graph.ConceptWidget;
 import spacegraph.Spatial;
 import spacegraph.layout.ForceDirected;
 import spacegraph.phys.Collidable;

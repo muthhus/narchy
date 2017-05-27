@@ -1,6 +1,5 @@
 package spacegraph.layout;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;

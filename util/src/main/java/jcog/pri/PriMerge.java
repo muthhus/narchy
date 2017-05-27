@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
-import static jcog.Util.lerp;
 import static jcog.pri.PriMerge.PriMergeOp.*;
 
 /**

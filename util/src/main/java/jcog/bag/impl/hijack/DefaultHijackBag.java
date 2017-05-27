@@ -1,9 +1,6 @@
 package jcog.bag.impl.hijack;
 
-import jcog.pri.PForget;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.Priority;
+import jcog.pri.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -24,7 +21,9 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
 
     @Override
     protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming) {
-        merge.merge(existing, incoming); //modify existing
+        float overflow = merge.merge(existing, incoming); //modify existing
+        if (overflow >= Pri.EPSILON)
+            pressurize(-overflow);
         return existing;
     }
 

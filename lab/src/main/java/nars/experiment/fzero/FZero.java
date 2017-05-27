@@ -16,7 +16,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 10f;
+        float fps = 20f;
 
 
         NAgentX.runRT((n)->{
@@ -215,7 +215,9 @@ public class FZero extends NAgentX {
         //System.out.println("head=" + fz.playerAngle%(2*3.14f) + " pow=" + fz.power + " vel=" + fz.vehicleMetrics[0][6] + " deltaDist=" + deltaDistance);
 
 
-        return Util.clamp((float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
+        return Util.clamp(
+                -0.5f /* bias */ +
+                (float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
                 //((float)fz.vehicleMetrics[0][6]/100f)+
                 deltaDistance), -1f, +1f);
     }

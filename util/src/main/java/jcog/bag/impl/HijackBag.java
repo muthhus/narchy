@@ -349,8 +349,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (p != p)
             return null; //already deleted
 
-        pressurize(p);
-
         V y = update(key(v), v, PUT);
 
         return y;
@@ -439,7 +437,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         AtomicReferenceArray<V> map = this.map.get();
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
     }
-
 
     public float depressurize(float frac) {
         frac = Util.unitize(frac);

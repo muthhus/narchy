@@ -379,7 +379,7 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) p).addAll(
 
-                    quest((Compound) (action.term()),now+dur),
+                    //quest((Compound) (action.term()),now+dur),
 
 //                            //ETERNAL)
 
