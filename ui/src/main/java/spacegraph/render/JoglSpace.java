@@ -10,10 +10,10 @@ import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.AnimatorBase;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
+import jcog.Loop;
 import jcog.Util;
 import jcog.meter.event.PeriodMeter;
 import jogamp.opengl.FPSCounterImpl;
-import jcog.Loop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +35,6 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     //protected static final MyFPSAnimator a = new MyFPSAnimator(JoglSpace.FPS_IDEAL, FPS_MIN, FPS_IDEAL);
     protected static final GameAnimatorControl a = new GameAnimatorControl(FPS_IDEAL);
 
-    static {
-        a.start();
-    }
 
     public final static GLSRT glsrt = new GLSRT(JoglSpace.glu);
 
@@ -70,6 +67,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
         sharedDrawable.display(); // triggers GLContext object creation and native realization.
         Draw.init(sharedDrawable.getGL().getGL2());
+        a.start();
     }
 
     public static GLWindow window(GLCapabilitiesImmutable config, JoglSpace j) {

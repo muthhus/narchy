@@ -135,11 +135,14 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
         //nar.conceptPriority(c);
 
 
+        ITask[] r = new ITask[]{new Premise(task, beliefTerm, belief,
+                priFromTasks
+                //pri() * priFromTasks //<-- this can reduce it too much
+        )};
 
-        return new ITask[] { new Premise(task, beliefTerm, belief,
-            priFromTasks
-            //pri() * priFromTasks //<-- this can reduce it too much
-        ) };
+        delete(); //self destruct
+
+        return r;
     }
 
 
