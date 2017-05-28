@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static jcog.net.UDPeer.Command.*;
+import static jcog.net.UDPeer.Msg.ADDRESS_BYTES;
 
 /**
  * UDP peer - self-contained generic p2p/mesh network node
@@ -732,7 +733,10 @@ public class UDPeer extends UDP {
         }
 
         public int port() {
-            return Shorts.fromBytes(bytes[PORT_BYTE], bytes[PORT_BYTE+1]);
+            int firstByte = (0x000000FF & ((int)bytes[PORT_BYTE]));
+            int secondByte = (0x000000FF & ((int)bytes[PORT_BYTE+1]));
+	        return (char) (firstByte << 8 | secondByte);
+            //return (( 0xff & ((int)bytes[PORT_BYTE]) << 8) | ( 0xff & ((int)bytes[PORT_BYTE+1])));
         }
 
 
@@ -834,9 +838,12 @@ public class UDPeer extends UDP {
 
 
     public static byte[] bytes(InetSocketAddress addr) {
-        //TODO optimize - this can be done with only one allocation
-        return ArrayUtils.addAll(Shorts.toByteArray((short) addr.getPort()),
-                ipv6(addr.getAddress().getAddress()));
+        byte[] x = new byte[ADDRESS_BYTES];
+        int port = addr.getPort();
+        x[0] = (byte)((port >> 8) & 0xff); //unsigned;
+        x[1] = (byte)(port & 0xff);
+        System.arraycopy(ipv6(addr.getAddress().getAddress()), 0, x, 2, 16);
+        return x;
     }
 
     private static byte[] ipv6(byte[] address) {
