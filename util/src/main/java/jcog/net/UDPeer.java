@@ -2,7 +2,6 @@ package jcog.net;
 
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
@@ -16,12 +15,14 @@ import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
+import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -32,6 +33,7 @@ import java.util.function.Consumer;
 
 import static jcog.net.UDPeer.Command.*;
 import static jcog.net.UDPeer.Msg.ADDRESS_BYTES;
+import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * UDP peer - self-contained generic p2p/mesh network node
@@ -47,12 +49,12 @@ public class UDPeer extends UDP {
 
     protected final Logger logger;
 
-
     public final HashMapTagSet can = new HashMapTagSet("C");
     public final HashMapTagSet need = new HashMapTagSet("N");
 
     public final Bag<Integer, UDProfile> them;
-    public final PriorityHijackBag<Msg,Msg> seen;
+    public final PriorityHijackBag<Msg, Msg> seen;
+    public final UDiscover<Discoverability> discover;
 
     /**
      * TODO use a variable size identifier, 32+ bit. ethereumj uses 512bits.
@@ -61,7 +63,9 @@ public class UDPeer extends UDP {
     public final int me;
     static final int UNKNOWN_ID = Integer.MIN_VALUE;
 
-    /** rate of sharing peer needs */
+    /**
+     * rate of sharing peer needs
+     */
     private static final FloatParam empathy = new FloatParam(0.5f);
 
     private static final byte DEFAULT_PING_TTL = 2;
@@ -76,13 +80,20 @@ public class UDPeer extends UDP {
     /**
      * message memory
      */
-    final static int SEEN_CAPACITY = 32*1024;
+    final static int SEEN_CAPACITY = 32 * 1024;
     private final Random rng;
 
     private AtomicBoolean
             needChanged = new AtomicBoolean(false),
             canChanged = new AtomicBoolean(false);
 
+
+    /**
+     * assigned a random port
+     */
+    public UDPeer() throws IOException {
+        this(0);
+    }
 
     public UDPeer(int port) throws IOException {
         this(null, port);
@@ -110,7 +121,7 @@ public class UDPeer extends UDP {
 
             @Override
             public void onAdded(UDProfile p) {
-                logger.debug("connect {}",  p);
+                logger.debug("connect {}", p);
                 onAddRemove(p, true);
             }
 
@@ -146,7 +157,7 @@ public class UDPeer extends UDP {
 
         them.setCapacity(PEERS_CAPACITY);
 
-        seen = new PriorityHijackBag<Msg,Msg>(SEEN_CAPACITY, 3) {
+        seen = new PriorityHijackBag<Msg, Msg>(SEEN_CAPACITY, 3) {
 
             @NotNull
             @Override
@@ -160,7 +171,35 @@ public class UDPeer extends UDP {
             }
         };
 
+        discover = new UDiscover<>(new Discoverability(me,addr)) {
+            @Override
+            protected void found(Discoverability who, InetAddress addr, int port) {
+                if (!them.contains(who.id)) {
+                    logger.info("discovered {} at {}:{}", who.id, who.addr);
+                    ping(who.addr);
+                }
+            }
+        };
     }
+
+    public static class Discoverability implements Serializable {
+        public int id;
+        public InetSocketAddress addr;
+
+        public Discoverability() { }
+
+        public Discoverability(int id, InetSocketAddress addr) {
+            this.id = id;
+            this.addr = addr;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        discover.start();
+    }
+
 
     protected void onAddRemove(UDProfile p, boolean addedOrRemoved) {
 
@@ -170,6 +209,7 @@ public class UDPeer extends UDP {
     /**
      * broadcast
      * TODO handle oversized message
+     *
      * @return how many sent
      */
     public int tellSome(Msg o, float pri, boolean onlyIfNotSeen) {
@@ -200,6 +240,7 @@ public class UDPeer extends UDP {
     protected void onStop() {
         super.onStop();
         them.clear();
+        discover.stop();
     }
 
 
@@ -276,7 +317,7 @@ public class UDPeer extends UDP {
         final byte[] inputArray = data;
 
         Msg m = Msg.get(data, len);
-        if (m == null || m.id()==me)
+        if (m == null || m.id() == me)
             return;
 
         Command cmd = Command.get(m.cmd());
@@ -385,12 +426,17 @@ public class UDPeer extends UDP {
     public void ping(String host, int port) {
         ping(new InetSocketAddress(host, port));
     }
+
     public void ping(InetAddress host, int port) {
         ping(new InetSocketAddress(host, port));
     }
 
     public void ping(@Nullable InetSocketAddress to) {
-        send(new Msg(PING.id, DEFAULT_PING_TTL, me, null, System.currentTimeMillis()), to);
+        send(ping(), to);
+    }
+
+    protected Msg ping() {
+        return new Msg(PING.id, DEFAULT_PING_TTL, me, null, System.currentTimeMillis());
     }
 
 
@@ -403,7 +449,7 @@ public class UDPeer extends UDP {
         } else {
             int pinger = m.dataInt(8, UNKNOWN_ID);
             if (pinger == me) {
-                connected = them.put( new UDProfile(m.id(), p, latency) );
+                connected = them.put(new UDProfile(m.id(), p, latency));
             }
         }
         return connected;
@@ -421,7 +467,6 @@ public class UDPeer extends UDP {
 
         send(p, from);
     }
-
 
 
     public void can(String tag, float pri) {
@@ -464,9 +509,7 @@ public class UDPeer extends UDP {
         /**
          * share a belief claim
          */
-        TELL('t'),
-
-        ;
+        TELL('t'),;
 
         public final byte id;
 
@@ -531,7 +574,7 @@ public class UDPeer extends UDP {
             if (origin != null) {
                 write(bytes(origin));
             } else {
-                fillBytes((byte)0, ADDRESS_BYTES );
+                fillBytes((byte) 0, ADDRESS_BYTES);
             }
 
 
@@ -675,8 +718,8 @@ public class UDPeer extends UDP {
                 throw new RuntimeException("missing 64-bit payload");
 
             return Longs.fromBytes(
-                b[offset++], b[offset++], b[offset++], b[offset++],
-                b[offset++], b[offset++], b[offset++], b[offset++]
+                    b[offset++], b[offset++], b[offset++], b[offset++],
+                    b[offset++], b[offset++], b[offset++], b[offset++]
             );
         }
 
@@ -687,7 +730,7 @@ public class UDPeer extends UDP {
                 return ifMissing;
 
             return Ints.fromBytes(
-                b[offset++], b[offset++], b[offset++], b[offset++]
+                    b[offset++], b[offset++], b[offset++], b[offset++]
             );
         }
 
@@ -733,9 +776,9 @@ public class UDPeer extends UDP {
         }
 
         public int port() {
-            int firstByte = (0x000000FF & ((int)bytes[PORT_BYTE]));
-            int secondByte = (0x000000FF & ((int)bytes[PORT_BYTE+1]));
-	        return (char) (firstByte << 8 | secondByte);
+            int firstByte = (0x000000FF & ((int) bytes[PORT_BYTE]));
+            int secondByte = (0x000000FF & ((int) bytes[PORT_BYTE + 1]));
+            return (char) (firstByte << 8 | secondByte);
             //return (( 0xff & ((int)bytes[PORT_BYTE]) << 8) | ( 0xff & ((int)bytes[PORT_BYTE+1])));
         }
 
@@ -752,7 +795,7 @@ public class UDPeer extends UDP {
 
         @Override
         public boolean delete() {
-            if (pri==pri) {
+            if (pri == pri) {
                 this.pri = Float.NaN;
                 return true;
             }
@@ -761,7 +804,7 @@ public class UDPeer extends UDP {
 
         @Override
         public boolean isDeleted() {
-            return pri!=pri;
+            return pri != pri;
         }
     }
 
@@ -840,8 +883,8 @@ public class UDPeer extends UDP {
     public static byte[] bytes(InetSocketAddress addr) {
         byte[] x = new byte[ADDRESS_BYTES];
         int port = addr.getPort();
-        x[0] = (byte)((port >> 8) & 0xff); //unsigned;
-        x[1] = (byte)(port & 0xff);
+        x[0] = (byte) ((port >> 8) & 0xff); //unsigned;
+        x[1] = (byte) (port & 0xff);
         System.arraycopy(ipv6(addr.getAddress().getAddress()), 0, x, 2, 16);
         return x;
     }

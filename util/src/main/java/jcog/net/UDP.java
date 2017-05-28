@@ -2,6 +2,7 @@ package jcog.net;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.net.InetAddresses;
 import jcog.Loop;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
@@ -12,7 +13,9 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.nio.channels.MembershipKey;
 import java.nio.channels.SelectionKey;
+import java.util.Enumeration;
 
 /**
  * generic UDP server & utilities
@@ -70,16 +73,32 @@ public class UDP extends Loop {
 //        }
 //    }
 
-
     public UDP(@Nullable InetAddress a, int port) throws IOException {
         super();
 
         c = DatagramChannel.open();
         c.configureBlocking(false);
+        c.socket().setBroadcast(true);
         c.setOption(StandardSocketOptions.SO_RCVBUF, 1024 * 1024);
         c.setOption(StandardSocketOptions.SO_SNDBUF, 1024 * 1024);
+        c.setOption(StandardSocketOptions.SO_BROADCAST, true);
+        c.setOption(StandardSocketOptions.SO_REUSEADDR, true);
+        c.setOption(StandardSocketOptions.SO_REUSEPORT, true);
         c.bind(new InetSocketAddress(a, port));
+
+//        final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+//        while (networkInterfaces.hasMoreElements()) {
+//            NetworkInterface nic = networkInterfaces.nextElement();
+//            DatagramChannel dc = DatagramChannel.open(StandardProtocolFamily.INET)
+//                    .setOption(StandardSocketOptions.SO_REUSEADDR, true)
+//                    .setOption(StandardSocketOptions.IP_MULTICAST_IF, nic);
+//
+//            MembershipKey key = dc.join(LAN.getAddress(), nic);
+//
+//        }
+
         addr = (InetSocketAddress) c.getLocalAddress();
+
 
 
         //in.setTrafficClass(0x10 /*IPTOS_LOWDELAY*/); //https://docs.oracle.com/javase/8/docs/api/java/net/DatagramSocket.html#setTrafficClass-int-
@@ -143,7 +162,7 @@ public class UDP extends Loop {
         try {
 
             SocketAddress from;
-            while ((from = c.receive(b.rewind()))!=null) {
+            while ((from = c.receive(b.rewind())) != null) {
                 in((InetSocketAddress) from, b.array(), b.position());
             }
         } catch (Throwable t) {
@@ -202,6 +221,7 @@ public class UDP extends Loop {
             return false;
         }
     }
+
 
     /**
      * override in subclasses

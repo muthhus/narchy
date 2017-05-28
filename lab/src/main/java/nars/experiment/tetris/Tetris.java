@@ -3,6 +3,7 @@ package nars.experiment.tetris;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.random.XorShift128PlusRandom;
+import nars.InterNAR;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
@@ -524,6 +525,14 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         a.startRT(10);
 
+//        try {
+//            InterNAR i = new InterNAR(n);
+//            i.pingLAN();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
         for (int i = 0; i < 10000; i++) {
             System.out.println(((NARS)n).stats());
             Util.sleep(500);
@@ -706,12 +715,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
         //n.onCycle(metaT.nar::cycle);
 
-//        try {
-//            InterNAR i = new InterNAR(n, 8, 10421);
-//            i.ping(10420);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
 
         //a.trace = true;

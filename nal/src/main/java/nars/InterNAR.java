@@ -25,9 +25,15 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
     public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
+    /** tasks per second output */
+    private static final float DEFAULT_RATE = 8;
+
     public final NAR nar;
     public final LeakOut out;
 
+    public InterNAR(NAR nar) throws IOException {
+        this(nar, DEFAULT_RATE, 0);
+    }
     /**
      *
      * @param nar
