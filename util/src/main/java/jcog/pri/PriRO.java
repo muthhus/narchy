@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 /**
  * reverse osmosis read-only budget
  */
-public final class ROBudget implements Priority {
+public final class PriRO implements Priority {
 
     private final float pri;
 
-    public ROBudget(float pri) {
+    public PriRO(float pri) {
         this.pri = pri;
     }
 

@@ -2,7 +2,7 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -40,12 +40,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         final Concept c = id;
 
-        final Bag<Task, PLink<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
-        final Bag<Term, PLink<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
+        final Bag<Task, PriReference<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
+        final Bag<Term, PriReference<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
         nar.terms.commit(c); //index cache update
 
-        @Nullable PLink<Task> tasklink = null;
-        @Nullable PLink<Term> termlink = null;
+        @Nullable PriReference<Task> tasklink = null;
+        @Nullable PriReference<Term> termlink = null;
         float taskLinkPri = -1f, termLinkPri = -1f;
 
         List<Hypothesis> premises = $.newArrayList();

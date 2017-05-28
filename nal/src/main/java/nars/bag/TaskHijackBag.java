@@ -1,11 +1,10 @@
 package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.pri.PForget;
+import jcog.pri.op.PriForget;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
-import nars.attention.SpreadingActivation;
 import nars.concept.TaskConcept;
 import nars.table.TaskTable;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -56,7 +55,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
     @Override
     protected Consumer<Task> forget(float avgToBeRemoved) {
-        return new PForget<>(avgToBeRemoved);
+        return new PriForget<>(avgToBeRemoved);
     }
 
 

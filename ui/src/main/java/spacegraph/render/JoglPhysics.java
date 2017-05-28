@@ -171,7 +171,6 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     @Override
     public void windowDestroyed(WindowEvent windowEvent) {
         super.windowDestroyed(windowEvent);
-        meters.remove(this);
     }
 
     /**

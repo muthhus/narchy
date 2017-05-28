@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.event.On;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
@@ -107,7 +107,7 @@ public class Vis {
 //        }
 //    }
 
-    public static Surface budgetHistogram(Iterable<PLink> bag, int bins) {
+    public static Surface budgetHistogram(Iterable<PriReference> bag, int bins) {
         //new SpaceGraph().add(new Facial(
 
         double[] d = new double[bins];
@@ -333,7 +333,7 @@ public class Vis {
         new LeakOut(nar, 4, 0.25f) {
 
             @Override
-            protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
+            protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
                 if (t.pri() >= priMin.floatValue()) {
                     super.in(t, each);
                 }
@@ -360,14 +360,14 @@ public class Vis {
         return new ReflectionSurface(c);
     }
 
-    public static class ConceptBagChart extends BagChart<PLink<Concept>> implements Consumer<NAR> {
+    public static class ConceptBagChart extends BagChart<PriReference<Concept>> implements Consumer<NAR> {
 
         private final On on;
         long now;
         int dur;
         final NAR nar;
 
-        public ConceptBagChart(Iterable<PLink<Concept>> b, int count, NAR nar) {
+        public ConceptBagChart(Iterable<PriReference<Concept>> b, int count, NAR nar) {
             super(b, count);
             this.now = nar.time();
             this.nar = nar;
@@ -386,7 +386,7 @@ public class Vis {
         }
 
         @Override
-        public void update(double width, double height, Iterable<? extends PLink<Concept>> children, BiConsumer<PLink<Concept>, ItemVis<PLink<Concept>>> update) {
+        public void update(double width, double height, Iterable<? extends PriReference<Concept>> children, BiConsumer<PriReference<Concept>, ItemVis<PriReference<Concept>>> update) {
             long now = nar.time();
             if (now == this.now)
                 return;
@@ -397,7 +397,7 @@ public class Vis {
         }
 
         @Override
-        public void accept(PLink<Concept> x, ItemVis<PLink<Concept>> y) {
+        public void accept(PriReference<Concept> x, ItemVis<PriReference<Concept>> y) {
             float p = x.priSafe(0);
 
             float r, g, b;

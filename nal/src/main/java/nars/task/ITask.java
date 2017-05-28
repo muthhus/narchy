@@ -30,4 +30,9 @@ public interface ITask extends Priority {
         return this;
     }
 
+    /** fluent form of setPri which returns this class */
+    default ITask pri(float p) {
+        setPri(p);
+        return this;
+    }
 }

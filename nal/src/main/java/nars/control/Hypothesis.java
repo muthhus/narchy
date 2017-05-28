@@ -1,6 +1,6 @@
 package nars.control;
 
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -22,9 +22,9 @@ import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
 /** precursor and bulider of premises */
-public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
+public class Hypothesis extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
-    public Hypothesis(@Nullable PLink<Task> tasklink, @Nullable PLink<Term> termlink) {
+    public Hypothesis(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
         super(tasklink, termlink, 0);
     }
 
@@ -44,7 +44,7 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
     @Override
     public ITask[] run(NAR nar) {
 
-        PLink<Task> taskLink = getOne();
+        PriReference<Task> taskLink = getOne();
 
         Task task = taskLink.get();
         float taskPri = task.pri();
@@ -146,7 +146,7 @@ public class Hypothesis extends BinaryTask<PLink<Task>,PLink<Term>> {
     }
 
 
-    static boolean tryAnswer(boolean reUnified, PLink<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
+    static boolean tryAnswer(boolean reUnified, PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
         Compound questionTerm = question.get().term();
         Compound answerTerm = answer.term();
         if (!reUnified && !nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {

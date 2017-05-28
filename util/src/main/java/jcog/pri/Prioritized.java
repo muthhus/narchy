@@ -6,8 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * something which has a priority floating point value
+ *      stores priority with 32-bit float precision
+ *      restricted to 0..1.0 range
+ *      NaN means it is 'deleted' which is a valid and testable state
  */
-public interface Prioritized extends Deletes {
+public interface Prioritized extends Deleteable {
 
     /**
      * a value in range 0..1.0 inclusive.
@@ -55,6 +58,8 @@ public interface Prioritized extends Deletes {
     static float oneMinusPri(Prioritized p) {
         return 1f - p.pri();
     }
+
+
 
 
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {

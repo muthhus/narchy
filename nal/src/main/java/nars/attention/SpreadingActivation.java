@@ -3,10 +3,10 @@ package nars.attention;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.map.SaneObjectFloatHashMap;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import nars.budget.PLinkUntilDeleted;
@@ -255,7 +255,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
     protected float activateAtom(AtomConcept atom, float scale) {
 
-        Bag<Task, PLink<Task>> tlinks = atom.tasklinks();
+        Bag<Task, PriReference<Task>> tlinks = atom.tasklinks();
         int n = tlinks.size();
         if (n > 0) {
 
@@ -368,7 +368,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             pri += x;
             linkOverflow.subtract(x);
         }
-        recipient.termlinks().put(new RawPLink(target, pri), linkOverflow);
+        recipient.termlinks().put(new PLink(target, pri), linkOverflow);
     }
 
 

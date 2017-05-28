@@ -1,7 +1,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -21,8 +21,8 @@ import java.util.Map;
 
 public class AtomConcept extends AtomicString implements Concept {
 
-    private final Bag<Term,PLink<Term>> termLinks;
-    private final Bag<Task,PLink<Task>> taskLinks;
+    private final Bag<Term,PriReference<Term>> termLinks;
+    private final Bag<Task,PriReference<Task>> taskLinks;
 
     @Nullable private transient ConceptState state = ConceptState.Deleted;
 
@@ -32,11 +32,11 @@ public class AtomConcept extends AtomicString implements Concept {
     @Nullable
     private Map meta;
 
-    public AtomConcept(@NotNull Atomic atom, Bag<Term,PLink<Term>> termLinks, Bag<Task,PLink<Task>> taskLinks) {
+    public AtomConcept(@NotNull Atomic atom, Bag<Term,PriReference<Term>> termLinks, Bag<Task,PriReference<Task>> taskLinks) {
         this(atom.toString(), atom.op(), termLinks, taskLinks);
     }
 
-    protected AtomConcept(@NotNull String term, @NotNull Op op, Bag<Term,PLink<Term>> termLinks, Bag<Task,PLink<Task>> taskLinks) {
+    protected AtomConcept(@NotNull String term, @NotNull Op op, Bag<Term,PriReference<Term>> termLinks, Bag<Task,PriReference<Task>> taskLinks) {
         super(term);
 
         this.op = op;
@@ -81,13 +81,13 @@ public class AtomConcept extends AtomicString implements Concept {
 
 
     @Override
-    public @NotNull Bag<Task,PLink<Task>> tasklinks() {
+    public @NotNull Bag<Task,PriReference<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term,PLink<Term>> termlinks() {
+    public Bag<Term,PriReference<Term>> termlinks() {
         return termLinks;
     }
 

@@ -1,7 +1,7 @@
 package nars.budget;
 
 import jcog.pri.Pri;
-import jcog.pri.PriMerge;
+import jcog.pri.op.PriMerge;
 import jcog.pri.Priority;
 import nars.$;
 import org.jetbrains.annotations.NotNull;

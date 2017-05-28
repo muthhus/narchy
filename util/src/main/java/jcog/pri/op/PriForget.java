@@ -1,5 +1,6 @@
-package jcog.pri;
+package jcog.pri.op;
 
+import jcog.pri.Priority;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,12 +11,12 @@ import java.util.function.Consumer;
  * decreases priority at a specified rate which is diminished in proportion to a budget's quality
  * so that high quality results in slower priority loss
  */
-public class PForget<X extends Priority> implements Consumer<X> {
+public class PriForget<X extends Priority> implements Consumer<X> {
 
     public static final float DEFAULT_TEMP = 0.5f;
     public final float avgToBeRemoved;
 
-    public PForget(float avgToBeRemoved) {
+    public PriForget(float avgToBeRemoved) {
         this.avgToBeRemoved = avgToBeRemoved;
     }
 

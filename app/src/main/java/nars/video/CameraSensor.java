@@ -1,5 +1,6 @@
 package nars.video;
 
+import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -10,7 +11,6 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.truth.Truth;
-import nars.util.data.Mix;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private final NAR nar;
 
     public final List<PixelConcept> pixels;
-    private final Mix.MixStream in;
+    private final PSink in;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 

@@ -1,8 +1,8 @@
 package jcog.bag.impl;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class CurveBag<X> extends ArrayBag<X> {
 
-    public CurveBag(int initialCapacity, @NotNull PriMerge mergeFunction, @NotNull Map<X, PLink<X>> map) {
+    public CurveBag(int initialCapacity, @NotNull PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
         super(mergeFunction, map);
         capacity(initialCapacity);
     }
@@ -23,17 +23,17 @@ public class CurveBag<X> extends ArrayBag<X> {
 
     /** optimized point sample impl */
     @Nullable
-    @Override public PLink<X> sample() {
+    @Override public PriReference<X> sample() {
         Object[] i = items.array();
         if (i.length == 0)
             return null;
 
-        return (PLink<X>) i[ThreadLocalRandom.current().nextInt(i.length)];
+        return (PriReference<X>) i[ThreadLocalRandom.current().nextInt(i.length)];
     }
 
     @NotNull
     @Override
-    public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each) {
+    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each) {
         sample(each, -1, false);
         return this;
     }

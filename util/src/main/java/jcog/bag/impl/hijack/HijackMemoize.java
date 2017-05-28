@@ -3,8 +3,8 @@ package jcog.bag.impl.hijack;
 import jcog.Texts;
 import jcog.bag.impl.HijackBag;
 import jcog.data.MwCounter;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -26,7 +26,7 @@ import java.util.function.Function;
  * TODO add an instrumentation wrapper to collect statistics
  * about cache efficiency and also processing time of the calculations
  */
-public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>> implements Function<K, V> {
+public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<K, V>>> implements Function<K, V> {
 
     float CACHE_HIT_BOOST;
     float CACHE_DENY_DAMAGE; //damage taken by a cell in rejecting an attempted hijack
@@ -83,14 +83,14 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
     @NotNull
     @Override
-    public HijackBag<K, PLink<Pair<K, V>>> commit(@Nullable Consumer<PLink<Pair<K, V>>> update) {
+    public HijackBag<K, PriReference<Pair<K, V>>> commit(@Nullable Consumer<PriReference<Pair<K, V>>> update) {
         //nothing
         return this;
     }
 
     @Nullable
     public V getIfPresent(@NotNull Object k) {
-        PLink<Pair<K, V>> exists = get(k);
+        PriReference<Pair<K, V>> exists = get(k);
         if (exists != null) {
             exists.priAdd(CACHE_HIT_BOOST);
             hit.inc();
@@ -101,7 +101,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
     @Nullable
     public V removeIfPresent(@NotNull K k) {
-        PLink<Pair<K, V>> exists = remove(k);
+        PriReference<Pair<K, V>> exists = remove(k);
         if (exists != null) {
             return exists.get().getTwo();
         }
@@ -114,7 +114,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
         V v = getIfPresent(k);
         if (v == null) {
             v = func.apply(k);
-            if (put(new RawPLink<>(Tuples.pair(k, v), value(k))) != null) {
+            if (put(new PLink<>(Tuples.pair(k, v), value(k))) != null) {
                 miss.inc();
             } else {
                 reject.inc();
@@ -125,7 +125,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
 
     @Override
-    protected boolean replace(PLink<Pair<K, V>> incoming, PLink<Pair<K, V>> existing) {
+    protected boolean replace(PriReference<Pair<K, V>> incoming, PriReference<Pair<K, V>> existing) {
         if (!super.replace(incoming, existing)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return false;
@@ -136,18 +136,18 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PLink<Pair<K, V>>>
 
     @NotNull
     @Override
-    public K key(PLink<Pair<K, V>> value) {
+    public K key(PriReference<Pair<K, V>> value) {
         return value.get().getOne();
     }
 
 
     @Override
-    protected Consumer<PLink<Pair<K, V>>> forget(float rate) {
+    protected Consumer<PriReference<Pair<K, V>>> forget(float rate) {
         return null;
     }
 
     @Override
-    public void onRemoved(@NotNull PLink<Pair<K, V>> value) {
+    public void onRemoved(@NotNull PriReference<Pair<K, V>> value) {
         evict.inc();
     }
 

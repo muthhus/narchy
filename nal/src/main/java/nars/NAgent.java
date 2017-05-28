@@ -9,6 +9,7 @@ import jcog.event.Topic;
 import jcog.list.FasterList;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.mix.PSink;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -21,7 +22,6 @@ import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import jcog.Loop;
-import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -73,10 +73,10 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final Mix.MixStream<String, Task> sense;
-    private final Mix.MixStream<String, Task> ambition;
-    private final Mix.MixStream<String, Task> predict;
-    private final Mix.MixStream<String, Task> motor;
+    private final PSink<String, Task> sense;
+    private final PSink<String, Task> ambition;
+    private final PSink<String, Task> predict;
+    private final PSink<String, Task> motor;
 
 
     private boolean initialized;
@@ -237,12 +237,12 @@ abstract public class NAgent implements NSense, NAct {
                     //+(dur * 3 / 2);
                     ;
 
-            ambition.input(Stream.<Task>of(happy.apply(nar)), nar::input);
+            ambition.input(Stream.<Task>of(happy.apply(nar)));
 
-            motor.input(actions.stream().flatMap(a -> a.apply(nar)), nar::input);
+            motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);
 
-            sense.input(sense(nar, next), nar::input);
+            sense.input(sense(nar, next));
 
             eventFrame.emitAsync(this, nar.exe);
 
@@ -253,14 +253,14 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     protected void predict() {
-        predict.input(predictions(now), nar::input);
+        predict.input(predictions(now));
 
         if (sensors.size() > 0) {
             actions.forEach(a -> {
                 for (Compound t : new Compound[] {
                         $.impl(a, randomSensor()),
                         $.impl($.neg(a), randomSensor())} )
-                    predict.input(question(t, now + nar.dur()), nar::input);
+                    predict.input(question(t, now + nar.dur()));
             });
         }
     }

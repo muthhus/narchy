@@ -1,6 +1,6 @@
 package nars.attention;
 
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -27,8 +27,8 @@ public class Crosslink {
             return; //null or same concept
 
         //termlinks are necessary:
-        tgtConcept.termlinks().put( new RawPLink(srcConcept, scaleSrcTgt));
-        srcConcept.termlinks().put( new RawPLink(tgtConcept, scaleTgtSrc));
+        tgtConcept.termlinks().put( new PLink(srcConcept, scaleSrcTgt));
+        srcConcept.termlinks().put( new PLink(tgtConcept, scaleTgtSrc));
 
         //tasklinks, not sure:
 //        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));

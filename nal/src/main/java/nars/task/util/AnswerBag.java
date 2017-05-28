@@ -2,8 +2,8 @@ package nars.task.util;
 
 import jcog.bag.impl.ArrayBag;
 import jcog.map.SynchronizedHashMap;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -22,7 +22,7 @@ public final class AnswerBag extends ArrayBag<Task> {
     }
 
     @Override
-    public void onAdded(@NotNull PLink<Task> x) {
+    public void onAdded(@NotNull PriReference<Task> x) {
         if (Param.ANSWER_REPORTING)
             Command.log(nar, question + "  " + x.get().toString());
     }

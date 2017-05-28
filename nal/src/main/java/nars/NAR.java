@@ -6,7 +6,7 @@ import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
@@ -35,7 +35,7 @@ import nars.time.Time;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
-import nars.util.data.Mix;
+import jcog.pri.mix.Mix;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
@@ -118,7 +118,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     protected final NARLoop loop = new NARLoop(this);
 
-    public final Mix<Object, Task> mix = new Mix();
+    public final Mix<Object, ITask> mix;
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -188,6 +188,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.random = rng;
 
         this.exe = exe;
+        this.mix = new Mix((Consumer<ITask>)exe::run); //same result as NAR.input()
 
         this.level = 8;
 
@@ -1143,7 +1144,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
                                   boolean includeTaskLinks, int maxPerConcept,
                                   @NotNull Consumer<Task> recip) {
-        Consumer<? super PLink<Task>> action = t -> recip.accept(t.get());
+        Consumer<? super PriReference<Task>> action = t -> recip.accept(t.get());
         forEachConcept(c -> {
             if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
             if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);

@@ -22,7 +22,7 @@ package nars.concept;
 
 import com.google.common.collect.Iterators;
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
@@ -50,9 +50,9 @@ import static nars.Op.*;
 
 public interface Concept extends Termed {
 
-    @NotNull Bag<Task,PLink<Task>> tasklinks();
+    @NotNull Bag<Task,PriReference<Task>> tasklinks();
 
-    @NotNull Bag<Term,PLink<Term>> termlinks();
+    @NotNull Bag<Term,PriReference<Term>> termlinks();
 
     @Nullable Map<Object, Object> meta();
 
@@ -374,7 +374,7 @@ public interface Concept extends Termed {
                 }
             };
 
-            Consumer<PLink> printBagItem = b -> {
+            Consumer<PriReference> printBagItem = b -> {
                 try {
                     out.append(indent);
                     out.append(String.valueOf(b.get())).append(' ').append(b.toBudgetString());

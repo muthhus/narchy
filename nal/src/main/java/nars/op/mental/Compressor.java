@@ -2,9 +2,9 @@ package nars.op.mental;
 
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Priority;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import nars.*;
 import nars.concept.PermanentConcept;
 import nars.nar.Default;
@@ -58,7 +58,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
     final Map<SequenceMatcher, Abbr> dc = new ConcurrentHashMap(); //HACK
     final Map<SequenceMatcher, Abbr> ec = new ConcurrentHashMap(); //HACK
 
-    class Abbr extends RawPLink<Compound> {
+    class Abbr extends PLink<Compound> {
 
         @NotNull
         public AliasConcept compressed;
@@ -171,7 +171,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
 
     @Override
-    protected float onOut(PLink<Compound> b) {
+    protected float onOut(PriReference<Compound> b) {
         Compound x = b.get();
 //        if (code.getIfPresent(x)!=null)
 //            return 0; //already in

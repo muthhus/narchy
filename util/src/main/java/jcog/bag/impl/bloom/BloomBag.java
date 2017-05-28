@@ -5,8 +5,8 @@ import il.technion.tinytable.TinyCountingTable;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.CircularArrayList;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 import static jcog.bag.Bag.BagCursorAction.Next;
 
 /** experimental implementation backed by a TinyCountingTable and a circular array of items */
-public class BloomBag<X> implements Bag<X,PLink<X>> {
+public class BloomBag<X> implements Bag<X,PriReference<X>> {
 
     CircularArrayList<X> list;
 
@@ -59,12 +59,12 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
 
     @Nullable
     @Override
-    public RawPLink<X> get(@NotNull Object f) {
-        return new RawPLink(f, p((X) f));
+    public PLink<X> get(@NotNull Object f) {
+        return new PLink(f, p((X) f));
     }
 
-    RawPLink<X> get(Object f, @NotNull byte[] b) {
-        return new RawPLink(f, p(b));
+    PLink<X> get(Object f, @NotNull byte[] b) {
+        return new PLink(f, p(b));
     }
 
 //    public MutablePLink<X> get(@NotNull X f, MutablePLink<X> m) {
@@ -78,11 +78,11 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
 
     @Nullable
     @Override
-    public PLink<X> remove(X x) {
+    public PriReference<X> remove(X x) {
         if (x == null)
             return null;
         byte[] hx = byteHash(x);
-        @Nullable PLink<X> z = get(x, hx);
+        @Nullable PriReference<X> z = get(x, hx);
         if (z.priSafe(0) > 0)
             pri.set(hx, 0);
         //TODO remove x from the collection?
@@ -91,7 +91,7 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
     }
 
     @Override
-    public PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflowing) {
+    public PriReference<X> put(@NotNull PriReference<X> b, @Nullable MutableFloat overflowing) {
         X c = b.get();
 
         byte[] hc = byteHash(c);
@@ -123,7 +123,7 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull
     @Override
-    public Bag<X, PLink<X>> sample(@NotNull Bag.BagCursor<? super PLink<X>> each, boolean pop) {
+    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each, boolean pop) {
         Iterator<X> ii = list.iterator();
         BagCursorAction next = Next;
         while (next==Next && ii.hasNext()) {
@@ -148,18 +148,18 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull
     @Override
-    public Iterator<PLink<X>> iterator() {
+    public Iterator<PriReference<X>> iterator() {
         return Iterators.transform(list.iterator(), this::get);
     }
 
 
     /** any changes to the re-used PLink are ignored */
-    @Override public void forEach(Consumer<? super PLink<X>> action) {
+    @Override public void forEach(Consumer<? super PriReference<X>> action) {
         list.forEach(x -> action.accept(get(x)));
     }
 
     @Override
-    public float pri(@NotNull PLink<X> key) {
+    public float pri(@NotNull PriReference<X> key) {
         return p(key.get());
     }
 
@@ -187,18 +187,18 @@ public class BloomBag<X> implements Bag<X,PLink<X>> {
 
     @NotNull
     @Override
-    public X key(PLink<X> value) {
+    public X key(PriReference<X> value) {
         return value.get();
     }
 
 
 
     @Override
-    public Bag<X, PLink<X>> commit() {
+    public Bag<X, PriReference<X>> commit() {
         return this;
     }
 
-    @NotNull @Override public Bag<X, PLink<X>> commit(Consumer<PLink<X>> update) {
+    @NotNull @Override public Bag<X, PriReference<X>> commit(Consumer<PriReference<X>> update) {
         forEach(update);
         return this;
     }

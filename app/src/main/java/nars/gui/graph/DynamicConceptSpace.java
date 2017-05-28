@@ -1,7 +1,7 @@
 package nars.gui.graph;
 
 import jcog.bag.util.Bagregate;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.control.ConceptFire;
 import org.jetbrains.annotations.NotNull;
@@ -26,12 +26,12 @@ public class DynamicConceptSpace extends ConceptSpace {
             }
 
             @Override
-            public void onAdded(PLink<ConceptFire> conceptPLink) {
+            public void onAdded(PriReference<ConceptFire> conceptPLink) {
 
             }
 
             @Override
-            public void onRemoved(@NotNull PLink<ConceptFire> value) {
+            public void onRemoved(@NotNull PriReference<ConceptFire> value) {
                 removeNode(value.get());
             }
         };
@@ -41,7 +41,7 @@ public class DynamicConceptSpace extends ConceptSpace {
     protected void get(Collection<ConceptWidget> displayNext) {
 
         bag.update();
-        bag.forEach(maxNodes, (PLink<ConceptFire> concept) ->
+        bag.forEach(maxNodes, (PriReference<ConceptFire> concept) ->
             displayNext.add( nodeGetOrCreate(concept))
             //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
         );

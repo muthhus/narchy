@@ -2,8 +2,8 @@ package nars.index.term;
 
 import jcog.Util;
 import jcog.bag.impl.hijack.PLinkHijackBag;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Param;
 import nars.concept.Concept;
@@ -47,7 +47,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
         this.table = new PLinkHijackBag<>(capacity, reprobes) {
             @Override
-            protected boolean replace(PLink<Termed> incoming, PLink<Termed> existing) {
+            protected boolean replace(PriReference<Termed> incoming, PriReference<Termed> existing) {
 
                 boolean existingPermanent = existing.get() instanceof PermanentConcept;
 
@@ -86,7 +86,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
     @Override
     public @Nullable Termed get(@NotNull Term key, boolean createIfMissing) {
-        @Nullable PLink<Termed> x = table.get(key);
+        @Nullable PriReference<Termed> x = table.get(key);
         if (x != null) {
             x.priAdd(getBoost);
             return x.get(); //cache hit
@@ -95,7 +95,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
             if (createIfMissing) {
                 Termed kc = conceptBuilder.apply(key);
                 if (kc!=null) {
-                    PLink<Termed> inserted = table.put(new RawPLink<>(kc, initial));
+                    PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
                     if (inserted != null) {
                         Termed ig = inserted.get();
                         if (ig.term().equals(kc))
@@ -114,7 +114,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     @Override
     public void set(@NotNull Term src, Termed target) {
         remove(src);
-        PLink<Termed> inserted = table.put(new RawPLink<>(target, 1f));
+        PriReference<Termed> inserted = table.put(new PLink<>(target, 1f));
         if (inserted == null && target instanceof PermanentConcept) {
             throw new RuntimeException("unresolvable hash collision between PermanentConcepts: " + target);
         }
@@ -152,7 +152,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     public void run() {
         while (running) {
 
-            AtomicReferenceArray<PLink<Termed>> tt = table.map.get();
+            AtomicReferenceArray<PriReference<Termed>> tt = table.map.get();
 
             int c = tt.length();
 
@@ -163,7 +163,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
                 if (visit >= c) visit = 0;
 
-                PLink<Termed> x = tt.get(visit);
+                PriReference<Termed> x = tt.get(visit);
                 if (x!=null)
                     update(x);
             }
@@ -175,7 +175,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         }
     }
 
-    protected void update(PLink<Termed> x) {
+    protected void update(PriReference<Termed> x) {
 
         //TODO better update function based on Concept features
         Termed c = x.get();

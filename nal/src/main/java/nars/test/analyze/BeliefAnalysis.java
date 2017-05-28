@@ -1,7 +1,7 @@
 package nars.test.analyze;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
@@ -117,7 +117,7 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@NotNull
-    public Bag<Task,PLink<Task>> tasklinks() {
+    public Bag<Task,PriReference<Task>> tasklinks() {
 		return concept().tasklinks();
 	}
 

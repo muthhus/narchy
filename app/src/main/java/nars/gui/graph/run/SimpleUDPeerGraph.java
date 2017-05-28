@@ -2,7 +2,7 @@ package nars.gui.graph.run;
 
 import jcog.net.UDPeer;
 import jcog.net.UDPeerSim;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import nars.$;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -107,7 +107,7 @@ public class SimpleUDPeerGraph {
                 @Nullable Concept from = n.conceptualize($.the(msg.port()));
                 @Nullable Concept to = n.conceptualize($.the(recv.port()));
                 float p = msgPri(msg);
-                from.termlinks().put(new RawPLink(to, p));
+                from.termlinks().put(new PLink(to, p));
 
 
                 n.input(new ConceptFire(from, 0.5f + p / 2f));

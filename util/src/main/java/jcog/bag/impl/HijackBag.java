@@ -5,7 +5,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
-import jcog.pri.PForget;
+import jcog.pri.op.PriForget;
 import jcog.pri.Pri;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -462,7 +462,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        PForget.forget(s, capacity(), (float) p, mass, PForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
+                        PriForget.forget(s, capacity(), (float) p, mass, PriForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
                         null
         );
 

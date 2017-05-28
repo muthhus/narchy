@@ -4,8 +4,8 @@ import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.map.SynchronizedUnifiedMap;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 
-import static jcog.pri.PriMerge.plus;
+import static jcog.pri.op.PriMerge.plus;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -66,7 +66,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //    }
 
     @NotNull
-    @Deprecated public <X> Bag<X,PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+    @Deprecated public <X> Bag<X,PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
         return new CurveBag<>(8, blend, m);
     }
 
@@ -84,10 +84,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //    final Function<Variable, VariableConcept> varBuilder =
 //            (Variable v) -> new VariableConcept(v);
 
-    public <X> X withBags(Term t, BiFunction<Bag<Term,PLink<Term>>,Bag<Task,PLink<Task>>,X> f) {
+    public <X> X withBags(Term t, BiFunction<Bag<Term,PriReference<Term>>,Bag<Task,PriReference<Task>>,X> f) {
         Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term,PLink<Term>> termbag = newBag(sharedMap, DEFAULT_BLEND);
-        @NotNull Bag<Task,PLink<Task>> taskbag = newBag(sharedMap, DEFAULT_BLEND);
+        @NotNull Bag<Term,PriReference<Term>> termbag = newBag(sharedMap, DEFAULT_BLEND);
+        @NotNull Bag<Task,PriReference<Task>> taskbag = newBag(sharedMap, DEFAULT_BLEND);
 
 
 //        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);
@@ -120,11 +120,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     /** for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private CompoundConcept newCompound(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+    private CompoundConcept newCompound(@NotNull Compound t, Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag) {
         return new CompoundConcept(t, termbag, taskbag, nar);
     }
 
-    private TaskConcept newTask(@NotNull Compound t, Bag<Term, PLink<Term>> termbag, Bag<Task, PLink<Task>> taskbag) {
+    private TaskConcept newTask(@NotNull Compound t, Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {

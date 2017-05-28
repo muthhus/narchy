@@ -1,7 +1,7 @@
 package nars.concept;
 
 import jcog.bag.Bag;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -23,10 +23,10 @@ import java.util.function.Predicate;
 public class CompoundConcept implements Concept, Compound, Termlike {
 
     @NotNull
-    private final Bag<Task,PLink<Task>> taskLinks;
+    private final Bag<Task,PriReference<Task>> taskLinks;
 
     @NotNull
-    private final Bag<Term,PLink<Term>> termLinks;
+    private final Bag<Term,PriReference<Term>> termLinks;
 
     @NotNull
     private final Compound term;
@@ -45,7 +45,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Term,PLink<Term>> termLinks, @NotNull Bag<Task,PLink<Task>> taskLinks, @NotNull NAR nar) {
+    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Term,PriReference<Term>> termLinks, @NotNull Bag<Task,PriReference<Task>> taskLinks, @NotNull NAR nar) {
 
         this.term = term;
         this.termLinks = termLinks;
@@ -105,13 +105,13 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     }
 
     @Override
-    public @NotNull Bag<Task,PLink<Task>> tasklinks() {
+    public @NotNull Bag<Task,PriReference<Task>> tasklinks() {
         return taskLinks;
     }
 
     @NotNull
     @Override
-    public Bag<Term,PLink<Term>> termlinks() {
+    public Bag<Term,PriReference<Term>> termlinks() {
         return termLinks;
     }
 

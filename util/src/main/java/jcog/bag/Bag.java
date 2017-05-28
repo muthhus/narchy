@@ -2,7 +2,7 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.list.FasterList;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -497,7 +497,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     }
 
     @NotNull
-    public static double[] priHistogram(Iterable<? extends PLink> pp, @NotNull double[] x) {
+    public static double[] priHistogram(Iterable<? extends PriReference> pp, @NotNull double[] x) {
         int bins = x.length;
         final double[] total = {0};
 
@@ -521,7 +521,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * double[histogramID][bin]
      */
     @NotNull
-    public static <X, Y> double[][] histogram(@NotNull Iterable<PLink<Y>> pp, @NotNull BiConsumer<PLink<Y>, double[][]> each, @NotNull double[][] d) {
+    public static <X, Y> double[][] histogram(@NotNull Iterable<PriReference<Y>> pp, @NotNull BiConsumer<PriReference<Y>, double[][]> each, @NotNull double[][] d) {
 
         pp.forEach(y -> {
             each.accept(y, d);

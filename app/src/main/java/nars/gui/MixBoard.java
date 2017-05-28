@@ -3,7 +3,7 @@ package nars.gui;
 import jcog.event.On;
 import nars.$;
 import nars.NAR;
-import nars.util.data.Mix;
+import jcog.pri.mix.Mix;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meter.Plot2D;

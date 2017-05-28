@@ -3,9 +3,9 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.bag.impl.ArrayBag;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.RawPLink;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.nar.Default;
@@ -151,7 +151,7 @@ public class IRCNLP extends IRC {
         }
 
         @Override
-        protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
+        protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
             if (trace || t.isCommand())
                 super.in(t, each);
         }
@@ -302,7 +302,7 @@ public class IRCNLP extends IRC {
 
             if (!bot.prevOut.contains(msg)) {
                 bot.out.commit();
-                bot.out.put(new RawPLink<String>(msg, 1f));
+                bot.out.put(new PLink<String>(msg, 1f));
             }
         });
 

@@ -5,6 +5,7 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.pri.*;
+import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -16,7 +17,7 @@ import java.util.*;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static jcog.pri.PriMerge.plus;
+import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -38,7 +39,7 @@ public class BagTest {
 
 
 
-    public static void testBasicInsertionRemoval(Bag<String,PLink<String>> c) {
+    public static void testBasicInsertionRemoval(Bag<String,PriReference<String>> c) {
 
 
         assertEquals(1, c.capacity());
@@ -48,7 +49,7 @@ public class BagTest {
         }
 
         //insert an item with zero budget
-        c.put(new RawPLink("x", 0));
+        c.put(new PLink("x", 0));
         c.commit();
 
         assertEquals(1, c.size());
@@ -65,13 +66,13 @@ public class BagTest {
         ArrayBag<String> a = new ArrayBag<String>(4, plus, new HashMap<>(4));
         assertEquals(0, a.size());
 
-        a.put(new RawPLink("x", 0.1f));
-        a.put(new RawPLink("x", 0.1f));
+        a.put(new PLink("x", 0.1f));
+        a.put(new PLink("x", 0.1f));
         a.commit(null);
         assertEquals(1, a.size());
 
 
-        PLink<String> agx = a.get("x");
+        PriReference<String> agx = a.get("x");
         Pri expect = new Pri(0.2f);
         assertTrue(agx + "==?==" + expect, expect.equalsBudget(
                 agx, 0.01f));
@@ -82,19 +83,19 @@ public class BagTest {
     public void testSort() {
         ArrayBag<String> a = new ArrayBag(4, plus, new HashMap<>(4));
 
-        a.put(new RawPLink("x",0.1f));
-        a.put(new RawPLink("y",0.2f));
+        a.put(new PLink("x",0.1f));
+        a.put(new PLink("y",0.2f));
 
         a.commit(null);
 
-        Iterator<PLink<String>> ii = a.iterator();
+        Iterator<PriReference<String>> ii = a.iterator();
         assertEquals("y", ii.next().get());
         assertEquals("x", ii.next().get());
 
 
         assertEquals("[y=0.2, x=0.1]", a.listCopy().toString());
 
-        a.put(new RawPLink("x", 0.2f));
+        a.put(new PLink("x", 0.2f));
 
         a.print();
         System.out.println( a.listCopy() );
@@ -115,14 +116,14 @@ public class BagTest {
     public void testCapacity() {
         ArrayBag<String> a = new ArrayBag(2, plus, new HashMap<>(2));
 
-        a.put(new RawPLink("x", 0.1f));
-        a.put(new RawPLink("y", 0.2f));
+        a.put(new PLink("x", 0.1f));
+        a.put(new PLink("y", 0.2f));
         a.commit(null);        a.print(); System.out.println();
         assertEquals(2, a.size());
 
         assertEquals( 0.1f , a.priMin(), 0.01f);
 
-        a.put(new RawPLink("z", 0.05f));
+        a.put(new PLink("z", 0.05f));
         a.commit();        a.print(); System.out.println();
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));
@@ -135,9 +136,9 @@ public class BagTest {
         testRemoveByKey(new ArrayBag(2, plus, new HashMap<>(2)));
     }
 
-    public static void testRemoveByKey(Bag<String,PLink<String>> a) {
+    public static void testRemoveByKey(Bag<String,PriReference<String>> a) {
 
-        a.put(new RawPLink("x", 0.1f));
+        a.put(new PLink("x", 0.1f));
         a.commit();
         assertEquals(1, a.size());
 
@@ -255,7 +256,7 @@ public class BagTest {
 
         //fill with uniform randomness
         for (int i = 0; i < n; i++) {
-            a.put(new RawPLink("x" + i, (float) random.getAsDouble()));
+            a.put(new PLink("x" + i, (float) random.getAsDouble()));
         }
 
         a.commit();
@@ -265,13 +266,13 @@ public class BagTest {
 
     }
 
-    public static void testPutMinMaxAndUniqueness(Bag<Integer,PLink<Integer>> a) {
+    public static void testPutMinMaxAndUniqueness(Bag<Integer,PriReference<Integer>> a) {
         float pri = 0.5f;
         int n = a.capacity()*16; //insert enough to fully cover all slots. strings have bad hashcode when input iteratively so this may need to be a high multiple
 
 
         for (int i = 0; i < n; i++) {
-            a.put(new RawPLink((i), pri));
+            a.put(new PLink((i), pri));
         }
 
         a.commit(null); //commit but dont forget
@@ -296,14 +297,14 @@ public class BagTest {
         return new CurveBag(n, mergeFunction, new HashMap<>(n));
     }
 
-    public static void populate(Bag<String,PLink<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
+    public static void populate(Bag<String,PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
         populate(b, rng, count, dimensionality, minPri, maxPri, qua, qua);
     }
 
-    public static void populate(Bag<String,PLink<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
+    public static void populate(Bag<String,PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
         float dPri = maxPri - minPri;
         for (int i = 0; i < count; i++) {
-            b.put(new RawPLink(
+            b.put(new PLink(
                     "x" + rng.nextInt(dimensionality),
                     rng.nextFloat() * dPri + minPri)
             );

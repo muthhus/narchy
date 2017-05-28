@@ -6,8 +6,8 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.Node;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 public abstract class STMClustered extends STM {
 
 
-    public final ThreadLocal<@Nullable Bag<Task, PLink<Task>>> input;
+    public final ThreadLocal<@Nullable Bag<Task, PriReference<Task>>> input;
 
     final short clusters;
     public final int dims;
@@ -311,7 +311,7 @@ public abstract class STMClustered extends STM {
 
 
             @Override
-            public void onRemoved(@NotNull PLink<Task> value) {
+            public void onRemoved(@NotNull PriReference<Task> value) {
                 super.onRemoved(value);
                 drop((TLink) value);
             }

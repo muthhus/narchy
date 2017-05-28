@@ -1,7 +1,7 @@
 package nars.budget;
 
-import jcog.pri.Deletes;
-import jcog.pri.RawPLink;
+import jcog.pri.Deleteable;
+import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Adds an additional condition that deletes the link if the referenced
  * Budgeted is deleted.
  */
-public class PLinkUntilDeleted<X extends Deletes> extends RawPLink<X> {
+public class PLinkUntilDeleted<X extends Deleteable> extends PLink<X> {
 
     public PLinkUntilDeleted(@NotNull X id, float p) {
         super(id, p);

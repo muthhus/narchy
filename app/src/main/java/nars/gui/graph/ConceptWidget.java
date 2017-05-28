@@ -4,9 +4,9 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
-import jcog.pri.Deletes;
+import jcog.pri.Deleteable;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import nars.$;
 import nars.Task;
 import nars.concept.Concept;
@@ -32,9 +32,9 @@ import java.util.function.Consumer;
 import static spacegraph.math.v3.v;
 
 
-public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? extends Termed>> {
+public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference<? extends Termed>> {
 
-    public final Bag<TermEdge, PLink<TermEdge>> edges;
+    public final Bag<TermEdge, PriReference<TermEdge>> edges;
 
 
     //caches a reference to the current concept
@@ -229,7 +229,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
     }
 
     @Override
-    public void accept(PLink<? extends Termed> tgt) {
+    public void accept(PriReference<? extends Termed> tgt) {
         float pri = tgt.priSafe(-1);
         if (pri < 0)
             return;
@@ -245,7 +245,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                     ate.add(tgt, !(ttt instanceof Task));
                     edges.put(
                             //new PLinkUntilDeleted(ate, pri)
-                            new RawPLink(ate, pri)
+                            new PLink(ate, pri)
                     );
 //                }
             }
@@ -259,7 +259,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 //        return this;
 //    }
 
-    public static class TermEdge extends EDraw<Term, ConceptWidget> implements Termed, Deletes {
+    public static class TermEdge extends EDraw<Term, ConceptWidget> implements Termed, Deleteable {
 
         float termlinkPri, tasklinkPri;
 
@@ -279,7 +279,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
         }
 
 
-        public void add(PLink b, boolean termOrTask) {
+        public void add(PriReference b, boolean termOrTask) {
             float p = b.priSafe(0);
             if (termOrTask) {
                 termlinkPri += p;

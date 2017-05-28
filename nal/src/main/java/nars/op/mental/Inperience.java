@@ -3,11 +3,14 @@ package nars.op.mental;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
+import jcog.pri.PriReference;
+import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -36,7 +39,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends TaskLeak<Task, PLink<Task>> {
+public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -70,11 +73,14 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
      */
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
+    final PSink<Object, ITask> in;
 
     float beliefFactor = 1f;
     float questionFactor = 0.5f;
 
-    /** multiplier for he sensory task priority to determine inperienced task priority */
+    /**
+     * multiplier for he sensory task priority to determine inperienced task priority
+     */
     private final float priFactor = 0.5f;
 
 //    public boolean isEnableWantBelieve() {
@@ -127,11 +133,13 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
     public Inperience(@NotNull NAR n, float rate, int capacity) {
         super(
-            //new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap())
-            new PLinkHijackBag(capacity, 4)
-            , rate, n
+                //new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap())
+                new PLinkHijackBag(capacity, 4)
+                , rate, n
         );
         this.nar = n;
+
+        in = nar.mix.stream(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();
@@ -153,7 +161,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
     }
 
     @Override
-    protected void in(Task task, @NotNull Consumer<PLink<Task>> each) {
+    protected void in(Task task, @NotNull Consumer<PriReference<Task>> each) {
 
 
         if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
@@ -169,7 +177,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
             float f = task.freq();
             float fm = freqMax.floatValue();
-            if (!(f <= fm) && !(f >= (1f - fm))  )
+            if (!(f <= fm) && !(f >= (1f - fm)))
                 return;
 
             //belief = true;
@@ -179,7 +187,7 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
         float p = task.priSafe(-1);
         if (p >= 0)
-            each.accept(new RawPLink<>(task, p));
+            each.accept(new PLink<>(task, p));
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -211,38 +219,33 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
     }
 
     @Override
-    protected float onOut(@NotNull PLink<Task> b) {
+    protected float onOut(@NotNull PriReference<Task> b) {
 
         Task task = b.get();
 
         //try {
-            Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.terms);
-            if (r != null) {
+        Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.terms);
+        if (r != null) {
 
-                long now = nar.time();
+            long now = nar.time();
 
-                long start = task.start();
-                long end;
-                if (start == ETERNAL)
-                    end = start = now;
-                else {
-                    end = task.end();
-                }
-
-                NALTask e = new NALTask(
-                        r,
-                        BELIEF,
-                        new DiscreteTruth(1, nar.confDefault(BELIEF)),
-                        now, start, end,
-                        task.stamp()
-                );
-                e.log("Inperience");
-                e.setPri( task.priSafe(0) * priFactor );
-
-                logger.info(" {}", e);
-                nar.input(e);
-                return 1;
+            long start = task.start();
+            long end;
+            if (start == ETERNAL)
+                end = start = now;
+            else {
+                end = task.end();
             }
+
+            in.input(
+                new InperienceTask(r,
+                    new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
+                    now, start, end, task
+                ).pri(task.priElseZero() * priFactor)
+            );
+
+            return 1;
+        }
 //        } catch (ClassCastException ignored) {
 //            //happens rarely, due to circularity while trying to create something like: want((x<->want),...
 //
@@ -290,19 +293,29 @@ public class Inperience extends TaskLeak<Task, PLink<Task>> {
 
         arg[k++] = self;
 
-        arg[k++] = nar.terms.queryToDepVar($.negIf(s.term(), tr!=null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
-
+        arg[k++] = nar.terms.queryToDepVar($.negIf(s.term(), tr != null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
         return Terms.compoundOrNull($.negIf($.func(reify(s.punc()), arg), false));
     }
 
 
-
-
-
     public static Atomic randomNonInnate(@NotNull Random r) {
         return NON_INNATE_BELIEF_ATOMICs[r.nextInt(NON_INNATE_BELIEF_ATOMICs.length)];
+    }
+
+    private static class InperienceTask extends NALTask {
+
+        public InperienceTask(Compound r, Truth t, long now, long start, long end, Task task) {
+            super(r, Op.BELIEF, t, now, start, end, task.stamp());
+            log("Inperience");
+        }
+
+        @Override
+        public ITask[] run(NAR n) {
+            logger.info(" {}", this);
+            return super.run(n);
+        }
     }
 
 //    public static boolean random(@NotNull Random r, float prob, int volume) {

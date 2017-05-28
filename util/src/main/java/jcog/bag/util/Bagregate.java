@@ -2,9 +2,9 @@ package jcog.bag.util;
 
 import jcog.bag.impl.ArrayBag;
 import jcog.data.FloatParam;
-import jcog.pri.PriMerge;
+import jcog.pri.op.PriMerge;
 import jcog.pri.Prioritized;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +43,7 @@ public class Bagregate<X extends Prioritized> extends ArrayBag<X> {
                 if (include(x)) {
                     float pri = x.pri();
                     if (pri==pri)
-                        put(new RawPLink(x, pri * scale), null);
+                        put(new PLink(x, pri * scale), null);
                 }
             });
             commit();

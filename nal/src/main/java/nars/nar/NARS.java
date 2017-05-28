@@ -1,12 +1,11 @@
 package nars.nar;
 
 import jcog.AffinityExecutor;
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -204,13 +203,13 @@ public class NARS extends NAR {
 //        );
 
         @Override
-        public <X> X withBags(Term t, BiFunction<Bag<Term, PLink<Term>>, Bag<Task, PLink<Task>>, X> f) {
+        public <X> X withBags(Term t, BiFunction<Bag<Term, PriReference<Term>>, Bag<Task, PriReference<Task>>, X> f) {
 
-            Bag<Term, PLink<Term>> termlink =
+            Bag<Term, PriReference<Term>> termlink =
                     new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
             //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
 
-            Bag<Task, PLink<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+            Bag<Task, PriReference<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
 
             return f.apply(termlink, tasklink);
         }
@@ -218,7 +217,7 @@ public class NARS extends NAR {
         @NotNull
         @Deprecated
         @Override
-        public <X> Bag<X, PLink<X>> newBag(@NotNull Map m, PriMerge blend) {
+        public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
             return new DefaultHijackBag<>(blend, reprobes);
         }
     }

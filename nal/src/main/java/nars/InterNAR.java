@@ -2,14 +2,12 @@ package nars;
 
 import jcog.Util;
 import jcog.net.UDPeer;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
+import jcog.pri.mix.PSink;
 import nars.bag.leak.LeakOut;
 import nars.task.LambdaQuestionTask;
-import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -32,7 +30,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     public final NAR nar;
     public final LeakOut out;
 
-    private final Mix.MixStream<String, Task> receive;
+    private final PSink<String, Task> receive;
 
 
     public InterNAR(NAR nar) throws IOException {
@@ -89,7 +87,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
             }
 
             @Override
-            protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
+            protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
                 if (t.isCommand() || !connected())
                     return;
 
@@ -132,7 +130,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
             //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
             logger.debug("recv {} from {}", x, m.origin());
-            receive.input(x, nar::input);
+            receive.input(x);
         }
     }
 

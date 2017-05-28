@@ -2,7 +2,7 @@ package nars.web;
 
 import jcog.bag.Bag;
 import jcog.data.MutableInteger;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.IO;
 import nars.NAR;
 import nars.concept.Concept;
@@ -118,7 +118,7 @@ public class ActiveConceptService extends PeriodicWebsocketService {
         }
     }
 
-    private static void writeConceptSummary(DataOutput out, PLink<Concept> bc) throws IOException {
+    private static void writeConceptSummary(DataOutput out, PriReference<Concept> bc) throws IOException {
         Concept c = bc.get();
 
         //punctuation: ConceptSummary
@@ -127,8 +127,8 @@ public class ActiveConceptService extends PeriodicWebsocketService {
 
         IO.writeUTF8WithPreLen(c.toString(), out);
 
-        Bag<Term,PLink<Term>> b = c.termlinks();
-        Consumer<? super PLink<Term>> action = t -> {
+        Bag<Term,PriReference<Term>> b = c.termlinks();
+        Consumer<? super PriReference<Term>> action = t -> {
             try {
                 IO.writeBudget(out, t);
                 IO.writeUTF8WithPreLen(t.get().toString(), out);

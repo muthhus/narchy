@@ -3,8 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.Priority;
-import jcog.pri.RawPLink;
-import nars.attention.SpreadingActivation;
+import jcog.pri.PLink;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
@@ -381,7 +380,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 answers.commit();
 
                 float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
-                answers.put(new RawPLink<>(answer, confEffective * 1f));
+                answers.put(new PLink<>(answer, confEffective * 1f));
             }
 
         }

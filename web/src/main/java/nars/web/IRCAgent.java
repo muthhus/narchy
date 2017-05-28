@@ -1,6 +1,6 @@
 package nars.web;
 
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
@@ -41,7 +41,7 @@ public class IRCAgent extends IRC {
     private final boolean hearTwenglish = true;
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
-    private final Leak<Task,PLink<Task>> out;
+    private final Leak<Task,PriReference<Task>> out;
 
     boolean trace;
 
@@ -345,7 +345,7 @@ public class IRCAgent extends IRC {
         }
 
         @Override
-        protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
+        protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
             if (trace || t.isCommand())
                 super.in(t, each);
         }

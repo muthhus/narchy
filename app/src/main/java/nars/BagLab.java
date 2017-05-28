@@ -5,8 +5,8 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.bloom.BloomBag;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import nars.gui.HistogramChart;
 import nars.gui.Vis;
 import spacegraph.SpaceGraph;
@@ -34,13 +34,13 @@ public class BagLab  {
     int iteration;
 
 
-    final Bag<Integer,PLink<Integer>> bag;
+    final Bag<Integer,PriReference<Integer>> bag;
     private final List<FloatSlider> inputSliders;
     private final int uniques;
 
     double[] selectionHistogram = new double[BINS];
 
-    public BagLab(Bag<Integer,PLink<Integer>> bag) {
+    public BagLab(Bag<Integer,PriReference<Integer>> bag) {
         super();
         this.bag = bag;
 
@@ -127,7 +127,7 @@ public class BagLab  {
                 if (Math.random() < inputSliders.get(i).value()) {
                     float p = (i + (float) Math.random()) / (n - 1);
                     //float q = (float)Math.random(); //random quality
-                    bag.put(new RawPLink<>((int) Math.floor(Math.random() * uniques), p));
+                    bag.put(new PLink<>((int) Math.floor(Math.random() * uniques), p));
                 }
             }
         }
@@ -144,7 +144,7 @@ public class BagLab  {
 
         //System.out.println(bag.size());
 
-        List<PLink<Integer>> sampled = $.newArrayList(1024);
+        List<PriReference<Integer>> sampled = $.newArrayList(1024);
         for (int i = 0; i < (int)sampleBatches ; i++) {
             sampled.clear();
 
@@ -154,7 +154,7 @@ public class BagLab  {
             });
 
             //BLink<Integer> sample = bag.sample();
-            for (PLink<Integer> sample : sampled) {
+            for (PriReference<Integer> sample : sampled) {
                 if (sample != null) {
                     float p = sample.priSafe(0);
                     selectionHistogram[Util.bin(p, bins - 1)]++;

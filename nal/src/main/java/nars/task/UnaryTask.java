@@ -2,13 +2,13 @@ package nars.task;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * task which is identified by one value parameter, and the class type itself
  */
-abstract public class UnaryTask<X> extends RawPLink<X> implements ITask {
+abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
 
     private final int hash;

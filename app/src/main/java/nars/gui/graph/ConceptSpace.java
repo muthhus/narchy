@@ -1,7 +1,7 @@
 package nars.gui.graph;
 
 import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.control.ConceptFire;
@@ -77,7 +77,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //    }
 
 
-    protected ConceptWidget nodeGetOrCreate(PLink<ConceptFire> clink) {
+    protected ConceptWidget nodeGetOrCreate(PriReference<ConceptFire> clink) {
         ConceptWidget cw = nodeGetOrCreate(clink.get());
         cw.pri = clink.priSafe(0);
         return cw;

@@ -2,17 +2,17 @@ package jcog.bag;
 
 import com.google.common.base.Joiner;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import jcog.pri.PLink;
-import jcog.pri.PriMerge;
-import jcog.pri.RawPLink;
 import org.junit.Test;
 
 import java.util.Random;
 import java.util.TreeSet;
 
 import static jcog.bag.BagTest.*;
-import static jcog.pri.PriMerge.max;
-import static jcog.pri.PriMerge.plus;
+import static jcog.pri.op.PriMerge.max;
+import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -69,9 +69,9 @@ public class HijackBagTest {
 
         int n = 256;
 
-        Bag<String,PLink<String>> a = new DefaultHijackBag<String>(max, n, 4);
+        Bag<String,PriReference<String>> a = new DefaultHijackBag<String>(max, n, 4);
         for (int i = 0; i < n*8; i++) {
-            a.put(new RawPLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
+            a.put(new PLink("x" + Integer.toString(Float.floatToIntBits(1f/i),5), ((float)(i))/(n)));
         }
 
         a.commit();

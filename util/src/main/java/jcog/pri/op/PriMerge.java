@@ -1,12 +1,14 @@
-package jcog.pri;
+package jcog.pri.op;
 
 import jcog.Util;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiFunction;
 
-import static jcog.pri.PriMerge.PriMergeOp.*;
+import static jcog.pri.op.PriMerge.PriMergeOp.*;
 
 /**
  * Budget merge function, with input scale factor

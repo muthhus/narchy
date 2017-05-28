@@ -1,8 +1,8 @@
 package jcog.bag.impl.hijack;
 
 import jcog.bag.impl.HijackBag;
-import jcog.pri.PForget;
-import jcog.pri.PLink;
+import jcog.pri.op.PriForget;
+import jcog.pri.PriReference;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,20 +11,20 @@ import java.util.function.Consumer;
 /**
  * Created by me on 2/17/17.
  */
-public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
+public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
 
     public PLinkHijackBag(int initialCapacity, int reprobes) {
         super(initialCapacity, reprobes);
     }
 
     @Override
-    public final float pri(@NotNull PLink<X> key) {
+    public final float pri(@NotNull PriReference<X> key) {
         return key.pri();
     }
 
     @NotNull
     @Override
-    public final X key(PLink<X> value) {
+    public final X key(PriReference<X> value) {
         return value.get();
     }
 
@@ -68,7 +68,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
 
     @Override
-    protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming, MutableFloat overflowing) {
+    protected PriReference<X> merge(@NotNull PriReference<X> existing, @NotNull PriReference<X> incoming, MutableFloat overflowing) {
         float overflow = existing.priAddOverflow(incoming.priSafe(0) );
         if (overflow > 0) {
             pressurize(-overflow);
@@ -80,7 +80,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
 
 
     @Override
-    public PForget forget(float avgToBeRemoved) {
-        return new PForget(avgToBeRemoved);
+    public PriForget forget(float avgToBeRemoved) {
+        return new PriForget(avgToBeRemoved);
     }
 }

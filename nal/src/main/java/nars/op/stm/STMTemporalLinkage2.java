@@ -2,8 +2,8 @@ package nars.op.stm;
 
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.event.On;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
@@ -20,7 +20,7 @@ import static nars.attention.Crosslink.crossLink;
  * Empties task buffer when plugin is (re)started.
  *
  */
-public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
+public class STMTemporalLinkage2 extends TaskLeak<Task,PriReference<Task>> {
 
 
     @NotNull private final On onReset;
@@ -39,9 +39,9 @@ public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
     }
 
     @Override
-    protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
+    protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
         if (t.isBeliefOrGoal() && !t.isEternal()) {
-            each.accept(new RawPLink(t,
+            each.accept(new PLink(t,
              t.priSafe(0)
                 //t.conf() /* scale by confidence */
             ));
@@ -50,7 +50,7 @@ public class STMTemporalLinkage2 extends TaskLeak<Task,PLink<Task>> {
 
 
     @Override
-    protected float onOut(@NotNull PLink<Task> popped) {
+    protected float onOut(@NotNull PriReference<Task> popped) {
         Task x = popped.get();
 
         Concept cx = x.concept(nar);

@@ -17,22 +17,22 @@ public interface Priority extends Prioritized {
     /**
      * common instance for a 'Deleted budget'.
      */
-    Priority Deleted = new ROBudget(Float.NaN);
+    Priority Deleted = new PriRO(Float.NaN);
 
     /**
      * common instance for a 'full budget'.
      */
-    Priority One = new ROBudget(1f);
+    Priority One = new PriRO(1f);
 
     /**
      * common instance for a 'half budget'.
      */
-    Priority Half = new ROBudget(0.5f);
+    Priority Half = new PriRO(0.5f);
 
     /**
      * common instance for a 'zero budget'.
      */
-    Priority Zero = new ROBudget(0);
+    Priority Zero = new PriRO(0);
 
     /**
      * default minimum difference necessary to indicate a significant modification in budget float number components
@@ -285,6 +285,9 @@ public interface Priority extends Prioritized {
 
         priLerp((p - min) / range, lerp);
     }
+
+
+
 
 //    void orPriority(float v);
 //

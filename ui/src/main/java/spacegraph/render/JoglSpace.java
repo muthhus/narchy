@@ -44,15 +44,10 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public GLWindow window = null;
     protected GL2 gl;
 
-    public final PeriodMeter frameTimeMS;
-
-    static final ConcurrentHashMap<JoglSpace, JoglSpace> meters = new ConcurrentHashMap();
-
 
     public JoglSpace() {
         super();
-        frameTimeMS = new PeriodMeter(toString(), 8);
-        meters.put(this, this);
+        //frameTimeMS = new PeriodMeter(toString(), 8);
     }
 
     public static GLWindow window(JoglSpace j) {
@@ -249,7 +244,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         render();
         long now = System.currentTimeMillis();
 
-        frameTimeMS.hit(now - start);
+        //frameTimeMS.hit(now - start);
 
     }
 

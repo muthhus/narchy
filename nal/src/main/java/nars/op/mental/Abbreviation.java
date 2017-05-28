@@ -2,10 +2,10 @@ package nars.op.mental;
 
 import jcog.bag.impl.CurveBag;
 import jcog.data.MutableIntRange;
-import jcog.pri.PLink;
-import jcog.pri.PriMerge;
+import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import jcog.pri.Priority;
-import jcog.pri.RawPLink;
+import jcog.pri.PLink;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -45,7 +45,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<Compound>> {
+public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriReference<Compound>> {
 
 
     /**
@@ -89,7 +89,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
 
     @Nullable
     @Override
-    protected void in(@NotNull Task task, @NotNull Consumer<PLink<Compound>> each) {
+    protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
 
         if (task instanceof AbbreviationTask)
             return;
@@ -99,7 +99,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
             input(b, each, task.term(), 1f);
     }
 
-    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale) {
+    private void input(@NotNull Priority b, @NotNull Consumer<PriReference<Compound>> each, @NotNull Compound t, float scale) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -111,7 +111,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
                         !(abbreviable instanceof PermanentConcept) &&
                                 abbreviable.get(Abbreviation.class) == null) {
 
-                    each.accept(new RawPLink<>(t, b.priSafe(0)));
+                    each.accept(new PLink<>(t, b.priSafe(0)));
                 }
             }
         } else {
@@ -127,7 +127,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PLink<C
 
 
     @Override
-    protected float onOut(PLink<Compound> b) {
+    protected float onOut(PriReference<Compound> b) {
 
         abbreviate(b.get(), b);
         return 1f;

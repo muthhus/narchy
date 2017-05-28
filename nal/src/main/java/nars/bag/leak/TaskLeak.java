@@ -3,7 +3,7 @@ package nars.bag.leak;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.event.On;
-import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * interface for controlled draining of a bag
  * "leaky bucket" model
  */
-public abstract class TaskLeak</* TODO: A, */X, V extends PLink<X>> extends Leak.DtLeak<X, V> implements Consumer<Task> {
+public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> extends Leak.DtLeak<X, V> implements Consumer<Task> {
 
     private final On onTask, onReset, onCycle;
 

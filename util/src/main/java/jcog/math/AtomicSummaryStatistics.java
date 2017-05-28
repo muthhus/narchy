@@ -4,6 +4,7 @@ import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 /**
  * floatSummaryStatistics in java.util can't be cleared
@@ -13,25 +14,44 @@ import java.io.Serializable;
  * Commons Math SummaryStatistics which also is undesirable
  *
  */
-public class RecycledSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
+public class AtomicSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
     protected long count;
 
+    protected double min = Float.POSITIVE_INFINITY;
+    protected double max = Float.NEGATIVE_INFINITY;
+    protected double mean = 0;
+    protected double sum = 0;
 
+        /** NaN triggers reset */
+    final DoubleAccumulator update = new DoubleAccumulator((ss, v) -> {
+        if (v == v) {
+            //sumWithCompensation(value);
+            if (min > v) min = v;
+            if (max < v) max = v;
 
+            //http://stackoverflow.com/a/36590815
+            //"waldorf method"
+            double tmpMean = mean;
 
-    protected double sSum;
-    //private float sumCompensation; // Low order bits of sum
-//    private float simpleSum; // Used to compute right sum for non-finite inputs
-    protected double min;
-    protected double max;
-    protected double mean;
+            double delta = v - tmpMean;
+            mean += delta / ++count;
+            return ss + delta * (v - mean);
+        } else {
+            count = 0;
+            mean = 0;
+            sum = 0;
+            min = Float.POSITIVE_INFINITY;
+            max = Float.NEGATIVE_INFINITY;
+            return 0;
+        }
+    }, 0);
 
     /**
      * Construct an empty instance with zero count, zero sum,
      * {@code float.POSITIVE_INFINITY} min, {@code float.NEGATIVE_INFINITY}
      * max and zero average.
      */
-    public RecycledSummaryStatistics() {
+    public AtomicSummaryStatistics() {
         clear();
     }
 
@@ -41,32 +61,11 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
     }
 
     public final void clear() {
-        count = 0;
-        sSum = 0;
-        mean = 0;
-        min = Float.POSITIVE_INFINITY;
-        max = Float.NEGATIVE_INFINITY;
+        accept(Float.NaN);
     }
-    /**
-     * Records another value into the summary information.
-     *
-     * @param value the input value
-     *
-     * NOT THREAD SAFE
-     */
+
     public final void accept(double value) {
-
-        //http://stackoverflow.com/a/36590815
-        //"waldorf method"
-        double tmpMean = mean;
-
-        double delta = value - tmpMean;
-        mean += delta / ++count;
-        sSum += delta * (value - mean);
-
-        //sumWithCompensation(value);
-        if (min > value) min = value;
-        if (max < value) max = value;
+        update.accumulate(value);
     }
 
 //    /**
@@ -105,7 +104,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
      */
     @Override
     public final double getSum() {
-        return (float) getMean() * count;
+        return sum;
 
 //        // Better error bounds to add both terms as the final sum
 //        float tmp =  sum + sumCompensation;
@@ -173,15 +172,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
                 getMax());
     }
 
-    public final double normalize(float n) {
-        double min = getMin();
-        double max = getMax();
-        double range = max - min;
-        if (range < Float.MIN_VALUE*64f /* estimate of an FP epsilon */)
-            return 0.5f;
-        else
-            return (n - min) / (range);
-    }
+
 
     /**
      * Returns the standard deviation of the values that have been added.
@@ -209,7 +200,7 @@ public class RecycledSummaryStatistics implements FloatProcedure, Serializable, 
     public double getVariance() {
         long c = count;
         if (c == 0) return Float.NaN;
-        return sSum / (c);
+        return update.floatValue() / (c);
     }
 
 }

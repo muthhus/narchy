@@ -3,7 +3,7 @@ package jcog.pri;
 /**
  * whether it has been deleted (read-only)
  */
-public interface Deletes {
+public interface Deleteable {
 
     boolean isDeleted();
 

@@ -5,8 +5,8 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.ValueGraph;
 import jcog.bag.Bag;
+import jcog.pri.PriReference;
 import jcog.pri.PLink;
-import jcog.pri.RawPLink;
 import nars.$;
 import nars.concept.Concept;
 import nars.control.ConceptFire;
@@ -108,7 +108,7 @@ public class SimpleGraph1 extends ConceptSpace {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
             //c.termlinks().clear();
-            g.successors(x).forEach( y -> c.termlinks().put(new RawPLink(nodeTerm(y),  1f) ));
+            g.successors(x).forEach( y -> c.termlinks().put(new PLink(nodeTerm(y),  1f) ));
             n2.add(new ConceptFire(c, 1f));
         });
 
@@ -122,10 +122,10 @@ public class SimpleGraph1 extends ConceptSpace {
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
-            Bag<Term, PLink<Term>> tl = c.termlinks();
+            Bag<Term, PriReference<Term>> tl = c.termlinks();
             //tl.clear();
             g.successors(x).forEach( y -> {
-                tl.put(new RawPLink(nodeTerm(y),  pri.floatValueOf(
+                tl.put(new PLink(nodeTerm(y),  pri.floatValueOf(
                     g.edgeValue(x, y)
                 )));
             } );
