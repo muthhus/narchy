@@ -1,11 +1,9 @@
 package nars.budget;
 
-import nars.NAR;
 import nars.Narsese;
 import nars.nar.Default;
-import nars.task.ITask;
 import nars.time.CycleTime;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.junit.Test;
 
 import static jcog.Texts.n4;
@@ -14,7 +12,7 @@ import static nars.nar.Default.INDEX_TO_CORE_INITIAL_SIZE_RATIO;
 
 public class TestDerivationBudgeting {
 
-    static class InstrumentedExecutor extends BufferedSynchronousExecutor {
+    static class InstrumentedExecutor extends TaskExecutor {
 
         double totalIn = 0;
         double totalExe = 0;
@@ -23,51 +21,53 @@ public class TestDerivationBudgeting {
             super(capacity, rate);
         }
 
-        protected void actuallyRun(ITask x) {
-            try {
-                //super.run(x);
-
-                System.out.println(x);
-
-                float start = x.priSafe(0);
-                if (x.isInput()) totalIn += start;
-                totalExe += start;
-
-                ITask[] next = x.run(nar);
-
-                //float afterExe = x.pri();
-
-                if (forgetEachPri > 0)
-                    x.priSub(forgetEachPri);
-
-                float afterForget = x.pri();
-
-                float spawnPri = 0;
-                int spawnCount = 0;
-                if (next != null) {
-                    spawnCount += next.length;
-                    for (ITask y : next) {
-                        spawnPri += y.priSafe(0);
-
-                        if (y == null || !run(y))
-                            break;
-                    }
-                }
-
-                System.out.println("\t" +
-                    n4(start) +
-                        /*"\t.." + n4(afterExe) + " --" + n4(afterForget) + */
-                        "\t\t**" + n4(spawnPri) + "/" + spawnCount
-                );
-
-            } catch (Throwable e) {
-                NAR.logger.error("{} {}", x, e.getMessage());
-                toRemove.add(x); //TODO add to a 'bad' bag?
-            }
-
-            System.out.println("\t in=" + n4(totalIn) + " exe=" + n4(totalExe));
-            System.out.println();
-        }
+        //TODO keep this consistent with superclass's method which has changed since this was written:
+//        protected void actuallyRun(ITask x) {
+//
+//            try {
+//                //super.run(x);
+//
+//                System.out.println(x);
+//
+//                float start = x.priSafe(0);
+//                if (x.isInput()) totalIn += start;
+//                totalExe += start;
+//
+//                ITask[] next = x.run(nar);
+//
+//                //float afterExe = x.pri();
+//
+//                if (forgetEachPri > 0)
+//                    x.priSub(forgetEachPri);
+//
+//                float afterForget = x.pri();
+//
+//                float spawnPri = 0;
+//                int spawnCount = 0;
+//                if (next != null) {
+//                    spawnCount += next.length;
+//                    for (ITask y : next) {
+//                        spawnPri += y.priSafe(0);
+//
+//                        if (y == null || !run(y))
+//                            break;
+//                    }
+//                }
+//
+//                System.out.println("\t" +
+//                    n4(start) +
+//                        /*"\t.." + n4(afterExe) + " --" + n4(afterForget) + */
+//                        "\t\t**" + n4(spawnPri) + "/" + spawnCount
+//                );
+//
+//            } catch (Throwable e) {
+//                NAR.logger.error("{} {}", x, e.getMessage());
+//                toRemove.add(x); //TODO add to a 'bad' bag?
+//            }
+//
+//            System.out.println("\t in=" + n4(totalIn) + " exe=" + n4(totalExe));
+//            System.out.println();
+//        }
     }
 
     @Test

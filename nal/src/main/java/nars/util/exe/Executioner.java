@@ -44,8 +44,10 @@ abstract public class Executioner implements Executor {
     abstract public void forEach(Consumer<ITask> each);
 
 
-    /** default impl: */
-    abstract public void run(@NotNull Consumer<NAR> r);
+//    /** default impl: */
+//    public final void run(@NotNull Consumer<NAR> r) {
+//        r.accept(nar);
+//    }
 
 //        if (nar!=null) {
 //            this.run(() -> r.accept(nar));

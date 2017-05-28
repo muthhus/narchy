@@ -495,7 +495,7 @@ public final class TruthFunctions  {
         return clamp(w / (w + horizon), 0, MAX_CONF);
     }
 
-    public static float confAnd(@NotNull Iterable<? extends Truthed> tt) {
+    public static float confAnd(Truthed... tt) {
         float c = 1f;
         for (Truthed x : tt)
             c *= x.conf();

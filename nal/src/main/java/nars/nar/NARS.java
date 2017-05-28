@@ -17,14 +17,17 @@ import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+
+import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
 /**
  * recursive cluster of NAR's
@@ -86,7 +89,81 @@ public class NARS extends NAR {
         });
     }
 
-    class SubExecutor extends BufferedSynchronousExecutor {
+    private static class RootExecutioner extends Executioner implements Runnable {
+
+        private final int passiveThreads;
+
+        public ForkJoinTask lastCycle;
+
+        final ForkJoinPool passive;
+
+        public RootExecutioner(int passiveThreads) {
+            this.passiveThreads = passiveThreads;
+            passive = new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
+                    null, true /* async */);
+        }
+
+
+        @Override
+        public void runLater(Runnable cmd) {
+            passive.execute(cmd);
+        }
+
+        @Override
+        public boolean run(@NotNull ITask t) {
+            throw new UnsupportedOperationException("should be intercepted by class NARS");
+        }
+
+        @Override
+        public void stop() {
+            lastCycle = null;
+            super.stop();
+        }
+
+        @Override
+        public void cycle(@NotNull NAR nar) {
+
+
+//            int waitCycles = 0;
+//            while (!passive.isQuiescent()) {
+//                Util.pauseNext(waitCycles++);
+//            }
+
+
+            if (lastCycle != null) {
+                if (lastCycle.isDone()) {
+                    lastCycle.reinitialize();
+                } else {
+                    lastCycle.join(); //wait for lastCycle's to finish
+                    lastCycle.reinitialize();
+                }
+            } else {
+                lastCycle = passive.submit(this);
+            }
+        }
+
+        /** dont call directly */
+        public void run() {
+            nar.eventCycleStart.emitAsync(nar, passive);
+        }
+
+        @Override
+        public int concurrency() {
+            return passiveThreads + 2; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
+        }
+
+        @Override
+        public boolean concurrent() {
+            return true;
+        }
+
+        @Override
+        public void forEach(Consumer<ITask> each) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    class SubExecutor extends TaskExecutor {
         public SubExecutor(int inputQueueCapacity, float exePct) {
             super(inputQueueCapacity, exePct);
         }
@@ -141,69 +218,7 @@ public class NARS extends NAR {
 
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
-        this(time, rng,
-                new Executioner() {
-
-                    final ForkJoinPool passive =
-                            new ForkJoinPool(passiveThreads);
-
-                    @Override
-                    public void run(@NotNull Consumer<NAR> r) {
-
-                        //run in sub thread
-//                        List<NAR> subs = ((NARS) nar).sub;
-//                        int which = nar.random().nextInt(subs.size());
-//                        subs.get(which).exe.run(r);
-
-                        runLater(() -> r.accept(nar)); //passive
-                    }
-
-                    @Override
-                    public void runLater(Runnable cmd) {
-                        passive.execute(cmd);
-                    }
-
-                    @Override
-                    public boolean run(@NotNull ITask t) {
-                        throw new UnsupportedOperationException("should be intercepted by class NARS");
-                    }
-
-                    @Override
-                    public void cycle(@NotNull NAR nar) {
-
-                        int waitCycles = 0;
-
-                        while (!passive.isQuiescent()) {
-                            Util.pauseNext(waitCycles++);
-                        }
-
-                        Consumer[] vv = nar.eventCycleStart.getCachedNullTerminatedArray();
-                        if (vv != null) {
-                            for (int i = 0; ; ) {
-                                Consumer c = vv[i++];
-                                if (c == null) break; //null terminator hit
-
-                                run(c);
-                            }
-                        }
-
-                    }
-
-                    @Override
-                    public int concurrency() {
-                        return 0; //TODO
-                    }
-
-                    @Override
-                    public boolean concurrent() {
-                        return true;
-                    }
-
-                    @Override
-                    public void forEach(Consumer<ITask> each) {
-                        throw new UnsupportedOperationException();
-                    }
-                });
+        this(time, rng, new RootExecutioner(passiveThreads));
     }
 
 

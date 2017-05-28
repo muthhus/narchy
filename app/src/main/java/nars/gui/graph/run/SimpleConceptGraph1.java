@@ -13,7 +13,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
 import nars.time.CycleTime;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.layout.Flatten;
@@ -46,7 +46,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         Default n = new Default(
                 new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
-                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f));
+                new CycleTime(), new TaskExecutor(64, 0.5f));
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -83,7 +83,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
         NARSpace cs = new SimpleConceptGraph1(n,
-                () -> (((BufferedSynchronousExecutor) (n.exe)).active)
+                () -> (((TaskExecutor) (n.exe)).active)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

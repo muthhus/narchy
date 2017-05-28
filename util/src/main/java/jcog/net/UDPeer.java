@@ -105,6 +105,11 @@ public class UDPeer extends UDP {
     public UDPeer(InetAddress address, int port) throws IOException {
         this(address, port, false);
     }
+
+    public UDPeer(int port, boolean discovery) throws IOException {
+        this(null, port, discovery);
+    }
+
     public UDPeer(InetAddress address, int port, boolean discovery) throws IOException {
         super(address, port);
 
@@ -220,6 +225,10 @@ public class UDPeer extends UDP {
     }
 
 
+    public boolean connected() {
+        return !them.isEmpty();
+    }
+
     /**
      * broadcast
      * TODO handle oversized message
@@ -228,7 +237,7 @@ public class UDPeer extends UDP {
      */
     public int tellSome(Msg o, float pri, boolean onlyIfNotSeen) {
 
-        if (them.isEmpty() || pri <= 0) {
+        if (connected() || pri <= 0) {
             //System.err.println(this + " without any peers to broadcast");
             return 0;
         } else {

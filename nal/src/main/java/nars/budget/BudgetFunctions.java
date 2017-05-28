@@ -198,11 +198,9 @@ public final class BudgetFunctions extends UtilityFunctions {
 
 
     /** from a to b, LERP of priority according to strength 's' [0 <= s <= 1] */
-    public static void transferPri(@NotNull Priority from, @NotNull Priority to, float s) {
-
-        float priToSend = from.priSafe(0) * s;
+    public static void transferPri(@NotNull Priority to, @NotNull Priority from, float priToSend) {
         if (priToSend > 0) {
-            float afterReceived = to.priSafe(0) + priToSend;
+            float afterReceived = to.priElseZero() + priToSend;
             float overflow = afterReceived - 1f;
 
             //cap at 1, and only transfer what is necessary to reach it
@@ -215,30 +213,26 @@ public final class BudgetFunctions extends UtilityFunctions {
         }
     }
 
-    /** TODO guarantee balanced input and output */
+
     @NotNull
-    public static Priority fund(@NotNull Iterable<? extends Priority> tt, float paymentProportion, boolean copyOrTransfer) {
+    public static Priority fund(float maxPri, boolean copyOrTransfer, Priority... src) {
+        float priSum = Math.min(maxPri, Pri.sum(src));
+        float perSrc = priSum / src.length;
+
         Pri u = new Pri(0f);
-        for (Priority t : tt)
-            fund(u, t, paymentProportion, copyOrTransfer);
+        for (Priority t : src) {
+            fund(u, t, perSrc, copyOrTransfer);
+        }
         return u;
     }
 
-    @NotNull
-    public static Priority fund(float paymentProportion, boolean copyOrTransfer, Priority... src) {
-        Pri u = new Pri(0f);
-        for (Priority t : src)
-            fund(u, t, paymentProportion, copyOrTransfer);
-        return u;
-    }
-
-    public static void fund(Priority target, Priority source, float scale, boolean copyOrTransfer) {
+    public static void fund(Priority target, Priority source, float amount, boolean copyOrTransfer) {
         if (copyOrTransfer) {
             //COPY
-            target.priAdd(source.priSafe(0) * scale);
+            target.priAdd(amount);
         } else {
             //TRANSFER
-            BudgetFunctions.transferPri(target, source, scale);
+            transferPri(target, source, amount);
         }
     }
 

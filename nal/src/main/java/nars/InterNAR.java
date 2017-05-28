@@ -38,6 +38,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     public InterNAR(NAR nar) throws IOException {
         this(nar, DEFAULT_RATE, 0);
     }
+
     /**
      *
      * @param nar
@@ -47,7 +48,20 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
      * @throws UnknownHostException
      */
     public InterNAR(NAR nar, float outRate, int port) throws IOException {
-        super(port);
+        this(nar, outRate, port, true);
+    }
+
+    /**
+     *
+     * @param nar
+     * @param outRate output rate in tasks per cycle, some value > 0, ammortize over multiple cycles with a fraction < 1
+     * @param port
+     * @param discover
+     * @throws SocketException
+     * @throws UnknownHostException
+     */
+    public InterNAR(NAR nar, float outRate, int port, boolean discover) throws IOException {
+        super(port, discover);
         this.nar = nar;
 
         this.receive = nar.mix.stream(this);
@@ -55,7 +69,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
         this.out = new LeakOut(nar, 256, outRate) {
             @Override protected float send(Task x) {
 
-                if (!them.isEmpty()) {
+                if (connected()) {
                     try {
                         x = nar.post(x);
                         //if (x!=null) {
@@ -76,7 +90,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
             @Override
             protected void in(@NotNull Task t, Consumer<PLink<Task>> each) {
-                if (t.isCommand())
+                if (t.isCommand() || !connected())
                     return;
 
                 super.in(t, each);

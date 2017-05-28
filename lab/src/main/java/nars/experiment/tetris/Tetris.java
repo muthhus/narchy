@@ -1,18 +1,13 @@
 package nars.experiment.tetris;
 
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.random.XorShift128PlusRandom;
 import nars.InterNAR;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.nar.NARS;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
-import nars.time.Time;
 import nars.truth.Truth;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
@@ -509,37 +504,35 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new RealTime.DSHalf(false).durFPS(10f);
-//        NAR n =
-//                NARBuilder.newMultiThreadNAR(1, clock);
-        NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
-        n.addNAR(512);
-        //n.addNAR(256);
-        //n.addNAR(128);
-        //n.addNAR(64);
 
-        Tetris a = new MyTetris(n);
-        //a.trace = true;
+        NAgentX.runRT((n) -> {
+            Tetris a = null;
+            try {
+                a = new MyTetris(n);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+            }
 
-        NAgentX.chart(a);
-
-        a.startRT(10);
-
-        try {
-            InterNAR i = new InterNAR(n);
-            i.setFPS(20);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                InterNAR i = new InterNAR(n);
+                i.setFPS(5);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
 
-        for (int i = 0; i < 10000; i++) {
-            System.out.println(((NARS)n).stats());
-            Util.sleep(500);
-        }
+            return a;
+        }, 10f);
 
-        n.stop();
-        a.stop();
+
+//
+//        for (int i = 0; i < 10000; i++) {
+//            System.out.println(((NARS)n).stats());
+//            Util.sleep(500);
+//        }
+//
+//        n.stop();
+//        a.stop();
 
 //        //nar.index.print(System.out);
 //        n.forEachTask(System.out::println);
@@ -714,7 +707,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        a.onFrame((z)->metaT.cycle());
 
         //n.onCycle(metaT.nar::cycle);
-
 
 
         //a.trace = true;

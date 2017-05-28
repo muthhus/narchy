@@ -5,8 +5,8 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.CycleTime;
+import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
-import nars.util.exe.SynchronousExecutor;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class NQuadsRDFTest {
     public void testSchema1() throws Exception {
 
         //Multi nar = new Multi(3,512,
-        Executioner e = new SynchronousExecutor();
+        Executioner e = new TaskExecutor(128);
         Default n = new Default(
                 new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
                 //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),

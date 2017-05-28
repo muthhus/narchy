@@ -4,14 +4,14 @@ import jcog.O;
 import jcog.random.XORShiftRandom;
 import nars.nar.Default;
 import nars.time.CycleTime;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.Nullable;
 
 public class SimpleOGraph {
 
     public static void main(String[] args) {
         O o = O.of(
-                BufferedSynchronousExecutor.class,
+                TaskExecutor.class,
                 CycleTime.class,
                 new Default.DefaultTermIndex(1024),
                 XORShiftRandom.class

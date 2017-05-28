@@ -10,7 +10,7 @@ import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.junit.Test;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,8 +46,8 @@ public class InterNARTest {
 
             a.run(2); b.run(2);
 
-            InterNAR ai = new InterNAR(a, 4, 0);
-            InterNAR bi = new InterNAR(b, 4, 0);
+            InterNAR ai = new InterNAR(a, 4, 0, false);
+            InterNAR bi = new InterNAR(b, 4, 0, false);
 
             ai.setFPS(8f);
             bi.setFPS(8f);
@@ -84,7 +84,7 @@ public class InterNARTest {
         return new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
                 new RealTime.DSHalf(true),
-                new BufferedSynchronousExecutor(256)
+                new TaskExecutor(256)
         );
     }
 
@@ -94,17 +94,19 @@ public class InterNARTest {
 
         testAB((a, b) -> {
 
+             a.onTask(tt -> {
+                //System.out.println(b + ": " + tt);
+                if (tt.toString().contains("(X-->y)"))
+                    recv.set(true);
+            });
+
             try {
                 b.believe("(X --> y)");
             } catch (Narsese.NarseseException e) {
                 assertTrue(false);
             }
 
-            a.onTask(tt -> {
-                //System.out.println(b + ": " + tt);
-                if (tt.toString().contains("(X-->y)"))
-                    recv.set(true);
-            });
+
 
             //a.log();
 

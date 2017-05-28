@@ -1,5 +1,6 @@
 package nars.concept.dynamic;
 
+import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -36,7 +37,7 @@ abstract public class DynamicTruthModel {
 
         Term[] inputs = components(superterm);
 
-        DynTruth d = new DynTruth(stamp ? $.newArrayList(0) : null);
+        DynTruth d = new DynTruth(stamp ? new FasterList(0) : null);
         d.freq = d.conf = 1f;
 
         final float confMin = 0; //n.confMin.floatValue();

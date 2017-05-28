@@ -1,6 +1,8 @@
 package nars.op.stm;
 
+import jcog.Util;
 import jcog.data.MutableInteger;
+import jcog.list.ArrayIterator;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -9,6 +11,7 @@ import nars.index.term.TermIndex;
 import nars.task.GeneratedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -210,10 +213,11 @@ public class MySTMClustered extends STMClustered {
                             });
                         });
 
-                        if (vv.size() < 2)
+                        int vs = vv.size();
+                        if (vs < 2)
                             return null;
 
-                        Collection<Task> uu = vv.values();
+                        Task[] uu = vv.values().toArray(new Task[vs]);
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
@@ -227,14 +231,11 @@ public class MySTMClustered extends STMClustered {
 
                         @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
                         if (cp!=null) {
-                            long[] evidence = Stamp.zip(uu);
+                            long[] evidence = Stamp.zip(()->new ArrayIterator<Stamp>(uu), uu.length); //HACK
 
                             Task m = new GeneratedTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-                            m.priority().setPri(BudgetFunctions.fund(uu, (1f / uu.size()),
-                                    //false
-                                    false
-                            ));
+                            m.priority().setPri( BudgetFunctions.fund(1f, false, uu ) );
                             return m;
 
                         }
@@ -278,15 +279,13 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private Compound group(boolean negated, @NotNull Collection<Task> uuu) {
+    private Compound group(boolean negated, @NotNull Task[] uu) {
 
 
         TermIndex index = nar.terms;
-        if (uuu.size() == 2) {
+        if (uu.length == 2) {
             //find the dt and construct a sequence
             Task early, late;
-
-            Task[] uu = uuu.toArray(new Task[2]);
 
             Task u0 = uu[0];
             Task u1 = uu[1];
@@ -306,14 +305,10 @@ public class MySTMClustered extends STMClustered {
 
         } else {
 
-            Term[] uu = uuu.stream().map(Task::term).toArray(Term[]::new);
-
-            if (negated)
-                $.neg(uu);
+            Term[] u = Util.map((tx) -> $.negIf(tx.term(), negated), new Term[uu.length], uu);
 
             //just assume they occurr simultaneously
-            return normalizedOrNull( index.the(CONJ, 0, uu ), index);
-            //return $.secte(s);
+            return normalizedOrNull( index.the(CONJ, 0, u ), index);
         }
     }
 }

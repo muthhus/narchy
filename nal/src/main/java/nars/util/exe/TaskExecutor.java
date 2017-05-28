@@ -2,13 +2,13 @@ package nars.util.exe;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
+import jcog.list.FasterList;
 import jcog.pri.Pri;
-import nars.$;
 import nars.NAR;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -17,7 +17,9 @@ import static nars.Op.COMMAND;
 /**
  * Buffers all executions between each cycle in order to remove duplicates
  */
-public class BufferedSynchronousExecutor extends SynchronousExecutor {
+public class TaskExecutor extends Executioner {
+
+    protected boolean trace;
 
     /**
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
@@ -28,7 +30,7 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     /**
      * temporary collection of tasks to remove after sampling
      */
-    protected final List<ITask> toRemove = $.newArrayList();
+    protected final FasterList<ITask> toRemove = new FasterList();
 
     /**
      * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
@@ -53,12 +55,12 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
         }
     };
 
-    public BufferedSynchronousExecutor(int capacity) {
+    public TaskExecutor(int capacity) {
         super();
         active.capacity(capacity);
     }
 
-    public BufferedSynchronousExecutor(int capacity, float executedPerCycle) {
+    public TaskExecutor(int capacity, float executedPerCycle) {
         this(capacity);
         exePerCycleMax.setValue(Math.ceil(capacity * executedPerCycle));
     }
@@ -67,9 +69,14 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     public void cycle(@NotNull NAR nar) {
         //flush();
 
-        super.cycle(nar);
+        nar.eventCycleStart.emit(nar);
 
         flush();
+    }
+
+    @Override
+    public int concurrency() {
+        return 1;
     }
 
     @Override
@@ -99,6 +106,13 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
         active.forEachKey(each);
     }
 
+
+
+    @Override
+    public void runLater(Runnable r) {
+        r.run(); //synchronous
+    }
+
     private void flush() {
         if (!busy.compareAndSet(false, true))
             return;
@@ -119,15 +133,14 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
 
 //            toExe = Math.min(ps, toExe);
 
-            float eFrac = ((float)toExe) / ps;
+            float eFrac = ((float) toExe) / ps;
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * active.depressurize(eFrac) / toExe;
             this.forgetEachPri = pAvg > Pri.EPSILON ? pAvg : 0;
 
             active.sample(toExe, this::actuallyRun);
 
             if (!toRemove.isEmpty()) {
-                toRemove.forEach(active::remove);
-                toRemove.clear();
+                toRemove.clear(active::remove);
             }
 
 //            } else {
@@ -151,23 +164,32 @@ public class BufferedSynchronousExecutor extends SynchronousExecutor {
     }
 
     protected void actuallyRun(ITask x) {
+        ITask[] next;
         try {
-            //super.run(x);
 
-            ITask[] next = x.run(nar);
-
-            if (forgetEachPri > 0)
-                x.priSub(forgetEachPri);
-
-            if (next != null)
-                for (ITask y : next)
-                    if (y == null || !run(y))
-                        break;
+            next = x.run(nar);
 
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, e.getMessage());
             toRemove.add(x); //TODO add to a 'bad' bag?
+            return;
         }
+
+        if (x instanceof NALTask) {
+            //it will either get stored in belief table, or not. but shouldnt remain in the active bag
+            toRemove.add(x);
+        } else {
+            if (x.isDeleted())
+                toRemove.add(x);
+
+            if (forgetEachPri > 0)
+                x.priSub(forgetEachPri);
+        }
+
+        if (next != null)
+            for (ITask y : next)
+                if (y == null || !run(y))
+                    break;
     }
 
 

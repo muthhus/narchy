@@ -17,7 +17,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.AbstractSpace;
@@ -224,7 +224,7 @@ public class Vis {
 
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> (((BufferedSynchronousExecutor) (n.exe)).active)
+                () -> (((TaskExecutor) (n.exe)).active)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

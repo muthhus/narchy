@@ -29,6 +29,7 @@ import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
@@ -1191,11 +1192,26 @@ public enum Util {
         return System.getProperty("java.io.tmpdir");
     }
 
+
+    public static <X,Y> Y[] map(Function<X,Y> f, Y[] target, X... src) {
+        int i = 0;
+        for (X x : src) {
+            target[i++] = f.apply(x);
+        }
+        return target;
+    }
+
+    public static <X> float sum(FloatFunction<X> value, X... xx) {
+        float y = 0;
+        for (X x : xx)
+            y += value.floatValueOf(x);
+        return y;
+    }
+
     public static float sum(float... x) {
         float y = 0;
-        for (float f : x) {
+        for (float f : x)
             y += f;
-        }
         return y;
     }
 
@@ -1363,7 +1379,6 @@ public enum Util {
      */
     public static void pauseNext(int previousContiguousPauses) {
         if (previousContiguousPauses < 16) {
-            //nothing
             Thread.onSpinWait();
         } else if (previousContiguousPauses < 32) {
             Thread.yield();

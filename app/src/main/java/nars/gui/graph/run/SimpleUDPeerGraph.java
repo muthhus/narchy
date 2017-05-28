@@ -7,20 +7,15 @@ import nars.$;
 import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
-import nars.gui.Vis;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.CycleTime;
-import nars.util.exe.BufferedSynchronousExecutor;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
-import spacegraph.Surface;
 import spacegraph.math.v2;
-import spacegraph.phys.Collidable;
-import spacegraph.phys.collision.ClosestRay;
-import spacegraph.render.JoglPhysics;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -40,12 +35,12 @@ public class SimpleUDPeerGraph {
 
         Default n = new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap<>()),
-                new CycleTime(), new BufferedSynchronousExecutor(512, 0.5f));
+                new CycleTime(), new TaskExecutor(512, 0.5f));
 
         int population = 256;
 
         SimpleConceptGraph1 s = new SimpleConceptGraph1(n,
-                () -> (((BufferedSynchronousExecutor) (n.exe)).active)
+                () -> (((TaskExecutor) (n.exe)).active)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

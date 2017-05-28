@@ -133,6 +133,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         float remain = linkOverflow.floatValue();
         if (remain > 0) {
             setPri(remain); //save for potential re-use
+            linkOverflow.setValue(0);
         } else {
             delete(); //self-destruct
         }

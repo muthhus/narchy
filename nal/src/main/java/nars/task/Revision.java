@@ -136,21 +136,15 @@ public class Revision {
             newTruth = newTruth.negated();
         }
 
-        //get a stamp collecting all evidence from the table, since it all contributes to the result
-        //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
-        //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
-
-        long[] evidence = Stamp.zip(a.stamp(), b.stamp(), aProp);
 
         RevisionTask t = new RevisionTask(cc, a.punc(),
                 newTruth,
                 now, start, end,
-                evidence
+                Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
+                    //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
+                    //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
         );
-        t.setPri(a.priSafe(0) +
-                b.priSafe(0));
-
-
+        t.setPri(a.priSafe(0) + b.priSafe(0));
         return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
     }
 

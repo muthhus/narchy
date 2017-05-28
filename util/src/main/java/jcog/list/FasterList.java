@@ -1,7 +1,9 @@
 package jcog.list;
 
+import org.eclipse.collections.api.block.function.Function;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
+import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.utility.ArrayIterate;
 import org.jetbrains.annotations.NotNull;
@@ -68,7 +70,7 @@ public class FasterList<X> extends FastList<X> {
 
     @Override
     public int size() {
-        assert(size >= 0);
+        assert (size >= 0);
         return size;
     }
 
@@ -99,8 +101,6 @@ public class FasterList<X> extends FastList<X> {
         return items[index];
         //}
     }
-
-
 
 
 //    public final boolean addIfCapacity(X newItem) {
@@ -138,6 +138,16 @@ public class FasterList<X> extends FastList<X> {
         return items;
     }
 
+
+    public float maxValue(FloatFunction<? super X> function) {
+        float max = Float.NEGATIVE_INFINITY;
+        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
+            float y = function.floatValueOf(this.get(i));
+            if (y > max)
+                max = y;
+        }
+        return max;
+    }
 
     public X maxBy(float mustExceed, FloatFunction<? super X> function) {
 
@@ -392,6 +402,21 @@ public class FasterList<X> extends FastList<X> {
             return a;
         else
             return toArray(ii);
+    }
+
+
+    /** after procedure executes on a cell, it nullifies the cell. equivalent to:
+     * forEach(p) ... clear()
+     * but faster
+     * @param procedure
+     */
+    public void clear(Consumer<? super X> procedure) {
+        int s = this.size;
+        for (int i = 0; i < s; i++ ) {
+            procedure.accept(this.items[i]);
+            this.items[i] = null;
+        }
+        this.size = 0;
     }
 
 }

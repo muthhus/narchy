@@ -115,4 +115,7 @@ public class Pri implements Priority {
 
     public static final FloatFunction<? extends Pri> floatValue = Pri::pri;
 
+    public static float sum(Priority... src) {
+        return Util.sum(Priority::priElseZero, src);
+    }
 }

@@ -193,10 +193,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 break;
 
             if (x.equals(newBelief)) {
-                if (x != newBelief) {
-                    x.priAdd(newBelief.priSafe(0));
-                    //PriMerge.max(x, newBelief.priority());
-                }
                 return x;
             }
 
@@ -233,6 +229,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             return null;
 
         final float newBeliefWeight = newBelief.evi();
+
+        //TODO use Task.tryContent in building the task:
+
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
         Compound t = normalizedOrNull(Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
@@ -249,7 +248,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 conclusion,
                 nar.time(),
                 ETERNAL, ETERNAL);
-        r.setPri(BudgetFunctions.fund(0.5f,false,oldBelief,newBelief));
+        r.setPri(BudgetFunctions.fund(1f,false,oldBelief,newBelief));
 
         if (Param.DEBUG)
             r.log("Insertion Revision");

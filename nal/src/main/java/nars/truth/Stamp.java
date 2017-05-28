@@ -377,13 +377,17 @@ public interface Stamp {
         return evidenceLength(a.stamp().length, b.stamp().length);
     }
 
-    static long[] zip(@NotNull TemporalBeliefTable s) {
-        return zip(s, s.size(), Param.STAMP_CAPACITY);
-    }
+//    static long[] zip(@NotNull TemporalBeliefTable s) {
+//        return zip(s, s.size(), Param.STAMP_CAPACITY);
+//    }
 
     static long[] zip(@NotNull Collection<? extends Stamp> s) {
         assert(!s.isEmpty());
-        return zip(s, s.size(), Param.STAMP_CAPACITY);
+        return zip(s, s.size());
+    }
+
+    static long[] zip(@NotNull Iterable<? extends Stamp> s, @Deprecated int num) {
+        return zip(s, num, Param.STAMP_CAPACITY);
     }
 
     static long[] zip(@NotNull Iterable<? extends Stamp> s, @Deprecated int num, int maxLen) {

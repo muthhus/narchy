@@ -1,5 +1,8 @@
 package nars.concept.dynamic;
 
+import jcog.Util;
+import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.pri.Priority;
 import nars.NAR;
 import nars.Op;
@@ -26,13 +29,13 @@ import static nars.time.Tense.ETERNAL;
  */
 public final class DynTruth implements Truthed {
 
-    @Nullable public final List<Task> e;
+    @Nullable public final FasterList<Task> e;
     public Truthed truth;
 
     public float freq;
     public float conf; //running product
 
-    public DynTruth(List<Task> e) {
+    public DynTruth(FasterList<Task> e) {
         //this.t = t;
         this.e = e;
         this.truth = null;
@@ -43,20 +46,20 @@ public final class DynTruth implements Truthed {
     }
 
     @Nullable
-    public Priority budget() {
+    public float budget() {
         //RawBudget b = new RawBudget();
         int s = e.size();
         assert (s > 0);
 
         if (s > 1) {
-            float f = 1f / s;
+            //float f = 1f / s;
             //            for (Task x : e) {
             //                BudgetMerge.plusBlend.apply(b, x.budget(), f);
             //            }
             //            return b;
-            return BudgetFunctions.fund(e, f, true);
+            return e.maxValue(Task::priElseZero); //use the maximum of their truths
         } else {
-            return e.get(0).priority().clone();
+            return e.get(0).priElseZero();
         }
     }
 
@@ -85,9 +88,17 @@ public final class DynTruth implements Truthed {
         if (tr == null)
             return null;
 
-        Priority priority = b != null ? b : budget();
-        if (priority == null || priority.isDeleted())
-            return null;
+        Priority priority;
+        if (b != null) {
+            if ((priority = b).isDeleted())
+                return null;
+        } else {
+             float p = budget();
+             if (p!=p)
+                 return null; //deleted
+            priority = new Pri(p);
+        }
+
 
         //HACK try to reconstruct the term because it may be invalid
         int dt = c.dt();

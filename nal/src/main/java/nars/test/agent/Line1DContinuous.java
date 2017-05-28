@@ -12,8 +12,8 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.term.atom.Atomic;
 import nars.time.CycleTime;
+import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
-import nars.util.exe.SynchronousExecutor;
 
 import java.util.Arrays;
 
@@ -201,7 +201,7 @@ public class Line1DContinuous extends NAgent {
 
         final Executioner exe =
                 //new MultiThreadExecutioner(2, 2048);
-                new SynchronousExecutor();
+                new TaskExecutor(128);
 
         Default nar = new Default(
                 new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, exe),

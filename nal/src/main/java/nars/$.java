@@ -826,10 +826,11 @@ public enum $ {
      * negates each entry in the array
      */
     public static void neg(@NotNull Term[] array) {
-        int l = array.length;
-        for (int i = 0; i < l; i++) {
-            array[i] = $.neg(array[i]);
-        }
+        Util.map($::neg, array, array);
+//        int l = array.length;
+//        for (int i = 0; i < l; i++) {
+//            array[i] = $.neg(array[i]);
+//        }
     }
 
 
