@@ -349,6 +349,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Task revised = tryRevision(input, concept, nar);
         if (revised != null && revised.equals(input)) {
+            if (revised == input && !input.isInput())
+                return null; //already present non-input, duplicate, so ignore
+
             //duplicate
             //TODO decide what to do here
             return revised;

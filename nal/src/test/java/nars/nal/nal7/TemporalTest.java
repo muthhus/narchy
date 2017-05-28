@@ -520,13 +520,11 @@ public class TemporalTest {
     public void testNonCommutivityImplConcept() throws Narsese.NarseseException {
         Param.DEBUG = true;
         NAR n = new Default();
-
-        n.log();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
         n.run(155);
 
         TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
-        n.forEachConceptActive(d::add);
+        n.forEachConceptActive(x -> d.add(x.get()));
 
         //2 unique impl concepts created
         assertEquals(

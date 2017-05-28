@@ -24,6 +24,10 @@ public class Mix<K, P extends Prioritized>  {
         public final PeriodMeter priMeterIn, priMeterOut;
         public final K source;
 
+        MixStream(K source) {
+            this(source, 4);
+        }
+
         MixStream(K source, int window) {
             super(1f, 0f, 2f);
             this.source = source;
@@ -88,7 +92,7 @@ public class Mix<K, P extends Prioritized>  {
     public final Map<K, MixStream> streams = new ConcurrentHashMap();
     //TODO use a WeakValue map?
 
-    final static int WINDOW = 8; //changing this affects the temporal precision
+    final static int WINDOW = 4; //changing this affects the temporal precision
 
     /** gets or creates a mix stream for the given key */
     public MixStream stream(K x) {

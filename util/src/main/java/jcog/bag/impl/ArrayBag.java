@@ -84,65 +84,50 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     }
 
     /**
-     * returns true unless failed to add during 'add' operation or is empty
+     * returns true unless failed to add during 'add' operation or becomes empty
      */
     @Override
     protected boolean updateItems(@Nullable PLink<X> toAdd) {
 
 
-        SortedArray<PLink<X>> items;
 
+
+        int c = capacity();
         List<PLink> pendingRemoval = null;
         boolean result;
-        synchronized (items = this.items) {
+        {
             int additional = (toAdd != null) ? 1 : 0;
-            int c = capacity();
 
             int s = size();
 
             int nextSize = s + additional;
 
-            if (nextSize > c) {
-                pendingRemoval = new FasterList(nextSize - c);
-                s = clean(toAdd, s, nextSize - c, pendingRemoval);
-                clean2(pendingRemoval);
-                if (s + additional > c) {
-                    return false; //throw new RuntimeException("overflow");
+            int needsRemoved = nextSize - c;
+            if (needsRemoved > 0) {
+
+                synchronized (items) {
+                    pendingRemoval = new FasterList(needsRemoved);
+                    clean(toAdd, s, nextSize - c, pendingRemoval);
                 }
+
+
+                pendingRemoval.forEach(this::onRemoved); //execute outside of synchronization
+
+
             }
 
 
             if (toAdd != null) {
-
-                //append somewhere in the items; will get sorted to appropriate location during next commit
-                //TODO update range
-
-//                Object[] a = items.array();
-
-//                //scan for an empty slot at or after index 's'
-//                for (int k = s; k < a.length; k++) {
-//                    if ((a[k] == null) /*|| (((BLink)a[k]).isDeleted())*/) {
-//                        a[k] = toAdd;
-//                        items._setSize(s+1);
-//                        return;
-//                    }
-//                }
-
                 int ss = size();
                 if (ss < c) {
-                    items.add(toAdd, this);
+                    synchronized (items) {
+                        items.add(toAdd, this);
+                    }
                     result = true;
                 } else {
                     //throw new RuntimeException("list became full during insert");
                     result = false;
                 }
-
-//                float p = toAdd.pri();
-//                if (minPri < p && capacity()<=size()) {
-//                    this.minPri = p;
-//                }
-
-
             } else {
                 result = size() > 0;
             }
@@ -150,36 +135,31 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
         }
 
         return result;
-
-//        if (toAdd != null) {
-//            synchronized (items) {
-//                //the item key,value should already be in the map before reaching here
-//                items.add(toAdd, this);
-//            }
-//            modified = true;
-//        }
-//
-//        if (modified)
-//            updateRange(); //regardless, this also handles case when policy changed and allowed more capacity which should cause minPri to go to -1
-
     }
 
-    private int clean(@Nullable PLink<X> toAdd, int s, int minRemoved, List<PLink> trash) {
-
-        final int s0 = s;
+    private void clean(@Nullable PLink<X> toAdd, int s, int minRemoved, List<PLink> trash) {
 
         if (cleanDeletedEntries()) {
             //first step: remove any nulls and deleted values
             s -= removeDeleted(trash, minRemoved);
-
-            if (s0 - s >= minRemoved)
-                return s;
         }
 
         //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-        s = removeWeakestUntilUnderCapacity(s, trash, toAdd != null);
+        int s1 = s;
+        SortedArray<PLink<X>> items1 = this.items;
+        final int c = capacity;
+        while (s1 > 0 && ((s1 - c) + (toAdd != null ? 1 : 0)) > 0) {
+            PLink<X> w1 = items1.remove(s1 - 1);
+            if (w1 != null) //skip over nulls
+                trash.add(w1);
+            s1--;
+        }
 
-        return s;
+        int trashed = trash.size();
+        for (int i = 0; i < trashed; i++) {
+            PLink<X> w = trash.get(i);
+            map.remove(key(w));
+        }
     }
 
 
@@ -188,33 +168,6 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
      */
     protected boolean cleanDeletedEntries() {
         return true;
-    }
-
-    private void clean2(List<PLink> trash) {
-        int toRemoveSize = trash.size();
-
-        for (int i = 0; i < toRemoveSize; i++) {
-            PLink<X> w = trash.get(i);
-
-            map.remove(key(w));
-
-            onRemoved(w);
-
-        }
-
-
-    }
-
-    private int removeWeakestUntilUnderCapacity(int s, @NotNull List<PLink> toRemove, boolean pendingAddition) {
-        SortedArray<PLink<X>> items = this.items;
-        final int c = capacity;
-        while (!isEmpty() && ((s - c) + (pendingAddition ? 1 : 0)) > 0) {
-            PLink<X> w = items.remove(s - 1);
-            if (w != null) //skip over nulls
-                toRemove.add(w);
-            s--;
-        }
-        return s;
     }
 
 
@@ -339,44 +292,39 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflow) {
 
-        pressurize(b.priSafe(0));
+        float[] incoming = new float[] { b.priSafe(0) };
 
         final boolean[] isNew = {false};
 
         X key = key(b);
         PLink<X> v = map.compute(key, (kk, existing) -> {
             PLink<X> res;
-            float o;
-            if (existing != null) {
-                //merge
-                res = existing;
 
-                o = mergeFunction.merge(existing, b);
+            if (existing != null) {
+                //MERGE
+                res = existing;
+                float oo = mergeFunction.merge(existing, b);
+                if (oo > 0) {
+                    incoming[0] -= oo; //release any unabsorbed pressure
+                    if (overflow != null)
+                        overflow.add(overflow);
+                }
 
             } else {
-                //new
-                PLink<X> n = new RawPLink<>(b.get(), 0);
-                float oo = mergeFunction.merge(n, b);
-                float np = n.pri();
+                //NEW
 
-                if (size() >= capacity && np < priMinFast(-1)) {
+                if (size() >= capacity && incoming[0] < priMinFast(-1)) {
                     res = null; //failed insert
-                    o = 0;
                 } else {
                     isNew[0] = true;
-                    res = n;
-                    o = oo;
+                    res = b;
                 }
             }
 
-            if ((o > 0) && overflow != null) {
-                overflow.add(o);
-            }
-
-
             return res;
-
         });
+
+        pressurize(incoming[0]);
 
         if (v == null) {
             return null; //rejected
@@ -384,18 +332,18 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
 
         if (isNew[0]) {
             boolean added = updateItems(v); //attempt new insert
-            if (added) {
+            if (!added) {
+                map.remove(key);
+                return null; //reject
+            } else {
                 onAdded(v);
-                return v;
             }
 
-            map.remove(key);
-            return null; //reject
-
         } else {
-            unsorted.set(true);
-            return v;
+            unsorted.set(true); //merging may have shifted ordering, so sort later
         }
+
+        return v;
 
     }
 

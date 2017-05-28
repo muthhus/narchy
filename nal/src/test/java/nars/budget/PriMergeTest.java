@@ -27,8 +27,6 @@ public class PriMergeTest {
         testMerge(z(), a, m,  1f, 0 /*overflow*/);  //adding to zero equals the incoming
         testMerge(a, z(),  m, a.pri());  //merging with zero should hae no effect
 
-        testMerge(b, b,  m, b.pri()); //scale of zero should have no effect
-
         testMerge(b, c,  m,0.75f); //test correct affect of components
 
 

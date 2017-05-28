@@ -31,14 +31,14 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(256);
+        this(128);
     }
 
     public Default(int activeConcepts) {
         this(
             new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new BufferedSynchronousExecutor(activeConcepts, 0.5f));
+            new BufferedSynchronousExecutor(activeConcepts, 0.25f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;

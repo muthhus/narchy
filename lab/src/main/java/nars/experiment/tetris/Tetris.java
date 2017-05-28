@@ -509,28 +509,28 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Time clock = new RealTime.DSHalf(true).durFPS(10f);
+        Time clock = new RealTime.DSHalf(false).durFPS(10f);
 //        NAR n =
 //                NARBuilder.newMultiThreadNAR(1, clock);
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
         n.addNAR(512);
-        n.addNAR(256);
-        n.addNAR(128);
-        n.addNAR(64);
+        //n.addNAR(256);
+        //n.addNAR(128);
+        //n.addNAR(64);
 
         Tetris a = new MyTetris(n);
-        a.trace = true;
+        //a.trace = true;
 
         NAgentX.chart(a);
 
         a.startRT(10);
 
-//        try {
-//            InterNAR i = new InterNAR(n);
-//            i.pingLAN();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            InterNAR i = new InterNAR(n);
+            i.setFPS(20);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         for (int i = 0; i < 10000; i++) {

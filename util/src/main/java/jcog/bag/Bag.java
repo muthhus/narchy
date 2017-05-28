@@ -236,8 +236,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     default float priAvg() {
         int s = size();
-        if (s == 0) return 0;
-        return priSum() / s;
+        return (s == 0) ? 0 : (priSum() / s);
     }
 
 

@@ -88,8 +88,10 @@ abstract public class NAgent implements NSense, NAct {
     public final FloatParam curiosity;
 
 
+    /** prediction templates */
     public final List<Task> p = newArrayList();
 
+    public AtomicBoolean enabled = new AtomicBoolean(true);
 
     public boolean trace = false;
 
@@ -484,12 +486,14 @@ abstract public class NAgent implements NSense, NAct {
         init();
 
         @NotNull On active = nar.onCycle((n) -> {
-            long lastNow = this.now;
-            long now = this.now = nar.time();
-            if (now - lastNow >= cyclesPerFrame) {
-                //only execute at most one agent frame per duration
-                senseAndMotor();
-                predict();
+            if (enabled.get()) {
+                long lastNow = this.now;
+                long now = this.now = nar.time();
+                if (now - lastNow >= cyclesPerFrame) {
+                    //only execute at most one agent frame per duration
+                    senseAndMotor();
+                    predict();
+                }
             }
         });
 
@@ -515,9 +519,11 @@ abstract public class NAgent implements NSense, NAct {
         NARLoop loop = nar.startFPS(fps);
 
         this.senseAndMotorLoop = nar.exe.loop(fps,()->{
-            this.now = nar.time();
-            senseAndMotor();
-            predict();
+            if (enabled.get()) {
+                this.now = nar.time();
+                senseAndMotor();
+                predict();
+            }
         });
 
         return loop;

@@ -51,13 +51,11 @@ public class QueryVariableTest {
 
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {
 
-        int time = 256;
+        int time = 512;
 
         AtomicBoolean valid = new AtomicBoolean();
 
-
         Default nar = new Default();
-        //nar.log();
         Compound beliefTerm = nar.term(beliefString);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.question(question, Tense.ETERNAL, (q, a)-> {

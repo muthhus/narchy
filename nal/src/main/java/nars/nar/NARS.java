@@ -50,17 +50,12 @@ public class NARS extends NAR {
     public void input(ITask... t) {
 
         //assert (!nar.isEmpty());
-        for (ITask x : t)
-            dispatch(x);
-    }
-
-    public void dispatch(ITask x) {
-        int remain = num;
-        int start = random().nextInt(remain);
-        while (remain-- > 0) {
-            NAR target = this.sub.get(start); //random distribution TODO abstract to other striping policies
-            if (target.exe.run(x))
-                break; //accepted
+        int next = random().nextInt(num);
+        for (ITask x : t) {
+            NAR target = this.sub.get(next); //random distribution TODO abstract to other striping policies
+//                if (target.exe.run(x))
+            target.exe.run(x);
+            if (++next == num) next = 0; //% num
         }
     }
 
@@ -86,6 +81,7 @@ public class NARS extends NAR {
         addNAR((time, terms, rng) -> {
             SubExecutor e = new SubExecutor(capacity, 0.5f);
             Default d = new Default(rng, terms, time, e);
+            d.stmLinkage.capacity.set(0); //disabled
             return d;
         });
     }

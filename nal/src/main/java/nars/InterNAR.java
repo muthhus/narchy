@@ -5,6 +5,7 @@ import jcog.net.UDPeer;
 import jcog.pri.PLink;
 import nars.bag.leak.LeakOut;
 import nars.task.LambdaQuestionTask;
+import nars.util.data.Mix;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -23,13 +24,16 @@ import static jcog.net.UDPeer.Command.TELL;
  */
 public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, Task> {
 
-    public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
+    //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
     /** tasks per second output */
     private static final float DEFAULT_RATE = 8;
 
     public final NAR nar;
     public final LeakOut out;
+
+    private final Mix.MixStream<String, Task> receive;
+
 
     public InterNAR(NAR nar) throws IOException {
         this(nar, DEFAULT_RATE, 0);
@@ -45,20 +49,23 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     public InterNAR(NAR nar, float outRate, int port) throws IOException {
         super(port);
         this.nar = nar;
-        this.out = new LeakOut(nar, 16, outRate) {
+
+        this.receive = nar.mix.stream(this);
+
+        this.out = new LeakOut(nar, 256, outRate) {
             @Override protected float send(Task x) {
 
                 if (!them.isEmpty()) {
                     try {
                         x = nar.post(x);
-                        if (x!=null) {
+                        //if (x!=null) {
                             @Nullable byte[] msg = IO.taskToBytes(x);
                             if (msg != null) {
                                 if (tellSome(msg, ttl(x), true) > 0) {
                                     return 1;
                                 }
                             }
-                        }
+                        //}
                     } catch (RuntimeException e) {
                         e.printStackTrace();
                     }
@@ -110,7 +117,8 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
             x.budget(nar);
 
             //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
-            nar.input(x);
+            logger.debug("recv {} from {}", x, m.origin());
+            receive.input(x, nar::input);
         }
     }
 
