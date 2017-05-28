@@ -52,7 +52,7 @@ public class ShapeHull {
 
 	public ShapeHull(ConvexShape shape) {
 		this.shape = shape;
-		this.vertices.clear();
+		this.vertices.clearFast();
 		this.indices.clear();
 		this.numIndices = 0;
 

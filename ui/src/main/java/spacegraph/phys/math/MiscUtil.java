@@ -64,12 +64,14 @@ public class MiscUtil {
 	 * Resizes list to exact size, filling with given value when expanding.
 	 */
 	public static void resize(IntArrayList list, int size, int value) {
-		while (list.size() < size) {
+		int s = list.size();
+		while (s < size) {
 			list.add(value);
+			s++;
 		}
 		
-		while (list.size() > size) {
-			list.remove(list.size() - 1);
+		while (s > size) {
+			list.removeQuick(--s);
 		}
 	}
 	

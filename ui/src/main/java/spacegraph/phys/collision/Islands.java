@@ -123,7 +123,7 @@ public class Islands {
 
         BulletStats.pushProfile("islandUnionFindAndQuickSort");
         try {
-            islandmanifold.clear();
+            islandmanifold.clearFast();
 
             // we are going to sort the unionfind array, and store the element id in the size
             // afterwards, we clean unionfind, to make sure no-one uses it anymore
@@ -345,7 +345,7 @@ public class Islands {
                     startManifoldIndex = endManifoldIndex;
                 }
 
-                islandBodies.clear();
+                islandBodies.clearFast();
             }
 
 

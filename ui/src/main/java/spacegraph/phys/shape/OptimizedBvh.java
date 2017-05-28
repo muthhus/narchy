@@ -345,7 +345,7 @@ public class OptimizedBvh implements Serializable {
 
 		// PCK: clear m_quantizedLeafNodes and m_leafNodes, they are temporary
 		quantizedLeafNodes.clear();
-		leafNodes.clear();
+		leafNodes.clearFast();
 	}
 
 	public void refit(StridingMeshInterface meshInterface) {

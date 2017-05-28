@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -101,6 +102,7 @@ public class NARS extends NAR {
             this.passiveThreads = passiveThreads;
             passive = new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
                     null, true /* async */);
+
         }
 
 
@@ -120,6 +122,7 @@ public class NARS extends NAR {
             super.stop();
         }
 
+        final AtomicBoolean busy = new AtomicBoolean(false);
         @Override
         public void cycle(@NotNull NAR nar) {
 
@@ -129,22 +132,32 @@ public class NARS extends NAR {
 //                Util.pauseNext(waitCycles++);
 //            }
 
+            if (!busy.compareAndSet(false, true))
+                return; //already in the cycle
+
 
             if (lastCycle != null) {
-                if (lastCycle.isDone()) {
-                    lastCycle.reinitialize();
-                } else {
+                //System.out.println(lastCycle + " " + lastCycle.isDone());
+                if (!lastCycle.isDone()) {
+                    //long start = System.currentTimeMillis();
                     lastCycle.join(); //wait for lastCycle's to finish
-                    lastCycle.reinitialize();
+                    //long end = System.currentTimeMillis();
+                    //System.out.println("cycle lag: " + (end - start) + "ms");
                 }
+
+                lastCycle.reinitialize();
+                passive.execute(lastCycle);
+
             } else {
                 lastCycle = passive.submit(this);
             }
+
+            busy.set(false);
         }
 
         /** dont call directly */
         public void run() {
-            nar.eventCycleStart.emitAsync(nar, passive);
+            nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
         }
 
         @Override
@@ -159,8 +172,9 @@ public class NARS extends NAR {
 
         @Override
         public void forEach(Consumer<ITask> each) {
-            throw new UnsupportedOperationException();
+            ((NARS)nar).sub.forEach(s -> s.exe.forEach(each));
         }
+
     }
 
     class SubExecutor extends TaskExecutor {

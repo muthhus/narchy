@@ -73,7 +73,7 @@ public class SequentialImpulseConstrainer extends Constrainer {
 
     ////////////////////////////////////////////////////////////////////////////
 
-    private final OArrayList<SolverBody> tmpSolverBodyPool = new OArrayList<>();
+    private final FasterList<SolverBody> tmpSolverBodyPool = new FasterList<>();
     private final FasterList<SolverConstraint> tmpSolverConstraintPool = new FasterList<>();
     private final FasterList<SolverConstraint> tmpSolverFrictionConstraintPool = new FasterList<>();
     private final IntArrayList orderTmpConstraintPool = new IntArrayList();
@@ -915,11 +915,11 @@ public class SequentialImpulseConstrainer extends Constrainer {
 		printf("m_tmpSolverFrictionConstraintPool.capacity() = %i\n",m_tmpSolverFrictionConstraintPool.capacity());
 		*/
 
-        tmpSolverBodyPool.clear();
+        tmpSolverBodyPool.clearFast();
 
-        tmpSolverConstraintPool.clear();
+        tmpSolverConstraintPool.clearFast();
 
-        tmpSolverFrictionConstraintPool.clear();
+        tmpSolverFrictionConstraintPool.clearFast();
 
         return 0f;
     }

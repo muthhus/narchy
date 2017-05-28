@@ -94,7 +94,7 @@ public class UnionFind {
 	}
 
 	public void free() {
-		elements.clear();
+		elements.clearFast();
 	}
 
 	public int find(int p, int q) {
