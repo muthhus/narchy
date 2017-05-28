@@ -112,33 +112,6 @@ public class v2 extends Tuple2f implements java.io.Serializable {
     }
 
 
-    /**
-   * Computes the dot product of the this vector and vector v1.
-   * @param v1 the other vector
-   */
-  public final float dot(v2 v1)
-    {
-      return (this.x*v1.x + this.y*v1.y);
-    }
-
-
-    /**  
-     * Returns the length of this vector.
-     * @return the length of this vector
-     */  
-    public final float length()
-    {
-        return (float) Math.sqrt(this.x*this.x + this.y*this.y);
-    }
-
-    /**  
-     * Returns the squared length of this vector.
-     * @return the squared length of this vector
-     */  
-    public final float lengthSquared()
-    {
-        return (this.x*this.x + this.y*this.y);
-    }
 
     /**
      * Sets the value of this vector to the normalization of vector v1.

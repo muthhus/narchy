@@ -106,6 +106,9 @@ public interface Priority extends Prioritized {
     default void priMax(float max) {
         setPri(Math.max(priSafe(0), max));
     }
+    default void priMin(float min) {
+        setPri(Math.min(priSafe(0), min));
+    }
 
     default float priAdd(float toAdd) {
         float e = priSafe(-1);

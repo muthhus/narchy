@@ -42,6 +42,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
     private transient ConceptSpace space;
     public float pri = 0;
 
+    private float edgeDecayRate = 0.5f;
+
 
     public ConceptWidget(Termed x) {
         super(x.term(), 1, 1);
@@ -128,8 +130,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             edges.setCapacity(newCap);
             if (newCap > 0) {
 
-                edges.forEach(x -> x.get().clear());
-                edges.commit(); //forget
+                //edges.commit(); //forget
 
                 //phase 1: collect
                 c.tasklinks().forEach(this);
@@ -142,6 +143,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
                 edges.commit(x -> {
                     x.get().update(ConceptWidget.this, priSum);
+                    x.get().decay(edgeDecayRate);
+                    x.priMult(edgeDecayRate);
                 });
 
             }
@@ -267,14 +270,14 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
             this.hash = target.key.hashCode();
         }
 
-        protected void clear() {
-            termlinkPri = tasklinkPri = 0;
+        protected void decay(float rate) {
+            //termlinkPri = tasklinkPri = 0;
+
+            //decay
+            termlinkPri *= rate;
+            tasklinkPri *= rate;
         }
 
-        public void set(PLink b, boolean termOrTask) {
-            clear();
-            add(b, termOrTask);
-        }
 
         public void add(PLink b, boolean termOrTask) {
             float p = b.priSafe(0);
@@ -335,8 +338,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
                         //0.1f + 0.9f * ff.pri(); //0.9f;
                         0.1f + 0.5f * edgeProp;
 
-                this.attraction = 0f + 4f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
-                this.attractionDist = 0.05f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
+                this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
+                this.attractionDist = 0.1f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
             } else {
                 this.a = -1;
                 this.attraction = 0;

@@ -16,9 +16,8 @@ import java.util.TimerTask;
 public class UDPeerSim {
 
 
-    public final UDPeer[] peer;
+    public final MyUDPeer[] peer;
 
-    public final MutableFloat packetLossRate = new MutableFloat(0.05f);
 
     private final Random random = new Random();
     private final Timer sim = new Timer();
@@ -27,7 +26,7 @@ public class UDPeerSim {
     public UDPeerSim(int population) throws IOException {
         int port = 10000;
 
-        peer = new UDPeer[population];
+        peer = new MyUDPeer[population];
         for (int i = 0; i < population; i++)
             peer[i] = new MyUDPeer(port, i);
 
@@ -49,7 +48,7 @@ public class UDPeerSim {
 
     }
 
-    long delay(InetSocketAddress from, InetSocketAddress to, int length) {
+    protected long delay(InetSocketAddress from, InetSocketAddress to, int length) {
         return 0;
     }
 
@@ -63,19 +62,20 @@ public class UDPeerSim {
     }
     public void pingRandom(int num) {
         int p = peer.length;
-        for (int i = 0; i < p; i++) {
+
             for (int d = 0; d < num; d++) {
+                int i = random.nextInt(p);
                 int j = random.nextInt(p);
                 if (i!=j)
                     peer[i].ping(peer[j].port());
             }
-        }
+
     }
 
     public static void main(String[] args) throws IOException {
         new UDPeerSim(5) {
             @Override
-            long delay(InetSocketAddress from, InetSocketAddress to, int length) {
+            protected long delay(InetSocketAddress from, InetSocketAddress to, int length) {
                 return 25 + Math.abs(from.getPort() - to.getPort()) * 50;
             }
         };
@@ -89,9 +89,10 @@ public class UDPeerSim {
             p.setFPS(fps);
     }
 
-    class MyUDPeer extends UDPeer {
+    public class MyUDPeer extends UDPeer {
 
         final Random random = new Random();
+        public final MutableFloat packetLossRate = new MutableFloat(0.05f);
 
         public MyUDPeer(int port, int i) throws IOException {
             super(port + i);

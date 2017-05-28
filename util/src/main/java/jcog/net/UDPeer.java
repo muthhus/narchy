@@ -70,12 +70,12 @@ public class UDPeer extends UDP {
      * active routing table capacity
      * TODO make this IntParam mutable
      */
-    final static int PEERS_CAPACITY = 16;
+    final static int PEERS_CAPACITY = 4;
 
     /**
      * message memory
      */
-    final static int SEEN_CAPACITY = 4096;
+    final static int SEEN_CAPACITY = 32*1024;
     private final Random rng;
 
     private AtomicBoolean
@@ -105,17 +105,17 @@ public class UDPeer extends UDP {
 
         this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + ":" + name());
 
-        them = new HijackBag<Integer, UDProfile>(4) {
+        them = new HijackBag<Integer, UDProfile>(3) {
 
             @Override
             public void onAdded(UDProfile p) {
-                logger.info("connect {}",  p);
+                logger.debug("connect {}",  p);
                 onAddRemove(p, true);
             }
 
             @Override
             public void onRemoved(@NotNull UDPeer.UDProfile p) {
-                logger.info("disconnect {}", p);
+                logger.debug("disconnect {}", p);
                 onAddRemove(p, false);
             }
 
@@ -131,7 +131,8 @@ public class UDPeer extends UDP {
 
             @Override
             public float pri(@NotNull UDPeer.UDProfile key) {
-                return 1f / (1f + key.latency() / 20f);
+                long latency = key.latency();
+                return 1f / (1f + (latency / 100f));
             }
 
             @NotNull
@@ -144,7 +145,7 @@ public class UDPeer extends UDP {
 
         them.setCapacity(PEERS_CAPACITY);
 
-        seen = new PriorityHijackBag<Msg,Msg>(SEEN_CAPACITY, 4) {
+        seen = new PriorityHijackBag<Msg,Msg>(SEEN_CAPACITY, 3) {
 
             @NotNull
             @Override

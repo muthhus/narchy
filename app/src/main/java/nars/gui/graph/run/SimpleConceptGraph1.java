@@ -27,7 +27,7 @@ import static spacegraph.layout.Grid.col;
 
 public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
-    final AtomicBoolean atomsEnabled = new AtomicBoolean(false);
+    final AtomicBoolean atomsEnabled = new AtomicBoolean(true);
 
     public SimpleConceptGraph1(NAR nar, @NotNull Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, concepts, maxNodes, bufferedNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
@@ -88,7 +88,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */, 128, 256, 2, 7);
+                /* TODO */, 64, 256, 1, 3);
 
 
         SpaceGraph<Term> s = new SpaceGraph(

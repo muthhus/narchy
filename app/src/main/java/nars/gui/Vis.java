@@ -50,6 +50,7 @@ import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
+import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.row;
 
@@ -219,10 +220,10 @@ public class Vis {
         return new LabeledPane(k, s);
     }
 
-    public static SpaceGraph<Term> conceptsWindow3D(NAR n, int maxNodes, int maxEdges) {
+    public static SimpleConceptGraph1 conceptsWindow3D(NAR n, int maxNodes, int maxEdges) {
 
 
-        NARSpace cs = new SimpleConceptGraph1(n,
+        SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
                 () -> (((BufferedSynchronousExecutor) (n.exe)).active)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
@@ -233,49 +234,26 @@ public class Vis {
 
         SpaceGraph<Term> s = new SpaceGraph(
 
-                cs.with(
-//                        new SpaceTransform<Term>() {
-//                            @Override
-//                            public void update(SpaceGraph<Term> g, AbstractSpace<Term, ?> src, float dt) {
-//                                float cDepth = -9f;
-//                                src.forEach(s -> {
-//                                    ((SimpleSpatial)s).moveZ(
-//                                            s.key.volume() * cDepth, 0.05f );
-//                                });
-//                            }
-//                        }
-
-                        new Flatten()
-//                        new Flatten() {
-//                            protected void locate(SimpleSpatial s, v3 f) {
-//                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
-//                            }
-//                        }
-
-
-                        //new Spiral()
-//                        //new FastOrganicLayout()
-                )
+                cs.with( new Flatten() )
         );
 
         MyForceDirected fd = new MyForceDirected();
         s.dyn.addBroadConstraint(fd);
 
+        s.camPos(0, 0, 90).show(1300, 900);
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 
 
         //Vis.conceptsWindow2D
-        s
 
                 //.add(new ZoomOrtho(logConsole(n, 120, 40, new FloatParam(0.25f)).opacity(0.5f)))
-                .camPos(0, 0, 90)
                 //.ortho( logConsole(n, 40, 10, 0.0f) )
-                .show(1300, 900);
 
+        window(reflect(fd), 500, 500);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
 
-        return s;
+        return cs;
 
     }
 
@@ -345,7 +323,7 @@ public class Vis {
 
         s.add(new Ortho(new CrosshairSurface(s)));
 
-        SpaceGraph.window(new ReflectionSurface(fd), 500, 500);
+        window(new ReflectionSurface(fd), 500, 500);
 
         return s;
     }
