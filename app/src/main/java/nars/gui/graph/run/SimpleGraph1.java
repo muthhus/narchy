@@ -12,7 +12,7 @@ import nars.concept.Concept;
 import nars.control.ConceptFire;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
-import nars.gui.graph.MyForceDirected;
+import nars.gui.graph.EdgeDirected;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
@@ -154,7 +154,7 @@ public class SimpleGraph1 extends ConceptSpace {
     public synchronized SpaceGraph show(int w, int h) {
         SpaceGraph<Term> s = new SpaceGraph(this.with(new Flatten()) );
 
-        MyForceDirected fd = new MyForceDirected();
+        EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
 
         s.camPos(0, 0, 90).show(1300, 900);

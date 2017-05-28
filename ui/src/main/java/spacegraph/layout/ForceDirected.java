@@ -24,13 +24,13 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
 
     boolean center = true;
 
-    public final FloatParam repel = new FloatParam(2.5f, 0, 5f);
-    public final FloatParam attraction = new FloatParam(0.05f, 0, 2f);
+    public final FloatParam repel = new FloatParam(3f, 0, 4f);
+    public final FloatParam attraction = new FloatParam(0.25f, 0, 1f);
 
 
 
     /** speed at which center correction is applied */
-    float centerSpeed = 0.25f;
+    float centerSpeed = 0.5f;
 
     final v3 boundsMin, boundsMax;
     final float maxRepelDist;
@@ -117,7 +117,7 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         }
     }
 
-    protected static void attract(Collidable x, Collidable y, float speed, float idealDistRads) {
+    protected static void attract(Collidable x, Collidable y, float speed, float idealDist) {
         SimpleSpatial xp = ((SimpleSpatial) x.data());
         SimpleSpatial yp = ((SimpleSpatial) y.data());
 
@@ -128,23 +128,22 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         if (!Float.isFinite(len))
             return;
 
-        len -= idealDistRads;
-        if (len < 0) {
-            len*=-1;
-            speed*=-1;
-        }
-        if (len < BulletGlobals.FLT_EPSILON)
-            return;
+        len -= idealDist;
+//        if (len < 0) {
+//            return;
+//        }
+//        if (len < BulletGlobals.FLT_EPSILON)
+//            return;
 
 
         //v3 delta2 = v(delta);
 
         //delta.scale((speed / (1 + /&xp.mass() /* + yp.mass()*/) ) * len );
-        delta.scale( (float)(len) * speed );
-        ((Dynamic) x).impulse(delta);
+        delta.scale( /* (float)(len) *  */ speed );
+        ((Dynamic) x).velAdd(delta);
         //delta2.scale(-(speed * (yp.mass() /* + yp.mass()*/) ) * len  );
         delta.scale(-1 );
-        ((Dynamic) y).impulse(delta);
+        ((Dynamic) y).velAdd(delta);
 
     }
 
@@ -162,18 +161,16 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         else if (len >= maxDist)
             return;
 
-        float base = speed / ( 1 + ( len ));
+        float s = (float) (speed / ( 1 + ( len*len )));
 
-        float mr = yp.mass() / xp.mass();
-
+        v3 v = v(delta.x * s, delta.y * s, delta.z * s );
         {
-            float s = mr * base;
-            ((Dynamic) x).impulse(delta.x * s, delta.y * s, delta.z * s);
+            ((Dynamic) x).velAdd(v);
         }
 
         {
-            float s = -(1f/mr) * base;
-            ((Dynamic) y).impulse(delta.x * s, delta.y * s, delta.z * s);
+            v.negate();
+            ((Dynamic) y).velAdd(v);
         }
 
     }

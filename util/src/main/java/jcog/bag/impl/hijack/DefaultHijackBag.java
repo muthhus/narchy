@@ -22,7 +22,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
     @Override
     protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming) {
         float overflow = merge.merge(existing, incoming); //modify existing
-        if (overflow >= Pri.EPSILON)
+        if (overflow > 0)
             pressurize(-overflow);
         return existing;
     }
@@ -45,11 +45,6 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
     @Override
     public K key(PLink<K> value) {
         return value.get();
-    }
-
-    @Override
-    protected float priEpsilon() {
-        return Priority.EPSILON;
     }
 
 

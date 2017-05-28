@@ -11,7 +11,7 @@ import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.concept.Concept;
 import nars.control.ConceptFire;
-import nars.gui.graph.MyForceDirected;
+import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
 import nars.term.Termed;
@@ -237,7 +237,7 @@ public class Vis {
                 cs.with( new Flatten() )
         );
 
-        MyForceDirected fd = new MyForceDirected();
+        EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
 
         s.camPos(0, 0, 90).show(1300, 900);
@@ -319,7 +319,7 @@ public class Vis {
                         new Flatten()
                         //new Spiral()
                         //new FastOrganicLayout()
-                )).with(fd = new MyForceDirected());
+                )).with(fd = new EdgeDirected());
 
         s.add(new Ortho(new CrosshairSurface(s)));
 

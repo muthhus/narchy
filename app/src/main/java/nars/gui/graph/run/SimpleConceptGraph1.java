@@ -6,7 +6,7 @@ import nars.Param;
 import nars.control.ConceptFire;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
-import nars.gui.graph.MyForceDirected;
+import nars.gui.graph.EdgeDirected;
 import nars.nar.Default;
 import nars.nar.NARS;
 import nars.term.Term;
@@ -88,7 +88,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */, 64, 256, 1, 3);
+                /* TODO */, 64, 64, 2, 5);
 
 
         SpaceGraph<Term> s = new SpaceGraph(
@@ -118,7 +118,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 )
         );
 
-        MyForceDirected fd = new MyForceDirected();
+        EdgeDirected fd = new EdgeDirected();
         s.dyn.addBroadConstraint(fd);
 
         //s.ortho(Vis.logConsole(nar, 90, 40, new FloatParam(0f)).opacity(0.25f));
@@ -160,9 +160,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        for (int i = 1; i < 24; i++)
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
-        new DeductiveMeshTest(n, new int[]{6, 6}, 16384);
+        new DeductiveMeshTest(n, new int[]{2, 2}, 16384);
 
-        n.startFPS(10f).join();
+        n.startFPS(1f).join();
 
 
         //n.input("(a-->b).", "(b-->c).","(c-->d).");

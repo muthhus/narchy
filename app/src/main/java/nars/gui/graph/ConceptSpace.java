@@ -14,7 +14,6 @@ import java.util.function.Function;
 
 abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
-
     public final NAR nar;
 
     public final int maxEdgesPerNodeMin, maxEdgesPerNodeMax;

@@ -329,7 +329,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
 
-        float priEpsilon = priEpsilon();
+        float priEpsilon = Pri.EPSILON;
 
         if (oldPri > priEpsilon) {
             float thresh = 1f - (1f - (oldPri / (newPri + oldPri))) / reprobes;
@@ -460,7 +460,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        PForget.forget(s, capacity(), (float) p, mass, PForget.DEFAULT_TEMP, priEpsilon(), this::forget) :
+                        PForget.forget(s, capacity(), (float) p, mass, PForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
                         null
         );
 
@@ -478,19 +478,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     abstract protected Consumer<V> forget(float rate);
 
 
-
-    protected float priEpsilon() {
-        return EPSILON;
-    }
-
     //final AtomicBoolean busy = new AtomicBoolean(false);
 
     @NotNull
     @Override
     public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
 
-//        if (!busy.compareAndSet(false, true))
-//            return this;
 
         try {
             if (update != null) {
@@ -504,6 +497,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             int count = 0;
 
             AtomicReferenceArray<V> a = map.get();
+
             int len = a.length();
             for (int i = 0; i < len; i++) {
                 V f = a.get(i);

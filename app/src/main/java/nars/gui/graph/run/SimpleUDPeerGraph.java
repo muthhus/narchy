@@ -50,7 +50,7 @@ public class SimpleUDPeerGraph {
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */, population+1, population+1, population/2, population/2);
+                /* TODO */, population+1, population+1, 4, 8);
 
         new SpaceGraph(s).camPos(0,0,200).show(800, 800);
 
@@ -58,13 +58,15 @@ public class SimpleUDPeerGraph {
 
             int WorldX = 300;
             int WorldY = 200;
-            float KmPerSec = 1000;
+            float KmPerSec = 32000;
 
             final List<v2> locations = $.newArrayList();
 
             {
                 for (int i = 0; i < peer.length; i++) {
-                    locations.add(new v2(n.random().nextFloat() * WorldX - WorldX/2, n.random().nextFloat() * WorldY - WorldY/2));
+                    locations.add(new v2(
+                            (float) (Math.sin(4f * n.random().nextFloat()) * WorldX - WorldX/2),
+                            (float) (Math.cos(4f * n.random().nextFloat()) * WorldY - WorldY/2)));
                     peer[i].them.capacity(8);
                 }
 
@@ -74,15 +76,15 @@ public class SimpleUDPeerGraph {
                         final MyUDPeer pp = peer[i];
                         v2 p = locations.get(i);
 
-                        @Override
-                        public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
-                            //if (buttons!=null && buttons.length > 0) {
-                                pp.packetLossRate.setValue(1f);
-                            //} else {
-                             //   pp.packetLossRate.setValue(0.05f); //back to normal
-                            //}
-                            return super.onTouch(body, hitPoint, buttons, space);
-                        }
+//                        @Override
+//                        public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
+//                            //if (buttons!=null && buttons.length > 0) {
+//                                pp.packetLossRate.setValue(1f);
+//                            //} else {
+//                             //   pp.packetLossRate.setValue(0.05f); //back to normal
+//                            //}
+//                            return super.onTouch(body, hitPoint, buttons, space);
+//                        }
 
                         @Override
                         public void commit(ConceptVis conceptVis, ConceptSpace space) {
@@ -111,13 +113,6 @@ public class SimpleUDPeerGraph {
                 @Nullable Concept to = n.conceptualize($.the(recv.port()));
                 float p = msgPri(msg);
                 from.termlinks().put(new RawPLink(to, p));
-                from.termlinks().commit();
-
-                //mirror the routing table by removing missing entries from it from the termlinks
-                to.termlinks().forEach(l -> {
-                    if (!recv.them.contains(i(l.get().toString()) - 10000))
-                        l.delete();
-                });
 
 
                 n.input(new ConceptFire(from, 0.5f + p / 2f));
@@ -133,13 +128,26 @@ public class SimpleUDPeerGraph {
 
         };
 
-        u.start(1);
+
+        for (UDPeer p : u.peer) {
+            float fps = (0.1f + 0.8f * n.random().nextFloat());
+            p.setFPS(fps);
+            p.them.setCapacity(Math.round(3 * fps));
+        }
 
         n.onCycle(() -> {
-            u.pingRandom(1);
-            u.tellSome(n.random().nextInt(u.peer.length), 2, 2);
+
+            n.forEachConcept(c -> {
+                c.termlinks().commit(x -> x.priMult(0.5f));
+            });
+
+            if (n.random().nextFloat() < 0.5f)
+                u.pingRandom(1);
+
+            if (n.random().nextFloat() < 0.5f)
+                u.tellSome(n.random().nextInt(u.peer.length), 2, 5);
         });
 
-        n.startFPS(4);
+        n.startFPS(5);
     }
 }

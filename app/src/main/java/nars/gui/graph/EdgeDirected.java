@@ -7,11 +7,10 @@ import spacegraph.phys.collision.broad.Broadphase;
 
 import java.util.List;
 
-public class MyForceDirected extends ForceDirected {
+public class EdgeDirected extends ForceDirected {
 
     @Override
     public void solve(Broadphase b, List<Collidable> objects, float timeStep) {
-        super.solve(b, objects, timeStep);
 
         float a = attraction.floatValue();
 
@@ -35,6 +34,9 @@ public class MyForceDirected extends ForceDirected {
                 });
             }
 
+
         }
+
+        super.solve(b, objects, timeStep);
     }
 }

@@ -83,24 +83,32 @@ public class UDPeer extends UDP {
     final static int SEEN_CAPACITY = 32 * 1024;
     private final Random rng;
 
+
     private AtomicBoolean
             needChanged = new AtomicBoolean(false),
             canChanged = new AtomicBoolean(false);
 
 
+    public UDPeer() throws IOException {
+        this(true);
+    }
     /**
      * assigned a random port
      */
-    public UDPeer() throws IOException {
-        this(0);
+    public UDPeer(boolean discovery) throws IOException {
+        this(null, 0, discovery);
     }
 
     public UDPeer(int port) throws IOException {
-        this(null, port);
+        this(null, port, true);
     }
 
     public UDPeer(InetAddress address, int port) throws IOException {
+        this(address, port, false);
+    }
+    public UDPeer(InetAddress address, int port, boolean discovery) throws IOException {
         super(address, port);
+
         //super( InetAddress.getLocalHost().getCanonicalHostName(), port);
 
         //this.me =  new InetSocketAddress( in.getInetAddress(), port );
@@ -144,7 +152,13 @@ public class UDPeer extends UDP {
             @Override
             public float pri(@NotNull UDPeer.UDProfile key) {
                 long latency = key.latency();
-                return 1f / (1f + (latency / 100f));
+                return 1f / (1f + Util.sqr (latency / 100f));
+            }
+
+            @Override
+            protected boolean replace(float incoming, float existing) {
+                //return super.replace(incoming, existing);
+                return hijackGreedy(incoming, existing);
             }
 
             @NotNull
@@ -171,7 +185,7 @@ public class UDPeer extends UDP {
             }
         };
 
-        discover = new UDiscover<>(new Discoverability(me,addr)) {
+        discover = discovery ? new UDiscover<>(new Discoverability(me,addr)) {
             @Override
             protected void found(Discoverability who, InetAddress addr, int port) {
                 if (!them.contains(who.id)) {
@@ -179,7 +193,7 @@ public class UDPeer extends UDP {
                     ping(who.addr);
                 }
             }
-        };
+        } : null;
     }
 
     public static class Discoverability implements Serializable {
@@ -197,7 +211,8 @@ public class UDPeer extends UDP {
     @Override
     protected void onStart() {
         super.onStart();
-        discover.start();
+        if (discover!=null)
+            discover.start();
     }
 
 
@@ -240,7 +255,8 @@ public class UDPeer extends UDP {
     protected void onStop() {
         super.onStop();
         them.clear();
-        discover.stop();
+        if (discover!=null)
+            discover.stop();
     }
 
 

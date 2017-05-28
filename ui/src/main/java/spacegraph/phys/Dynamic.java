@@ -681,6 +681,8 @@ public class Dynamic<X> extends Collidable<X> {
 	public void force(v3 delta) {
 		applyCentralForce(delta);
 	}
+
+
 //
 //	public int getNumConstraintRefs() {
 //		return constraintRefs.size();

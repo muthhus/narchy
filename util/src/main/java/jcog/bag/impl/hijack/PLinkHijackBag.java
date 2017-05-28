@@ -70,7 +70,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PLink<X>> {
     @Override
     protected PLink<X> merge(@NotNull PLink<X> existing, @NotNull PLink<X> incoming) {
         float overflow = existing.priAddOverflow(incoming.priSafe(0) );
-        if (overflow >= Pri.EPSILON)
+        if (overflow > 0)
             pressurize(-overflow);
         return existing;
     }

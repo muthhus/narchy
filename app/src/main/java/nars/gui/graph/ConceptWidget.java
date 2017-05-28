@@ -42,7 +42,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
     private transient ConceptSpace space;
     public float pri = 0;
 
-    private float edgeDecayRate = 0.5f;
+    private float edgeDecayRate = 0.1f;
 
 
     public ConceptWidget(Termed x) {
@@ -403,8 +403,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PLink<? exte
 
             float density = 10.5f;
             if (cw.body != null) {
-                cw.body.setMass(1 + l * w * h * density);
-                cw.body.setDamping(0.5f, 0.9f);
+                cw.body.setMass( l * w * h * density);
+                cw.body.setDamping(0.9f, 0.9f);
             }
 
 //            Draw.hsb(
