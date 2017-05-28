@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.data.sorted.SortedArray;
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -325,59 +326,82 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Nullable
-    public Task add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar) {
+    public void add(@NotNull Task input, TaskConcept c, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {
             if (input.isInput())
                 throw new RuntimeException("input task rejected (0 capacity): " + input);
-            return null;
+            return;
         }
 
-
+        Task activated;
+        float activation;
 
         if ((input.conf() >= 1f) && (cap != 1) && (isEmpty() || (first().conf() < 1f))) {
             //AXIOMATIC/CONSTANT BELIEF/GOAL
             synchronized (this) {
                 addEternalAxiom(input, this, nar);
-                return input;
+                activation = input.priSafe(0);
+                activated = input;
             }
-        }
-
-        //Try forming a revision and if successful, inputs to NAR for subsequent cycle
-            /*if (!(input instanceof AnswerTask))*/
-
-        Task revised = tryRevision(input, concept, nar);
-        if (revised != null && revised.equals(input)) {
-            if (revised == input && !input.isInput())
-                return null; //already present non-input, duplicate, so ignore
-
-            //duplicate
-            //TODO decide what to do here
-            return revised;
-        }
-
-
-
-
-
-        if (revised == null) {
-            return insert(input) ? input : null;
         } else {
-            boolean revisedIns = insert(revised);
-            if (!revisedIns) {
-                return null; //couldnt even insert the revised, another thread must have inserted better beliefs in-between the revision test and here
+
+
+            Task revised = tryRevision(input, c, nar);
+            if (revised != null) {
+                if (revised == input) {
+                    activation = 0;//already present duplicate, so ignore
+                    activated = null;
+                } else if (revised.equals(input)) {
+                    activation = input.priSafe(0) - revised.priSafe(0);
+                    activated = revised; //use previous value
+                    input.delete();
+                } else {
+                    //a novel revision
+                    if (insert(revised)) {
+                        activation = revised.priSafe(0);
+                        activated = revised;
+                    } else {
+                        activation = 0; //couldnt insert the revision
+                        activated = null;
+                        revised.delete();
+                    }
+
+                    boolean inputIns = insert(input);
+                    if (inputIns) {
+                        if (activated == null) {
+                            activated = input;
+                            activation = input.priSafe(0);
+                        } else {
+                            //revised will be activated, but at least emit a taskProcess for the input task
+                            nar.eventTaskProcess.emit(input);
+                        }
+                    } else {
+                        activated = null;
+                        activation = 0;
+                        input.delete();
+                    }
+                }
+            } else {
+                if (insert(input)) {
+                    activated = input;
+                    activation = input.priSafe(0);
+                } else {
+                    activation = 0;
+                    activated = null;
+                    input.delete();
+                }
             }
-            boolean inputIns = insert(input);
-            if (inputIns) {
-                //return revised but only emit a process input. the revised (stronger) will be used for activation
-                nar.eventTaskProcess.emit(input);
-            }
-            return revised;
         }
 
 
+        if (activation >= Pri.EPSILON) {
+            TaskTable.activate(activated, Float.POSITIVE_INFINITY, c, nar);
+        }
     }
+
+
 
 
     /**

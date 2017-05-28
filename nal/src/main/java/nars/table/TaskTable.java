@@ -1,6 +1,10 @@
 package nars.table;
 
+import nars.NAR;
 import nars.Task;
+import nars.attention.SpreadingActivation;
+import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -13,6 +17,19 @@ import java.util.function.Consumer;
 public interface TaskTable  {
 
 
+    /**
+     * attempt to insert a task.
+     *
+     * @return: the input task itself, it it was added to the table
+     * an existing equivalent task if this was a duplicate
+     */
+    void add(@NotNull Task t, TaskConcept c, NAR n);
+
+
+    static void activate(@NotNull Task t, float activation, TaskConcept c, @NotNull NAR n) {
+        n.eventTaskProcess.emit(/*post*/t);
+        n.input(new SpreadingActivation(t, c, activation));
+    }
 
     int capacity();
 

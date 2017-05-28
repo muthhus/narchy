@@ -80,14 +80,14 @@ public class TaskConcept extends CompoundConcept {
     }
 
     @NotNull
-    final BeliefTable beliefsOrNew(@NotNull NAR nar) {
-        return beliefs == null ? (beliefs = newBeliefTable(nar, true)) : beliefs;
-    }
-
-
-    @NotNull
-    final BeliefTable goalsOrNew(@NotNull NAR nar) {
-        return goals == null ? (goals = newBeliefTable(nar, false)) : goals;
+    final BeliefTable tableOrNew(@NotNull NAR nar, boolean beliefOrGoal) {
+        @Nullable BeliefTable t = beliefOrGoal ? beliefs : goals;
+        if (t == null) {
+            t = newBeliefTable(nar, beliefOrGoal);
+            if (beliefOrGoal) beliefs = t;
+            else goals = t;
+        }
+        return t;
     }
 
     @NotNull
@@ -127,36 +127,6 @@ public class TaskConcept extends CompoundConcept {
         return beliefTableOrEmpty(goals);
     }
 
-
-    public
-    @Nullable
-    Task processQuest(@NotNull Task task, @NotNull NAR nar) {
-        return processQuestion(task, nar);
-    }
-
-    /**
-     * To accept a new judgment as belief, and check for revisions and solutions
-     * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
-     */
-    @Nullable Task processBelief(@NotNull Task belief, @NotNull NAR nar) {
-        return processBeliefOrGoal(belief, beliefsOrNew(nar), nar);
-    }
-
-    /**
-     * To accept a new goal, and check for revisions and realization, then
-     * decide whether to actively pursue it
-     * Returns null if the task was not accepted, else the goal which was accepted and somehow modified the state of this concept
-     */
-    @Nullable Task processGoal(@NotNull Task goal, @NotNull NAR nar) {
-        return processBeliefOrGoal(goal, goalsOrNew(nar), nar);
-    }
-
-    private final Task processBeliefOrGoal(@NotNull Task belief, @NotNull BeliefTable target, @NotNull NAR nar) {
-
-        return target.add(belief, this, nar);
-
-    }
-
     protected void beliefCapacity(@NotNull ConceptState p, NAR nar) {
 
         int be = p.beliefCap(this, true, true);
@@ -180,17 +150,6 @@ public class TaskConcept extends CompoundConcept {
         quests().capacity((byte) p.questionCap(false), nar);
     }
 
-    /**
-     * To answer a quest or q by existing beliefs
-     *
-     * @param q         The task to be processed
-     * @param nar
-     * @param displaced
-     * @return the relevant task
-     */
-    Task processQuestion(@NotNull Task q, @NotNull NAR nar) {
-        return (q.isQuestion() ? questionsOrNew(nar) : questsOrNew(nar)).add(q);
-    }
 
 
     @Override
@@ -211,39 +170,46 @@ public class TaskConcept extends CompoundConcept {
      * Directly process a new task. Called exactly once on each task. Using
      * local information and finishing in a constant time. Provide feedback in
      * the taskBudget value of the task.
-     * <p>
-     * called in Memory.immediateProcess only
-     *
-     * @return null if not processed, or an Activation instance to continue with link activation and feedback
      */
     @Nullable
-    public final Task process(@NotNull Task input, @NotNull NAR nar) {
-
-
-        Task inserted = null;
-
-        switch (input.punc()) {
+    public final void process(@NotNull Task t, @NotNull NAR n) {
+        switch (t.punc()) {
             case BELIEF:
-                inserted = processBelief(input, nar);
+                tableOrNew(n, true).add(t, this, n);
                 break;
-
             case GOAL:
-                inserted = processGoal(input, nar);
+                tableOrNew(n, false).add(t, this, n);
                 break;
 
             case QUESTION:
-                inserted = processQuestion(input, nar);
-                break;
-
             case QUEST:
-                inserted = processQuest(input, nar);
+                (t.isQuestion() ? questionsOrNew(n) : questsOrNew(n))
+                        .add(t, this, n);
                 break;
 
             default:
-                throw new RuntimeException("Invalid sentence type: " + input);
+                throw new RuntimeException("Invalid sentence type: " + t);
         }
 
-        return inserted;
+//        return inserted;
+//        if ((accepted != null) &&
+//                (this == accepted || !this.equals(accepted))) {
+//
+//            n.terms.commit(c);
+//
+//            if (!isInput()) //dont count direct input as learning
+//                n.emotion.learn(accepted.pri(), accepted.volume());
+//
+//            n.eventTaskProcess.emit(/*post*/accepted);
+//
+//            return new ITask[]{new SpreadingActivation(accepted, c)};
+//        }
+//
+//        // REJECTED DUE TO PRE-EXISTING REDUNDANCY,
+//        // INSUFFICIENT CONFIDENCE/PRIORITY/RELEVANCE
+//        // OR OTHER REASON
+//
+//        return null;
 
 
 

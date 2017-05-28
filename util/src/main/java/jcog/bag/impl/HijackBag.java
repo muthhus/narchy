@@ -22,7 +22,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static jcog.bag.impl.HijackBag.Mode.*;
-import static jcog.pri.Priority.EPSILON;
 
 /**
  * the superclass's treadmill's extra data slots are used for storing:
@@ -164,8 +163,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         GET, PUT, REMOVE
     }
 
-    @Nullable
-    private V update(Object k, @Nullable V v /* null to remove */, Mode mode) {
+    private V update(Object k, @Nullable V v /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
@@ -200,7 +198,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             if (p == v) {
                                 toReturn = p; //identical match found, keep original
                             } else {
-                                V next = merge(p, v);
+                                V next = merge(p, v, overflowing);
                                 if (next != null && (next == p || map.compareAndSet(i, p, next))) {
                                     if (next != p) {
                                         toRemove = p; //replaced
@@ -208,6 +206,11 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                                     }
                                     toReturn = next;
                                 }
+                            }
+                            if (toReturn == p) {
+                                float oo = pri(p);
+                                pressurize(-oo); //undo pressurization
+                                overflowing.add(oo);
                             }
                             break;
 
@@ -304,8 +307,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * if returns null, the merge is considered failed and will try inserting/merging
      * at a different probe location
      */
-    @Nullable
-    protected abstract V merge(@NotNull V existing, @NotNull V incoming);
+    protected abstract V merge(@NotNull V existing, @NotNull V incoming, @Nullable MutableFloat overflowing);
 
     /**
      * can override in subclasses for custom replacement policy.
@@ -324,7 +326,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     @Nullable
     @Override
     public V remove(@NotNull K k) {
-        return update(k, null, REMOVE);
+        return update(k, null, REMOVE, null);
     }
 
     protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
@@ -349,7 +351,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (p != p)
             return null; //already deleted
 
-        V y = update(key(v), v, PUT);
+        V y = update(key(v), v, PUT, overflowing);
 
         return y;
     }
@@ -357,7 +359,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     public @Nullable V get(@NotNull Object key) {
-        return update(key, null, GET);
+        return update(key, null, GET, null);
     }
 
     @Override

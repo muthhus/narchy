@@ -9,6 +9,7 @@ import nars.nar.Default;
 import nars.nar.NARS;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
+import nars.op.stm.STMTemporalLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Time;
@@ -111,6 +112,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_QUEST_PRIORITY = 0.25f * p;
         n.termVolumeMax.setValue(48);
 
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 8);
         MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 16);

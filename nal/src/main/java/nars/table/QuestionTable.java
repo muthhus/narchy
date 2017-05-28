@@ -2,6 +2,8 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
+import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -12,13 +14,6 @@ import java.util.Iterator;
  * */
 public interface QuestionTable extends TaskTable {
 
-    /**
-     * attempt to insert a task.
-     *
-     * @return: the input task itself, it it was added to the table
-     * an existing equivalent task if this was a duplicate
-     */
-    Task add(@NotNull Task t);
 
     void capacity(int newCapacity, NAR nar);
 
@@ -61,8 +56,8 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public Task add(Task t) {
-            return null;
+        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+
         }
 
         @Override

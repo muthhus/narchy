@@ -14,8 +14,8 @@ import jcog.net.attn.HashMapTagSet;
 import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.math3.stat.descriptive.SynchronizedDescriptiveStatistics;
-import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,7 +33,6 @@ import java.util.function.Consumer;
 
 import static jcog.net.UDPeer.Command.*;
 import static jcog.net.UDPeer.Msg.ADDRESS_BYTES;
-import static org.eclipse.collections.impl.tuple.Tuples.pair;
 
 /**
  * UDP peer - self-contained generic p2p/mesh network node
@@ -140,7 +139,7 @@ public class UDPeer extends UDP {
             }
 
             @Override
-            protected UDPeer.UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming) {
+            protected UDProfile merge(@Nullable UDPeer.UDProfile existing, @NotNull UDPeer.UDProfile incoming, MutableFloat overflowing) {
                 return (existing != null ? existing : incoming);
             }
 

@@ -103,6 +103,9 @@ public class GoalActionConcept extends ActionConcept {
 //        }
 
         Truth fbt = this.motor.motor(belief, goal);
+//        if (fbt==null && belief!=null) {
+//            fbt = belief;
+//        }
 
         Task fb = fbt!=null ? feedback.set(this, fbt, nar) : feedback.current;
 

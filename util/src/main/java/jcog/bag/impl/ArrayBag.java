@@ -292,7 +292,7 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
     @Override
     public final PLink<X> put(@NotNull PLink<X> b, @Nullable MutableFloat overflow) {
 
-        float[] incoming = new float[] { b.priSafe(0) };
+        float[] incoming = { b.priSafe(0) };
 
         final boolean[] isNew = {false};
 
@@ -303,11 +303,10 @@ public class ArrayBag<X> extends SortedListTable<X, PLink<X>> implements Bag<X, 
             if (existing != null) {
                 //MERGE
                 res = existing;
-                float oo = mergeFunction.merge(existing, b);
+                float oo = existing!=b ? mergeFunction.merge(existing, b) : incoming[0] /* all of it if identical */;
                 if (oo > 0) {
                     incoming[0] -= oo; //release any unabsorbed pressure
-                    if (overflow != null)
-                        overflow.add(overflow);
+                    if (overflow != null) overflow.add(oo);
                 }
 
             } else {

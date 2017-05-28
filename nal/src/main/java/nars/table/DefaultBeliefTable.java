@@ -131,7 +131,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
             if (eternal == EternalTable.EMPTY) {
@@ -141,12 +141,12 @@ public class DefaultBeliefTable implements BeliefTable {
                         if (cap > 0)
                             eternal = concept.newEternalTable(cap); //allocate
                         else
-                            return null;
+                            return;
                     }
                 //}
             }
 
-            return eternal.add(input, concept, nar);
+            eternal.add(input, concept, nar);
 
         } else {
             if (temporal == TemporalBeliefTable.EMPTY) {
@@ -156,12 +156,12 @@ public class DefaultBeliefTable implements BeliefTable {
                         if (cap > 0)
                             temporal = concept.newTemporalTable(cap, nar); //allocate
                         else
-                            return null;
+                            return;
                     }
                 //}
             }
 
-            return temporal.add(input);
+            temporal.add(input, concept, nar);
         }
     }
 

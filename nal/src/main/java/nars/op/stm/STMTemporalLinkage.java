@@ -2,6 +2,7 @@ package nars.op.stm;
 
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
+import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -32,6 +33,7 @@ public final class STMTemporalLinkage extends STM {
         super(nar, new MutableInteger(capacity));
 
         allowNonInput = false;
+        strength.setValue( 1f/capacity );
 
         //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
         stm = new ArrayDeque<>(capacity);
@@ -107,8 +109,11 @@ public final class STMTemporalLinkage extends STM {
                     Task u = queued.get(i);
                     /** current task's... */
                     Concept concept = t.concept(nar);
-                    if (concept != null)
-                        crossLink(concept, t, u, strength * tPri, strength * u.priSafe(0), nar);
+                    if (concept != null) {
+                        float interStrength= tPri * u.priSafe(0) * strength;
+                        if (interStrength > Pri.EPSILON)
+                            crossLink(concept, t, u, interStrength, interStrength, nar);
+                    }
                 }
             }
         }

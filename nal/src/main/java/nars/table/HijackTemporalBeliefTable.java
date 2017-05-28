@@ -53,29 +53,21 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        }
 //    }
 
-    @Override
-    public void capacity(int c, NAR nar) {
-        setCapacity(c);
+    static FloatFunction<Task> evidence(long when, long now, int dur) {
+        return (x) -> x.evi(when, dur);
+
+
+            //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
+
+//        //HACK present/future prediction boost
+//        if (t.start() >= now) {
+//            r += 1f;
+//        }
     }
 
-
-    @Override
-    protected boolean replace(Task incoming, Task existing) {
-
-        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
-            return true;
-
-        float exPri = existing.pri();
-        if (exPri!=exPri)
-            return true;
-
-        float inPri = incoming.priSafe(0);
-        if (!replace(inPri, exPri)) {
-            //existing.priMult(1f - /*temperature() * */ inPri/reprobes);
-            return false;
-        }
-        return true;
-        //return super.replace(incoming, existing, scale);
+    @Nullable
+    static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
+        return l.maxBy(Float.NEGATIVE_INFINITY, rankMatchMerge(toMergeWith, now, dur));
     }
 
 //    @Override
@@ -322,28 +314,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        return false;
 //    }
 
-
-    static FloatFunction<Task> evidence(long when, long now, int dur) {
-        return (x) -> x.evi(when, dur);
-
-
-            //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
-
-//        //HACK present/future prediction boost
-//        if (t.start() >= now) {
-//            r += 1f;
-//        }
-    }
-
-//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
-//        return x -> rankTemporalByConfidence(x, when, now, dur);
-//    }
-
-    @Nullable
-    static Task matchMerge(@NotNull FasterList<Task> l, long now, @NotNull Task toMergeWith, int dur) {
-        return l.maxBy(Float.NEGATIVE_INFINITY, rankMatchMerge(toMergeWith, now, dur));
-    }
-
     /**
      * max value given to the ideal match for the provided task to be merged with
      */
@@ -387,6 +357,34 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
                     ;
         };
 
+    }
+
+//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
+//        return x -> rankTemporalByConfidence(x, when, now, dur);
+//    }
+
+    @Override
+    public void capacity(int c, NAR nar) {
+        setCapacity(c);
+    }
+
+    @Override
+    protected boolean replace(Task incoming, Task existing) {
+
+        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
+            return true;
+
+        float exPri = existing.pri();
+        if (exPri!=exPri)
+            return true;
+
+        float inPri = incoming.priSafe(0);
+        if (!replace(inPri, exPri)) {
+            //existing.priMult(1f - /*temperature() * */ inPri/reprobes);
+            return false;
+        }
+        return true;
+        //return super.replace(incoming, existing, scale);
     }
 
 

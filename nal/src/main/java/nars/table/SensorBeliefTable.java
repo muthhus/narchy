@@ -27,7 +27,7 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
 
     @Override
-    public Task add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
 
         //boolean refresh = false;
 
@@ -40,13 +40,13 @@ public class SensorBeliefTable extends DefaultBeliefTable  {
 
             if (input.isEternal()) {
                 logger.warn("reject non-authentic eternal override:\n{}", input.proof());
-                return null; //reject non-input eternal derivations
+                return; //reject non-input eternal derivations
             }
 
         }
 
 
-        return super.add(input, concept, nar);
+        super.add(input, concept, nar);
     }
 
 

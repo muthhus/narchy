@@ -2,6 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
+import nars.concept.TaskConcept;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -35,15 +36,16 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     }
 
     TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
+
+        @Override
+        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+
+        }
+
         @Override
         public int capacity() {
             //throw new UnsupportedOperationException();
             return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public @Nullable Task add(@NotNull Task input) {
-            return null;
         }
 
         @Override
@@ -85,7 +87,5 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
         }
     };
-
-    @Nullable Task add(@NotNull Task input);
 
 }

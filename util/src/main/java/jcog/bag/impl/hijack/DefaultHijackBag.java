@@ -1,6 +1,7 @@
 package jcog.bag.impl.hijack;
 
 import jcog.pri.*;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -20,10 +21,12 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PLink<K>> {
     }
 
     @Override
-    protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming) {
+    protected PLink<K> merge(@NotNull PLink<K> existing, @NotNull PLink<K> incoming, MutableFloat overflowing) {
         float overflow = merge.merge(existing, incoming); //modify existing
-        if (overflow > 0)
+        if (overflow > 0) {
             pressurize(-overflow);
+            if (overflowing!=null) overflowing.add(overflow);
+        }
         return existing;
     }
 

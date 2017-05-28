@@ -4,6 +4,7 @@ import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.map.SaneObjectFloatHashMap;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jcog.pri.RawPLink;
 import nars.NAR;
@@ -77,27 +78,21 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     transient private NAR nar;
     transient private FasterList<ITask> activations;
 
-    /** priority of the task, which will differ from the priority of the activation.
-     * we want to activate with the task's current priority regardless how low the priority of this
-     * activation becomes.*/
-    transient private float taskPri;
-
 
     /**
      * runs the task activation procedure
      */
-    public SpreadingActivation(@NotNull Task t, @NotNull TaskConcept c) {
-        super(t, t.priSafe(0));
+    public SpreadingActivation(@NotNull Task t, @NotNull TaskConcept c, float pri) {
+        super(t, pri);
         this.origin = c;
     }
 
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        this.taskPri = id.pri();
-        if (taskPri!=taskPri)
+        float p = priSafe(0);
+        if (p < Pri.EPSILON)
             return null;
-
 
         this.momentum = nar.momentum.floatValue();
         this.dur = nar.dur();
@@ -115,7 +110,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         int ss = 0;
         try {
 
-            link(origin, 1f, 0);
+            link(origin, p, 0);
             nar.emotion.stress(linkOverflow);
 
             ss = spread.size();
@@ -135,7 +130,12 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             }
         }
 
-        delete(); //self-destruct
+        float remain = linkOverflow.floatValue();
+        if (remain > 0) {
+            setPri(remain); //save for potential re-use
+        } else {
+            delete(); //self-destruct
+        }
 
         return a;
     }
@@ -188,26 +188,24 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     }
 
     @Override
-    public void value(@NotNull Termed c, float scale) {
+    public void value(@NotNull Termed c, float p) {
         //System.out.println("\t" + k + " " + v);
 
-        float p = taskPri;
-        float pScaled = p * scale;
-        if (pScaled >= Priority.EPSILON) {
+        if (p >= Priority.EPSILON) {
             if (c instanceof Concept)
-                activations.add(new ConceptFire((Concept) c, pScaled));
+                activations.add(new ConceptFire((Concept) c, p));
         }
 
-        if (pScaled >= Priority.EPSILON) {
+        if (p >= Priority.EPSILON) {
 
 
-            termBidi(c, p * TERMLINK_BALANCE, p * (1f - TERMLINK_BALANCE), scale);
+            termBidi(c, TERMLINK_BALANCE,  (1f - TERMLINK_BALANCE), p);
 
             if (c instanceof Concept) {
-                tasklink((Concept) c, p * scale);
-                //            if (c instanceof AtomConcept) {
-                //                activateAtom((AtomConcept) c, scale);
-                //            }
+                tasklink((Concept) c, p);
+
+                if (c instanceof AtomConcept)
+                    activateAtom((AtomConcept) c, p);
             }
         }
 
@@ -216,8 +214,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     @Nullable
     void link(@NotNull Termed target, float scale, int depth) {
 
-//        if (scale < Pri.EPSILON)
-//            return;
+        if (scale < Pri.EPSILON)
+            return;
 
         if ((target instanceof Variable)) {
             if (target.op() == VAR_QUERY)
@@ -362,6 +360,13 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     }
 
     void termlink(Concept recipient, Term target, float pri) {
+        float oo = linkOverflow.floatValue();
+        if (oo > 0) {
+            //use some of running overflow to boost the priority for the next link (sibling backpressure)
+            float x = Math.min((1f-pri), oo * 0.5f);
+            pri += x;
+            linkOverflow.subtract(x);
+        }
         recipient.termlinks().put(new RawPLink(target, pri), linkOverflow);
     }
 

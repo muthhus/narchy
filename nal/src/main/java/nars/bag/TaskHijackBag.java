@@ -2,9 +2,15 @@ package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.PForget;
+import jcog.pri.Pri;
+import nars.NAR;
 import nars.Task;
+import nars.attention.SpreadingActivation;
+import nars.concept.TaskConcept;
 import nars.table.TaskTable;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -78,12 +84,28 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         return false;
     }
 
-    public Task add(@NotNull Task x) {
+    public void add(@NotNull Task x, TaskConcept c, NAR n) {
 
-        commit();
+        float activation = x.priSafe(0);
 
-        Task y = put(x);
-        return y;
+        MutableFloat oo = new MutableFloat();
+        @Nullable Task y = put(x, oo);
+        if (y == null) {
+            activation = 0;//not inserted
+        } else {
+            //fully inserted or merged with existing item, and activate only the absorbed amount
+            activation -= oo.floatValue();
+        }
+        if (y!=x) {
+            x.delete();
+        }
+
+        if (pressure.floatValue() >= Pri.EPSILON)
+            commit(); //apply forgetting
+
+        if (activation > Pri.EPSILON) {
+            TaskTable.activate(y, activation, c, n);
+        }
     }
 
 

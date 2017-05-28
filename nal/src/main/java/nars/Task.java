@@ -91,7 +91,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             } else {
                 //nearest endpoint of the interval
                 if (dur > 0) {
-                    cw = TruthPolation.evidenceDecay(cw, dur, a!=z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a-when) );
+                    cw = TruthPolation.evidenceDecay(cw, dur, a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when));
                 } else {
                     cw = 0;
                 }
@@ -157,13 +157,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
 
         if (task instanceof DerivedTask) {
-            Task pt = ((DerivedTask)task).getParentTask();
+            Task pt = ((DerivedTask) task).getParentTask();
             if (pt != null) {
                 //sb.append("  PARENT ");
                 proof(pt, indent + 1, sb);
             }
 
-            Task pb = ((DerivedTask)task).getParentBelief();
+            Task pb = ((DerivedTask) task).getParentBelief();
             if (pb != null) {
                 //sb.append("  BELIEF ");
                 proof(pb, indent + 1, sb);
@@ -627,7 +627,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
 
-
     default boolean cyclic() {
         return Stamp.isCyclic(stamp());
     }
@@ -935,31 +934,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         TaskConcept c = concept(n, true);
         if (c == null) {
             delete();
-            return null;
-        }
-
-        Task accepted = c.process(this, n);
-        if (accepted != null) {
-
-            if (this == accepted || !this.equals(accepted)) {
-
-                n.terms.commit(c);
-
-                if (!isInput()) //dont count direct input as learning
-                    n.emotion.learn(accepted.pri(), accepted.volume());
-
-                n.eventTaskProcess.emit(/*post*/accepted);
-
-            }
-
-            return new ITask[] {  new SpreadingActivation(accepted, c) };
-
         } else {
-
-            // REJECTED DUE TO PRE-EXISTING REDUNDANCY,
-            // INSUFFICIENT CONFIDENCE/PRIORITY/RELEVANCE
-            // OR OTHER REASON
-
+            c.process(this, n);
         }
 
         return null;
@@ -977,7 +953,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 if (args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
                     if (funcConcept instanceof Command) {
-                        Command o = (Command)funcConcept;
+                        Command o = (Command) funcConcept;
 
                         Task result = o.run(cmd, nar);
                         if (result != null && result != cmd) {
@@ -1004,7 +980,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //                                    }
 //                                }
 //                            }
-
 
 
                     }
