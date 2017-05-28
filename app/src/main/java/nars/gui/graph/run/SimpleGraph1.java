@@ -3,6 +3,9 @@ package nars.gui.graph.run;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
+import com.google.common.graph.ValueGraph;
+import jcog.bag.Bag;
+import jcog.pri.PLink;
 import jcog.pri.RawPLink;
 import nars.$;
 import nars.concept.Concept;
@@ -13,6 +16,7 @@ import nars.gui.graph.MyForceDirected;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
@@ -103,8 +107,29 @@ public class SimpleGraph1 extends ConceptSpace {
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
-            c.termlinks().clear();
+            //c.termlinks().clear();
             g.successors(x).forEach( y -> c.termlinks().put(new RawPLink(nodeTerm(y),  1f) ));
+            n2.add(new ConceptFire(c, 1f));
+        });
+
+        this.next = n2;
+        return this;
+    }
+   protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
+        List<ConceptFire> n2 = $.newArrayList(g.nodes().size());
+
+
+        g.nodes().forEach(x -> {
+            //HACK todo use proxyterms in a cache
+            Concept c = nar.conceptualize(nodeTerm(x));
+            Bag<Term, PLink<Term>> tl = c.termlinks();
+            //tl.clear();
+            g.successors(x).forEach( y -> {
+                tl.put(new RawPLink(nodeTerm(y),  pri.floatValueOf(
+                    g.edgeValue(x, y)
+                )));
+            } );
+            tl.commit();
             n2.add(new ConceptFire(c, 1f));
         });
 
