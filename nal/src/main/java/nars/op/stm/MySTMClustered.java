@@ -3,12 +3,15 @@ package nars.op.stm;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.list.ArrayIterator;
+import jcog.list.FasterList;
+import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.index.term.TermIndex;
 import nars.task.GeneratedTask;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
@@ -42,6 +45,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxInputVolume;
     private final int minGroupSize;
     private final int inputsPerFrame;
+    private final PSink<Object, ITask> in;
 
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
     float freqCoherenceThresh = 0.9f;
@@ -62,7 +66,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
-        super(4, nar, new MutableInteger(size), punc, maxGroupSize);
+        super(4, nar, new MutableInteger(size), punc, maxGroupSize*3 /* groups per node */);
 
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
@@ -73,6 +77,7 @@ public class MySTMClustered extends STMClustered {
 
         this.allowNonInput = allowNonInput;
 
+        this.in = nar.in.stream(this);
         net.setAlpha(0.05f);
         //net.setBeta(0.05f);
         net.setWinnerUpdateRate(0.03f, 0.01f);
@@ -105,7 +110,7 @@ public class MySTMClustered extends STMClustered {
 
         if (t.punc() == punc && t.volume() <= maxInputVolume) {
 
-            input.get().put(new TLink(t));
+            input.put(new TLink(t));
         }
 
     }
@@ -140,7 +145,7 @@ public class MySTMClustered extends STMClustered {
         if (limit == 0)
             return;
 
-        List<Task> toInput = $.newArrayList(0);
+        List<ITask> toInput = $.newArrayList(0);
         net.nodeStream()
                 //.parallel()
                 //.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
@@ -231,11 +236,16 @@ public class MySTMClustered extends STMClustered {
 
                         @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
                         if (cp!=null) {
-                            long[] evidence = Stamp.zip(()->new ArrayIterator<Stamp>(uu), uu.length); //HACK
+                            int uuLen = uu.length;
+                            long[] evidence = Stamp.zip(()->new ArrayIterator<Stamp>(uu), uuLen); //HACK
 
                             Task m = new GeneratedTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
-                            m.priority().setPri( BudgetFunctions.fund(1f, false, uu ) );
+
+                            float maxPri = new FasterList<Task>(uuLen, uu)
+                                                .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
+
+                            m.priority().setPri( BudgetFunctions.fund( maxPri, false, uu ) );
                             return m;
 
                         }
@@ -274,7 +284,7 @@ public class MySTMClustered extends STMClustered {
                 }).limit(limit).forEach(toInput::add);
 
         if (!toInput.isEmpty())
-            nar.input(toInput);
+            in.input(toInput);
 
     }
 

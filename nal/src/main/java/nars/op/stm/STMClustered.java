@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 public abstract class STMClustered extends STM {
 
 
-    public final ThreadLocal<@Nullable Bag<Task, PriReference<Task>>> input;
+    final @Nullable Bag<Task, PriReference<Task>> input;
 
     final short clusters;
     public final int dims;
@@ -297,7 +297,7 @@ public abstract class STMClustered extends STM {
         this.punc = punc;
 
         //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
-        this.input = ThreadLocal.withInitial(() ->
+        this.input =
                 new DefaultHijackBag<Task>(PriMerge.max, capacity.intValue(), 3) {
 
 //            @NotNull
@@ -322,7 +322,7 @@ public abstract class STMClustered extends STM {
 //                drop((TLink) value);
 //            }
 
-        });
+        };
 
         this.net = new NeuralGasNet<>(dims, clusters) {
             @NotNull
@@ -360,14 +360,14 @@ public abstract class STMClustered extends STM {
                 t.delete();
             }
 
-            input.get().setCapacity(capacity.intValue());
-            input.get().commit();
+            input.setCapacity(capacity.intValue());
+            input.commit();
 
             net.compact();
 
             now = nar.time();
 
-            input.get().forEach(t -> {
+            input.forEach(t -> {
                 if (t != null) {
                     TLink tt = (TLink) t;
                     tt.nearest().transfer(tt);
@@ -384,7 +384,7 @@ public abstract class STMClustered extends STM {
 
     @Override
     public void clear() {
-        input.get().clear();
+        input.clear();
         net.clear();
     }
 
@@ -392,7 +392,7 @@ public abstract class STMClustered extends STM {
     public void accept(@NotNull Task t) {
 
         if (t.punc() == punc) {
-            input.get().put(new TLink(t));
+            input.put(new TLink(t));
         }
 
     }
@@ -404,7 +404,7 @@ public abstract class STMClustered extends STM {
     }
 
     public int size() {
-        return input.get().size();
+        return input.size();
     }
 
     public void print(@NotNull PrintStream out) {
@@ -431,7 +431,7 @@ public abstract class STMClustered extends STM {
     }
 
     public DoubleSummaryStatistics bagStatistics() {
-        return StreamSupport.stream(input.get().spliterator(), false).mapToDouble(Prioritized::pri).summaryStatistics();
+        return StreamSupport.stream(input.spliterator(), false).mapToDouble(Prioritized::pri).summaryStatistics();
     }
 
 

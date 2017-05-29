@@ -54,7 +54,7 @@ public final class Emotion implements Serializable {
 //    public final FloatGuage alert;
 
 
-    final ResourceMeter resourceMeter = new ResourceMeter();
+    //final ResourceMeter resourceMeter = new ResourceMeter();
 
     public Emotion() {
         super();
@@ -237,7 +237,7 @@ public final class Emotion implements Serializable {
                 .append(" errr=").append(n4(erring()))
                 .append(" strs=").append(n4(stress.getSum()))
                 //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)
-                .append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
+                //.append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
                 //.append(" alrt=").append(n4(alert.getSum()))
         .toString();
 

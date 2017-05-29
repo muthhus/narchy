@@ -2,20 +2,27 @@ package nars.op.stm;
 
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
+import jcog.pri.PLink;
 import jcog.pri.Pri;
+import jcog.pri.mix.Mix;
+import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.nar.NARS;
+import nars.task.BinaryTask;
+import nars.task.ITask;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
-import static nars.attention.Crosslink.crossLink;
+
 
 /**
  * Short-term Memory Belief Event Induction.
@@ -28,16 +35,20 @@ public final class STMTemporalLinkage extends STM {
     public final Deque<Task> stm;
 
     final FloatParam strength = new FloatParam(1f, 0f, 1f);
+    private final PSink<Object, ITask> in;
+
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
         super(nar, new MutableInteger(capacity));
 
         allowNonInput = false;
-        strength.setValue( 1f/capacity );
+        strength.setValue(1f / capacity);
 
         //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
         stm = new ArrayDeque<>(capacity);
         //stm = new ConcurrentLinkedDeque<>();
+
+        this.in = nar.in.stream(this);
     }
 
     @Override
@@ -68,7 +79,7 @@ public final class STMTemporalLinkage extends STM {
         //final long now = nal.memory.time();
 
 
-        Term tt = t.unneg();
+        Term tt = t.term();
 
 
         List<Task> queued;
@@ -87,7 +98,8 @@ public final class STMTemporalLinkage extends STM {
                         numExtra--;
                         ss.remove();
                     } else {
-                        if (!tt.equals(previousTask.unneg()))
+                        /* WARNING: not exhaustive, may still be the same concept in temporal cases */
+                        if (!tt.equals(previousTask.term()))
                             queued.add(previousTask);
                     }
 
@@ -108,11 +120,9 @@ public final class STMTemporalLinkage extends STM {
                 for (int i = 0, queuedSize = queued.size(); i < queuedSize; i++) {
                     Task u = queued.get(i);
                     /** current task's... */
-                    Concept concept = t.concept(nar);
-                    if (concept != null) {
-                        float interStrength= tPri * u.priSafe(0) * strength;
-                        if (interStrength > Pri.EPSILON)
-                            crossLink(concept, t, u, interStrength, interStrength, nar);
+                    float interStrength = tPri * u.priSafe(0) * strength;
+                    if (interStrength >= Pri.EPSILON) {
+                        in.input(new STMLink(t, u, interStrength));
                     }
                 }
             }
@@ -120,5 +130,40 @@ public final class STMTemporalLinkage extends STM {
 
     }
 
+    public static class STMLink extends BinaryTask<Task, Task> {
+
+        public STMLink(@NotNull Task t, @NotNull Task u, float interStrength) {
+            super(t, u, interStrength);
+        }
+
+        @Nullable
+        @Override
+        public ITask[] run(@NotNull NAR n) {
+
+            float p = pri;
+            if (p == p) {
+                Task a = getOne();
+                Concept ac = a.concept(n);
+                if (ac != null) {
+                    Task b = getTwo();
+                    Concept bc = b.concept(n);
+                    if (bc != null && !bc.equals(ac)) { //null or same concept?
+
+                        //TODO handle overflow?
+                        bc.termlinks().put(new PLink(ac, pri));
+                        ac.termlinks().put(new PLink(bc, pri));
+
+                        //tasklinks, not sure:
+                        //        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));
+                        //        srcConcept.tasklinks().put( new RawPLink(tgtTask, scaleTgtSrc));
+
+                    }
+                }
+            }
+
+            delete();
+            return null;
+        }
+    }
 
 }

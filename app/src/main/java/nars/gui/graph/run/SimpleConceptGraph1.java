@@ -160,7 +160,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        for (int i = 1; i < 24; i++)
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
-        new DeductiveMeshTest(n, new int[]{2, 2}, 16384);
+        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
 
         n.startFPS(1f).join();
 

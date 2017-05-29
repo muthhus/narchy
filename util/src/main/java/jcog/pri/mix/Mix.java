@@ -3,7 +3,9 @@ package jcog.pri.mix;
 import jcog.list.FasterList;
 import jcog.meter.TelemetryRing;
 import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 
+import java.sql.Time;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +21,7 @@ import java.util.function.Consumer;
  *
  * see: http://dr-lex.be/info-stuff/volumecontrols.html#about
  */
-public class Mix<K, P extends Prioritized>  {
+public class Mix<K, P extends Priority>  {
 
 
     public final Map<K, PSink> streams = new ConcurrentHashMap();
@@ -42,7 +44,7 @@ public class Mix<K, P extends Prioritized>  {
     }
 
     /** gets or creates a mix stream for the given key */
-    public PSink stream(K x) {
+    public  PSink<K,P> stream(K x) {
 
         return streams.computeIfAbsent(x, xx -> {
             //nullify the history, need to create a new one for the new stream
@@ -55,6 +57,9 @@ public class Mix<K, P extends Prioritized>  {
         });
     }
 
+//    public void commit(Time t) {
+//        //TODO downsample correctly
+//    }
 
     /** captures state into the history, resetting any periodic statistics.
      * warning: a long value for time will not fit in float with full precision

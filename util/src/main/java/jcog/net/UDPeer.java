@@ -161,8 +161,8 @@ public class UDPeer extends UDP {
 
             @Override
             protected boolean replace(float incoming, float existing) {
-                //return super.replace(incoming, existing);
-                return hijackGreedy(incoming, existing);
+                return super.replace(incoming, existing);
+                //return hijackGreedy(incoming, existing);
             }
 
             @NotNull

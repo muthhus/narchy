@@ -10,6 +10,7 @@ import nars.Task;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -56,7 +57,7 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    public Stream<Task> sense(NAR nar, long when) {
+    public Stream<ITask> sense(NAR nar, long when) {
         List<Task> q = $.newArrayList(queue.size());
         Iterator<Task> qq = queue.iterator();
         while (qq.hasNext()) {
@@ -112,7 +113,7 @@ public abstract class ConsoleAgent extends NAgentX {
     }
 
     @Override
-    protected Stream<Task> predictions(long next) {
+    protected Stream<ITask> predictions(long next) {
         return Stream.concat(
            Stream.concat(
                W.input(),

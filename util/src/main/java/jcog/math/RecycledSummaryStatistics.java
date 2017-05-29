@@ -14,10 +14,8 @@ import java.io.Serializable;
  *
  */
 public class RecycledSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
+
     protected long count;
-
-
-
 
     protected double sSum;
     //private float sumCompensation; // Low order bits of sum

@@ -15,6 +15,7 @@ import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.table.EternalTable;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -73,10 +74,10 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final PSink<String, Task> sense;
-    private final PSink<String, Task> ambition;
-    private final PSink<String, Task> predict;
-    private final PSink<String, Task> motor;
+    private final PSink<Object, ITask> sense;
+    private final PSink<Object, ITask> ambition;
+    private final PSink<Object, ITask> predict;
+    private final PSink<Object, ITask> motor;
 
 
     private boolean initialized;
@@ -237,7 +238,7 @@ abstract public class NAgent implements NSense, NAct {
                     //+(dur * 3 / 2);
                     ;
 
-            ambition.input(Stream.<Task>of(happy.apply(nar)));
+            ambition.input(Stream.of(happy.apply(nar)));
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);
@@ -266,7 +267,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     /** provides the stream of the environment's next sensory percept tasks */
-    public Stream<Task> sense(NAR nar, long when) {
+    public Stream<ITask> sense(NAR nar, long when) {
         return sensors.stream().map(s -> s.apply(nar));
     }
 
@@ -529,7 +530,7 @@ abstract public class NAgent implements NSense, NAct {
         return loop;
     }
 
-    protected Stream<Task> predictions(long now) {
+    protected Stream<ITask> predictions(long now) {
 
 
         int dur = nar.dur();

@@ -191,7 +191,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         this.emotion = new Emotion();
         this.in = new Mix((Consumer<ITask>)this::input);
-        this.onCycle((n) -> n.in.commit(n.time()));
+        this.onCycle((n) -> n.in.commit(time()));
 
         this.level = 8;
 

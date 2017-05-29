@@ -6,6 +6,7 @@ import nars.NAgent;
 import nars.NAgentX;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
+import nars.task.NALTask;
 import nars.time.Tense;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class RLBooster implements Consumer<NAgent> {
 
         List<SensorConcept> sc = $.newArrayList();
         env.sense(env.nar, 0).forEach(x -> {
-            sc.add((SensorConcept) x.concept(env.nar));
+            sc.add((SensorConcept) ((NALTask)x).concept(env.nar));
         });
         if (env instanceof NAgentX) {
             ((NAgentX) env).cam.values().forEach(c -> {
