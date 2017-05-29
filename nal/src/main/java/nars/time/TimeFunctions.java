@@ -942,12 +942,12 @@ public interface TimeFunctions {
                 preDT = DTERNAL;
             }
 
-            Term newPresub = p.index.the(preSub, preDT);
+            Term newPresub = p.terms.the(preSub, preDT);
 
             if (!(newPresub instanceof Compound))
                 return null;
 
-            derived = compoundOrNull((p.index.the(derived,
+            derived = compoundOrNull((p.terms.the(derived,
                     new Term[]{$.negIf(newPresub, neg), derived.sub(1)})
             ));
         }
@@ -970,14 +970,14 @@ public interface TimeFunctions {
 
 
             //set subterm 1's DT
-            Term newSubterm1 = p.index.the((Compound) derived.sub(1), postDT);
+            Term newSubterm1 = p.terms.the((Compound) derived.sub(1), postDT);
 
             if (isTrueOrFalse(newSubterm1))
                 return null;
 
 
             derived = compoundOrNull(
-                    p.index.the(derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)})
+                    p.terms.the(derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)})
             );
 
         }
@@ -1327,7 +1327,7 @@ public interface TimeFunctions {
 //        }
         if (derived.dt() != dt) {
             TermContainer ds = derived.subterms();
-            @NotNull Compound n = compoundOrNull(p.index.the(o, dt, ds));
+            @NotNull Compound n = compoundOrNull(p.terms.the(o, dt, ds));
             if (n == null)
                 return null; //throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 

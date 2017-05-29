@@ -24,7 +24,7 @@ public class SubUnify extends Unify {
     }
 
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
-        super(parent.index, type, parent.random, parent.versioning);
+        super(parent.terms, type, parent.random, parent.versioning);
     }
 
 //    @Override
@@ -70,7 +70,7 @@ public class SubUnify extends Unify {
 //            }
 
 
-                result = transform(xterm, index);
+                result = transform(xterm, terms);
 //                if (result == null)
 //                    fail = true;
 

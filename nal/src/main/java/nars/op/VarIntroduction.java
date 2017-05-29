@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
+import static nars.term.Terms.normalizedOrNull;
 
 /**
  * a generalized variable introduction model that can transform tasks
@@ -31,6 +32,12 @@ public abstract class VarIntroduction {
 
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test
+
+        if (!(c.isNormalized())) {
+            c = normalizedOrNull(c, $.terms);
+            if (c == null)
+                return;
+        }
 
         List<Term> selections = select(c);
         if (selections == null) return;
@@ -51,11 +58,12 @@ public abstract class VarIntroduction {
 
 
         Map<Term,Term> substs = new UnifiedMap<>(0 /* pessimistic */);
-        int o = 0;
+
+        int varOffset = c.vars(); //ensure the variables dont collide with existing variables
         boolean found = false;
         for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
             Term u = selections.get(i);
-            Term v = next(c, u, o++);
+            Term v = next(c, u, varOffset++);
             if (v != null) {
                 substs.put(u, v);
                 found = true;
@@ -65,7 +73,7 @@ public abstract class VarIntroduction {
             return; //nothing found to introduce a variable for
 
 
-        Term newContent = index().replace(c, substs);
+        Term newContent = $.terms.replace(c, substs);
 
         if ((newContent instanceof Compound) && !newContent.equals(c)) {
             each.accept((Compound) newContent);
@@ -93,9 +101,7 @@ public abstract class VarIntroduction {
 //        }
     }
 
-    protected TermIndex index() {
-        return $.terms;
-    }
+
 
 
     @Nullable

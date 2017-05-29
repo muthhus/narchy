@@ -13,6 +13,7 @@ import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptFire;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
@@ -81,7 +82,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<NAR> {
+public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<NAR>, TermContext {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
@@ -1520,4 +1521,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
+    @Nullable @Override
+    public final Term the(@NotNull Op op, int dt, Term[] subs) {
+        return terms.the(op, dt, subs);
+    }
+
+    @Override
+    public final Termed get(Term x, boolean createIfAbsent) {
+        return terms.get(x, createIfAbsent);
+    }
 }

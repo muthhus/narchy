@@ -137,12 +137,12 @@ abstract public class Derivation extends Unify implements TermContext {
                 case "subIfUnifiesDep": return _substituteIfUnifiesDep;
             }
         }
-        return index.get(x, createIfAbsent);
+        return terms.get(x, createIfAbsent);
     }
 
     @Override
     public Term the(@NotNull Op op, int dt, Term[] subs) {
-        return index.the(op, dt, subs);
+        return terms.the(op, dt, subs);
     }
 
 
@@ -150,7 +150,7 @@ abstract public class Derivation extends Unify implements TermContext {
      * @param n*/
     @NotNull public void restartA(NAR n) {
         this.nar = n;
-        this.index = n.terms;
+        this.terms = n.terms;
         this.budgeting = n.budgeting;
         this.random = n.random();
         this.time = nar.time();

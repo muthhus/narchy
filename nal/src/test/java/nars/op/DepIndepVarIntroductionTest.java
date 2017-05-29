@@ -1,6 +1,10 @@
 package nars.op;
 
+import nars.$;
+import nars.Narsese;
 import nars.nar.Default;
+import nars.nar.Terminal;
+import nars.term.Term;
 import nars.time.Tense;
 import org.junit.Test;
 
@@ -10,12 +14,12 @@ import org.junit.Test;
 public class DepIndepVarIntroductionTest {
 
     @Test
-    public void testIntroInProduct() {
-        Default d = new Default();
-        d.log();
-        d.believe("(fz-->(d00,c00,b01,a00))", Tense.Present, 1f, 0.9f);
-        d.believe("(fz-->(d01,c00,b01,a00))", Tense.Present, 1f, 0.9f);
-        d.run(100);
-        //should introduce multiple variables
+    public void testIntroducedVariablesNormalized() throws Narsese.NarseseException {
+        Terminal n = new Terminal();
+
+        Term t = $.$("(&&,(a-->c),(b-->c))");
+        Term u = $.$("varIntro(" + t + ")").eval(n);
+        System.out.println(t + " " + u);
+
     }
 }

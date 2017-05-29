@@ -12,10 +12,10 @@ import org.jetbrains.annotations.Nullable;
 public interface TermContext {
 
     /** TODO rename: eval( */
-    Term the(@NotNull Op op, int dt, Term[] subs);
+    @Nullable Term the(@NotNull Op op, int dt, Term[] subs);
 
     /** TODO rename: eval( */
-    Termed get(Term x, boolean createIfAbsent);
+    @Nullable Termed get(Term x, boolean createIfAbsent);
 
     /**
      * internal get procedure: get if not absent

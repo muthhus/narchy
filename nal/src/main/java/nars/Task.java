@@ -37,6 +37,7 @@ import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.

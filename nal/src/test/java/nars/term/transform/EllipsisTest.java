@@ -124,7 +124,7 @@ public class EllipsisTest {
 
 
                         //2. test substitution
-                        Term s = Termed.termOrNull(transform(r,index));
+                        Term s = Termed.termOrNull(transform(r, terms));
                         if (s!=null) {
                             //System.out.println(s);
                             if (s.varPattern()==0)

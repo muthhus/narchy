@@ -150,8 +150,8 @@ public final class STMTemporalLinkage extends STM {
                     if (bc != null && !bc.equals(ac)) { //null or same concept?
 
                         //TODO handle overflow?
-                        bc.termlinks().put(new PLink(ac, pri));
-                        ac.termlinks().put(new PLink(bc, pri));
+                        bc.termlinks().put(new PLink(ac, p));
+                        ac.termlinks().put(new PLink(bc, p));
 
                         //tasklinks, not sure:
                         //        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));

@@ -25,12 +25,13 @@ import org.slf4j.LoggerFactory;
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 
 /**
  * Final conclusion step of the derivation process that produces a derived task
- *
+ * <p>
  * Each rule corresponds to a unique instance of this
  */
 public final class Conclude extends AbstractPred<Derivation> {
@@ -68,7 +69,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
         Pair<Atomic, TermContainer> outerFunctor = Op.functor(pp, $.terms);
-        if (outerFunctor!=null && outerFunctor.getOne().toString().equals("varIntro")) {
+        if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);
         } else {
@@ -111,7 +112,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-        TermIndex index = d.index;
+        TermIndex index = d.terms;
 
 
         Term b0 = this.conclusionPattern;
@@ -224,37 +225,38 @@ public final class Conclude extends AbstractPred<Derivation> {
                 c2 = c1;
             }
 
-            Compound c2v;
-            if (varIntro) {
-                c2v = compoundOrNull(new DepIndepVarIntroduction.VarIntro(nar).introduce(c2));
-                if (c2v == null)
-                    return;
-            } else {
-                c2v = c2;
-            }
 
             byte punc = d.concPunc;
-            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2v, punc, d.index);
+            @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms);
             if (c3n != null) {
-                if (c3n.getTwo() && truth!=null)
-                    truth = truth.negated();
+
+
+                Compound C = c3n.getOne();
+                if (varIntro) {
+                    Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(C), d.terms);
+                    if (Cv == null || Cv.equals(C) /* keep only if it differs */)
+                        return;
+                    else
+                        C = Cv;
+                }
 
                 long start = occ[0];
                 long end = occ[1];
+                if (start != ETERNAL && end < start) { //why?
+                    long s = start; start = end; end = s; //swap
+                }
 
-                Compound C = c3n.getOne();
                 float priority = d.budgeting.budget(d, C, truth, punc, start, end);
-
                 if (priority == priority) {
 
-                    if (start!=ETERNAL && end < start) { //why?
-                        long s = start; start = end; end = s; //swap
-                    }
+
+                    if (c3n.getTwo() && truth != null)
+                        truth = truth.negated();
 
                     DerivedTask t =
                             Param.DEBUG ?
-                                new DebugDerivedTask( C, punc, truth, d, start, end) :
-                                new DerivedTask( C, punc, truth, d, start, end);
+                                    new DebugDerivedTask(C, punc, truth, d, start, end) :
+                                    new DerivedTask(C, punc, truth, d, start, end);
 
                     if (t.equals(d.task) || t.equals(d.belief)) {
                         return; //created a duplicate of the task

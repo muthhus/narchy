@@ -51,7 +51,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public static final int binarySearchThreshold = 8;
 
-    protected E[] list = (E[]) zeroList;
+    public E[] list = (E[]) zeroList;
 
     private int size;
 

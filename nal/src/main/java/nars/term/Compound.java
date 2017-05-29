@@ -28,6 +28,7 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
+import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
@@ -790,8 +791,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override
-    default Term eval(TermContext index) {
+    @Override default Term eval(TermContext index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!isDynamic()) //!hasAll(Op.EvalBits))
@@ -833,6 +833,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 evalSubs[i] = y;
             }
+
             if (modified) {
                 return
                     index.the(op(), dt(), evalSubs)

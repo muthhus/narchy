@@ -26,7 +26,7 @@ public interface TaskTable  {
     void add(@NotNull Task t, TaskConcept c, NAR n);
 
 
-    static void activate(@NotNull Task t, float activation, TaskConcept c, @NotNull NAR n) {
+    static void activate(@NotNull Task t, float activation, @NotNull TaskConcept c, @NotNull NAR n) {
         n.eventTaskProcess.emit(/*post*/t);
         n.input(new SpreadingActivation(t, c, activation));
     }

@@ -177,15 +177,23 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variable_elimination4()  {
         TestNAR tester = test();
-        //tester.log();
+        tester.log();
         tester.believe("(&&,<#x --> bird>,<#x --> swimmer>)"); //en("Some bird can swim.");
         tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
         tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, //en("I guess swan can swim.");
                 0.38f);
                 //0.43f);
-
     }
-
+   @Test
+    public void variable_elimination4b()  {
+        TestNAR tester = test();
+        tester.log();
+        tester.believe("(<#x --> bird> <-> <#x --> swimmer>)"); //en("Some bird can swim.");
+        tester.believe("<swan --> bird>", 0.90f, 0.9f); //en("Swan is a type of bird.");
+        tester.mustBelieve(cycles, "<swan --> swimmer>", 0.90f, //en("I guess swan can swim.");
+                0.81f);
+                //0.43f);
+    }
 
     @Test
     public void variable_elimination5()  {

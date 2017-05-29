@@ -4,7 +4,6 @@ import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
@@ -24,6 +23,11 @@ import static nars.Op.*;
  */
 public class DepIndepVarIntroduction extends VarIntroduction {
 
+    public static final VarIntro the = new VarIntro();
+
+    public final static Term varIntro(Term x) {
+        return the.introduce(x);
+    }
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
 
@@ -32,16 +36,13 @@ public class DepIndepVarIntroduction extends VarIntroduction {
     /** sum by complexity if passes include filter */
     private static final ToIntFunction<Term> depIndepFilter = t ->
             t.hasAny(DepOrIndepBits | Op.NEG.bit) ? 0 : 1;
-    private final NAR nar;
 
-    public DepIndepVarIntroduction(NAR nar) {
-        this.nar = nar;
+
+    public DepIndepVarIntroduction() {
+
     }
 
-    @Override
-    protected TermIndex index() {
-        return nar.terms;
-    }
+
 
     //(t.op()==VAR_INDEP || t.op()==VAR_DEP) ? 0 : 1;
 
@@ -123,12 +124,12 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         if (!depOrIndep) {
             //at least one impl/equiv must have both sides covered
             return (m.anySatisfy(b -> b == 0b11)) ?
-                    $.v(VAR_INDEP, "x" + order) /*varIndep(order)*/ : null;
+                    $.v(VAR_INDEP, order) /*varIndep(order)*/ : null;
 
         } else {
             //at least one conjunction must contain >=2 path instances
             return m.anySatisfy(b -> b >= 2) ?
-                    $.v(VAR_DEP, "x" + order)  /* $.varDep(order) */ : null;
+                    $.v(VAR_DEP, order)  /* $.varDep(order) */ : null;
         }
 
     }
@@ -147,9 +148,9 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         @NotNull
         final DepIndepVarIntroduction introducer;
 
-        public VarIntro(NAR nar) {
+        public VarIntro() {
             super("varIntro");
-            this.introducer = new DepIndepVarIntroduction(nar);
+            this.introducer = new DepIndepVarIntroduction();
         }
 
 

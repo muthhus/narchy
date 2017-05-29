@@ -350,10 +350,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             Task revised = tryRevision(input, c, nar);
             if (revised != null) {
                 if (revised == input) {
-                    activation = 0;//already present duplicate, so ignore
-                    activated = null;
+                    //already present duplicate, so ignore
+                    return;
                 } else if (revised.equals(input)) {
-                    activation = input.priSafe(0) - revised.priSafe(0);
+                    float maxActivation = 1f - revised.priSafe(0);
+                    activation = Math.min(maxActivation, input.priSafe(0)); //absorb up to 1.0 max
+                    revised.priAdd(activation);
                     activated = revised; //use previous value
                     input.delete();
                 } else {
@@ -395,6 +397,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
+        assert(activation>=0);
         if (activation >= Pri.EPSILON) {
             TaskTable.activate(activated, Float.POSITIVE_INFINITY, c, nar);
         }

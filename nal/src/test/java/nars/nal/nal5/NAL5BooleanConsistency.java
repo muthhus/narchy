@@ -34,7 +34,7 @@ public class NAL5BooleanConsistency {
             for (int j = 0; j < 2; j++) {
                 Default d = new Default();
                 d.nal(6);
-                d.termVolumeMax.setValue(20);
+                d.termVolumeMax.setValue(14);
 
                 //d.log();
 

@@ -57,22 +57,22 @@ public abstract class Unify implements Termutator, Subst {
     public final Versioning versioning;
 
     @NotNull
-    public TermIndex index;
+    public TermIndex terms;
 
     @NotNull
     public final VersionMap<Term, Term> xy;
 
 
 
-    protected Unify(TermIndex index, @Nullable Op type, Random random, int stackMax, int ttl) {
-        this(index, type, random, new Versioning(stackMax, ttl));
+    protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int ttl) {
+        this(terms, type, random, new Versioning(stackMax, ttl));
     }
 
     /** TODO make type not @Nullable */
-    protected Unify(TermIndex index, @Nullable Op type, Random random, @NotNull Versioning versioning) {
+    protected Unify(TermIndex terms, @Nullable Op type, Random random, @NotNull Versioning versioning) {
         super();
 
-        this.index = index;
+        this.terms = terms;
 
         this.random = random;
         this.type = type!=null ? type : VAR_PATTERN;
@@ -211,7 +211,7 @@ public abstract class Unify implements Termutator, Subst {
 
     @Nullable
     public Term resolve(@NotNull Term x) {
-        return transform(x, index);
+        return transform(x, terms);
     }
 
 

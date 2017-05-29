@@ -430,10 +430,13 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     protected void sort() {
         int s = size();
-        if (s > 1) {
-            int[] stack = new int[sortSize(s) /* estimate */];
+        if (s > 1 && items.list.length > 1) {
             synchronized (items) {
-                qsort(stack, items.array(), 0 /*dirtyStart - 1*/, (s - 1));
+                Object[] a = items.list;
+                if (a.length > 1) { //test again
+                    int[] stack = new int[sortSize(s) /* estimate */];
+                    qsort(stack, (PriReference[]) a, 0 /*dirtyStart - 1*/, (s - 1));
+                }
             }
         }
     }

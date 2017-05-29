@@ -102,7 +102,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         if (pressure.floatValue() >= Pri.EPSILON)
             commit(); //apply forgetting
 
-        if (activation > Pri.EPSILON) {
+        if (activation >= Pri.EPSILON) {
             TaskTable.activate(y, activation, c, n);
         }
     }

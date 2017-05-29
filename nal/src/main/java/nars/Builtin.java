@@ -75,7 +75,7 @@ public class Builtin {
      */
     public static void load(NAR nar) {
 
-        nar.on(new DepIndepVarIntroduction.VarIntro(nar));
+        nar.on(new DepIndepVarIntroduction.VarIntro());
 
 
 
