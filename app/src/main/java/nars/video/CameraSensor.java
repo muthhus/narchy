@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * manages reading a camera to a pixel grid of SensorConcepts
@@ -57,7 +56,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         this.h = src.height();
         numPixels = w * h;
 
-        this.in = nar.mix.stream(this);
+        this.in = nar.in.stream(this);
 
         pixels = encode(pixelTermer);
 

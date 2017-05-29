@@ -37,7 +37,7 @@ public class MIDI {
         d.termVolumeMax.setValue(32);
         MidiInReceiver midi = MIDI(d);
 
-        d.mix.stream("Derive").setValue(0.25f);
+        d.in.stream("Derive").setValue(0.25f);
 
         SoNAR s = new SoNAR(d);
         //s.audio.record("/tmp/midi2.raw");

@@ -17,6 +17,7 @@ public class FloatSlider extends BaseSlider {
     final Label label;
     public FloatSupplier input;
 
+
     public FloatSlider(float v, float min, float max) {
         super((v - min) / (max - min));
 

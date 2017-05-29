@@ -118,7 +118,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     protected final NARLoop loop = new NARLoop(this);
 
-    public final Mix<Object, ITask> mix;
+    public final Mix<Object, ITask> in;
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -188,7 +188,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.random = rng;
 
         this.exe = exe;
-        this.mix = new Mix((Consumer<ITask>)this::input);
+
+        this.emotion = new Emotion();
+        this.in = new Mix((Consumer<ITask>)this::input);
+        this.onCycle((n) -> n.in.commit(n.time()));
 
         this.level = 8;
 
@@ -196,7 +199,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         this.terms = terms;
 
-        this.emotion = new Emotion();
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);

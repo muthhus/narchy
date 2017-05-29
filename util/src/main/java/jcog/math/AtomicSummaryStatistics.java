@@ -7,6 +7,7 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import java.io.Serializable;
 import java.util.concurrent.atomic.DoubleAccumulator;
 
+/** see also: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/StatCounter.scala */
 public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure, Serializable, StatisticalSummary {
 
     protected long count;

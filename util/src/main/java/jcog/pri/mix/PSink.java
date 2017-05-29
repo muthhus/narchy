@@ -15,17 +15,22 @@ import java.util.stream.Stream;
 public class PSink<K,P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
 
     public final AtomicSummaryStatistics in, out;
-    public final K source;
+    public final K id;
     private final Consumer<P> target;
 
     float minThresh = Pri.EPSILON;
 
-    PSink(K source, Consumer<P> target) {
+    PSink(K id, Consumer<P> target) {
         super(1f, 0f, 2f);
-        this.source = source;
+        this.id = id;
         in = new AtomicSummaryStatistics();
         out = new AtomicSummaryStatistics();
         this.target = target;
+    }
+
+    @Override
+    public String toString() {
+        return id.toString();
     }
 
     public Stream<P> apply(Stream<P> x) {

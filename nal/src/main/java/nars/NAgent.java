@@ -147,10 +147,10 @@ abstract public class NAgent implements NSense, NAct {
         curiosity = new FloatParam( 0.10f);
 
 
-        this.sense = nar.mix.stream(id + " sensor");
-        this.ambition = nar.mix.stream(id + " ambition");
-        this.predict = nar.mix.stream(id + " predict");
-        this.motor = nar.mix.stream(id + " motor");
+        this.sense = nar.in.stream(id + " sensor");
+        this.ambition = nar.in.stream(id + " ambition");
+        this.predict = nar.in.stream(id + " predict");
+        this.motor = nar.in.stream(id + " motor");
     }
 
     @Override

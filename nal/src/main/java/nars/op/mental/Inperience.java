@@ -139,7 +139,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         );
         this.nar = n;
 
-        in = nar.mix.stream(this);
+        in = nar.in.stream(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();

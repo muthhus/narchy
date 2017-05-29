@@ -1,9 +1,11 @@
 package nars.gui;
 
+import jcog.data.FloatParam;
 import jcog.event.On;
+import jcog.pri.mix.Mix;
+import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
-import jcog.pri.mix.Mix;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meter.Plot2D;
@@ -21,6 +23,7 @@ public class MixBoard extends Grid implements Consumer<NAR> {
     private final Plot2D /*priInPlot, */priOutPlot;
     private final Plot2D quaPlot;
     private final Mix mix;
+    float[] next;
 
     public MixBoard(NAR nar, Mix<Object, ?> mix) {
         super(HORIZONTAL);
@@ -32,17 +35,32 @@ public class MixBoard extends Grid implements Consumer<NAR> {
         //priInPlot = new Plot2D(32, Plot2D.Line);
         priOutPlot = new Plot2D(32, Plot2D.Line);
         quaPlot = new Plot2D(32, Plot2D.Line);
-        mix.streams.forEach((k, v) -> {
-            //priInPlot.add(k + " in", v.in::getSum);
-            priOutPlot.add(k + " out", v.out::getSum);
+        String[] col = nar.in.data.col;
+        int streamCols = 2;
+        int i = 0;
+        next = new float[streamCols * nar.in.streamID.length];
+        for (PSink k : nar.in.streamID) {
+            final int ii = i;
+            priOutPlot.add(k + " out", () -> {
+//                float N = next[1 + ii * 2];
+//                if (N == 0)
+//                    return 0;
+//                else {
+                float sum = next[1 + ii * streamCols + 0];
+                return sum;
+
+            });
             sliders.add(
-                new FloatSlider(v) {
-                    @Override public String labelText() {
-                        return k.toString();
+                    new FloatSlider(new LogAdapter(k)) {
+
+                        @Override
+                        public String labelText() {
+                            return k.toString();
+                        }
                     }
-                }
             );
-        });
+            i++;
+        }
 
         set(col(sliders), col(/*priInPlot, */priOutPlot, quaPlot));
 
@@ -57,12 +75,43 @@ public class MixBoard extends Grid implements Consumer<NAR> {
 
     @Override
     public void accept(NAR pLinks) {
+
+        next = mix.data.sample(next);
+
         //priInPlot.update();
         priOutPlot.update();
 
         quaPlot.update();
+    }
 
-        mix.commit();
+    /**
+     * the x=0..1 left-half
+     *          mapped to a exponential-like curve, with x=1 corresponding to gain=1
+     *     x=1..2 right-half
+     *          mapped to a linear up to max gain (ex: =2)
+     */
+
+    static class LogAdapter extends FloatParam {
+        private final FloatParam target;
+
+        public LogAdapter(FloatParam target) {
+            super(1, 0, 2);
+            this.target = target;
+        }
+
+        public static float y(float x) {
+            if (x < 1f) {
+                return x*x*x*x; //x^4, exponential-like
+            } else {
+                return x;
+            }
+        }
+
+        @Override
+        public void setValue(float x) {
+            super.setValue(x);
+            target.setValue(y(x));
+        }
     }
 
 //    private static class PriDifference implements DoubleSupplier {

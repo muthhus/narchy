@@ -224,7 +224,7 @@ abstract public class NAgentX extends NAgent {
                                     ) : label(nar.getClass()),
 
                             new WindowButton("mix", () -> {
-                                return new MixBoard(nar, nar.mix);
+                                return new MixBoard(nar, nar.in);
                             })
                     ),
 

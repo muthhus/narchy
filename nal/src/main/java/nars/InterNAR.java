@@ -62,7 +62,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
         super(port, discover);
         this.nar = nar;
 
-        this.receive = nar.mix.stream(this);
+        this.receive = nar.in.stream(this);
 
         this.out = new LeakOut(nar, 256, outRate) {
             @Override protected float send(Task x) {
