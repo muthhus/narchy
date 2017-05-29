@@ -1,20 +1,23 @@
 package jcog.math;
 
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
+import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
 import java.util.concurrent.atomic.DoubleAccumulator;
 
-public class AtomicSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
+public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure, Serializable, StatisticalSummary {
+
     protected long count;
+    protected double min;
+    protected double max;
+    protected double mean;
+    protected double sum;
 
-    protected double min = Float.POSITIVE_INFINITY;
-    protected double max = Float.NEGATIVE_INFINITY;
-    protected double mean = 0;
-    protected double sum = 0;
-
-        /** NaN triggers reset */
+    /**
+     * NaN triggers reset
+     */
     final DoubleAccumulator update = new DoubleAccumulator((ss, v) -> {
         if (v == v) {
             //sumWithCompensation(value);
@@ -34,8 +37,8 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
             count = 0;
             mean = 0;
             sum = 0;
-            min = Float.POSITIVE_INFINITY;
-            max = Float.NEGATIVE_INFINITY;
+            min = Double.POSITIVE_INFINITY;
+            max = Double.NEGATIVE_INFINITY;
             return 0;
         }
     }, 0);
@@ -54,12 +57,17 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
         accept(each);
     }
 
+    @Override
+    public void value(double each) {
+        accept(each);
+    }
+
     public final void clear() {
         update.accumulate(Double.NaN);
     }
 
     public final void accept(double value) {
-        if (value!=value)
+        if (value != value)
             return; //filter any NaN coming from outside
         update.accumulate(value);
     }
@@ -78,25 +86,24 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
     /**
      * Returns the sum of values recorded, or zero if no values have been
      * recorded.
-     *
+     * <p>
      * If any recorded value is a NaN or the sum is at any point a NaN
      * then the sum will be NaN.
-     *
+     * <p>
      * <p> The value of a floating-point sum is a function both of the
      * input values as well as the order of addition operations. The
      * order of addition operations of this method is intentionally
      * not defined to allow for implementation flexibility to improve
      * the speed and accuracy of the computed result.
-     *
+     * <p>
      * In particular, this method may be implemented using compensated
      * summation or other technique to reduce the error bound in the
      * numerical sum compared to a simple summation of {@code float}
      * values.
      *
+     * @return the sum of values, or zero if none
      * @apiNote Values sorted by increasing absolute magnitude tend to yield
      * more accurate results.
-     *
-     * @return the sum of values, or zero if none
      */
     @Override
     public final double getSum() {
@@ -151,7 +158,7 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Returns a non-empty string representation of this object suitable for
      * debugging. The exact presentation format is unspecified and may vary
      * between implementations and versions.
@@ -169,22 +176,22 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
     }
 
 
-
     /**
      * Returns the standard deviation of the values that have been added.
      * <p>
      * Double.NaN is returned if no values have been added.
      * </p>
      * The Standard Deviation is a measure of how spread out numbers are.
+     *
      * @return the standard deviation
      */
     @Override
     public double getStandardDeviation() {
         double v = getVariance();
-        if (v==v)
-            return (float) Math.sqrt(v);
+        if (v == v)
+            return Math.sqrt(v);
         else
-            return Float.NaN;
+            return Double.NaN;
     }
 
     @Override
@@ -195,8 +202,8 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
     @Override
     public double getVariance() {
         long c = count;
-        if (c == 0) return Float.NaN;
-        return update.floatValue() / (c);
+        if (c == 0) return Double.NaN;
+        return update.doubleValue() / (c);
     }
 
 }
