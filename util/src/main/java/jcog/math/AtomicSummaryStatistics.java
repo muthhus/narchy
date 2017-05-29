@@ -55,10 +55,12 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
     }
 
     public final void clear() {
-        accept(Float.NaN);
+        update.accumulate(Double.NaN);
     }
 
     public final void accept(double value) {
+        if (value!=value)
+            return; //filter any NaN coming from outside
         update.accumulate(value);
     }
 
