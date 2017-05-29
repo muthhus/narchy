@@ -190,6 +190,12 @@ public class NARS extends NAR {
 //            );
 //        }
 
+
+        @Override
+        public boolean run(@NotNull ITask input) {
+            return super.run(input);
+        }
+
         @Override
         public void runLater(@NotNull Runnable r) {
             pool.execute(r); //use the common threadpool
@@ -240,11 +246,6 @@ public class NARS extends NAR {
         return this.loop.isRunning();
     }
 
-
-    @Override
-    public @NotNull NARLoop start() {
-        return startFPS(SYNC_HZ_DEFAULT);
-    }
 
     @Override
     public NARLoop startPeriodMS(int ms) {

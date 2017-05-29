@@ -73,7 +73,7 @@ public class Recog2D extends NAgentX {
         Param.DEBUG = false;
     }
 
-    public Recog2D(NAR n) throws Narsese.NarseseException {
+    public Recog2D(NAR n) {
         super("x", n);
 
 
@@ -117,7 +117,7 @@ public class Recog2D extends NAgentX {
 
         //nar.log();
 
-        outs = new Outputs(ii -> (Compound) $.inh(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> $.inh(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
@@ -302,14 +302,14 @@ public class Recog2D extends NAgentX {
         g.drawString(s, Math.round(w / 2f - sb.getCenterX()), Math.round(h / 2f - sb.getCenterY()));
     }
 
-    public static void main(String[] arg) throws Narsese.NarseseException {
-        Recog2D a = new Recog2D(NARBuilder.newMultiThreadNAR(
-                1,
-                new RealTime.DS(true).durFPS(1)));
+    public static void main(String[] arg) {
 
+        NAgentX.runRT((n) -> {
 
-        NAgentX.chart(a);
-        a.startRT(1);
+            Recog2D a = new Recog2D(n);
+            return a;
+
+        }, 10);
     }
 
     public static class Training {

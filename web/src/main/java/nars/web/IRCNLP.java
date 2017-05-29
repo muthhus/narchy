@@ -404,7 +404,6 @@ public class IRCNLP extends IRC {
 
         );
 
-        n.start();
 
         bot.start();
 

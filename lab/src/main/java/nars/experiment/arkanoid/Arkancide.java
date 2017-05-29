@@ -17,14 +17,14 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 16;
-    final int visH = 8;
+    final int visW = 32;
+    final int visH = 16;
 
     //final int afterlife = 60;
 

@@ -5,6 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.experiment.recog2d.Recog2D;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
@@ -81,16 +82,18 @@ public class Gradius extends NAgentX {
     }
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(
-                3,
-                new RealTime.CS(true)
-                        .durFPS(10f), true);
 
-        Gradius a = new Gradius(n);
-        a.startRT(10f);
+         NAgentX.runRT((n) -> {
 
+             Gradius a = null;
+             try {
+                 a = new Gradius(n);
+             } catch (Narsese.NarseseException e) {
+                 e.printStackTrace();
+             }
+             return a;
 
-        NAgentX.chart(a);
+        }, 20f);
 
     }
 
