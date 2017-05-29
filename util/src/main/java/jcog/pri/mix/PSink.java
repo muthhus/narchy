@@ -1,11 +1,8 @@
 package jcog.pri.mix;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.AtomicSummaryStatistics;
-import jcog.meter.event.PeriodMeter;
 import jcog.pri.Pri;
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 
 import java.util.function.Consumer;
@@ -13,21 +10,21 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 /** a sink channel (ie. target/destination) for streams of Priority instances,
- *      with mix controls */
+ *      with mix controls. safe for multiple writers, as long as the target
+ *      consumer also is. */
 public class PSink<K,P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
 
-    public final AtomicSummaryStatistics priMeterIn, priMeterOut;
+    public final AtomicSummaryStatistics in, out;
     public final K source;
     private final Consumer<P> target;
 
     float minThresh = Pri.EPSILON;
 
-
     PSink(K source, Consumer<P> target) {
         super(1f, 0f, 2f);
         this.source = source;
-        priMeterIn = new AtomicSummaryStatistics();
-        priMeterOut = new AtomicSummaryStatistics();
+        in = new AtomicSummaryStatistics();
+        out = new AtomicSummaryStatistics();
         this.target = target;
     }
 
@@ -77,8 +74,8 @@ public class PSink<K,P extends Priority> extends FloatParam implements Function<
             if (pg >= minThresh) {
                 pp.setPri(p * g);
                 target.accept(pp);
-                priMeterIn.accept(p);
-                priMeterOut.accept(p * g);
+                in.accept(p);
+                out.accept(p * g);
             }
         }
 
@@ -86,8 +83,8 @@ public class PSink<K,P extends Priority> extends FloatParam implements Function<
 
     /** reset gathered statistics */
     public void commit() {
-        priMeterIn.clear();
-        priMeterOut.clear();
+        in.clear();
+        out.clear();
         //quaMeter.clear();
     }
 }

@@ -16,8 +16,8 @@ import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -50,16 +50,14 @@ public class NARS extends NAR {
     private List<NARLoop> loops;
 
     @Override
-    public void input(ITask... t) {
+    public void input(ITask x) {
 
-        //assert (!nar.isEmpty());
-        int next = random().nextInt(num);
-        for (ITask x : t) {
-            NAR target = this.sub.get(next); //random distribution TODO abstract to other striping policies
-//                if (target.exe.run(x))
-            target.exe.run(x);
-            if (++next == num) next = 0; //% num
-        }
+        int next = random.nextInt(num);
+
+        NAR target = this.sub.get(next); //random distribution TODO abstract to other striping policies
+
+        target.exe.run(x);
+
     }
 
     @FunctionalInterface
@@ -122,6 +120,7 @@ public class NARS extends NAR {
         }
 
         final AtomicBoolean busy = new AtomicBoolean(false);
+
         @Override
         public void cycle(@NotNull NAR nar) {
 
@@ -154,7 +153,9 @@ public class NARS extends NAR {
             busy.set(false);
         }
 
-        /** dont call directly */
+        /**
+         * dont call directly
+         */
         public void run() {
             nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
         }
@@ -171,7 +172,7 @@ public class NARS extends NAR {
 
         @Override
         public void forEach(Consumer<ITask> each) {
-            ((NARS)nar).sub.forEach(s -> s.exe.forEach(each));
+            ((NARS) nar).sub.forEach(s -> s.exe.forEach(each));
         }
 
     }
@@ -233,8 +234,6 @@ public class NARS extends NAR {
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
         this(time, rng, new RootExecutioner(passiveThreads));
     }
-
-
 
 
     public boolean running() {

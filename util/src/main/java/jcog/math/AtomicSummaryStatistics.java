@@ -6,14 +6,6 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import java.io.Serializable;
 import java.util.concurrent.atomic.DoubleAccumulator;
 
-/**
- * floatSummaryStatistics in java.util can't be cleared
- * wtf
- * anyway we'll add stdev calcluation to this and it will
- * serve as a lighter weight replacement for Apache
- * Commons Math SummaryStatistics which also is undesirable
- *
- */
 public class AtomicSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
     protected long count;
 
@@ -26,6 +18,8 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
     final DoubleAccumulator update = new DoubleAccumulator((ss, v) -> {
         if (v == v) {
             //sumWithCompensation(value);
+
+            sum += v;
             if (min > v) min = v;
             if (max < v) max = v;
 
@@ -165,11 +159,11 @@ public class AtomicSummaryStatistics implements FloatProcedure, Serializable, St
         return String.format(
                 "%s{n=%d, sum=%f, min=%f, avg=%f, max=%f}",
                 getClass().getSimpleName(),
-                getN(),
-                getSum(),
-                getMin(),
-                (float) getMean(),
-                getMax());
+                count,
+                sum,
+                min,
+                mean,
+                max);
     }
 
 

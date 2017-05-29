@@ -88,7 +88,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     static final String VERSION = "NARchy v?.?";
 
     public final Executioner exe;
-    private final @NotNull Random random;
+    protected final @NotNull Random random;
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
@@ -188,7 +188,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.random = rng;
 
         this.exe = exe;
-        this.mix = new Mix((Consumer<ITask>)exe::run); //same result as NAR.input()
+        this.mix = new Mix((Consumer<ITask>)this::input);
 
         this.level = 8;
 
@@ -526,9 +526,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * main task entry point
      */
-    public void input(@NotNull ITask... t) {
+    public final void input(@NotNull ITask... t) {
         for (ITask x : t)
-            exe.run(x);
+            input(x);
+    }
+    public void input(@NotNull ITask t) {
+        exe.run(t);
     }
 
 

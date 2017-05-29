@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 public class MixBoard extends Grid implements Consumer<NAR> {
 
     private final On on;
-    private final Plot2D priInPlot, priOutPlot;
+    private final Plot2D /*priInPlot, */priOutPlot;
     private final Plot2D quaPlot;
     private final Mix mix;
 
@@ -29,12 +29,12 @@ public class MixBoard extends Grid implements Consumer<NAR> {
 
         List<Surface> sliders = $.newArrayList();
 
-        priInPlot = new Plot2D(32, Plot2D.Line);
+        //priInPlot = new Plot2D(32, Plot2D.Line);
         priOutPlot = new Plot2D(32, Plot2D.Line);
         quaPlot = new Plot2D(32, Plot2D.Line);
         mix.streams.forEach((k, v) -> {
-            priInPlot.add(k + " in", v.priMeterIn::sum);
-            priOutPlot.add(k + " out", v.priMeterOut::sum);
+            //priInPlot.add(k + " in", v.in::getSum);
+            priOutPlot.add(k + " out", v.out::getSum);
             sliders.add(
                 new FloatSlider(v) {
                     @Override public String labelText() {
@@ -44,7 +44,7 @@ public class MixBoard extends Grid implements Consumer<NAR> {
             );
         });
 
-        set(col(sliders), col(priInPlot, priOutPlot, quaPlot));
+        set(col(sliders), col(/*priInPlot, */priOutPlot, quaPlot));
 
         on = nar.onCycle(this);
     }
@@ -57,7 +57,7 @@ public class MixBoard extends Grid implements Consumer<NAR> {
 
     @Override
     public void accept(NAR pLinks) {
-        priInPlot.update();
+        //priInPlot.update();
         priOutPlot.update();
 
         quaPlot.update();
