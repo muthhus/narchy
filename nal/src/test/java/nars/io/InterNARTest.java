@@ -6,6 +6,8 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
 import nars.index.term.map.MapTermIndex;
 import nars.nar.Default;
 import nars.time.RealTime;
@@ -26,12 +28,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class InterNARTest {
 
-    final static AtomicInteger nextPort = new AtomicInteger(10000);
+    static {
+        Deriver x = DefaultDeriver.the;
+    }
 
     static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 100;
-        int postCycles = 50;
+        final int CONNECTION_TIME = 400;
+        int preCycles = 1;
+        int postCycles = 150;
 
         Param.ANSWER_REPORTING = false;
 
@@ -44,33 +49,34 @@ public class InterNARTest {
 
             beforeConnect.accept(a, b);
 
-            a.run(2); b.run(2);
+            for (int i = 0; i < preCycles; i++) {
+                a.run(1); b.run(1);
+            }
 
-            InterNAR ai = new InterNAR(a, 4, 0, false);
-            InterNAR bi = new InterNAR(b, 4, 0, false);
+            InterNAR ai = new InterNAR(a, 20, 0, false);
+            InterNAR bi = new InterNAR(b, 20, 0, false);
 
-            ai.setFPS(8f);
-            bi.setFPS(8f);
+            ai.setFPS(6f);
+            bi.setFPS(6f);
 
-            Util.pause(CONNECTION_TIME);
+            Util.sleep(CONNECTION_TIME);
 
             bi.ping(ai.addr);
 
-            Util.pause(CONNECTION_TIME);
+            Util.sleep(CONNECTION_TIME);
 
             afterConnect.accept(ai, bi);
 
-            Util.pause(CONNECTION_TIME);
+            Util.sleep(CONNECTION_TIME);
 
             for (int i = 0; i < postCycles; i++) {
-                a.run(1);
-                b.run(1);
+                a.run(1); b.run(1);
             }
 
-            Util.pause(CONNECTION_TIME);
+            Util.sleep(CONNECTION_TIME);
 
-//            ai.stop();
-//            bi.stop();
+            ai.stop();
+            bi.stop();
             a.stop();
             b.stop();
 
@@ -149,11 +155,11 @@ public class InterNARTest {
         }, (ai, bi) -> {
 
 
-//            try {
-//                bi.nar.question("(a --> d)");
-//            } catch (Narsese.NarseseException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                bi.nar.question("(a --> d)");
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+            }
 
             try {
                 ai.nar.believe( $("(b --> c)"), Tense.Eternal,1f,0.9f);

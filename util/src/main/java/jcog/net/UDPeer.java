@@ -237,7 +237,7 @@ public class UDPeer extends UDP {
      */
     public int tellSome(Msg o, float pri, boolean onlyIfNotSeen) {
 
-        if (connected() || pri <= 0) {
+        if (!connected() || pri <= 0) {
             //System.err.println(this + " without any peers to broadcast");
             return 0;
         } else {
@@ -249,7 +249,7 @@ public class UDPeer extends UDP {
 
             final int[] remain = {them.size()};
             them.sample((to) -> {
-                if (o.id() != to.id && (pri >= 1 || rng.nextFloat() <= pri)) {
+                if (o.id() != to.id /*&& (pri >= 1 || rng.nextFloat() <= pri)*/ ) {
                     outBytes(bytes, to.addr);
                 }
                 return ((remain[0]--) > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
