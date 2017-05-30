@@ -13,6 +13,8 @@ import nars.time.RealTime;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
 
+import static nars.video.BufferedImageBitmap2D.ColorMode.R;
+
 /**
  * Created by me on 4/30/17.
  */
@@ -26,15 +28,15 @@ public class Gradius extends NAgentX {
         this.g =  new Gradius4K();
 
         Scale camScale = new Scale(() -> g.image, 64, 64);
+        Scale camScaleLow = new Scale(() -> g.image, 16, 16);
         for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
-                BufferedImageBitmap2D.ColorMode.R,
+                R,
                 BufferedImageBitmap2D.ColorMode.B,
                 BufferedImageBitmap2D.ColorMode.G
         }) {
-            senseCamera("(G,c" + cm.name() + ")",
-                    camScale.filter(cm)
-            )
-                    .resolution(0.2f);
+            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
+                    (cm == R ? camScale : camScaleLow).filter(cm)
+            ).resolution(0.1f);
         }
 
         actionToggle($.inh(Atomic.the("fire"),id),
@@ -85,7 +87,7 @@ public class Gradius extends NAgentX {
 
          NAgentX.runRT((n) -> {
 
-             n.termVolumeMax.setValue(16);
+             n.termVolumeMax.setValue(20);
 
              Gradius a = null;
              try {
@@ -95,7 +97,7 @@ public class Gradius extends NAgentX {
              }
              return a;
 
-        }, 10f);
+        }, 20f);
 
     }
 
