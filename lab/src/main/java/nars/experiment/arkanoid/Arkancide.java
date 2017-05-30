@@ -51,6 +51,7 @@ public class Arkancide extends NAgentX {
 
             try {
                 a = new Arkancide(n, cam, numeric);
+
                 //a.trace = true;
                 //((RealTime)a.nar.time).durSeconds(0.05f);
                 //a.nar.log();
@@ -111,7 +112,7 @@ public class Arkancide extends NAgentX {
             Scale sw = new Scale(new SwingBitmap2D(noid), visW, visH);
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
                     .resolution(0.1f);
-            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, (visW*visH)/8)
+            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
                     .resolution(0.25f);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));

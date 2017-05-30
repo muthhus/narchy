@@ -31,6 +31,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public final List<PixelConcept> pixels;
     private final PSink in;
+    private final Term id;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
@@ -42,13 +43,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
     public CameraSensor(Term root, P src, NAgent agent) {
-        this(src, agent,
-                //XY(root, 2,  src.width(), src.height())
-                RadixProduct(root, src.width(), src.height(), RADIX)
-        );
-    }
-
-    public CameraSensor(P src, NAgent agent, Int2Function<Compound> pixelTermer) {
         super(src, src.width(), src.height());
 
         this.nar = agent.nar;
@@ -59,10 +53,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         this.in = nar.in.stream(this);
 
-        pixels = encode(pixelTermer);
+        pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX));
 
         agent.onFrame(this);
+        this.id = root;
+
     }
+
 
     @NotNull
     @Override
@@ -239,7 +236,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                if (y < h-1) s.add( concept(x, y+1) );
 //
 //                return TermVector.the(s);
-            this.templates = new PixelNeighborsXYRandom(subterms(), x, y, w, h, 2);
+            this.templates = new PixelNeighborsXYRandom(x, y, w, h, 1);
         }
 
         @Override
@@ -256,58 +253,17 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
 
-    private class PixelNeighborsManhattan implements TermContainer {
 
-        private final int x;
-        private final int y;
-        private final int w;
-        private final int h;
-        private final TermContainer subs;
-
-        public PixelNeighborsManhattan(TermContainer subs, int x, int y, int w, int h) {
-            this.subs = subs;
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-        }
-
-        @Override
-        public int size() {
-            return 4 + subs.size();
-        }
-
-        @Override
-        public @NotNull Term sub(int i) {
-
-
-            switch (i) {
-                case 0:
-                    return (x == 0) ? sub(1) : concept(x - 1, y).sub(0);
-                case 1:
-                    return (x == w - 1) ? sub(0) : concept(x + 1, y).sub(0);
-                case 2:
-                    return (y == 0) ? sub(3) : concept(x, y - 1).sub(0);
-                case 3:
-                    return (y == h - 1) ? sub(2) : concept(x, y + 1).sub(0);
-                default:
-                    return subs.sub(i - 4);
-            }
-
-        }
-    }
-
+    /** links only to the 'id' of the image, and N random neighboring pixels */
     private class PixelNeighborsXYRandom implements TermContainer {
 
         private final int x;
         private final int y;
         private final int w;
         private final int h;
-        private final TermContainer subs;
         private final int extra;
 
-        public PixelNeighborsXYRandom(TermContainer subs, int x, int y, int w, int h, int extra) {
-            this.subs = subs;
+        public PixelNeighborsXYRandom(int x, int y, int w, int h, int extra) {
             this.extra = extra;
             this.x = x;
             this.y = y;
@@ -317,24 +273,65 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         @Override
         public int size() {
-            return extra + subs.size();
+            return extra + 1;
         }
 
         @Override
         public @NotNull Term sub(int i) {
 
-            if (i >= subs.size()) {
+            if (i == 0) {
+                return id;
+            } else {
                 //extra
                 return concept(
                         x + (nar.random().nextBoolean() ? -1 : +1),
                         y + (nar.random().nextBoolean() ? -1 : +1)
-                ).sub(0);
-            } else
-                return subs.sub(i);
+                );
+            }
 
 
 
         }
     }
 
+//    private class PixelNeighborsManhattan implements TermContainer {
+//
+//        private final int x;
+//        private final int y;
+//        private final int w;
+//        private final int h;
+//        private final TermContainer subs;
+//
+//        public PixelNeighborsManhattan(TermContainer subs, int x, int y, int w, int h) {
+//            this.subs = subs;
+//            this.x = x;
+//            this.y = y;
+//            this.w = w;
+//            this.h = h;
+//        }
+//
+//        @Override
+//        public int size() {
+//            return 4 + subs.size();
+//        }
+//
+//        @Override
+//        public @NotNull Term sub(int i) {
+//
+//
+//            switch (i) {
+//                case 0:
+//                    return (x == 0) ? sub(1) : concept(x - 1, y).sub(0);
+//                case 1:
+//                    return (x == w - 1) ? sub(0) : concept(x + 1, y).sub(0);
+//                case 2:
+//                    return (y == 0) ? sub(3) : concept(x, y - 1).sub(0);
+//                case 3:
+//                    return (y == h - 1) ? sub(2) : concept(x, y + 1).sub(0);
+//                default:
+//                    return subs.sub(i - 4);
+//            }
+//
+//        }
+//    }
 }

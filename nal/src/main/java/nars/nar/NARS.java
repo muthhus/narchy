@@ -232,8 +232,8 @@ public class NARS extends NAR {
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                //new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
     }
 

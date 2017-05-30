@@ -39,8 +39,8 @@ public class AtomInt implements Atomic {
 
 
     @Override
-    public int hashCode() {
-        return id;
+    public final int hashCode() {
+        return id * 31;
     }
 
     @Override
