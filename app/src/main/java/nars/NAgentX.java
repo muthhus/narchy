@@ -118,7 +118,7 @@ abstract public class NAgentX extends NAgent {
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, false, 8);
-        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 16);
 
         int threads = 2;

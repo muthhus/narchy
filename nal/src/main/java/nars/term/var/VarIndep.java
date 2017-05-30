@@ -1,7 +1,10 @@
 package nars.term.var;
 
 import nars.Op;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.VAR_INDEP;
 
 
 /**
@@ -10,14 +13,17 @@ import org.jetbrains.annotations.NotNull;
 public final class VarIndep extends AbstractVariable {
 
     public VarIndep(int id) {
-        super(Op.VAR_INDEP, id);
+        super(VAR_INDEP, id);
     }
+
+    final static int RANK = Term.opX(VAR_INDEP, 0);
+    @Override public int opX() { return RANK;    }
 
 
     @NotNull
     @Override
     public Op op() {
-        return Op.VAR_INDEP;
+        return VAR_INDEP;
     }
 
     @Override

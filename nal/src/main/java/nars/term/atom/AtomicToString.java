@@ -5,7 +5,7 @@ import jcog.Util;
 /**
  * an Atomic impl which relies on the value provided by toString()
  */
-public abstract class ToStringAtomic implements Atomic {
+public abstract class AtomicToString implements Atomic {
 
     /** Assumes that the op()
      *  is encoded within its string such that additional op()

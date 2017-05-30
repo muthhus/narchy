@@ -1,7 +1,10 @@
 package nars.derive.meta.match;
 
+import nars.term.Term;
 import nars.term.var.AbstractVariable;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.VAR_PATTERN;
 
 /**
  * Created by me on 12/5/15.
@@ -23,7 +26,8 @@ public class EllipsisOneOrMore extends Ellipsis {
 //        return new EllipsisOneOrMore(newVar);
 //    }
 
-
+    final static int RANK = Term.opX(VAR_PATTERN, 2 /* different from normalized variables with a subOp of 0 */);
+    @Override public int opX() { return RANK;    }
 
 
     @NotNull

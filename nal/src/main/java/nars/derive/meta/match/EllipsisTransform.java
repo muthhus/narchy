@@ -8,6 +8,8 @@ import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.VAR_PATTERN;
+
 /** ellipsis that transforms one of its elements, which it is required to match within */
 public class EllipsisTransform extends EllipsisOneOrMore {
 
@@ -37,6 +39,9 @@ public class EllipsisTransform extends EllipsisOneOrMore {
         return ss.substring(0,ss.length()-3) /* minus the ..+, as-if calling super.super.toString() */ +
                 ".." + from + '=' + to + "..+";
     }
+
+    final static int RANK = Term.opX(VAR_PATTERN, 3 /* different from normalized variables with a subOp of 0 */);
+    @Override public int opX() { return RANK;    }
 
 //    @NotNull
 //    @Override

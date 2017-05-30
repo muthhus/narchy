@@ -4,7 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,8 +75,8 @@ public class VariableNormalization extends VariableTransform implements Function
     @NotNull
     protected Variable newVariable(@NotNull Variable x, int serial) {
         Variable y;
-        if (x instanceof GenericVariable) {
-            y = ((GenericVariable) x).normalize(serial); //HACK
+        if (x instanceof UnnormalizedVariable) {
+            y = ((UnnormalizedVariable) x).normalize(serial); //HACK
         } else {
             y = $.v(x.op(), serial);
             //y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc

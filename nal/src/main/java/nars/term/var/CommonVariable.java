@@ -2,6 +2,7 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 public final class CommonVariable extends GenericNormalizedVariable {
@@ -11,6 +12,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
         super(type, hashMultiVar(a, b));
     }
 
+    @Override public int opX() { return Term.opX(op(), 1 /* different from normalized variables with a subOp of 0 */);    }
 
     public static @NotNull Variable common(@NotNull Variable A, @NotNull Variable B) {
 
@@ -25,7 +27,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
 //        }
 
 
-        if (A instanceof GenericVariable || B instanceof GenericVariable)
+        if (A instanceof UnnormalizedVariable || B instanceof UnnormalizedVariable)
             throw new RuntimeException("Generic Variable being made Common");
 
         int a = A.id();

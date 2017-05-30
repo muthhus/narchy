@@ -1,7 +1,10 @@
 package nars.term.var;
 
 import nars.Op;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.VAR_PATTERN;
 
 /**
  * normalized pattern variable
@@ -9,8 +12,11 @@ import org.jetbrains.annotations.NotNull;
 public class VarPattern extends AbstractVariable {
 
     public VarPattern(int id) {
-        super(Op.VAR_PATTERN, id);
+        super(VAR_PATTERN, id);
     }
+
+    final static int RANK = Term.opX(VAR_PATTERN, 0);
+    @Override public int opX() { return RANK;    }
 
 
     /** special case: pattern variables contribute no structure currently */
@@ -22,7 +28,7 @@ public class VarPattern extends AbstractVariable {
     @NotNull
     @Override
     public final Op op() {
-        return Op.VAR_PATTERN;
+        return VAR_PATTERN;
     }
 
 

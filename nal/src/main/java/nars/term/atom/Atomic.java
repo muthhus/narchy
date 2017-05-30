@@ -21,24 +21,30 @@ import static java.lang.Integer.MIN_VALUE;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
+
     @NotNull
     static Atomic the(@NotNull String id) {
+        assert(id.length() > 0);
+
         //special cases
         switch (id) {
             case "_":
                 return Op.Imdex;
         }
 
+        //TODO handle negative ints prefixd with '-'
+        if (Character.isDigit(id.charAt(0))) {
+            //try to parse int
+            int i = Texts.i(id, MIN_VALUE);
+            if (i != MIN_VALUE)
+                return AtomInt.the(i); //parsed as integer, so
+        }
+
         if ($.isQuoteNecessary(id))
             return $.quote(id);
 
-        //try to parse int
-        int i = Texts.i(id, MIN_VALUE);
-        if (i != MIN_VALUE)
-            return $.the(i); //parsed as integer, so
 
         return new Atom(id);
-
     }
 
 

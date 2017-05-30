@@ -20,7 +20,10 @@ import nars.task.UnaryTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.AtomInt;
 import nars.term.container.TermContainer;
+import nars.term.var.UnnormalizedVariable;
+import nars.term.var.VarQuery;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -219,8 +222,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             return;
 
         if ((target instanceof Variable)) {
-            if (target.op() == VAR_QUERY)
-                return; //dont create termlinks to query variable subterms
+
         } else {
             @Nullable Concept termConcept = nar.conceptualize(target);
             if (termConcept != null)
@@ -322,17 +324,33 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         int n = targetSubs.size();
         if (n > 0) {
-            float childScale = ((1f - momentum) * scale) / (n);
 
-            for (int i = 0; i < n; i++) {
-                link(targetSubs.sub(i).unneg(), childScale, nextDepth); //link and recurse to the concept
-            }
+            float childScale = ((1f - momentum) * scale) / (n);
             float parentActivation = scale * momentum;
+            for (int i = 0; i < n; i++) {
+                Term si = targetSubs.sub(i);
+                if (termlinkable(si)) {
+                    link(si.unneg(), childScale, nextDepth); //link and recurse to the concept
+                } else {
+                    parentActivation += childScale; //absorb to parent
+                }
+            }
+
             return parentActivation;
 
         }
 
         return scale;
+    }
+
+    private static boolean termlinkable(Term x) {
+
+        assert(!(x instanceof UnnormalizedVariable));
+
+        if (x instanceof AtomInt || x instanceof VarQuery)
+            return false;
+
+        return true;
     }
 
 

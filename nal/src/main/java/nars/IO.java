@@ -15,7 +15,7 @@ import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
@@ -308,7 +308,7 @@ public class IO {
     }
 
     public static boolean isSpecial(@NotNull Term term) {
-        return term instanceof GenericVariable;
+        return term instanceof UnnormalizedVariable;
     }
 
 

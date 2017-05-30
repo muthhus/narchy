@@ -1,8 +1,10 @@
 package nars.derive.meta;
 
+import nars.$;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.premise.Derivation;
-import nars.term.atom.Atom;
+import nars.term.ProxyTerm;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -10,14 +12,14 @@ import java.util.Map;
 /**
  * Created by me on 5/21/16.
  */
-public final class PatternOpSwitch extends Atom /* TODO represent as some GenericCompound */ implements BoolPred<Derivation> {
+public final class PatternOpSwitch extends ProxyTerm<Term> implements BoolPred<Derivation> {
 
     public final BoolPred[] proc = new BoolPred[32]; //should be large enough
     public final int subterm;
 
 
     public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, BoolPred> cases) {
-        super('"' + cases.toString() + '"');
+        super($.func( $.the(subterm), $.quote( cases.toString() )));
 
         this.subterm = subterm;
 

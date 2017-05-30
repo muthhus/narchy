@@ -1,7 +1,10 @@
 package nars.term.var;
 
 import nars.Op;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.VAR_DEP;
 
 
 public abstract class GenericNormalizedVariable extends AbstractVariable {
@@ -13,6 +16,7 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
         super(type, id);
         this.type = type;
     }
+
 
 
     public int[] unhashMultiVar() {

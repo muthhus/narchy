@@ -19,11 +19,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
+import nars.term.atom.AtomInt;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.VarPattern;
 import nars.term.var.Variable;
 import nars.truth.PreciseTruth;
@@ -124,14 +125,7 @@ public enum $ {
     }
 
 
-    @NotNull
-    public static Atom the(int i) {
-        if (i >= 0 && i < MAX_CACHED_INTS) {
-            return digits[i];
-        } else {
-            return new Atom(Integer.toString(i));
-        }
-    }
+
 
     @NotNull
     public static Atom the(char c) {
@@ -267,7 +261,7 @@ public enum $ {
 //                return $.v(type, c-'0'); //explicit use of normalized var
 //        }
 
-        return new GenericVariable(type, type.ch + name);
+        return new UnnormalizedVariable(type, type.ch + name);
     }
 
 
@@ -651,16 +645,6 @@ public enum $ {
     }
 
 
-
-    final static int MAX_CACHED_INTS = 16;
-    private static final Atom[] digits = new Atom[MAX_CACHED_INTS];
-
-    static {
-        for (int i = 0; i < MAX_CACHED_INTS; i++) {
-            digits[i] = new Atom(Integer.toString(i));
-        }
-    }
-
     /**
      * gets the atomic term of an integer, with specific radix (up to 36)
      */
@@ -696,6 +680,11 @@ public enum $ {
 
     public static Atomic the(Number o) {
         return terms.the(o);
+    }
+
+    @NotNull
+    public static Atomic the(int v) {
+        return AtomInt.the((int) v);
     }
 
     @NotNull

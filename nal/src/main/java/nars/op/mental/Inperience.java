@@ -1,10 +1,12 @@
 package nars.op.mental;
 
+import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.mix.PSink;
+import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -26,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -133,9 +136,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
     public Inperience(@NotNull NAR n, float rate, int capacity) {
         super(
-                //new CurveBag(capacity, new CurveBag.NormalizedSampler(power2BagCurve, n.random), BudgetMerge.maxBlend, new ConcurrentHashMap())
-                new PLinkHijackBag(capacity, 4)
-                , rate, n
+            new CurveBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>(capacity)), rate, n
         );
         this.nar = n;
 

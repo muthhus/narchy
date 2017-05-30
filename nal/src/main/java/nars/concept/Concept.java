@@ -54,7 +54,7 @@ public interface Concept extends Termed {
 
     @NotNull Bag<Term,PriReference<Term>> termlinks();
 
-    @Nullable Map<Object, Object> meta();
+    @Nullable Map meta();
 
     /**
      * should not be called directly

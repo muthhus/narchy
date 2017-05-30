@@ -30,7 +30,7 @@ import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
@@ -311,6 +311,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return true;
     }
 
+    /** operator extended:
+     *     operator << 8 | sub-operator type rank for determing compareTo ordering
+     *
+     *     */
+    int opX();
 
     /**
      * GLOBAL TERM COMPARATOR FUNCTION
@@ -323,11 +328,14 @@ public interface Term extends Termlike, Comparable<Termlike> {
 //        if (diff2 != 0)
 //            return diff2;
 
-        if (this.equals(y)) return 0;
-
-        int d = this.op().compareTo( y.op() );
+        int d = Integer.compare(this.opX(), ((Term)y).opX() );
         if (d != 0)
             return d;
+
+        if (y instanceof ProxyTerm)
+            y = ((ProxyTerm)y).ref; //de-ref
+
+        if (this.equals(y)) return 0;
 
         if (this instanceof Compound) {
 
@@ -355,8 +363,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
             //if the op is the same, it is required to be a subclass of Atomic
             //which should have an ordering determined by its toString()
 
-            boolean gx = this instanceof GenericVariable;
-            boolean gy = y instanceof GenericVariable;
+            boolean gx = this instanceof UnnormalizedVariable;
+            boolean gy = y instanceof UnnormalizedVariable;
             if (gx && !gy)
                 return -1;
             if (!gx && gy)
@@ -398,5 +406,16 @@ public interface Term extends Termlike, Comparable<Termlike> {
     default TreeTraverser<Term> termverse() {
         return TreeTraverser.using(x -> x instanceof Compound ? ((Compound)x).subterms() : Collections.emptyList());
     }
+
+    /** opX function */
+    static int opX(Op o, byte subOp) {
+        return o.ordinal() << 8 | subOp;
+    }
+
+    /** for convenience, delegates to the byte function */
+    static int opX(Op o, int subOp) {
+        return opX(o, (byte)subOp);
+    }
+
 }
 

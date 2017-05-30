@@ -33,6 +33,11 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
+    public int opX() {
+        return ref.opX();
+    }
+
+    @Override
     public boolean isTemporal() {
         return ref.isTemporal();
     }

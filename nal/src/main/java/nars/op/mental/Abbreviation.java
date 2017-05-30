@@ -75,7 +75,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(new CurveBag(capacity,
-                PriMerge.plus, new ConcurrentHashMap<>(capacity)), selectionRate, n);
+                PriMerge.max, new ConcurrentHashMap<>(capacity)), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -306,7 +306,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         }
 
         AliasConcept(@NotNull String abbreviation, CompoundConcept abbr, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            super(abbreviation, Op.ATOM, abbr.termlinks(), abbr.tasklinks());
+            super(abbreviation, abbr.termlinks(), abbr.tasklinks());
 
             this.abbr = abbr;
 

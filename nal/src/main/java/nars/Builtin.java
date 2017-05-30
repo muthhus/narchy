@@ -30,6 +30,7 @@ public class Builtin {
             new intersect(),
             new differ(),
             new union(),
+            DepIndepVarIntroduction.the,
 
             //Functor.f0("date", () -> quote(new Date().toString())),
 
@@ -74,9 +75,6 @@ public class Builtin {
      * generate all NAR-contextualized functors
      */
     public static void load(NAR nar) {
-
-        nar.on(new DepIndepVarIntroduction.VarIntro());
-
 
 
                     /** subterm, but specifically inside an ellipsis. otherwise pass through */

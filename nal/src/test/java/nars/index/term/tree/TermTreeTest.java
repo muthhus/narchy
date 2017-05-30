@@ -7,6 +7,7 @@ import nars.concept.Concept;
 import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class TermTreeTest {
 
         TermTree tree = new TermTree();
 
-        Function<Term, Concept> cb = (t)->new AtomConcept((Atomic)t, null, null);
+        Function<Term, Concept> cb = (t)->new AtomConcept((Atom)t, null, null);
 
         tree.computeIfAbsent(TermKey.term($("concept")), cb);
         tree.computeIfAbsent(TermKey.term($("term")), cb);

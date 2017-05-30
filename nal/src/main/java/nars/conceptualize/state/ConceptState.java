@@ -1,26 +1,18 @@
 package nars.conceptualize.state;
 
-import nars.Op;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.term.atom.AtomicString;
+import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 
 /** interface for a management model responsible for concept resource allocation:
  *      --budget (time)
  *      --memory (space)
  */
-public abstract class ConceptState extends AtomicString {
+public abstract class ConceptState extends Atom {
 
     protected ConceptState(@NotNull String id) {
         super(id);
-    }
-
-
-    @NotNull
-    @Override
-    public Op op() {
-        return Op.ATOM;
     }
 
     public abstract int linkCap(Concept compoundConcept, boolean termOrTask);

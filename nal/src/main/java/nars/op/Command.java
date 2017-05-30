@@ -7,6 +7,7 @@ import nars.concept.PermanentConcept;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
 
     public static String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
-    public Command(@NotNull Atomic atom) {
+    public Command(@NotNull Atom atom) {
         super(atom, Bag.EMPTY, Bag.EMPTY);
     }
 

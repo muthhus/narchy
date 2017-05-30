@@ -30,7 +30,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return iterator();
     }
 
-    @Nullable
+    @NotNull
     BeliefTable EMPTY = new BeliefTable() {
 
         @Override

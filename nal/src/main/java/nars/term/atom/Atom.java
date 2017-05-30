@@ -6,13 +6,25 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-/** default Atom implementation: wraps a String instance as closely as possible.
- * ideally this string is stored encoded in UTF8 byte[]'s */
-public class Atom extends AtomicString {
+import static nars.Op.ATOM;
+
+/**
+ * default Atom implementation: wraps a String instance as closely as possible.
+ * ideally this string is stored encoded in UTF8 byte[]'s
+ */
+public class Atom extends AtomicToString {
+
+    public final static int RANK = Term.opX(ATOM, 1);
 
     public Atom(@NotNull String id) {
-        super(validateAtomID(id));
+        this.id = validateAtomID(id);
+        this.hash = super.hashCode();
     }
+
+    @NotNull public final String id;
+
+    /** (cached for speed) */
+    final int hash;
 
     @NotNull
     private static String validateAtomID(@NotNull String id) {
@@ -21,16 +33,34 @@ public class Atom extends AtomicString {
 
         char c = id.charAt(0);
         switch (c) {
+            case '+':
+            case '-':
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+
             case '^':
             case '?':
             case '%':
             case '#':
             case '$':
-                throw new RuntimeException("invalid Atom name \"" + id + "\": leading character imitates another operation type");
+                throw new RuntimeException("invalid " + Atom.class + " name \"" + id + "\": leading character imitates another operation type");
         }
 
         //return id.intern();
         return id;
+    }
+
+    @Override
+    public final int opX() {
+        return RANK;
     }
 
     @NotNull
@@ -39,10 +69,56 @@ public class Atom extends AtomicString {
         return Op.ATOM;
     }
 
-    @Override public Term eval(TermContext index) {
+    @Override
+    public Term eval(TermContext index) {
         Termed existing = index.get(this); //resolve atoms to their concepts for efficiency
         //assumes the AtomConcept returned is the Term itself, as .term() would return
         return existing != null ? existing.term() : this;
     }
+
+    @NotNull
+    @Override public final String toString() {
+        return id;
+    }
+
+    @Override
+    public final int varIndep() {
+        return 0;
+    }
+
+    @Override
+    public final int varDep() {
+        return 0;
+    }
+
+    @Override
+    public final int varQuery() {
+        return 0;
+    }
+
+    @Override
+    public final int varPattern() {
+        return 0;
+    }
+
+    @Override
+    public final int vars() {
+        return 0;
+    }
+
+
+    @Override
+    public final int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public final void init(@NotNull int[] meta) {
+
+        meta[4] ++; //volume
+        meta[5] |= op().bit; //structure();
+
+    }
+
 }
 

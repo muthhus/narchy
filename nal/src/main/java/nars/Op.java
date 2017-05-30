@@ -7,7 +7,7 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.Pair;
@@ -115,7 +115,6 @@ public enum Op {
     //NONE('\u2205', Op.ANY, null),
 
 
-
     VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 
 
@@ -178,7 +177,11 @@ public enum Op {
      * Image index ("imdex") symbol for products, and anonymous variable in products
      */
     public static final Atomic Imdex =
-            new GenericVariable(Op.VAR_DEP, "_");
+            new UnnormalizedVariable(Op.VAR_DEP, "_") {
+
+                final int RANK = Term.opX(VAR_PATTERN, 20 /* different from normalized variables with a subOp of 0 */);
+                @Override public int opX() { return RANK; }
+            };
 
     /**
      * absolute true/always

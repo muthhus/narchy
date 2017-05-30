@@ -133,11 +133,6 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
         });
     }
 
-    @NotNull
-    @Override
-    public final Op op() {
-        return Op.ATOM;
-    }
 
     public static final class LambdaFunctor extends Functor {
 

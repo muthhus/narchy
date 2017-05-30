@@ -7,6 +7,7 @@ import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.atom.AtomInt;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
@@ -1179,9 +1180,10 @@ public abstract class TermBuilder {
     }
 
     public Atomic the(Number o) {
+
 //        if (o instanceof Byte) return the(o.intValue());
 //        if (o instanceof Short) return the(o.intValue());
-//        if (o instanceof Integer) return the(o.intValue());
+        if (o instanceof Integer) return AtomInt.the(o.intValue());
 //
 //        if (o instanceof Long) {
 //            if (((int) o) == o.longValue())

@@ -1,13 +1,14 @@
 package nars.term.atom;
 
 import nars.Op;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 
-public class AtomicSingleton extends AtomicString {
+public class AtomicSingleton extends Atom {
 
     public AtomicSingleton(@NotNull String id) {
         super(id);
@@ -31,9 +32,10 @@ public class AtomicSingleton extends AtomicString {
         }
     }
 
+
     @Override
-    public @NotNull Op op() {
-        return Op.ATOM;
+    public Term eval(TermContext index) {
+        return this;
     }
 
     @Override

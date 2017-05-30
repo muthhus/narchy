@@ -28,7 +28,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
-import nars.index.term.TermIndex;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
@@ -73,6 +72,11 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().hashCode();
     }
 
+
+    @Override
+    default int opX() {
+        return Term.opX(op(), size());
+    }
 
     /**
      * if the compound tracks normalization state, this will set the flag internally

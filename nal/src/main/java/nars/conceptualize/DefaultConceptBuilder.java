@@ -21,6 +21,7 @@ import nars.conceptualize.state.DefaultConceptState;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -290,10 +291,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 //serial++;
                 //result = varBuilder.apply((Variable) term);
                 return term;
-            } else if (term instanceof Atomic) {
+            } else if (term instanceof Atom) {
 
                 return withBags(term, (termbag, taskbag) ->
-                        new AtomConcept((Atomic) term, termbag, taskbag));
+                        new AtomConcept((Atom)term, termbag, taskbag));
 
 //                result = new AtomConcept((Atomic)term,
 //                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),

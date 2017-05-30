@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * interface for controlled draining of a bag
  * "leaky bucket" model
  */
-public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> extends Leak.DtLeak<X, V> implements Consumer<Task> {
+public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> extends DtLeak<X, V> implements Consumer<Task> {
 
     private final On onTask, onReset, onCycle;
 
@@ -23,7 +23,7 @@ public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> exten
         this(bag, new FloatParam(rate), n);
     }
 
-    public TaskLeak(@NotNull Bag<X, V> bag, @NotNull FloatParam rate, @NotNull NAR n) {
+    TaskLeak(@NotNull Bag<X, V> bag, @NotNull FloatParam rate, @NotNull NAR n) {
         super(bag, rate);
         onTask = n.onTask(this);
         onReset = n.eventReset.on((nn) -> clear());

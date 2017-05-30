@@ -23,7 +23,7 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
@@ -766,10 +766,10 @@ public class Narsese extends BaseParser<Object> {
                                         (Variable) pop(), (Term) pop(), Op.Imdex))
                         ),
                         seq("+",
-                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (GenericVariable) pop(), 1))
+                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (UnnormalizedVariable) pop(), 1))
                         ),
                         seq("*",
-                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (GenericVariable) pop(), 0))
+                                push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (UnnormalizedVariable) pop(), 0))
                         )
                 )
         );
@@ -1044,11 +1044,6 @@ public class Narsese extends BaseParser<Object> {
         return T.the(op, DTERNAL, vectorterms);
     }
 
-
-    /**
-     * place-holder for invalid term. this value should never leave this class
-     */
-    public final static AtomicSingleton NarseseNull = new AtomicSingleton("");
 
 
 

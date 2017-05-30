@@ -2,13 +2,14 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
-import nars.term.atom.ToStringAtomic;
+import nars.term.Term;
+import nars.term.atom.AtomicToString;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Unnormalized, labeled variable
  */
-public class GenericVariable extends ToStringAtomic implements Variable {
+public class UnnormalizedVariable extends AtomicToString implements Variable {
 
     @NotNull
     public final Op type;
@@ -16,7 +17,9 @@ public class GenericVariable extends ToStringAtomic implements Variable {
     @NotNull
     private final String str;
 
-    public GenericVariable(@NotNull Op type, @NotNull String label) {
+    @Override public int opX() { return Term.opX(op(), 10);    }
+
+    public UnnormalizedVariable(@NotNull Op type, @NotNull String label) {
         this.type = type;
         this.str = label;
     }
@@ -36,8 +39,8 @@ public class GenericVariable extends ToStringAtomic implements Variable {
 //        }
 
         //prevent comparison with AbstractVariable
-        if (u instanceof GenericVariable) {
-            return str.equals(((GenericVariable) u).str);
+        if (u instanceof UnnormalizedVariable) {
+            return str.equals(((UnnormalizedVariable) u).str);
         }
 
         return false;

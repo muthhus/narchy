@@ -6,10 +6,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
-import nars.term.var.GenericVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import static nars.Op.VAR_DEP;
 
 public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
 
@@ -41,11 +43,11 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
     //public final Variable target;
 
-    public static class EllipsisPrototype extends GenericVariable implements Ellipsislike {
+    public static class EllipsisPrototype extends UnnormalizedVariable implements Ellipsislike {
 
         public final int minArity;
 
-        public EllipsisPrototype(@NotNull Op type, @NotNull GenericVariable target, int minArity) {
+        public EllipsisPrototype(@NotNull Op type, @NotNull UnnormalizedVariable target, int minArity) {
             super(type, target.toString()
                     + ".." + (minArity == 0 ? '*' : '+'));
             this.minArity = minArity;
@@ -73,7 +75,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         }
     }
 
-    public static class EllipsisTransformPrototype extends GenericVariable {
+    public static class EllipsisTransformPrototype extends UnnormalizedVariable {
 
         //public final Variable name;
         public final Term from, to;
