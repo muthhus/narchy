@@ -10,12 +10,20 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ITask extends Priority {
 
+    /** note: the first null in the returned array will break the iteration because it means its the end of the list (all following it should also be null) */
+    @Nullable ITask[] run(@NotNull NAR n);
+
+    /** special signal a task can return to signal it should be deleted after execution */
+    ITask[] DeleteMe = new ITask[0];
+
+    /** special signal a task can return to signal it should be quietly removed from the bag (and not deleted or forgotten) */
+    ITask[] HideMe = new ITask[0];
+
+
     default byte punc() {
         return 0;
     }
 
-    /** the first null in the returned array should break the iteration because it means its the end of the list (all following it should also be null) */
-    @Nullable ITask[] run(@NotNull NAR n);
 
     default Priority clone() {
         throw new UnsupportedOperationException();

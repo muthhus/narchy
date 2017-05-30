@@ -163,14 +163,6 @@ abstract public class Derivation extends Unify implements TermContext {
     /** tasklink scope */
     @NotNull public void restartB(@NotNull Task task) {
 
-        if (task.equals(this.task)) {
-            if (this.task!=task) {
-                //merge budgets?
-                this.task.setPri(task);
-            }
-            return;
-        }
-
         this.task = task;
 
         this.taskTruth = task.truth();
@@ -187,7 +179,7 @@ abstract public class Derivation extends Unify implements TermContext {
 
 
     /** termlink scope */
-    @NotNull public Derivation restartC(@NotNull Premise p, int ttl) {
+    @NotNull public Derivation restartC(@NotNull Premise p, Task belief, Term beliefTerm, int ttl) {
 
         assert(ttl >= 0);
 
@@ -211,20 +203,13 @@ abstract public class Derivation extends Unify implements TermContext {
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
 
-        belief = null;
-        beliefTruth = beliefTruthRaw = null;
-
-
         this.versioning.setTTL(ttl);
 
         this.premise = p;
 
-        Task belief = p.belief();
         this.belief = belief;
-        this.beliefTerm = p.beliefTerm();
-        if (beliefTerm.op()==NEG) {
-            throw new RuntimeException("negated belief term");
-        }
+        this.beliefTerm = beliefTerm;
+        assert(beliefTerm.op()!=NEG);
 
 
         if (belief == null) {

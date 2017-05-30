@@ -10,21 +10,24 @@ import org.jetbrains.annotations.Nullable;
 
 public class DebugDerivedTask extends DerivedTask {
 
-    public final Premise premise;
+
+    private final Task parentBelief;
+    private final Task parentTask;
 
     public DebugDerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation d, long start, long end) {
         super(tc, punct, truth, d, start, end);
-        this.premise = d.premise;
+        this.parentTask = d.task;
+        this.parentBelief = d.belief;
     }
 
     @Nullable
     public final Task getParentTask() {
-        return this.premise.task();
+        return parentTask;
     }
 
     @Nullable
     public final Task getParentBelief() {
-        return this.premise.belief();
+        return parentBelief;
     }
 
 }

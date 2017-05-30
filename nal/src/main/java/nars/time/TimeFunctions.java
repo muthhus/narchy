@@ -130,7 +130,7 @@ public interface TimeFunctions {
     @Nullable
     static Compound dtDiff(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
 
-        Compound taskTerm = (Compound) p.taskTerm.unneg();
+        Compound taskTerm = (Compound) p.taskTerm;
         Term beliefTerm = p.beliefTerm;
 
         int dt;
@@ -174,12 +174,12 @@ public interface TimeFunctions {
         }
 
         if ((polarity == 0) || (polarity == 2) || (polarity == -2)) {
-            occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence); //TODO CALCULATE
+            occReturn[0] = occurrenceTarget(p, earliestOccurrence); //TODO CALCULATE
 
             polarity = 1;
         } else {
             //diff
-            occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
+            occReturn[0] = occurrenceTarget(p, earliestOccurrence);
         }
 
         return deriveDT(derived, polarity, dt, occReturn, p);
@@ -921,7 +921,7 @@ public interface TimeFunctions {
             }
         }
 
-        occReturn[0] = occurrenceTarget(p.premise, earliestOccurrence);
+        occReturn[0] = occurrenceTarget(p, earliestOccurrence);
 
         if (pre && derived.sub(0) instanceof Compound) {
             //set subterm 0's DT
@@ -1345,9 +1345,9 @@ public interface TimeFunctions {
     }
 
 
-    public static long occurrenceTarget(Premise p, @NotNull OccurrenceSolver s) {
-        long tOcc = p.task().start();
-        Task b = p.belief();
+    public static long occurrenceTarget(Derivation p, @NotNull OccurrenceSolver s) {
+        long tOcc = p.task.start();
+        Task b = p.belief;
         if (b == null) {
             return tOcc;
         } else {

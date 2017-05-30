@@ -175,20 +175,16 @@ public class TaskExecutor extends Executioner {
             return;
         }
 
-        if (x instanceof NALTask) {
-            //it will either get stored in belief table, or not. but shouldnt remain in the active bag
+        if (next == ITask.DeleteMe) {
+            x.delete();
             toRemove.add(x);
-        } else {
-            if (x.isDeleted())
-                toRemove.add(x);
-
-            if (forgetEachPri > 0)
-                x.priSub(forgetEachPri);
-        }
+        } else if (next == ITask.HideMe || x.isDeleted())
+            toRemove.add(x);
+        else if (forgetEachPri > 0)
+            x.priSub(forgetEachPri);
 
         if (next != null)
             actuallyFeedback(x, next);
-
     }
 
     protected void actuallyFeedback(ITask x, ITask[] next) {

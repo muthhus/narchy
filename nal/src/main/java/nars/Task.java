@@ -892,7 +892,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         float inputPri = this.pri();
         if (inputPri != inputPri)
-            return null; //deleted
+            return DeleteMe; //deleted
 
         n.emotion.busy(inputPri, this.volume());
 
@@ -914,7 +914,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                     NALTask inputY = clone(this, y);
                     assert (inputY != null);
 
-                    delete(); //transfer control to clone
+                    delete(); //transfer control to transformation result
 
                     return inputY.run(n);
                 }
@@ -923,7 +923,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         if (isCommand()) {
             execute(this, n);
-            return null; //done
+            return HideMe; //done
         }
 
 //        if (n.time instanceof FrameTime) {
@@ -932,13 +932,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //        }
 
         TaskConcept c = concept(n, true);
-        if (c == null) {
-            delete();
-        } else {
+        if (c != null) {
             c.process(this, n);
         }
 
-        return null;
+        return HideMe;
     }
 
 

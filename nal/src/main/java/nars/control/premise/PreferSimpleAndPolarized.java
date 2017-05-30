@@ -19,40 +19,40 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
     /**  polarity (includes conf) vs. complexity balance */
     public final FloatParam polarityVsComplexity = new FloatParam(0.5f, 0f, 1f);
 
-    public final FloatParam belief = new FloatParam(1f, 0f, 2f);
-    public final FloatParam goal = new FloatParam(1f, 0f, 2f);
-    public final FloatParam question = new FloatParam(1f, 0f, 2f);
-    public final FloatParam quest = new FloatParam(1f, 0f, 2f);
-
-    final FloatParam puncFactor(byte punc) {
-        switch (punc) {
-            case BELIEF: return belief;
-            case GOAL: return goal;
-            case QUESTION: return question;
-            case QUEST: return quest;
-
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
-
-    public final FloatParam structural = new FloatParam(1f, 0f, 1f);
-    public final FloatParam causal = new FloatParam(1f, 0f, 1f);
-
-    final FloatParam opFactor(Compound c) {
-        switch (c.op()) {
-
-            case IMPL:
-            case CONJ:
-            case EQUI:
-                return causal;
-
-            case INH:
-            case SIM:
-            default:
-                return structural;
-        }
-    }
+//    public final FloatParam belief = new FloatParam(1f, 0f, 2f);
+//    public final FloatParam goal = new FloatParam(1f, 0f, 2f);
+//    public final FloatParam question = new FloatParam(1f, 0f, 2f);
+//    public final FloatParam quest = new FloatParam(1f, 0f, 2f);
+//
+//    final FloatParam puncFactor(byte punc) {
+//        switch (punc) {
+//            case BELIEF: return belief;
+//            case GOAL: return goal;
+//            case QUESTION: return question;
+//            case QUEST: return quest;
+//
+//            default:
+//                throw new UnsupportedOperationException();
+//        }
+//    }
+//
+//    public final FloatParam structural = new FloatParam(1f, 0f, 1f);
+//    public final FloatParam causal = new FloatParam(1f, 0f, 1f);
+//
+//    final FloatParam opFactor(Compound c) {
+//        switch (c.op()) {
+//
+//            case IMPL:
+//            case CONJ:
+//            case EQUI:
+//                return causal;
+//
+//            case INH:
+//            case SIM:
+//            default:
+//                return structural;
+//        }
+//    }
 
 
     @Override
@@ -69,11 +69,8 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
             p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
         }
 
-
-
-        p *= puncFactor(punc).floatValue();
-
-        p *= opFactor(conclusion).floatValue();
+//        p *= puncFactor(punc).floatValue();
+//        p *= opFactor(conclusion).floatValue();
 
         return p;
     }

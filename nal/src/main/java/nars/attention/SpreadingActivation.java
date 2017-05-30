@@ -90,9 +90,10 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        float p = priSafe(0);
-        if (p < Pri.EPSILON)
-            return null;
+        float p = priElseZero();
+        if (p < Pri.EPSILON) {
+            return DeleteMe;
+        }
 
         this.momentum = nar.momentum.floatValue();
         this.dur = nar.dur();

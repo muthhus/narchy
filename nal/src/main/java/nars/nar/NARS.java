@@ -15,7 +15,6 @@ import nars.Task;
 import nars.attention.SpreadingActivation;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
-import nars.control.Hypothesis;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.DerivedTask;
@@ -34,6 +33,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
+import static nars.Op.*;
 
 /**
  * recursive cluster of NAR's
@@ -61,26 +61,30 @@ public class NARS extends NAR {
     enum PostBand {
         Input,
         Premise,
-        Derived,
-        Hypothesis,
+        DerivedBelief, DerivedGoal, DerivedQuestion, DerivedQuest,
         Activation,
         ConceptFire,
         Other;
 
         public static PostBand which(ITask x) {
-            if (x instanceof nars.control.Hypothesis) {
-                return Hypothesis;
-            } else if (x instanceof SpreadingActivation) {
+            if (x instanceof SpreadingActivation) {
                 return Activation;
             } else if (x instanceof DerivedTask) {
-                return Derived;
+                switch (x.punc()) {
+                    case BELIEF: return DerivedBelief;
+                    case GOAL: return DerivedGoal;
+                    case QUESTION: return DerivedQuestion;
+                    case QUEST: return DerivedQuest;
+                }
             } else if (x instanceof nars.control.Premise) {
                 return Premise;
             } else if (x instanceof ConceptFire) {
                 return ConceptFire;
-            } else {
-                return Other;
+            } else if (x.isInput()) {
+                return Input;
             }
+
+            return Other;
         }
 
         public static EnumMap<PostBand, PSink<PostBand, ITask>> map(Mix<PostBand, ITask> mix) {
@@ -239,15 +243,6 @@ public class NARS extends NAR {
         public SubExecutor(int inputQueueCapacity, float exePct) {
             super(inputQueueCapacity, exePct);
         }
-
-
-        //    class SubExecutor extends BufferedSynchronousExecutor {
-//        public SubExecutor(int inputQueueCapacity) {
-//            super(
-//                new DisruptorBlockingQueue<ITask>(inputQueueCapacity)
-//            );
-//        }
-
 
         @Override
         protected void actuallyFeedback(ITask x, ITask[] next) {
