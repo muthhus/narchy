@@ -7,8 +7,8 @@
 
      C, X, task("&&"), time(decomposeTaskSubset) |- dropAnyConj(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-     (&&,X,A..+), Y, task("."), time(task,A..+) |- subIfUnifiesAny((&&,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
-     (&&,(--,%X),A..+), Y, task("."), time(task,A..+) |- (--,subIfUnifiesAny((&&,A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), Y, task("."), time(task,A..+,X) |- subIfUnifiesAny((&&,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
+     (&&,(--,%X),A..+), Y, task("."), time(task,A..+,X) |- (--,subIfUnifiesAny((&&,A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
 
         //TODO add a conj() guard to fast fail
         //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
@@ -19,8 +19,8 @@
         ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
         ((--,%Z) &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
-        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0)) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
+     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
+        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
 
      //X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
      //   X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()
@@ -65,11 +65,24 @@
 
 
 //substitutionViaSimilarity
-     X, (B<->C), neqCom(X,C) |- subIfUnifiesAny(C,B,X), (Belief:Intersection, Goal:Strong)
+     (&&,X,A..+), (X<->Y), time(dtTaskExact)  |- (&&,Y,A..+), (Belief:Intersection, Goal:Strong)
+        (&&,(--,%X),A..+), (X<->Y), time(dtTaskExact)  |- (&&,(--,%Y),A..+), (Belief:Intersection, Goal:Strong)
+     (&&,X,A..+), (X<=>Y), time(dtTaskExact)  |- (&&,Y,A..+), (Belief:Intersection, Goal:Strong)
+        (&&,(--,%X),A..+), (X<=>Y), time(dtTaskExact)  |- (&&,(--,%Y),A..+), (Belief:Intersection, Goal:Strong)
+     (X ==> Z), (X<->Y), time(dtTaskExact) |- (Y ==>+- Z), (Belief:Intersection)
+        ((--,%X) ==> Z), (X<->Y), time(dtTaskExact) |- ((--,%Y) ==>+- Z), (Belief:Intersection)
+     (X ==> Z), (X<=>Y), time(dtTaskExact) |- (Y ==>+- Z), (Belief:Intersection)
+        ((--,%X) ==> Z), (X<=>Y), time(dtTaskExact) |- ((--,%Y) ==>+- Z), (Belief:Intersection)
+     (Z ==> X), (X<->Y), time(dtTaskExact) |- (Z ==>+- Y), (Belief:Intersection)
+        (Z ==> (--,%X)), (X<->Y), time(dtTaskExact) |- (Z ==> (--,%Y)), (Belief:Intersection)
+     (Z ==> X), (X<=>Y), time(dtTaskExact) |- (Z ==>+- Y), (Belief:Intersection)
+        (Z ==> (--,%X)), (X<=>Y), time(dtTaskExact) |- (Z ==> (--,%Y)), (Belief:Intersection)
 
 //needs special temporal handling to shift occurrence time of result if the <=> has a non-zero non-eternal dt
      X, (B<=>C), task(positive), neqCom(X,C), time(beliefDTSimultaneous) |- subIfUnifiesAny(C,B,X), (Belief:Intersection, Goal:Strong)
      X, (B<=>C), task(negative), neqCom(X,C), time(beliefDTSimultaneous) |- subIfUnifiesAny((--,%C),B,X), (Belief:IntersectionN, Goal:StrongN)
+
+
 
 
 //INVALID:

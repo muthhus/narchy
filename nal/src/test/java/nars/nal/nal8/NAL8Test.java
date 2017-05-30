@@ -964,8 +964,8 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((reward) ==> (good))", 1, 0.9f)
                 .believe("((--,(reward)) ==> (bad))", 1, 0.9f)
                 .mustDesire(cycles, "(good)", 1.0f, 0.45f)
-                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.0f, 1f, ETERNAL)
                 .mustDesire(cycles, "(bad)", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.0f, 1f, ETERNAL)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0.0f, 1f, ETERNAL);
     }
 

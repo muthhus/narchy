@@ -810,7 +810,7 @@ public class PremiseRule extends GenericCompound {
                                 return null;
                             int relOccShift = p.taskTerm.subtermTime(zr);
                             if (relOccShift != DTERNAL)
-                                occ -= relOccShift;
+                                occReturn[0] -= ( relOccShift - p.taskTerm.dtRange());
 
                             @Nullable Term yr = p.resolve(y).eval(p.terms);
                             if (yr == null)

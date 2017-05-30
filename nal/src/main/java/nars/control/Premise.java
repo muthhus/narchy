@@ -170,7 +170,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
 
     static boolean tryAnswer(boolean reUnified, PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
-        Compound questionTerm = question.get().term();
+        Task Q = question.get();
+        Compound questionTerm = Q.term();
         Compound answerTerm = answer.term();
         if (!reUnified && !nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
             //see if belief unifies with task (in reverse of previous unify)
@@ -180,7 +181,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         }
 
 
-        @Nullable Task answered = question.get().onAnswered(answer, nar);
+        @Nullable Task answered = Q.onAnswered(answer, nar);
 
         if (answered != null) {
 
@@ -190,6 +191,9 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
             BudgetFunctions.fund(question, answered, (float) Math.sqrt(answered.conf()), false);
                     //(1f - taskBudget.qua())
                     //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
+
+            if (Q.isInput())
+                nar.eventTaskProcess.emit(answer);
 
             return true;
 
