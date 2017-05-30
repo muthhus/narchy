@@ -6,6 +6,10 @@
      //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
 
      C, X, task("&&"), time(decomposeTaskSubset) |- dropAnyConj(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+     (&&,X,A..+), Y, task("."), time(task,A..+) |- subIfUnifiesAny((&&,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
+     (&&,(--,%X),A..+), Y, task("."), time(task,A..+) |- (--,subIfUnifiesAny((&&,A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
+
         //TODO add a conj() guard to fast fail
         //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 

@@ -109,6 +109,7 @@ public class GoalActionConcept extends ActionConcept {
 
         Task fb = fbt!=null ? feedback.set(this, fbt, nar) : feedback.current;
 
+
 //        //HACK insert shadow goal
         //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
 

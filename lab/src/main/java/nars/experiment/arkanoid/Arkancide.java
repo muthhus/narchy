@@ -3,7 +3,9 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.learn.Autoencoder;
 import jcog.math.FloatPolarNormalized;
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
@@ -12,6 +14,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.video.CameraSensor;
+import nars.video.Scale;
+import nars.video.SwingBitmap2D;
 import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
@@ -23,8 +27,8 @@ public class Arkancide extends NAgentX {
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 32;
-    final int visH = 16;
+    final int visW = 48;
+    final int visH = 24;
 
     //final int afterlife = 60;
 
@@ -60,7 +64,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -86,7 +90,7 @@ public class Arkancide extends NAgentX {
         //nar.derivedEvidenceGain.setValue(1f);
 
 
-        noid = new Arkanoid(!cam) {
+        noid = new Arkanoid(true) {
             @Override
             protected void die() {
                 //nar.time.tick(afterlife); //wont quite work in realtime mode
@@ -103,11 +107,18 @@ public class Arkancide extends NAgentX {
         float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
-            CameraSensor cc = senseCamera("noid", noid, visW, visH);
+
+            Scale sw = new Scale(new SwingBitmap2D(noid), visW, visH);
+            CameraSensor cc = senseCamera("noid", sw, visW, visH)
+                    .resolution(0.1f);
+            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, (visW*visH)/8)
+                    .resolution(0.25f);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
         }
+
+
         if (numeric) {
             SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);

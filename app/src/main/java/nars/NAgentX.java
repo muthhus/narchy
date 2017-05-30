@@ -105,6 +105,10 @@ abstract public class NAgentX extends NAgent {
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
+
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.9f);
+
         float p = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
         n.DEFAULT_GOAL_PRIORITY = 1f * p;
@@ -367,10 +371,12 @@ abstract public class NAgentX extends NAgent {
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {
         return senseCamera(id.toString(), new CameraSensor(id, bc, this));
     }
+    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(Term id, C bc, int outputPixels) {
+        return senseCamera(id.toString(), new CameraSensor(id, new AutoencodedBitmap(bc, outputPixels), this));
+    }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {
         //sense(c);
-
         cam.put(id, c);
         return c;
     }

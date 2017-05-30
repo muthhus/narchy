@@ -42,8 +42,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", () -> fz.image, 32, 24)
-                .resolution(0.15f);
+        senseCamera("fz", () -> fz.image, 20, 12)
+                .resolution(0.2f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (r) -> {
@@ -216,7 +216,7 @@ public class FZero extends NAgentX {
 
 
         return Util.clamp(
-                -0.5f /* bias */ +
+                //-0.5f /* bias */ +
                 (float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
                 //((float)fz.vehicleMetrics[0][6]/100f)+
                 deltaDistance), -1f, +1f);

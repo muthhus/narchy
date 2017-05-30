@@ -1,5 +1,6 @@
 package nars.util.signal;
 
+import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
@@ -79,8 +80,7 @@ public class Signal {
 
         //no signal
         if (nextTruth == null) {
-            this.current = null;
-            return null;
+            return (this.current = null);
         } else {
 
 
@@ -97,19 +97,18 @@ public class Signal {
 //                }
 //                return null;
                 //nothing, keep as-is
-                t = current;
+                return current;
             } else {
 
 
                 t = task(term, nextTruth.truth(),
                     last, now,
                         previous, stamper.getAsLong(), nar);
+
+                t.priMax(pri.asFloat() * deltaFactor(previous, t.truth()));
+                return (this.current = t);
+
             }
-
-            t.priMax(pri.asFloat()); // * deltaFactor(previous, t.truth()));
-
-
-            return (this.current = t);
         }
 
 
@@ -128,13 +127,19 @@ public class Signal {
 //     * factor to reduce priority for similar truth value
 //     * TODO revise
 //     */
-//    protected float deltaFactor(@Nullable Truthed a, Truth b) {
-//        return 1f;
-//
-//        /*if (a == null)
-//            return 1f;
-//        return 0.5f + ( (a==b) ? 0 : 0.5f * Math.abs(a.freq() - b.freq()));*/
-//    }
+    protected float deltaFactor(@Nullable Truthed a, Truth b) {
+        //return 1f;
+
+        if (a == null)
+            return 1f;
+        else {
+            float diff = Math.abs(a.freq() - b.freq());
+            //return 0.5f + ( (a==b) ? 0 : 0.5f * diff);
+            //1-((1-x)^2)
+            //1-((1-x)^4)
+            return 1f - (Util.sqr(Util.sqr(1-diff)));
+        }
+    }
 
     @NotNull
     public Signal pri(FloatSupplier p) {

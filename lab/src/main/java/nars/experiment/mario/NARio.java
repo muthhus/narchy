@@ -2,14 +2,13 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Narsese;
-import nars.Param;
+import nars.*;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
+import nars.video.Scale;
+import nars.video.SwingBitmap2D;
 
 import javax.swing.*;
 
@@ -76,6 +75,10 @@ public class NARio extends NAgentX {
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
         sc.resolution(0.1f);
         sc.pri(0.5f);
+
+        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 8)
+            .resolution(0.25f);
+
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);
 //        senseCameraRetina("narioGlobal", ()->mario.image, 16, 16, (v) -> t(v, alpha()));//.setResolution(0.1f);

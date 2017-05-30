@@ -63,7 +63,7 @@ public abstract class VarIntroduction {
         boolean found = false;
         for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
             Term u = selections.get(i);
-            Term v = next(c, u, varOffset++);
+            Term v = next(c, u, ++varOffset);
             if (v != null) {
                 substs.put(u, v);
                 found = true;

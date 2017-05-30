@@ -157,13 +157,13 @@ public class Arkanoid extends JFrame implements KeyListener {
 		public float moveTo(float target, float paddleSpeed) {
 			target *= SCREEN_WIDTH;
 
-//			if (Math.abs(target-x) <= paddleSpeed) {
+			if (Math.abs(target-x) <= paddleSpeed) {
 				x = target;
-//			} else if (target < x) {
-//				x -= paddleSpeed;
-//			} else {
-//				x += paddleSpeed;
-//			}
+			} else if (target < x) {
+				x -= paddleSpeed;
+			} else {
+				x += paddleSpeed;
+			}
 
 			x = Math.min(x, SCREEN_WIDTH-1);
 			x = Math.max(x, 0);

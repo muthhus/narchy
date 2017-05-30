@@ -14,6 +14,8 @@ import spacegraph.widget.slider.FloatSlider;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static java.lang.Math.sqrt;
+
 /**
  * Created by me on 4/3/17.
  */
@@ -51,7 +53,7 @@ public class MixBoard extends Grid implements Consumer<NAR> {
 
             });
             sliders.add(
-                    new FloatSlider(new LogAdapter(k)) {
+                    new FloatSlider(new PowerAdapter(k)) {
 
                         @Override
                         public String labelText() {
@@ -91,21 +93,25 @@ public class MixBoard extends Grid implements Consumer<NAR> {
      *          mapped to a linear up to max gain (ex: =2)
      */
 
-    static class LogAdapter extends FloatParam {
+    static class PowerAdapter extends FloatParam {
         private final FloatParam target;
 
-        public LogAdapter(FloatParam target) {
+        public PowerAdapter(FloatParam target) {
             super(1, 0, 2);
             this.target = target;
+            setValue(x(target.asFloat()));
         }
 
+        //forward
         public static float y(float x) {
-            if (x < 1f) {
-                return x*x*x*x; //x^4, exponential-like
-            } else {
-                return x;
-            }
+            return x*x*x*x; //x^4, exponential-like
         }
+
+        //reverse
+        public static float x(float y) {
+            return (float) sqrt(sqrt(y));
+        }
+
 
         @Override
         public void setValue(float x) {

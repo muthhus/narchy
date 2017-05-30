@@ -1,6 +1,7 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
+import nars.NAR;
 import nars.Param;
 import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
@@ -105,6 +106,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     }
 
+    @Override
+    public void start(NAR nar) {
+        super.start(nar);
+        nar.onCycle(concepts::cleanUp);
+    }
 
     @NotNull
     @Override

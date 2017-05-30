@@ -72,7 +72,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<
     public boolean setCapacity(int i) {
         if (super.setCapacity(i)) {
             this.CACHE_HIT_BOOST = i > 0 ?
-                    (0.5f / (float)Math.sqrt(capacity())) : 0;
+                    (0.5f / capacity()) : 0;
             //reprobes / (float)Math.sqrt(i) : 0;
             this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST / (reprobes);
             return true;

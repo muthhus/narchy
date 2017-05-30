@@ -224,7 +224,7 @@ public class Autoencoder {
 	}
 
 	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
-	public float learn(float[] x, float[] y, float learningRate) {
+	float learn(float[] x, float[] y, float learningRate) {
 		float[][] W = this.W;
 		float[] L_hbias = this.L_hbias;
 		float[] L_vbias = this.L_vbias;

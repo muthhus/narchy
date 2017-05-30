@@ -25,7 +25,8 @@ import java.util.function.Consumer;
 public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Consumer<NAgent>, Iterable<CameraSensor<P>.PixelConcept> {
 
 
-    ;
+    public static final int RADIX = 1;
+
     private final NAR nar;
 
     public final List<PixelConcept> pixels;
@@ -43,7 +44,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public CameraSensor(Term root, P src, NAgent agent) {
         this(src, agent,
                 //XY(root, 2,  src.width(), src.height())
-                RadixProduct(root, src.width(), src.height(), 2)
+                RadixProduct(root, src.width(), src.height(), RADIX)
         );
     }
 

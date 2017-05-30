@@ -11,6 +11,7 @@ import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -80,7 +81,7 @@ public class NARS extends NAR {
      */
     public void addNAR(int capacity) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(capacity, 0.5f);
+            SubExecutor e = new SubExecutor(capacity, 0.2f);
             Default d = new Default(rng, terms, time, e);
             d.stmLinkage.capacity.set(0); //disabled
             return d;
@@ -231,8 +232,8 @@ public class NARS extends NAR {
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                //new HijackTermIndex(new DefaultConceptBuilder(), 256 * 1024, 3),
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                //new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
     }
 
