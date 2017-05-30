@@ -161,8 +161,7 @@ public final class STMTemporalLinkage extends STM {
                 }
             }
 
-            delete();
-            return null;
+            return DeleteMe;
         }
     }
 

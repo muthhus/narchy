@@ -3,10 +3,10 @@ package nars.attention;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.map.SaneObjectFloatHashMap;
-import jcog.pri.PriReference;
-import jcog.pri.Pri;
-import jcog.pri.Priority;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
+import jcog.pri.PriReference;
+import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
 import nars.budget.PLinkUntilDeleted;
@@ -90,10 +90,6 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        float p = priElseZero();
-        if (p < Pri.EPSILON) {
-            return DeleteMe;
-        }
 
         this.momentum = nar.momentum.floatValue();
         this.dur = nar.dur();
@@ -103,13 +99,20 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         ITask[] a = null;
 
-        /* HEURISTIC estimate */
-        spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
-        spread.clear();
-        //assert(spread.isEmpty());
+
 
         int ss = 0;
         try {
+            float p = priElseZero();
+            if (p < Pri.EPSILON) {
+                return null;
+            }
+            setPri(0); //all pri now held in p until end of method
+
+            /* HEURISTIC estimate */
+            spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
+            spread.clear();
+            linkOverflow.setValue(0);
 
             link(origin, p, 0);
             nar.emotion.stress(linkOverflow);
@@ -133,12 +136,8 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
 
         float remain = linkOverflow.floatValue();
         if (remain > 0) {
-            setPri(remain); //save for potential re-use
-            linkOverflow.setValue(0);
-        } else {
-            delete(); //self-destruct
+            priAdd(remain); //save for potential re-use
         }
-
         return a;
     }
 
@@ -193,23 +192,23 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
     public void value(@NotNull Termed c, float p) {
         //System.out.println("\t" + k + " " + v);
 
-        if (p >= Priority.EPSILON) {
-            if (c instanceof Concept)
-                activations.add(new ConceptFire((Concept) c, p));
+        if (p < Priority.EPSILON) {
+            return;
         }
 
-        if (p >= Priority.EPSILON) {
+        if (c instanceof Concept)
+            activations.add(new ConceptFire((Concept) c, p));
 
 
-            termBidi(c, TERMLINK_BALANCE,  (1f - TERMLINK_BALANCE), p);
+        termBidi(c, TERMLINK_BALANCE, (1f - TERMLINK_BALANCE), p);
 
-            if (c instanceof Concept) {
-                tasklink((Concept) c, p);
+        if (c instanceof Concept) {
+            tasklink((Concept) c, p);
 
-                if (c instanceof AtomConcept)
-                    activateAtom((AtomConcept) c, p);
-            }
+            if (c instanceof AtomConcept)
+                activateAtom((AtomConcept) c, p);
         }
+
 
     }
 
@@ -380,7 +379,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         float oo = linkOverflow.floatValue();
         if (oo > 0) {
             //use some of running overflow to boost the priority for the next link (sibling backpressure)
-            float x = Math.min((1f-pri), oo * 0.5f);
+            float x = Math.min((1f - pri), oo * 0.5f);
             pri += x;
             linkOverflow.subtract(x);
         }

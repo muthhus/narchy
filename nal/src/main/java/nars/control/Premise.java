@@ -147,8 +147,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
         float priFromTasks = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
-                //aveAri
-                or
+                aveAri
+                //or
                     (taskPri, beliefPriority);
 
         BufferedDerivation d = derivation.get();

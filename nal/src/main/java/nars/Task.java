@@ -923,7 +923,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         if (isCommand()) {
             execute(this, n);
-            return HideMe; //done
+            return Disappear; //done
         }
 
 //        if (n.time instanceof FrameTime) {
@@ -936,7 +936,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             c.process(this, n);
         }
 
-        return HideMe;
+        return Disappear;
     }
 
 

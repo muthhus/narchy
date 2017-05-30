@@ -6,7 +6,6 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.task.ITask;
-import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -177,11 +176,12 @@ public class TaskExecutor extends Executioner {
 
         if (next == ITask.DeleteMe) {
             x.delete();
-            toRemove.add(x);
-        } else if (next == ITask.HideMe || x.isDeleted())
-            toRemove.add(x);
-        else if (forgetEachPri > 0)
+            //toRemove.add(x);
+        } else if (next == ITask.Disappear) {
+            active.remove(x); //immediately but dont affect its budget
+        } else if (forgetEachPri > 0) {
             x.priSub(forgetEachPri);
+        }
 
         if (next != null)
             actuallyFeedback(x, next);
