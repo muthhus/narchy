@@ -892,7 +892,7 @@ public class NAL7Test extends AbstractNALTest {
             //.log()
             .inputAt(0, "(x --> a). :|:")
             .inputAt(3, "(y --> a). :|:")
-            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 3)
+            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 2)
         ;
     }
 

@@ -1,6 +1,5 @@
 package nars.concept.dynamic;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
@@ -8,7 +7,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.budget.BudgetFunctions;
 import nars.term.Compound;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
@@ -16,8 +14,6 @@ import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;

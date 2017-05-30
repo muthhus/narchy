@@ -2,6 +2,7 @@ package nars;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import jcog.Loop;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -22,7 +23,6 @@ import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
-import jcog.Loop;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;

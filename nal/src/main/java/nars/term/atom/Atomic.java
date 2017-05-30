@@ -77,6 +77,9 @@ public interface Atomic extends Term {
     default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
 
     @Override
+    default boolean ORrecurse(@NotNull Predicate<Term> v) { return AND(v); }
+
+    @Override
     default boolean OR(@NotNull Predicate<Term> v) {
         return AND(v); //re-use and, even though it's so similar
     }

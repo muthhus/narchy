@@ -2,13 +2,13 @@ package nars.derive.meta.op;
 
 import nars.$;
 import nars.Op;
+import nars.control.premise.Derivation;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.index.term.PatternTermIndex;
-import nars.control.premise.Derivation;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

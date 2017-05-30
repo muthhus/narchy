@@ -183,8 +183,11 @@ public enum Op {
                 @Override public int opX() { return RANK; }
             };
 
+    /** absolutely invalid */
+    public static final AtomicSingleton Null = new AtomicSingleton("Null");
+
     /**
-     * absolute true/always
+     * absolutely true
      */
     public static final AtomicSingleton True = new AtomicSingleton("†") {
         @NotNull
@@ -195,7 +198,7 @@ public enum Op {
     };
 
     /**
-     * absolute false/never
+     * absolutely false
      */
     public static final AtomicSingleton False = new AtomicSingleton("Ø") {
         @NotNull
@@ -208,7 +211,6 @@ public enum Op {
     public static final Term[] TrueArray = {True};
     public static final Term[] FalseArray = {False};
 
-    public static final AtomicSingleton Null = new AtomicSingleton("null");
 
 
     /**
@@ -306,6 +308,10 @@ public enum Op {
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
         return ((existing | possiblyIncluded) == existing);
+    }
+
+    public static boolean isAbsolute(@NotNull Term x) {
+        return x instanceof AtomicSingleton && (isTrue(x) || isFalse(x) || x==Null);
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {

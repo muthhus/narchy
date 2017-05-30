@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.pri.Pri;
 import jcog.pri.Priority;
 import nars.control.premise.Derivation;
 import nars.task.DerivedTask;

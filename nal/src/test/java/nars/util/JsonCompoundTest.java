@@ -5,10 +5,8 @@ import nars.Narsese;
 import nars.nar.Default;
 import nars.task.util.TaskRule;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JsonCompoundTest {

@@ -1,11 +1,12 @@
 package nars.op.data;
 
 import nars.$;
-import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.Null;
 
 /** all X which are in the first term AND not in the second term */
 public class differ extends Functor.BinaryFunctor {
@@ -21,7 +22,7 @@ public class differ extends Functor.BinaryFunctor {
         if (a instanceof Compound && b instanceof Compound){
             Term y = $.terms.difference(a.op(), (Compound) a, (Compound) b);
             if (y.equals(a))
-                return Op.False; //prevent identical fall-through
+                return Null; //prevent identical fall-through
             return y;
         }
 

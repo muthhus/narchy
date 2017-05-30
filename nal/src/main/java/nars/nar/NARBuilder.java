@@ -15,8 +15,8 @@ import nars.index.term.map.CaffeineIndex;
 import nars.op.stm.MySTMClustered;
 import nars.term.Term;
 import nars.time.Time;
-import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 

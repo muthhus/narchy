@@ -129,13 +129,14 @@ public interface Termlike extends Termed {
     /** returns false if the supplied predicate fails for any of the recursive subterms of the specified type */
     boolean ANDrecurse(@NotNull Predicate<Term> v);
 
-
-
     /** recurses all subterms until the result of the predicate becomes true;
      *  returns true if any true
      *
      * @param v*/
     boolean OR(Predicate<Term> v);
+
+    boolean ORrecurse(@NotNull Predicate<Term> v);
+
 
     /** returns the number of subterms (1st layer) having the provided operator */
     default int subCount(Op o) {

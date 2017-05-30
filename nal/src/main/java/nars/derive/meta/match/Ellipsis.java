@@ -11,8 +11,6 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.VAR_DEP;
-
 public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
 
     private final int minArity;

@@ -243,8 +243,8 @@ public class IO {
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
-        if (isTrueOrFalse(term))
-            throw new InvalidTermException("true/false leak", $.p(term));
+        if (isAbsolute(term))
+            throw new InvalidTermException("absolute leak", $.p(term));
 
         if (term instanceof SerialCompound) {
             //it's already serialized in a SerialCompound
@@ -321,7 +321,7 @@ public class IO {
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
             Term read = (s[i] = readTerm(in, t));
-            if (read == null || isTrueOrFalse(read))
+            if (read == null || isAbsolute(read))
                 throw new InvalidTermException(Op.PROD /* consider the termvector as a product */, s, "invalid");
         }
 
@@ -349,7 +349,7 @@ public class IO {
         }
 
         Term y = t.the(o, dt, v);
-        if (isTrueOrFalse(y))
+        if (isAbsolute(y))
             throw new InvalidTermException(o, dt, v, "invalid term");
 
 //        if (key == null)

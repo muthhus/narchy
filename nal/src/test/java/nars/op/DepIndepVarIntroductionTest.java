@@ -2,10 +2,8 @@ package nars.op;
 
 import nars.$;
 import nars.Narsese;
-import nars.nar.Default;
 import nars.nar.Terminal;
 import nars.term.Term;
-import nars.time.Tense;
 import org.junit.Test;
 
 /**

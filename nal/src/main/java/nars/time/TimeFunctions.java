@@ -5,11 +5,10 @@ import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.Task;
+import nars.control.premise.Derivation;
 import nars.derive.meta.Conclude;
 import nars.derive.meta.OccurrenceSolver;
 import nars.derive.rule.PremiseRule;
-import nars.control.premise.Derivation;
-import nars.control.Premise;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -972,9 +971,8 @@ public interface TimeFunctions {
             //set subterm 1's DT
             Term newSubterm1 = p.terms.the((Compound) derived.sub(1), postDT);
 
-            if (isTrueOrFalse(newSubterm1))
+            if (isAbsolute(newSubterm1))
                 return null;
-
 
             derived = compoundOrNull(
                     p.terms.the(derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)})

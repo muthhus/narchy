@@ -1,11 +1,5 @@
 package nars.attention;
 
-import jcog.pri.PLink;
-import nars.NAR;
-import nars.Task;
-import nars.concept.Concept;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by me on 12/18/16.
  */

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static nars.Op.False;
+import static nars.Op.Null;
 
 /**
  * memoizes term construction, in attempt to intern as much as possible (but not exhaustively)
@@ -28,10 +28,10 @@ public class CachedTermIndex extends StaticTermIndex {
                 } catch (InvalidTermException e) {
                     if (Param.DEBUG_EXTRA)
                         logger.error("{}", e);
-                    return False;
+                    return Null;
                 } catch (Throwable t) {
                     logger.error("{}", t);
-                    return False;
+                    return Null;
                 }
             }
     );

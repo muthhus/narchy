@@ -6,14 +6,12 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
-import nars.task.Revision;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;

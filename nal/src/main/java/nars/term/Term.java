@@ -27,6 +27,7 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
@@ -48,7 +49,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static nars.Op.False;
+import static nars.Op.Null;
+import static nars.Op.isAbsolute;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -398,8 +400,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
 
     @NotNull
-    static Term falseIfNull(@Nullable Term maybeNull) {
-        return (maybeNull==null) ? False : maybeNull;
+    static Term nullIfNull(@Nullable Term maybeNull) {
+        return (maybeNull==null) ? Null : maybeNull;
     }
 
     /** https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/TreeTraverser.html */
@@ -415,6 +417,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
     /** for convenience, delegates to the byte function */
     static int opX(Op o, int subOp) {
         return opX(o, (byte)subOp);
+    }
+
+    /** if filterTrueFalse is false, only filters Null's */
+    static boolean filterAbsolute(Term u, boolean filterTrueFalse) {
+        return u instanceof AtomicSingleton && (isAbsolute(u) || (filterTrueFalse && Op.isTrueOrFalse(u)));
     }
 
 }

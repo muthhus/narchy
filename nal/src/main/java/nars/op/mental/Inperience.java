@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;

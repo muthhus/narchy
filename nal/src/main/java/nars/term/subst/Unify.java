@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static nars.Op.VAR_PATTERN;
 import static nars.Param.UnificationConstraintsMax;
 
 

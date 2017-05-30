@@ -6,7 +6,6 @@ import nars.time.CycleTime;
 import nars.util.exe.TaskExecutor;
 import org.junit.Test;
 
-import static jcog.Texts.n4;
 import static nars.nar.Default.INDEX_TO_CORE_INITIAL_SIZE_RATIO;
 
 

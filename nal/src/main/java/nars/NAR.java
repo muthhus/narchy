@@ -9,16 +9,17 @@ import jcog.event.Topic;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
+import jcog.pri.mix.Mix;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptFire;
+import nars.control.premise.DerivationBudgeting;
+import nars.control.premise.PreferSimpleAndPolarized;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
-import nars.control.premise.DerivationBudgeting;
-import nars.control.premise.PreferSimpleAndPolarized;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -36,7 +37,6 @@ import nars.time.Time;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
-import jcog.pri.mix.Mix;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
@@ -1237,7 +1237,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
 
 
-        if (term == null || (term instanceof Variable) || (isTrueOrFalse(term)))
+        if (term == null || (term instanceof Variable) || (isAbsolute(term)))
             return null;
         return term;
     }

@@ -5,7 +5,6 @@ import jcog.pri.PriReference;
 import nars.Task;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
 /**

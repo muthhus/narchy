@@ -66,7 +66,7 @@ public class TermReductionsTest {
 
     @Test
     public void testIntersectExtReduction5() throws Narsese.NarseseException {
-        assertEquals(False /* emptyset */, secte(seti(p, q), seti(r, s)));
+        assertEquals(Null /* emptyset */, secte(seti(p, q), seti(r, s)));
     }
 
     @Test
@@ -249,13 +249,13 @@ public class TermReductionsTest {
     @Test
     public void testDiffIntEqual() throws Narsese.NarseseException {
 
-        assertEquals(False, diffi(p, p));
+        assertEquals(Null, diffi(p, p));
     }
 
     @Test
     public void testDiffExtEqual() throws Narsese.NarseseException {
 
-        assertEquals(False, diffe(p, p));
+        assertEquals(Null, diffe(p, p));
     }
 
 
@@ -280,7 +280,7 @@ public class TermReductionsTest {
 //        );
         //check consistency with differenceSorted
         assertEquals(
-                False,
+                Null,
                 terms.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
@@ -480,7 +480,7 @@ public class TermReductionsTest {
         assertEquals("(d==>(b&&c))",
                 $("((&&, a, d) ==> (&&, a, b, c))").toString());
         assertInvalidTerms("((&&, a, b, c) ==> (&&, a, b))");
-        assertInvalidTerms("((&&, a, b) ==> (&&, a, b, c))");
+        assertEquals("c", $("((&&, a, b) ==> (&&, a, b, c))").toString());
         assertInvalidTerms("((&&, a, b, c) ==> a)");
         assertInvalidTerms("(a ==> (&&, a, b, c))");
     }
@@ -493,7 +493,6 @@ public class TermReductionsTest {
         assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
 
 
-        assertEquals(False, $("((--,L(out))&&L(out))"));
     }
 
 
@@ -605,8 +604,8 @@ public class TermReductionsTest {
 
     @Test
     public void testFilterCoNegatedStatements() throws Narsese.NarseseException {
-        assertEquals(Op.False, $("((--,(a1)) <-> (a1))"));
-        assertEquals(Op.False, $("((--,(a1)) --> (a1))"));
+        assertEquals(False, $("((--,(a1)) <-> (a1))"));
+        assertEquals(False, $("((--,(a1)) --> (a1))"));
     }
 
 
@@ -619,9 +618,12 @@ public class TermReductionsTest {
     @Test
     public void testCoNegatedEqui() throws Narsese.NarseseException {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
-        assertInvalid(("((--,(a)) <=> (a))"));
-        assertInvalid(("((--,(a)) <=>+0 (a))"));
-        assertValid($("((--,(a)) <=>+1 (a))"));
+
+        assertEquals(False, $("((--,(a)) <=> (a))"));
+
+        assertEquals(False, $("((--,(a)) <=>+0 (a))"));
+
+        String e = "(--,((a) <=>+1 (a)))"; assertEquals(e, $(e).toString());
 
         //due to the unpaired $3
         assertInvalidTasks("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz)))).");
@@ -676,9 +678,17 @@ public class TermReductionsTest {
         //..
     }
 
-    @Test public void testSimEquivOfAbsoluteTrueFalse() throws Narsese.NarseseException {
-        assertEquals(True, sim(True,True));
-        assertEquals(True, sim(False,False));
+    @Test public void testSimEquivOfAbsoluteTrueNull1() throws Narsese.NarseseException {
+        assertEquals(True, sim(True, True));
+    }
+    @Test public void testSimEquivOfAbsoluteTrueNull2() throws Narsese.NarseseException {
+        assertEquals(Null, sim(Null, Null));
+    }
+    @Test public void testSimEquivOfAbsoluteTrueNull3() throws Narsese.NarseseException {
+        assertEquals(Null, sim(True, Null));
+    }
+    @Test public void testSimEquivOfAbsoluteTrueNull4() throws Narsese.NarseseException {
+        assertEquals(Null, sim(neg(True),Null));
         assertEquals(False, sim(True,False));
         assertEquals(True, sim(neg(True),False));
     }
@@ -695,7 +705,7 @@ public class TermReductionsTest {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
-        assertEquals(Op.False, $("(&&,(--,(a==>a)),c:d,e:f)"));
+        assertEquals(False, $("(&&,(--,(a==>a)),c:d,e:f)"));
 
     }
 

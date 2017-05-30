@@ -1,12 +1,7 @@
 package nars.bag.leak;
 
 import jcog.bag.Bag;
-import jcog.data.FloatParam;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static nars.time.Tense.ETERNAL;
 
 /**
  * drains items from a Bag at

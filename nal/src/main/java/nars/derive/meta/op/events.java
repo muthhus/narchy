@@ -1,9 +1,9 @@
 package nars.derive.meta.op;
 
 import nars.Task;
+import nars.control.premise.Derivation;
 import nars.derive.meta.AtomicPred;
 import nars.derive.meta.BoolPred;
-import nars.control.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -289,7 +289,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         //int modifications = 0;
 
-        boolean filterTrueAndFalse = disallowTrueOrFalse(op);
+        boolean filterTrueFalse = disallowTrueOrFalse(op);
 
         int s = src.size(), modifications = 0;
         AppendProtoCompound target = new AppendProtoCompound(op, dt, s);
@@ -310,9 +310,8 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
                 return null;
 
             if (y != x) {
-                if (filterTrueAndFalse && Op.isTrueOrFalse(y)) {
+                if (Term.filterAbsolute(y, filterTrueFalse))
                     return null;
-                }
 
                 //            if (y != null)
                 //                y = y.eval(this);

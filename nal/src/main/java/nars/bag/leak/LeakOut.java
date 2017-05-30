@@ -1,9 +1,9 @@
 package nars.bag.leak;
 
 import jcog.bag.impl.ArrayBag;
+import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import org.jetbrains.annotations.NotNull;

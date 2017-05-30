@@ -2,8 +2,8 @@ package nars;
 
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
-import jcog.pri.Priority;
 import jcog.pri.PLink;
+import jcog.pri.Priority;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
@@ -37,7 +37,6 @@ import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
@@ -190,10 +189,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             return fail(t, "top-level temporal term with dt=XTERNAL", safe);
         }
 
-        //if (Param.DEBUG) {
-        if (t.contains(True) || t.contains(False))
-            throw new InvalidTaskException(t, "term contains True or False");
-        //}
+        if (Param.DEBUG) {
+            if (t.ORrecurse(Op::isAbsolute)) // t.contains(True) || t.contains(False))
+                throw new InvalidTaskException(t, "term contains True or False");
+        }
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
             return fail(t, "Belief or goal with query variable", safe);

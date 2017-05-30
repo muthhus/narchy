@@ -10,8 +10,8 @@ import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.CycleTime;
 import nars.time.Time;
-import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

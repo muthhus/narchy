@@ -3,7 +3,6 @@ package nars.term;
 import jcog.bag.Bag;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;

@@ -2,7 +2,6 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -162,7 +161,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
         @NotNull
         public Term introduce(Term x) {
-            Term[] only = { False };
+            Term[] only = { Null };
 
             //temporarily unwrap negation
             boolean negated = x.op() == NEG;
@@ -174,7 +173,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             introducer.accept((Compound)xx, y -> only[0] = y);
 
             Term o = only[0];
-            return (o == False) ? False : $.negIf(o, negated);
+            return (o == Null) ? Null : $.negIf(o, negated);
         }
     }
 

@@ -589,6 +589,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 return false;
         return true;
     }
+    default boolean ORrecurse(@NotNull Predicate<Term> p) {
+        int s = size();
+        for (int i = 0; i < s; i++)
+            if (sub(i).ORrecurse(p))
+                return true;
+        return false;
+    }
 
     default int count(@NotNull Predicate<Term> match) {
         int s = size();

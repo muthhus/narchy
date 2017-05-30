@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
-import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

@@ -499,7 +499,7 @@ public class EllipsisTest {
             if (o!=DIFFe && o!=DIFFi) {
                 assertEquals(o + " with normal term", a, $.the(o, a));
             } else {
-                assertEquals(False, $.the(o, a));
+                assertEquals(Null, $.the(o, a));
             }
 
             assertEquals(o + " with ellipsis not reduced",

@@ -14,7 +14,6 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
-import nars.control.BufferedDerivation;
 import nars.derive.DefaultDeriver;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
@@ -22,12 +21,9 @@ import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 

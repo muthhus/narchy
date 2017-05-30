@@ -22,7 +22,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicSingleton;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -38,7 +37,7 @@ import java.util.function.Consumer;
 
 import static nars.$.newArrayList;
 import static nars.Op.*;
-import static nars.term.Term.falseIfNull;
+import static nars.term.Term.nullIfNull;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -1294,7 +1293,7 @@ public class Narsese extends BaseParser<Object> {
         try {
             Term y = term(s);
             if (normalize && y instanceof Compound) {
-                return falseIfNull(index.normalize((Compound) y));
+                return nullIfNull(index.normalize((Compound) y));
             } else {
                 Termed existing = index.get(y, false);
                 if (existing == null)

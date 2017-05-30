@@ -78,6 +78,11 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
+    public boolean ORrecurse(@NotNull Predicate<Term> v) {
+        return ref.ORrecurse(v);
+    }
+
+    @Override
     public boolean OR(Predicate<Term> v) {
         return ref.OR(v);
     }

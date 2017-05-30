@@ -652,8 +652,7 @@ public class TermTest {
 
     public static void assertValid(Term o) {
         assertNotNull(o);
-        assertNotEquals(False, o);
-        assertNotEquals(True, o);
+        assertTrue(!isAbsolute(o));
     }
 
     public static void assertValidTermValidConceptInvalidTaskContent(@NotNull Supplier<Term> o) {
@@ -882,14 +881,14 @@ public class TermTest {
                     Term x = $(o);
                     return x;
                 } catch (Narsese.NarseseException e) {
-                    return False;
+                    return Null;
                 }
         });
     }
     public static void assertInvalid(@NotNull Supplier<Term> o) {
         try {
             Term recv = o.get();
-            if (recv!=False) //False also signals invalid reduction
+            if (recv!=Null) //False also signals invalid reduction
                 assertTrue(recv.toString() + " was not null", false);
         } catch (InvalidTermException e) {
             //correct if happens here

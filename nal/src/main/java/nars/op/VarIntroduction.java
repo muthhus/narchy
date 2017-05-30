@@ -2,7 +2,6 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;

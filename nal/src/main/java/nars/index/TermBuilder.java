@@ -35,9 +35,6 @@ import static nars.time.Tense.XTERNAL;
  */
 public abstract class TermBuilder {
 
-
-    private static final TermContainer InvalidSubterms = TermVector.the(False);
-
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
     private static final int InvalidImplicationSubj = or(EQUI, IMPL);
     private static final int InvalidImplicationPred = or(EQUI);
@@ -321,11 +318,11 @@ public abstract class TermBuilder {
                 Term t0 = t[0];
                 return t0 instanceof Ellipsislike ?
                         finish(op, t0) :
-                        False;
+                        Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
                 if (et0.equals(et1) || et0.containsRecursively(et1) || et1.containsRecursively(et0))
-                    return False;
+                    return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
@@ -390,8 +387,8 @@ public abstract class TermBuilder {
 
             x = productNormalize(x);
 
-            if (isTrueOrFalse(x))
-                return False; //may have become False through eval()
+            if (isAbsolute(x))
+                return Null; //may have become False through eval()
 
             if ((i == 0) && (s == 1) && (op.minSize > 1) && !(x instanceof Ellipsislike)) {
                 //special case: allow for ellipsis to occupy one item even if minArity>1
@@ -452,6 +449,7 @@ public abstract class TermBuilder {
         } else if (x instanceof AtomicSingleton) {
             if (isFalse(x)) return True;
             if (isTrue(x)) return False;
+            else return Null;
         }
 
         Term y = compound(NEG, DTERNAL, x);
@@ -501,7 +499,7 @@ public abstract class TermBuilder {
 
         final int n = u.length;
         if (n == 0)
-            return False;
+            return Null;
 
         if (n == 1) {
             Term only = u[0];
@@ -747,6 +745,8 @@ public abstract class TermBuilder {
     @NotNull
     private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
+        if (subject==Null || predicate==Null)
+            return Null;
 
         switch (op) {
 
@@ -785,8 +785,10 @@ public abstract class TermBuilder {
                 //if (isTrue(predicate)) return subject;
                 //if (isFalse(subject)) return neg(predicate);
                 //if (isFalse(predicate)) return neg(subject);
-                if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
-                    return False;
+                if (concurrent(dt) && subject.equals(predicate))
+                    return True;
+                if (isTrue(subject) || isFalse(subject))
+                    return False; //otherwise they are absolutely inequal
 
                 if (!validEquivalenceTerm(subject))
                     throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
@@ -831,15 +833,15 @@ public abstract class TermBuilder {
                     if (concurrent(dt) || dt == XTERNAL)
                         return $.negIf(predicate, isFalse(subject));
                     else {
-                        return False; //no temporal basis
+                        return Null; //no temporal basis
                     }
                 }
-                if (isTrueOrFalse(predicate /* consequence */))
-                    return False;
+                if (isAbsolute(predicate /* consequence */))
+                    return Null;
                 if (subject.hasAny(InvalidImplicationSubj))
-                    return False; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
+                    return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
                 if (predicate.hasAny(InvalidImplicationPred))
-                    return False; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+                    return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
 
                 if (predicate.op() == NEG) {
@@ -883,8 +885,8 @@ public abstract class TermBuilder {
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((!(pu instanceof Variable) && pu.varPattern()==0 && (subject.equals(pu) || subject.contains(pu))) ||
-                (!(su instanceof Variable) && su.varPattern()==0 && (predicate.equals(su) || predicate.contains(su))) )
+            if ((pu.varPattern()==0 && (subject.equals(pu) || subject.containsRecursively(pu))) ||
+                (su.varPattern()==0 && (predicate.equals(su) || predicate.containsRecursively(su))) )
                     //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 
@@ -900,21 +902,23 @@ public abstract class TermBuilder {
                 boolean predConj = predicate.op() == CONJ && concurrent(((Compound) predicate).dt());
                 if (subjConj && !predConj) {
                     final Compound csub = (Compound) subject;
-                    TermContainer subjs = csub.subterms();
-                    if (csub.contains(predicate)) {
-                        Term finalPredicate = predicate;
-                        subject = the(CONJ, csub.dt(), subjs.asFiltered(z -> z.equals(finalPredicate)).toArray());
-                        predicate = False;
-                        return statement(op, dt, subject, predicate);
+                    //TermContainer subjs = csub.subterms();
+                    if (csub.containsRecursively(predicate)) {
+                        return False;
+//                        Term finalPredicate = predicate;
+//                        subject = the(CONJ, csub.dt(), subjs.asFiltered(z -> z.equals(finalPredicate)).toArray());
+//                        predicate = False;
+//                        return statement(op, dt, subject, predicate);
                     }
                 } else if (predConj && !subjConj) {
                     final Compound cpred = (Compound) predicate;
-                    TermContainer preds = cpred.subterms();
-                    if (cpred.contains(subject)) {
-                        Term finalSubject = subject;
-                        predicate = the(CONJ, cpred.dt(), preds.asFiltered(z -> z.equals(finalSubject)).toArray());
-                        subject = False;
-                        return statement(op, dt, subject, predicate);
+                    //TermContainer preds = cpred.subterms();
+                    if (cpred.containsRecursively(subject)) {
+                        return False;
+//                        Term finalSubject = subject;
+//                        predicate = the(CONJ, cpred.dt(), preds.asFiltered(z -> z.equals(finalSubject)).toArray());
+//                        subject = False;
+//                        return statement(op, dt, subject, predicate);
                     }
 
                 } else if (subjConj && predConj) {
@@ -931,8 +935,7 @@ public abstract class TermBuilder {
                             int s0 = sss.size();
                             switch (s0) {
                                 case 0:
-                                    subject = False;
-                                    break;
+                                    subject = True; break;
                                 case 1:
                                     subject = sss.iterator().next();
                                     break;
@@ -947,8 +950,7 @@ public abstract class TermBuilder {
                             int s0 = ppp.size();
                             switch (s0) {
                                 case 0:
-                                    predicate = False;
-                                    break;
+                                    predicate = True; break;
                                 case 1:
                                     predicate = ppp.iterator().next();
                                     break;
@@ -1017,7 +1019,7 @@ public abstract class TermBuilder {
                 //everything intersects with the "all", so remove this TRUE below
                 trues++;
             } else if (isFalse(x)) {
-                return False;
+                return Null;
             }
         }
         if (trues > 0) {
@@ -1121,7 +1123,7 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s == null || s.isEmpty() ? False : (Compound) finalize(o, s);
+        return s == null || s.isEmpty() ? Null : (Compound) finalize(o, s);
     }
 
 
@@ -1291,7 +1293,7 @@ public abstract class TermBuilder {
     public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
 
         if (a.equals(b))
-            return False; //empty set
+            return Null; //empty set
 
         //quick test: intersect the mask: if nothing in common, then it's entirely the first term
         if ((a.structure() & b.structure()) == 0) {
@@ -1312,7 +1314,7 @@ public abstract class TermBuilder {
         if (retained == size) { //same as 'a'
             return a;
         } else if (retained == 0) {
-            return False; //empty set
+            return Null; //empty set
         } else {
             return the(o, terms.toArray(new Term[retained]));
         }

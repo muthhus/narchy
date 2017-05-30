@@ -12,7 +12,7 @@ import nars.term.subst.MapSubst1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.False;
+import static nars.Op.Null;
 
 
 public class substitute extends Functor {
@@ -44,7 +44,7 @@ public class substitute extends Functor {
         boolean strict = xx.subEquals(3, STRICT);
 
         if (strict && (!(input instanceof Compound) || !input.containsRecursively(x)))
-            return False;
+            return Null;
 
         Term y = xx.sub(2); //replacement term (y)
 //        if (hasYX) {
@@ -55,7 +55,7 @@ public class substitute extends Functor {
 //        }
 
         if (x.equals(y)) {
-            return strict ? False : input;
+            return strict ? Null : input;
         }
 
         Term output =
@@ -64,7 +64,7 @@ public class substitute extends Functor {
                     new MapSubst1(x,y) //optimized case
                         .transform(input, parent.terms);
 
-        return (output != null) ? output : False;
+        return (output != null) ? output : Null;
     }
 
 }

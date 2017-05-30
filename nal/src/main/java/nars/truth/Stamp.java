@@ -24,7 +24,6 @@ import jcog.io.BinTxt;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.table.TemporalBeliefTable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.set.primitive.LongSet;
 import org.eclipse.collections.impl.factory.primitive.LongSets;

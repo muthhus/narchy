@@ -8,8 +8,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.*;
-
 /**
  * prioritizes derivations exhibiting polarization (confident and discerning)
  * and low complexity

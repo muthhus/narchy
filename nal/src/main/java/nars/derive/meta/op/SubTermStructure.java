@@ -2,8 +2,8 @@ package nars.derive.meta.op;
 
 import nars.$;
 import nars.Op;
-import nars.derive.meta.AtomicPred;
 import nars.control.premise.Derivation;
+import nars.derive.meta.AtomicPred;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;

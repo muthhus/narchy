@@ -2,13 +2,12 @@ package nars.op.mental;
 
 import jcog.bag.impl.CurveBag;
 import jcog.data.MutableIntRange;
-import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
-import jcog.pri.Priority;
 import jcog.pri.PLink;
+import jcog.pri.PriReference;
+import jcog.pri.Priority;
+import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
-import nars.Op;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
 import nars.concept.AtomConcept;

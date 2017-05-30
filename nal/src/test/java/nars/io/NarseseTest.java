@@ -614,7 +614,7 @@ public class NarseseTest {
         for (String s : inputs ) {
             try {
                 Term e = term(s);
-                if (Op.isTrueOrFalse(e)) {
+                if (Op.isAbsolute(e)) {
                     assertTrue(true);
                 } else {
                     assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception

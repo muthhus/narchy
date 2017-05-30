@@ -77,6 +77,7 @@ public class Builtin {
             Functor.f1("quote", x -> x) //TODO does this work    //throw new RuntimeException("quote should never actually be invoked by the system");
     };
 
+
     /**
      * generate all NAR-contextualized functors
      */
@@ -89,18 +90,18 @@ public class Builtin {
 
                 Term x = c.sub(0, null);
                 if (x==null)
-                    return null;
+                    return Null;
 
                 if (x instanceof Compound) {
                     Term index = c.sub(1, null);
                     int which;
                     if (index != null) {
                         if (index instanceof Variable)
-                            return null;
+                            return Null;
 
                         which = $.intValue(index, -1);
                         if (which < 0) {
-                            return null;
+                            return Null;
                         }
                     } else {
                         //random
@@ -121,7 +122,7 @@ public class Builtin {
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
             if (t.op() != CONJ)
-                return False;
+                return Null; //fail
 
             Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
 
@@ -131,13 +132,15 @@ public class Builtin {
             Term result;
             if (size == 2) {
                 int n = nar.random().nextInt(2);
-                result = Term.falseIfNull(x[n]);
+                result = Term.nullIfNull(x[n]);
             } else {
                 Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
-                result = Term.falseIfNull(nar.terms.the(c.op(), c.dt(), y));
+                result = Term.nullIfNull(nar.terms.the(c.op(), c.dt(), y));
             }
+
             if (result instanceof Variable)
-                return False;
+                return Null;
+
             return result;
         }));
 

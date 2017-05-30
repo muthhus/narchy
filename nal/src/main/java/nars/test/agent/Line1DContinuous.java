@@ -12,8 +12,8 @@ import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.term.atom.Atomic;
 import nars.time.CycleTime;
-import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 
 import java.util.Arrays;
 

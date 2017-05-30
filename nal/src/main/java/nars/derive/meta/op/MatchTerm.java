@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.BoolPred;
 import nars.control.premise.Derivation;
+import nars.derive.meta.BoolPred;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;

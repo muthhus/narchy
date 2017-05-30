@@ -10,14 +10,11 @@ import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-
-import static nars.Op.ATOM;
 
 
 public class AtomConcept extends Atom implements Concept {

@@ -2,7 +2,6 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import org.jetbrains.annotations.NotNull;
 

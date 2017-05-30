@@ -14,7 +14,6 @@ import nars.task.GeneratedTask;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -23,7 +22,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static nars.Op.CONJ;
 import static nars.term.Terms.normalizedOrNull;

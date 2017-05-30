@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
-import nars.derive.meta.AtomicPred;
 import nars.control.premise.Derivation;
+import nars.derive.meta.AtomicPred;
 import nars.term.Compound;
 import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
