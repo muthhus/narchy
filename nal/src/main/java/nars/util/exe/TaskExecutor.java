@@ -2,7 +2,6 @@ package nars.util.exe;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
-import jcog.list.FasterList;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.task.ITask;
@@ -26,10 +25,10 @@ public class TaskExecutor extends Executioner {
      */
     public final FloatParam exePerCycleMax = new FloatParam(-1);
 
-    /**
-     * temporary collection of tasks to remove after sampling
-     */
-    protected final FasterList<ITask> toRemove = new FasterList();
+//    /**
+//     * temporary collection of tasks to remove after sampling
+//     */
+//    protected final FasterList<ITask> toRemove = new FasterList();
 
     /**
      * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
@@ -42,7 +41,7 @@ public class TaskExecutor extends Executioner {
     public final PriorityHijackBag<ITask, ITask> active = new PriorityHijackBag<>(4) {
         @Override
         protected final Consumer<ITask> forget(float rate) {
-            return null;
+            return null; //manages its own forgets
             //return new PForget(rate);
         }
 
@@ -106,7 +105,6 @@ public class TaskExecutor extends Executioner {
     }
 
 
-
     @Override
     public void runLater(Runnable r) {
         r.run(); //synchronous
@@ -138,9 +136,9 @@ public class TaskExecutor extends Executioner {
 
             active.sample(toExe, this::actuallyRun);
 
-            if (!toRemove.isEmpty()) {
-                toRemove.clear(active::remove);
-            }
+//            if (!toRemove.isEmpty()) {
+//                toRemove.clear(active::remove);
+//            }
 
 //            } else {
 //                //sort
@@ -169,8 +167,8 @@ public class TaskExecutor extends Executioner {
             next = x.run(nar);
 
         } catch (Throwable e) {
+            x.delete(); //TODO add to a 'bad' bag?
             NAR.logger.error("{} {}", x, e.getMessage());
-            toRemove.add(x); //TODO add to a 'bad' bag?
             return;
         }
 
@@ -182,7 +180,6 @@ public class TaskExecutor extends Executioner {
         } else if (forgetEachPri > 0) {
             x.priSub(forgetEachPri);
         }
-
         if (next != null)
             actuallyFeedback(x, next);
     }

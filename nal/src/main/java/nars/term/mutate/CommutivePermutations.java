@@ -1,6 +1,5 @@
 package nars.term.mutate;
 
-import jcog.Util;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -16,11 +15,6 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     @NotNull
     private final TermContainer y;
     private final TermContainer x;
-
-    @Override
-    protected Object newKey() {
-        return Util.tuple(CommutivePermutations.class, x, y);
-    }
 
     public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
         super();

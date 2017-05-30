@@ -827,15 +827,13 @@ public abstract class TermBuilder {
             case IMPL:
 
                 //special case for implications: reduce to --predicate if the subject is False
-                if (isTrue(subject /* antecedent */)) {
+                if (isTrueOrFalse(subject /* antecedent */)) {
                     if (concurrent(dt) || dt == XTERNAL)
-                        return predicate; //special case for implications: reduce to predicate if the subject is True
+                        return $.negIf(predicate, isFalse(subject));
                     else {
                         return False; //no temporal basis
                     }
                 }
-                if (isFalse(subject))
-                    return False;
                 if (isTrueOrFalse(predicate /* consequence */))
                     return False;
                 if (subject.hasAny(InvalidImplicationSubj))

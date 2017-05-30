@@ -68,14 +68,20 @@ public abstract class Unify implements Termutator, Subst {
         this(terms, type, random, new Versioning(stackMax, ttl));
     }
 
-    /** TODO make type not @Nullable */
+    /**
+     *
+     * @param terms
+     * @param type if null, unifies any variable type.  if non-null, only unifies that type
+     * @param random
+     * @param versioning
+     */
     protected Unify(TermIndex terms, @Nullable Op type, Random random, @NotNull Versioning versioning) {
         super();
 
         this.terms = terms;
 
         this.random = random;
-        this.type = type!=null ? type : VAR_PATTERN;
+        this.type = type;
 
         this.versioning = versioning;
 
@@ -199,7 +205,7 @@ public abstract class Unify implements Termutator, Subst {
 
     public final boolean matchType(@NotNull Op oy) {
         Op t = this.type;
-        return t == VAR_PATTERN ?
+        return t == null ?
                 oy.var : //any variable
                 oy == t; //the specified type
     }

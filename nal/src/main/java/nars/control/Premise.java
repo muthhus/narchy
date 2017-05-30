@@ -70,8 +70,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
             return ITask.DeleteMe; //task deleted
         }
 
-        float p = priElseZero();
-        if (p < Pri.EPSILON)
+        float premisePri = priElseZero();
+        if (premisePri < Pri.EPSILON)
             return null;
 
         Term beliefTerm = getTwo().get();
@@ -148,7 +148,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
-        float priFromTasks = beliefPriority != beliefPriority ? taskPri :
+        float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
                 aveAri
                 //or
@@ -161,12 +161,13 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         d.restartA(nar);
         d.restartB(task);
         d.restartC(this, belief, beliefTerm,
-                Util.lerp(priFromTasks, Param.UnificationTTLMax, Param.UnificationTTLMin));
+                Util.lerp(parentTaskPri, Param.UnificationTTLMax, Param.UnificationTTLMin));
 
         DefaultDeriver.the.test(d);
 
-        priSub(p); //absorb starting priority here
-        ITask[] r = d.flush(p);
+        priSub(premisePri); //absorb starting priority here
+
+        ITask[] r = d.flush(parentTaskPri);
 //
         return r;
     }

@@ -151,12 +151,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     @Nullable void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
+    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, Random rng);
 
     default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap, Random rng) {
         return match(when, now, dur, against, null, noOverlap, rng);
     }
-
-    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, Random rng);
 
     @Nullable default Task match(long when, long now, int dur) {
         return match(when, now, dur, null, true, ThreadLocalRandom.current() /* HACK */);

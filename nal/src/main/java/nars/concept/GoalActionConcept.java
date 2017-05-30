@@ -116,14 +116,14 @@ public class GoalActionConcept extends ActionConcept {
 
 
         //apply additional forgetting for past goals and beliefs, to promote future predictions
-        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
-        Consumer<Task> decay = x -> {
-            if (x.end() < now) {
-                x.priMult(decayFactor);
-            }
-        };
-        beliefs().forEachTask(decay);
-        goals().forEachTask(decay);
+//        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
+//        Consumer<Task> decay = x -> {
+//            if (x.end() < now) {
+//                x.priMult(decayFactor);
+//            }
+//        };
+//        beliefs().forEachTask(decay);
+//        goals().forEachTask(decay);
 
         return Stream.of(fb).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);

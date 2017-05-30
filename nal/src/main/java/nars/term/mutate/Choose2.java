@@ -1,6 +1,5 @@
 package nars.term.mutate;
 
-import jcog.Util;
 import jcog.data.array.IntArrays;
 import jcog.math.Combinations;
 import nars.derive.meta.match.Ellipsis;
@@ -30,11 +29,6 @@ public class Choose2 extends Termutator.AbstractTermutator {
     private final Unify f;
     @NotNull
     private final ShuffledSubterms yy;
-
-    @Override
-    protected Object newKey() {
-        return Util.tuple(Choose2.class,xEllipsis, x/*, yFreeSet*/);
-    }
 
     public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
         super();

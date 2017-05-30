@@ -531,7 +531,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean isCommutative() {
-        if (op().commutative) {
+        if (op().commutative) { //TODO only test dt() if equiv or conj
             int dt = dt();
             switch (dt) {
                 case 0:

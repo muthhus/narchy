@@ -73,17 +73,12 @@ public class FunctorTest {
         int TIME = 2048;
         TestNAR t = new TestNAR(new Default());
 
-        //Param.DEBUG = true; t.log();
-
-        t.believe("(equal(complexity($1),$2) ==> c($1,$2))");
-        t.ask("c(x, 1)");
-        t.ask("c(x, 2)");
-        t.ask("c((y), 1)");
-        t.ask("c((y), 2)");
-        t.mustBelieve(TIME, "c(x,1)", 1f, 0.81f);
-        t.mustBelieve(TIME, "c(x,2)", 0f, 0.81f);
-        t.mustBelieve(TIME, "c((y),1)", 0f, 0.81f);
-        t.mustBelieve(TIME, "c((y),2)", 1f, 0.81f);
+        Param.DEBUG = true; t.log();
+        t.believe("(equal(complexity($1),complexity($2)) ==> c({$1,$2}))");
+        t.ask("c({x, y})");
+        t.ask("c({x, (x)})");
+        t.mustBelieve(TIME, "c({x,y})", 1f, 0.81f);
+        t.mustBelieve(TIME, "c({x,(x)})", 0f, 0.81f);
         t.run(true);
     }
 

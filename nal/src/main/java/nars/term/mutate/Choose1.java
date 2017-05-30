@@ -1,6 +1,5 @@
 package nars.term.mutate;
 
-import jcog.Util;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.term.Term;
@@ -22,11 +21,6 @@ public class Choose1 extends Termutator.AbstractTermutator {
     private final Term xEllipsis;
     @NotNull
     private final Term[] yy;
-
-    @Override
-    protected Object newKey() {
-        return Util.tuple(xEllipsis, x);
-    }
 
     public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
         super();

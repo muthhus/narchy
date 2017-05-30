@@ -54,9 +54,5 @@ public interface Termutator {
 //            return k;
 //        }
 
-        /**
-         * lazily generate a key for identity comparison
-         */
-        abstract protected Object newKey();
     }
 }

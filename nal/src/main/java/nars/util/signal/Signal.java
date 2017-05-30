@@ -69,7 +69,7 @@ public class Signal {
         this.lastInputTime = now;
 
         if (this.current != null) {
-            this.current.setEnd((now+last)/2);
+            this.current.setEnd(last); //(now+last)/2);
             if (now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)) {
                 this.current = null;
             }

@@ -33,8 +33,8 @@ public class NAL5BooleanConsistency {
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
                 Default d = new Default();
-                d.nal(6);
-                d.termVolumeMax.setValue(14);
+                d.nal(7);
+                d.termVolumeMax.setValue(20);
 
                 //d.log();
 
@@ -61,7 +61,7 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(512);
+                d.run(1512);
 
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {

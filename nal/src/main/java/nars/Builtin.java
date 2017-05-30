@@ -46,8 +46,14 @@ public class Builtin {
             new flat.flatProduct(),
             new similaritree(),
 
-            Functor.f2("equal", (x, y) ->
-                    x.equals(y) ? True : ((x instanceof Variable) || (y instanceof Variable) ? null : False)),
+            Functor.f2("equal", (x, y) -> {
+                if (x.equals(y))
+                    return True; //unconditionally true
+                if ((x.vars() > 0) || (y.vars() > 0)) {
+                    return null; //unknown, fall-through
+                }
+                return False;
+            }),
 
             //TODO for binding equal values
 //            Functor.f2("equality", (x, y) ->

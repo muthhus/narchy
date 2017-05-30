@@ -183,9 +183,8 @@ public interface Priority extends Prioritized {
         float before = priSafe(0);
         float next = priAdd(toAdd);
         float delta = next - before;
-        float excess = toAdd - delta;
 
-        return excess;
+        return toAdd - delta;
     }
 
     /**
