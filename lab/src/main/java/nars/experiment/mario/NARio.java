@@ -74,10 +74,11 @@ public class NARio extends NAgentX {
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
         sc.resolution(0.1f);
-        sc.pri(0.5f);
+        sc.pri(0.25f);
 
-        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 8)
-            .resolution(0.25f);
+        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 16)
+            .resolution(0.1f);
+        ccAe.pri(0.3f);
 
 
 //        //new CameraGasNet($.the("camF"), cc, this, 64);

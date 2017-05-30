@@ -13,6 +13,7 @@ import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -114,6 +115,15 @@ public class GoalActionConcept extends ActionConcept {
         //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
 
 
+        //apply additional forgetting for past goals and beliefs, to promote future predictions
+        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
+        Consumer<Task> decay = x -> {
+            if (x.end() < now) {
+                x.priMult(decayFactor);
+            }
+        };
+        beliefs().forEachTask(decay);
+        goals().forEachTask(decay);
 
         return Stream.of(fb).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);

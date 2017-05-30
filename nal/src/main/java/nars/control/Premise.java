@@ -5,6 +5,7 @@
 package nars.control;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
@@ -63,13 +64,15 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
     public ITask[] run(NAR nar) {
 
         PriReference<Task> taskLink = getOne();
-
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri) {
             return ITask.DeleteMe; //task deleted
         }
 
+        float p = priElseZero();
+        if (p < Pri.EPSILON)
+            return null;
 
         Term beliefTerm = getTwo().get();
         Task belief = null;
@@ -162,10 +165,9 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
         DefaultDeriver.the.test(d);
 
-        ITask[] r = d.flush();
+        priSub(p); //absorb starting priority here
+        ITask[] r = d.flush(p);
 //
-        delete(); //self destruct
-
         return r;
     }
 

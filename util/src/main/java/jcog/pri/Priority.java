@@ -286,7 +286,21 @@ public interface Priority extends Prioritized {
         priLerp((p - min) / range, lerp);
     }
 
+    static <X extends Priority> void normalize(X[] xx, float target) {
+        int l = xx.length;
+        assert(target==target);
+        assert(l > 0);
 
+        float ss = sum(Priority::priElseZero, xx);
+        if (ss <= Pri.EPSILON)
+            return;
+
+        float factor = target / ss;
+
+        for (X x : xx)
+            x.priMult(factor);
+
+    }
 
 
 //    void orPriority(float v);

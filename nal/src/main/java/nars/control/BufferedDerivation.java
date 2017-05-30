@@ -1,5 +1,7 @@
 package nars.control;
 
+import jcog.pri.Pri;
+import jcog.pri.Priority;
 import nars.control.premise.Derivation;
 import nars.task.DerivedTask;
 import nars.task.ITask;
@@ -24,12 +26,15 @@ public final class BufferedDerivation extends Derivation implements BiFunction<I
     }
 
     @Nullable
-    public ITask[] flush() {
+    public ITask[] flush(float normalizeTo) {
         int bs = buffer.size();
         if (bs > 0) {
-            ITask[] dd = buffer.values().toArray(new ITask[bs]);
+            ITask[] xx = buffer.values().toArray(new ITask[bs]);
             buffer.clear();
-            return dd;
+
+            Priority.normalize(xx, normalizeTo);
+
+            return xx;
         }
         return null;
     }
