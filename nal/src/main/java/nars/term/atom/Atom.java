@@ -14,9 +14,8 @@ import static nars.Op.ATOM;
  */
 public class Atom extends AtomicToString {
 
-    public final static int RANK = Term.opX(ATOM, 1);
 
-    public Atom(@NotNull String id) {
+    protected Atom(@NotNull String id) {
         this.id = validateAtomID(id);
         this.hash = super.hashCode();
     }
@@ -58,9 +57,9 @@ public class Atom extends AtomicToString {
         return id;
     }
 
-    @Override
-    public final int opX() {
-        return RANK;
+    public final static int AtomOpX = Term.opX(ATOM, 1);
+    @Override public final int opX() {
+        return AtomOpX;
     }
 
     @NotNull

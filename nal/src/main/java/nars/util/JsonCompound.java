@@ -1,8 +1,11 @@
 package nars.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import jcog.Util;
+import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -18,40 +21,46 @@ import java.util.List;
 public enum JsonCompound  { ;
 
 
-    public static Compound the(JsonNode j) {
+    public static Term the(JsonNode j) {
 
-        Op op;
-        Term[] subterms;
         if (j.isArray()) {
-            op = Op.PROD;
-            List<Term> s = Lists.newArrayList(
-                    Iterators.transform(
-                            j.iterator(), JsonCompound::the
-                    )
-            );
-            subterms = s.toArray(new Term[s.size()]);
+            int s = j.size();
+            Term[] subterms = new Term[s];
+            for (int i = 0; i < s; i++) {
+                subterms[i] = the(j.get(i));
+            }
+            return $.p(subterms);
+
         } else if (j.isValueNode()) {
-            op = Op.PROD;
-            subterms = new Term[]{Atomic.the(j.toString())};
+            if (j.isTextual()) {
+                return $.quote(j.textValue());
+            } else if (j.isNumber()) {
+                return $.the(j.numberValue());
+            } else {
+                throw new UnsupportedOperationException();
+            }
         } else if (j.isObject()) {
-            throw new UnsupportedOperationException("TODO");
-//            op = Op.SETe;
-//            j.fields().forEachRemaining(...
-//            subterms = StreamSupport.stream(j.spliterator(), false).map(e -> {
-//                //return $.p($.the(e.getKey()), fromJSON(e.getValue()));
-//                return $.inh( the(e.asText()), Atomic.the(e.getKey()) );
-//            }).toArray(Term[]::new);
+            Term[] s = new Term[j.size()];
+            final int[] i = {0};
+            j.fields().forEachRemaining(f -> {
+                Atomic k = $.quote(f.getKey());
+                Term v = the(f.getValue());
+                s[i[0]++] =
+                        $.inh(v, k);
+                        //$.p(k, v);
+
+            });
+            return $.sete(s);
         } else {// if (j.isJsonObject()) {
             throw new UnsupportedOperationException("TODO");
         }
-
-        return new GenericCompound(op, new ArrayTermVector(subterms));
     }
 
 
-    public static Compound the(String json) {
+    public static Term the(String json) {
 
-        throw new UnsupportedOperationException("TODO");
-        //return the( new Gson().fromJson(json, JsonElement.class) );
+        JsonNode x = Util.toJSON(json);
+        return the(x);
+
     }
 }

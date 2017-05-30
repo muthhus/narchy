@@ -62,7 +62,7 @@ public class Gradius extends NAgentX {
     }
 
 
-    int lastScore = 0;
+    int lastScore;
 
     @Override
     protected float act() {
@@ -81,9 +81,11 @@ public class Gradius extends NAgentX {
             return r;
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
+    public static void main(String[] args) {
 
          NAgentX.runRT((n) -> {
+
+             n.termVolumeMax.setValue(16);
 
              Gradius a = null;
              try {
@@ -93,7 +95,7 @@ public class Gradius extends NAgentX {
              }
              return a;
 
-        }, 20f);
+        }, 10f);
 
     }
 

@@ -29,6 +29,7 @@ import nars.term.var.VarPattern;
 import nars.term.var.Variable;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.JsonCompound;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.jetbrains.annotations.NotNull;
@@ -138,11 +139,11 @@ public enum $ {
      */
     @Nullable
     public static <T extends Term> T inh(Term subj, Term pred) {
-
-//        if ((predicate instanceof Operator) && if (subject instanceof Product))
-//            return new GenericCompound(Op.INHERITANCE, (Operator)predicate, (Product)subject);
-//        else
         return (T) the(INH, subj, pred);
+    }
+
+    public static <T extends Term> T inh(Term subj, String pred) {
+        return $.inh(subj, $.the(pred));
     }
 
 
@@ -1108,6 +1109,10 @@ public enum $ {
         } else {
             return ifNotInt;
         }
+    }
+
+    public static Term fromJSON(String j) {
+        return JsonCompound.the(j);
     }
 
 

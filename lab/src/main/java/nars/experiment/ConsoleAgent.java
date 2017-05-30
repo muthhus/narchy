@@ -49,9 +49,6 @@ public abstract class ConsoleAgent extends NAgentX {
     final TestConsole W;
 
 
-
-
-
     protected void input(Task t) {
         queue.add(t);
     }
@@ -90,7 +87,7 @@ public abstract class ConsoleAgent extends NAgentX {
         W = new TestConsole(
                 nar.self(),
                 true,
-                R.width(), R.height()).write('a','b',' ');
+                R.width(), R.height()).write('a', 'b', ' ');
 
         //SpaceGraph.window(new VSplit(Rlabel, R, 0.1f), 800, 600);
         //SpaceGraph.window(new VSplit(label("context"), Rlabel, 0.1f), 800, 600);
@@ -106,20 +103,18 @@ public abstract class ConsoleAgent extends NAgentX {
 //        });
 
 
-        NAgentX.chart(this);
-
-        senseNumberDifference($.func((Atomic)id, Atomic.the("joy")), happy);
+        senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), happy);
 
     }
 
     @Override
     protected Stream<ITask> predictions(long next) {
         return Stream.concat(
-           Stream.concat(
-               W.input(),
-               R.input()
-           ),
-           super.predictions(next)
+                Stream.concat(
+                        W.input(),
+                        R.input()
+                ),
+                super.predictions(next)
         );
     }
 
@@ -127,35 +122,31 @@ public abstract class ConsoleAgent extends NAgentX {
     abstract protected float act();
 
     public static void main(String[] args) {
-        Default n = NARBuilder.newMultiThreadNAR(2,
-                new RealTime.CS(true).durSeconds(0.05f));
-        n.setSelf("I");
-        n.termVolumeMax.setValue(24);
-        //n.logBudgetMin(System.out, 0.25f);
-        //n.log();
 
-        @NotNull ConsoleAgent a = new ConsoleAgent(n) {
-            @Override
-            protected float act() {
-                //copy
-                return  similarity(R.chars, W.chars );
-            }
-        };
+        NAgentX.runRT((n) -> {
+            @NotNull ConsoleAgent a = new ConsoleAgent(n) {
+                @Override
+                protected float act() {
+                    //copy
+                    return similarity(R.chars, W.chars);
+                }
+            };
 
-        a.trace = true;
+            a.trace = true;
+            return a;
+        }, 4f);
 
-        a.startRT(4f);
     }
 
     private static float similarity(char[][] a, char[][] b) {
         int total = 0, equal = 0;
         for (int j = 0; j < a[0].length; j++) {
             for (int i = 0; i < a.length; i++) {
-                equal+= (a[i][j] == b[i][j]) ? 1 : 0;
+                equal += (a[i][j] == b[i][j]) ? 1 : 0;
                 total++;
             }
         }
-        return (equal)/((float)total);
+        return (equal) / ((float) total);
     }
 
     private class TestConsole extends ConsoleSurface {
@@ -177,12 +168,12 @@ public abstract class ConsoleAgent extends NAgentX {
 
             nextStamp = nar.time.nextStamp();
 
-            for (int x = 0; x< w; x++) {
+            for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
                     chars[x][y] = ' ';
                     terms[x][y] = $.p(id, $.the(x), $.the(y));
-                    beliefs[x][y] = new Signal(BELIEF, ()->0.25f);
-                    believe((char)0, x, y);
+                    beliefs[x][y] = new Signal(BELIEF, () -> 0.25f);
+                    believe((char) 0, x, y);
                 }
             }
             c[0] = 0;
@@ -194,31 +185,31 @@ public abstract class ConsoleAgent extends NAgentX {
 
         public TestConsole write(char... vocabulary) {
             write = true;
-                actionTriState($.func("cursor", Atomic.the("x"), id), (d) -> {
-                    switch (d) {
-                        case -1:
-                            left();
-                            break;
+            actionTriState($.func("cursor", Atomic.the("x"), id), (d) -> {
+                switch (d) {
+                    case -1:
+                        left();
+                        break;
 
-                        case +1:
-                            right();
-                            break;
-                    }
-                });
-                actionTriState($.func("cursor", Atomic.the("y"), id), (d) -> {
-                    switch (d) {
-                        case -1:
-                            up();
-                            break;
-                        case +1:
-                            down();
-                            break;
+                    case +1:
+                        right();
+                        break;
+                }
+            });
+            actionTriState($.func("cursor", Atomic.the("y"), id), (d) -> {
+                switch (d) {
+                    case -1:
+                        up();
+                        break;
+                    case +1:
+                        down();
+                        break;
 
-                        //case +1: Wmodel.setCursorPosition(cx, Math.min(Wmodel.getTerminalSize().getRows()-2, cy+1) ); break;
-                    }
-                });
-                for (char c : vocabulary) {
-                    Compound ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
+                    //case +1: Wmodel.setCursorPosition(cx, Math.min(Wmodel.getTerminalSize().getRows()-2, cy+1) ); break;
+                }
+            });
+            for (char c : vocabulary) {
+                Compound ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
 
 //                    ActionConcept m = new GoalActionConcept(ct, nar(), (b, d) -> {
 //                        boolean next = d != null && d.expectation() > 0.75f;
@@ -230,10 +221,10 @@ public abstract class ConsoleAgent extends NAgentX {
 //                    });
 //                    actions().add(m);
 
-                    actionToggle(ct, d -> {
-                        if (d) write(c);
-                    });
-                }
+                actionToggle(ct, d -> {
+                    if (d) write(c);
+                });
+            }
 
             return this;
         }
@@ -283,13 +274,15 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         public void left() {
-            c[0] = Math.max(0, c[0]-1);
+            c[0] = Math.max(0, c[0] - 1);
         }
+
         public void up() {
-            c[1] = Math.max(0, c[1]-1);
+            c[1] = Math.max(0, c[1] - 1);
         }
+
         public void down() {
-            c[1] = Math.min(rows()-1, c[1]+1);
+            c[1] = Math.min(rows() - 1, c[1] + 1);
         }
 
         public int rows() {
@@ -297,7 +290,7 @@ public abstract class ConsoleAgent extends NAgentX {
         }
 
         public void right() {
-            c[0] = Math.min(cols() -1, c[0]+1);
+            c[0] = Math.min(cols() - 1, c[0] + 1);
         }
 
         public int cols() {
@@ -315,7 +308,7 @@ public abstract class ConsoleAgent extends NAgentX {
         protected void believe(char prev, int cx, int cy) {
             char value = chars[cx][cy];
 
-            if (prev == 0 || (value!=prev)) {
+            if (prev == 0 || (value != prev)) {
 //                Task prevBelief = beliefs[cx][cy];
 //                if (prevBelief!=null) {
 //                    //..
@@ -324,7 +317,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 beliefs[cx][cy].set(
                         $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
                         $.t(1f, 0.9f),
-                        ()->nextStamp,
+                        () -> nextStamp,
                         nar);
             }
         }
@@ -365,13 +358,14 @@ public abstract class ConsoleAgent extends NAgentX {
         public int height() {
             return chars[0].length;
         }
+
         public int width() {
             return cols();
         }
 
         public Stream<Task> input() {
             nextStamp = nar.time.nextStamp();
-            return IntStream.range(0, rows()*cols()).mapToObj(i -> {
+            return IntStream.range(0, rows() * cols()).mapToObj(i -> {
                 int x = i % cols();
                 int y = (i - x) / cols();
                 return beliefs[x][y].get();

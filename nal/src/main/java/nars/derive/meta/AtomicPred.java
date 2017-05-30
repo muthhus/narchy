@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
     @Override
     public int opX() {
-        return Atom.RANK; //HACK
+        return Atom.AtomOpX; //HACK
     }
 
     @Override

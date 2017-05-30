@@ -36,7 +36,7 @@ public class Gradius4K extends GamePanel implements Runnable {
 
     // keys
     public boolean[] keys = new boolean[32768];
-    private long updateMS = 20;
+    private long updateMS = 40;
     public BufferedImage image;
     public static final int VK_LEFT = 0x25;
     public static final int VK_RIGHT = 0x27;
@@ -45,6 +45,7 @@ public class Gradius4K extends GamePanel implements Runnable {
     public static final int VK_SHOOT = 0x42;
     public int score = 0;
     public int playerDead = 1;
+    public int SPEED = 10;
 
     public static void main(String[] args) {
         new Gradius4K();
@@ -559,20 +560,20 @@ public class Gradius4K extends GamePanel implements Runnable {
                             // update player position based on user input
                             if (keys[VK_UP]) {
                                 if (object[OBJ_Y] > 11) {
-                                    object[OBJ_Y] -= 3;
+                                    object[OBJ_Y] -= SPEED;
                                 }
                             } else if (keys[VK_DOWN]) {
                                 if (object[OBJ_Y] < 220) {
-                                    object[OBJ_Y] += 3;
+                                    object[OBJ_Y] += SPEED;
                                 }
                             }
                             if (keys[VK_LEFT]) {
                                 if (object[OBJ_X] > cameraX + 13) {
-                                    object[OBJ_X] -= 3;
+                                    object[OBJ_X] -= SPEED;
                                 }
                             } else if (keys[VK_RIGHT]) {
                                 if (object[OBJ_X] < cameraX + 243) {
-                                    object[OBJ_X] += 3;
+                                    object[OBJ_X] += SPEED;
                                 }
                             }
 

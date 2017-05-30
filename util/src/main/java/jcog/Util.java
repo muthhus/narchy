@@ -14,6 +14,7 @@
  */
 package jcog;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +40,9 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.*;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -49,6 +52,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -1594,7 +1598,9 @@ public enum Util {
 
 
     public final static ObjectMapper msgPackMapper =
-            new ObjectMapper(new MessagePackFactory());//.enableDefaultTyping();
+            new ObjectMapper(new MessagePackFactory())
+            .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+            ;
 
     /**
      * msgpack serialization
@@ -1617,7 +1623,17 @@ public enum Util {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len,  type);
     }
 
+    static final Logger jsonLogger = LoggerFactory.getLogger(JsonNode.class);
+
     public static JsonNode toJSON(Object x) {
+        if (x instanceof String) {
+            try {
+                return msgPackMapper.readTree(x.toString());
+            } catch (IOException e) {
+                jsonLogger.error(" {}", e);
+            }
+        }
+
         return msgPackMapper.valueToTree(x);
     }
 
@@ -1645,4 +1661,6 @@ public enum Util {
 
         return true;
     }
+
+
 }

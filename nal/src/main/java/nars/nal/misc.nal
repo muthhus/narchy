@@ -176,3 +176,7 @@
     //<patham9> should have
     //<sseehh__> thats possible
     //<patham9> and I wouldnt apply StructuralDeduction as truth
+
+
+//set un-recurser
+    ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction)

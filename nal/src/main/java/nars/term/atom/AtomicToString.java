@@ -7,9 +7,7 @@ import jcog.Util;
  */
 public abstract class AtomicToString implements Atomic {
 
-    /** Assumes that the op()
-     *  is encoded within its string such that additional op()
-     *  comparison would be redundant. */
+
     @Override public boolean equals(Object u) {
 
         return  (this == u)
@@ -17,7 +15,7 @@ public abstract class AtomicToString implements Atomic {
                 (
                         u instanceof Atomic &&
                         hashCode() == u.hashCode() &&
-                        op() == ((Atomic) u).op()) &&
+                        opX() == ((Atomic) u).opX()) &&
                         toString().equals(u.toString()
                 );
 

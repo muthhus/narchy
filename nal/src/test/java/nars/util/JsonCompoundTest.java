@@ -4,28 +4,25 @@ import nars.$;
 import nars.Narsese;
 import nars.nar.Default;
 import nars.task.util.TaskRule;
+import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.junit.Ignore;
 import org.junit.Test;
 
-/**
- * Created by me on 4/2/17.
- */
-@Ignore
 public class JsonCompoundTest {
 
-    //TODO make into a test
     @Test public void testJsonArray() throws Narsese.NarseseException {
         Default d = new Default();
-        //d.log();
+        d.log();
 
         new TaskRule("(json,%1):{x(%2)}", "X(%1,%2)", d);
 
         //d.believe( $.inh( JsonCompound.the("['a', 1, ['b', 'c']]"), $.the("(json,1)")  ) );
         //TaskProcess: $.50;.95$ (("a"),(1),(("b"),("c"))). %1.0;.90% {0: 1}
 
-        d.believe( $.inh( JsonCompound.the("{ x: 3, y: [a,b] }"), $.$("(json,2)") ) );
+        d.believe( $.inh( JsonCompound.the("{ x: 3, y: [\"a\",4] }"), $.$("(json,2)") ) );
         //d.believe( $.inh( JsonCompound.the("{ x: 3 }"), $.$("(json,2)") ) );
         //               $.15;.86$ X(3,2). %1.0;.81% {1: 1;;}
 
@@ -48,7 +45,26 @@ public class JsonCompoundTest {
             d.believe($.inst(id, Atomic.the("now")), Tense.Present);
         }
         d.run(256);
+    }
 
-
+    @Test public void testBigJSON2() {
+        /*
+        * https://eonet.sci.gsfc.nasa.gov/api/v2.1/events?limit=5&days=20&source=InciWeb&status=open
+        * https://worldview.earthdata.nasa.gov/config/wv.json
+        * */
+        String j = "{ \"id\": \"EONET_2797\",\n" +
+                "   \"title\": \"Snake Ridge Fire, ARIZONA\",\n" +
+                "   \"description\": \"\",\n" +
+                "   \"link\": \"http://eonet.sci.gsfc.nasa.gov/api/v2.1/events/EONET_2797\",\n" +
+                "   \"categories\": [\n" +
+                "    {\n" +
+                "     \"id\": 8,\n" +
+                "     \"title\": \"Wildfires\"\n" +
+                "    }\n" +
+                "   ] }";
+        Default d = new Default();
+        d.log();
+        d.believe($.inh((Compound)$.fromJSON(j), "x"));
+        d.run(1000);
     }
 }

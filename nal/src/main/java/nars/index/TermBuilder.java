@@ -1179,7 +1179,7 @@ public abstract class TermBuilder {
         //return null;
     }
 
-    public Atomic the(Number o) {
+    public Atomic the(@NotNull Number o) {
 
 //        if (o instanceof Byte) return the(o.intValue());
 //        if (o instanceof Short) return the(o.intValue());
