@@ -7,8 +7,6 @@ import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
-import nars.video.Scale;
-import nars.video.SwingBitmap2D;
 
 import javax.swing.*;
 

@@ -3,9 +3,9 @@ package nars.web;
 
 import com.google.common.base.Joiner;
 import jcog.bag.impl.ArrayBag;
+import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import jcog.pri.PLink;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.nar.Default;

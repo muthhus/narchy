@@ -5,8 +5,8 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.Default;
 import nars.time.CycleTime;
-import nars.util.exe.TaskExecutor;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -2,10 +2,8 @@ package jcog.pri.mix;
 
 import jcog.list.FasterList;
 import jcog.meter.TelemetryRing;
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 
-import java.sql.Time;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

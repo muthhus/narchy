@@ -1,7 +1,6 @@
 package jcog.list;
 
 import java.util.Iterator;
-import java.util.function.Consumer;
 
 public class ArrayIterator<E> implements Iterator<E> {
 

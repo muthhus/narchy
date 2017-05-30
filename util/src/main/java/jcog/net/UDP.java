@@ -2,7 +2,6 @@ package jcog.net;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.net.InetAddresses;
 import jcog.Loop;
 import jcog.Util;
 import org.jetbrains.annotations.Nullable;
@@ -13,9 +12,7 @@ import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
-import java.nio.channels.MembershipKey;
 import java.nio.channels.SelectionKey;
-import java.util.Enumeration;
 
 /**
  * generic UDP server & utilities

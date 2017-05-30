@@ -12,7 +12,6 @@ import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import jcog.Loop;
 import jcog.Util;
-import jcog.meter.event.PeriodMeter;
 import jogamp.opengl.FPSCounterImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -230,14 +230,22 @@ public final class Conclude extends AbstractPred<Derivation> {
             @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms);
             if (c3n != null) {
 
+                boolean negating = c3n.getTwo();
 
                 Compound C = c3n.getOne();
                 if (varIntro) {
                     Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(C), d.terms);
                     if (Cv == null || Cv.equals(C) /* keep only if it differs */)
                         return;
-                    else
+                    else {
                         C = Cv;
+                        if (C.op()==NEG) {
+                            C = compoundOrNull(C.unneg()); //argh
+                            if (C == null)
+                                return;
+                            negating = !negating;
+                        }
+                    }
                 }
 
                 long start = occ[0];
@@ -250,7 +258,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                 if (priority == priority) {
 
 
-                    if (c3n.getTwo() && truth != null)
+                    if (negating && truth != null)
                         truth = truth.negated();
 
                     DerivedTask t =

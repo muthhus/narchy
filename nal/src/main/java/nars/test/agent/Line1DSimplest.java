@@ -33,11 +33,12 @@ public class Line1DSimplest extends NAgent {
 
 
     public Line1DSimplest(NAR n) {
-        super("L", n);
+        super("", n);
 
         in = senseNumber(
                 //$.inh($.the("i"), id),
-                $.inh(Atomic.the("i"), id),
+                //$.inh(Atomic.the("i"), id),
+                $.p("i"),
                 this.i);
 //        FuzzyScalarConcepts in = senseNumberBi(
 //                //$.inh($.the("i"), id),
@@ -51,7 +52,8 @@ public class Line1DSimplest extends NAgent {
 //        }));
 
         //out = null;
-        Compound O = $.inh(Atomic.the("o"), id);
+        Compound O = //$.inh(Atomic.the("o"), id);
+                $.p("o");
         out = actionTriState(O, (d) -> {
             switch (d) {
                 case -1:

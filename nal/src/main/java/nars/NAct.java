@@ -134,12 +134,12 @@ public interface NAct {
                     throw new RuntimeException();
             }
 
-            return accepted ?
-                    $.t(f,
-                            d!=null ? d.conf() :
-                                nar().confMin.floatValue()
+            return accepted && d!=null ?
+                    $.t(f, d.conf())
+//                            d!=null ? d.conf() :
+//                                null
+                                //nar().confMin.floatValue()
                                 //nar().confDefault(BELIEF)
-                    )
                     : null
                     ;
         });

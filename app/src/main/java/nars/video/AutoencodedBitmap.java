@@ -1,11 +1,7 @@
 package nars.video;
 
-import boofcv.struct.image.GrayF32;
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
-
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 
 /**
  * Autoencoder dimensional reduction of bitmap input

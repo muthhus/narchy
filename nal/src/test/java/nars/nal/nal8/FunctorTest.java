@@ -59,9 +59,7 @@ public class FunctorTest {
         TestNAR t = new TestNAR(new Default());
         //t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
-        //t.believe("--(2<->3)");
         t.ask("c3(x:y)");
-        //t.ask("c3((x))");
         t.mustBelieve(512, "c3(x:y)", 1f, 0.81f);
         t.run(true);
     }

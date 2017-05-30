@@ -41,7 +41,6 @@ import spacegraph.phys.math.MiscUtil;
 import spacegraph.phys.math.Transform;
 import spacegraph.phys.math.TransformUtil;
 import spacegraph.phys.util.IntArrayList;
-import spacegraph.phys.util.OArrayList;
 
 import java.util.Collection;
 

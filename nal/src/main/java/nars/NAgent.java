@@ -489,8 +489,9 @@ abstract public class NAgent implements NSense, NAct {
         @NotNull On active = nar.onCycle((n) -> {
             if (enabled.get()) {
                 long lastNow = this.now;
-                long now = this.now = nar.time();
+                long now = nar.time();
                 if (now - lastNow >= cyclesPerFrame) {
+                    this.now = now;
                     //only execute at most one agent frame per duration
                     senseAndMotor();
                     predict();

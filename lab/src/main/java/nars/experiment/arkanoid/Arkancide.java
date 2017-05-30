@@ -3,9 +3,7 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
-import jcog.learn.Autoencoder;
 import jcog.math.FloatPolarNormalized;
-import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
@@ -151,8 +149,17 @@ public class Arkancide extends NAgentX {
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
         Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
-        actionUnipolarTransfer(paddleControl, (v) -> {
-            return noid.paddle.moveTo(v, maxPaddleSpeed);
+//        actionUnipolarTransfer(paddleControl, (v) -> {
+//            return noid.paddle.moveTo(v, maxPaddleSpeed);
+//        });
+        actionTriState(paddleControl, (s) -> {
+           switch (s) {
+               case 0:
+                   break;
+               case -1:
+               case 1: noid.paddle.move(maxPaddleSpeed * s);
+                    break;
+           }
         });
 
 //        Param.DEBUG = true;

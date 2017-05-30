@@ -30,7 +30,6 @@ import static nars.Op.BELIEF;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
-import static spacegraph.layout.Grid.row;
 
 /**
  * Extensions to NAgent interface:
@@ -306,13 +305,13 @@ abstract public class NAgentX extends NAgent {
 //            window(
 //                    grid(
 //                            new ReflectionSurface<>(a),
+//                            Vis.beliefCharts(100, a.actions, a.nar ),
 //
 //                            Vis.emotionPlots(a, 256),
 //
 //                            //tc,
 //
 //
-//                            Vis.beliefCharts(100, a.actions, a.nar ),
 //                            //budgetHistogram(d, 16),
 //
 //                            //Vis.agentActions(a, 50),

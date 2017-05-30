@@ -2,9 +2,9 @@ package jcog.bag;
 
 import com.google.common.base.Joiner;
 import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import jcog.pri.PLink;
 import org.junit.Test;
 
 import java.util.Random;

@@ -31,7 +31,7 @@ public class InterNARTest {
         Deriver x = DefaultDeriver.the;
     }
 
-    static void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
+    void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
         final int CONNECTION_TIME = 400;
         int preCycles = 1;

@@ -1,21 +1,30 @@
 package nars.experiment;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.math.FloatSupplier;
+import nars.$;
 import nars.NAR;
-import nars.NAgentX;
 import nars.Param;
 import nars.Task;
+import nars.gui.Vis;
 import nars.nar.Default;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
+import spacegraph.layout.Grid;
+import spacegraph.widget.meta.ReflectionSurface;
+import spacegraph.widget.meter.Plot2D;
 
 import java.util.LinkedHashSet;
+import java.util.List;
+
+import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.*;
 
 /**
  * Created by me on 3/15/17.
  */
 public class Line1D {
-
 
 
     public static void main(String[] args) {
@@ -26,15 +35,18 @@ public class Line1D {
 
         //n.log();
 
-        n.time.dur(16);
+        n.time.dur(2);
 
         n.termVolumeMax.setValue(24);
         n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.75f;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.5f;
+
 
         Line1DSimplest a = new Line1DSimplest(n);
+        a.speed.setValue(0.3f);
+
         //Line1DTrainer trainer = new Line1DTrainer(a);
 
         //new RLBooster(a, new HaiQAgent());
@@ -49,21 +61,60 @@ public class Line1D {
 
         a.onFrame((z) -> {
             a.target(
-                    (float) (0.5f * (Math.sin(n.time() / 1000f) + 1f))
+                    (float) (0.5f * (Math.sin(n.time() / 250f) + 1f))
                     //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                     //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
             );
 
+            Util.pause(1);
         });
-        NAgentX.chart(a);
+
+
+        new Thread(() -> {
+            //NAgentX.chart(a);
+            window(
+                    row(
+                            conceptPlot(a.nar, Lists.newArrayList(
+                                    a.i, a.o, () -> a.reward),
+                                    400),
+                            col(
+                                new Vis.EmotionPlot(400, a),
+                                new ReflectionSurface<>(a),
+                                    Vis.beliefCharts(400,
+                                            Lists.newArrayList(a.in, a.out)
+                                            , a.nar)
+                            )
+                    )
+                    , 900, 900);
+
+        }).start();
 
         a.runCycles(5000000);
 
 
     }
 
+    public static Grid conceptPlot(NAR nar, Iterable<FloatSupplier> concepts, int plotHistory) {
 
-        public static class Line1DTrainer {
+        //TODO make a lambda Grid constructor
+        Grid grid = new Grid(VERTICAL);
+        List<Plot2D> plots = $.newArrayList();
+        for (FloatSupplier t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
+            p.add(t.toString(), () -> t.asFloat(), 0f, 1f);
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        nar.onCycle(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
+    }
+
+    public static class Line1DTrainer {
 
         public static final int trainingRounds = 20;
         private float lastReward;

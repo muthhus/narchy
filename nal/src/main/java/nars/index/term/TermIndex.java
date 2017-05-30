@@ -25,7 +25,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -39,11 +39,9 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     public NAR nar;
 
 
-
-
-
-
-    /** internal get procedure */
+    /**
+     * internal get procedure
+     */
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
 
@@ -70,7 +68,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     public abstract void set(@NotNull Term src, Termed target);
 
     public final void set(@NotNull Termed t) {
-        set(t instanceof Term ? (Term)t : t.term(), t);
+        set(t instanceof Term ? (Term) t : t.term(), t);
     }
 
 
@@ -92,7 +90,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
         for (Concept t : Builtin.statik)
             set(t);
 
-        Builtin.load( nar );
+        Builtin.load(nar);
 
         conceptBuilder().start(nar);
     }
@@ -147,7 +145,6 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //        }
 //        return False; //place a False placeholder so that a repeat call will not have to discover this manually
 //    }
-
 
 
     public Term the(ProtoCompound t) {
@@ -259,7 +256,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             result = x;
         }
 
-        if (result!=null)
+        if (result != null)
             result.setNormalized();
 
         return result;
@@ -409,7 +406,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public final Concept concept(@NotNull Term term, boolean createIfMissing) {
 
-        assert(term.op()!=NEG); //term = term.unneg();
+        assert (term.op() != NEG); //term = term.unneg();
 
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
@@ -426,7 +423,6 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         return cc;
     }
-
 
 
     @Nullable
@@ -464,14 +460,15 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
         }
     }
 
-    /**
-     * changes all 'XTERNAL' to 'DTERNAL' and applies reductions in the process.  a change requires renormalization
-     */
-    @Nullable
     public Compound retemporalize(@NotNull Compound x) {
+        return retemporalize(x, retemporalizationDTERNAL);
+    }
 
-        int dt = x.dt();
-        Term y = transform(x, dt == XTERNAL ? DTERNAL : dt, retemporalization);
+
+    @Nullable
+    public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
+
+        Term y = transform(x, r.dt(x), r);
         if (!(y instanceof Compound)) {
             return null;
         } else {
@@ -480,22 +477,43 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     }
 
-    final CompoundTransform retemporalization = new CompoundTransform() {
-
-        @Nullable
-        @Override
-        public Term apply(@Nullable Compound parent, @NotNull Term term) {
-            if (term instanceof Compound && ((Compound) term).dt() == XTERNAL) {
-                Compound cs = (Compound) term;
-                return the(cs.op(), DTERNAL, cs.toArray());
-            }
-            return term;
-        }
-    };
-
     @Nullable
     public Term queryToDepVar(@NotNull Compound term) {
         return transform(term, CompoundTransform.queryToDepVar);
     }
 
+
+    public final Retemporalization retemporalizationDTERNAL = new Retemporalization(DTERNAL);
+    public final Retemporalization retemporalizationZero = new Retemporalization(0);
+
+
+    private class Retemporalization implements CompoundTransform {
+
+        final int dtIfXternal;
+
+        private Retemporalization(int dtIfXternal) {
+            this.dtIfXternal = dtIfXternal;
+        }
+
+        @Override
+        public boolean testSuperTerm(@NotNull Compound c) {
+            return c instanceof Compound && c.hasAny(TemporalBits);
+        }
+
+        @Nullable
+        @Override
+        public Term apply(@Nullable Compound parent, @NotNull Term term) {
+            if (term instanceof Compound) {
+                Compound x = (Compound) term;
+                return transform(x, dt(x), this);
+            }
+            return term;
+        }
+
+        public int dt(@NotNull Compound x) {
+            int dt = x.dt();
+            Op o = x.op();
+            return dt!=XTERNAL && (!o.temporal || !concurrent(dt)) ? dt : dtIfXternal;
+        }
+    }
 }

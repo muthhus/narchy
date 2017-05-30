@@ -95,20 +95,10 @@ public final class DynTruth implements Truthed {
             priority = new Pri(p);
         }
 
-
-        //HACK try to reconstruct the term because it may be invalid
-        int dt = c.dt();
-        if (c.op().temporal && dt == DTERNAL && start!=ETERNAL)
-            dt = 0; //actually it is measured at the current time so make it parallel
-
-        c = compoundOrNull(nar.terms.the(c.op(), dt, c.toArray()));
-        if (c == null)
+        if (null == (c = nar.terms.retemporalize(c, nar.terms.retemporalizationZero)))
             return null;
 
         if (null == (c = Task.content(c, nar)))
-            return null;
-
-        if (null == (c = nar.terms.retemporalize(c)))
             return null;
 
         // then if the term is valid, see if it is valid for a task
@@ -116,11 +106,19 @@ public final class DynTruth implements Truthed {
             return null;
         }
 
-        long dur = (start!=ETERNAL && c.op() == CONJ) ? c.dtRange() : 0;
+        //long dur = (start!=ETERNAL && c.op() == CONJ) ? c.dtRange() : 0;
+
+        if (c.op() == NEG) {
+            c = compoundOrNull(c.unneg());
+            if (c == null)
+                return null;
+            tr = tr.negated();
+        }
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
-                tr, cre, start, start + dur, evidence());
+                tr, cre, start, start /*+ dur*/, evidence());
         dyn.setPri(priority);
+
         //        if (srcCopy == null) {
 //            delete();
 //        } else {

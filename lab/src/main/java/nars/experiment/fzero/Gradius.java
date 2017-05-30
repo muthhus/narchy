@@ -5,11 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.experiment.recog2d.Recog2D;
-import nars.nar.Default;
-import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
-import nars.time.RealTime;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
 

@@ -104,6 +104,12 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
         throw new UnsupportedOperationException();
     }
 
+//    @Override
+//    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+//        if (history.)
+//        super.add(x, c, n);
+//    }
+
     @Override
     public void onRemoved(Task x) {
         if (include(x)) {

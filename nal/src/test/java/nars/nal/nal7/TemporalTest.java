@@ -140,6 +140,7 @@ public class TemporalTest {
 
         testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
     }
+
     @Test
     public void testCommutiveTemporalityConjEquiv2() {
         testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
@@ -171,8 +172,8 @@ public class TemporalTest {
         Term t0 = n.term("((SELF,#1)-->at)").term();
         Term t1 = n.term("goto(#1)").term();
         assertEquals(
-            TermContainer.the(Op.CONJ, DTERNAL, t0, t1),
-            TermContainer.the(Op.CONJ, DTERNAL, t1, t0)
+                TermContainer.the(Op.CONJ, DTERNAL, t0, t1),
+                TermContainer.the(Op.CONJ, DTERNAL, t1, t0)
         );
     }
 
@@ -249,13 +250,14 @@ public class TemporalTest {
 
         a.beliefs().print();
 
-        assertTrue( a.beliefs().size() >= 4);
+        assertTrue(a.beliefs().size() >= 4);
     }
+
     @Test
     public void testCommutiveTemporalityConcepts2() throws Narsese.NarseseException {
         Default n = new Default();
 
-        for (String op : new String[] { "&&", "<=>"} ) {
+        for (String op : new String[]{"&&", "<=>"}) {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
             Concept b = n.conceptualize($("(x " + op + "+1 y)"));
             Concept c = n.conceptualize($("(x " + op + "+2 y)"));
@@ -371,7 +373,6 @@ public class TemporalTest {
     }
 
 
-
     @Test
     public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
 
@@ -411,7 +412,7 @@ public class TemporalTest {
         String abpill = "((a==>b)-->[pill])";
         Concept cc = n.concept(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
-        assertNotNull( cc );
+        assertNotNull(cc);
 
         String correctMerge = "((a ==>+4 b)-->[pill])";
 
@@ -472,7 +473,8 @@ public class TemporalTest {
 
     }
 
-    @Test public void testSubtermConjInConj() throws Narsese.NarseseException {
+    @Test
+    public void testSubtermConjInConj() throws Narsese.NarseseException {
         Compound g = $("(((x) &&+1 (y)) &&+1 (z))");
         assertEquals(0, g.subtermTime($("(x)")));
         assertEquals(1, g.subtermTime($("(y)")));
@@ -494,7 +496,8 @@ public class TemporalTest {
         assertEquals(2, j.subtermTime($("(y)")));
     }
 
-    @Test public void testDTRange() throws Narsese.NarseseException {
+    @Test
+    public void testDTRange() throws Narsese.NarseseException {
         assertEquals(1, $("((z) &&+1 (y))").dtRange());
         assertEquals(2, $("((x) &&+1 ((z) &&+1 (y)))").dtRange());
         assertEquals(4, $("((x) &&+1 ((z) &&+1 ((y) &&+2 (w))))").dtRange());
@@ -640,7 +643,8 @@ public class TemporalTest {
         assertFalse(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (z ==>+1 w))")));
     }
 
-    @Test public void testAtemporalization1() throws Narsese.NarseseException {
+    @Test
+    public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
         Term y = $.terms.atemporalize(x);
         assertEquals("(($1&&(--,(tetris-->(_n,#2))))<=>($1&&(--,(tetris-->(_n,#2)))))", y.toString());
@@ -704,6 +708,28 @@ public class TemporalTest {
 //            return as.equals(bs);
 //        }
         assertFalse(Terms.equalAtemporally($("(/, a, b, _)"), $.$("(/, a, _, b)")));
+    }
+
+    @Test
+    public void testRetermporalization1() throws Narsese.NarseseException {
+
+        String st = "((--,(happy)) && (--,((--,(o))&&(happy))))";
+        Compound t = $.$(st);
+        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", t.toString());
+        Term xe = $.terms.retemporalize(t, $.terms.retemporalizationDTERNAL);
+        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", xe.toString());
+        Term xz = $.terms.retemporalize(t, $.terms.retemporalizationZero);
+        assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", xz.toString());
+
+        String su = "((--,(happy)) &&+- (--,((--,(o))&&+-(happy))))";
+        Compound u = $.$(su);
+        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());
+        Term ye = $.terms.retemporalize(u, $.terms.retemporalizationDTERNAL);
+        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", ye.toString());
+        Term yz = $.terms.retemporalize(u, $.terms.retemporalizationZero);
+        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", yz.toString());
+
+
     }
 
 //    @Test public void testRelationTaskNormalization() {

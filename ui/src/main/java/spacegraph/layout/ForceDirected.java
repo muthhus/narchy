@@ -4,7 +4,6 @@ import jcog.data.FloatParam;
 import spacegraph.SimpleSpatial;
 import spacegraph.Spatial;
 import spacegraph.math.v3;
-import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.Collidable;
 import spacegraph.phys.Dynamic;
 import spacegraph.phys.collision.broad.Broadphase;

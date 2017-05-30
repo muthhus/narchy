@@ -24,7 +24,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static jcog.Texts.i;
-import static spacegraph.SpaceGraph.window;
 
 /**
  * represents a live UDP mesh network as concepts and links

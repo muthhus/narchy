@@ -13,6 +13,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
+import static nars.time.Tense.DTERNAL;
+
 /**
  * Created by me on 12/4/16.
  */
@@ -85,7 +87,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     public DynTruth truth(long when, int dt, boolean evidence) {
-        return truth(when, (Compound) $.terms.the(dynamicConcept.term(), dt), evidence);
+        return truth(when, (Compound) $.terms.the(dynamicConcept, dt), evidence);
     }
 
     @Nullable
@@ -126,8 +128,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Override
     public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
         if (template == null) {
-            Compound dct = dynamicConcept.term();
-            template = dynamicConcept.nar.terms.retemporalize(dct); //TODO move this somewhere else where it can use the NAR's index
+            template = dynamicConcept;
+//                    dynamicConcept.nar.terms.retemporalize(dct,
+//                when==DTERNAL ?
+//                    dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
         }
 
 //        Compound template =

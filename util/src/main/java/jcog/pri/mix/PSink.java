@@ -5,7 +5,6 @@ import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 
-import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
