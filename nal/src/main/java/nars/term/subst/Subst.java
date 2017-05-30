@@ -5,7 +5,7 @@ import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;

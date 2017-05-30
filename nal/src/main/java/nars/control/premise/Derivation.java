@@ -1,9 +1,10 @@
-package nars.premise;
+package nars.control.premise;
 
 import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.control.Premise;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
@@ -48,7 +49,7 @@ abstract public class Derivation extends Unify implements TermContext {
      * the current premise being evaluated in this context TODO make private again
      */
     @NotNull
-    public  Premise premise;
+    public Premise premise;
 
 
     public  float premiseEvidence;

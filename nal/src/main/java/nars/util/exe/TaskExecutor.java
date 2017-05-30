@@ -187,9 +187,12 @@ public class TaskExecutor extends Executioner {
         }
 
         if (next != null)
-            for (ITask y : next)
-                if (y == null || !run(y))
-                    break;
+            actuallyFeedback(x, next);
+
+    }
+
+    protected void actuallyFeedback(ITask x, ITask[] next) {
+        nar.input(next);
     }
 
 

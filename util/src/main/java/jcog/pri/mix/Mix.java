@@ -44,7 +44,7 @@ public class Mix<K, P extends Priority>  {
     }
 
     /** gets or creates a mix stream for the given key */
-    public  PSink<K,P> stream(K x) {
+    public PSink<K,P> stream(K x) {
 
         return streams.computeIfAbsent(x, xx -> {
             //nullify the history, need to create a new one for the new stream

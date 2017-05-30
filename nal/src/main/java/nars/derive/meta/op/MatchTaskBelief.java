@@ -8,7 +8,7 @@ import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.index.term.PatternTermIndex;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

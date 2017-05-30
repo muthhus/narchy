@@ -3,7 +3,7 @@ package nars.derive.meta.op;
 import nars.Op;
 import nars.derive.meta.AbstractPred;
 import nars.derive.meta.AtomicPred;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /**

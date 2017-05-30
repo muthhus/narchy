@@ -1,4 +1,4 @@
-package nars.premise;
+package nars.control.premise;
 
 import jcog.Util;
 import jcog.data.FloatParam;

@@ -2,7 +2,6 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.random.XorShift128PlusRandom;
-import nars.gui.BagChart;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -18,7 +17,6 @@ import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
-import spacegraph.layout.VSplit;
 import spacegraph.widget.meta.WindowButton;
 
 import java.awt.*;
@@ -28,9 +26,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.toList;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.grid;
@@ -142,13 +138,16 @@ abstract public class NAgentX extends NAgent {
         window(new NARSView(n, a), 600, 600);
     }
 
-    public static class NARSView extends VSplit<Surface, Grid<BagChart>> {
+    public static class NARSView extends Grid {
 
 
         public NARSView(NARS n, NAgent a) {
             super(
+                new MixBoard(n, n.in),
+                new MixBoard(n, n.post),
                 Vis.reflect(n),
-                row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
+                new Vis.EmotionPlot(64, a)
+                //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
             );
 //                (n.sub.stream().map(c -> {
 //                int capacity = 128;
@@ -227,9 +226,7 @@ abstract public class NAgentX extends NAgent {
                                             new WindowButton("deriverFilter", () -> ((Default) nar).budgeting)
                                     ) : label(nar.getClass()),
 
-                            new WindowButton("mix", () -> {
-                                return new MixBoard(nar, nar.in);
-                            })
+                            new WindowButton("mix", () -> new MixBoard(nar, nar.in))
                     ),
 
                     grid(

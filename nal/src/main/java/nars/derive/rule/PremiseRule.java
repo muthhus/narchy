@@ -12,7 +12,7 @@ import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.*;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;

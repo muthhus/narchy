@@ -22,8 +22,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.AtomInt;
 import nars.term.container.TermContainer;
-import nars.term.var.UnnormalizedVariable;
-import nars.term.var.VarQuery;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectFloatProcedure;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.math.Interval.unionLength;
-import static nars.Op.VAR_QUERY;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -329,7 +326,7 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
             float parentActivation = scale * momentum;
             for (int i = 0; i < n; i++) {
                 Term si = targetSubs.sub(i);
-                if (termlinkable(si)) {
+                if (linkableSub(si)) {
                     link(si.unneg(), childScale, nextDepth); //link and recurse to the concept
                 } else {
                     parentActivation += childScale; //absorb to parent
@@ -343,11 +340,11 @@ public class SpreadingActivation extends UnaryTask<Task> implements ObjectFloatP
         return scale;
     }
 
-    private static boolean termlinkable(Term x) {
+    private static boolean linkableSub(Term x) {
 
-        assert(!(x instanceof UnnormalizedVariable));
+        //assert(!(x instanceof UnnormalizedVariable));
 
-        if (x instanceof AtomInt || x instanceof VarQuery)
+        if (x instanceof AtomInt || x instanceof Variable)
             return false;
 
         return true;

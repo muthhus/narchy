@@ -3,7 +3,7 @@ package nars.derive.meta.constraint;
 import nars.$;
 import nars.derive.meta.AbstractPred;
 import nars.derive.meta.BoolPred;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.subst.Unify;

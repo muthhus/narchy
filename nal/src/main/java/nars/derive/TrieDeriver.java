@@ -12,7 +12,7 @@ import nars.derive.meta.op.MatchOneSubtermPrototype;
 import nars.derive.meta.op.MatchTermPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Term;
 import nars.util.TermTrie;
 import org.jetbrains.annotations.NotNull;

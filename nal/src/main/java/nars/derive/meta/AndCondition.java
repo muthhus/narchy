@@ -2,7 +2,7 @@ package nars.derive.meta;
 
 import com.google.common.collect.Lists;
 import nars.Op;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;

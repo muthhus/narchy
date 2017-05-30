@@ -4,7 +4,7 @@ import nars.*;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermIndex;
 import nars.op.DepIndepVarIntroduction;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;

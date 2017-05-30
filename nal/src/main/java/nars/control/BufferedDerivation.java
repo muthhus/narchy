@@ -1,6 +1,6 @@
 package nars.control;
 
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import org.jetbrains.annotations.Nullable;

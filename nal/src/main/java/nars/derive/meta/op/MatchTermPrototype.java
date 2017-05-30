@@ -5,7 +5,7 @@ import nars.derive.meta.AtomicPred;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.Conclude;
 import nars.derive.meta.Fork;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

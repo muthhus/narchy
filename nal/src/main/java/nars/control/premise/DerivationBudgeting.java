@@ -1,4 +1,4 @@
-package nars.premise;
+package nars.control.premise;
 
 import nars.term.Compound;
 import nars.truth.Truth;

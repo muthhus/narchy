@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.derive.meta.AtomicPred;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /** matches the possibility that one half of the premise must be contained within the other.

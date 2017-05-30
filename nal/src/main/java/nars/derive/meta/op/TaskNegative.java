@@ -1,6 +1,6 @@
 package nars.derive.meta.op;
 
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import org.jetbrains.annotations.NotNull;
 
 /** freq < 0.5 */

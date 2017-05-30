@@ -3,7 +3,7 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.Op;
 import nars.derive.meta.AbstractPred;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 
 /**
  * Created by me on 5/19/17.

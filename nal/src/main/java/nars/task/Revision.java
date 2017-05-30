@@ -3,7 +3,7 @@ package nars.task;
 import nars.$;
 import nars.Param;
 import nars.Task;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;

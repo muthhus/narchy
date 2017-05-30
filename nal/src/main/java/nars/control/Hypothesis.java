@@ -8,7 +8,6 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
-import nars.premise.Premise;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
 import nars.task.ITask;

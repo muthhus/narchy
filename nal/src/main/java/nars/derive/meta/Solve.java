@@ -1,7 +1,7 @@
 package nars.derive.meta;
 
 import nars.Op;
-import nars.premise.Derivation;
+import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;

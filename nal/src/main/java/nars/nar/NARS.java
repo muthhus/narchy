@@ -5,15 +5,20 @@ import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
 import jcog.pri.PriReference;
+import jcog.pri.mix.Mix;
+import jcog.pri.mix.PSink;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
+import nars.attention.SpreadingActivation;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.HijackTermIndex;
+import nars.control.ConceptFire;
+import nars.control.Hypothesis;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.time.Time;
@@ -50,16 +55,68 @@ public class NARS extends NAR {
     private AffinityExecutor pool;
     private List<NARLoop> loops;
 
+
+    public Mix<PostBand,ITask> post = new Mix<>(this::inputSub);
+
+    enum PostBand {
+        Input,
+        Premise,
+        Derived,
+        Hypothesis,
+        Activation,
+        ConceptFire,
+        Other;
+
+        public static PostBand which(ITask x) {
+            if (x instanceof nars.control.Hypothesis) {
+                return Hypothesis;
+            } else if (x instanceof SpreadingActivation) {
+                return Activation;
+            } else if (x instanceof DerivedTask) {
+                return Derived;
+            } else if (x instanceof nars.control.Premise) {
+                return Premise;
+            } else if (x instanceof ConceptFire) {
+                return ConceptFire;
+            } else {
+                return Other;
+            }
+        }
+
+        public static EnumMap<PostBand, PSink<PostBand, ITask>> map(Mix<PostBand, ITask> mix) {
+            EnumMap<PostBand, PSink<PostBand, ITask>> e = new EnumMap(PostBand.class);
+            for (PostBand p : PostBand.values()) {
+                e.put(p, mix.stream(p));
+            }
+            return e;
+        }
+    }
+
+    final EnumMap<PostBand,PSink<PostBand,ITask>> postBandMap = PostBand.map(post);
+
+    protected PSink<PostBand,ITask> stream(ITask x) {
+        return postBandMap.get(PostBand.which(x));
+    }
+
+
+    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
+        super(time,
+                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                rng, e);
+        onCycle(n -> post.commit(n.time()));
+    }
+
     @Override
     public void input(ITask x) {
-
-        int next = random.nextInt(num);
-
-        NAR target = this.sub.get(next); //random distribution TODO abstract to other striping policies
-
-        target.exe.run(x);
-
+        stream(x).input(x);
     }
+
+    public void inputSub(ITask x) {
+        int sub = random.nextInt(num);
+        this.sub.get(sub).exe.run(x);
+    }
+
 
     @FunctionalInterface
     public interface NARSSupplier {
@@ -193,8 +250,8 @@ public class NARS extends NAR {
 
 
         @Override
-        public boolean run(@NotNull ITask input) {
-            return super.run(input);
+        protected void actuallyFeedback(ITask x, ITask[] next) {
+            NARS.this.input(next); //through post mix
         }
 
         @Override
@@ -230,12 +287,6 @@ public class NARS extends NAR {
         }
     }
 
-    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(time,
-                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
-                rng, e);
-    }
 
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {

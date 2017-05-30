@@ -17,8 +17,8 @@ import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.Operator;
-import nars.premise.DerivationBudgeting;
-import nars.premise.PreferSimpleAndPolarized;
+import nars.control.premise.DerivationBudgeting;
+import nars.control.premise.PreferSimpleAndPolarized;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -531,7 +531,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     public final void input(@NotNull ITask... t) {
         for (ITask x : t)
-            input(x);
+            if (x!=null) input(x);
     }
     public void input(@NotNull ITask t) {
         exe.run(t);

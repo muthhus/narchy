@@ -2,7 +2,7 @@
  * Here comes the text of your license
  * Each line should be prefixed with  *
  */
-package nars.premise;
+package nars.control;
 
 import jcog.Util;
 import nars.NAR;

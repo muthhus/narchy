@@ -2,10 +2,12 @@ package nars.gui;
 
 import jcog.data.FloatParam;
 import jcog.event.On;
+import jcog.meter.TelemetryRing;
 import jcog.pri.mix.Mix;
 import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meter.Plot2D;
@@ -22,28 +24,26 @@ import static java.lang.Math.sqrt;
 public class MixBoard extends Grid implements Consumer<NAR> {
 
     private final On on;
-    private final Plot2D /*priInPlot, */priOutPlot;
-    private final Plot2D quaPlot;
+    private final Plot2D /*priInPlot, */plot;
+
     private final Mix mix;
     float[] next;
 
-    public MixBoard(NAR nar, Mix<Object, ?> mix) {
+    public MixBoard(@NotNull NAR nar, @NotNull Mix mix) {
         super(HORIZONTAL);
 
         this.mix = mix;
 
         List<Surface> sliders = $.newArrayList();
 
-        //priInPlot = new Plot2D(32, Plot2D.Line);
-        priOutPlot = new Plot2D(32, Plot2D.Line);
-        quaPlot = new Plot2D(32, Plot2D.Line);
-        String[] col = nar.in.data.col;
+        plot = new Plot2D(32, Plot2D.Line);
+
         int streamCols = 2;
         int i = 0;
-        next = new float[streamCols * nar.in.streamID.length];
-        for (PSink k : nar.in.streamID) {
+        next = new float[streamCols * mix.streamID.length];
+        for (PSink k : mix.streamID) {
             final int ii = i;
-            priOutPlot.add(k + " out", () -> {
+            plot.add(k.toString(), () -> {
 //                float N = next[1 + ii * 2];
 //                if (N == 0)
 //                    return 0;
@@ -64,7 +64,7 @@ public class MixBoard extends Grid implements Consumer<NAR> {
             i++;
         }
 
-        set(col(sliders), col(/*priInPlot, */priOutPlot, quaPlot));
+        set(col(sliders), col(/*priInPlot, */plot));
 
         on = nar.onCycle(this);
     }
@@ -78,12 +78,11 @@ public class MixBoard extends Grid implements Consumer<NAR> {
     @Override
     public void accept(NAR pLinks) {
 
-        next = mix.data.sample(next);
-
-        //priInPlot.update();
-        priOutPlot.update();
-
-        quaPlot.update();
+        TelemetryRing m = mix.data;
+        if (m!=null) {
+            next = m.sample(next);
+            plot.update();
+        }
     }
 
     /**
