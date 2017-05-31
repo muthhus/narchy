@@ -2,48 +2,37 @@ package spacegraph.tool;
 
 import com.google.common.primitives.Doubles;
 import com.jogamp.opengl.GL2;
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.learn.gng.NeuralGasNet;
-import jcog.learn.gng.Node;
+import jcog.learn.gng.NeuralGasMap;
 import jcog.net.attn.MeshMap;
-import org.jetbrains.annotations.NotNull;
+import org.apache.commons.math3.util.MathArrays;
+import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
-import spacegraph.Spatial;
-import spacegraph.Surface;
+import spacegraph.phys.Collidable;
 import spacegraph.render.Draw;
 
 import java.util.List;
 
-import static jcog.Texts.n4;
 import static spacegraph.SpaceGraph.window;
 
-/** a tool for realtime multidimensional data visualization
- *  input modes:
- *      UDPeer net
- *          -each data model has its own network
- *
- *      stdio CSV (TODO)
- *
- *  visualization models:
- *      3D gasnet pointcloud
+/**
+ * a tool for realtime multidimensional data visualization
+ * input modes:
+ * UDPeer net
+ * -each data model has its own network
+ * <p>
+ * stdio CSV (TODO)
+ * <p>
+ * visualization models:
+ * 3D gasnet pointcloud
  */
-public class Dimensionaleyez extends SpaceGraph {
+public class Dimensionaleyez extends SimpleSpatial {
 
     private final MeshMap<Integer, List<Float>> m;
-    NeuralGasNet<Node> n = new NeuralGasNet(3, 16) {
-        @NotNull
-        @Override
-        public Node newNode(int i, int dims) {
-            return new Node(i, dims);
-        }
-    };
+    final NeuralGasMap n = new NeuralGasMap(5, 16, 3);
 
     public Dimensionaleyez(String id) {
-        super();
-
-        n.learn(1, 1, 2);
-        n.learn(2, 3, 1);
+        super(id);
 
         m = MeshMap.get(id, (k, v) -> {
             //System.out.println(k + " " + v);
@@ -54,28 +43,35 @@ public class Dimensionaleyez extends SpaceGraph {
     }
 
     private void accept(Integer k, List v) {
-        n.learn(Doubles.toArray(v));
+        double[] da = Doubles.toArray(v);
+        da = MathArrays.normalizeArray(da, 1f); //HACK this should be a learned normalization to not distort the axes
+        n.learn(da);
     }
 
 
-
-    final FloatParam scale = new FloatParam(1, 0.5f, 200f);
+    final FloatParam scale = new FloatParam(100, 0.5f, 200f);
 
     @Override
-    protected void render() {
+    public void renderRelative(GL2 gl, Collidable body) {
 
         float s = scale.floatValue();
-        n.forEachVertex((Node n) -> {
-            double[] d = n.getDataRef();
-            float x = (float)d[0] * s;
-            float y = (float)d[1] * s;
-            float z = (float)d[2] * s;
+        n.forEachVertex((NeuralGasMap.AENode n) -> {
+            float[] d = n.center();
+            float d0 = d[0];
+            if (d0 != d0) {
+                System.out.println("NaN" + n);
+                return;
+            }
+            float x = d0 * s;
+            float y = d[1] * s;
+            float z = d[2] * s;
 
+            System.out.println(x + " " + y + " " + z + " <- " + n);
 
             gl.glPushMatrix();
             gl.glTranslatef(x, y, z);
-            Draw.colorHash(gl, n.hashCode(), 1f);
-            glut.glutSolidCube(0.05f);
+            Draw.colorHash(gl, n.hashCode(), (float) (1f/(1f+n.getLocalDistance())));
+            SpaceGraph.glut.glutSolidCube(1);
             gl.glPopMatrix();
         });
     }

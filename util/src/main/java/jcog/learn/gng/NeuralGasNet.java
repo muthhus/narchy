@@ -157,7 +157,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
         final int nodes = maxNodes;
         for (short j = 0; j < nodes; j++) {
-            double dd = node[j].updateDistanceSq(x);
+            double dd = node[j].learn(x);
 
             if (dd > maxDist) {
                 furthest = j;

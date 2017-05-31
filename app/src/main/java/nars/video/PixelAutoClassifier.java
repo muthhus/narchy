@@ -157,7 +157,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
 
                 short[] po = null;
                 if (learn) {
-                    float regionError = train(in, alpha, 0f, corruption, true, false, true);
+                    float regionError = learn(in, alpha, 0f, corruption, true, false, true);
                     sumErr += regionError;
 
                     // must have sufficient error, and

@@ -34,7 +34,7 @@ public class AutoencodedBitmap implements Bitmap2D {
                 input[j++] = source.brightness(x, y);
             }
         }
-        ae.train(input, 0.1f, 0.02f, 0, true);
+        ae.learn(input, 0.1f, 0.02f, 0, true);
     }
 
     @Override

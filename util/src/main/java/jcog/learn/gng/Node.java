@@ -110,7 +110,7 @@ public class Node extends ArrayRealVector  {
         return id + ": " + super.toString();
     }
 
-    public double updateDistanceSq(double[] x) {
+    public double learn(double[] x) {
         return (this.localDistanceSq = getDistanceSq(x));
     }
 

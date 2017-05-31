@@ -212,14 +212,14 @@ public class Autoencoder {
 		return y;
 	}
 
-	public float train(float[] x, float learningRate,
+	public float learn(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
 					   boolean sigmoid) {
-		return train(x, learningRate, noiseLevel, corruptionRate, sigmoid, true, sigmoid);
+		return learn(x, learningRate, noiseLevel, corruptionRate, sigmoid, true, sigmoid);
 	}
 
 	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
-	public float train(float[] x, float learningRate,
+	public float learn(float[] x, float learningRate,
 					   float noiseLevel, float corruptionRate,
 					   boolean sigmoidIn, boolean normalize, boolean sigmoidOut) {
 
