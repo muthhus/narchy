@@ -102,7 +102,7 @@ public class MutableInteger extends Number implements Comparable, Mutable {
    *           if the type is not a {@link Number}
    */
   public void set(Number value) {
-    set(value.intValue());
+    set(Math.round(value.floatValue()));
   }
 
   // -----------------------------------------------------------------------

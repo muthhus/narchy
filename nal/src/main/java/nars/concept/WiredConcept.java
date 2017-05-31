@@ -36,7 +36,6 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         super(term, n);
         resolution.setValue(n.truthResolution);
         n.on(this);
-
     }
 
 

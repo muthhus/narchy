@@ -108,11 +108,11 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@NotNull
-	public BeliefAnalysis input(boolean beliefOrGoal, float v, float v1) {
+	public BeliefAnalysis input(boolean beliefOrGoal, float f, float c) {
 		if (beliefOrGoal)
-			believe(1.0f, 0.9f);
+			believe(f, c);
 		else
-			goal(1.0f, 0.9f);
+			goal(f, c);
 		return this;
 	}
 

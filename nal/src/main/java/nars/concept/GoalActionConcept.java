@@ -23,7 +23,7 @@ import static nars.Op.GOAL;
  */
 public class GoalActionConcept extends ActionConcept {
 
-    private final Signal feedback, feedbackGoal;
+    public final Signal feedback, feedbackGoal;
     private final FloatParam curiosity;
 
 

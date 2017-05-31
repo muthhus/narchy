@@ -129,9 +129,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
         if (template == null) {
             template = dynamicConcept;
-//                    dynamicConcept.nar.terms.retemporalize(dct,
-//                when==DTERNAL ?
-//                    dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+            dynamicConcept.nar.terms.retemporalize(template,
+                    when == DTERNAL ?
+                            dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
         }
 
 //        Compound template =
@@ -167,7 +167,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         float xc = x.evi(when, dur);
         float yc = y.evi(when, dur);
         //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
-            return xc >= yc ? x : y;
+        return xc >= yc ? x : y;
         //}
 //
 //        //choose based on originality (includes cyclic), but by default prefer the existing task not the dynamic one

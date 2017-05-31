@@ -51,6 +51,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         @Override
         public void capacity(int eternals, int temporals, NAR nar) {
+            throw new RuntimeException("tried to set capacity on null table impl");
         }
 
         @Override
@@ -101,11 +102,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return Spliterators.emptySpliterator();
         }
 
-
-        @Override
-        public float freq(long when, int dur) {
-            return Float.NaN;
-        }
 
 
         @Nullable
@@ -204,20 +200,19 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     }
 
 
-    default float expectation(long when, int dur) {
-        Truth t = truth(when, dur);
-        return t != null ? t.expectation() : 0.5f;
-    }
-
+//    default float expectation(long when, int dur) {
+//        Truth t = truth(when, dur);
+//        return t != null ? t.expectation() : 0.5f;
+//    }
 //    default float motivation(long when, int dur) {
 //        Truth t = truth(when, dur);
 //        return t != null ? t.motivation() : 0;
 //    }
-
-    default float freq(long when, int dur) {
-        Truth t = truth(when, dur);
-        return t != null ? t.freq() : Float.NaN;
-    }
+//
+//    default float freq(long when, int dur) {
+//        Truth t = truth(when, dur);
+//        return t != null ? t.freq() : Float.NaN;
+//    }
 
     /**
      * empties the table, an unindexes them in the NAR

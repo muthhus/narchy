@@ -1,6 +1,7 @@
 package jcog.learn;
 
 import jcog.Util;
+import org.apache.commons.math3.util.MultidimensionalCounter;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
 import java.util.Random;
@@ -22,6 +23,8 @@ public class Autoencoder {
 	final public float[] y;
 
 	public final float[][] W;
+	final MultidimensionalCounter w;
+
 	private final float[] hbias;
 	private final float[] vbias;
 	private final Random rng;
@@ -57,6 +60,7 @@ public class Autoencoder {
 		this.rng = rng;
 
 		this.W = new float[outs][ins];
+		w = new MultidimensionalCounter(outs, ins);
 		float a = 1.0f / ins;
 
 		for (int i = 0; i < outs; i++) {

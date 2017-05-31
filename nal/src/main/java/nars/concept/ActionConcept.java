@@ -17,6 +17,8 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
+        beliefs = newBeliefTable(n,true);
+        goals = newBeliefTable(n,false);
     }
 
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {
