@@ -849,7 +849,7 @@ public enum Util {
      * clamps output to 0..+1.  y=0.5 at x=0
      */
     public static float sigmoid(float v) {
-        return 1f / (1f + (float) Math.exp(-v));
+        return (float) (1 / (1 + Math.exp(-v)));
     }
 
     public static float sigmoidDiff(float a, float b) {

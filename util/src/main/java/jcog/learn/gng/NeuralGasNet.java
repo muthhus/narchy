@@ -112,7 +112,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 //        pw.println("*");
     }
 
-    public void forEachVertex(Consumer<N> each) {
+    public void forEachNode(Consumer<N> each) {
         for (Node n : node)
             each.accept((N)n);
     }

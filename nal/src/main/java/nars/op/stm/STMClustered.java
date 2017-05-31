@@ -412,7 +412,7 @@ public abstract class STMClustered extends STM {
         out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
                 + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
         out.println("\tBag Priority: " + bagStatistics());
-        net.forEachVertex(v -> {
+        net.forEachNode(v -> {
             out.println(v);
             out.println("\t[Avg,Coherence]: Temporal=" + Arrays.toString(v.coherence(0)) +
                     "\tFrequency=" + Arrays.toString(v.coherence(1)));

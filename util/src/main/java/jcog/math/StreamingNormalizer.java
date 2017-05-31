@@ -1,5 +1,9 @@
 package jcog.math;
 
+
+import jcog.learn.gng.NeuralGasMap;
+import org.apache.commons.math3.linear.ArrayRealVector;
+
 /**
  * normalizes each dimension in a vector seperately,
  * determined by iterative vector inputs which stretch each
@@ -16,7 +20,7 @@ public class StreamingNormalizer {
         clear();
     }
 
-    protected void clear() {
+    public void clear() {
 
         for (int i = 0; i < dim * 2; i++) {
             n[i] = (
@@ -38,9 +42,19 @@ public class StreamingNormalizer {
             if (v < min)
                 n[i * 2 + 1] = v;
 
-            y[i] = (max == min) ? 0 : (v - min) / (max - min);
+            y[i] = (!Float.isFinite(max) || max == min) ? 0 : (v - min) / (max - min);
         }
         return y;
+    }
+    public float[] unnormalize(ArrayRealVector v) {
+        double[] vv = v.getDataRef();
+        float[] f = new float[vv.length];
+        for (int i = 0; i < dim; i++) {
+            float max = n[i * 2];
+            float min = n[i * 2 + 1];
+            f[i] = ((float)vv[i]) * (max-min) + min;
+        }
+        return f;
     }
 
     float maxmin(boolean maxOrMin) {
@@ -52,4 +66,12 @@ public class StreamingNormalizer {
         }
         return z;
     }
+
+    public void decay(float v) {
+        for (int i = 0; i < dim*2; i++) {
+            n[i] *= v;
+        }
+    }
+
+
 }

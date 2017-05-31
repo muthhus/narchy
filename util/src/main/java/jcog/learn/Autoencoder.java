@@ -4,6 +4,7 @@ import jcog.Util;
 import org.apache.commons.math3.util.MultidimensionalCounter;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Random;
  */
 public class Autoencoder {
 
-	final static float NORMALIZATION_EPSILON = 0.0001f;
+	final static float NORMALIZATION_EPSILON = Float.MIN_VALUE*2f;
 
 
 	/** input vector after preprocessing (noise, corruption, etc..) */
@@ -135,7 +136,7 @@ public class Autoencoder {
 
 		if ((normalize)) {
 			float maxMin = max - min;
-			if (!Util.equals(maxMin, 0, NORMALIZATION_EPSILON))
+			if (!Util.equals(maxMin, 0, NORMALIZATION_EPSILON)) {
 
 				for (int i = 0; i < outs; i++) {
 					y[i] = (y[i] - min) / maxMin;
@@ -153,7 +154,10 @@ public class Autoencoder {
 //			for (int i = 0; i < nh; i++) {
 //				y[i] = (y[i] - min) / (max-min);
 //			}
+			} else {
+				Arrays.fill(y, 0);
 			}
+		}
 
 
 
