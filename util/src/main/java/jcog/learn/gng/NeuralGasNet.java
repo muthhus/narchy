@@ -71,13 +71,13 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     }
 
 
-    public NeuralGasNet(int dimension, short maxNodes) {
+    public NeuralGasNet(int dimension, int maxNodes) {
 
         super();
 
 
         this.e =
-                new SemiDenseIntUndirectedGraph(maxNodes);
+                new SemiDenseIntUndirectedGraph((short) maxNodes);
                 //new DenseIntUndirectedGraph(maxNodes);
         this.node = new Node[maxNodes];
         clear();
@@ -140,7 +140,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     /**
      * translates all nodes uniformly
      */
-    public void addToNodes(double[] x) {
+    public void translate(double[] x) {
         for (Node n : node) {
             n.add(x);
         }

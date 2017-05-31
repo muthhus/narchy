@@ -74,7 +74,7 @@ public class UDPeer extends UDP {
      * active routing table capacity
      * TODO make this IntParam mutable
      */
-    final static int PEERS_CAPACITY = 4;
+    final static int PEERS_CAPACITY = 64;
 
     /**
      * message memory
@@ -247,7 +247,7 @@ public class UDPeer extends UDP {
 
             byte[] bytes = o.array();
 
-            final int[] remain = {them.size()};
+            final int[] remain = {Math.round(them.size() * pri)};
             them.sample((to) -> {
                 if (o.id() != to.id /*&& (pri >= 1 || rng.nextFloat() <= pri)*/ ) {
                     outBytes(bytes, to.addr);

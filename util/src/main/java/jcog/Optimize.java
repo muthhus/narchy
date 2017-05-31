@@ -2,6 +2,9 @@ package jcog;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
+import jcog.event.ArrayTopic;
+import jcog.event.Topic;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -128,13 +131,14 @@ public class Optimize<X> {
             //System.out.println(Arrays.toString(point) + " = " + loss);
             if (trace)
                 System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
+
+            onExperiment(point, score);
             return score;
         });
 
-        int dim = mid.length;
 
 
-        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, 1e-10, true, 0,
+        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, 0, true, 0,
                 0, new MersenneTwister(3), true, null);
         PointValuePair r = optim.optimize(new MaxEval(maxIterations),
                 func,
@@ -142,7 +146,8 @@ public class Optimize<X> {
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
                 new CMAESOptimizer.Sigma(inc),
-                new CMAESOptimizer.PopulationSize(4));
+                new CMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
+
 
 
 //        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
@@ -164,6 +169,10 @@ public class Optimize<X> {
 
 
         return new Result(r);
+
+    }
+
+    protected void onExperiment(double[] point, float score) {
 
     }
 
@@ -244,4 +253,5 @@ public class Optimize<X> {
 
 
     }
+
 }

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -1195,7 +1196,7 @@ public enum Util {
     }
 
 
-    public static <X,Y> Y[] map(Function<X,Y> f, Y[] target, X... src) {
+    public static <X, Y> Y[] map(Function<X, Y> f, Y[] target, X... src) {
         int i = 0;
         for (X x : src) {
             target[i++] = f.apply(x);
@@ -1597,7 +1598,7 @@ public enum Util {
 
     public final static ObjectMapper msgPackMapper =
             new ObjectMapper(new MessagePackFactory())
-            .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+                    .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
             ;
 
     /**
@@ -1617,8 +1618,9 @@ public enum Util {
     public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
     }
+
     public static <X> X fromBytes(byte[] msgPacked, int len, Class<? extends X> type) throws IOException {
-        return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len,  type);
+        return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len, type);
     }
 
     static final Logger jsonLogger = LoggerFactory.getLogger(JsonNode.class);
@@ -1660,5 +1662,23 @@ public enum Util {
         return true;
     }
 
+    public static float[] doubleToFloatArray(double[] a) {
+        return doubleToFloatArray(a, 0, a.length);
+    }
 
+    public static float[] doubleToFloatArray(double[] a, int from, int to) {
+        float[] result = new float[to - from];
+        for (int j = 0, i = from; i < to; i++, j++) {
+            result[j] = (float) a[i];
+        }
+        return result;
+    }
+
+    public static double[] floatToDoubleArray(float[] a) {
+        double[] result = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            result[i] = a[i];
+        }
+        return result;
+    }
 }

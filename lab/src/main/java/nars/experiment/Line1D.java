@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import jcog.Optimize;
 import jcog.Util;
 import jcog.math.FloatSupplier;
+import jcog.net.MeshOptimize;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -22,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import static java.lang.Math.PI;
+import static jcog.Texts.n4;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -43,7 +45,7 @@ public class Line1D {
 
         a.out.resolution.setValue(speed * 1);
         a.in.resolution.setValue(speed * 1);
-        a.curiosity.setValue(0.01f);
+        a.curiosity.setValue(0.05f);
 
         //            a.in.beliefs().capacity(0, 100, a.nar);
         //            a.out.beliefs().capacity(0, 100, a.nar);
@@ -67,7 +69,7 @@ public class Line1D {
             //Util.pause(1);
         });
 
-        int runtime = 100000;
+        int runtime = 5000;
 
         a.runCycles(runtime);
 
@@ -75,17 +77,17 @@ public class Line1D {
 
     };
 
-
     public static class Line1DOptimize {
+
         public static void main(String[] args) {
 
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 1000;
+            int maxIterations = 10000;
             int repeats = 2;
 
-            Optimize.Result r = new Optimize<NAR>(() -> {
+            Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
                 Default n = new Default();
 
@@ -101,11 +103,14 @@ public class Line1D {
                 x.beliefConfidence(y);
             }).tweak("goalConf", 0.5f, 0.95f, 0.1f, (y, x) -> {
                 x.goalConfidence(y);
-            }).tweak("termVolMax", 7, 32, 4, (y, x) -> {
+            }).tweak("termVolMax", 5, 20, 2, (y, x) -> {
                 x.termVolumeMax.setValue(y);
             }).tweak("exeRate", 0.05f, 0.5f, 0.1f, (y, x) -> {
                 ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
-            }).run(maxIterations, repeats, experiment);
+            });
+
+
+            Optimize.Result r = o.run(maxIterations, repeats, experiment);
 
             r.print();
 

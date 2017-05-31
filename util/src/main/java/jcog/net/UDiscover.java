@@ -19,7 +19,7 @@ abstract public class UDiscover<P> extends Thread {
     final static int port = 6576;
     public static final int MAX_PAYLOAD_ID = 256;
     private final P id;
-    private int periodMS = 1000;
+    private int periodMS = 200;
     MulticastSocket ms;
 
 
@@ -39,6 +39,10 @@ abstract public class UDiscover<P> extends Thread {
             InetAddress ia = InetAddress.getByName(address);
 
             ms = new MulticastSocket(port);
+            ms.setBroadcast(true);
+            ms.setReuseAddress(true);
+
+            //ms.setTrafficClass();
             ms.setSoTimeout(periodMS);
             ms.joinGroup(ia);
 
