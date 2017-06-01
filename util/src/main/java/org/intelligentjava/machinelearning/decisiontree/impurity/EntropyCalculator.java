@@ -2,9 +2,9 @@ package org.intelligentjava.machinelearning.decisiontree.impurity;
 
 
 import com.google.common.math.DoubleMath;
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -20,8 +20,8 @@ public class EntropyCalculator implements ImpurityCalculator {
      * {@inheritDoc}
      */
     @Override
-    public <L> double calculateImpurity(String value, List<Value<L>> splitData) {
-        List<L> labels = splitData.stream().map((x) -> x.get(value)).distinct().collect(Collectors.toList());
+    public <K, V> double calculateImpurity(K value, List<Function<K, V>> splitData) {
+        List<V> labels = splitData.stream().map((x) -> x.apply(value)).distinct().collect(Collectors.toList());
         if (labels.size() > 1) {
             double p = ImpurityCalculator.getEmpiricalProbability(value, splitData, labels.get(0), labels.get(1)); // TODO fix to multiple labels
             return -1.0 * p * DoubleMath.log2(p) - ((1.0 - p) * DoubleMath.log2(1.0 - p));

@@ -21,7 +21,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
 
     private final IntUndirectedGraph e;
-    protected final Node[] node;
+    public final Node[] node;
 
     private int iteration;
 

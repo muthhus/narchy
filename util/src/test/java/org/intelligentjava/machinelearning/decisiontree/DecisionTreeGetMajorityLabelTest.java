@@ -4,8 +4,8 @@ import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabe
 import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.TRUE_LABEL;
 
 import java.util.List;
+import java.util.function.Function;
 
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,8 +23,8 @@ public class DecisionTreeGetMajorityLabelTest {
     
     @Test
     public void testGetMajorityLabel() {
-        DecisionTree<Object> tree = new DecisionTree();
-        List<Value<Object>> data = Lists.newArrayList();
+        DecisionTree<String, Object> tree = new DecisionTree();
+        List<Function<String,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(TRUE_LABEL));
@@ -35,8 +35,8 @@ public class DecisionTreeGetMajorityLabelTest {
 
     @Test
     public void testGetMajorityLabelWhenEqualCounts() {
-        DecisionTree<Object> tree = new DecisionTree();
-        List<Value<Object>> data = Lists.newArrayList();
+        DecisionTree<String, Object> tree = new DecisionTree();
+        List<Function<String,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(TRUE_LABEL));

@@ -6,13 +6,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
- * Simple {@link Value} implementation which uses {@link HashMap} to keep data in columns.
  *
  * @author Ignas
  */
-public class SimpleValue<L> implements Value<L> {
+public class SimpleValue<L> implements Function<String,L> {
 
     private final Map<String, L> values = Maps.newHashMap();
 
@@ -43,7 +43,7 @@ public class SimpleValue<L> implements Value<L> {
 
     @Nullable
     @Override
-    public L get(String column) {
+    public L apply(String column) {
         return values.get(column);
     }
 

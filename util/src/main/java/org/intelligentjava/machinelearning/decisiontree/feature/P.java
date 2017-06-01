@@ -1,5 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree.feature;
 
+import com.fasterxml.jackson.databind.node.IntNode;
+
 import java.util.function.Predicate;
 
 /**
@@ -20,6 +22,11 @@ public class P {
     public static Predicate<Double> lessThanD(double value) {
         return p -> p < value;
     }
+
+    public static Predicate<Number> moreThan(Number value) {
+        return p -> p.floatValue() > value.floatValue();
+    }
+
 
     public static Predicate<Integer> moreThan(int value) {
         return p -> p > value;

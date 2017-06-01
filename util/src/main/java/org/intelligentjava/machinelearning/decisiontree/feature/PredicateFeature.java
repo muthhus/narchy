@@ -1,16 +1,15 @@
 package org.intelligentjava.machinelearning.decisiontree.feature;
 
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
-
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Feature type that splits data into 2 sublists - one that
  *
- * @param <T> Feature data type (string, number)
+ * @param <L> Feature data type (string, number)
  * @author Ignas
  */
-public class PredicateFeature<T> implements Feature {
+public class PredicateFeature<L> implements Predicate<Function<String,L>> {
 
     /**
      * Data column used by feature.
@@ -20,7 +19,7 @@ public class PredicateFeature<T> implements Feature {
     /**
      * Predicate used for splitting.
      */
-    private final Predicate<T> predicate;
+    private final Predicate<L> predicate;
 
     /**
      * Feature Label used for visualization and testing the tree.
@@ -34,7 +33,7 @@ public class PredicateFeature<T> implements Feature {
      * @param predicate    Predicate used for splitting. For example if value is equal to some value, or is more/less.
      * @param featureValue Feature value used by predicate when comparing with data.
      */
-    private PredicateFeature(String column, Predicate<T> predicate, String label) {
+    private PredicateFeature(String column, Predicate<L> predicate, String label) {
         super();
         this.column = column;
         this.predicate = predicate;
@@ -49,7 +48,7 @@ public class PredicateFeature<T> implements Feature {
      * @param featureValue Feature value.
      * @return New feature.
      */
-    public static <T> Feature feature(String column, T featureValue) {
+    public static <T> Predicate<Function<String,T>> feature(String column, T featureValue) {
         return new PredicateFeature<>(column, P.isEqual(featureValue), String.format("%s = %s", column, featureValue));
     }
 
@@ -60,7 +59,7 @@ public class PredicateFeature<T> implements Feature {
      * @param predicate Predicate to use for splitting.
      * @return New feature.
      */
-    public static <T> Feature feature(String column, Predicate<T> predicate, String predicateString) {
+    public static <T> Predicate<Function<String,T>> feature(String column, Predicate<T> predicate, String predicateString) {
         return new PredicateFeature<>(column, predicate, String.format("%s %s", column, predicateString));
     }
 
@@ -69,9 +68,9 @@ public class PredicateFeature<T> implements Feature {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public boolean of(Value x) { // TODO implement other splits (in different type of feature)
-        Object optionalValue = x.get(column);
-        return optionalValue!=null && predicate.test((T) optionalValue);
+    public boolean test(Function<String,L> x) { // TODO implement other splits (in different type of feature)
+        L y = x.apply(column);
+        return y!=null && predicate.test(y);
     }
 
     @Override

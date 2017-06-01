@@ -1,12 +1,13 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.intelligentjava.machinelearning.decisiontree.data.SimpleValue;
-import org.intelligentjava.machinelearning.decisiontree.feature.Feature;
 import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.Arrays.asList;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.classification;
@@ -14,8 +15,13 @@ import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.
 import static org.intelligentjava.machinelearning.decisiontree.feature.PredicateFeature.feature;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class DecisionTreeTrainingTest {
+
+
+    static final com.google.common.base.Function<JsonNode, Function<String,Object>> jsonValue = (j) -> j::get;
+    //static final com.google.common.base.Function<Map, Value> mapValue = (j) -> j::get;
 
     /**
      * Test if decision tree correctly learns simple AND function.
@@ -32,7 +38,7 @@ public class DecisionTreeTrainingTest {
      */
     @Test
     public void testTrainingAndFunction() {
-        DecisionTree<Object> tree = new DecisionTree();
+        DecisionTree<String, Object> tree = new DecisionTree();
         String[] header = {"x1", "x2", "answer"};
 
         SimpleValue data1 = data(header, Boolean.TRUE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
@@ -40,25 +46,27 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.FALSE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Feature feature1 = feature("x1", Boolean.TRUE);
-        Feature feature2 = feature("x1", Boolean.FALSE);
-        Feature feature3 = feature("x2", Boolean.TRUE);
-        Feature feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        assertEquals("x1 = true", tree.root().toString()); // root node x1 = true split
-        assertEquals(null, tree.root().label); // not leaf node
+        DecisionTree.Node<Object> root = tree.root();
 
-        assertEquals("x2 = true", tree.root().get(0).toString());
-        assertEquals(null, tree.root().get(0).label); // not leaf node
-        assertEquals("Leaf", tree.root().get(0).get(0).toString()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(0).get(0).label);
-        assertEquals("Leaf", tree.root().get(0).get(1).toString()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(0).get(1).label);
+        assertEquals("x1 = true", root.toString()); // root node x1 = true split
+        assertEquals(null, root.label); // not leaf node
 
-        assertEquals("Leaf", tree.root().get(1).toString());
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(1).label);
+        assertEquals("x2 = true", root.get(0).toString());
+        assertEquals(null, root.get(0).label); // not leaf node
+        assertTrue(root.get(0).get(0).isLeaf());
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(0).get(0).label);
+        assertTrue(root.get(0).get(1).isLeaf());
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(0).get(1).label);
+
+        assertTrue(root.get(1).isLeaf());
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(1).label);
 
     }
 
@@ -78,7 +86,7 @@ public class DecisionTreeTrainingTest {
      */
     @Test
     public void testTrainingORFunction() {
-        DecisionTree<Object> tree = new DecisionTree();
+        DecisionTree<String, Object> tree = new DecisionTree();
         String[] header = {"x1", "x2", "answer"};
 
         SimpleValue data1 = data(header, Boolean.TRUE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
@@ -86,25 +94,26 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Feature feature1 = feature("x1", Boolean.TRUE);
-        Feature feature2 = feature("x1", Boolean.FALSE);
-        Feature feature3 = feature("x2", Boolean.TRUE);
-        Feature feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        assertEquals("x1 = true", tree.root().toString()); // root node x1 = true split
-        assertEquals(null, tree.root().label); // not leaf node
+        DecisionTree.Node<Object> root = tree.root();
+        assertEquals("x1 = true", root.toString()); // root node x1 = true split
+        assertEquals(null, root.label); // not leaf node
 
-        assertEquals("Leaf", tree.root().get(0).toString());
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(0).label);
+        assertTrue(root.get(0).isLeaf());
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(0).label);
 
-        assertEquals("x2 = true", tree.root().get(1).toString());
-        assertEquals(null, tree.root().get(1).label);
-        assertEquals("Leaf", tree.root().get(1).get(0).toString()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(1).get(0).label);
-        assertEquals("Leaf", tree.root().get(1).get(1).toString()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(1).get(1).label);
+        assertEquals("x2 = true", root.get(1).toString());
+        assertEquals(null, root.get(1).label);
+        assertTrue(root.get(1).get(0).isLeaf());
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(1).get(0).label);
+        assertTrue(root.get(1).get(1).isLeaf());
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(1).get(1).label);
 
     }
 
@@ -124,7 +133,7 @@ public class DecisionTreeTrainingTest {
      */
     @Test
     public void testTrainingXORFunction() {
-        DecisionTree<Object> tree = new DecisionTree();
+        DecisionTree<String, Object> tree = new DecisionTree();
         String[] header = {"x1", "x2", "answer"};
 
         SimpleValue data1 = data(header, Boolean.TRUE, Boolean.TRUE, BooleanLabel.FALSE_LABEL);
@@ -132,36 +141,37 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Feature feature1 = feature("x1", Boolean.TRUE);
-        Feature feature2 = feature("x1", Boolean.FALSE);
-        Feature feature3 = feature("x2", Boolean.TRUE);
-        Feature feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
         tree.print();
 
-        assertEquals("x1 = true", tree.root().toString()); // root node x1 = true split
-        assertNull(tree.root().label); // not leaf node
+        DecisionTree.Node<Object> root = tree.root();
+        assertEquals("x1 = true", root.toString()); // root node x1 = true split
+        assertNull(root.label); // not leaf node
 
-        assertEquals("x2 = true", tree.root().get(0).toString());
-        assertEquals(null, tree.root().get(0).label);
-        assertEquals("Leaf", tree.root().get(1).get(0).toString()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(0).get(0).label);
-        assertEquals("Leaf", tree.root().get(1).get(0).toString()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(0).get(1).label);
+        assertEquals("x2 = true", root.get(0).toString());
+        assertEquals(null, root.get(0).label);
+        assertTrue(root.get(1).get(0).isLeaf()); // leaf
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(0).get(0).label);
+        assertTrue(root.get(1).get(0).isLeaf()); // leaf
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(0).get(1).label);
 
-        assertEquals("x2 = true", tree.root().get(1).toString());
-        assertEquals(null, tree.root().get(1).label);
-        assertEquals("Leaf", tree.root().get(1).get(0).toString()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(1).get(0).label);
-        assertEquals("Leaf", tree.root().get(1).get(1).toString()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(1).get(1).label);
+        assertEquals("x2 = true", root.get(1).toString());
+        assertEquals(null, root.get(1).label);
+        assertTrue(root.get(1).get(0).isLeaf());
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(1).get(0).label);
+        assertTrue(root.get(1).get(1).isLeaf());
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(1).get(1).label);
 
     }
 
     @Test
     public void testLearnSimpleMoreLessFeature() {
-        DecisionTree<Object> tree = new DecisionTree();
+        DecisionTree<String, Integer> tree = new DecisionTree();
         String[] header = {"x1", "answer"};
 
         tree.learn(
@@ -179,13 +189,14 @@ public class DecisionTreeTrainingTest {
 
         tree.print();
 
-        assertEquals("x1 > 2", tree.root().toString()); // root node x1 = true split
-        assertEquals(null, tree.root().label); // not leaf node
+        DecisionTree.Node<Integer> root = tree.root();
+        assertEquals("x1 > 2", root.toString()); // root node x1 = true split
+        assertEquals(null, root.label); // not leaf node
 
-        assertEquals("Leaf", tree.root().get(0).toString()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(0).label);
-        assertEquals("Leaf", tree.root().get(1).toString()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(1).label);
+        assertTrue(root.get(0).isLeaf());
+        assertEquals(BooleanLabel.TRUE_LABEL, root.get(0).label);
+        assertTrue(root.get(1).isLeaf());
+        assertEquals(BooleanLabel.FALSE_LABEL, root.get(1).label);
 
 
     }
@@ -207,10 +218,10 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.FALSE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Feature feature1 = feature("x1", Boolean.TRUE);
-        Feature feature2 = feature("x1", Boolean.FALSE);
-        Feature feature3 = feature("x2", Boolean.TRUE);
-        Feature feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.learn("answer",
                 asList(data1, data2, data3, data4),
@@ -224,24 +235,18 @@ public class DecisionTreeTrainingTest {
         assertEquals(BooleanLabel.FALSE_LABEL, tree.classify(classification(classificationHeader, Boolean.FALSE, Boolean.FALSE)));
     }
 
-//        @Test
+//    @Test
 //    public void testJSON() {
 //        DecisionTree<Object> tree = new DecisionTree();
-//        String[] header = {"x", "answer"};
 //
 //        String json = "[ { x: 1, answer: false }, { x: 2, answer: false }, { x: 3, answer: true }, { x: 4, answer: true }]";
-//
-//        tree.learn(
-//                Util.jsonNode(json)
+//            tree.learn(
+//                "answer",
+//                Lists.newArrayList(Iterables.transform(Util.jsonNode(json), jsonValue)),
 //                asList(
-//                        data("answer", header, 1, BooleanLabel.FALSE_LABEL),
-//                        data("answer", header, 2, BooleanLabel.FALSE_LABEL),
-//                        data("answer", header, 3, BooleanLabel.TRUE_LABEL),
-//                        data("answer", header, 4, BooleanLabel.TRUE_LABEL)),
-//                asList(
-//                        feature("x", P.moreThan(0), "> 0"),
-//                        feature("x", P.moreThan(1), "> 1"),
-//                        feature("x", P.moreThan(2), "> 2"))
+//                        feature("x", (IntNode p) -> p.intValue() > 0, "> 0"),
+//                        feature("x", (IntNode p) -> p.intValue() > 1, "> 1"),
+//                        feature("x", (IntNode p) -> p.intValue() > 2, "> 2"))
 //        );
 //
 //        tree.print();
@@ -249,12 +254,23 @@ public class DecisionTreeTrainingTest {
 //        assertEquals("x > 2", tree.root().toString()); // root node x = true split
 //        assertEquals(null, tree.root().label); // not leaf node
 //
-//        assertEquals("Leaf", tree.root().get(0).toString()); // leaf
-//        assertEquals(BooleanLabel.TRUE_LABEL, tree.root().get(0).label);
-//        assertEquals("Leaf", tree.root().get(1).toString()); // leaf
-//        assertEquals(BooleanLabel.FALSE_LABEL, tree.root().get(1).label);
-//
-//
+//        assertTrue(tree.root().get(0).isLeaf());
+//        assertEquals("true", tree.root().get(0).label.toString());
+//        assertTrue(tree.root().get(1).isLeaf());
+//        assertEquals("false", tree.root().get(1).label.toString());
 //    }
+//
+
+    @Test public void testRealDecisionTable() {
+        RealTableDecisionTree t = new RealTableDecisionTree(2, "a", "b", "x");
+        t.add(1, 1, 0);
+        t.add(1, 0, 1);
+        t.add(2, 1, 1);
+        t.add(5, 1, 0);
+        t.add(5, 0, 1);
+        t.learn(1);
+        t.print();
+    }
+
 
 }

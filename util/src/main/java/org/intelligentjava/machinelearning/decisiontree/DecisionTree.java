@@ -1,9 +1,9 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import jcog.list.FasterList;
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
-import org.intelligentjava.machinelearning.decisiontree.feature.Feature;
+
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
 import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculator;
 import org.slf4j.Logger;
@@ -13,10 +13,13 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.partitioningBy;
 import static org.intelligentjava.machinelearning.decisiontree.DecisionTree.Node.leaf;
 
 /**
@@ -24,7 +27,7 @@ import static org.intelligentjava.machinelearning.decisiontree.DecisionTree.Node
  *
  * @author Ignas
  */
-public class DecisionTree<L> {
+public class DecisionTree<K, V> {
 
     /**
      * When data is considered homogeneous and node becomes leaf and is labeled. If it is equal 1.0 then absolutely all
@@ -47,20 +50,20 @@ public class DecisionTree<L> {
     /**
      * Root node.
      */
-    private Node<L> root;
+    private Node<V> root;
 
-    protected L label(String value, List<Value<L>> data) {
+    protected V label(K value, List<Function<K, V>> data) {
         return label(value, data, homogenityPercentage);
     }
 
     /**
      * Returns Label if data is homogeneous.
      */
-    protected static <L> L label(String value, Collection<Value<L>> data, double homogenityPercentage) {
+    protected static <K, V> V label(K value, Collection<Function<K, V>> data, double homogenityPercentage) {
         // group by to map <Label, count>
-        Map<L, Long> labelCount = data.stream().collect(groupingBy((x)->x.get(value), counting()));
+        Map<V, Long> labelCount = data.stream().collect(groupingBy((x)->x.apply(value), counting()));
         long totalCount = data.size();
-        for (Map.Entry<L, Long> e : labelCount.entrySet()) {
+        for (Map.Entry<V, Long> e : labelCount.entrySet()) {
             long nbOfLabels = e.getValue();
             if ((nbOfLabels / (double) totalCount) >= homogenityPercentage) {
                 return e.getKey();
@@ -72,7 +75,7 @@ public class DecisionTree<L> {
     /**
      * Get root.
      */
-    public Node<L> root() {
+    public Node<V> root() {
         return root;
     }
 
@@ -83,8 +86,23 @@ public class DecisionTree<L> {
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public void learn(String value, List<Value<L>> trainingData, List<Feature> features) {
+    public void learn(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features) {
         root = learn(value, trainingData, features, 1);
+    }
+
+
+    /**
+     * Split data according to if it has this feature.
+     *
+     * @param data Data to by split by this feature.
+     * @return Sublists of split data samples.
+     */
+    static <K, V> List<List<Function<K, V>>> split(Predicate<Function<K, V>> p, Collection<Function<K, V>> data) {
+        // TODO:  maybe use sublist streams instead of creating new list just track indexes
+        // http://stackoverflow.com/questions/22917270/how-to-get-a-range-of-items-from-stream-using-java-8-lambda
+        Map<Boolean, List<Function<K, V>>> split = data.stream().collect(partitioningBy(p::test));
+
+        return Lists.newArrayList(split.get(true), split.get(false));
     }
 
     /**
@@ -94,10 +112,10 @@ public class DecisionTree<L> {
      * @param features     List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node<L> learn(String value, List<Value<L>> trainingData, List<Feature> features, int currentDepth) {
+    protected Node<V> learn(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth) {
 
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
-        L currentNodeLabel;
+        V currentNodeLabel;
         if ((currentNodeLabel = label(value, trainingData, homogenityPercentage)) != null) {
             return leaf(currentNodeLabel); //log.debug("New leaf is created because data is homogeneous: {}", currentNodeLabel.name());
         }
@@ -108,7 +126,7 @@ public class DecisionTree<L> {
             return leaf(majority(value, trainingData)); //log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
         }
 
-        Feature split = bestSplit(value, trainingData, features); // get best set of literals
+        Predicate<Function<K, V>> split = bestSplit(value, trainingData, features); // get best set of literals
         //log.debug("Best split found: {}", bestSplit.toString());
 
         // add children to current node according to split
@@ -116,7 +134,7 @@ public class DecisionTree<L> {
         // else grow tree further recursively
 
         //log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
-        return split.split(trainingData).stream().map(
+        return split(split, trainingData).stream().map(
 
                 subsetTrainingData -> subsetTrainingData.isEmpty() ?
 
@@ -137,11 +155,11 @@ public class DecisionTree<L> {
      * @param value Data sample
      * @return Return label of class.
      */
-    public L classify(Value value) {
-        Node<L> node = root;
+    public V classify(Function<K, V> value) {
+        Node<V> node = root;
         while (!node.isLeaf()) { // go through tree until leaf is reached
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
-            node = node.get(value.has(node.feature) ? 0 : 1);
+            node = node.get(node.feature.test(value) ? 0 : 1);
         }
         return node.label;
     }
@@ -149,16 +167,16 @@ public class DecisionTree<L> {
     /**
      * Finds best feature to split on which is the one whose split results in lowest impurity measure.
      */
-    protected Feature bestSplit(String value, Collection<Value<L>> data, Iterable<? extends Feature> features) {
+    protected Predicate<Function<K, V>> bestSplit(K value, Collection<Function<K, V>> data, Iterable<Predicate<Function<K, V>>> features) {
         double currentImpurity = 1;
-        Feature bestSplitFeature = null; // rename split to feature
+        Predicate<Function<K, V>> bestSplitFeature = null; // rename split to feature
 
-        for (Feature feature : features) {
+        for (Predicate<Function<K, V>> feature : features) {
 
             // totalSplitImpurity = sum(singleLeafImpurities) / nbOfLeafs
             // in other words splitImpurity is average of leaf impurities
             double calculatedSplitImpurity =
-                    feature.split(data).stream().filter(list -> !list.isEmpty()).mapToDouble(splitData -> impurityCalculator.calculateImpurity(value, splitData)).average().orElse(Double.POSITIVE_INFINITY);
+                    split(feature, data).stream().filter(list -> !list.isEmpty()).mapToDouble(splitData -> impurityCalculator.calculateImpurity(value, splitData)).average().orElse(Double.POSITIVE_INFINITY);
             if (calculatedSplitImpurity < currentImpurity) {
                 currentImpurity = calculatedSplitImpurity;
                 bestSplitFeature = feature;
@@ -172,9 +190,9 @@ public class DecisionTree<L> {
      * Differs from getLabel() that it always return some label and does not look at homogenityPercentage parameter. It
      * is used when tree growth is stopped and everything what is left must be classified so it returns majority label for the data.
      */
-    static <L> L majority(String value, Collection<Value<L>> data) {
+    static <K, V> V majority(K value, Collection<Function<K, V>> data) {
         // group by to map <Label, count> like in getLabels() but return Label with most counts
-        return data.stream().collect(groupingBy((x)->x.get(value), counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        return data.stream().collect(groupingBy((x)->x.apply(value), counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 
     // -------------------------------- TREE PRINTING ------------------------------------
@@ -187,7 +205,7 @@ public class DecisionTree<L> {
         printSubtree(root, o);
     }
 
-    private void printSubtree(Node<L> node, PrintStream o) {
+    private void printSubtree(Node<V> node, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, "", o);
         }
@@ -197,12 +215,12 @@ public class DecisionTree<L> {
         }
     }
 
-    private static <L> void print(Node<L> node, PrintStream o) {
+    private static <V> void print(Node<V> node, PrintStream o) {
         o.print(node);
         o.println();
     }
 
-    private static <L> void print(Node<L> node, boolean isRight, String indent, PrintStream o) {
+    private static <K, V> void print(Node<V> node, boolean isRight, K indent, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, indent + (isRight ? "        " : " |      "), o);
         }
@@ -221,28 +239,27 @@ public class DecisionTree<L> {
 
     static class Node<L> extends FasterList<Node<L>> {
 
-        private static final String LEAF_NODE_NAME = "Leaf";
 
         /**
          * Node's feature used to split it further.
          */
-        public final Feature feature;
+        public final Predicate feature;
 
         public final L label;
 
-        Node(Feature feature) {
+        Node(Predicate feature) {
             super();
             this.feature = feature;
             this.label = null;
         }
 
-        private Node(Feature feature, L label) {
+        private Node(Predicate feature, L label) {
             super();
             this.label = label;
             this.feature = feature;
         }
 
-        public static <L> Node<L> feature(Feature feature) {
+        public static <V> Node<V> feature(Predicate feature) {
             return new Node<>(feature);
         }
 
@@ -255,7 +272,7 @@ public class DecisionTree<L> {
         }
 
         public String toString() {
-            return feature != null ? feature.toString() : LEAF_NODE_NAME;
+            return feature != null ? feature.toString() : label.toString();
         }
 
     }

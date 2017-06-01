@@ -1,8 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree.impurity;
 
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
-
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -18,8 +17,8 @@ public class GiniIndexImpurityCalculation implements ImpurityCalculator {
      * {@inheritDoc}
      */
     @Override
-    public <L> double calculateImpurity(String value, List<Value<L>> splitData) {
-        List<L> labels = splitData.stream().map((x)->x.get(value)).distinct().collect(Collectors.toList());
+    public <K, V> double calculateImpurity(K value, List<Function<K , V>> splitData) {
+        List<V> labels = splitData.stream().map((x)->x.apply(value)).distinct().collect(Collectors.toList());
         int s = labels.size();
         if (s > 1) {
             double p = ImpurityCalculator.getEmpiricalProbability(value, splitData, labels.get(0), labels.get(1)); // TODO fix to multiple labels

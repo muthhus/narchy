@@ -1,10 +1,11 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import java.util.Optional;
+import java.util.function.Function;
 
-import org.intelligentjava.machinelearning.decisiontree.data.Value;
 
-public class TestValue<L> implements Value<L> {
+
+public class TestValue<L> implements Function<String,L> {
     
     private L label;
     
@@ -14,7 +15,7 @@ public class TestValue<L> implements Value<L> {
     }
 
     @Override
-    public L get(String what) {
+    public L apply(String what) {
         return label;
     }
 
