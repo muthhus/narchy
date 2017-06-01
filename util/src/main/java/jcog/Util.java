@@ -1625,7 +1625,7 @@ public enum Util {
 
     static final Logger jsonLogger = LoggerFactory.getLogger(JsonNode.class);
 
-    public static JsonNode toJSON(Object x) {
+    public static JsonNode jsonNode(Object x) {
         if (x instanceof String) {
             try {
                 return msgPackMapper.readTree(x.toString());

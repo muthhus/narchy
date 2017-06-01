@@ -97,7 +97,7 @@ public class NARWeb extends WebServer {
             stat.put("emo", nar.emotion.summary());
             stat.put("net", net.summary());
 
-            Command.log( n, Util.toJSON(stat).toString());
+            Command.log( n, Util.jsonNode(stat).toString());
         });
 
 

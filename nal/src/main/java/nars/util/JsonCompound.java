@@ -50,7 +50,7 @@ public enum JsonCompound  { ;
 
     public static Term the(String json) {
 
-        JsonNode x = Util.toJSON(json);
+        JsonNode x = Util.jsonNode(json);
         return the(x);
 
     }

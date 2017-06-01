@@ -37,6 +37,15 @@ public class FasterList<X> extends FastList<X> {
         super(capacity);
     }
 
+    public FasterList(Iterable<X> copy) {
+        copy.forEach(this::add);
+    }
+
+    public FasterList(Iterable<X> copy, int sizeEstimate) {
+        super(sizeEstimate);
+        copy.forEach(this::add);
+    }
+
     public FasterList(Collection<X> copy) {
         super(copy);
     }

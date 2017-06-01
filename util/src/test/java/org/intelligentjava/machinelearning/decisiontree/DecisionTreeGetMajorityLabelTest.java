@@ -5,7 +5,7 @@ import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabe
 
 import java.util.List;
 
-import org.intelligentjava.machinelearning.decisiontree.data.DataSample;
+import org.intelligentjava.machinelearning.decisiontree.data.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,24 +23,24 @@ public class DecisionTreeGetMajorityLabelTest {
     
     @Test
     public void testGetMajorityLabel() {
-        DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        Assert.assertEquals("false", DecisionTree.getMajorityLabel(data).name());
+        DecisionTree<Object> tree = new DecisionTree();
+        List<Value<Object>> data = Lists.newArrayList();
+        data.add(new TestValue(TRUE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        data.add(new TestValue(TRUE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        Assert.assertEquals("false", DecisionTree.majority(null, data).toString());
     }
 
     @Test
     public void testGetMajorityLabelWhenEqualCounts() {
-        DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        Assert.assertEquals("false", DecisionTree.getMajorityLabel(data).name());
+        DecisionTree<Object> tree = new DecisionTree();
+        List<Value<Object>> data = Lists.newArrayList();
+        data.add(new TestValue(TRUE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        data.add(new TestValue(TRUE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        Assert.assertEquals("false", DecisionTree.majority(null, data).toString());
     }
 }

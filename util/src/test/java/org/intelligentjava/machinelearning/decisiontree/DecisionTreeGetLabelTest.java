@@ -1,7 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import com.google.common.collect.Lists;
-import org.intelligentjava.machinelearning.decisiontree.data.DataSample;
+import org.intelligentjava.machinelearning.decisiontree.data.Value;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,38 +15,38 @@ public class DecisionTreeGetLabelTest {
     @Test
     public void testGetLabelOnEmptyList() {
         DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
-        Assert.assertNull(tree.label(data));
+        List<Value> data = Lists.newArrayList();
+        Assert.assertNull(tree.label(null, data));
     }
 
     @Test
     public void testGetLabelOnSingleElement() {
         DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        Assert.assertEquals("true", tree.label(data).name());
+        List<Value> data = Lists.newArrayList();
+        data.add(new TestValue(TRUE_LABEL));
+        Assert.assertEquals("true", tree.label(null, data).toString());
     }
 
     @Test
     public void testGetLabelOnTwoDifferent() {
         DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
-        data.add(new TestDataSample(null, TRUE_LABEL));
-        data.add(new TestDataSample(null, FALSE_LABEL));
-        Assert.assertNull(tree.label(data));
+        List<Value> data = Lists.newArrayList();
+        data.add(new TestValue(TRUE_LABEL));
+        data.add(new TestValue(FALSE_LABEL));
+        Assert.assertNull(tree.label(null, data));
     }
 
     @Test
     public void testGetLabelOn95vs5() {
         DecisionTree tree = new DecisionTree();
-        List<DataSample> data = Lists.newArrayList();
+        List<Value> data = Lists.newArrayList();
         for (int i = 0; i < 95; i++) {
-            data.add(new TestDataSample(null, TRUE_LABEL));
+            data.add(new TestValue(TRUE_LABEL));
         }
         for (int i = 0; i < 5; i++) {
-            data.add(new TestDataSample(null, FALSE_LABEL));
+            data.add(new TestValue(FALSE_LABEL));
         }
-        Assert.assertEquals("true", tree.label(data).name());
+        Assert.assertEquals("true", tree.label(null, data).toString());
     }
 
     @Test
@@ -54,23 +54,23 @@ public class DecisionTreeGetLabelTest {
         DecisionTree tree = new DecisionTree();
 
         {
-            List<DataSample> homogenous = buildSample(96, 4);
-            Assert.assertNotNull(tree.label(homogenous));
+            List<Value> homogenous = buildSample(96, 4);
+            Assert.assertNotNull(tree.label(null, homogenous));
         }
 
 
         {
-            List<DataSample> nonhomogenous = buildSample(50, 50);
-            Assert.assertNull(tree.label(nonhomogenous));
+            List<Value> nonhomogenous = buildSample(50, 50);
+            Assert.assertNull(tree.label(null, nonhomogenous));
         }
     }
 
-    static List<DataSample> buildSample(int a, int b) {
-        List<DataSample> homogenous = Lists.newArrayList();
+    static List<Value> buildSample(int a, int b) {
+        List<Value> homogenous = Lists.newArrayList();
         for (int i = 0; i < a; i++)
-            homogenous.add(new TestDataSample(null, TRUE_LABEL));
+            homogenous.add(new TestValue(TRUE_LABEL));
         for (int i = 0; i < b; i++)
-            homogenous.add(new TestDataSample(null, FALSE_LABEL));
+            homogenous.add(new TestValue(FALSE_LABEL));
         return homogenous;
     }
 

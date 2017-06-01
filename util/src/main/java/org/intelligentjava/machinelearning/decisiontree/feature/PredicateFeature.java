@@ -1,8 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree.feature;
 
-import org.intelligentjava.machinelearning.decisiontree.data.DataSample;
+import org.intelligentjava.machinelearning.decisiontree.data.Value;
 
-import java.util.Optional;
 import java.util.function.Predicate;
 
 /**
@@ -70,9 +69,9 @@ public class PredicateFeature<T> implements Feature {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public boolean belongsTo(DataSample dataSample) { // TODO implement other splits (in different type of feature)
-        Optional<Object> optionalValue = dataSample.value(column);
-        return optionalValue.isPresent() && predicate.test((T) optionalValue.get());
+    public boolean of(Value x) { // TODO implement other splits (in different type of feature)
+        Object optionalValue = x.get(column);
+        return optionalValue!=null && predicate.test((T) optionalValue);
     }
 
     @Override

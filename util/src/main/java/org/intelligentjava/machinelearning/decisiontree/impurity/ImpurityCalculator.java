@@ -1,7 +1,6 @@
 package org.intelligentjava.machinelearning.decisiontree.impurity;
 
-import org.intelligentjava.machinelearning.decisiontree.data.DataSample;
-import org.intelligentjava.machinelearning.decisiontree.label.Label;
+import org.intelligentjava.machinelearning.decisiontree.data.Value;
 
 import java.util.List;
 
@@ -16,16 +15,18 @@ import java.util.List;
  * @author Ignas
  */
 @FunctionalInterface
-public interface ImpurityCalculationMethod {
+public interface ImpurityCalculator {
 
     /**
      * Calculates impurity value. High impurity implies low information gain and more random labels of data which in
      * turn means that split is not very good.
      *
+     *
+     * @param value
      * @param splitData Data subset on which impurity is calculated.
      * @return Impurity.
      */
-    double calculateImpurity(List<DataSample> splitData);
+    <L> double calculateImpurity(String value, List<Value<L>> splitData);
 
 
     /**
@@ -34,8 +35,8 @@ public interface ImpurityCalculationMethod {
      * @param splitData Data on which positive label probability is calculated.
      * @return Empirical probability.
      */
-    default double getEmpiricalProbability(List<DataSample> splitData, Label positive, Label negative) {
+    static <L> double getEmpiricalProbability(String value, List<Value<L>> splitData, L positive, L negative) {
         // TODO cache calculated counts
-        return (double) splitData.stream().filter(d -> d.label().equals(positive)).count() / splitData.size();
+        return (double) splitData.stream().filter(d -> d.get(value).equals(positive)).count() / splitData.size();
     }
 }

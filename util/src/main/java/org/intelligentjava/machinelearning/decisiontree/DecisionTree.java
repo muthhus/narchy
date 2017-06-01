@@ -1,25 +1,30 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
-import org.intelligentjava.machinelearning.decisiontree.data.DataSample;
+import com.google.common.collect.Iterables;
+import jcog.list.FasterList;
+import org.intelligentjava.machinelearning.decisiontree.data.Value;
 import org.intelligentjava.machinelearning.decisiontree.feature.Feature;
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
-import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculationMethod;
-import org.intelligentjava.machinelearning.decisiontree.label.Label;
+import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static org.intelligentjava.machinelearning.decisiontree.DecisionTree.Node.leaf;
 
 /**
  * Decision tree implementation.
  *
  * @author Ignas
  */
-public class DecisionTree {
+public class DecisionTree<L> {
 
     /**
      * When data is considered homogeneous and node becomes leaf and is labeled. If it is equal 1.0 then absolutely all
@@ -29,11 +34,11 @@ public class DecisionTree {
     /**
      * Logger.
      */
-    private final Logger log = LoggerFactory.getLogger(DecisionTree.class);
+    private static final Logger log = LoggerFactory.getLogger(DecisionTree.class);
     /**
      * Impurity calculation method.
      */
-    private final ImpurityCalculationMethod impurityCalculationMethod = new GiniIndexImpurityCalculation();
+    private final ImpurityCalculator impurityCalculator = new GiniIndexImpurityCalculation();
     /**
      * Max depth parameter. Growth of the tree is stopped once this depth is reached. Limiting depth of the tree can
      * help with overfitting, however if depth will be set too low tree will not be acurate.
@@ -42,23 +47,23 @@ public class DecisionTree {
     /**
      * Root node.
      */
-    private Node root;
+    private Node<L> root;
 
-    protected static Label label(List<DataSample> data) {
-        return label(data, homogenityPercentage);
+    protected L label(String value, List<Value<L>> data) {
+        return label(value, data, homogenityPercentage);
     }
 
     /**
      * Returns Label if data is homogeneous.
      */
-    protected static Label label(List<DataSample> data, double homogenityPercentage) {
+    protected static <L> L label(String value, Collection<Value<L>> data, double homogenityPercentage) {
         // group by to map <Label, count>
-        Map<Label, Long> labelCount = data.stream().collect(groupingBy(DataSample::label, counting()));
+        Map<L, Long> labelCount = data.stream().collect(groupingBy((x)->x.get(value), counting()));
         long totalCount = data.size();
-        for (Map.Entry<Label, Long> labelLongEntry : labelCount.entrySet()) {
-            long nbOfLabels = labelLongEntry.getValue();
+        for (Map.Entry<L, Long> e : labelCount.entrySet()) {
+            long nbOfLabels = e.getValue();
             if ((nbOfLabels / (double) totalCount) >= homogenityPercentage) {
-                return labelLongEntry.getKey();
+                return e.getKey();
             }
         }
         return null;
@@ -67,18 +72,19 @@ public class DecisionTree {
     /**
      * Get root.
      */
-    public Node getRoot() {
+    public Node<L> root() {
         return root;
     }
 
     /**
      * Trains tree on training data for provided features.
      *
+     * @param value        The value column being learned
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public void train(List<DataSample> trainingData, List<Feature> features) {
-        root = growTree(trainingData, features, 1);
+    public void learn(String value, List<Value<L>> trainingData, List<Feature> features) {
+        root = learn(value, trainingData, features, 1);
     }
 
     /**
@@ -88,70 +94,71 @@ public class DecisionTree {
      * @param features     List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node growTree(List<DataSample> trainingData, List<Feature> features, int currentDepth) {
+    protected Node<L> learn(String value, List<Value<L>> trainingData, List<Feature> features, int currentDepth) {
 
-        Label currentNodeLabel = null;
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
-        if ((currentNodeLabel = label(trainingData, homogenityPercentage)) != null) {
-            log.debug("New leaf is created because data is homogeneous: {}", currentNodeLabel.name());
-            return Node.newLeafNode(currentNodeLabel);
+        L currentNodeLabel;
+        if ((currentNodeLabel = label(value, trainingData, homogenityPercentage)) != null) {
+            return leaf(currentNodeLabel); //log.debug("New leaf is created because data is homogeneous: {}", currentNodeLabel.name());
         }
 
-        boolean stoppingCriteriaReached = features.isEmpty() || currentDepth >= maxDepth;
+        int fs = features.size();
+        boolean stoppingCriteriaReached = (fs==0) || currentDepth >= maxDepth;
         if (stoppingCriteriaReached) {
-            Label majorityLabel = getMajorityLabel(trainingData);
-            log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
-            return Node.newLeafNode(majorityLabel);
+            return leaf(majority(value, trainingData)); //log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
         }
 
-        Feature bestSplit = findBestSplitFeature(trainingData, features); // get best set of literals
-        log.debug("Best split found: {}", bestSplit.toString());
-        List<List<DataSample>> splitData = bestSplit.split(trainingData);
-        log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
+        Feature split = bestSplit(value, trainingData, features); // get best set of literals
+        //log.debug("Best split found: {}", bestSplit.toString());
 
-        // remove best split from features (TODO check if it is not slow)
-        List<Feature> newFeatures = features.stream().filter(p -> !p.equals(bestSplit)).collect(toList());
-        Node node = Node.newNode(bestSplit);
-        for (List<DataSample> subsetTrainingData : splitData) { // add children to current node according to split
-            if (subsetTrainingData.isEmpty()) {
-                // if subset data is empty add a leaf with label calculated from initial data
-                node.addChild(Node.newLeafNode(getMajorityLabel(trainingData)));
-            } else {
-                // grow tree further recursively
-                node.addChild(growTree(subsetTrainingData, newFeatures, currentDepth + 1));
-            }
-        }
+        // add children to current node according to split
+        // if subset data is empty add a leaf with label calculated from initial data
+        // else grow tree further recursively
 
-        return node;
+        //log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
+        return split.split(trainingData).stream().map(
+
+                subsetTrainingData -> subsetTrainingData.isEmpty() ?
+
+                    leaf(majority(value, trainingData))
+
+                        :
+
+                    learn(value, subsetTrainingData,
+                            new FasterList<>(Iterables.filter(features, p -> !p.equals(split)), fs - 1),
+                        currentDepth + 1))
+
+                .collect(Collectors.toCollection(()->Node.feature(split)));
     }
 
     /**
      * Classify dataSample.
      *
-     * @param dataSample Data sample
+     * @param value Data sample
      * @return Return label of class.
      */
-    public Label classify(DataSample dataSample) {
-        Node node = root;
+    public L classify(Value value) {
+        Node<L> node = root;
         while (!node.isLeaf()) { // go through tree until leaf is reached
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
-            node = node.get(dataSample.has(node.getFeature()) ? 0 : 1);
+            node = node.get(value.has(node.feature) ? 0 : 1);
         }
-        return node.getLabel();
+        return node.label;
     }
 
     /**
      * Finds best feature to split on which is the one whose split results in lowest impurity measure.
      */
-    protected Feature findBestSplitFeature(List<DataSample> data, List<Feature> features) {
+    protected Feature bestSplit(String value, Collection<Value<L>> data, Iterable<? extends Feature> features) {
         double currentImpurity = 1;
         Feature bestSplitFeature = null; // rename split to feature
 
         for (Feature feature : features) {
-            List<List<DataSample>> splitData = feature.split(data);
+
             // totalSplitImpurity = sum(singleLeafImpurities) / nbOfLeafs
             // in other words splitImpurity is average of leaf impurities
-            double calculatedSplitImpurity = splitData.stream().filter(list -> !list.isEmpty()).mapToDouble(impurityCalculationMethod::calculateImpurity).average().orElse(Double.POSITIVE_INFINITY);
+            double calculatedSplitImpurity =
+                    feature.split(data).stream().filter(list -> !list.isEmpty()).mapToDouble(splitData -> impurityCalculator.calculateImpurity(value, splitData)).average().orElse(Double.POSITIVE_INFINITY);
             if (calculatedSplitImpurity < currentImpurity) {
                 currentImpurity = calculatedSplitImpurity;
                 bestSplitFeature = feature;
@@ -165,50 +172,91 @@ public class DecisionTree {
      * Differs from getLabel() that it always return some label and does not look at homogenityPercentage parameter. It
      * is used when tree growth is stopped and everything what is left must be classified so it returns majority label for the data.
      */
-    protected static Label getMajorityLabel(List<DataSample> data) {
+    static <L> L majority(String value, Collection<Value<L>> data) {
         // group by to map <Label, count> like in getLabels() but return Label with most counts
-        return data.stream().collect(groupingBy(DataSample::label, counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        return data.stream().collect(groupingBy((x)->x.get(value), counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 
     // -------------------------------- TREE PRINTING ------------------------------------
 
-    public void printTree() {
-        printSubtree(root);
+    public void print() {
+        print(System.out);
     }
 
-    public void printSubtree(Node node) {
+    public void print(PrintStream o) {
+        printSubtree(root, o);
+    }
+
+    private void printSubtree(Node<L> node, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
-            printTree(node.get(0), true, "");
+            print(node.get(0), true, "", o);
         }
-        printNodeValue(node);
+        print(node, o);
         if (node.size() > 1 && node.get(1) != null) {
-            printTree(node.get(1), false, "");
+            print(node.get(1), false, "", o);
         }
     }
 
-    private static void printNodeValue(Node node) {
-        if (node.isLeaf()) {
-            System.out.print(node.getLabel());
-        } else {
-            System.out.print(node.getName());
-        }
-        System.out.println();
+    private static <L> void print(Node<L> node, PrintStream o) {
+        o.print(node);
+        o.println();
     }
 
-    private static void printTree(Node node, boolean isRight, String indent) {
+    private static <L> void print(Node<L> node, boolean isRight, String indent, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
-            printTree(node.get(0), true, indent + (isRight ? "        " : " |      "));
+            print(node.get(0), true, indent + (isRight ? "        " : " |      "), o);
         }
-        System.out.print(indent);
+        o.print(indent);
         if (isRight) {
-            System.out.print(" /");
+            o.print(" /");
         } else {
-            System.out.print(" \\");
+            o.print(" \\");
         }
-        System.out.print("----- ");
-        printNodeValue(node);
+        o.print("----- ");
+        print(node, o);
         if (node.size() > 1 && node.get(1) != null) {
-            printTree(node.get(1), false, indent + (isRight ? " |      " : "        "));
+            print(node.get(1), false, indent + (isRight ? " |      " : "        "), o);
         }
+    }
+
+    static class Node<L> extends FasterList<Node<L>> {
+
+        private static final String LEAF_NODE_NAME = "Leaf";
+
+        /**
+         * Node's feature used to split it further.
+         */
+        public final Feature feature;
+
+        public final L label;
+
+        Node(Feature feature) {
+            super();
+            this.feature = feature;
+            this.label = null;
+        }
+
+        private Node(Feature feature, L label) {
+            super();
+            this.label = label;
+            this.feature = feature;
+        }
+
+        public static <L> Node<L> feature(Feature feature) {
+            return new Node<>(feature);
+        }
+
+        public static <L> Node<L> leaf(L label) {
+            return new Node<>(null, label);
+        }
+
+        public boolean isLeaf() {
+            return label != null;
+        }
+
+        public String toString() {
+            return feature != null ? feature.toString() : LEAF_NODE_NAME;
+        }
+
     }
 }

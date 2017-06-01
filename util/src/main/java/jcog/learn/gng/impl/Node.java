@@ -110,7 +110,7 @@ public class Node extends ArrayRealVector  {
 
     @Override
     public String toString() {
-        return id + ": " + super.toString() + ("lErr=" + n4(localError) + " dist=" + n4(localDistance()));
+        return id + ": " + super.toString() + " lErr=" + n4(localError) + " dist=" + n4(localDistance());
     }
 
     public double learn(double[] x) {
