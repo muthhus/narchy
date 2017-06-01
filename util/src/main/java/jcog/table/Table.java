@@ -31,7 +31,7 @@ public interface Table<K,V> extends Iterable<V> {
 
     int capacity();
 
-    boolean setCapacity(int i);
+    void setCapacity(int i);
 
 
 

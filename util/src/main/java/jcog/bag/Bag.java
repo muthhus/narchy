@@ -393,7 +393,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     @Override
-    boolean setCapacity(int c);
+    void setCapacity(int c);
 
 
 //    /**
@@ -614,8 +614,8 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
         @Override
-        public boolean setCapacity(int c) {
-            return false;
+        public void setCapacity(int c) {
+
         }
 
         @Override

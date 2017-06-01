@@ -129,6 +129,10 @@ public class WrappedRoaringBitmap implements MutableBitmap {
         bitmap.add(entry);
     }
 
+    @Override public boolean remove(int entry) {
+        return bitmap.checkedRemove(entry);
+    }
+
     @Override
     public int size() {
         return bitmap.getCardinality();
@@ -187,10 +191,6 @@ public class WrappedRoaringBitmap implements MutableBitmap {
         return getClass().getSimpleName() + bitmap.toString();
     }
 
-    @Override
-    public void remove(int entry) {
-        bitmap.remove(entry);
-    }
 
     @Override
     public IntIterator iterator() {

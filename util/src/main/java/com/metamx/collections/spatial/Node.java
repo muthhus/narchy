@@ -174,9 +174,9 @@ public class Node {
 
         int pos = buffer.position();
         int childStartOffset = pos + children.size() * Ints.BYTES;
-        for (Node child : children) {
+        for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
             buffer.putInt(pos, childStartOffset);
-            childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
+            childStartOffset = children.get(i).storeInByteBuffer(buffer, childStartOffset);
             pos += Ints.BYTES;
         }
 
@@ -189,5 +189,34 @@ public class Node {
             area *= (max[i] - min[i]);
         }
         return area;
+    }
+
+    /** returns the node which contained the entry, or null if not found */
+    public Node remove(float[] coord, int entry) {
+        if (contains(coord)) {
+
+            if (bmp.remove(entry)) {
+                for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
+                    Node r = children.get(i);
+                    if (r instanceof Point) {
+                        if (((Point)r).bitmap.get(entry)) {
+                            children.remove(i);
+                            childrenSize--;
+                            //enclose();
+                        }
+                    }
+                }
+                return this;
+            }
+
+            if (children!=null) {
+                for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
+                    Node r = children.get(i).remove(coord, entry);
+                    if (r != null)
+                        return r;
+                }
+            }
+        }
+        return null;
     }
 }

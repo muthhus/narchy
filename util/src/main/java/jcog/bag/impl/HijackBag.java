@@ -100,7 +100,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     @Override
-    public boolean setCapacity(int _newCapacity) {
+    public void setCapacity(int _newCapacity) {
 
         int newCapacity = Math.max(_newCapacity, reprobes);
 
@@ -132,10 +132,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             }
 
 
-            return true;
+            //return true;
         }
 
-        return false;
+        //return false;
     }
 
 

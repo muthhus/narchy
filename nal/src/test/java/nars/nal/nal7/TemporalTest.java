@@ -425,7 +425,7 @@ public class TemporalTest {
 
         //test merge after capacity shrink:
 
-        cc.beliefs().capacity(1, 1, n); //set to capacity=1 to force compression
+        cc.beliefs().capacity(1, 1); //set to capacity=1 to force compression
 
         cc.print();
 

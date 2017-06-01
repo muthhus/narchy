@@ -108,9 +108,9 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
      * returns whether the capacity has changed
      */
     @Override
-    public boolean setCapacity(int newCapacity) {
+    public void setCapacity(int newCapacity) {
         this.capacity = newCapacity;
-        return true;
+        //return true;
     }
 
 

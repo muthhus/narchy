@@ -47,6 +47,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         @Override
+        public void setCapacity(int c) {
+
+        }
+
+        @Override
         public void forEachTask(Consumer<? super Task> action) {
 
         }
@@ -76,7 +81,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         return new Task[grow(oldSize)];
     }
 
-    public void capacity(int c) {
+    public void setCapacity(int c) {
         if (this.capacity != c) {
 
             this.capacity = c;
@@ -433,7 +438,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         //1. clear the corresponding table, set capacity to one, and insert this task
         et.forEachTask(t -> removeTask(t, "Overridden"));
         et.clear();
-        et.capacity(1);
+        et.setCapacity(1);
 
 //        //2. clear the other table, set capcity to zero preventing temporal tasks
         //TODO

@@ -3,7 +3,6 @@ package nars.table;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
-import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
@@ -363,11 +362,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
 //        return x -> rankTemporalByConfidence(x, when, now, dur);
 //    }
-
-    @Override
-    public void capacity(int c, NAR nar) {
-        setCapacity(c);
-    }
 
     @Override
     protected boolean replace(Task incoming, Task existing) {

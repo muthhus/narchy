@@ -26,8 +26,10 @@ import java.util.List;
 /**
  */
 public class Point extends Node {
-    private final float[] coords;
-    private final MutableBitmap bitmap;
+
+    public final float[] coords;
+    public final MutableBitmap bitmap;
+
     public Point(float[] coords, int entry, BitmapFactory bitmapFactory) {
         super(
                 coords,
@@ -54,14 +56,6 @@ public class Point extends Node {
         MutableBitmap retVal = bitmapFactory.makeEmptyMutableBitmap();
         retVal.add(entry);
         return retVal;
-    }
-
-    public float[] getCoords() {
-        return coords;
-    }
-
-    public MutableBitmap getBmp() {
-        return bitmap;
     }
 
     @Override

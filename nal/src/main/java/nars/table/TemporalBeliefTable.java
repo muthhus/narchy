@@ -25,10 +25,9 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     Truth truth(long when, int dur, EternalTable eternal);
 
-    void capacity(int c, NAR nar);
-
     @Override
     void clear();
+
 
     @Override
     default Iterator<Task> iterator() {
@@ -39,6 +38,11 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {
+
+        }
+
+        @Override
+        public void setCapacity(int c) {
 
         }
 
@@ -79,13 +83,10 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public void capacity(int c, NAR nar) { /* N/A */ }
-
-
-        @Override
         public void clear() {
 
         }
     };
 
+    void setCapacity(int temporals);
 }

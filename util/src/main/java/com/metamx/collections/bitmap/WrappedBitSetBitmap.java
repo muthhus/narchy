@@ -121,8 +121,12 @@ public class WrappedBitSetBitmap extends WrappedImmutableBitSetBitmap implements
     }
 
     @Override
-    public void remove(int entry) {
-        this.bitmap.clear(entry);
+    public boolean remove(int entry) {
+        if (bitmap.get(entry)) {
+            this.bitmap.clear(entry);
+            return true;
+        }
+        return false;
     }
 
     @Override

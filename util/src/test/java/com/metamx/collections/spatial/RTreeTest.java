@@ -25,6 +25,10 @@ import org.junit.Test;
 
 import java.util.Random;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 /**
  */
 public class RTreeTest {
@@ -76,7 +80,26 @@ public class RTreeTest {
 
         Assert.assertEquals(R.root().children.size(), 3);
     }
+    @Test
+    public void testRemoval() {
+        R.insert(new float[]{1, 2}, 1);
+        R.insert(new float[]{3, 2}, 2);
+        R.insert(new float[]{1, 3}, 3);
 
+        Assert.assertEquals(3, R.root().children.size());
+
+        RTreeUtils.print(R);
+
+        assertTrue( R.remove(new float[]{1, 3}, 3) );
+
+        RTreeUtils.print(R);
+
+        Assert.assertEquals(2, R.root().children.size());
+        assertFalse(R.root().contains(new float[]{1, 3}));
+
+        assertEquals(2, R.root().max[1], 0.01f); //y coord = 2, not 3 (which was just removed)
+
+    }
 
 //    @Test
 //    public void testSplitOccurs() {
@@ -98,12 +121,5 @@ public class RTreeTest {
         Assert.assertTrue(R.root().children.size() > 1);
     }
 
-    @Test
-    public void testRemoval() {
-        testSplitOccursRoaring();
 
-        RTreeUtils.print(R);
-
-
-    }
 }

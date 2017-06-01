@@ -41,13 +41,13 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
     }
 
     @Override
-    public boolean setCapacity(int c) {
+    public void setCapacity(int c) {
         if (list == null || capacity()!=c) {
             this.list = new CircularArrayList<X>(c);
             this.pri = newTable();
-            return true;
+            //return true;
         }
-        return false;
+        //return false;
     }
 
 

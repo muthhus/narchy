@@ -296,7 +296,7 @@ public class Autoencoder {
 		return error;
 	}
 
-	float[] recode(float[] x, boolean sigmoidIn, boolean normalize, boolean sigmoidOut) {
+	public float[] recode(float[] x, boolean sigmoidIn, boolean normalize, boolean sigmoidOut) {
 		return decode(encode(x, y, sigmoidIn, normalize), sigmoidOut);
 	}
 

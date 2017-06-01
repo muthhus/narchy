@@ -48,14 +48,14 @@ public class RTreeUtils {
     public static double getExpansionCost(Node node, Point point) {
         Preconditions.checkArgument(node.dim() == point.dim());
 
-        if (node.contains(point.getCoords())) {
+        if (node.contains(point.coords)) {
             return 0;
         }
 
         double expanded = 1.0;
         for (int i = 0; i < node.dim(); i++) {
-            double min = Math.min(point.getCoords()[i], node.min[i]);
-            double max = Math.max(point.getCoords()[i], node.min[i]);
+            double min = Math.min(point.coords[i], node.min[i]);
+            double max = Math.max(point.coords[i], node.min[i]);
             expanded *= (max - min);
         }
 
@@ -120,8 +120,8 @@ public class RTreeUtils {
                         .printf(
                                 "%scoords: %s, conciseSet: %s%n",
                                 makeDashes(level),
-                                jsonMapper.writeValueAsString(point.getCoords()),
-                                point.getBmp()
+                                jsonMapper.writeValueAsString(point.coords),
+                                point.bitmap
                         );
             }
         } else {

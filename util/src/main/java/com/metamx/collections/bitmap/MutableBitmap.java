@@ -90,7 +90,7 @@ public interface MutableBitmap extends ImmutableBitmap {
      *
      * @param entry integer to be remove
      */
-    void remove(int entry);
+    boolean remove(int entry);
 
     /**
      * Write out a serialized (Immutable) version of the bitmap to the ByteBuffer. We preprend

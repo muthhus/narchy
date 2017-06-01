@@ -62,16 +62,16 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * returns whether the capacity has changed
      */
     @Override
-    public final boolean setCapacity(int newCapacity) {
+    public final void setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
             this.capacity = newCapacity;
             synchronized (items) {
                 if (this.size() > newCapacity)
                     commit(null, true);
             }
-            return true;
+            //return true;
         }
-        return false;
+        //return false;
     }
 
 

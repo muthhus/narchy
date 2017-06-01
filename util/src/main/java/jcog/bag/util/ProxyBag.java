@@ -89,8 +89,8 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
 
 
     @Override
-    public boolean setCapacity(int c) {
-        return bag.setCapacity(c);
+    public void setCapacity(int c) {
+        bag.setCapacity(c);
     }
 
     @Override

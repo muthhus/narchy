@@ -34,6 +34,7 @@ public class RoaringBitmapFactory implements BitmapFactory {
     static final boolean DEFAULT_COMPRESS_RUN_ON_SERIALIZATION = false;
 
     private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
+    public static final BitmapFactory DEFAULT = new RoaringBitmapFactory();
 
     static {
         try {

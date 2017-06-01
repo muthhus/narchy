@@ -53,9 +53,11 @@ public class ImmutableRTree {
         this.root = new ImmutableNode(dim, initPosition, 1 + Ints.BYTES, data, bitmapFactory);
     }
 
+    final static ImmutableRTree EMPTY = new ImmutableRTree();
+
     public static ImmutableRTree toImmutable(RTree rTree) {
         if (rTree.size() == 0) {
-            return new ImmutableRTree();
+            return EMPTY;
         }
 
         ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);

@@ -140,8 +140,8 @@ public class TaskConcept extends CompoundConcept {
 
     protected final void beliefCapacity(int be, int bt, int ge, int gt, NAR nar) {
 
-        beliefs().capacity(be, bt, nar);
-        goals().capacity(ge, gt, nar);
+        beliefs().capacity(be, bt);
+        goals().capacity(ge, gt);
 
     }
 

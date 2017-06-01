@@ -19,6 +19,7 @@ package com.metamx.collections.spatial;
 import com.google.common.base.Preconditions;
 import com.metamx.collections.bitmap.BitmapFactory;
 import com.metamx.collections.bitmap.MutableBitmap;
+import com.metamx.collections.bitmap.RoaringBitmapFactory;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
 
@@ -39,6 +40,12 @@ public class RTree {
 
     public RTree(BitmapFactory bmp) {
         this(0, new LinearGutmanSplitStrategy(0, 0, bmp), bmp);
+    }
+
+    public RTree(int dim) {
+        this(dim,
+            new LinearGutmanSplitStrategy(0, 4, RoaringBitmapFactory.DEFAULT),
+            RoaringBitmapFactory.DEFAULT);
     }
 
     public RTree(int dim, SplitStrategy split, BitmapFactory bmp) {
@@ -77,16 +84,6 @@ public class RTree {
         return insertInner(new Point(coords, entry));
     }
 
-    /**
-     * Not yet implemented.
-     *
-     * @param coords - the coordinates of the entry
-     * @param entry  - the integer to insert
-     * @return - whether the operation completed successfully
-     */
-    public boolean delete(double[] coords, int entry) {
-        throw new UnsupportedOperationException();
-    }
 
     public int size() {
         return size;
@@ -211,5 +208,20 @@ public class RTree {
         if (n.parent() != null && updateParent) {
             adjust(n.parent(), null);
         }
+    }
+
+    public boolean remove(float[] coord, int entry) {
+        Node contained = this.root().remove(coord, entry);
+        if (contained!=null) {
+            adjust(contained, null);
+            size--;
+            return true;
+        }
+        return false;
+    }
+
+    public void clear() {
+        root.clear();
+        size = 0;
     }
 }
