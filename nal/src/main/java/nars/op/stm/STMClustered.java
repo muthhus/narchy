@@ -240,7 +240,7 @@ public abstract class STMClustered extends STM {
 
         private TasksNode nearest() {
             synchronized (net) {
-                return net.learn(coord);
+                return net.put(coord);
             }
         }
 

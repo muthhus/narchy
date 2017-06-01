@@ -63,7 +63,7 @@ public class Dimensionaleyez extends SimpleSpatial {
             //history.addLast(da);
 
 
-            n.learn(x);
+            n.put(x);
         }
 
 

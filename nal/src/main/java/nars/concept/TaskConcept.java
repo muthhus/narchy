@@ -167,11 +167,9 @@ public class TaskConcept extends CompoundConcept {
 
 
     /**
-     * Directly process a new task. Called exactly once on each task. Using
-     * local information and finishing in a constant time. Provide feedback in
-     * the taskBudget value of the task.
+     * Directly process a new task, if belief tables agree to store it.
+     * Called exactly once on each task.
      */
-    @Nullable
     public final void process(@NotNull Task t, @NotNull NAR n) {
         switch (t.punc()) {
             case BELIEF:

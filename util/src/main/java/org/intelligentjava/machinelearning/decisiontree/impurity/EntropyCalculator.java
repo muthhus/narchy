@@ -20,7 +20,7 @@ public class EntropyCalculator implements ImpurityCalculator {
      * {@inheritDoc}
      */
     @Override
-    public <K, V> double calculateImpurity(K value, List<Function<K, V>> splitData) {
+    public <K, V> double impurity(K value, List<Function<K, V>> splitData) {
         List<V> labels = splitData.stream().map((x) -> x.apply(value)).distinct().collect(Collectors.toList());
         if (labels.size() > 1) {
             double p = ImpurityCalculator.getEmpiricalProbability(value, splitData, labels.get(0), labels.get(1)); // TODO fix to multiple labels

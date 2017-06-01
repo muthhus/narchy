@@ -13,9 +13,7 @@ import static java.util.Arrays.asList;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.classification;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.data;
 import static org.intelligentjava.machinelearning.decisiontree.feature.PredicateFeature.feature;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DecisionTreeTrainingTest {
 
@@ -51,9 +49,9 @@ public class DecisionTreeTrainingTest {
         Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
         Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
-        tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
+        tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        DecisionTree.Node<Object> root = tree.root();
+        DecisionTree.Node root = tree.root();
 
         assertEquals("x1 = true", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
@@ -99,9 +97,9 @@ public class DecisionTreeTrainingTest {
         Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
         Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
-        tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
+        tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        DecisionTree.Node<Object> root = tree.root();
+        DecisionTree.Node root = tree.root();
         assertEquals("x1 = true", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
 
@@ -146,10 +144,10 @@ public class DecisionTreeTrainingTest {
         Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
         Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
-        tree.learn("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
+        tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
         tree.print();
 
-        DecisionTree.Node<Object> root = tree.root();
+        DecisionTree.Node root = tree.root();
         assertEquals("x1 = true", root.toString()); // root node x1 = true split
         assertNull(root.label); // not leaf node
 
@@ -174,7 +172,7 @@ public class DecisionTreeTrainingTest {
         DecisionTree<String, Integer> tree = new DecisionTree();
         String[] header = {"x1", "answer"};
 
-        tree.learn(
+        tree.put(
                 "answer",
                 asList(
                         data(header, 1, BooleanLabel.FALSE_LABEL),
@@ -189,7 +187,7 @@ public class DecisionTreeTrainingTest {
 
         tree.print();
 
-        DecisionTree.Node<Integer> root = tree.root();
+        DecisionTree.Node root = tree.root();
         assertEquals("x1 > 2", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
 
@@ -223,7 +221,7 @@ public class DecisionTreeTrainingTest {
         Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
         Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
 
-        tree.learn("answer",
+        tree.put("answer",
                 asList(data1, data2, data3, data4),
                 asList(feature1, feature2, feature3, feature4));
 
@@ -268,7 +266,7 @@ public class DecisionTreeTrainingTest {
         t.add(2, 1, 1);
         t.add(5, 1, 0);
         t.add(5, 0, 1);
-        t.learn(1);
+        t.learn(2);
         t.print();
     }
 

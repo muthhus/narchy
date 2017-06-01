@@ -54,7 +54,7 @@ public class VectorMapTest {
                 if (d == null)
                     d = new Autoencoder(in.length, out.length, n.random());
 
-                d.learn(in, 0, 0.05f, 0, true);
+                d.put(in, 0, 0.05f, 0, true);
                 d.encode(in, out, true, true);
             }
         };

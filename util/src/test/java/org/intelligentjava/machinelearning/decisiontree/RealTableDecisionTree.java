@@ -3,10 +3,8 @@ package org.intelligentjava.machinelearning.decisiontree;
 import jcog.learn.gng.Gasolinear;
 import jcog.list.FasterList;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -31,7 +29,7 @@ public class RealTableDecisionTree extends DecisionTree<Integer, Float> {
         }
 
         public void learn(float x) {
-            discretizer.learn(x);
+            discretizer.put(x);
         }
 
         public Stream<Predicate<Function<Integer,Float>>> classifiers() {
@@ -50,7 +48,7 @@ public class RealTableDecisionTree extends DecisionTree<Integer, Float> {
 
             @Override
             public String toString() {
-                return "col(" + num + ")~" + discretizer.node[v].getEntry(0);
+                return "col(" + name + ")~" + discretizer.node[v].getEntry(0);
             }
 
             @Override
@@ -76,18 +74,22 @@ public class RealTableDecisionTree extends DecisionTree<Integer, Float> {
         rows.add(row);
     }
 
-    public void learn(int value) {
+    public void learn(int column) {
+        learn(rows.stream(), column);
+    }
 
-        List<Predicate<Function<Integer, Float>>> classifiers = cols.stream().
-                filter(x -> x.num!=value).
+    void learn(Stream<float[]> rows, int column) {
+
+        //System.out.println(classifiers);
+
+        put(column, rows.map((r)->(Function<Integer,Float>)(i -> r[i])).collect(toList()),
+
+            //the classifiers from every non-target column
+            cols.stream().
+                filter(x -> x.num!=column).
                 flatMap(NumericFeature::classifiers).
-                collect(toList());
-
-        System.out.println(classifiers);
-
-        learn(value,
-                rows.stream().map((r)->(Function<Integer,Float>)(i -> r[i])).collect(toList()),
-                classifiers);
+                collect(toList())
+        );
     }
 
 

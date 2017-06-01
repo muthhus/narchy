@@ -72,9 +72,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
 
     public NeuralGasNet(int dimension, int maxNodes) {
-
         super();
-
 
         this.e =
                 new SemiDenseIntUndirectedGraph((short) maxNodes);
@@ -146,7 +144,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         }
     }
 
-    public N learn(double... x) {
+    public N put(double... x) {
 
         //find closest nodes
         double minDist = Double.POSITIVE_INFINITY;

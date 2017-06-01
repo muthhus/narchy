@@ -25,7 +25,7 @@ public interface ImpurityCalculator {
      * @param splitData Data subset on which impurity is calculated.
      * @return Impurity.
      */
-    <K, V> double calculateImpurity(K value, List<Function<K, V>> splitData);
+    <K, V> double impurity(K value, List<Function<K, V>> splitData);
 
 
     /**

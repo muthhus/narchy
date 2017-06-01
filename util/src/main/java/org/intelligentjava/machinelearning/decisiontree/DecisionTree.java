@@ -1,7 +1,5 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import jcog.list.FasterList;
 
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
@@ -16,6 +14,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -50,7 +49,7 @@ public class DecisionTree<K, V> {
     /**
      * Root node.
      */
-    private Node<V> root;
+    private Node root;
 
     protected V label(K value, List<Function<K, V>> data) {
         return label(value, data, homogenityPercentage);
@@ -75,7 +74,7 @@ public class DecisionTree<K, V> {
     /**
      * Get root.
      */
-    public Node<V> root() {
+    public Node root() {
         return root;
     }
 
@@ -86,8 +85,8 @@ public class DecisionTree<K, V> {
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public void learn(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features) {
-        root = learn(value, trainingData, features, 1);
+    public void put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features) {
+        root = put(value, trainingData, features, 1);
     }
 
 
@@ -97,12 +96,12 @@ public class DecisionTree<K, V> {
      * @param data Data to by split by this feature.
      * @return Sublists of split data samples.
      */
-    static <K, V> List<List<Function<K, V>>> split(Predicate<Function<K, V>> p, Collection<Function<K, V>> data) {
+    static <K, V> Stream<List<Function<K, V>>> split(Predicate<Function<K, V>> p, Collection<Function<K, V>> data) {
         // TODO:  maybe use sublist streams instead of creating new list just track indexes
         // http://stackoverflow.com/questions/22917270/how-to-get-a-range-of-items-from-stream-using-java-8-lambda
         Map<Boolean, List<Function<K, V>>> split = data.stream().collect(partitioningBy(p::test));
 
-        return Lists.newArrayList(split.get(true), split.get(false));
+        return Stream.of(split.get(true), split.get(false));
     }
 
     /**
@@ -112,7 +111,7 @@ public class DecisionTree<K, V> {
      * @param features     List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node<V> learn(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth) {
+    protected Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth) {
 
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
         V currentNodeLabel;
@@ -134,7 +133,7 @@ public class DecisionTree<K, V> {
         // else grow tree further recursively
 
         //log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
-        return split(split, trainingData).stream().map(
+        return split(split, trainingData).map(
 
                 subsetTrainingData -> subsetTrainingData.isEmpty() ?
 
@@ -142,8 +141,8 @@ public class DecisionTree<K, V> {
 
                         :
 
-                    learn(value, subsetTrainingData,
-                            new FasterList<>(Iterables.filter(features, p -> !p.equals(split)), fs - 1),
+                    put(value, subsetTrainingData,
+                            new FasterList<>(()->(features.stream().filter(p -> !p.equals(split)).iterator()), fs - 1),
                         currentDepth + 1))
 
                 .collect(Collectors.toCollection(()->Node.feature(split)));
@@ -156,12 +155,12 @@ public class DecisionTree<K, V> {
      * @return Return label of class.
      */
     public V classify(Function<K, V> value) {
-        Node<V> node = root;
+        Node node = root;
         while (!node.isLeaf()) { // go through tree until leaf is reached
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
             node = node.get(node.feature.test(value) ? 0 : 1);
         }
-        return node.label;
+        return (V) node.label;
     }
 
     /**
@@ -176,7 +175,7 @@ public class DecisionTree<K, V> {
             // totalSplitImpurity = sum(singleLeafImpurities) / nbOfLeafs
             // in other words splitImpurity is average of leaf impurities
             double calculatedSplitImpurity =
-                    split(feature, data).stream().filter(list -> !list.isEmpty()).mapToDouble(splitData -> impurityCalculator.calculateImpurity(value, splitData)).average().orElse(Double.POSITIVE_INFINITY);
+                    split(feature, data).filter(list -> !list.isEmpty()).mapToDouble(splitData -> impurityCalculator.impurity(value, splitData)).average().orElse(Double.POSITIVE_INFINITY);
             if (calculatedSplitImpurity < currentImpurity) {
                 currentImpurity = calculatedSplitImpurity;
                 bestSplitFeature = feature;
@@ -205,7 +204,7 @@ public class DecisionTree<K, V> {
         printSubtree(root, o);
     }
 
-    private void printSubtree(Node<V> node, PrintStream o) {
+    private void printSubtree(Node node, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, "", o);
         }
@@ -215,12 +214,12 @@ public class DecisionTree<K, V> {
         }
     }
 
-    private static <V> void print(Node<V> node, PrintStream o) {
+    private static <V> void print(Node node, PrintStream o) {
         o.print(node);
         o.println();
     }
 
-    private static <K, V> void print(Node<V> node, boolean isRight, K indent, PrintStream o) {
+    private static <K, V> void print(Node node, boolean isRight, K indent, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, indent + (isRight ? "        " : " |      "), o);
         }
@@ -237,7 +236,7 @@ public class DecisionTree<K, V> {
         }
     }
 
-    static class Node<L> extends FasterList<Node<L>> {
+    static class Node extends FasterList<Node> {
 
 
         /**
@@ -245,7 +244,7 @@ public class DecisionTree<K, V> {
          */
         public final Predicate feature;
 
-        public final L label;
+        public final Object label;
 
         Node(Predicate feature) {
             super();
@@ -253,18 +252,18 @@ public class DecisionTree<K, V> {
             this.label = null;
         }
 
-        private Node(Predicate feature, L label) {
+        private Node(Predicate feature, Object label) {
             super();
             this.label = label;
             this.feature = feature;
         }
 
-        public static <V> Node<V> feature(Predicate feature) {
-            return new Node<>(feature);
+        public static Node feature(Predicate feature) {
+            return new Node(feature);
         }
 
-        public static <L> Node<L> leaf(L label) {
-            return new Node<>(null, label);
+        public static  Node leaf(Object label) {
+            return new Node(null, label);
         }
 
         public boolean isLeaf() {

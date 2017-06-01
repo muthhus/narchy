@@ -1,13 +1,13 @@
 package org.intelligentjava.machinelearning.decisiontree.impurity;
 
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import org.intelligentjava.machinelearning.decisiontree.data.SimpleValue;
 import org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.function.Function;
 
 public class ImpurityCalculatorTest {
 

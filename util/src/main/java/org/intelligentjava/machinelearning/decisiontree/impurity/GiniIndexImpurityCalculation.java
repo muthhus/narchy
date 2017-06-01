@@ -17,7 +17,7 @@ public class GiniIndexImpurityCalculation implements ImpurityCalculator {
      * {@inheritDoc}
      */
     @Override
-    public <K, V> double calculateImpurity(K value, List<Function<K , V>> splitData) {
+    public <K, V> double impurity(K value, List<Function<K , V>> splitData) {
         List<V> labels = splitData.stream().map((x)->x.apply(value)).distinct().collect(Collectors.toList());
         int s = labels.size();
         if (s > 1) {

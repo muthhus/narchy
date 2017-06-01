@@ -1,13 +1,8 @@
 package jcog.learn.gng;
 
-import com.google.common.collect.Lists;
 import com.google.common.primitives.Doubles;
-import jcog.data.array.Arrays;
 import jcog.learn.gng.impl.Node;
-import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /** convenience class for discretizing points in a 1D (linear) space
  *  with growing neural gasnet
@@ -44,19 +39,19 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
         Gasolinear g = new Gasolinear(nodes, min, max);
         g.setWinnerUpdateRate(4f/points.length, 0.05f/points.length);
         for (double x : points)
-            g.learn(x);
+            g.put(x);
         return g;
     }
 
     public int which(double x) {
         if (needsSort)
             sort();
-        return learn(x).order;
+        return put(x).order;
     }
 
     @Override
-    public Sorted1DNode learn(double... x) {
-        Sorted1DNode y = super.learn(x);
+    public Sorted1DNode put(double... x) {
+        Sorted1DNode y = super.put(x);
         needsSort = true;
         return y;
     }

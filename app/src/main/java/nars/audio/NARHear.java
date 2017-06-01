@@ -55,7 +55,7 @@ public class NARHear extends NAgent {
 
         Autoencoder ae = new Autoencoder(au.data.length, 16, new XorShift128PlusRandom(1));
         nar.onCycle(f->{
-            ae.learn(au.data, 0.15f, 0.01f, 0.1f, true, true, true);
+            ae.put(au.data, 0.15f, 0.01f, 0.1f, true, true, true);
         });
 
         SpaceGraph.window(

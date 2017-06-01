@@ -26,7 +26,7 @@ public class AutoencoderTest {
         // train
         for (int epoch = 0; epoch < training_epochs; epoch++) {
             for (int i = 0; i < train_N; i++) {
-                da.learn(train_X[i], learning_rate, 0, corruption_level, false);
+                da.put(train_X[i], learning_rate, 0, corruption_level, false);
             }
         }
 

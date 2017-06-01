@@ -1,15 +1,14 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
-import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.FALSE_LABEL;
-import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.TRUE_LABEL;
+import com.google.common.collect.Lists;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.function.Function;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.Lists;
+import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.FALSE_LABEL;
+import static org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel.TRUE_LABEL;
 
 public class DecisionTreeGetMajorityLabelTest {
     
