@@ -47,8 +47,6 @@ public class Dimensionaleyez extends SimpleSpatial {
             //System.out.println(k + " " + v);
             accept(k, v);
         });
-
-
     }
 
     @Override

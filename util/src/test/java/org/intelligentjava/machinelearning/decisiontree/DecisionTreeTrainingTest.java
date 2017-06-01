@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.classification;
 import static org.intelligentjava.machinelearning.decisiontree.data.SimpleValue.data;
 import static org.intelligentjava.machinelearning.decisiontree.feature.PredicateFeature.feature;
@@ -148,23 +149,11 @@ public class DecisionTreeTrainingTest {
         tree.print();
 
         DecisionTree.Node root = tree.root();
-        assertEquals("x1 = true", root.toString()); // root node x1 = true split
+        assertEquals("x2 = true", root.toString()); // root node x1 = true split
         assertNull(root.label); // not leaf node
 
-        assertEquals("x2 = true", root.get(0).toString());
-        assertEquals(null, root.get(0).label);
-        assertTrue(root.get(1).get(0).isLeaf()); // leaf
-        assertEquals(BooleanLabel.FALSE_LABEL, root.get(0).get(0).label);
-        assertTrue(root.get(1).get(0).isLeaf()); // leaf
-        assertEquals(BooleanLabel.TRUE_LABEL, root.get(0).get(1).label);
-
-        assertEquals("x2 = true", root.get(1).toString());
-        assertEquals(null, root.get(1).label);
-        assertTrue(root.get(1).get(0).isLeaf());
-        assertEquals(BooleanLabel.TRUE_LABEL, root.get(1).get(0).label);
-        assertTrue(root.get(1).get(1).isLeaf());
-        assertEquals(BooleanLabel.FALSE_LABEL, root.get(1).get(1).label);
-
+        assertEquals("false", root.get(0).toString());
+        assertEquals("true", root.get(1).toString());
     }
 
     @Test
@@ -260,14 +249,18 @@ public class DecisionTreeTrainingTest {
 //
 
     @Test public void testRealDecisionTable() {
-        RealDecisionTree t = new RealDecisionTree(2, "a", "b", "x").rangeLabels("LO", "HI");
+        RealDecisionTree t = new RealDecisionTree(2, 5,"a", "b", "x").rangeLabels("LO", "HI");
         t.add(1, 1, 0);
         t.add(1, 0, 1);
         t.add(2, 1, 1);
         t.add(5, 1, 0);
         t.add(5, 0, 1);
-        t.put(2);
+        t.update(2);
         t.print();
+
+        assertEquals("[1.0, 0.0]",
+                t.leaves().collect(toList()).toString());
+
     }
 
 

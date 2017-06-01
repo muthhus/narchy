@@ -15,6 +15,7 @@ import nars.nar.Default;
 import nars.test.agent.Line1DSimplest;
 import nars.util.exe.TaskExecutor;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
@@ -23,7 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import static java.lang.Math.PI;
-import static jcog.Texts.n4;
+import static java.util.stream.Collectors.toList;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -39,8 +40,9 @@ public class Line1D {
         Line1DSimplest a = new Line1DSimplest(n);
         a.init();
 
-        float freq = 1 / 500f;
-        float speed = 0.1f;
+        int runtime = 1000;
+        float freq = 1 / 100f;
+        float speed = 0.05f;
         a.speed.setValue(speed);
 
         a.out.resolution.setValue(speed * 1);
@@ -69,7 +71,6 @@ public class Line1D {
             //Util.pause(1);
         });
 
-        int runtime = 1500;
 
         a.runCycles(runtime);
 
@@ -84,8 +85,8 @@ public class Line1D {
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 15;
-            int repeats = 5;
+            int maxIterations = 3000;
+            int repeats = 3;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
@@ -93,20 +94,28 @@ public class Line1D {
 
                 n.time.dur(1);
 
-                n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-                n.DEFAULT_GOAL_PRIORITY = 0.75f;
-                n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+                n.DEFAULT_BELIEF_PRIORITY = 1f;
+                n.DEFAULT_GOAL_PRIORITY = 1f;
+                n.DEFAULT_QUESTION_PRIORITY = 0.5f;
                 n.DEFAULT_QUEST_PRIORITY = 0.5f;
 
                 return n;
-            }).tweak("beliefConf", 0.01f, 0.99f, 0.01f, (y, x) -> {
+            }).tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.beliefConfidence(y);
-            }).tweak("goalConf", 0.01f, 0.99f, 0.01f, (y, x) -> {
+            }).tweak("goalConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.goalConfidence(y);
-            }).tweak("termVolMax", 5, 30, 2, (y, x) -> {
+            }).tweak("termVolMax", 8, 14, 1, (y, x) -> {
                 x.termVolumeMax.setValue(y);
-            }).tweak("exeRate", 0.01f, 1f, 0.01f, (y, x) -> {
+            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
+            }).tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
+                x.in.streams.values().forEach(s -> s.setValue(y));
+            }).tweak("stmSize", 1, 2, 1, (y,x)->{
+                ((Default)x).stmLinkage.capacity.setValue(y);
+            }).tweak("confMin", 0, 0.8f, 0.01f, (y,x)->{
+                x.confMin.setValue(y);
+            }).tweak("truthResolution", 0, 0.2f, 0.02f, (y,x)->{
+                x.truthResolution.setValue(y);
             });
 
 
@@ -114,7 +123,16 @@ public class Line1D {
 
             r.print();
 
-            r.predict();
+            RealDecisionTree t = r.predict(4, o.tweaks.size()*2);
+            t.print();
+
+//            float predictedScore = t.get(0, 1, 0, 1, Float.NaN);
+//            System.out.println(predictedScore);
+
+            //t.root().recurse().forEach(x -> System.out.println(x));
+
+//            System.out.println(t.leaves().collect(toList()));
+
 
         }
 
@@ -133,8 +151,8 @@ public class Line1D {
                 Line1DSimplest a = new Line1DSimplest(n);
                 a.init();
 
-                float freq = 1 / 10f;
-                float speed = 0.2f;
+                float freq = 1 / 50f;
+                float speed = 0.05f;
                 a.speed.setValue(speed);
 
                 a.out.resolution.setValue(speed * 1);
@@ -163,8 +181,7 @@ public class Line1D {
                     //Util.pause(1);
                 });
 
-                int runtime = 10000;
-
+                int runtime = 3000;
 
 
                 new Thread(() -> {
@@ -192,7 +209,7 @@ public class Line1D {
                             , 900, 900);
 
                 }).start();
-                                a.runCycles(runtime);
+                a.runCycles(runtime);
 
             }
 

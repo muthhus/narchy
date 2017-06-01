@@ -40,10 +40,7 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
     /* default: i >= 1
      * gradually reduces pressure on leaf precision
      */
-    final static IntToFloatFunction depthToPrecision = (i) -> {
-        float p = (0.9f / (1 + (i-1)/4f)) * 0.5f + 0.5f;
-        return p;
-    };
+    final IntToFloatFunction depthToPrecision;
 
     class NumFeature {
 
@@ -99,11 +96,17 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
 
 
 
-    public RealDecisionTree(int discretization, @NotNull String... cols) {
+    public RealDecisionTree(int discretization, int maxDepth, @NotNull String... cols) {
         super();
 
         assert(discretization>1);
         assert(cols.length > 1);
+        maxDepth(maxDepth);
+
+        depthToPrecision = (i) -> {
+            float p = (0.9f / (1 + (i-1)/((float)maxDepth)));
+            return p;
+        };
 
         this.cols = IntStream.range(0, cols.length).mapToObj(x -> new NumFeature(x, cols[x], discretization))
                 .toArray(NumFeature[]::new);
@@ -138,7 +141,7 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
         rows.add(row);
     }
 
-    public void put(int column) {
+    public void update(int column) {
         put(rows.stream(), column);
     }
 
@@ -153,7 +156,8 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
                 filter(x -> x.num!=column).
                 flatMap(f -> f.classifiers(rangeLabels)).
                 collect(toList()),
-                depthToPrecision
+
+            depthToPrecision
         );
     }
 

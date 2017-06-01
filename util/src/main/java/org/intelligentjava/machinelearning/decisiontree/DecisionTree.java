@@ -1,16 +1,17 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
+import com.google.common.collect.Streams;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
 import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -35,7 +36,8 @@ public class DecisionTree<K, V> {
     /**
      * Logger.
      */
-    private static final Logger log = LoggerFactory.getLogger(DecisionTree.class);
+    //private static final Logger log = LoggerFactory.getLogger(DecisionTree.class);
+
     /**
      * Impurity calculation method.
      */
@@ -44,15 +46,19 @@ public class DecisionTree<K, V> {
      * Max depth parameter. Growth of the tree is stopped once this depth is reached. Limiting depth of the tree can
      * help with overfitting, however if depth will be set too low tree will not be acurate.
      */
-    private static final int maxDepth = 15;
+    private int maxDepth = 15;
     /**
      * Root node.
      */
     private Node root;
 
-//    protected static <K,V> V label(K value, Collection<Function<K, V>> data) {
+    //    protected static <K,V> V label(K value, Collection<Function<K, V>> data) {
 //        return DecisionTree.label(value, data, DEFAULT_PRECISION);
 //    }
+    public DecisionTree maxDepth(int d) {
+        this.maxDepth = d;
+        return this;
+    }
 
     /**
      * Returns Label if data is homogeneous.
@@ -77,6 +83,10 @@ public class DecisionTree<K, V> {
         return root;
     }
 
+    public Stream<Node> leaves() {
+        return root != null ? root.recurse().filter(Node::isLeaf).distinct() : Stream.empty();
+    }
+
     /**
      * Trains tree on training data for provided features.
      *
@@ -88,11 +98,16 @@ public class DecisionTree<K, V> {
         root = put(value, trainingData, features, 1, precision);
     }
 
-    /** constant precision */
+    /**
+     * constant precision
+     */
     public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, float precision) {
         put(value, data, features, (depth) -> precision);
     }
-    /** default constant precision */
+
+    /**
+     * default constant precision
+     */
     public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features) {
         put(value, data, features, DEFAULT_PRECISION);
     }
@@ -105,6 +120,7 @@ public class DecisionTree<K, V> {
      */
     static <K, V> Stream<List<Function<K, V>>> split(Predicate<Function<K, V>> p, Collection<Function<K, V>> data) {
         // TODO:  maybe use sublist streams instead of creating new list just track indexes
+        //  TODO maybe with bitset, Pair<sublist stream, bitset>
         // http://stackoverflow.com/questions/22917270/how-to-get-a-range-of-items-from-stream-using-java-8-lambda
         Map<Boolean, List<Function<K, V>>> split = data.stream().collect(partitioningBy(p::test));
 
@@ -114,25 +130,25 @@ public class DecisionTree<K, V> {
     /**
      * Grow tree during training by splitting data recusively on best feature.
      *
-     * @param trainingData List of training data samples.
+     * @param data List of training data samples.
      * @param features     List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth, IntToFloatFunction depthToPrecision) {
+    protected Node put(K key, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, int currentDepth, IntToFloatFunction depthToPrecision) {
 
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
         V currentNodeLabel;
-        if ((currentNodeLabel = label(value, trainingData, depthToPrecision.valueOf(currentDepth))) != null) {
+        if ((currentNodeLabel = label(key, data, depthToPrecision.valueOf(currentDepth))) != null) {
             return leaf(currentNodeLabel); //log.debug("New leaf is created because data is homogeneous: {}", currentNodeLabel.name());
         }
 
         int fs = features.size();
         boolean stoppingCriteriaReached = (fs == 0) || currentDepth >= maxDepth;
         if (stoppingCriteriaReached) {
-            return leaf(majority(value, trainingData)); //log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
+            return leaf(majority(key, data)); //log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
         }
 
-        Predicate<Function<K, V>> split = bestSplit(value, trainingData, features); // get best set of literals
+        Predicate<Function<K, V>> split = bestSplit(key, data, features); // get best set of literals
         //log.debug("Best split found: {}", bestSplit.toString());
 
         // add children to current node according to split
@@ -140,22 +156,25 @@ public class DecisionTree<K, V> {
         // else grow tree further recursively
 
         //log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
-        return split(split, trainingData).map(
+        Node branch = split(split, data).map(
 
                 subsetTrainingData -> subsetTrainingData.isEmpty() ?
 
-                        leaf(majority(value, trainingData))
+                        leaf(majority(key, data))
 
                         :
 
-                        put(value, subsetTrainingData,
-                                new FasterList<>(() -> (
-                                        features.stream().filter(p -> !p.equals(split)).iterator()), fs - 1),
+                        put(key, subsetTrainingData,
+                                new FasterList<>(() ->
+                                        features.stream().filter(p -> !p.equals(split)).iterator(), fs - 1),
                                 currentDepth + 1,
                                 depthToPrecision
                         ))
 
                 .collect(Collectors.toCollection(() -> Node.feature(split)));
+
+        return (branch.size() == 1) ? branch.get(0) : branch;
+
     }
 
     /**
@@ -246,7 +265,7 @@ public class DecisionTree<K, V> {
         }
     }
 
-    static class Node extends FasterList<Node> {
+    public static class Node extends FasterList<Node> implements Comparable {
 
 
         /**
@@ -255,17 +274,34 @@ public class DecisionTree<K, V> {
         public final Predicate feature;
 
         public final Object label;
+        private final int hash;
 
         Node(Predicate feature) {
-            super();
-            this.feature = feature;
-            this.label = null;
+            this(feature, null);
         }
 
         private Node(Predicate feature, Object label) {
             super();
             this.label = label;
             this.feature = feature;
+            this.hash = Objects.hash(label, feature);
+        }
+
+        @Override
+        public boolean add(Node newItem) {
+            if (contains(newItem))
+                return false; //err
+            return super.add(newItem);
+        }
+
+        @Override
+        public void add(int index, Node element) {
+            super.add(index, element);
+        }
+
+        public Stream<Node> recurse() {
+            return Stream.concat(Stream.of(this), isEmpty() ? Stream.empty() :
+                    Streams.concat(stream().map(Node::recurse).toArray(Stream[]::new)));
         }
 
         public static Node feature(Predicate feature) {
@@ -273,16 +309,61 @@ public class DecisionTree<K, V> {
         }
 
         public static Node leaf(Object label) {
-            return new Node(null, label);
+            return new LeafNode(label);
         }
 
         public boolean isLeaf() {
-            return label != null;
+            return feature == null || isEmpty();
         }
 
         public String toString() {
             return feature != null ? feature.toString() : label.toString();
         }
 
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object that) {
+            if (this == that) return true;
+            else {
+                if (feature != null)
+                    if (!feature.equals(((Node) that).feature))
+                        return false;
+                return Objects.equals(label, (((Node) that).label));
+            }
+        }
+
+        @Override
+        public int compareTo(@NotNull Object o) {
+            if (o == this) return 0;
+            Node n = (Node) o;
+            if (feature != null) {
+                int f = Integer.compare(feature.hashCode(), n.feature.hashCode());
+                if (f != 0)
+                    return f;
+            }
+            return ((Comparable) label).compareTo(n.label);
+        }
+
+        private static class LeafNode extends Node {
+            public LeafNode(Object label) {
+                super(null, label);
+            }
+
+            //override other modifying methods
+
+            @Override
+            public boolean add(Node newItem) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void add(int index, Node element) {
+                throw new UnsupportedOperationException();
+            }
+        }
     }
 }

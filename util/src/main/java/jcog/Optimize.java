@@ -3,6 +3,7 @@ package jcog;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import jcog.list.FasterList;
+import jcog.math.ParallelCMAESOptimizer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -33,7 +34,7 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 public class Optimize<X> {
     final Supplier<X> subject;
 
-    final List<Tweak<X>> tweaks = new ArrayList();
+    public final List<Tweak<X>> tweaks = new ArrayList();
     private final boolean trace = true;
     private final static Logger logger = LoggerFactory.getLogger(Optimize.class);
 
@@ -117,6 +118,8 @@ public class Optimize<X> {
 
         List<DoubleObjectPair<double[]>> experiments = new FasterList();
 
+
+
         ObjectiveFunction func = new ObjectiveFunction(point -> {
 
 
@@ -143,15 +146,18 @@ public class Optimize<X> {
         });
 
 
-        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, 0, true, 0,
+        ParallelCMAESOptimizer optim = new ParallelCMAESOptimizer(maxIterations, 0, true, 0,
                 0, new MersenneTwister(3), true, null);
+
+        startExperiments();
+
         PointValuePair r = optim.optimize(new MaxEval(maxIterations),
                 func,
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new CMAESOptimizer.Sigma(MathArrays.scale(2, inc)),
-                new CMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
+                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+                new ParallelCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
 
 
 //        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
@@ -176,8 +182,11 @@ public class Optimize<X> {
 
     }
 
-    protected void onExperiment(double[] point, double score) {
+    private void startExperiments() {
         System.out.println(Joiner.on(",").join(tweaks) + ",score");
+    }
+
+    protected void onExperiment(double[] point, double score) {
     }
 
     /**
@@ -213,15 +222,16 @@ public class Optimize<X> {
 
         }
 
-        public void predict() {
+        public RealDecisionTree predict(int discretization, int maxDepth) {
             if (experiments.isEmpty())
-                return;
+                return null;
 
 
             int cols = tweaks.size() + 1;
-            RealDecisionTree rt = new RealDecisionTree(3,
+            RealDecisionTree rt = new RealDecisionTree(discretization, maxDepth,
                     ArrayUtils.add(
                             tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score"));
+
             for (DoubleObjectPair<double[]> exp : experiments) {
                 float[] r = new float[cols];
                 int i = 0;
@@ -232,11 +242,9 @@ public class Optimize<X> {
                 rt.add(r);
             }
 
-            rt.put(cols-1 /* score */);
-            rt.print();
+            rt.update(cols-1 /* score */);
 
-            float predictedScore = rt.get(0, 1, 0, 1, Float.NaN);
-            System.out.println(predictedScore);
+            return rt;
 
         }
     }
