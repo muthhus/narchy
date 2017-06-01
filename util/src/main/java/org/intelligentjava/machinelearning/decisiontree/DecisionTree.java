@@ -1,7 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import jcog.list.FasterList;
-
+import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
 import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculator;
 import org.slf4j.Logger;
@@ -16,9 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.partitioningBy;
+import static java.util.stream.Collectors.*;
 import static org.intelligentjava.machinelearning.decisiontree.DecisionTree.Node.leaf;
 
 /**
@@ -32,7 +30,8 @@ public class DecisionTree<K, V> {
      * When data is considered homogeneous and node becomes leaf and is labeled. If it is equal 1.0 then absolutely all
      * data must be of the same label that node would be considered a leaf.
      */
-    public static final double homogenityPercentage = 0.90;
+    public static final float DEFAULT_PRECISION = 0.90f;
+
     /**
      * Logger.
      */
@@ -51,16 +50,16 @@ public class DecisionTree<K, V> {
      */
     private Node root;
 
-    protected V label(K value, List<Function<K, V>> data) {
-        return label(value, data, homogenityPercentage);
-    }
+//    protected static <K,V> V label(K value, Collection<Function<K, V>> data) {
+//        return DecisionTree.label(value, data, DEFAULT_PRECISION);
+//    }
 
     /**
      * Returns Label if data is homogeneous.
      */
-    protected static <K, V> V label(K value, Collection<Function<K, V>> data, double homogenityPercentage) {
+    protected static <K, V> V label(K value, Collection<Function<K, V>> data, float homogenityPercentage) {
         // group by to map <Label, count>
-        Map<V, Long> labelCount = data.stream().collect(groupingBy((x)->x.apply(value), counting()));
+        Map<V, Long> labelCount = data.stream().collect(groupingBy((x) -> x.apply(value), counting()));
         long totalCount = data.size();
         for (Map.Entry<V, Long> e : labelCount.entrySet()) {
             long nbOfLabels = e.getValue();
@@ -85,10 +84,18 @@ public class DecisionTree<K, V> {
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public void put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features) {
-        root = put(value, trainingData, features, 1);
+    public void put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, IntToFloatFunction precision) {
+        root = put(value, trainingData, features, 1, precision);
     }
 
+    /** constant precision */
+    public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, float precision) {
+        put(value, data, features, (depth) -> precision);
+    }
+    /** default constant precision */
+    public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features) {
+        put(value, data, features, DEFAULT_PRECISION);
+    }
 
     /**
      * Split data according to if it has this feature.
@@ -111,16 +118,16 @@ public class DecisionTree<K, V> {
      * @param features     List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth) {
+    protected Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, int currentDepth, IntToFloatFunction depthToPrecision) {
 
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
         V currentNodeLabel;
-        if ((currentNodeLabel = label(value, trainingData, homogenityPercentage)) != null) {
+        if ((currentNodeLabel = label(value, trainingData, depthToPrecision.valueOf(currentDepth))) != null) {
             return leaf(currentNodeLabel); //log.debug("New leaf is created because data is homogeneous: {}", currentNodeLabel.name());
         }
 
         int fs = features.size();
-        boolean stoppingCriteriaReached = (fs==0) || currentDepth >= maxDepth;
+        boolean stoppingCriteriaReached = (fs == 0) || currentDepth >= maxDepth;
         if (stoppingCriteriaReached) {
             return leaf(majority(value, trainingData)); //log.debug("New leaf is created because stopping criteria reached: {}", majorityLabel.name());
         }
@@ -137,24 +144,27 @@ public class DecisionTree<K, V> {
 
                 subsetTrainingData -> subsetTrainingData.isEmpty() ?
 
-                    leaf(majority(value, trainingData))
+                        leaf(majority(value, trainingData))
 
                         :
 
-                    put(value, subsetTrainingData,
-                            new FasterList<>(()->(features.stream().filter(p -> !p.equals(split)).iterator()), fs - 1),
-                        currentDepth + 1))
+                        put(value, subsetTrainingData,
+                                new FasterList<>(() -> (
+                                        features.stream().filter(p -> !p.equals(split)).iterator()), fs - 1),
+                                currentDepth + 1,
+                                depthToPrecision
+                        ))
 
-                .collect(Collectors.toCollection(()->Node.feature(split)));
+                .collect(Collectors.toCollection(() -> Node.feature(split)));
     }
 
     /**
-     * Classify dataSample.
+     * Classify a sample.
      *
      * @param value Data sample
      * @return Return label of class.
      */
-    public V classify(Function<K, V> value) {
+    public V get(Function<K, V> value) {
         Node node = root;
         while (!node.isLeaf()) { // go through tree until leaf is reached
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
@@ -191,7 +201,7 @@ public class DecisionTree<K, V> {
      */
     static <K, V> V majority(K value, Collection<Function<K, V>> data) {
         // group by to map <Label, count> like in getLabels() but return Label with most counts
-        return data.stream().collect(groupingBy((x)->x.apply(value), counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+        return data.stream().collect(groupingBy((x) -> x.apply(value), counting())).entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 
     // -------------------------------- TREE PRINTING ------------------------------------
@@ -262,7 +272,7 @@ public class DecisionTree<K, V> {
             return new Node(feature);
         }
 
-        public static  Node leaf(Object label) {
+        public static Node leaf(Object label) {
             return new Node(null, label);
         }
 

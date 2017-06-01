@@ -4,17 +4,17 @@ import java.util.function.Function;
 
 
 
-public class TestValue<L> implements Function<String,L> {
+public class TestValue implements Function<Object,Object> {
     
-    private L label;
+    private Object label;
     
-    public TestValue(L label) {
+    public TestValue(Object label) {
         super();
         this.label = label;
     }
 
     @Override
-    public L apply(String what) {
+    public Object apply(Object what) {
         return label;
     }
 

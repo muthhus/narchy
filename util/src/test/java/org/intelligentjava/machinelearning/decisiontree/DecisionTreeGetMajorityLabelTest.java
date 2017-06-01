@@ -22,8 +22,8 @@ public class DecisionTreeGetMajorityLabelTest {
     
     @Test
     public void testGetMajorityLabel() {
-        DecisionTree<String, Object> tree = new DecisionTree();
-        List<Function<String,Object>> data = Lists.newArrayList();
+        DecisionTree<Object, Object> tree = new DecisionTree();
+        List<Function<Object,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(TRUE_LABEL));
@@ -34,8 +34,8 @@ public class DecisionTreeGetMajorityLabelTest {
 
     @Test
     public void testGetMajorityLabelWhenEqualCounts() {
-        DecisionTree<String, Object> tree = new DecisionTree();
-        List<Function<String,Object>> data = Lists.newArrayList();
+        DecisionTree<Object, Object> tree = new DecisionTree();
+        List<Function<Object,Object>> data = Lists.newArrayList();
         data.add(new TestValue(TRUE_LABEL));
         data.add(new TestValue(FALSE_LABEL));
         data.add(new TestValue(TRUE_LABEL));

@@ -227,10 +227,10 @@ public class DecisionTreeTrainingTest {
 
         // now check classify
         String[] classificationHeader = {"x1", "x2"};
-        assertEquals(BooleanLabel.TRUE_LABEL, tree.classify(classification(classificationHeader, Boolean.TRUE, Boolean.TRUE)));
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.classify(classification(classificationHeader, Boolean.TRUE, Boolean.FALSE)));
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.classify(classification(classificationHeader, Boolean.FALSE, Boolean.TRUE)));
-        assertEquals(BooleanLabel.FALSE_LABEL, tree.classify(classification(classificationHeader, Boolean.FALSE, Boolean.FALSE)));
+        assertEquals(BooleanLabel.TRUE_LABEL, tree.get(classification(classificationHeader, Boolean.TRUE, Boolean.TRUE)));
+        assertEquals(BooleanLabel.FALSE_LABEL, tree.get(classification(classificationHeader, Boolean.TRUE, Boolean.FALSE)));
+        assertEquals(BooleanLabel.FALSE_LABEL, tree.get(classification(classificationHeader, Boolean.FALSE, Boolean.TRUE)));
+        assertEquals(BooleanLabel.FALSE_LABEL, tree.get(classification(classificationHeader, Boolean.FALSE, Boolean.FALSE)));
     }
 
 //    @Test
@@ -260,13 +260,13 @@ public class DecisionTreeTrainingTest {
 //
 
     @Test public void testRealDecisionTable() {
-        RealTableDecisionTree t = new RealTableDecisionTree(2, "a", "b", "x");
+        RealDecisionTree t = new RealDecisionTree(2, "a", "b", "x").rangeLabels("LO", "HI");
         t.add(1, 1, 0);
         t.add(1, 0, 1);
         t.add(2, 1, 1);
         t.add(5, 1, 0);
         t.add(5, 0, 1);
-        t.learn(2);
+        t.put(2);
         t.print();
     }
 

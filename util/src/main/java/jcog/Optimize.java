@@ -16,7 +16,7 @@ import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
-import org.intelligentjava.machinelearning.decisiontree.RealTableDecisionTree;
+import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -220,7 +219,7 @@ public class Optimize<X> {
 
 
             int cols = tweaks.size() + 1;
-            RealTableDecisionTree rt = new RealTableDecisionTree(2,
+            RealDecisionTree rt = new RealDecisionTree(3,
                     ArrayUtils.add(
                             tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score"));
             for (DoubleObjectPair<double[]> exp : experiments) {
@@ -233,8 +232,11 @@ public class Optimize<X> {
                 rt.add(r);
             }
 
-            rt.learn(cols-1 /* score */);
+            rt.put(cols-1 /* score */);
             rt.print();
+
+            float predictedScore = rt.get(0, 1, 0, 1, Float.NaN);
+            System.out.println(predictedScore);
 
         }
     }
