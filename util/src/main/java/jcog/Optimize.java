@@ -2,8 +2,7 @@ package jcog;
 
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
-import jcog.event.ArrayTopic;
-import jcog.event.Topic;
+import jcog.list.FasterList;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -11,11 +10,13 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.*;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
+import org.intelligentjava.machinelearning.decisiontree.RealTableDecisionTree;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +24,9 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-import static jcog.Texts.n4;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * Optimization solver wrapper w/ lambdas
@@ -114,8 +116,7 @@ public class Optimize<X> {
         }
 
 
-
-        System.out.println(Joiner.on(",").join(tweaks) + ",score");
+        List<DoubleObjectPair<double[]>> experiments = new FasterList();
 
         ObjectiveFunction func = new ObjectiveFunction(point -> {
 
@@ -124,10 +125,10 @@ public class Optimize<X> {
             try {
                 float sum = 0;
                 for (int r = 0; r < repeats; r++) {
-                    X x = newSubject(point);
+                    X x = subject(point);
                     sum += eval.floatValueOf(x);
                 }
-                score = sum/repeats;
+                score = sum / repeats;
             } catch (Exception e) {
                 logger.error("{} {} {}", this, point, e);
                 score = Float.NEGATIVE_INFINITY;
@@ -137,10 +138,10 @@ public class Optimize<X> {
             if (trace)
                 System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
 
+            experiments.add(pair((double) score, point));
             onExperiment(point, score);
             return score;
         });
-
 
 
         CMAESOptimizer optim = new CMAESOptimizer(maxIterations, 0, true, 0,
@@ -150,9 +151,8 @@ public class Optimize<X> {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new CMAESOptimizer.Sigma(MathArrays.scale(2,inc)),
+                new CMAESOptimizer.Sigma(MathArrays.scale(2, inc)),
                 new CMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
-
 
 
 //        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
@@ -173,15 +173,18 @@ public class Optimize<X> {
 //        );
 
 
-        return new Result(r);
+        return new Result(experiments, r);
 
     }
 
-    protected void onExperiment(double[] point, float score) {
-
+    protected void onExperiment(double[] point, double score) {
+        System.out.println(Joiner.on(",").join(tweaks) + ",score");
     }
 
-    private X newSubject(double[] point) {
+    /**
+     * builds an experiment subject (input)
+     */
+    private X subject(double[] point) {
         X x = subject.get();
         int i1 = 0;
         for (int i = 0, tweaksSize = tweaks.size(); i < tweaksSize; i++) {
@@ -192,10 +195,13 @@ public class Optimize<X> {
 
     public class Result {
 
-        private final PointValuePair optimal;
+        public final PointValuePair optimal;
+        public final List<DoubleObjectPair<double[]>> experiments;
 
-        public Result(PointValuePair p) {
-            this.optimal = p;
+
+        public Result(List<DoubleObjectPair<double[]>> experiments, PointValuePair r) {
+            this.optimal = r;
+            this.experiments = experiments;
         }
 
         public void print() {
@@ -205,6 +211,30 @@ public class Optimize<X> {
             for (int i = 0; i < p.length; i++) {
                 System.out.println(tweaks.get(i).id + " " + p[i]);
             }
+
+        }
+
+        public void predict() {
+            if (experiments.isEmpty())
+                return;
+
+
+            int cols = tweaks.size() + 1;
+            RealTableDecisionTree rt = new RealTableDecisionTree(2,
+                    ArrayUtils.add(
+                            tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score"));
+            for (DoubleObjectPair<double[]> exp : experiments) {
+                float[] r = new float[cols];
+                int i = 0;
+                for (double x : exp.getTwo()) {
+                    r[i++] = (float)x;
+                }
+                r[i] = (float)exp.getOne();
+                rt.add(r);
+            }
+
+            rt.learn(cols-1 /* score */);
+            rt.print();
 
         }
     }

@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
+/** TODO abstract this into a DecisionTreeBuilder which can be used to generate different trees
+ * from a common builder instance */
 public class RealTableDecisionTree extends DecisionTree<Integer, Float> {
 
     private final List<float[]> rows = new FasterList();
@@ -58,6 +60,7 @@ public class RealTableDecisionTree extends DecisionTree<Integer, Float> {
         }
 
     }
+
 
 
     public RealTableDecisionTree(int discretization, String... cols) {

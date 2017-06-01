@@ -84,7 +84,7 @@ public class Line1D {
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 1500;
+            int maxIterations = 15;
             int repeats = 5;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
@@ -113,6 +113,8 @@ public class Line1D {
             Optimize.Result r = o.run(maxIterations, repeats, experiment);
 
             r.print();
+
+            r.predict();
 
         }
 
