@@ -111,7 +111,7 @@ public class Dimensionaleyez extends SimpleSpatial {
 
             gl.glPushMatrix();
             gl.glTranslatef(x, y, z);
-            float p = 0.3f + (float) (0.7f / (1f + n.getLocalDistance()));
+            float p = 0.3f + (float) (0.7f / (1f + n.localDistance()));
 
             float sat = 0.5f;
             float hue = 0.1f + 0.3f * (last);

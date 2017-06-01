@@ -1,4 +1,4 @@
-package jcog.learn.gng;
+package jcog.learn.gng.impl;
 
 import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.ShortIntProcedure;

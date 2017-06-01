@@ -13,6 +13,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.*;
 import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static jcog.Texts.n4;
 
 /**
  * Optimization solver wrapper w/ lambdas
@@ -96,6 +99,7 @@ public class Optimize<X> {
         double[] min = new double[n];
         double[] max = new double[n];
         double[] inc = new double[n];
+        double[] range = new double[n];
 
         for (Tweak w : tweaks) {
             //w.apply.value((float) point[i++], x);
@@ -104,13 +108,14 @@ public class Optimize<X> {
             min[i] = (s.getMin());
             max[i] = (s.getMax());
             inc[i] = s.getInc();
+            range[i] = max[i] - min[i];
             //sigma[i] = Math.abs(max[i] - min[i]) * 0.75f; //(s.getInc());
             i++;
         }
 
 
 
-        System.out.println(Joiner.on(",").join(tweaks) + ",\tScore");
+        System.out.println(Joiner.on(",").join(tweaks) + ",score");
 
         ObjectiveFunction func = new ObjectiveFunction(point -> {
 
@@ -145,7 +150,7 @@ public class Optimize<X> {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new CMAESOptimizer.Sigma(inc),
+                new CMAESOptimizer.Sigma(MathArrays.scale(2,inc)),
                 new CMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
 
 

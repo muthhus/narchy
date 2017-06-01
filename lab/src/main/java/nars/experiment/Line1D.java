@@ -69,7 +69,7 @@ public class Line1D {
             //Util.pause(1);
         });
 
-        int runtime = 5000;
+        int runtime = 1500;
 
         a.runCycles(runtime);
 
@@ -84,8 +84,8 @@ public class Line1D {
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 10000;
-            int repeats = 2;
+            int maxIterations = 1500;
+            int repeats = 5;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
@@ -99,13 +99,13 @@ public class Line1D {
                 n.DEFAULT_QUEST_PRIORITY = 0.5f;
 
                 return n;
-            }).tweak("beliefConf", 0.5f, 0.95f, 0.1f, (y, x) -> {
+            }).tweak("beliefConf", 0.01f, 0.99f, 0.01f, (y, x) -> {
                 x.beliefConfidence(y);
-            }).tweak("goalConf", 0.5f, 0.95f, 0.1f, (y, x) -> {
+            }).tweak("goalConf", 0.01f, 0.99f, 0.01f, (y, x) -> {
                 x.goalConfidence(y);
-            }).tweak("termVolMax", 5, 20, 2, (y, x) -> {
+            }).tweak("termVolMax", 5, 30, 2, (y, x) -> {
                 x.termVolumeMax.setValue(y);
-            }).tweak("exeRate", 0.05f, 0.5f, 0.1f, (y, x) -> {
+            }).tweak("exeRate", 0.01f, 1f, 0.01f, (y, x) -> {
                 ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
             });
 
@@ -131,13 +131,13 @@ public class Line1D {
                 Line1DSimplest a = new Line1DSimplest(n);
                 a.init();
 
-                float freq = 1 / 350f;
-                float speed = 0.1f;
+                float freq = 1 / 10f;
+                float speed = 0.2f;
                 a.speed.setValue(speed);
 
                 a.out.resolution.setValue(speed * 1);
                 a.in.resolution.setValue(speed * 1);
-                a.curiosity.setValue(0.01f);
+                a.curiosity.setValue(0.05f);
 
                 //            a.in.beliefs().capacity(0, 100, a.nar);
                 //            a.out.beliefs().capacity(0, 100, a.nar);
@@ -161,7 +161,7 @@ public class Line1D {
                     //Util.pause(1);
                 });
 
-                int runtime = 20000;
+                int runtime = 10000;
 
 
 

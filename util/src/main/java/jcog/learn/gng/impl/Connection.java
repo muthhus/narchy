@@ -1,4 +1,4 @@
-package jcog.learn.gng;
+package jcog.learn.gng.impl;
 
 
 import java.util.Objects;

@@ -255,13 +255,14 @@ abstract public class NAgent implements NSense, NAct {
 
     protected void predict() {
         predict.input(predictions(now));
-
+        int dur = nar.dur();
+        int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
         if (sensors.size() > 0) {
             actions.forEach(a -> {
                 for (Compound t : new Compound[] {
-                        $.impl(a, randomSensor()),
-                        $.impl($.neg(a), randomSensor())} )
-                    predict.input(question(t, now + nar.dur()));
+                        $.impl(a, dur, randomSensor()),
+                        $.impl($.neg(a), dur, randomSensor())} )
+                    predict.input(question(t, now + nar.random().nextInt(horizon) ));
             });
         }
     }
@@ -336,36 +337,6 @@ abstract public class NAgent implements NSense, NAct {
                         now
                 )
         );
-//        predictors.add(
-//                goal(happiness,
-//                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
-//                        ETERNAL
-//                )
-//        );
-
-
-//        predictors.addAll(
-//                //what will imply reward
-//                new TaskBuilder($.equi(what, dt, happiness), '?', null).time(now, now),
-//                //new TaskBuilder($.equi(sth, dt, happiness), '.', null).time(now,now),
-//
-//                //what will imply non-reward
-//                //new TaskBuilder($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
-//                //new TaskBuilder($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-//
-//                //what co-occurs with reward
-//                new TaskBuilder($.parallel(what, happiness), '?', null).time(now, now)
-//
-//                //what co-occurs with non-reward
-//                //new TaskBuilder($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
-//        );
-
-//        predictors.add(
-//                nar.ask($.seq(what, dt, happy.term()), '?', now)
-//        );
-//        predictors.add( //+2 cycles ahead
-//                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
-//        );
 
         p.add(
             question(seq($.varQuery(1), dur, happiness),
@@ -382,6 +353,16 @@ abstract public class NAgent implements NSense, NAct {
 
             ((FasterList) p).addAll(
 
+                    question(impl(action, dur, happiness), now),
+                    question(impl(neg(action), dur, happiness), now),
+
+                    question(seq(action, dur, happiness), now),
+                    question(seq(neg(action), dur, happiness), now),
+
+                    question(seq(action, dur, $.varQuery(1)), now),
+                    question(seq(neg(action), dur, $.varQuery(1)), now)
+
+
                     //quest((Compound) (action.term()),now+dur),
 
 //                            //ETERNAL)
@@ -392,14 +373,6 @@ abstract public class NAgent implements NSense, NAct {
                     //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-                    question(impl(action, dur, happiness), now),
-                    question(impl(neg(action), dur, happiness), now),
-
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
-
-                    question(seq(action, dur, $.varQuery(1)), now),
-                    question(seq(neg(action), dur, $.varQuery(1)), now)
 
 
 //                    question(impl(conj(varQuery(0),action), dur, happiness), now),
@@ -460,6 +433,36 @@ abstract public class NAgent implements NSense, NAct {
 
 //        predictors.add(
 //                new TaskBuilder($.seq($.varQuery(0 /*"what"*/), dur, happiness), '?', null).time(now, now)
+//        );
+//        predictors.add(
+//                goal(happiness,
+//                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
+//                        ETERNAL
+//                )
+//        );
+
+
+//        predictors.addAll(
+//                //what will imply reward
+//                new TaskBuilder($.equi(what, dt, happiness), '?', null).time(now, now),
+//                //new TaskBuilder($.equi(sth, dt, happiness), '.', null).time(now,now),
+//
+//                //what will imply non-reward
+//                //new TaskBuilder($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
+//                //new TaskBuilder($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+//
+//                //what co-occurs with reward
+//                new TaskBuilder($.parallel(what, happiness), '?', null).time(now, now)
+//
+//                //what co-occurs with non-reward
+//                //new TaskBuilder($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
+//        );
+
+//        predictors.add(
+//                nar.ask($.seq(what, dt, happy.term()), '?', now)
+//        );
+//        predictors.add( //+2 cycles ahead
+//                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
 //        );
 
 

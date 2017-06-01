@@ -1,5 +1,9 @@
 package jcog.learn.gng;
 
+import com.google.common.base.Joiner;
+import jcog.learn.gng.impl.IntUndirectedGraph;
+import jcog.learn.gng.impl.Node;
+import jcog.learn.gng.impl.SemiDenseIntUndirectedGraph;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -17,7 +21,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
 
     private final IntUndirectedGraph e;
-    private final Node[] node;
+    protected final Node[] node;
 
     private int iteration;
 
@@ -64,10 +68,6 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
     public double getWinnerUpdateRate() {
         return winnerUpdateRate;
-    }
-
-    public double getWinnerNeighborUpdateRate() {
-        return winnerNeighborUpdateRate;
     }
 
 
@@ -130,7 +130,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         double minDist = Double.POSITIVE_INFINITY;
         Node closest = null;
         for (Node n : node) {
-            if (n.getDistanceSq(x) < minDist)
+            if (n.distanceSq(x) < minDist)
                 closest = n;
         }
 
@@ -173,7 +173,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         for (short j = 0; j < nodes; j++) {
             Node n = node[j];
             if (j == closest) continue;
-            double dd = n.getLocalDistanceSq(); //TODO cache this localDist
+            double dd = n.localDistanceSq(); //TODO cache this localDist
             if (dd < minDist2) {
                 nextClosestNode = j;
                 minDist2 = dd;
@@ -187,19 +187,12 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         }
 
         //update local error of the "winner"
-        Node closestNode = node[closest];
-        closestNode.setLocalError(closestNode.getLocalError() + closestNode.getLocalDistance());
-
-        //update weights for "winner"
-        closestNode.update(getWinnerUpdateRate(), x);
+        node[closest].updateLocalError(getWinnerUpdateRate(), x);
 
         //update weights for "winner"'s neighbours
         short sc = closest;
         e.edgesOf(closest, (connection,age) -> {
-            Node toUpdate = node[connection];
-
-            //if (toUpdate != null) { //should not be null
-            toUpdate.update(getWinnerNeighborUpdateRate(), x);
+            node[connection].update(winnerNeighborUpdateRate, x);
         });
         e.addToEdges(sc, +1);
 
@@ -225,9 +218,9 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
                 for (int i = 0, nodeLength = node.length; i < nodeLength; i++) {
                     Node n = node[i];
                     if (i == furthest) continue; //skip furthest which was supposed to be removed, and will be replaced below
-                    if (n.getLocalError() > maxError) {
+                    if (n.localError() > maxError) {
                         maxErrorID = (short) i;
-                        maxError = n.getLocalError();
+                        maxError = n.localError();
                     }
                 }
 
@@ -235,6 +228,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
                     throw new RuntimeException("maxErrorID=null");
                 }
             }
+
 
             short maxErrorNeighborID = -1;
             //if (e has edges for maxErrorID..)
@@ -244,9 +238,9 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
                 Node otherNode = node[otherNodeID];
 
-                if (otherNode.getLocalError() > maxError[0]) {
+                if (otherNode.localError() > maxError[0]) {
                     _maxErrorNeighbour[0] = otherNodeID;
-                    maxError[0] = otherNode.getLocalError();
+                    maxError[0] = otherNode.localError();
                 }
             });
 
@@ -359,6 +353,11 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     }
 
     public int size() { return node.length; }
+
+    @Override
+    public String toString() {
+        return Joiner.on("\n").join(node);
+    }
 
     /** snapshot state of the node status */
     public static class NeuralGasNetState {

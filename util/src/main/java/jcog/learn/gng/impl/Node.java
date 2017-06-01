@@ -1,21 +1,23 @@
-package jcog.learn.gng;
+package jcog.learn.gng.impl;
 
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+
+import static jcog.Texts.n4;
 
 /**
  * Created by Scadgek on 11/3/2014.
  */
 public class Node extends ArrayRealVector  {
 
-    private double localError;
     public final int id;
+    private double localError;
     private double localDistanceSq; //caches square of last tested distance
 
     public Node(int id, int dimensions) {
         super(dimensions);
         this.id = id;
-        localError = 0;
+        this.localError = 0;
     }
 
     @Override
@@ -25,18 +27,17 @@ public class Node extends ArrayRealVector  {
 
     @Override
     public int hashCode() {
-        //return Objects.hash(id);
-
         return (id+1)*37;
     }
 
     /** create a node from two existing nodes */
     public void set(Node maxErrorNode, Node maxErrorNeighbour) {
-
-        setLocalError(maxErrorNode.getLocalError());
+        double[] a = maxErrorNode.getDataRef();
+        setLocalError(maxErrorNode.localError());
+        double[] b = maxErrorNeighbour.getDataRef();
         double[] d= getDataRef();
         for (int i = 0; i < d.length; i++) {
-            d[i] =  (maxErrorNode.getEntry(i) + maxErrorNeighbour.getEntry(i)) / 2;
+            d[i] = (a[i] + b[i]) / 2;
         }
     }
 
@@ -46,7 +47,8 @@ public class Node extends ArrayRealVector  {
     }
 
     public Node randomizeUniform(double min, double max) {
-        for (int i = 0; i < getDimension(); i++) {
+        int dim = getDimension();
+        for (int i = 0; i < dim; i++) {
             setEntry(i, Math.random() * (max-min) + min);
         }
         return this;
@@ -60,19 +62,20 @@ public class Node extends ArrayRealVector  {
 //        this.weights = weights;
 //    }
 
-    public double getLocalError() {
+    public double localError() {
         return localError;
     }
 
-    public void setLocalError(double localError) {
+    public Node setLocalError(double localError) {
         this.localError = localError;
+        return this;
     }
 
     public void mulLocalError(double alpha) {
         this.localError *= alpha;
     }
 
-    public double getDistanceSq(final double[] x) {
+    public double distanceSq(final double[] x) {
         double s = 0;
         final double[] y = getDataRef();
         int l = y.length;
@@ -85,8 +88,8 @@ public class Node extends ArrayRealVector  {
 
 
 
-    public double getDistance(final double[] x) {
-        return Math.sqrt(getDistanceSq(x));
+    public double distance(final double[] x) {
+        return Math.sqrt(distanceSq(x));
     }
 
     /** 0 < rate < 1.0 */
@@ -107,24 +110,28 @@ public class Node extends ArrayRealVector  {
 
     @Override
     public String toString() {
-        return id + ": " + super.toString();
+        return id + ": " + super.toString() + ("lErr=" + n4(localError) + " dist=" + n4(localDistance()));
     }
 
     public double learn(double[] x) {
-        return (this.localDistanceSq = getDistanceSq(x));
+        return (this.localDistanceSq = distanceSq(x));
     }
 
-    public double getLocalDistanceSq() {
+    public double localDistanceSq() {
         return localDistanceSq;
     }
-    public double getLocalDistance() { return Math.sqrt(localDistanceSq); }
+    public double localDistance() { return Math.sqrt(localDistanceSq); }
 
 
 
     public double getDistanceSq(Node b) {
-        return getDistanceSq(b.getDataRef());
+        return distanceSq(b.getDataRef());
     }
 
+    public void updateLocalError(double winnerUpdateRate, double[] x) {
+        setLocalError(localError() + localDistance());
+        update(winnerUpdateRate, x);
+    }
 
 
     //    public double distanceTo(double[] x) {

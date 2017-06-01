@@ -2,7 +2,7 @@ package nars.video;
 
 import com.jogamp.opengl.GL2;
 import jcog.learn.gng.NeuralGasNet;
-import jcog.learn.gng.Node;
+import jcog.learn.gng.impl.Node;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatSupplier;
 import nars.$;
@@ -90,7 +90,7 @@ public class CameraGasNet<P extends Bitmap2D> implements Consumer<NAR> {
                 int nodes = net.size();
                 for (int i = 0; i < nodes; i++) {
                     Node n = net.node(i);
-                    float e = (float) ((1f + n.getLocalDistance()) * (1f + n.getLocalError()));
+                    float e = (float) ((1f + n.localDistance()) * (1f + n.localError()));
                     float x = (float) n.getEntry(0);
                     float y = (float) n.getEntry(1);
                     float c = (float) n.getEntry(2);

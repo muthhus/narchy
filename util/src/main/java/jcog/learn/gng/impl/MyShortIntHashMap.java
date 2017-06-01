@@ -1,4 +1,4 @@
-package jcog.learn.gng;
+package jcog.learn.gng.impl;
 
 import org.eclipse.collections.api.LazyShortIterable;
 import org.eclipse.collections.api.RichIterable;

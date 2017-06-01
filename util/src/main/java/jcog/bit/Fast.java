@@ -168,6 +168,7 @@ public enum Fast {
 	 * @return the base-2 logarithm of <code>x</code>.
 	 */
 	public static double log2( double x ) {
+
 		return Math.log( x ) / 0.6931471805599453;
 	}
 

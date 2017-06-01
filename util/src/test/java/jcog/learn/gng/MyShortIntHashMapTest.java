@@ -1,5 +1,6 @@
 package jcog.learn.gng;
 
+import jcog.learn.gng.impl.MyShortIntHashMap;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

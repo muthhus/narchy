@@ -2,7 +2,7 @@ package jcog.learn.gng;
 
 import jcog.Util;
 import jcog.learn.Autoencoder;
-import jcog.math.StreamingNormalizer;
+import jcog.learn.gng.impl.Node;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 
