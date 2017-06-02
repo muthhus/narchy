@@ -63,7 +63,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 30);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -157,9 +157,10 @@ public class Arkancide extends NAgentX {
                case 0:
                    break;
                case -1:
-               case 1: noid.paddle.move(maxPaddleSpeed * s);
+               case 1: noid.paddle.move(0.5f * maxPaddleSpeed * s);
                     break;
            }
+
         });
 
 //        Param.DEBUG = true;

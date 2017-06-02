@@ -128,10 +128,11 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Override
     public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
         if (template == null) {
-            template = dynamicConcept;
-            dynamicConcept.nar.terms.retemporalize(template,
-                    when == DTERNAL ?
-                            dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+            template =
+
+                    dynamicConcept.nar.terms.retemporalize(template,
+                            when == DTERNAL ?
+                                    dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
         }
 
 //        Compound template =

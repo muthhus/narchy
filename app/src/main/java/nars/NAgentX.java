@@ -2,6 +2,8 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.random.XorShift128PlusRandom;
+import nars.conceptualize.DefaultConceptBuilder;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -98,6 +100,12 @@ abstract public class NAgentX extends NAgent {
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+
+        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
+        conceptState.beliefsMaxTemp.set(32);
+        conceptState.goalsMaxTemp.set(32);
+
+
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
@@ -105,11 +113,11 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
         float p = 0.5f;
-        n.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+        n.DEFAULT_BELIEF_PRIORITY = 1f * p;
         n.DEFAULT_GOAL_PRIORITY = 1f * p;
-        n.DEFAULT_QUESTION_PRIORITY = 0.25f * p;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f * p;
-        n.termVolumeMax.setValue(48);
+        n.DEFAULT_QUESTION_PRIORITY = 1f * p;
+        n.DEFAULT_QUEST_PRIORITY = 1f * p;
+        n.termVolumeMax.setValue(28);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, false, 8);
@@ -118,7 +126,7 @@ abstract public class NAgentX extends NAgent {
 
         int threads = 2;
         for (int i = 0; i < threads; i++) {
-            n.addNAR(1024);
+            n.addNAR(512);
         }
 
         NAgent a = init.apply(n);
@@ -236,8 +244,8 @@ abstract public class NAgentX extends NAgent {
                     grid(
                             Vis.beliefCharts(16, nar, a.happy),
                             new WindowButton("agent", () -> (a)),
-                            new WindowButton("action", () -> Vis.beliefCharts(100, a.actions, a.nar)),
-                            new WindowButton("predict", () -> Vis.beliefCharts(100, a.p, a.nar)),
+                            new WindowButton("action", () -> Vis.beliefCharts(250, a.actions, a.nar)),
+                            new WindowButton("predict", () -> Vis.beliefCharts(250, a.p, a.nar)),
                             //"agentActions",
                             //"agentPredict",
 

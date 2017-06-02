@@ -19,7 +19,7 @@ public final class DefaultConceptState extends ConceptState {
     @NotNull
     public final MutableInteger termLinksCapacityMax, termLinksCapacityMin, taskLinksCapacityMax, taskLinksCapacityMin;
     public final MutableInteger beliefsMaxTemp;
-    private final MutableInteger goalsMaxTemp;
+    public final MutableInteger goalsMaxTemp;
 
     /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
     public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {

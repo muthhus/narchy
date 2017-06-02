@@ -725,9 +725,9 @@ public class TemporalTest {
         Compound u = $.$(su);
         assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());
         Term ye = $.terms.retemporalize(u, $.terms.retemporalizationDTERNAL);
-        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", ye.toString());
+        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", ye.toString());
         Term yz = $.terms.retemporalize(u, $.terms.retemporalizationZero);
-        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", yz.toString());
+        assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", yz.toString());
 
 
     }

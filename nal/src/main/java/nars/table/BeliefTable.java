@@ -225,7 +225,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
 
 
-        Task answer = match(when, now, dur, question, template, false, nar.random());
+        Task answer = match(when, now, dur, question, question.term(), false, nar.random());
         if (answer == null || answer.isDeleted())
             return null;
 

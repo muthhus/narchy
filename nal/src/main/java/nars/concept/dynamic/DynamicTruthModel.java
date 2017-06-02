@@ -60,7 +60,8 @@ abstract public class DynamicTruthModel {
                     return null;
 
                 int dt = superterm.subtermTime(subterm);
-                if (dt == DTERNAL) dt = 0; //TODO maybe this should never happen, and if it does there is an error
+                if (dt == DTERNAL)
+                    dt = 0; //TODO maybe this should never happen, and if it does there is an error
                 boolean evi = d.e != null;
 
 

@@ -53,7 +53,11 @@ abstract public class UDiscover<P> extends Thread {
 
             for (; ; ) {
 
-                ms.send(p);
+                try {
+                    ms.send(p);
+                } catch (IOException e) {
+                    logger.warn("{}", e);
+                }
                 //System.out.println(this + " Sent...");
 
                 Util.sleep(periodMS);

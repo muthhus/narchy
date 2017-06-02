@@ -111,8 +111,13 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
                     long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept)beliefConcept, nar);
                 } else {
-                    //should not project the matched belief
-                    long when = task.start();
+
+                    //temporal focus control
+                    long when =
+                            task.nearestStartOrEnd(now);
+                            //now;
+                            //now + dur;
+
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
                 }
 

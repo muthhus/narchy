@@ -10,7 +10,9 @@ import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 
@@ -56,7 +58,9 @@ public class QueryVariableTest {
         AtomicBoolean valid = new AtomicBoolean();
 
         Default nar = new Default();
-        Compound beliefTerm = nar.term(beliefString);
+
+        Compound beliefTerm = compoundOrNull(nar.term(beliefString));
+        assertNotNull(beliefTerm);
         nar.believe(beliefTerm, 1f, 0.9f);
         nar.question(question, Tense.ETERNAL, (q, a)-> {
             if (a.term().equals(beliefTerm)) {

@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import nars.time.Tense;
@@ -899,33 +900,40 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testPrediction1() throws Narsese.NarseseException {
 
-        int eventDT = 50;
+        Param.DEBUG = true;
 
-        int x1 = 0;
-        int x2 = x1 + eventDT * 2;
-        int x3 = x2 + eventDT * 2;
-        int deadline = x3 + (int) (eventDT * 1.5f);
-        int x4 = x3 + eventDT * 2 + 14;
-
+        int eventDT = 16;
+        int cycles = 10;
 
         TestNAR t = test();
         //((FrameTime)t.nar.time).dur(eventDT);
 
-        t
-                .inputAt(x1, "(x). :|:")
-                .inputAt(x1 + eventDT, "(y). :|:")
-                .inputAt(x2, "(x). :|:")
-                .inputAt(x2 + eventDT, "(y). :|:")
+        t.log();
+        t.dur(eventDT/2);
 
-                .inputAt(x3, "(x). :|:")
-                .inputAt(x3 + eventDT,
+        t.nar.onTask((tt)->{
+           if (tt.start() > t.nar.time()) {
+               System.out.println(tt.proof());
+           }
+        });
 
-                        $.task($("(y)"), QUESTION, null).time(x3, x3 + eventDT).setPriThen(1f).apply(t.nar)
-                )
+        int x = 0;
+        for (int i = 0; i < cycles; i++) {
 
-                .mustBelieve(deadline, "(x)", 1f, 0.73f, x4)
-                .mustBelieve(deadline, "(y)", 1f, 0.73f, x4 + eventDT)
-        ;
+            if (i == cycles-1) {
+                $.task($("(y)"), QUESTION, null).time(x, x+2*eventDT).setPriThen(1f).apply(t.nar);
+            }
+
+            t
+                .inputAt(x, "(x). :|:")
+                .inputAt(x + eventDT, "(y). :|:");
+
+
+            x+= 2 * eventDT;
+        }
+
+        t.mustBelieve(x-1, "(x)", 1f, 0.73f, x)
+            .mustBelieve(x-1, "(y)", 1f, 0.73f, x + eventDT);
     }
 
     @Test

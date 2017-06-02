@@ -3,6 +3,7 @@ package nars.experiment;
 import com.google.common.collect.Lists;
 import jcog.Optimize;
 import jcog.Util;
+import jcog.math.FloatAveraged;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
 import nars.$;
@@ -24,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import static java.lang.Math.PI;
-import static java.util.stream.Collectors.toList;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 
@@ -34,49 +34,71 @@ import static spacegraph.layout.Grid.*;
 public class Line1D {
 
 
-    static FloatFunction<NAR> experiment = (n) -> {
+    static class Line1DExperiment implements FloatFunction<NAR> {
+        float tHz = 0.0003f; //in time units
+        float yResolution = 0.1f; //in 0..1.0
+        float cycles = 128;
+
+        final int runtime = Math.round(cycles/tHz);
+
+        @Override
+        public float floatValueOf(NAR n) {
+            Line1DSimplest a = new Line1DSimplest(n) {
+
+                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
+
+                @Override
+                protected float act() {
+                    return rewardAveraged.asFloat();
+                }
+            };
+
+            a.init();
+
+            onStart(a);
 
 
-        Line1DSimplest a = new Line1DSimplest(n);
-        a.init();
+            a.speed.setValue(yResolution);
 
-        int runtime = 1000;
-        float freq = 1 / 100f;
-        float speed = 0.05f;
-        a.speed.setValue(speed);
+            a.out.resolution.setValue(yResolution * 1);
+            a.in.resolution.setValue(yResolution * 1);
+            a.curiosity.setValue(0.01f);
 
-        a.out.resolution.setValue(speed * 1);
-        a.in.resolution.setValue(speed * 1);
-        a.curiosity.setValue(0.05f);
+            //            a.in.beliefs().capacity(0, 100, a.nar);
+            //            a.out.beliefs().capacity(0, 100, a.nar);
+            //            a.out.goals().capacity(0, 100, a.nar);
 
-        //            a.in.beliefs().capacity(0, 100, a.nar);
-        //            a.out.beliefs().capacity(0, 100, a.nar);
-        //            a.out.goals().capacity(0, 100, a.nar);
+            //Line1DTrainer trainer = new Line1DTrainer(a);
 
-        //Line1DTrainer trainer = new Line1DTrainer(a);
+            //new RLBooster(a, new HaiQAgent(), 5);
 
-        //new RLBooster(a, new HaiQAgent(), 5);
-
-        //ImplicationBooster.implAccelerator(a);
+            //ImplicationBooster.implAccelerator(a);
 
 
-        a.onFrame((z) -> {
+            a.onFrame((z) -> {
 
-            a.target(
-                    (float) (0.5f * (Math.sin(a.nar.time() * freq * 2 * PI) + 1f))
-                    //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
-                    //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
-            );
+                a.target(
+                        Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
+                        //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
+                        //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                        //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
+                );
 
-            //Util.pause(1);
-        });
+                //Util.pause(1);
+            });
 
 
-        a.runCycles(runtime);
+            a.runCycles(runtime);
 
-        return a.rewardSum / runtime;
+            return a.rewardSum / runtime;
 
-    };
+        }
+
+        protected void onStart(Line1DSimplest a) {
+
+        }
+    }
+
 
     public static class Line1DOptimize {
 
@@ -85,8 +107,8 @@ public class Line1D {
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 3000;
-            int repeats = 3;
+            int maxIterations = 128;
+            int repeats = 1;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
@@ -106,24 +128,24 @@ public class Line1D {
                 x.goalConfidence(y);
             }).tweak("termVolMax", 8, 14, 1, (y, x) -> {
                 x.termVolumeMax.setValue(y);
-            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
-                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
+//            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
+//                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
             }).tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
                 x.in.streams.values().forEach(s -> s.setValue(y));
-            }).tweak("stmSize", 1, 2, 1, (y,x)->{
-                ((Default)x).stmLinkage.capacity.setValue(y);
-            }).tweak("confMin", 0, 0.8f, 0.01f, (y,x)->{
+            }).tweak("stmSize", 1, 2, 1, (y, x) -> {
+                ((Default) x).stmLinkage.capacity.setValue(y);
+            }).tweak("confMin", 0, 0.8f, 0.01f, (y, x) -> {
                 x.confMin.setValue(y);
-            }).tweak("truthResolution", 0, 0.2f, 0.02f, (y,x)->{
+            }).tweak("truthResolution", 0, 0.2f, 0.02f, (y, x) -> {
                 x.truthResolution.setValue(y);
             });
 
 
-            Optimize.Result r = o.run(maxIterations, repeats, experiment);
+            Optimize.Result r = o.run(maxIterations, repeats, new Line1DExperiment());
 
             r.print();
 
-            RealDecisionTree t = r.predict(4, o.tweaks.size()*2);
+            RealDecisionTree t = r.predict(3, o.tweaks.size());
             t.print();
 
 //            float predictedScore = t.get(0, 1, 0, 1, Float.NaN);
@@ -147,69 +169,42 @@ public class Line1D {
 //            }
 //        });
                 Default n = new Default();
+                n.time.dur(4);
+                n.termVolumeMax.set(15);
+                n.goalConfidence(0.2f);
+                n.beliefConfidence(0.2f);
 
-                Line1DSimplest a = new Line1DSimplest(n);
-                a.init();
-
-                float freq = 1 / 50f;
-                float speed = 0.05f;
-                a.speed.setValue(speed);
-
-                a.out.resolution.setValue(speed * 1);
-                a.in.resolution.setValue(speed * 1);
-                a.curiosity.setValue(0.05f);
-
-                //            a.in.beliefs().capacity(0, 100, a.nar);
-                //            a.out.beliefs().capacity(0, 100, a.nar);
-                //            a.out.goals().capacity(0, 100, a.nar);
-
-                //Line1DTrainer trainer = new Line1DTrainer(a);
-
-                //new RLBooster(a, new HaiQAgent(), 5);
-
-                //ImplicationBooster.implAccelerator(a);
-
-
-                a.onFrame((z) -> {
-
-                    a.target(
-                            (float) (0.5f * (Math.sin(a.nar.time() * freq * 2 * PI) + 1f))
-                            //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
-                            //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
-                    );
-
-                    //Util.pause(1);
-                });
-
-                int runtime = 3000;
-
-
-                new Thread(() -> {
-                    //NAgentX.chart(a);
-                    int history = 5000;
-                    window(
-                            row(
-                                    conceptPlot(a.nar, Lists.newArrayList(
-                                            () -> (float) a.in.sensor.getAsDouble(),
-                                            () -> a.o.floatValue(),
-                                            () -> a.reward,
-                                            () -> a.rewardSum
-
+                new Line1DExperiment() {
+                    @Override
+                    protected void onStart(Line1DSimplest a) {
+                        new Thread(() -> {
+                            //NAgentX.chart(a);
+                            int history = 5000;
+                            window(
+                                    row(
+                                            conceptPlot(a.nar, Lists.newArrayList(
+                                                    () -> (float) a.in.sensor.getAsDouble(),
+                                                    () -> a.o.floatValue(),
+                                                    () -> a.reward
+                                                    //() -> a.rewardSum
+                                                    )
+                                                    ,
+                                                    history),
+                                            col(
+                                                    new Vis.EmotionPlot(history, a),
+                                                    new ReflectionSurface<>(a),
+                                                    Vis.beliefCharts(history,
+                                                            Lists.newArrayList(a.in, a.out)
+                                                            , a.nar)
                                             )
-                                            ,
-                                            history),
-                                    col(
-                                            new Vis.EmotionPlot(history, a),
-                                            new ReflectionSurface<>(a),
-                                            Vis.beliefCharts(history,
-                                                    Lists.newArrayList(a.in, a.out)
-                                                    , a.nar)
                                     )
-                            )
-                            , 900, 900);
+                                    , 900, 900);
 
-                }).start();
-                a.runCycles(runtime);
+                        }).start();
+
+                    }
+                }.floatValueOf(n);
+
 
             }
 
@@ -219,8 +214,8 @@ public class Line1D {
                 Grid grid = new Grid(VERTICAL);
                 List<Plot2D> plots = $.newArrayList();
                 for (FloatSupplier t : concepts) {
-                    Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/);
-                    p.add(t.toString(), () -> t.asFloat(), 0f, 1f);
+                    Plot2D p = new Plot2D(plotHistory, Plot2D.BarWave);
+                    p.add(t.toString(), t::asFloat, -1f, 1f);
                     grid.children.add(p);
                     plots.add(p);
                 }
@@ -238,10 +233,10 @@ public class Line1D {
 
             public static final int trainingRounds = 20;
             private float lastReward;
-            int consecutiveCorrect = 0;
-            int lag = 0;
+            int consecutiveCorrect;
+            int lag;
             //int perfect = 0;
-            int step = 0;
+            int step;
 
 
             final LinkedHashSet<Task>

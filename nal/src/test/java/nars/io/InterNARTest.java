@@ -33,9 +33,9 @@ public class InterNARTest {
 
     void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
-        final int CONNECTION_TIME = 400;
-        int preCycles = 1;
-        int postCycles = 150;
+        final int CONNECTION_TIME = 200;
+        int preCycles = 5;
+        int postCycles = 200;
 
         Param.ANSWER_REPORTING = false;
 
@@ -52,11 +52,11 @@ public class InterNARTest {
                 a.run(1); b.run(1);
             }
 
-            InterNAR ai = new InterNAR(a, 20, 0, false);
-            InterNAR bi = new InterNAR(b, 20, 0, false);
+            InterNAR ai = new InterNAR(a, 10, 0, false);
+            InterNAR bi = new InterNAR(b, 10, 0, false);
 
-            ai.setFPS(6f);
-            bi.setFPS(6f);
+            ai.setFPS(20f);
+            bi.setFPS(20f);
 
             Util.sleep(CONNECTION_TIME);
 
@@ -89,7 +89,7 @@ public class InterNARTest {
         return new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
                 new RealTime.DSHalf(true),
-                new TaskExecutor(256)
+                new TaskExecutor(512)
         );
     }
 

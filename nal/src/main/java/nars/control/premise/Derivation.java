@@ -1,5 +1,6 @@
 package nars.control.premise;
 
+import jcog.math.Interval;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -8,6 +9,7 @@ import nars.control.Premise;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
+import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -16,6 +18,7 @@ import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;
 import nars.term.var.CommonVariable;
+import nars.time.TimeFunctions;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -216,9 +219,29 @@ abstract public class Derivation extends Unify implements TermContext {
             this.beliefTruth = this.beliefTruthRaw = null;
         } else {
             Truth beliefTruth = this.beliefTruthRaw = belief.truth();
-            long start = task.start();
-            if ((start != ETERNAL) && (!belief.isEternal())) {
-                beliefTruth = belief.truth(start, dur, confMin); //project belief truth to task's time
+
+            /** to compute the time-discounted truth, find the minimum distance
+             *  of the tasks considering their dtRange
+             */
+            long tstart = task.start();
+            if ((tstart != ETERNAL)) {
+                long bstart = belief.start();
+                if (bstart != ETERNAL) {
+                    long tend = task.end();
+                    long bend = belief.end();
+                    long btime;
+                    if (tstart <= bstart) btime = tstart;
+                    else if (tend >= bend) btime = tend;
+                    else {
+                      //if ((bend >= tend) && (bstart <= tstart))
+                          btime = belief.mid();
+                      //else if (Math.abs(bend - tstart))
+                        //TODO
+                    }
+                    if (!belief.contains(btime)) {
+                        beliefTruth = belief.truth(btime, dur, confMin); //project belief truth to task's time
+                    }
+                }
             }
             this.beliefTruth = beliefTruth;
         }

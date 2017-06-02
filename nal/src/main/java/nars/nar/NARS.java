@@ -14,6 +14,7 @@ import nars.NARLoop;
 import nars.Task;
 import nars.attention.SpreadingActivation;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.conceptualize.state.DefaultConceptState;
 import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
@@ -108,6 +109,7 @@ public class NARS extends NAR {
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
+
         onCycle(n -> post.commit(n.time()));
     }
 

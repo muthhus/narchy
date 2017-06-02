@@ -211,8 +211,7 @@ public interface TimeFunctions {
 
             occReturn[0] = union.a;
 
-            if (/*merge && */derived.op() == CONJ) {
-                assert (polarity == 1);
+            if (/*merge*/derived.op() == CONJ) {
 
                 occReturn[1] = union.b;
 
@@ -230,7 +229,9 @@ public interface TimeFunctions {
                     if (derivationMatch(bt, d0))
                         dt *= -1;
                 }
-
+                if (derived.op().temporal) {
+                    occReturn[1] = union.b; //extend <=> and ==>
+                }
 
                 return deriveDT(derived, polarity, dt, occReturn, p);
 
@@ -388,7 +389,7 @@ public interface TimeFunctions {
 
                 //occReturn[1] = occReturn[0]; //HACK
 
-                if (taskStart > occReturn[0]) {
+                if (taskStart > now) {
 
                     long range = occReturn[1] - occReturn[0];
 
@@ -580,14 +581,15 @@ public interface TimeFunctions {
             if (rDerived != null) {
 
                 Compound rDecomposed = compoundOrNull(resolve(decomposedTerm, p));
-                if (rDecomposed != null) {
+                {
                     if (occOther != ETERNAL) {
-
                         Compound rOtherTerm = compoundOrNull(resolve(otherTerm, p));
-                        long derivedInTask = solveDecompose(occOther, rDerived, (Compound) rOtherTerm);
+
+                        long derivedInTask = solveDecompose(occOther, rDerived, rDecomposed);
+
                         if (derivedInTask != ETERNAL) {
 
-                            int taskInBelief = rDecomposed.subtermTime(rOtherTerm /* task */);
+                            int taskInBelief = rDecomposed.subtermTime(rOtherTerm);
                             if (taskInBelief != DTERNAL) {
                                 occ = derivedInTask - taskInBelief;
                             }
@@ -764,7 +766,7 @@ public interface TimeFunctions {
         return ETERNAL;
     }
 
-    static Term resolve(@NotNull Term x, @NotNull Derivation p) {
+    @NotNull static Term resolve(@NotNull Term x, @NotNull Derivation p) {
         Term y;
         try {
             y = p.resolve(x);
