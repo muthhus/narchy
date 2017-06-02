@@ -30,12 +30,12 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AENode> {
 
             float[] x1 = Util.doubleToFloatArray(n.getDataRef());
             if (x1[0] == x1[0]) { //avoid NaN contaminating the matrices
-                enc.put(x1, 0.1f, 0.01f, 0.0f, false, false, false);
+                enc.put(x1, 0.01f, 0.001f, 0.0f, false, false, false);
                 arraycopy(enc.output(), 0, n.center, 0, outs);
-                if (n.isInfinite()) {
-                    clear();
-                    Arrays.fill(n.center, 0);
-                }
+//                if (n.isInfinite()) {
+//                    clear();
+//                    Arrays.fill(n.center, 0);
+//                }
                 //System.out.println(n4(n.center));
             }
         });

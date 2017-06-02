@@ -93,8 +93,6 @@ public abstract class Param  {
     public final static int UnificationTTLMax = BeliefMatchTTL * 10;
     public final static int UnificationTTLMin = BeliefMatchTTL * 4;
 
-    public final static int FireTTLMax = 10;
-    public final static int FireTTLMin = 5;
 
     public final static int SubUnificationStackMax = UnificationStackMax/2;
 

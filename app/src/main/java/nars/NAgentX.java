@@ -101,23 +101,23 @@ abstract public class NAgentX extends NAgent {
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
 
-        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
-        conceptState.beliefsMaxTemp.set(32);
-        conceptState.goalsMaxTemp.set(32);
+//        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
+//        conceptState.beliefsMaxTemp.set(32);
+//        conceptState.goalsMaxTemp.set(32);
 
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.beliefConfidence(0.5f);
+        n.goalConfidence(0.5f);
 
         float p = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * p;
         n.DEFAULT_GOAL_PRIORITY = 1f * p;
         n.DEFAULT_QUESTION_PRIORITY = 1f * p;
         n.DEFAULT_QUEST_PRIORITY = 1f * p;
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(60);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, false, 8);
@@ -126,7 +126,7 @@ abstract public class NAgentX extends NAgent {
 
         int threads = 2;
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512);
+            n.addNAR(4096);
         }
 
         NAgent a = init.apply(n);

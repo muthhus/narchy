@@ -113,7 +113,7 @@ abstract public class Derivation extends Unify implements TermContext {
     private substitute _substitute;
     private substituteIfUnifiesAny _substituteIfUnifiesAny;
     private substituteIfUnifiesDep _substituteIfUnifiesDep;
-
+    private int serial;
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
@@ -361,6 +361,9 @@ abstract public class Derivation extends Unify implements TermContext {
     }
 
 
+    public int next() {
+        return serial++;
+    }
 }
 
 

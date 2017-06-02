@@ -1,7 +1,9 @@
 package nars.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
+import jcog.net.attn.MeshMap;
 import nars.$;
 import nars.InterNAR;
 import nars.NAR;
@@ -27,11 +29,23 @@ public class NARWeb extends WebServer {
 
     private final NarseseIOService io;
     private final ActiveConceptService active;
+    private final MeshMap<Object, Object> net;
 
     public NARWeb(NAR nar, int httpPort) {
         super(httpPort);
 
         addPrefixPath("/terminal", socket(io = new NarseseIOService(nar)));
+
+        net = MeshMap.get("d1", (k, v) -> {
+            System.out.println(k + " " + v);
+            try {
+                io.send(Util.toBytes(new Object[] { k , v }));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+
+
         //.addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
         addPrefixPath("/active", socket(active = new ActiveConceptService(nar, 200, 48)));
 //        addPrefixPath("/json/in", socket(new WebsocketService() {

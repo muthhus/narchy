@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.list.FasterList;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -20,9 +21,9 @@ import java.util.Random;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
-    //static final int MISFIRE_COST = 1;
-    static final int premiseCost = 1;
-    static final int linkSampleCost = 1;
+    /** rate at which ConceptFire forms premises */
+    private static final float spendRate = 0.5f;
+    private static final int premisesPerCycle = 4;
 
 
     public ConceptFire(Concept c, float pri) {
@@ -36,8 +37,6 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         if (pri!=pri)
             return null;
 
-        int ttl = Util.lerp(pri, Param.FireTTLMax, Param.FireTTLMin);
-
         final Concept c = id;
 
         final Bag<Task, PriReference<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
@@ -48,7 +47,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         @Nullable PriReference<Term> termlink = null;
         float taskLinkPri = -1f, termLinkPri = -1f;
 
-        List<Premise> premises = $.newArrayList();
+        FasterList<Premise> premises = new FasterList<>(0,new Premise[premisesPerCycle]);
         //also maybe Set is appropriate here
 
         float taskMargin = 1f/(1+tasklinks.size());
@@ -62,11 +61,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
          * the probabilistic selection sequence and doesnt affect derivation
          * budgeting directly.
          */
+
+        int ttl = premisesPerCycle;
+
         Random rng = nar.random();
         while (ttl > 0) {
             if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = tasklinks.sample();
-                ttl -= linkSampleCost;
                 if (tasklink == null)
                     break;
 
@@ -76,24 +77,27 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
             if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                 termlink = termlinks.sample();
-                ttl -= linkSampleCost;
                 if (termlink == null)
                     break;
                 termLinkPri = Util.clamp(termlinks.normalizeMinMax(termlink.priSafe(0)), termMargin, 1f-termMargin);
             }
 
             premises.add(new Premise(tasklink, termlink));
-
-            ttl -= premiseCost; //failure of premise generation still causes cost
+            ttl--;
         }
 
         int num = premises.size();
         if (num > 0) {
-            ITask[] pp = premises.toArray(new ITask[num]);
+            ITask[] pp = premises.array();
+            float spend = this.pri * spendRate;
+
             //divide priority among the premises
-            float subPri = pri / num;
-            for (ITask p : pp)
-                p.setPri(subPri);
+            float subPri = spend / num;
+            for (int i = 0; i < num; i++) {
+                pp[i].setPri(subPri);
+            }
+
+            this.pri -= spend;
 
             return pp;
         } else {

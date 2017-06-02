@@ -11,7 +11,6 @@ import org.junit.runners.Parameterized;
 import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * see bAbl.nal
@@ -19,7 +18,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class bAblTests extends AbstractNALTest {
 
-    public bAblTests (Supplier<NAR> b) {
+    public bAblTests(Supplier<NAR> b) {
         super(b);
     }
 
@@ -28,7 +27,8 @@ public class bAblTests extends AbstractNALTest {
         return AbstractNALTest.nars(8);
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void test1() throws nars.Narsese.NarseseException {
 
         test()
@@ -36,7 +36,7 @@ public class bAblTests extends AbstractNALTest {
                 .believe("in(bob,office)") //Bob is in the office.
                 .ask("in({john},{?where})") //Where is john?
                 .mustBelieve(100, "in({john},{playground})", 1f, 0.73f) //note that the 0.90 conf result should have been provided as an answer to the question, not as a belief. the 0.73 conf version is a side effect so we'll test for that at least
-                ;
+        ;
 
 
         ////(1) Basic Factoid QA with Single Supporting Fact
@@ -57,42 +57,46 @@ public class bAblTests extends AbstractNALTest {
         //background knowledge (multiple input for priority boost to have the answer faster ^^)
         //if something is picked, it means that the object which is picked is where the person is
 
-        TestNAR t = test()
-                //.log()
-                .believe("((pick(#Person,$Object) &&+0 isIn(#Person,$Place)) ==>+0 isIn($Object,$Place))")
-                .inputAt(0, "isIn(john,playground).") ////John is in the playground.
-                .inputAt(0, "isIn(bob,office).") ////Bob is in the office.
-                .inputAt(0, "pick(john,football).") ////John picked up the football.
-                .inputAt(0, "isIn(bob,kitchen).") ////Bob went to the kitchen.
-                .inputAt(0, "isIn(football,#where)?") ////Where is the football?
-                .mustOutput(0, 2000,
-                        "isIn(football,playground)",BELIEF,
-                        1f,1f, 0.1f, 0.99f, ETERNAL); ////A: playground
+        TestNAR t = test();
+
+        t.nar.truthResolution.setValue(0.25f);
+
+        //t.log();
+        t.believe("((pick(#Person,$Object) &&+0 inside(#Person,$Place)) ==>+0 inside($Object,$Place))")
+                .input("inside(john,playground). :|:") ////John is in the playground.
+                .input("inside(bob,office). :|:") ////Bob is in the office.
+                .input("pick(john,football). :|:") ////John picked up the football.
+                .input("inside(bob,kitchen). :|:") ////Bob went to the kitchen.
+                .input("$0.9$ inside(football,?where)?") ////Where is the football?
+                .mustOutput(0, 5000,
+                        "inside(football,playground)", BELIEF,
+                        1f, 1f, 0.5f, 0.99f, 0); ////A: playground
 
     }
 
-    /** TODO find a better problem representation, this one isnt good */
-    @Ignore @Test public void test19() throws nars.Narsese.NarseseException {
+    /**
+     * TODO find a better problem representation, this one isnt good
+     */
+    @Test
+    public void test19() throws nars.Narsese.NarseseException {
 
         //(19) Path Finding
         TestNAR t = test();
-        t.nar.termVolumeMax.setValue(40); //larger than default
+        t.nar.termVolumeMax.setValue(40);
+        t.nar.truthResolution.setValue(0.25f);
 
-        //t.log();
-
-               t.believe("((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) ))")
-                .believe("((&&, start($1,$2), at( $1,$B,$C), at( $2,$B,$C2) ) ==> ( path( id,$C,neg,$C2)  && chunk( $1,$2,$B) ))")
-                .believe("((&&, start($1,$2), at( $B,$1,$C), at( $B,$2,$C2) ) ==> ( path( neg,$C,id,$C2)  && chunk( $1,$2,$B) ))")
-                .believe("((&&, start($1,$2), at( $B,$1,$C), at( $2,$B,$C2) ) ==> ( path( neg,$C,neg,$C2) && chunk( $1,$2,$B) ))")
-                .believe("at(kitchen,hallway,south)") //The kitchen is north of the hallway.
-                .believe("at(den,hallway,west)") //The den is east of the hallway.
-                .believe("start(den,kitchen)") //How do you go from den to kitchen?
-                .ask("<?what --> path>")
+        t.input("$0.9 ((&&, start($1,$2), at( $1,$B,$C), at( $B,$2,$C2) ) ==> ( path( id,$C,id,$C2)   && chunk( $1,$2,$B) )).")
+                .input("$0.9 ((&&, start($1,$2), at( $1,$B,$C), at( $2,$B,$C2) ) ==> ( path( id,$C,neg,$C2)  && chunk( $1,$2,$B) )).")
+                .input("$0.9 ((&&, start($1,$2), at( $B,$1,$C), at( $B,$2,$C2) ) ==> ( path( neg,$C,id,$C2)  && chunk( $1,$2,$B) )).")
+                .input("$0.9 ((&&, start($1,$2), at( $B,$1,$C), at( $2,$B,$C2) ) ==> ( path( neg,$C,neg,$C2) && chunk( $1,$2,$B) )).")
+                .input("at(kitchen,hallway,south).") //The kitchen is north of the hallway.
+                .input("at(den,hallway,west).") //The den is east of the hallway.
+                .input("start(den,kitchen).") //How do you go from den to kitchen?
+                .input("$0.9 path(?a,?b,?c,?d)?")
                 .mustBelieve(2500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
 
 
     }
-
 
 
 }

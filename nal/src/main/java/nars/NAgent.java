@@ -14,6 +14,7 @@ import jcog.pri.mix.PSink;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
+import nars.control.ConceptFire;
 import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.ITask;
@@ -106,6 +107,7 @@ abstract public class NAgent implements NSense, NAct {
     public float reward;
     private Loop senseAndMotorLoop;
     private Loop predictLoop;
+    final private ConceptFire fireHappy;
 
     public NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -144,6 +146,7 @@ abstract public class NAgent implements NSense, NAct {
                 return new EternalTable(1); //for storing the eternal happiness goal
             }
         };
+        fireHappy = new ConceptFire(happy, 1f);
 
         curiosity = new FloatParam( 0.10f);
 
@@ -238,7 +241,11 @@ abstract public class NAgent implements NSense, NAct {
                     //+(dur * 3 / 2);
                     ;
 
-            ambition.input(Stream.of(happy.apply(nar)));
+
+            ambition.input(
+                Stream.of(happy.apply(nar), fireHappy)
+            );
+
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);

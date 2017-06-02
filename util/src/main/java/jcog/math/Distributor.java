@@ -84,7 +84,7 @@ public final class Distributor {
      * @param index The current index
      * @return the next index
      */
-    public int next(int index) {
-        return (index + 1) % capacity;
+    public int next(long index) {
+        return ((int) ((index + 1) )) % capacity;
     }
 }

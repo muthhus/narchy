@@ -3,7 +3,6 @@ package nars.experiment;
 import com.google.common.collect.Lists;
 import jcog.Optimize;
 import jcog.Util;
-import jcog.math.FloatAveraged;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
 import nars.$;
@@ -14,7 +13,6 @@ import nars.derive.DefaultDeriver;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.test.agent.Line1DSimplest;
-import nars.util.exe.TaskExecutor;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
@@ -37,9 +35,9 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.001f; //in time units
         float yResolution = 0.2f; //in 0..1.0
-        float cycles = 32;
+        float periods = 64;
 
-        final int runtime = Math.round(cycles/tHz);
+        final int runtime = Math.round(periods /tHz);
 
         @Override
         public float floatValueOf(NAR n) {
@@ -62,7 +60,7 @@ public class Line1D {
 
             a.out.resolution.setValue(yResolution * 1);
             a.in.resolution.setValue(yResolution * 1);
-            a.curiosity.setValue(0.01f);
+            a.curiosity.setValue(0.05f);
 
             //            a.in.beliefs().capacity(0, 100, a.nar);
             //            a.out.beliefs().capacity(0, 100, a.nar);
@@ -78,8 +76,8 @@ public class Line1D {
             a.onFrame((z) -> {
 
                 a.target(
-                        Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
-                        //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
+                        //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
+                        (float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );

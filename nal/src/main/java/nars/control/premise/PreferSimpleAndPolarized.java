@@ -14,8 +14,11 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
-    /**  polarity (includes conf) vs. complexity balance */
-    public final FloatParam polarityVsComplexity = new FloatParam(0.5f, 0f, 1f);
+//    /** preference for polarity (includes conf) */
+//    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);
+//
+//    /** preference for simplicity */
+//    public final FloatParam simplicity = new FloatParam(0.5f, 0f, 1f);
 
 //    public final FloatParam belief = new FloatParam(1f, 0f, 2f);
 //    public final FloatParam goal = new FloatParam(1f, 0f, 2f);
@@ -59,12 +62,13 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         float p = d.premise.pri();
 
         if (truth!=null) { //belief and goal:
-            float polarityFactor = this.polarityVsComplexity.floatValue();
-            p *= (1f-polarityFactor) * complexityFactorRelative(conclusion, punc, d.task, d.belief) +
-                 (polarityFactor) * truth.polarization();
+            p *=
+                 simplicityFactorRelative(conclusion, punc, d.task, d.belief)  * truth.polarization();
+//                    simplicity.floatValue() * simplicityFactorRelative(conclusion, punc, d.task, d.belief) +
+//                 polarity.floatValue()   * truth.polarization();
         } else {
             //p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-            p *= complexityFactorRelative(conclusion, punc, d.task, d.belief);
+            p *= simplicityFactorRelative(conclusion, punc, d.task, d.belief);
         }
 
 //        p *= puncFactor(punc).floatValue();
@@ -94,7 +98,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
      * occam's razor: penalize relative complexity growth
      * @return a value between 0 and 1 that priority will be scaled by
      */
-    public static float complexityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
+    public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
         int parentComplexity;
         int taskCompl = task.complexity();
         if (belief != null) // && parentBelief.complexity() > parentComplexity)
