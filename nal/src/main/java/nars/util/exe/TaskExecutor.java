@@ -4,6 +4,7 @@ import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.Pri;
 import nars.NAR;
+import nars.Param;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
@@ -168,7 +169,8 @@ public class TaskExecutor extends Executioner {
 
         } catch (Throwable e) {
             x.delete(); //TODO add to a 'bad' bag?
-            NAR.logger.error("{} {}", x, e.getMessage());
+            if (Param.DEBUG)
+                NAR.logger.error("{} {}", x, e.getMessage());
             return;
         }
 

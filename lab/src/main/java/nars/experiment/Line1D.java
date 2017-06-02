@@ -35,9 +35,9 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.0003f; //in time units
-        float yResolution = 0.1f; //in 0..1.0
-        float cycles = 128;
+        float tHz = 0.001f; //in time units
+        float yResolution = 0.2f; //in 0..1.0
+        float cycles = 32;
 
         final int runtime = Math.round(cycles/tHz);
 
@@ -45,12 +45,12 @@ public class Line1D {
         public float floatValueOf(NAR n) {
             Line1DSimplest a = new Line1DSimplest(n) {
 
-                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
-
-                @Override
-                protected float act() {
-                    return rewardAveraged.asFloat();
-                }
+//                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
+//
+//                @Override
+//                protected float act() {
+//                    return rewardAveraged.asFloat();
+//                }
             };
 
             a.init();
@@ -107,26 +107,27 @@ public class Line1D {
             Param.ANSWER_REPORTING = false;
             Object d = DefaultDeriver.the;
 
-            int maxIterations = 128;
-            int repeats = 1;
+            int maxIterations = 1024;
+            int repeats = 2;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
                 Default n = new Default();
+                n.random().setSeed(System.nanoTime());
 
                 n.time.dur(1);
 
                 n.DEFAULT_BELIEF_PRIORITY = 1f;
                 n.DEFAULT_GOAL_PRIORITY = 1f;
-                n.DEFAULT_QUESTION_PRIORITY = 0.5f;
-                n.DEFAULT_QUEST_PRIORITY = 0.5f;
+                n.DEFAULT_QUESTION_PRIORITY = 1f;
+                n.DEFAULT_QUEST_PRIORITY = 1f;
 
                 return n;
             }).tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.beliefConfidence(y);
             }).tweak("goalConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.goalConfidence(y);
-            }).tweak("termVolMax", 8, 14, 1, (y, x) -> {
+            }).tweak("termVolMax", 10, 16, 1, (y, x) -> {
                 x.termVolumeMax.setValue(y);
 //            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
 //                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
@@ -134,9 +135,9 @@ public class Line1D {
                 x.in.streams.values().forEach(s -> s.setValue(y));
             }).tweak("stmSize", 1, 2, 1, (y, x) -> {
                 ((Default) x).stmLinkage.capacity.setValue(y);
-            }).tweak("confMin", 0, 0.8f, 0.01f, (y, x) -> {
+            }).tweak("confMin", 0.01f, 0.9f, 0.1f, (y, x) -> {
                 x.confMin.setValue(y);
-            }).tweak("truthResolution", 0, 0.2f, 0.02f, (y, x) -> {
+            }).tweak("truthResolution", 0, 0.05f, 0.01f, (y, x) -> {
                 x.truthResolution.setValue(y);
             });
 
@@ -169,10 +170,10 @@ public class Line1D {
 //            }
 //        });
                 Default n = new Default();
-                n.time.dur(4);
-                n.termVolumeMax.set(15);
-                n.goalConfidence(0.2f);
-                n.beliefConfidence(0.2f);
+                n.time.dur(1);
+                n.termVolumeMax.set(20);
+                n.goalConfidence(0.5f);
+                n.beliefConfidence(0.5f);
 
                 new Line1DExperiment() {
                     @Override
@@ -184,7 +185,8 @@ public class Line1D {
                                     row(
                                             conceptPlot(a.nar, Lists.newArrayList(
                                                     () -> (float) a.in.sensor.getAsDouble(),
-                                                    () -> a.o.floatValue(),
+                                                    a.o,
+                                                            //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
                                                     () -> a.reward
                                                     //() -> a.rewardSum
                                                     )
@@ -214,7 +216,7 @@ public class Line1D {
                 Grid grid = new Grid(VERTICAL);
                 List<Plot2D> plots = $.newArrayList();
                 for (FloatSupplier t : concepts) {
-                    Plot2D p = new Plot2D(plotHistory, Plot2D.BarWave);
+                    Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
                     p.add(t.toString(), t::asFloat, -1f, 1f);
                     grid.children.add(p);
                     plots.add(p);

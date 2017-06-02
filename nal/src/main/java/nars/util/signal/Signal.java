@@ -21,7 +21,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Signal {
 
-    final int MAX_PERCEPT_DURATIONS = 10;
+    final int MAX_PERCEPT_DURATIONS = 4;
 
     public FloatSupplier pri;
 

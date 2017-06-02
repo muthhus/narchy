@@ -7,10 +7,13 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.ActionConcept;
+import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
+
+import static jcog.Util.*;
 
 
 /**
@@ -27,7 +30,7 @@ public class Line1DSimplest extends NAgent {
     public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
     @NotNull
-    public final ActionConcept out;
+    public final GoalActionConcept out;
     /**
      * the current value
      */
@@ -111,13 +114,17 @@ public class Line1DSimplest extends NAgent {
 
     @Override
     protected float act() {
-        float dist = Math.abs(i.floatValue() - o.floatValue());
+        float dist = Math.abs(
+            round(i.floatValue(), in.resolution.floatValue()) -
+            round(o.floatValue(), out.resolution.floatValue())
+        );
+
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
         //return (1f - dist); //unipolar, 0..1.0
 
-        float r = (1f - dist); //bipolar, normalized to -1..+1
-        return (r-0.5f)*2f;
+        float r = (2f - dist); //bipolar, normalized to -1..+1
+        return (r-1f);
     }
 
 

@@ -34,8 +34,8 @@ public class Dimensionaleyez extends SimpleSpatial {
 
     private final MeshMap<Integer, List<Float>> m;
 
-    int outs = 2;
-    final NeuralGasMap n = new NeuralGasMap(5, 128, outs);
+    int outs = 3;
+    final NeuralGasMap n = new NeuralGasMap(5, 64, outs);
 
     private final StreamingNormalizer s;
 
@@ -102,8 +102,8 @@ public class Dimensionaleyez extends SimpleSpatial {
 
             float last = ((float) n.getEntry(n.getDimension() - 1) + 1f) / 2f;
 
-            float[] c = this.s.unnormalize(n);
-            System.out.println(n4(c) + last);
+            //float[] c = this.s.unnormalize(n);
+            //System.out.println(n4(c) + last);
 
             //System.out.println(x + " " + y + " " + z + " <- " + n);
 

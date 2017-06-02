@@ -7,7 +7,6 @@ import nars.Narsese;
 import nars.Task;
 import nars.table.BeliefTable;
 import nars.table.EternalTable;
-import nars.table.SensorBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -52,14 +51,14 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         };
 
         this.signal = signal;
-        this.beliefs = newBeliefTable(n, true);
-        this.goals = newBeliefTable(n, false);
+//        this.beliefs = newBeliefTable(n, true);
+//        this.goals = newBeliefTable(n, false);
     }
 
-    @Override
-    protected @NotNull BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
-        return new SensorBeliefTable();
-    }
+//    @Override
+//    protected @NotNull BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
+//        return new SensorBeliefTable();
+//    }
 
     /** returns a new stamp for a sensor task */
     protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {

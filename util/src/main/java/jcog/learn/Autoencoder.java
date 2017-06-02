@@ -7,6 +7,8 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static java.util.Arrays.fill;
+
 /**
  * Denoising Autoencoder (from DeepLearning.net)
  * 
@@ -24,7 +26,6 @@ public class Autoencoder {
 	final public float[] y;
 
 	public final float[][] W;
-	final MultidimensionalCounter w;
 
 	private final float[] hbias;
 	private final float[] vbias;
@@ -61,18 +62,24 @@ public class Autoencoder {
 		this.rng = rng;
 
 		this.W = new float[outs][ins];
-		w = new MultidimensionalCounter(outs, ins);
-		float a = 1.0f / ins;
+			this.hbias = new float[outs];
+		this.vbias = new float[ins];
 
-		for (int i = 0; i < outs; i++) {
-			for (int j = 0; j < ins; j++) {
+		randomize();
+	}
+
+	public void randomize() {
+		float a = 1.0f / W[0].length;
+		for (int i = 0; i < W.length; i++) {
+			for (int j = 0; j < W[0].length; j++) {
 				this.W[i][j] = uniform(-a, a);
 			}
 		}
-
-		this.hbias = new float[outs];
-		this.vbias = new float[ins];
-	}
+		fill(hbias, 0);
+		fill(L_hbias, 0);
+		fill(vbias, 0);
+		fill(L_vbias, 0);
+    }
 
 	private float[] preprocess(float[] x, float noiseLevel, float corruptionRate) {
 
@@ -155,7 +162,7 @@ public class Autoencoder {
 //				y[i] = (y[i] - min) / (max-min);
 //			}
 			} else {
-				Arrays.fill(y, 0);
+				fill(y, 0);
 			}
 		}
 
@@ -344,5 +351,6 @@ public class Autoencoder {
 		}
 		return (s == null) ? null : s.toArray();
 	}
+
 
 }

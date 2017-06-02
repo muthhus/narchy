@@ -59,9 +59,9 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .input("--x:before. :|:")
                 .inputAt(10, "x:after. :|:")
-                .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0)
+                .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
                 .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
         ;
     }
@@ -343,7 +343,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "(((John, door) --> open) ==>+4 ((John, room) --> enter))",
-                1.00f, 0.45f, 0);
+                1.00f, 0.45f, 0,4);
 
     }
 
@@ -356,7 +356,7 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
                 1.00f, 0.45f,
-                0);
+                0,4);
 
     }
 
@@ -369,7 +369,7 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(<door --> open> <=>+1 <room --> enter>)",
                 1.00f, 0.45f,
-                1);
+                1,2);
     }
 
     @Test
@@ -423,7 +423,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles,
                 "(enter($1,room) <=>-2 open($1,door))",
                 1.00f, 0.45f,
-                0
+                0,2
         );
 
     }
@@ -442,7 +442,7 @@ public class NAL7Test extends AbstractNALTest {
                 "(<$1 --> (/, open, _, door)> ==>+2 <$1 --> (/, enter, _, room)>)",
                 1.00f,
                 0.45f /* 0.45f */,
-                0
+                0,2
         );
 
         //REVERSE:
@@ -735,7 +735,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .inputAt(2, "(a-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
-                .mustBelieve(cycles, "((d-->c) ==>-3 (a-->b))", 1f, 0.45f, 2)
+                .mustBelieve(cycles, "((d-->c) ==>-3 (a-->b))", 1f, 0.45f, 2, 5)
                 .mustNotOutput(cycles, "<a-->b>", BELIEF, -1)
                 .mustNotOutput(cycles, "<a-->b>", BELIEF, 5)
                 .mustNotOutput(cycles, "<d-->c>", BELIEF, 2)
