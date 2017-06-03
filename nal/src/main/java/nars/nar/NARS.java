@@ -4,6 +4,7 @@ import jcog.AffinityExecutor;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
+import jcog.math.FloatAveraged;
 import jcog.pri.PriReference;
 import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.classify.EnumClassifier;
@@ -71,11 +72,14 @@ public class NARS extends NAR {
 
     public final RLMixControl<String,Task> nalMix = new RLMixControl<String,Task>(this::inputSub,
             15f,
-            emotion.happy.sumIntegrator()::meanThenClear,
-            new BooleanClassifier<>("simple",
-                    (x) -> x.complexity() <= termVolumeMax.intValue()/2f),
-            new BooleanClassifier<>("complex",
-                    (x) -> x.complexity() > termVolumeMax.intValue()/2f),
+            new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
+            new EnumClassifier<String, Task>("complexity", 3, (t) -> {
+                int c  = t.complexity();
+                int m = termVolumeMax.intValue();
+                if (c < m/4) return 0;
+                if (c < m/2) return 1;
+                return 2;
+            }),
             new EnumClassifier<String, Task>("punc", 4, (t) -> {
                 switch (t.punc()) {
                     case BELIEF: return 0;

@@ -33,7 +33,7 @@ public class RingBufferTensor extends ArrayTensor {
         for (int i = 0; i < num; i++) {
             int ts = target * segment;
             for (int j = 0; j < segment; j++) {
-                each.value(k++, data[j + ts]);
+                each.value(k++, data[ts++]);
             }
             if (++target == num) target = 0;
         }

@@ -144,7 +144,7 @@ abstract public class NAgentX extends NAgent {
                         .add("happy", () -> n.nalMix.lastScore)
                         .on(a::onFrame),
                 col(
-                        new MatrixView(n.nalMix.agentIn, 4, (x, gl) -> {
+                        new MatrixView(n.nalMix.agentIn, n.nalMix.size(), (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
                         }),
@@ -161,7 +161,7 @@ abstract public class NAgentX extends NAgent {
                         ),
                         //new MatrixView(n.nalMix.agentIn.data, false),
                         new MatrixView(n.nalMix.agent.ae.W),
-                        new MatrixView(n.nalMix.agent.ae.y, true),
+                        new MatrixView(n.nalMix.agent.ae.y, false),
                         new MatrixView(n.nalMix.agent.q),
                         new MatrixView(n.nalMix.agent.et)
                 )

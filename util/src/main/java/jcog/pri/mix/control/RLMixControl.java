@@ -6,15 +6,17 @@ import jcog.math.AtomicSummaryStatistics;
 import jcog.math.FloatSupplier;
 import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
-import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.mix.MixRouter;
-import jcog.tensor.*;
+import jcog.tensor.ArrayTensor;
+import jcog.tensor.BufferedTensor;
+import jcog.tensor.RingBufferTensor;
+import jcog.tensor.TensorChain;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.*;
+import static jcog.Util.sqr;
 
 /**
  * record a finite history of mix parameters values
@@ -35,30 +37,33 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     public final BufferedTensor agentIn;
     private final int size;
 
-    /** values less than 1 eventually lowers channel volume levels to zero (flat, ie. x1)
-     *  unless otherwise boosted or cut */
+    /**
+     * values less than 1 eventually lowers channel volume levels to zero (flat, ie. x1)
+     * unless otherwise boosted or cut
+     */
     float decay = 1f;
 
     private final double[] delta; //delta accumulated
     double controlSpeed = 0.1; //increments up/down per action
     public float lastScore;
 
-    public RLMixControl(Consumer<Y> target, float fps, FloatSupplier score, AbstractClassifier<Y,X>... tests) {
+    public RLMixControl(Consumer<Y> target, float fps, FloatSupplier score, AbstractClassifier<Y, X>... tests) {
         super(fps);
 
-        this.mix = new MixRouter<X,Y>(target, this, tests);
+        this.mix = new MixRouter<X, Y>(target, this, tests);
 
         this.size = mix.size();
         int outs = size + 1 /* bias */;
 
-        this.levels = new ArrayTensor(size);
-        this.traffic = new ArrayTensor(size);
         this.agentIn = new BufferedTensor(new RingBufferTensor(
-                new TensorChain(levels, traffic),4) );
+                new TensorChain(
+                    this.levels = new ArrayTensor(size),
+                    this.traffic = new ArrayTensor(size)
+                ), 2));
 
         int numInputs = agentIn.volume();
-        agent = new HaiQAgent(numInputs, numInputs / 2, outs * 2);
-        agent.setQ(0.05f, 0.5f, 0.9f, 0.01f); // 0.1 0.5 0.9
+        agent = new HaiQAgent(numInputs, size*2, outs * 2);
+        agent.setQ(0.05f, 0.25f, 0.9f, 0.01f); // 0.1 0.5 0.9
         this.delta = new double[outs];
         this.score = score;
     }
@@ -70,13 +75,13 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     @Override
     public float floatValueOf(RoaringBitmap t) {
         final float[] preGain = {0};
-        t.forEach((int i)->{
+        t.forEach((int i) -> {
             preGain[0] += levels.get(i);
         });
 
-        preGain[0] += levels.get(size-1); //bias
+        preGain[0] += levels.get(size - 1); //bias
 
-        return sqr(1f + 2 * (-0.5f + Math.max(0, Math.min(1, preGain[0]) ))); //l^2
+        return sqr(1f + 2 * (-0.5f + Math.max(0, Math.min(1, preGain[0])))); //l^2
     }
 
     @Override
@@ -94,8 +99,8 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
 
         int action = agent.act(this.lastScore = score.asFloat(), agentIn.get());
 
-        int which = action/2;
-        if (action%2==0)
+        int which = action / 2;
+        if (action % 2 == 0)
             delta[which] = -1;
         else
             delta[which] = +1;

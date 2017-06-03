@@ -54,15 +54,15 @@ public class TensorChain implements Tensor {
     }
 
     @Override
-    public void forEach(IntFloatProcedure sequential) {
-        for (Tensor x : sub) {
-            x.forEach(sequential);
-        }
-    }
-
-    @Override
     public void forEach(IntFloatProcedure  sequential, int start, int end) {
-        throw new UnsupportedOperationException();
+        assert(start == 0);
+        assert(end == volume());
+        final int[] p = {0};
+        for (Tensor x : sub) {
+            x.forEach((i,v) -> {
+               sequential.value(p[0]++, v);
+            });
+        }
     }
 
     @Override
