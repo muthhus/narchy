@@ -69,7 +69,7 @@ public class Autoencoder {
 	}
 
 	public void randomize() {
-		float a = 0.5f / W[0].length;
+		float a = 1f / W[0].length;
 		for (int i = 0; i < W.length; i++) {
 			for (int j = 0; j < W[0].length; j++) {
 				this.W[i][j] = uniform(-a, a);

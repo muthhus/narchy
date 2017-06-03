@@ -21,6 +21,7 @@ import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
+import nars.task.NALTask;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.time.Time;
@@ -62,7 +63,6 @@ public class NARS extends NAR {
 
 
     enum PostBand {
-        Input,
         Premise,
         NAL,
         Activation,
@@ -70,52 +70,14 @@ public class NARS extends NAR {
         Other
     }
 
-    public final RLMixControl<String,Task> nalMix = new RLMixControl<String,Task>(this::inputSub,
+    public final RLMixControl<String,ITask> nalMix = new RLMixControl<>(this::inputSub,
             15f,
             new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
-            new EnumClassifier<String, Task>("complexity", 3, (t) -> {
-                int c  = t.complexity();
-                int m = termVolumeMax.intValue();
-                if (c < m/4) return 0;
-                if (c < m/2) return 1;
-                return 2;
-            }),
-            new EnumClassifier<String, Task>("punc", 4, (t) -> {
-                switch (t.punc()) {
-                    case BELIEF: return 0;
-                    case GOAL: return 1;
-                    case QUESTION: return 2;
-                    case QUEST: return 3;
-                    default:
-                        throw new RuntimeException("unknown punc");
-                }
-            }),
 
-            //TODO write as EnumClassifier:
-            new BooleanClassifier<>("isPresent", t -> t.isPresentOf(time(), dur())),
-            new BooleanClassifier<>("isFuture", t -> t.isFutureOf(time())),
-            new BooleanClassifier<>("isPast", t -> t.isPastOf(time())),
-
-            new EnumClassifier<String, Task>("type", 2, (t) -> {
-                if (t instanceof SignalTask) {
-                    return 1;
-                } else {
-                    return 0;
-                }
-            })
-//            new MixRouter.Classifier<>("original",
-//                    (x) -> x.stamp().length <= 2),
-//            new MixRouter.Classifier<>("unoriginal",
-//                    (x) -> x.stamp().length > 2),
-    );
-
-
-
-    public final MixSwitch<ITask> controlMix = new MixSwitch<>(this::inputSub,
-            (x) -> {
+            new EnumClassifier<>("type", PostBand.values().length, (x) -> {
                 PostBand result;
                 if (x instanceof Task) {
-                    result = NAL; //should be zero
+                    result = NAL;
 //                    switch (x.punc()) {
 //                        case BELIEF:
 //                            result = PostBand.DerivedBelief; break;
@@ -139,8 +101,56 @@ public class NARS extends NAR {
                 }
 
                 return result.ordinal();
-            },
-            Stream.of(PostBand.values()).map(Enum::toString).toArray(String[]::new));
+            }),
+
+            new EnumClassifier<>("complexity", 3, (t) -> {
+                if (t instanceof NALTask) {
+                    int c = ((NALTask)t).complexity();
+                    int m = termVolumeMax.intValue();
+                    if (c < m / 4) return 0;
+                    if (c < m / 2) return 1;
+                    return 2;
+                }
+                return -1; //n/A
+            }),
+            new EnumClassifier<>("punc", 4, (t) -> {
+                if (t instanceof NALTask) {
+                    switch (((NALTask)t).punc()) {
+                        case BELIEF:
+                            return 0;
+                        case GOAL:
+                            return 1;
+                        case QUESTION:
+                            return 2;
+                        case QUEST:
+                            return 3;
+                        default:
+                            throw new RuntimeException("unknown punc");
+                    }
+                }
+                return -1;
+            }),
+            new EnumClassifier<>("when", 3, (t) -> {
+                if (t instanceof NALTask) {
+                    long now = time();
+                    long h = ((NALTask)t).nearestStartOrEnd(now);
+                    if (Math.abs(h - now) <= dur()) {
+                        return 0; //present
+                    } else if (h > now) {
+                        return 1; //future
+                    } else {
+                        return 2; //past
+                    }
+                }
+                return -1;
+            })
+
+//            new MixRouter.Classifier<>("original",
+//                    (x) -> x.stamp().length <= 2),
+//            new MixRouter.Classifier<>("unoriginal",
+//                    (x) -> x.stamp().length > 2),
+    );
+
 
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
@@ -148,16 +158,11 @@ public class NARS extends NAR {
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
                 new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024, e),
                 rng, e);
-
-        onCycle(n -> controlMix.commit(n.time()));
     }
 
     @Override
     public void input(ITask x) {
-        if (x instanceof Task)
-            nalMix.accept((Task) x);
-        else
-            controlMix.accept(x);
+        nalMix.accept(x);
     }
 
     public void inputSub(ITask x) {

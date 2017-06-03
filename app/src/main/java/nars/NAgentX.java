@@ -181,7 +181,6 @@ abstract public class NAgentX extends NAgent {
             super(
                     new MixBoard(n, n.in),
                     //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
-                    new MixBoard(n, n.controlMix),
                     Vis.reflect(n),
                     new Vis.EmotionPlot(64, a)
                     //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))

@@ -24,8 +24,10 @@ public class EnumClassifier<Y, X> extends AbstractClassifier<X,Y> {
     @Override
     public void classify(X x, RoaringBitmap bmp, int offset) {
         int w = which.applyAsInt(x);
-        assert(w >= 0 && w < dim);
-        bmp.add(offset + w);
+        if (w > 0) {
+            assert (w < dim);
+            bmp.add(offset + w);
+        }
     }
 
 }
