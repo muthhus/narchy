@@ -1,9 +1,5 @@
 package jcog.learn;
 
-import jcog.math.TensorF;
-
-import java.util.function.Supplier;
-
 /**
  * lowest common denominator reinforcement learning agent interface
  */

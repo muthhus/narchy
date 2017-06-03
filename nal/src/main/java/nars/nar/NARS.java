@@ -5,7 +5,8 @@ import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
 import jcog.pri.PriReference;
-import jcog.pri.mix.MixRouter;
+import jcog.pri.classify.BooleanClassifier;
+import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.MixSwitch;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
@@ -19,6 +20,7 @@ import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
+import nars.task.SignalTask;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -34,6 +36,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
+import static nars.Op.*;
 import static nars.nar.NARS.PostBand.*;
 
 /**
@@ -67,19 +70,35 @@ public class NARS extends NAR {
     }
 
     public final RLMixControl<String,Task> nalMix = new RLMixControl<String,Task>(this::inputSub,
-            30f,
+            15f,
             emotion.happy.sumIntegrator()::meanThenClear,
-            new MixRouter.Classifier<>("simple",
+            new BooleanClassifier<>("simple",
                     (x) -> x.complexity() <= termVolumeMax.intValue()/2f),
-            new MixRouter.Classifier<>("complex",
+            new BooleanClassifier<>("complex",
                     (x) -> x.complexity() > termVolumeMax.intValue()/2f),
-            new MixRouter.Classifier<>("isBelief", Task::isBelief),
-            new MixRouter.Classifier<>("isGoal", Task::isGoal),
-            new MixRouter.Classifier<>("isQuestion", Task::isQuestion),
-            new MixRouter.Classifier<>("isQuest", Task::isQuest),
-            new MixRouter.Classifier<>("isPresent", t -> t.isPresentOf(time(), dur())),
-            new MixRouter.Classifier<>("isFuture", t -> t.isFutureOf(time())),
-            new MixRouter.Classifier<>("isPast", t -> t.isPastOf(time()))
+            new EnumClassifier<String, Task>("punc", 4, (t) -> {
+                switch (t.punc()) {
+                    case BELIEF: return 0;
+                    case GOAL: return 1;
+                    case QUESTION: return 2;
+                    case QUEST: return 3;
+                    default:
+                        throw new RuntimeException("unknown punc");
+                }
+            }),
+
+            //TODO write as EnumClassifier:
+            new BooleanClassifier<>("isPresent", t -> t.isPresentOf(time(), dur())),
+            new BooleanClassifier<>("isFuture", t -> t.isFutureOf(time())),
+            new BooleanClassifier<>("isPast", t -> t.isPastOf(time())),
+
+            new EnumClassifier<String, Task>("type", 2, (t) -> {
+                if (t instanceof SignalTask) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            })
 //            new MixRouter.Classifier<>("original",
 //                    (x) -> x.stamp().length <= 2),
 //            new MixRouter.Classifier<>("unoriginal",
@@ -123,7 +142,7 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024, e),
                 rng, e);
 
         onCycle(n -> controlMix.commit(n.time()));

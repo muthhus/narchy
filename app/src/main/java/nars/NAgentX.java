@@ -32,8 +32,7 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.col;
-import static spacegraph.layout.Grid.grid;
+import static spacegraph.layout.Grid.*;
 
 /**
  * Extensions to NAgent interface:
@@ -145,15 +144,26 @@ abstract public class NAgentX extends NAgent {
                         .add("happy", () -> n.nalMix.lastScore)
                         .on(a::onFrame),
                 col(
-                        new MatrixView(n.nalMix.agentIn, false),
+                        new MatrixView(n.nalMix.agentIn, 4, (x, gl) -> {
+                            Draw.colorGrays(gl, x);
+                            return 0;
+                        }),
+
+                        row(
+                                new MatrixView(n.nalMix.traffic, 4, (x, gl) -> {
+                                    Draw.colorGrays(gl, x);
+                                    return 0;
+                                }),
+                                new MatrixView(n.nalMix.levels, 4, (x, gl) -> {
+                                    Draw.colorUnipolarHue(gl, x, 0.4f, 0.7f);
+                                    return 0;
+                                })
+                        ),
+                        //new MatrixView(n.nalMix.agentIn.data, false),
                         new MatrixView(n.nalMix.agent.ae.W),
                         new MatrixView(n.nalMix.agent.ae.y, true),
                         new MatrixView(n.nalMix.agent.q),
-                        new MatrixView(n.nalMix.agent.et),
-                        new MatrixView(n.nalMix.levels, 1, (x, gl) -> {
-                            Draw.colorBipolar(gl, x);
-                            return 0;
-                        })
+                        new MatrixView(n.nalMix.agent.et)
                 )
         ), 800, 800);
 

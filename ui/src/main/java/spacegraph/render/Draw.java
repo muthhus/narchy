@@ -761,7 +761,7 @@ public enum Draw {
         colorHash(gl, o, 1f);
     }
 
-    public static void colorGrayscale(GL2 gl, float x) {
+    public static void colorGrays(GL2 gl, float x) {
         gl.glColor3f(x,x,x);
     }
 

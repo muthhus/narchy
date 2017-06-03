@@ -2,6 +2,7 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
+import jcog.tensor.Tensor;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
@@ -84,7 +85,7 @@ public class MatrixView extends Widget {
         return 0;
     };
     static final ViewFunction1D unipolar1 = (x, gl) -> {
-        Draw.colorGrayscale(gl, x);
+        Draw.colorGrays(gl, x);
         return 0;
     };
 
@@ -122,7 +123,11 @@ public class MatrixView extends Widget {
                 return Float.NaN;
         });
     }
-
+    public MatrixView(Tensor t, int stride, ViewFunction1D view) {
+        this((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) ->
+            view.update(t.get(x * stride + y), gl)
+        );
+    }
     public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
         this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
             double[] d = e.get();

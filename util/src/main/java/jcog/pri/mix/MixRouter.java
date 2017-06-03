@@ -2,11 +2,12 @@ package jcog.pri.mix;
 
 import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
+import jcog.pri.classify.AbstractClassifier;
+import jcog.pri.classify.BooleanClassifier;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * prioritized by N separate predicate classifiers which add their activation
@@ -14,35 +15,30 @@ import java.util.function.Predicate;
  */
 public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
 
-    public final Classifier<Y, X>[] tests;
+    public final AbstractClassifier<Y, X>[] tests;
     private final FloatFunction<RoaringBitmap> gain;
+    public final AtomicSummaryStatistics[] traffic;
+    private final int dim;
 
     public int size() {
-        return tests.length;
+        return dim;
     }
 
     private final Consumer<Y> target;
 
-    public static class Classifier<X, Y> {
-
-        public final Y name;
-        final Predicate<X> pred;
-        public final AtomicSummaryStatistics in = new AtomicSummaryStatistics();
-
-        public Classifier(Y name, Predicate<X> pred) {
-            this.name = name;
-            this.pred = pred;
-        }
-
-        public boolean test(X x) {
-            return pred.test(x);
-        }
-    }
-
-    public MixRouter(Consumer<Y> target, FloatFunction<RoaringBitmap> gain, Classifier<Y, X>... outs) {
+    public MixRouter(Consumer<Y> target, FloatFunction<RoaringBitmap> gain, AbstractClassifier<Y, X>... outs) {
         this.target = target;
         this.tests = outs;
         this.gain = gain;
+        int dim = 0;
+        for (AbstractClassifier t : tests) {
+            dim += t.dimension();
+        }
+        this.dim = dim;
+
+        traffic = new AtomicSummaryStatistics[dim];
+        for (int i = 0; i < dim; i++)
+            traffic[i] = new AtomicSummaryStatistics();
     }
 
 
@@ -50,19 +46,28 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
     public void accept(Y y) {
         float g = gain.floatValueOf(classify(y));
         if (g > 0) {
-            y.priMult( g );
+            y.priMult(g);
             target.accept(y);
         }
     }
 
+
     public RoaringBitmap classify(Y y) {
         RoaringBitmap truths = new RoaringBitmap();
+        int t = 0;
         for (int i = 0, outsLength = tests.length; i < outsLength; i++) {
-            Classifier<Y, X> c = tests[i];
-            if (c.test(y)) {
-                c.in.accept(y.priElseZero());
-                truths.add(i);
-            }
+            AbstractClassifier<Y, X> c = tests[i];
+            c.classify(y, truths, t);
+            t += c.dimension();
+        }
+
+        if (!truths.isEmpty()) {
+            truths.runOptimize();
+
+            float ypri = y.priElseZero();
+            truths.forEach((int b) -> {
+                traffic[b].accept(ypri);
+            });
         }
         return truths;
     }
