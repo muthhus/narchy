@@ -19,7 +19,7 @@ import static io.undertow.UndertowOptions.ENABLE_HTTP2;
 import static java.util.zip.Deflater.BEST_COMPRESSION;
 
 
-public class WebServer extends PathHandler /*extends PathHandler*/ {
+public class WebServer extends PathHandler  {
 
     public final Undertow server;
 

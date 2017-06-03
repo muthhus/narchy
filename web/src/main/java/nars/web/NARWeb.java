@@ -20,9 +20,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 
-/**
- * Created by me on 1/21/17.
- */
+
 public class NARWeb extends WebServer {
 
     private static final Logger logger = LoggerFactory.getLogger(nars.web.NARWeb.class);

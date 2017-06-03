@@ -1,7 +1,7 @@
 // star
 function generatorsStar(num) {
-    var bn = 50;
-    var bm = 50;
+    const bn = 50;
+    const bm = 50;
     for (i = 0; i < bn; ++i) {
         for (j = bn; j < bn + bm; ++j) {
             g.addEdge(i, j);
@@ -12,14 +12,15 @@ function generatorsStar(num) {
 
 // balanced tree, don't go above 11
 function generatorsBalancedTree(num) {
-    var n = num, count = Math.pow(2, n), level;
+    const n = num, count = Math.pow(2, n);
+    let level;
 
     if (n === 0) {
         g.addNode(1);
     }
 
     for (level = 1; level < count; ++level) {
-        var root = level,
+        const root = level,
             left = root * 2,
             right = root * 2 + 1;
 
@@ -32,14 +33,17 @@ function generatorsBalancedTree(num) {
 function generatorCube(id, num) {
 // n dimensinonal cube don't go past 14
     var n = m = z = num;
+    var k;
+    var i;
+    var j;
     if (n < 1 || m < 1 || z < 1) {
         throw new Error("Invalid number of nodes in grid3 graph");
     }
     for (k = 0; k < z; ++k) {
         for (i = 0; i < n; ++i) {
             for (j = 0; j < m; ++j) {
-                var level = k * n * m;
-                var node = i + j * n + level;
+                const level = k * n * m;
+                const node = i + j * n + level;
                 if (i > 0) {
                     g.addEdge(id + node, id + i - 1 + j * n + level);
                 }

@@ -1,37 +1,46 @@
-var canvas, stats;
-var camera, scene, renderer, controls;
-var composer, vignette2Pass, multiPassBloomPass;
-var backgroundColor = new THREE.Color(0x3c3c3c);
+let canvas, stats;
+let camera, scene, renderer, controls;
+let composer, vignette2Pass, multiPassBloomPass;
+const backgroundColor = new THREE.Color(0x3c3c3c);
 
-var nodeMesh,
+let nodeMesh,
     nodeGeometry,
-    nodeUniforms, labelUniforms;
+    nodeUniforms, labelUniforms, edgeUniforms;
 
-var simulate = false;
-var graphStructure;
-var mouse = new THREE.Vector2();
-var mouseUp = true;
-var mouseDown = false;
-var mouseDblClick = false;
-var temperature = 100;
-var lastPickedNode = {};
-var last = performance.now();
-var simulator, interface;
-var pickingTexture, pickingScene;
-var k = 0;
-var shaders;
-var slider;
+var cloudLines;
+var edgeGeometry, edgeMaterial;
+var pickingNodeGeometry;
+var pickingMesh;
+var nodeMaterial, pickingMaterial;
+var labelGeometry;
+var labelMaterial;
 
-var epochMin, epochMax;
-var epochOffset;
+let simulate = false;
+let graphStructure;
+const mouse = new THREE.Vector2();
+let mouseUp = true;
+let mouseDown = false;
+let mouseDblClick = false;
+let temperature = 100;
+let lastPickedNode = {};
+let last = performance.now();
+let simulator, interface;
+let pickingTexture, pickingScene;
+const k = 0;
+let shaders;
+let slider;
+
+let epochMin, epochMax;
+let epochOffset;
 
 
 var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCount, edgesCount, edgesAndEpochs,
-    edgesLookupTable;
+    edgesLookupTable,
+    pickingNodeGeometry, gpupicking;
 
-var nodesRendered = {};
+let nodesRendered = [];
 
-var g;
+var g = new Graph();
 
 
 $(document).ready(() => {
@@ -48,25 +57,37 @@ $(document).ready(() => {
     shaders.load('sim-nodeAttrib', 'nodeAttrib', 'simulation');
     shaders.load('vs-text', 'text', 'vertex');
     shaders.load('fs-text', 'text', 'fragment');
+
+
+
     shaders.shaderSetLoaded = function () {
         start().animate();
     };
 });
 
 function start() {
+
     g = new Graph();
 
 
     // generatorChain(100);
     generatorsBalancedTree(3);
-    setTimeout(() => {
+
+
+    setInterval(() => {
 
         console.log('regen');
-        generatorCube('a', 2);
-        updateGraph();
+
+        g = new Graph();
+        if (Math.random() < 0.5)
+            generatorsBalancedTree(3);
+        else
+            generatorCube('e', 6);
+
+        graphStructure = updateGraph(graphStructure);
 
 
-    }, 4000);
+    }, 1500);
     // generatorCube(5);
     // generatorsStar(50);
 
@@ -96,6 +117,14 @@ function start() {
         canvas: canvas
     });
 
+    // NODES
+    nodeRegular = THREE.ImageUtils.loadTexture('textures/new_circle.png', {}, function () {
+        renderer.render(scene, camera);
+    });
+    nodeThreat = THREE.ImageUtils.loadTexture('textures/crosshair.png', {}, function () {
+        renderer.render(scene, camera);
+    });
+
     // WAGNER.vertexShadersPath = './shaders';
     // WAGNER.fragmentShadersPath = './shaders';
     // composer = new WAGNER.Composer(renderer, {useRGBA: false});
@@ -118,10 +147,10 @@ function start() {
     // stats.domElement.style.top = '50px';
     // container.appendChild(stats.domElement);
 
-    var gridHelper1 = new THREE.GridHelper(2000, 500);
+    const gridHelper1 = new THREE.GridHelper(2000, 500);
     scene.add(gridHelper1);
 
-    var gridHelper2 = new THREE.GridHelper(2000, 500);
+    const gridHelper2 = new THREE.GridHelper(2000, 500);
     gridHelper2.rotation.z = Math.PI / 2;
     scene.add(gridHelper2);
 
@@ -147,8 +176,46 @@ function start() {
     //epochOffset = min;
 
 
-    interface = new GUIInterface(simulator);
+    interface = new GUIInterface();
     interface.init();
+
+    const letterWidth = 20;
+    const letterSpacing = 15;
+
+    const font = UbuntuMono('lib/UbuntuMono.png');
+    function getTextCoordinates(letter) {
+        let index;
+        let charCode = letter.charCodeAt(0);
+        //console.log('  charCode is:', charCode);
+        //var charString = "" + charCode;
+        // Some weird CHAR CODES
+        if (charCode === 8216) {
+            charCode = 39;
+        }
+        if (charCode === 8217) {
+            charCode = 39;
+        }
+        if (charCode === 8212) {
+            charCode = 45;
+        }
+        for (let z in font) {
+            if (z === charCode) {
+                index = font[z];
+            }
+        }
+        if (!index) {
+
+            //console.log('  NO LETTER');
+            index = [0, 0];
+        }
+        const left = index[0] / 1024;
+        const top = index[1] / 1024;
+        const width = index[2] / 1024;
+        const height = index[3] / 1024;
+        const xoffset = index[4] / 1024;
+        const yoffset = index[5] / 1024;
+        return [left, top, width, height, xoffset, yoffset];
+    }
 
 
     //
@@ -190,18 +257,12 @@ function start() {
     //gui.add(effectController, "k", 1, 10000).onChange(valuesChanger);
 
 
-    function updateGraph() {
+    function updateGraph(prevGraphStructure) {
 
-        if (graphStructure) {
-            scene.remove(graphStructure);
-        }
-
-        graphStructure = new THREE.Object3D();
-        scene.add(graphStructure);
+        const graphStructure = new THREE.Object3D();
 
 
         nodesAndEdges = g.getNodesAndEdgesArray();
-
 
         nodesAndEpochs = g.getEpochTextureArray('nodes');
         edgesAndEpochs = g.getEpochTextureArray('edges');
@@ -230,10 +291,10 @@ function start() {
         // get the min and max values for epoch.
 
 
-        var bigArray = [];
+        const bigArray = [];
         for (var i = 0; i < nodesAndEpochs.length; i++) {
 
-            for (var j = 0; j < nodesAndEpochs[i].length; j++) {
+            for (let j = 0; j < nodesAndEpochs[i].length; j++) {
 
                 bigArray.push(nodesAndEpochs[i][j]);
             }
@@ -253,44 +314,37 @@ function start() {
          *   requires globals nodesAndEdges, nodesWidth, edgesWidth, nodesCount, edgesCount
          *
          * */
-        // NODES
-        nodeRegular = THREE.ImageUtils.loadTexture('textures/new_circle.png', {}, function () {
-            renderer.render(scene, camera);
-        });
-        nodeThreat = THREE.ImageUtils.loadTexture('textures/crosshair.png', {}, function () {
-            renderer.render(scene, camera);
-        });
+
         nodeGeometry = new THREE.BufferGeometry();
         pickingNodeGeometry = new THREE.BufferGeometry();
 // visible geometry attributes
-        var nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-        var nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
-        var nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-        var nodePick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
-        var hover = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
-        var threat = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+        const nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+        const nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
+        const nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+        const nodePick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+        const hover = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+        const threat = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
         nodeGeometry.addAttribute('position', nodePositions);
         nodeGeometry.addAttribute('texPos', nodeReferences);
         nodeGeometry.addAttribute('customColor', nodeColors);
         nodeGeometry.addAttribute('pickingNode', nodePick);
         nodeGeometry.addAttribute('threat', threat);
 // picking geometry attributes (different colors)
-        var pickingColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-        var pickingPick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+        const pickingColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+        const pickingPick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
         pickingNodeGeometry.addAttribute('position', nodePositions);
         pickingNodeGeometry.addAttribute('texPos', nodeReferences);
         pickingNodeGeometry.addAttribute('customColor', pickingColors);
         pickingNodeGeometry.addAttribute('pickingNode', pickingPick);
         pickingNodeGeometry.addAttribute('threat', threat);
-        var color = new THREE.Color(0x999999);
-        var chromaColor;
+        const color = new THREE.Color(0x999999);
+        let chromaColor;
         //console.log(nodesCount);
-        var scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
-        var chromaScale = chroma.scale(scale).domain([0, nodesCount]);
-        var threatValue = 0;
-        var v = 0;
+        const scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
+        const chromaScale = chroma.scale(scale).domain([0, nodesCount]);
+        let threatValue = 0;
+        let v = 0;
         nodesRendered = [];
-        console.log(g.nodes);
         $.each(g.nodes, function (key, value) {
             nodesRendered.push(key);
             threatValue = 0;
@@ -365,19 +419,19 @@ function start() {
         graphStructure.add(nodeMesh);
         //EDGES
         edgeGeometry = new THREE.BufferGeometry();
-        var edgePositions = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
-        var edgeReferences = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 2), 2);
-        var edgeColors = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
+        const edgePositions = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
+        const edgeReferences = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 2), 2);
+        const edgeColors = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
         edgeGeometry.addAttribute('position', edgePositions);
         edgeGeometry.addAttribute('texPos', edgeReferences);
         edgeGeometry.addAttribute('customColor', edgeColors);
         //which vertex we're on
         v = 0;
-        var line;
+        let line;
         $.each(g.edges, function (key) {
             line = key.split('<>');
-            var startNode = edgesLookupTable[line[0]];
-            var endNode = edgesLookupTable[line[1]];
+            const startNode = edgesLookupTable[line[0]];
+            const endNode = edgesLookupTable[line[1]];
             //start of line
             edgeReferences.array[v * 2] = startNode.texPos[0];
             edgeReferences.array[v * 2 + 1] = startNode.texPos[1];
@@ -418,59 +472,23 @@ function start() {
         cloudLines = new THREE.LineSegments(edgeGeometry, edgeMaterial);
         graphStructure.add(cloudLines);
 
-        var font = UbuntuMono('lib/UbuntuMono.png');
-        var texture = font.texture;
-        var letterWidth = 20;
-        var letterSpacing = 15;
 
-        function getTextCoordinates(letter) {
-            var index;
-            var charCode = letter.charCodeAt(0);
-            //console.log('  charCode is:', charCode);
-            var charString = "" + charCode;
-            // Some weird CHAR CODES
-            if (charCode === 8216) {
-                charCode = 39;
-            }
-            if (charCode === 8217) {
-                charCode = 39;
-            }
-            if (charCode === 8212) {
-                charCode = 45;
-            }
-            for (var z in font) {
-                if (z === charCode) {
-                    index = font[z];
-                }
-            }
-            if (!index) {
-
-                //console.log('  NO LETTER');
-                index = [0, 0];
-            }
-            var left = index[0] / 1024;
-            var top = index[1] / 1024;
-            var width = index[2] / 1024;
-            var height = index[3] / 1024;
-            var xoffset = index[4] / 1024;
-            var yoffset = index[5] / 1024;
-            var array = [left, top, width, height, xoffset, yoffset];
-        }
+        const texture = font.texture;
 
         // need to get particle count.
-        var particleCount = 0;
+        let particleCount = 0;
         $.each(g.nodes, function (key) {
             particleCount += key.length;
         });
         //console.log('character count:', particleCount);
         labelGeometry = new THREE.BufferGeometry();
-        var positions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-        var labelPositions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-        var labelColors = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-        var uvs = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
-        var ids = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 1), 1);
-        var textCoords = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 4), 4);
-        var labelReferences = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
+        const positions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+        const labelPositions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+        const labelColors = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+        const uvs = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
+        const ids = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 1), 1);
+        const textCoords = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 4), 4);
+        const labelReferences = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
         labelGeometry.addAttribute('position', positions);
         labelGeometry.addAttribute('labelPositions', labelPositions);
         labelGeometry.addAttribute('uv', uvs);
@@ -478,25 +496,25 @@ function start() {
         labelGeometry.addAttribute('textCoord', textCoords);
         labelGeometry.addAttribute('texPos', labelReferences);
         labelGeometry.addAttribute('customColor', labelColors);
-        var counter = 0;
-        var nodeLookup;
+        let counter = 0;
+        let nodeLookup;
         $.each(g.nodes, function (key) {
             nodeLookup = edgesLookupTable[key];
             //console.log('working on word:', key);
-            for (var i = 0; i < key.length; i++) {
+            for (let i = 0; i < key.length; i++) {
                 //console.log(' counter:', counter);
-                var index = counter * 3 * 2;
+                const index = counter * 3 * 2;
                 //console.log('  character:', key[i]);
-                var tc = getTextCoordinates(key[i]);
+                const tc = getTextCoordinates(key[i]);
                 //console.log('  tc:', tc);
                 // Left is offset
-                var l = tc[4];
+                const l = tc[4];
                 // Right is offset + width
-                var r = tc[4] + tc[2];
+                const r = tc[4] + tc[2];
                 // bottom is y offset
-                var b = tc[5] - tc[3];
+                const b = tc[5] - tc[3];
                 // top is y offset + height
-                var t = tc[5];
+                const t = tc[5];
                 ids.array[index + 0] = i;
                 ids.array[index + 1] = i;
                 ids.array[index + 2] = i;
@@ -625,10 +643,24 @@ function start() {
         labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
         graphStructure.add(labelMesh);
 
-        if (!simulator)
-            simulator = new Simulator(renderer);
+        //if (!simulator)
 
+        //simulator.update(); //reinit
+
+        if (prevGraphStructure) {
+            scene.remove(prevGraphStructure);
+        }
+
+
+        scene.add(graphStructure);
+
+        //if (!simulator)
+            simulator = new Simulator(renderer);
         simulator.update(); //reinit
+
+        return graphStructure;
+
+
     }
 
 
@@ -636,8 +668,8 @@ function start() {
 
         // console.log(canvas);
 
-        var width = canvas.clientWidth * window.devicePixelRatio;
-        var height = canvas.clientHeight * window.devicePixelRatio;
+        const width = canvas.clientWidth * window.devicePixelRatio;
+        const height = canvas.clientHeight * window.devicePixelRatio;
 
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
@@ -730,15 +762,16 @@ function start() {
     };
 
 
-    g.animate = function () {
+    function animate() {
 
         // stats.update();
         controls.update();
-        slider.update();
+        //slider.update();
 
         render();
-        requestAnimationFrame(g.animate);
-    };
+
+        requestAnimationFrame(animate);
+    }
 
     function highlightNode(idx, color) {
         nodeGeometry.attributes.customColor.array[idx * 3 + 0] = color[0];
@@ -750,9 +783,9 @@ function start() {
 
     function saveNodeColor(idx) {
 
-        var r = nodeGeometry.attributes.customColor.array[idx * 3 + 0];
-        var g = nodeGeometry.attributes.customColor.array[idx * 3 + 1];
-        var b = nodeGeometry.attributes.customColor.array[idx * 3 + 2];
+        const r = nodeGeometry.attributes.customColor.array[idx * 3 + 0];
+        const g = nodeGeometry.attributes.customColor.array[idx * 3 + 1];
+        const b = nodeGeometry.attributes.customColor.array[idx * 3 + 2];
 
         return [r, g, b];
 
@@ -765,7 +798,7 @@ function start() {
         renderer.render(scene, camera, pickingTexture);
 
         // create buffer for reading single pixel
-        var pixelBuffer = new Uint8Array(4);
+        const pixelBuffer = new Uint8Array(4);
 
 
         // read the pixel under the mouse from the texture
@@ -780,8 +813,8 @@ function start() {
 
         }
 
-        var id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] ) - 1;
-        var data = nodesAndEdges[id];
+        const id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] ) - 1;
+        const data = nodesAndEdges[id];
 
 
         if (id !== lastPickedNode.id) {
@@ -790,7 +823,7 @@ function start() {
 
             // reset the old stuff to original values
 
-            var lastData = nodesAndEdges[lastPickedNode.id];
+            const lastData = nodesAndEdges[lastPickedNode.id];
 
             if (lastData) {
                 // console.log('restoring', lastPickedNode.id);
@@ -836,9 +869,9 @@ function start() {
 
     function countDataArrayItems(dataArray) {
 
-        var counter = 0;
+        let counter = 0;
 
-        for (var i = 0; i < dataArray.length; i++) {
+        for (let i = 0; i < dataArray.length; i++) {
 
             counter += dataArray[i].length;
 
@@ -852,8 +885,8 @@ function start() {
     function render() {
 
 
-        var now = performance.now();
-        var delta = (now - last) / 1000.0;
+        const now = performance.now();
+        let delta = (now - last) / 1000.0;
 
         if (delta > 1) delta = 1; // safety cap on large deltas
         last = now;
@@ -899,6 +932,8 @@ function start() {
 
     }
 
-    updateGraph();
-    return g;
+    graphStructure = updateGraph();
+    animate();
+
+    return this;
 }

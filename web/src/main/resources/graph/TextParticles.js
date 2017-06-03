@@ -1,21 +1,21 @@
 function createLabels() {
 
 
-    var font = UbuntuMono('lib/UbuntuMono.png');
-    var texture = font.texture;
+    const font = UbuntuMono('lib/UbuntuMono.png');
+    const texture = font.texture;
 
-    var letterWidth = 20;
-    var letterSpacing = 15;
+    const letterWidth = 20;
+    const letterSpacing = 15;
 
     function getTextCoordinates(letter) {
 
-        var index;
+        let index;
 
-        var charCode = letter.charCodeAt(0);
+        let charCode = letter.charCodeAt(0);
         //console.log('  charCode is:', charCode);
 
 
-        var charString = "" + charCode;
+        const charString = "" + charCode;
 
 
         // Some weird CHAR CODES
@@ -31,7 +31,7 @@ function createLabels() {
             charCode = 45;
         }
 
-        for (var z in font) {
+        for (let z in font) {
             if (z === charCode) {
                 index = font[z];
             }
@@ -45,17 +45,16 @@ function createLabels() {
         }
 
 
-        var left = index[0] / 1024;
-        var top = index[1] / 1024;
+        const left = index[0] / 1024;
+        const top = index[1] / 1024;
 
-        var width = index[2] / 1024;
-        var height = index[3] / 1024;
+        const width = index[2] / 1024;
+        const height = index[3] / 1024;
 
-        var xoffset = index[4] / 1024;
-        var yoffset = index[5] / 1024;
+        const xoffset = index[4] / 1024;
+        const yoffset = index[5] / 1024;
 
-        var array = [left, top, width, height, xoffset, yoffset];
-        return array
+        return [left, top, width, height, xoffset, yoffset]
 
     }
 
@@ -63,7 +62,7 @@ function createLabels() {
     // need to get particle count.
 
 
-    var particleCount = 0;
+    let particleCount = 0;
     $.each(g.nodes, function (key) {
         particleCount += key.length;
     });
@@ -72,13 +71,13 @@ function createLabels() {
 
     labelGeometry = new THREE.BufferGeometry();
 
-    var positions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-    var labelPositions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-    var labelColors = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
-    var uvs = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
-    var ids = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 1), 1);
-    var textCoords = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 4), 4);
-    var labelReferences = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
+    const positions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+    const labelPositions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+    const labelColors = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
+    const uvs = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
+    const ids = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 1), 1);
+    const textCoords = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 4), 4);
+    const labelReferences = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 2), 2);
 
     labelGeometry.addAttribute('position', positions);
     labelGeometry.addAttribute('labelPositions', labelPositions);
@@ -88,35 +87,35 @@ function createLabels() {
     labelGeometry.addAttribute('texPos', labelReferences);
     labelGeometry.addAttribute('customColor', labelColors);
 
-    var counter = 0;
-    var nodeLookup;
+    let counter = 0;
+    let nodeLookup;
     $.each(g.nodes, function (key) {
 
         nodeLookup = edgesLookupTable[key];
 
         //console.log('working on word:', key);
 
-        for (var i = 0; i < key.length; i++) {
+        for (let i = 0; i < key.length; i++) {
             //console.log(' counter:', counter);
 
 
-            var index = counter * 3 * 2;
+            const index = counter * 3 * 2;
 
             //console.log('  character:', key[i]);
-            var tc = getTextCoordinates(key[i]);
+            const tc = getTextCoordinates(key[i]);
             //console.log('  tc:', tc);
 
             // Left is offset
-            var l = tc[4];
+            const l = tc[4];
 
             // Right is offset + width
-            var r = tc[4] + tc[2];
+            const r = tc[4] + tc[2];
 
             // bottom is y offset
-            var b = tc[5] - tc[3];
+            const b = tc[5] - tc[3];
 
             // top is y offset + height
-            var t = tc[5];
+            const t = tc[5];
 
 
             ids.array[index + 0] = i;

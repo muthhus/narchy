@@ -21,12 +21,12 @@ function createGeometry() {
 	pickingNodeGeometry = new THREE.BufferGeometry();
 
 // visible geometry attributes
-	var nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-	var nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
-	var nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-	var nodePick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
-	var hover = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
-	var threat = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+	const nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+	const nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
+	const nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+	const nodePick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+	const hover = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+	const threat = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
 
 	nodeGeometry.addAttribute('position', nodePositions);
 	nodeGeometry.addAttribute('texPos', nodeReferences);
@@ -35,24 +35,24 @@ function createGeometry() {
 	nodeGeometry.addAttribute('threat', threat);
 
 // picking geometry attributes (different colors)
-	var pickingColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
-	var pickingPick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
+	const pickingColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+	const pickingPick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
 	pickingNodeGeometry.addAttribute('position', nodePositions);
 	pickingNodeGeometry.addAttribute('texPos', nodeReferences);
 	pickingNodeGeometry.addAttribute('customColor', pickingColors);
 	pickingNodeGeometry.addAttribute('pickingNode', pickingPick);
 	pickingNodeGeometry.addAttribute('threat', threat);
 
-	var color = new THREE.Color(0x999999);
-	var chromaColor;
+	const color = new THREE.Color(0x999999);
+	let chromaColor;
 	//console.log(nodesCount);
 
-	var scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
+	const scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
 
-	var chromaScale = chroma.scale(scale).domain([0, nodesCount]);
-	var threatValue = 0;
+	const chromaScale = chroma.scale(scale).domain([0, nodesCount]);
+	//var threatValue = 0;
 
-	var v = 0;
+	let v = 0;
 	
 	nodesRendered = [];
 	
@@ -62,22 +62,6 @@ function createGeometry() {
 
 		nodesRendered.push(key);
 
-		threatValue = 0;
-		$.each(value.data, function (dkey, dvalue) {
-
-			if (key === dvalue['source']){
-
-				if (dvalue['source_hit'] === true) threatValue = 1;
-
-			}
-
-			if (key === dvalue['target']){
-
-				if (dvalue['target_hit'] === true) threatValue = 1;
-
-			}
-
-		});
 
 		nodePositions.array[v * 3] = 0;
 		nodePositions.array[v * 3 + 1] = 0;
@@ -175,9 +159,9 @@ function createGeometry() {
 	//EDGES
 	edgeGeometry = new THREE.BufferGeometry();
 
-	var edgePositions = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
-	var edgeReferences = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 2), 2);
-	var edgeColors = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
+	const edgePositions = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
+	const edgeReferences = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 2), 2);
+	const edgeColors = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
 
 	edgeGeometry.addAttribute('position', edgePositions);
 	edgeGeometry.addAttribute('texPos', edgeReferences);
@@ -185,14 +169,14 @@ function createGeometry() {
 
 	//which vertex we're on
 	v = 0;
-	var line;
+	let line;
 
 	$.each(g.edges, function (key) {
 
 		line = key.split('<>');
 
-		var startNode = edgesLookupTable[line[0]];
-		var endNode = edgesLookupTable[line[1]];
+		const startNode = edgesLookupTable[line[0]];
+		const endNode = edgesLookupTable[line[1]];
 
 
 		//start of line

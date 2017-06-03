@@ -1,4 +1,4 @@
-function GUIInterface( simulator ) {
+function GUIInterface() {
 
 	function enableForceDirected() {
 
@@ -44,27 +44,27 @@ function GUIInterface( simulator ) {
 
 	this.init = function() {
 
-		var container = document.createElement( 'div' );
+		const container = document.createElement('div');
 		container.id = 'layouts';
 
-		var forceDirected = document.createElement( 'div' );
+		const forceDirected = document.createElement('div');
 		forceDirected.id = 'forceDirected';
 		$( forceDirected ).append( "<img src='textures/forceDirected.png' height='32px' width='32px'>" );
 
 
-		var circular = document.createElement( 'div' );
+		const circular = document.createElement('div');
 		circular.id = 'circular';
 		$( circular ).append( "<img src='textures/circle.png' height='32px' width='32px'>" );
 
-		var spherical = document.createElement( 'div' );
+		const spherical = document.createElement('div');
 		spherical.id = 'spherical';
 		$( spherical ).append( "<img src='textures/sphere.png' height='32px' width='32px'>" );
 
-		var helix = document.createElement( 'div' );
+		const helix = document.createElement('div');
 		helix.id = 'helix';
 		$( helix ).append( "<img src='textures/spring.png' height='32px' width='32px'>" );
 
-		var grid = document.createElement( 'div' );
+		const grid = document.createElement('div');
 		grid.id = 'grid';
 		$( grid ).append( "<img src='textures/square.png' height='32px' width='32px'>" );
 

@@ -1,23 +1,23 @@
 function Slider() {
 
-    var frameNumber = 0;
+    const frameNumber = 0;
 
-    var stepSize = 300;
+    const stepSize = 300;
 
-    var sliderObject;
-    var tMin = null;
-    var tMax = null;
+    let sliderObject;
+    let tMin = null;
+    let tMax = null;
 
-    var playing = false;
-    var repeat = false;
-    var expand = false;
+    let playing = false;
+    let repeat = false;
+    let expand = false;
 
-    var step = 0.01;
+    let step = 0.01;
 
     var currentMin = 0;
     var currentMin = 0;
 
-    var oldDuration = {};
+    const oldDuration = {};
 
     this.increaseStep = function(){
 
@@ -42,7 +42,7 @@ function Slider() {
 
         if (sliderObject) {
 
-            var addThis = ((currentMax - currentMin) / 25 ) / 2;
+            const addThis = ((currentMax - currentMin) / 25 ) / 2;
             currentMin -= addThis;
             currentMax += addThis;
 
@@ -59,7 +59,7 @@ function Slider() {
 
         if (sliderObject) {
 
-            var addThis = ((currentMax - currentMin) / 25 ) / 2;
+            const addThis = ((currentMax - currentMin) / 25 ) / 2;
             currentMin += addThis;
             currentMax -= addThis;
 
@@ -189,7 +189,7 @@ function Slider() {
         tMin = min;
         tMax = max;
 
-        var diff = tMax - tMin;
+        const diff = tMax - tMin;
         currentMin = tMin;
         currentMax = tMin + (diff / 25);
         step = diff / stepSize;

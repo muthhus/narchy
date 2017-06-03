@@ -1,14 +1,14 @@
 function GPUPick() {
 
-	var id;
-	var data;
+	let id;
+	let data;
 	//var lastData = {};
 	//var lastClickedNode = -1;
-	var lastHovereddNode = -1;
-	var nodeClicked = {down: null, up: null};
-	var selectedNode = null;
+	let lastHovereddNode = -1;
+	const nodeClicked = {down: null, up: null};
+	let selectedNode = null;
 
-	var pixelBuffer = new Uint8Array(4);
+	let pixelBuffer = new Uint8Array(4);
 
 
 	this.pickingTexture = new THREE.WebGLRenderTarget();

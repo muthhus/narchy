@@ -6,29 +6,29 @@ function Simulator(renderer) {
 	 * 
 	 */
 
-	var camera = new THREE.Camera();
+	const camera = new THREE.Camera();
 	camera.position.z = 1;
 
-	var scene = new THREE.Scene();
+	const scene = new THREE.Scene();
 
-	var passThruUniforms = {
-		texture : {
-			type : "t",
-			value : null
-		}
-	};
+	const passThruUniforms = {
+        texture: {
+            type: "t",
+            value: null
+        }
+    };
 
-	var passThruShader = new THREE.ShaderMaterial({
-		uniforms : passThruUniforms,
-		defines : {
-			NODESWIDTH : nodesWidth.toFixed(2)
-		},
-		vertexShader : shaders.vs.passthru,
-		fragmentShader : shaders.fs.passthru
-	});
+	const passThruShader = new THREE.ShaderMaterial({
+        uniforms: passThruUniforms,
+        defines: {
+            NODESWIDTH: nodesWidth.toFixed(2)
+        },
+        vertexShader: shaders.vs.passthru,
+        fragmentShader: shaders.fs.passthru
+    });
 
-	var mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2),
-			passThruShader);
+	const mesh = new THREE.Mesh(new THREE.PlaneBufferGeometry(2, 2),
+        passThruShader);
 	scene.add(mesh);
 
 	/*
@@ -37,153 +37,155 @@ function Simulator(renderer) {
 	 * function
 	 */
 
-	var velocityShader = new THREE.ShaderMaterial({
+	const velocityShader = new THREE.ShaderMaterial({
 
-		uniforms : {
-			delta : {
-				type : "f",
-				value : 0.0
-			},
-			k : {
-				type : "f",
-				value : 100.0
-			},
-			temperature : {
-				type : "f",
-				value : 0.0
-			},
-			positions : {
-				type : "t",
-				value : null
-			},
-			layoutPositions : {
-				type : "t",
-				value : null
-			},
-			velocities : {
-				type : "t",
-				value : null
-			},
-			edgeIndices : {
-				type : "t",
-				value : null
-			},
-			edgeData : {
-				type : "t",
-				value : null
-			}
-		},
-		defines : {
-			NODESWIDTH : nodesWidth.toFixed(2),
-			EDGESWIDTH : edgesWidth.toFixed(2)
-		},
-		vertexShader : shaders.vs.passthru,
-		fragmentShader : shaders.ss.velocity,
-		blending : 0
+        uniforms: {
+            delta: {
+                type: "f",
+                value: 0.0
+            },
+            k: {
+                type: "f",
+                value: 100.0
+            },
+            temperature: {
+                type: "f",
+                value: 0.0
+            },
+            positions: {
+                type: "t",
+                value: null
+            },
+            layoutPositions: {
+                type: "t",
+                value: null
+            },
+            velocities: {
+                type: "t",
+                value: null
+            },
+            edgeIndices: {
+                type: "t",
+                value: null
+            },
+            edgeData: {
+                type: "t",
+                value: null
+            }
+        },
+        defines: {
+            NODESWIDTH: nodesWidth.toFixed(2),
+            EDGESWIDTH: edgesWidth.toFixed(2)
+        },
+        vertexShader: shaders.vs.passthru,
+        fragmentShader: shaders.ss.velocity,
+        blending: 0
 
-	});
+    });
 
-	var positionShader = new THREE.ShaderMaterial({
+	const positionShader = new THREE.ShaderMaterial({
 
-		uniforms : {
-			delta : {
-				type : "f",
-				value : 0.0
-			},
-			temperature : {
-				type : "f",
-				value : 0.0
-			},
-			positions : {
-				type : "t",
-				value : null
-			},
-			velocities : {
-				type : "t",
-				value : null
-			}
-		},
-		defines : {
-			NODESWIDTH : nodesWidth.toFixed(2)
-		},
-		vertexShader : shaders.vs.passthru,
-		fragmentShader : shaders.ss.position,
-		blending : 0
-	});
+        uniforms: {
+            delta: {
+                type: "f",
+                value: 0.0
+            },
+            temperature: {
+                type: "f",
+                value: 0.0
+            },
+            positions: {
+                type: "t",
+                value: null
+            },
+            velocities: {
+                type: "t",
+                value: null
+            }
+        },
+        defines: {
+            NODESWIDTH: nodesWidth.toFixed(2)
+        },
+        vertexShader: shaders.vs.passthru,
+        fragmentShader: shaders.ss.position,
+        blending: 0
+    });
 
-	var nodeAttribShader = new THREE.ShaderMaterial({
+	const nodeAttribShader = new THREE.ShaderMaterial({
 
-		uniforms : {
-			nodeIDMappings : {
-				type : "t",
-				value : null
-			},
-			epochsIndices : {
-				type : "t",
-				value : null
-			},
-			epochsData : {
-				type : "t",
-				value : null
-			},
-			nodeAttrib : {
-				type : "t",
-				value : null
-			},
-			edgeIndices : {
-				type : "t",
-				value : null
-			},
-			edgeData : {
-				type : "t",
-				value : null
-			},
-			delta : {
-				type : "f",
-				value : 0.0
-			},
-			minTime : {
-				type : "f",
-				value : 0.0
-			},
-			maxTime : {
-				type : "f",
-				value : 0.0
-			},
-			selectedNode : {
-				type : "f",
-				value : -1.0
-			},
-			hoverMode : {
-				type : "f",
-				value : 1.0
-			}
-		},
-		defines : {
-			NODESWIDTH : nodesWidth.toFixed(2),
-			EPOCHSWIDTH : epochsWidth.toFixed(2),
-			EDGESWIDTH : edgesWidth.toFixed(2)
-		},
-		vertexShader : shaders.vs.passthru,
-		fragmentShader : shaders.ss.nodeAttrib,
-		blending : 0
-	});
+        uniforms: {
+            nodeIDMappings: {
+                type: "t",
+                value: null
+            },
+            epochsIndices: {
+                type: "t",
+                value: null
+            },
+            epochsData: {
+                type: "t",
+                value: null
+            },
+            nodeAttrib: {
+                type: "t",
+                value: null
+            },
+            edgeIndices: {
+                type: "t",
+                value: null
+            },
+            edgeData: {
+                type: "t",
+                value: null
+            },
+            delta: {
+                type: "f",
+                value: 0.0
+            },
+            minTime: {
+                type: "f",
+                value: 0.0
+            },
+            maxTime: {
+                type: "f",
+                value: 0.0
+            },
+            selectedNode: {
+                type: "f",
+                value: -1.0
+            },
+            hoverMode: {
+                type: "f",
+                value: 1.0
+            }
+        },
+        defines: {
+            NODESWIDTH: nodesWidth.toFixed(2),
+            EPOCHSWIDTH: epochsWidth.toFixed(2),
+            EDGESWIDTH: edgesWidth.toFixed(2)
+        },
+        vertexShader: shaders.vs.passthru,
+        fragmentShader: shaders.ss.nodeAttrib,
+        blending: 0
+    });
 
 	// expose uniforms to the rest of the app
 	this.velocityUniforms = velocityShader.uniforms;
 	this.positionUniforms = positionShader.uniforms;
 	this.nodeAttribUniforms = nodeAttribShader.uniforms;
 
-	var flipflop = true;
+	let flipflop = true;
 
-	var rtPosition1, rtPosition2, rtVelocity1, rtVelocity2, rtNodeAttrib1, rtNodeAttrib2;
+	let rtPosition1, rtPosition2, rtVelocity1, rtVelocity2, rtNodeAttrib1, rtNodeAttrib2;
 
 	function init() {
 
-		var dtPosition = generatePositionTexture(nodesAndEdges, nodesWidth,
-				1000);
-		var dtVelocity = generateVelocityTexture(nodesAndEdges, nodesWidth);
-		var dtNodeAttrib = generateNodeAttribTexture(nodesAndEdges, nodesWidth);
+		console.log('simulator init', nodesAndEdges);
+
+		const dtPosition = generatePositionTexture(nodesAndEdges, nodesWidth,
+            1000);
+		const dtVelocity = generateVelocityTexture(nodesAndEdges, nodesWidth);
+		const dtNodeAttrib = generateNodeAttribTexture(nodesAndEdges, nodesWidth);
 
 		velocityShader.uniforms.edgeIndices.value = generateIndiciesTexture(
 				nodesAndEdges, nodesWidth);
@@ -225,7 +227,7 @@ function Simulator(renderer) {
 
 	function getRenderTarget(type) {
 
-		var renderTarget = new THREE.WebGLRenderTarget(nodesWidth, nodesWidth,
+        return new THREE.WebGLRenderTarget(nodesWidth, nodesWidth,
 				{
 					wrapS : THREE.RepeatWrapping,
 					wrapT : THREE.RepeatWrapping,
@@ -235,8 +237,6 @@ function Simulator(renderer) {
 					type : THREE.FloatType,
 					stencilBuffer : false
 				});
-
-		return renderTarget;
 	}
 
 	this.renderTexture = function(input, output) {
@@ -288,7 +288,7 @@ function Simulator(renderer) {
 
 		if (flipflop) {
 
-			if (temperature > 0.1) {
+			/*if (temperature > 0.1)*/ {
 
 				simulator.renderVelocity(rtPosition1, rtVelocity1, rtVelocity2,
 						delta, temperature);
@@ -302,7 +302,7 @@ function Simulator(renderer) {
 
 		} else {
 
-			if (temperature > 0.1) {
+			/*if (temperature > 0.1)*/ {
 
 				simulator.renderVelocity(rtPosition2, rtVelocity2, rtVelocity1,
 						delta, temperature);

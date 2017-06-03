@@ -1,7 +1,7 @@
 function Graph(settings) {
 
-    var nodes = {};
-    var edges = {};
+    const nodes = {};
+    const edges = {};
     var settings = {
         epoch: 'Event Time',
         epochFormat: 'YYYY-M-D H:m:s',
@@ -13,8 +13,8 @@ function Graph(settings) {
     this.nodes = nodes;
     this.settings = settings;
 
-    var nodesCount = 0;
-    var edgesCount = 0;
+    let nodesCount = 0;
+    let edgesCount = 0;
 
 
     function getNode(node) {
@@ -32,7 +32,7 @@ function Graph(settings) {
 
     function createEdge(source, target, data) {
 
-        var edge = getEdge(source, target) || getEdge(target, source);
+        let edge = getEdge(source, target) || getEdge(target, source);
 
         if (!edge) {
 
@@ -59,7 +59,7 @@ function Graph(settings) {
 
         }
 
-        var node = getNode(nodeName);
+        let node = getNode(nodeName);
 
         if (!node) {
 
@@ -88,8 +88,8 @@ function Graph(settings) {
 
         } else {
 
-            var fromNode = this.addNode(source, data);
-            var toNode = this.addNode(target, data);
+            const fromNode = this.addNode(source, data);
+            const toNode = this.addNode(target, data);
 
             if (fromNode && toNode) {
                 // a valid edge appears!
@@ -117,7 +117,7 @@ function Graph(settings) {
 
     this.getNodesAndEdgesArray = function () {
 
-        var edgesArray = [];
+        const edgesArray = [];
 
         $.each(this.nodes, function (key, value) {
 
@@ -132,11 +132,11 @@ function Graph(settings) {
 
     this.getLookupTable = function () {
 
-        var lookupTable = {};
-        var texStartX;
-        var texStartY;
+        const lookupTable = {};
+        let texStartX;
+        let texStartY;
 
-        var i = 0;
+        let i = 0;
 
         $.each(this.nodes, function (key, value) {
 
@@ -159,17 +159,17 @@ function Graph(settings) {
 
     this.getEpochTextureArray = function (type) {
 
-        var thing;
+        let thing;
 
         if (type === 'nodes') thing = this.nodes;
         if (type === 'edges') thing = this.edges;
 
-        var epochArray = [];
+        const epochArray = [];
 
 
         $.each(thing, function (key, value) {
 
-            var epochs = [];
+            const epochs = [];
             $.each(value.data, function (dkey, dvalue) {
 
                 epochs.push(moment(dvalue[settings.epoch], [settings.epochFormat]).unix());
