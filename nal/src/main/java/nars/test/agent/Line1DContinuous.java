@@ -77,7 +77,7 @@ public class Line1DContinuous extends NAgent {
 
             yEst += (v)*speed;
 
-            return true;
+            return yEst;
         });
 
         trace = false;

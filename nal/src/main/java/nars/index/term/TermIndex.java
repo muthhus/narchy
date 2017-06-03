@@ -468,7 +468,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
 
-        Term y = transform(x, r.dt(x), r);
+        Term y = transform(x, x.dt()==XTERNAL ? r.dt(x) : x.dt(),  r);
         if (!(y instanceof Compound)) {
             return null;
         } else {

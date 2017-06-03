@@ -33,9 +33,18 @@ public class HaiQAgent extends HaiQ {
         this.numStates = numStates;
     }
 
+    public HaiQAgent(int in, int hidden, int out) {
+        this();
+        start(in, hidden, out);
+    }
+
     @Override
     public void start(int inputs, int outputs) {
         int states = numStates.apply(inputs, outputs);
+        start(inputs, states, outputs);
+    }
+
+    protected void start(int inputs, int states, int outputs) {
         logger.info("start {} -> {} -> {}", inputs, states, outputs);
         ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
         super.start(states, outputs);

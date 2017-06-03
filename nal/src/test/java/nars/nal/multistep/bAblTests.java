@@ -60,6 +60,7 @@ public class bAblTests extends AbstractNALTest {
         TestNAR t = test();
 
         t.nar.truthResolution.setValue(0.25f);
+        t.nar.termVolumeMax.setValue(24);
 
         //t.log();
         t.believe("((pick(#Person,$Object) &&+0 inside(#Person,$Place)) ==>+0 inside($Object,$Place))")
@@ -93,7 +94,7 @@ public class bAblTests extends AbstractNALTest {
                 .input("at(den,hallway,west).") //The den is east of the hallway.
                 .input("start(den,kitchen).") //How do you go from den to kitchen?
                 .input("$0.9 path(?a,?b,?c,?d)?")
-                .mustBelieve(2500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
+                .mustBelieve(4500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
 
 
     }

@@ -125,7 +125,7 @@ public class SimpleUDPeerGraph {
 
         for (UDPeer p : u.peer) {
             float fps = (0.1f + 0.8f * n.random().nextFloat());
-            p.setFPS(fps);
+            p.runFPS(fps);
             p.them.setCapacity(Math.round(3 * fps));
         }
 

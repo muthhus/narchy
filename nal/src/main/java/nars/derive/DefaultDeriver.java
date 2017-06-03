@@ -20,62 +20,60 @@ import nars.control.premise.Derivation;
  *  2483 2
  *  2483 1
  */
-public class DefaultDeriver implements Deriver {
+public class DefaultDeriver  {
 
-    public static final Deriver the = new DefaultDeriver();
-
-    final TrieDeriver[] levels;
-
-
-    public DefaultDeriver() {
-
-        levels = new TrieDeriver[]{
-                (TrieDeriver) Deriver.get(
+    public static final Deriver the =
+              (TrieDeriver) Deriver.get(
                         "nal1.nal",
                         //"nal4.nal",
                         "nal6.nal",
-                        "misc.nal"
-                ),
-                (TrieDeriver) Deriver.get(
+                        "misc.nal",
+                        "induction.nal",
                         "nal2.nal",
                         "nal3.nal"
-                ),
+                );
 
-                (TrieDeriver) Deriver.get(
-                        "induction.nal"
-                )
-        };
-
-
-
-    }
-
-    //new InstrumentedDeriver(
-
-
-    //"relation_introduction.nal"
-
-    //)
-
-
-    @Override
-    public boolean test(Derivation derivation) {
-        int num = (derivation.next()) % (1+ levels.length);
-        for (int i = 0; i < num; i++) {
-            if (!levels[i].test(derivation))
-                return false;
-        }
-        return true;
-    }
-
-
-//    @Override
-//    public void accept(Derivation x) {
-//        int start = x.now();
-//        for (Deriver d : modules) {
-//            d.accept(x);
-//            if (x.now()!=start)
-//                throw new RuntimeException("revert fault");
-//        }
+//            //new DefaultDeriver();
+//
+//    final TrieDeriver[] levels;
+//
+//
+//    public DefaultDeriver() {
+//
+//        levels = new TrieDeriver[]{
+//                (TrieDeriver) Deriver.get(
+//                        "nal1.nal",
+//                        //"nal4.nal",
+//                        "nal6.nal",
+//                        "misc.nal",
+//                        "induction.nal"
+//
+//                        "nal2.nal",
+//                        "nal3.nal"
+//                )
+//        };
+//
+//
+//
 //    }
+//
+//    //new InstrumentedDeriver(
+//
+//
+//    //"relation_introduction.nal"
+//
+//    //)
+//
+//
+//    @Override
+//    public boolean test(Derivation derivation) {
+//        int num = (derivation.next()) % (1+ levels.length);
+//        for (int i = 0; i < num; i++) {
+//            if (!levels[i].test(derivation))
+//                return false;
+//        }
+//        return true;
+//    }
+//
+//
 }

@@ -14,8 +14,8 @@ public class UDPeerTest {
 
         UDPeer x = new UDPeer();
         UDPeer y = new UDPeer();
-        x.setFPS(4);
-        y.setFPS(4);
+        x.runFPS(4);
+        y.runFPS(4);
 
         Util.sleep(3000);
 

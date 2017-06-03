@@ -253,19 +253,19 @@ public abstract class PixelBag implements Bitmap2D {
         return f / 2f + 0.5f;
     }
 
-    public boolean setZoom(float f) {
-        Z = u(f);
-        return true;
+    public float setZoom(float f) {
+        Z = f;
+        return f;
     }
 
-    public boolean setYRelative(float f) {
-        Y = u(f);
-        return true;
+    public float setYRelative(float f) {
+        Y = f;
+        return f;
     }
 
-    public boolean setXRelative(float f) {
-        X = u(f);
-        return true;
+    public float setXRelative(float f) {
+        X = f;
+        return f;
     }
 
     public void setFilter(float r, float g, float b) {
@@ -294,9 +294,9 @@ public abstract class PixelBag implements Bitmap2D {
         actions = $.newArrayList(3);
 
         Term termRoot = Atomic.the(termRootStr);
-        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
-        actions.add(a.actionBipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
+        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
+        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
+        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );

@@ -107,13 +107,13 @@ public class Jake2Agent extends NAgentX implements Runnable {
             float yawSpeed = 10;
             cl.viewangles[Defines.YAW] += yawSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
-            return true;
+            return x;
         });
         actionBipolar($("q(lookpitch)"), (x) -> {
             float pitchSpeed = 20; //absolute
             cl.viewangles[Defines.PITCH] = pitchSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
-            return true;
+            return x;
         });
         //actionToggle($.$("(lookdown)"), (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
         actionToggle($("q(attak)"), (x) -> CL_input.in_attack.state = x ? 1 : 0);

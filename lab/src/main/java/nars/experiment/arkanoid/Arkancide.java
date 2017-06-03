@@ -19,7 +19,7 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
@@ -102,8 +102,8 @@ public class Arkancide extends NAgentX {
 
         maxPaddleSpeed = 40 * noid.BALL_VELOCITY;
 
-        float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 

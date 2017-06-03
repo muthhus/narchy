@@ -434,7 +434,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             setPrintExceptions(true);
 
             animThread = loop.thread();
-            loop.setFPS(initialFPS);
+            loop.runFPS(initialFPS);
             //setExclusiveContext(loop.thread);
         }
 

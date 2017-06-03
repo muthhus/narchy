@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.TaskTable;
+import nars.task.SignalTask;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +20,22 @@ import java.util.function.Consumer;
  */
 public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements TaskTable {
 
+    private long now;
+
     public TaskHijackBag(int reprobes) {
         super(reprobes);
     }
 
+    @Override
+    protected boolean replace(Task incoming, Task existing) {
+        float it = incoming.conf() * (1f + incoming.dtRange())/(1+Math.abs(now - incoming.nearestStartOrEnd(now)));
+        float et = existing.conf() * (1f + existing.dtRange())/(1+Math.abs(now - existing.nearestStartOrEnd(now)));
 
-//    @Override
+        return replace(it, et);
+    }
+
+
+    //    @Override
 //    protected Task merge(@NotNull Task existing, @NotNull Task incoming, float scaleIgnored) {
 //        Task next;
 //
@@ -87,6 +98,8 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
         float activation = x.priSafe(0);
 
+        this.now = n.time();
+
         MutableFloat oo = new MutableFloat();
         @Nullable Task y = put(x, oo);
         if (y == null) {
@@ -99,8 +112,8 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             x.delete();
         }
 
-        if (pressure.floatValue() >= Pri.EPSILON)
-            commit(); //apply forgetting
+//        if (pressure.floatValue() >= Pri.EPSILON)
+//            commit(); //apply forgetting
 
         if (activation >= Pri.EPSILON) {
             TaskTable.activate(y, activation, c, n);

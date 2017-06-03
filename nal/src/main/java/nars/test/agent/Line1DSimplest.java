@@ -26,7 +26,7 @@ public class Line1DSimplest extends NAgent {
     /**
      * the target value
      */
-    public final FloatParam i = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam i = new FloatParam(0f, 0, 1f);
     public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
     @NotNull
@@ -60,28 +60,28 @@ public class Line1DSimplest extends NAgent {
         //out = null;
         Compound O = //$.inh(Atomic.the("o"), id);
                 $.p("o");
-//        out = actionTriState(O, (d) -> {
-//            switch (d) {
-//                case -1:
-//                case +1:
-//                    this.o.setValue(Math.max(0f, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
-//                    return true;
-//
-//            }
-//            return true;
-//        });
-        out = actionBipolar(O, v -> {
-            //float current = this.o.floatValue();
-
-            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
-            o.setValue(
-                    //Util.unitize( current + v * speed.floatValue())
-                    v
-            );
-            return true;
-            //}
-            //return false;
+        out = actionTriState(O, (d) -> {
+            switch (d) {
+                case -1:
+                case +1:
+                    this.o.setValue(Math.max(-1f, Math.min(1f, this.o.floatValue() + d * speed.floatValue() * 2)));
+                    break;
+            }
         });
+//        out = actionBipolar(O, v -> {
+//            //float current = this.o.floatValue();
+//
+//            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
+//            if (v == v) {
+//                o.setValue(
+//                        //Util.unitize( current + v * speed.floatValue())
+//                        v
+//                );
+//            }
+//            return o.floatValue();
+//            //}
+//            //return false;
+//        });
 
 //        out = action(
 //                //$.inh($.the("o"), id),

@@ -1039,4 +1039,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     }
 
+    /** amount of time this spans for */
+    default long dtRange() {
+        long s = start();
+        return s!=ETERNAL ? end() - s : 0;
+    }
+
 }

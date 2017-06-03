@@ -55,8 +55,8 @@ public class InterNARTest {
             InterNAR ai = new InterNAR(a, 10, 0, false);
             InterNAR bi = new InterNAR(b, 10, 0, false);
 
-            ai.setFPS(20f);
-            bi.setFPS(20f);
+            ai.runFPS(20f);
+            bi.runFPS(20f);
 
             Util.sleep(CONNECTION_TIME);
 

@@ -61,8 +61,8 @@ public class NARio extends NAgentX {
                 float xCam = scene.xCam;
                 float yCam = scene.yCam;
                 Mario M = ((LevelScene) this.mario.scene).mario;
-                float x = (-160 + M.x - xCam) / 320f;
-                float y = (-120 + M.y - yCam) / 240f;
+                float x = ( M.x - xCam) / 320f;
+                float y = ( M.y - yCam) / 240f;
                 cc.setXRelative(x);
                 cc.setYRelative(y);
                 cc.setZoom(0.05f);

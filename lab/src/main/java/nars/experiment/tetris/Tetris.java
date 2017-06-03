@@ -515,7 +515,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             try {
                 InterNAR i = new InterNAR(n);
-                i.setFPS(5);
+                i.runFPS(5);
             } catch (Exception e) {
                 e.printStackTrace();
             }

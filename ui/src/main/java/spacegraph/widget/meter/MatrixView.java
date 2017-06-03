@@ -4,11 +4,12 @@ import com.jogamp.opengl.GL2;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
+import java.util.function.Supplier;
+
 /**
  * Created by me on 7/29/16.
  */
 public class MatrixView extends Widget {
-
 
 
     private final int w;
@@ -23,6 +24,7 @@ public class MatrixView extends Widget {
             return 0;
         };
     }
+
     public static ViewFunction2D arrayRenderer(float[] w) {
         return (x, y, gl) -> {
             float v = w[y];
@@ -30,7 +32,13 @@ public class MatrixView extends Widget {
             return 0;
         };
     }
-
+  public static ViewFunction2D arrayRenderer(double[] w) {
+        return (x, y, gl) -> {
+            float v = (float) w[y];
+            Draw.colorPolarized(gl, v);
+            return 0;
+        };
+    }
 
     public interface ViewFunction1D {
         /**
@@ -59,6 +67,9 @@ public class MatrixView extends Widget {
     }
 
 
+    public MatrixView(float[][] w) {
+        this(w.length, w[0].length, MatrixView.arrayRenderer(w));
+    }
     public MatrixView(int w, int h, ViewFunction2D view) {
         this.w = w;
         this.h = h;
@@ -86,6 +97,18 @@ public class MatrixView extends Widget {
         });
     }
 
+    public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
+        this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
+            double[] d = e.get();
+            if (d != null) {
+
+                int i = y * stride + x;
+                if (i < d.length)
+                    return view.update((float) d[i], gl);
+            }
+            return Float.NaN;
+        });
+    }
 
     protected void paintComponent(GL2 gl) {
 

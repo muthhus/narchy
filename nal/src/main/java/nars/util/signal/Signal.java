@@ -21,7 +21,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Signal {
 
-    final int MAX_PERCEPT_DURATIONS = 4;
+    final int MAX_PERCEPT_DURATIONS = 16;
 
     public FloatSupplier pri;
 
@@ -43,6 +43,7 @@ public class Signal {
     @Nullable
     public SignalTask current;
 
+
     public Signal(byte punc, FloatSupplier resolution) {
         pri(1);
         this.punc = punc;
@@ -63,19 +64,23 @@ public class Signal {
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;
 
+        int dur = nar.dur();
+
         long last = this.lastInputTime;
         if (last == ETERNAL)
             last = now;
-        this.lastInputTime = now;
+
+        Task previous = current;
 
         if (this.current != null) {
-            this.current.setEnd(last); //(now+last)/2);
-            if (now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)) {
+            this.current.setEnd(now);
+            if (current.isDeleted() || now - current.start() >= (dur * MAX_PERCEPT_DURATIONS)) {
+                if (nextTruth == null)
+                    nextTruth = current.truth;
                 this.current = null;
             }
         }
 
-        Task previous = current;
 
 
         //no signal
@@ -84,10 +89,9 @@ public class Signal {
         } else {
 
 
-            SignalTask t;
-            //merge existing signal
 
 
+            this.lastInputTime = now;
 
             if (current != null && current.truth.equals(nextTruth, resolution.asFloat())) {
 //                if (residualBudgetFactor > 0) {
@@ -97,18 +101,20 @@ public class Signal {
 //                }
 //                return null;
                 //nothing, keep as-is
-                return current;
             } else {
 
+                SignalTask t;
 
                 t = task(term, nextTruth.truth(),
                     last, now,
                         previous, stamper.getAsLong(), nar);
 
-                t.priMax(pri.asFloat() * deltaFactor(previous, t.truth()));
-                return (this.current = t);
-
+                if (t!=null)
+                    current = t;
             }
+
+            current.priMax(pri.asFloat() * deltaFactor(previous, current.truth()));
+            return current;
         }
 
 
@@ -130,15 +136,15 @@ public class Signal {
     protected float deltaFactor(@Nullable Truthed a, Truth b) {
         //return 1f;
 
-        if (a == null)
+        //if (a == null)
             return 1f;
-        else {
-            float diff = Math.abs(a.freq() - b.freq());
+//        else {
+//            float diff = Math.abs(a.freq() - b.freq());
             //return 0.5f + ( (a==b) ? 0 : 0.5f * diff);
             //1-((1-x)^2)
             //1-((1-x)^4)
-            return 1f - (Util.sqr(Util.sqr(1-diff)));
-        }
+//            return 1f - (Util.sqr(Util.sqr(1-diff)));
+//        }
     }
 
     @NotNull

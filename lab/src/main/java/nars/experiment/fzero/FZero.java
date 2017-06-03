@@ -46,13 +46,13 @@ public class FZero extends NAgentX {
                 .resolution(0.2f);
 
 
-        actionBipolar($.inh(Atomic.the("fwd"), id), (r) -> {
-            fz.vehicleMetrics[0][6] += (r*r*r) * 1f;
-            return true;
+        actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
+            fz.vehicleMetrics[0][6] += (f*f*f) * 1f;
+            return f;
         }).resolution.setValue(0.1f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
             fz.playerAngle += (r*r*r) * 0.15f;
-            return true;
+            return r;
         }).resolution.setValue(0.1f);
 
         //keyboard-ish controls:

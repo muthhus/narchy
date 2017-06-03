@@ -33,9 +33,9 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.001f; //in time units
+        float tHz = 0.01f; //in time units
         float yResolution = 0.2f; //in 0..1.0
-        float periods = 64;
+        float periods = 16;
 
         final int runtime = Math.round(periods /tHz);
 
@@ -47,7 +47,8 @@ public class Line1D {
 //
 //                @Override
 //                protected float act() {
-//                    return rewardAveraged.asFloat();
+//
+//                    //return rewardAveraged.asFloat();
 //                }
             };
 
@@ -58,9 +59,10 @@ public class Line1D {
 
             a.speed.setValue(yResolution);
 
-            a.out.resolution.setValue(yResolution * 1);
-            a.in.resolution.setValue(yResolution * 1);
-            a.curiosity.setValue(0.05f);
+            a.happy.resolution.setValue(0.1f);
+            a.out.resolution.setValue(yResolution);
+            a.in.resolution.setValue(yResolution /2);
+            a.curiosity.setValue((2/yResolution)*tHz);
 
             //            a.in.beliefs().capacity(0, 100, a.nar);
             //            a.out.beliefs().capacity(0, 100, a.nar);
@@ -77,7 +79,8 @@ public class Line1D {
 
                 a.target(
                         //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
-                        (float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
+                        Util.round((float) ( Math.sin(a.nar.time() * tHz * 2 * PI) ), yResolution)
+                        //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
                 );
@@ -106,7 +109,7 @@ public class Line1D {
             Object d = DefaultDeriver.the;
 
             int maxIterations = 1024;
-            int repeats = 2;
+            int repeats = 1;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
@@ -115,10 +118,10 @@ public class Line1D {
 
                 n.time.dur(1);
 
-                n.DEFAULT_BELIEF_PRIORITY = 1f;
-                n.DEFAULT_GOAL_PRIORITY = 1f;
-                n.DEFAULT_QUESTION_PRIORITY = 1f;
-                n.DEFAULT_QUEST_PRIORITY = 1f;
+                n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+                n.DEFAULT_GOAL_PRIORITY = 0.5f;
+                n.DEFAULT_QUESTION_PRIORITY = 0.5f;
+                n.DEFAULT_QUEST_PRIORITY = 0.5f;
 
                 return n;
             }).tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
@@ -169,7 +172,7 @@ public class Line1D {
 //        });
                 Default n = new Default();
                 n.time.dur(1);
-                n.termVolumeMax.set(20);
+                n.termVolumeMax.set(40);
                 n.goalConfidence(0.5f);
                 n.beliefConfidence(0.5f);
 
@@ -255,7 +258,7 @@ public class Line1D {
 
                 NAR n = a.nar;
                 a.speed.setValue(0.02f);
-                a.target(0.5f); //start
+
 
                 float speed = a.speed.floatValue();
                 this.worsenThreshold = speed / 2f;

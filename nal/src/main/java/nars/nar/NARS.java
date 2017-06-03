@@ -5,8 +5,9 @@ import jcog.bag.Bag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
 import jcog.pri.PriReference;
-import jcog.pri.mix.Mix;
-import jcog.pri.mix.PSink;
+import jcog.pri.mix.MixRouter;
+import jcog.pri.mix.MixSwitch;
+import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
@@ -14,12 +15,11 @@ import nars.NARLoop;
 import nars.Task;
 import nars.attention.SpreadingActivation;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.conceptualize.state.DefaultConceptState;
 import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.task.DerivedTask;
 import nars.task.ITask;
+import nars.task.SignalTask;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -32,9 +32,10 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
-import static nars.Op.*;
+import static nars.nar.NARS.PostBand.*;
 
 /**
  * recursive cluster of NAR's
@@ -57,51 +58,65 @@ public class NARS extends NAR {
     private List<NARLoop> loops;
 
 
-    public Mix<PostBand,ITask> post = new Mix<>(this::inputSub);
-
     enum PostBand {
         Input,
         Premise,
-        DerivedBelief, DerivedGoal, DerivedQuestion, DerivedQuest,
+        NAL,
         Activation,
         ConceptFire,
-        Other;
+        Other
+    }
 
-        public static PostBand which(ITask x) {
-            if (x instanceof SpreadingActivation) {
-                return Activation;
-            } else if (x instanceof DerivedTask) {
-                switch (x.punc()) {
-                    case BELIEF: return DerivedBelief;
-                    case GOAL: return DerivedGoal;
-                    case QUESTION: return DerivedQuestion;
-                    case QUEST: return DerivedQuest;
+    public final MixRouter<String,Task> nalMix = new MixRouter<>(this::inputSub,
+            new MixRouter.Classifier<>("isComplex", (x) -> {
+                return x.complexity() > termVolumeMax.intValue()/2f;
+            }),
+            new MixRouter.Classifier<>("isBelief", (x) -> {
+                return x.isBelief();
+            }),
+            new MixRouter.Classifier<>("isGoal", (x) -> {
+                return x.isGoal();
+            }),
+            new MixRouter.Classifier<>("isQuestion", (x) -> {
+                return x.isBelief();
+            }),
+            new MixRouter.Classifier<>("isQuest", (x) -> {
+                return x.isQuest();
+            })
+    );
+
+
+
+    public final MixSwitch<ITask> controlMix = new MixSwitch<ITask>(this::inputSub,
+            (x) -> {
+                PostBand result;
+                if (x instanceof Task) {
+                    result = NAL;
+//                    switch (x.punc()) {
+//                        case BELIEF:
+//                            result = PostBand.DerivedBelief; break;
+//                        case GOAL:
+//                            result = PostBand.DerivedGoal; break;
+//                        case QUESTION:
+//                            result = PostBand.DerivedQuestion; break;
+//                        case QUEST:
+//                            result = PostBand.DerivedQuest; break;
+//                        default:
+//                            result = Other; break;
+//                    }
+                } else if (x instanceof SpreadingActivation) {
+                    result = Activation;
+                } else if (x instanceof nars.control.Premise) {
+                    result = PostBand.Premise;
+                } else if (x instanceof ConceptFire) {
+                    result = PostBand.ConceptFire;
+                } else {
+                    result = Other;
                 }
-            } else if (x instanceof nars.control.Premise) {
-                return Premise;
-            } else if (x instanceof ConceptFire) {
-                return ConceptFire;
-            } else if (x.isInput()) {
-                return Input;
-            }
 
-            return Other;
-        }
-
-        public static EnumMap<PostBand, PSink<PostBand, ITask>> map(Mix<PostBand, ITask> mix) {
-            EnumMap<PostBand, PSink<PostBand, ITask>> e = new EnumMap(PostBand.class);
-            for (PostBand p : PostBand.values()) {
-                e.put(p, mix.stream(p));
-            }
-            return e;
-        }
-    }
-
-    final EnumMap<PostBand,PSink<PostBand,ITask>> postBandMap = PostBand.map(post);
-
-    protected PSink<PostBand,ITask> stream(ITask x) {
-        return postBandMap.get(PostBand.which(x));
-    }
+                return result.ordinal();
+            },
+            Stream.of(PostBand.values()).map(Enum::toString).toArray(String[]::new));
 
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
@@ -110,12 +125,15 @@ public class NARS extends NAR {
                 new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, e),
                 rng, e);
 
-        onCycle(n -> post.commit(n.time()));
+        onCycle(n -> controlMix.commit(n.time()));
     }
 
     @Override
     public void input(ITask x) {
-        stream(x).input(x);
+        if (x instanceof Task)
+            nalMix.accept((Task) x);
+        else
+            controlMix.accept(x);
     }
 
     public void inputSub(ITask x) {
@@ -142,9 +160,9 @@ public class NARS extends NAR {
     /**
      * default implementation convenience method
      */
-    public void addNAR(int capacity) {
+    public void addNAR(int capacity, float rate) {
         addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(capacity, 0.2f);
+            SubExecutor e = new SubExecutor(capacity, rate);
             Default d = new Default(rng, terms, time, e);
             d.stmLinkage.capacity.set(0); //disabled
             return d;
@@ -220,6 +238,7 @@ public class NARS extends NAR {
         /**
          * dont call directly
          */
+        @Override
         public void run() {
             nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
         }
@@ -283,7 +302,6 @@ public class NARS extends NAR {
             return new DefaultHijackBag<>(blend, reprobes);
         }
     }
-
 
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {

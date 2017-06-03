@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 
@@ -26,7 +25,7 @@ public class MeshMap<K,V> extends UDPeer /* implements Map<K,V>*/ {
     static {
         try {
             seed = new UDPeer();
-            seed.setFPS(seedFPS);
+            seed.runFPS(seedFPS);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +101,7 @@ public class MeshMap<K,V> extends UDPeer /* implements Map<K,V>*/ {
         return the.computeIfAbsent(id, i -> {
             try {
                 MeshMap<K, V> y = new MeshMap<K, V>(id, x);
-                y.setFPS(mapFPS);
+                y.runFPS(mapFPS);
                 return y;
             } catch (IOException e) {
                 //logger.error("{}",e);

@@ -285,6 +285,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return terms.term(t);
     }
 
+    @NotNull
+    public <T extends Term> T term(@NotNull byte[] code) throws NarseseException {
+        return (T)IO.termFromBytes(code, terms);
+    }
+
 
     /**
      * gets a concept if it exists, or returns null if it does not

@@ -107,7 +107,7 @@ public class NAL8Test extends AbstractNALTest {
 
 
     @Test
-    public void conditional_abduction_test()  { //maybe to nal7 lets see how we will split these in the future
+    public void conditional_abduction_temporal_vs_eternal()  { //maybe to nal7 lets see how we will split these in the future
         TestNAR tester = test();
 
         tester.input("at(SELF,{t003}). :|:");
@@ -330,7 +330,7 @@ public class NAL8Test extends AbstractNALTest {
 
 
     @Test
-    public void condition_goal_deduction()  {
+    public void condition_goal_deduction_eternal_belief()  {
         test()
             
             .input("<(SELF,{t002}) --> reachable>! :|:")
@@ -1249,7 +1249,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 10) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.48f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
     @Test public void conjDecoposeGoalAfterPosNeg() {
@@ -1260,11 +1260,27 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL);
     }
 
+    @Test public void implDecoposeGoalAfterPosPos() {
+        test()
+                .inputAt(3, "((a) ==>+3 (b)). :|:")
+                .inputAt(13, "(b)! :|:")
+                .mustDesire(cycles, "(a)", 1f, 0.4f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL, 10);
+    }
+
+    @Test public void implDecoposeGoalAfterPosNeg() {
+        test()
+                .inputAt(3, "(--(a) ==>+3 (b)). :|:")
+                .inputAt(13, "(b)! :|:")
+                .mustDesire(cycles, "(a)", 0f, 0.4f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL, 10);
+    }
+
     @Test public void conjDecoposeGoalAfterNegNeg() {
         test()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(13, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f, 10) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustDesire(cycles, "(a)", 1f, 0.48f, 13) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { ETERNAL } );
     }
 

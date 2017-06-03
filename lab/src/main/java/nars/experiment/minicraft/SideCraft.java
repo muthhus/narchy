@@ -50,7 +50,7 @@ public class SideCraft extends NAgentX {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = PixelBag.of(()->camBuffer, 48, 32).addActions("cra", this);
+        PixelBag cam = PixelBag.of(() -> camBuffer, 48, 32).addActions("cra", this);
 
 
         //camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);
@@ -87,20 +87,16 @@ public class SideCraft extends NAgentX {
         actionBipolar($("cra(mouse,X)"), (v) -> {
             int x = craft.screenMousePos.x;
             int xx = Util.clampI(x + v * mSpeed, 0, camBuffer.getWidth() - 1);
-            if (xx != x) {
-                craft.screenMousePos.x = xx;
-                return true;
-            }
-            return false;
+
+            craft.screenMousePos.x = xx;
+            return v;
+
         });
         actionBipolar($("cra(mouse,Y)"), (v) -> {
             int y = craft.screenMousePos.y;
             int yy = Util.clampI(y + v * mSpeed, 0, camBuffer.getHeight() - 1);
-            if (yy != y) {
-                craft.screenMousePos.y = yy;
-                return true;
-            }
-            return false;
+            craft.screenMousePos.y = yy;
+            return v;
         });
 
 

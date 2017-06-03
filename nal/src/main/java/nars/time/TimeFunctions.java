@@ -371,8 +371,8 @@ public interface TimeFunctions {
             decomposeLate(derived, p, occReturn, false);
 
     static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
-        return lateIfGoal(p, occReturn, decompose(derived, p, occReturn, b));
-    }
+        return lateIfGoal(p, occReturn, (decompose(derived, p, occReturn, b)));
+    };
 
     static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Compound x) {
         if ((x != null) && p.task.isGoal() && p.concPunc == GOAL && (occReturn[0] != ETERNAL)) {
@@ -389,7 +389,8 @@ public interface TimeFunctions {
 
                 //occReturn[1] = occReturn[0]; //HACK
 
-                if (taskStart > now) {
+                long derivedStart = occReturn[0];
+                if (taskStart > derivedStart) {
 
                     long range = occReturn[1] - occReturn[0];
 
@@ -518,6 +519,7 @@ public interface TimeFunctions {
             //}
         }
 
+        //return derived;
         return lateIfGoal(p, occReturn, derived);
     };
 

@@ -1,9 +1,8 @@
 package nars;
 
 import jcog.data.FloatParam;
+import jcog.pri.mix.control.RLMixControl;
 import jcog.random.XorShift128PlusRandom;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.conceptualize.state.DefaultConceptState;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -19,7 +18,9 @@ import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.render.Draw;
 import spacegraph.widget.meta.WindowButton;
+import spacegraph.widget.meter.MatrixView;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -109,29 +110,39 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.5f);
-        n.goalConfidence(0.5f);
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.9f);
 
         float p = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 1f * p;
         n.DEFAULT_GOAL_PRIORITY = 1f * p;
-        n.DEFAULT_QUESTION_PRIORITY = 1f * p;
-        n.DEFAULT_QUEST_PRIORITY = 1f * p;
-        n.termVolumeMax.setValue(60);
+        n.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
+        n.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+        n.termVolumeMax.setValue(40);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3);
-        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, false, 8);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 4, false, 16);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.01f, 16);
+        Inperience inp = new Inperience(n, 0.01f, 4);
 
-        int threads = 2;
+        int threads = 3;
         for (int i = 0; i < threads; i++) {
-            n.addNAR(4096);
+            n.addNAR(512, 0.25f);
         }
 
         NAgent a = init.apply(n);
         //a.trace = true;
 
+        RLMixControl nalControl = new RLMixControl(n.nalMix, 25f, a.happy);
+        window(grid(
+                new MatrixView(nalControl.agent.ae.W),
+                new MatrixView(nalControl.agent.q),
+                new MatrixView(nalControl.agent.et),
+                new MatrixView( nalControl.levels, 1, (x, gl) -> {
+                   Draw.colorPolarized(gl, x);
+                   return 0;
+                })
+        ), 800, 800);
 
         a.runRT(fps, endTime);
 
@@ -151,7 +162,8 @@ abstract public class NAgentX extends NAgent {
         public NARSView(NARS n, NAgent a) {
             super(
                 new MixBoard(n, n.in),
-                new MixBoard(n, n.post),
+                //new MixBoard(n, n.nalMix),
+                new MixBoard(n, n.controlMix),
                 Vis.reflect(n),
                 new Vis.EmotionPlot(64, a)
                 //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))

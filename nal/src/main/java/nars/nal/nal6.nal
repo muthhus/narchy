@@ -11,15 +11,13 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqCom(S,P), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neqCom(S,P), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction, Permute:Backwards)
 
-    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
+    (P ==> M), (S ==> M), neqCom(S,P), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction, Permute:Backwards)
 
+    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction, Permute:Backwards)
 
-    (M ==> P), (M ==> S), neqCom(S,P), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
-
-
-    (P ==> M), (M ==> S), neqCom(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neqCom(S,P), time(dtSumReverse), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification, Permute:Backwards)
 
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
@@ -92,10 +90,10 @@
     B, ((--,%A) ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
         B, ((--,%A) ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
-    B, (C ==> A), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
-    B, ((--,%C) ==> A), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
-        B, ((--,%C) ==> A), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionNN, Goal:DeductionNN)
+    B, (C ==> A), belief(positive), time(decomposeBeliefLate), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), time(decomposeBeliefLate), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
+    B, ((--,%C) ==> A), belief(positive), time(decomposeBeliefLate), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
+        B, ((--,%C) ==> A), belief(negative), time(decomposeBeliefLate), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionNN, Goal:DeductionNN)
 
     B, (A <=> C), neq(C, B), task(positive), belief(positive), time(belief, C, A) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
     B, (A <=> C), neq(C, B), task(positive), belief(negative), time(belief, C, A) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyPN, Goal:DeductionPN)

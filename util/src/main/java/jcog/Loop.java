@@ -48,7 +48,7 @@ abstract public class Loop implements Runnable {
      */
     public Loop(float fps) {
         this();
-        setFPS(fps);
+        runFPS(fps);
     }
 
     /**
@@ -63,7 +63,7 @@ abstract public class Loop implements Runnable {
         return thread.get() != null;
     }
 
-    public final void setFPS(float fps) {
+    public final void runFPS(float fps) {
         setPeriodMS((int) (1000f / fps));
     }
 

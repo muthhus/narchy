@@ -47,9 +47,9 @@ public class NAL7Test extends AbstractNALTest {
         test()
                 .input("x:before. :|:")
                 .inputAt(10, "x:after. :|:")
-                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0)
+                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
                 .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
         ;
     }
@@ -381,10 +381,10 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
                         1.00f, 0.45f,
-                        0)
+                        0, 4)
                 .mustBelieve(cycles, "(enter:room <=>+4 open:door)", //same as other condition
                         1.00f, 0.45f,
-                        0)
+                        0, 4)
 
         ;
 //        t.nar.onFrame(z -> {

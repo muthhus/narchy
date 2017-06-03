@@ -61,8 +61,8 @@ public class GoalActionConcept extends ActionConcept {
             //inject curiosity
 
             float curiConf =
-                    //nar.confDefault(GOAL)/2f;
                     nar.confDefault(GOAL);
+                    //nar.confDefault(GOAL)/2f;
                     //nar.confMin.floatValue()*2f;
 
             float cc =
@@ -101,17 +101,22 @@ public class GoalActionConcept extends ActionConcept {
 //            kickstart = false;
 //        }
 
-        Truth fbt = this.motor.motor(belief, goal);
+        Truth beliefFeedback = this.motor.motor(belief, goal);
 //        if (fbt==null && belief!=null) {
 //            fbt = belief;
 //        }
 
-        Task fb = fbt!=null ? feedback.set(this, fbt, nar) : feedback.current;
+        //1. check feedback
+        //2. check current belief
+        //3. check previous signal belief
+        Truth nextTruth = beliefFeedback != null ? beliefFeedback : belief;
+
+        Task fb = feedback.set(this, nextTruth, nar);
 
 
 //        //HACK insert shadow goal
         //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
-
+        Task fg = null;
 
         //apply additional forgetting for past goals and beliefs, to promote future predictions
 //        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
@@ -123,8 +128,8 @@ public class GoalActionConcept extends ActionConcept {
 //        beliefs().forEachTask(decay);
 //        goals().forEachTask(decay);
 
-        return Stream.of(fb).filter(Objects::nonNull);
-        //return Stream.of(fb, fg).filter(Objects::nonNull);
+        //return Stream.of(fb).filter(Objects::nonNull);
+        return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 
 
