@@ -18,7 +18,6 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -494,20 +493,20 @@ public enum Util {
      * targetfactor=0.5: average
      * targetFactor=0:   full current
      */
-    public static float lerp(float targetFactor, float max, float min) {
-        return min + (max - min) * unitize(targetFactor);
+    public static float lerp(float x, float min, float max) {
+        return min + (max - min) * unitize(x);
     }
 
-    public static double lerp(double targetFactor, double max, double min) {
-        return min + (max - min) * unitize(targetFactor);
+    public static double lerp(double x, double min, double max) {
+        return min + (max - min) * unitize(x);
     }
 
-    public static long lerp(float factor, long max, long min) {
-        return min + Math.round((max - min) * unitize((double) factor));
+    public static long lerp(float x, long min, long max) {
+        return min + Math.round((max - min) * unitize((double) x));
     }
 
-    public static int lerp(float factor, int max, int min) {
-        return min + Math.round((max - min) * unitize(factor));
+    public static int lerp(float x, int min, int max) {
+        return min + Math.round((max - min) * unitize(x));
     }
 
     /**
@@ -1520,9 +1519,9 @@ public enum Util {
             ne = se + nw - sw;
 
         // calculate interpolation of selected triangle
-        float n = lerp(x, nw, ne);
-        float s = lerp(x, sw, se);
-        return lerp(z, n, s);
+        float n = lerp(x, ne, nw);
+        float s = lerp(x, se, sw);
+        return lerp(z, s, n);
     }
 
     public static String secondStr(double s) {

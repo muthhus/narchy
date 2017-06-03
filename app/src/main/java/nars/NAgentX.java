@@ -133,6 +133,12 @@ abstract public class NAgentX extends NAgent {
         NAgent a = init.apply(n);
         //a.trace = true;
 
+
+        a.runRT(fps, endTime);
+
+        chart(a);
+        chart(n, a);
+
         RLMixControl nalControl = new RLMixControl(n.nalMix, 25f, a.happy);
         window(grid(
                 new MatrixView(nalControl.agent.ae.W),
@@ -141,13 +147,12 @@ abstract public class NAgentX extends NAgent {
                 new MatrixView( nalControl.levels, 1, (x, gl) -> {
                    Draw.colorPolarized(gl, x);
                    return 0;
+                }),
+                new MatrixView( n.nalMix.outs, 1, (x, gl) -> {
+                   Draw.colorUnipolarHue(gl, x/4f, 0.5f, 0.8f);
+                   return 0;
                 })
         ), 800, 800);
-
-        a.runRT(fps, endTime);
-
-        chart(a);
-        chart(n, a);
 
         return n;
     }
@@ -162,7 +167,7 @@ abstract public class NAgentX extends NAgent {
         public NARSView(NARS n, NAgent a) {
             super(
                 new MixBoard(n, n.in),
-                //new MixBoard(n, n.nalMix),
+                //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
                 new MixBoard(n, n.controlMix),
                 Vis.reflect(n),
                 new Vis.EmotionPlot(64, a)

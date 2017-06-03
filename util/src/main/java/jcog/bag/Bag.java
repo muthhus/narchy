@@ -128,7 +128,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     /** normalizes a priorty to within the present min/max range of this bag, and unitized to within 0..1.0 clipping if exceeded */
     default float normalizeMinMax(float pri) {
-        return Util.unitize(Util.lerp(pri, priMax(), priMin()));
+        return Util.unitize(Util.lerp(pri, priMin(), priMax()));
     }
 
     default void normalizeAll(float lerp) {

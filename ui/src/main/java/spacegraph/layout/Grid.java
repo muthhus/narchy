@@ -98,10 +98,10 @@ public class Grid<S extends Surface> extends Layout<S> {
             int x;
             int s = (int)Math.sqrt(n);
             if (actualAspect > 1f) {
-                x = Math.round(lerp((actualAspect)/n, 1f, s));
+                x = Math.round(lerp((actualAspect)/n, s, 1f));
             } else if (actualAspect < 1f) {
                 //TODO fix
-                x = Math.round(lerp(1f-(1f/actualAspect)/n, (float)s, n));
+                x = Math.round(lerp(1f-(1f/actualAspect)/n, n, (float)s));
             } else {
                 x = s;
             }

@@ -92,7 +92,7 @@ public class Mix<K, P extends Priority>  {
             for (PSink s : streamID) {
                 now[i++] = (float)s.out.getSum();
                 now[i++] = s.out.getN();
-                s.commit();
+                s.clear();
             }
 
             r.commit(now);

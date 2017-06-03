@@ -162,7 +162,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         d.restartA(nar);
         d.restartB(task);
         d.restartC(this, belief, beliefTerm,
-                Util.lerp(parentTaskPri, Param.UnificationTTLMax, Param.UnificationTTLMin));
+                Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax));
 
         DefaultDeriver.the.test(d);
 

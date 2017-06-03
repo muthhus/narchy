@@ -1307,7 +1307,7 @@ public interface TimeFunctions {
 
         float tw = t.evi();
         float bw = b.evi();
-        return Util.lerp((tw) / (bw + tw), to, bo);
+        return Util.lerp((tw) / (bw + tw), bo, to);
 
 
 //        } else {

@@ -7,7 +7,6 @@ import jcog.event.On;
 import jcog.pri.PriReference;
 import jcog.pri.mix.MixRouter;
 import jcog.pri.mix.MixSwitch;
-import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
@@ -19,7 +18,6 @@ import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
-import nars.task.SignalTask;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -68,30 +66,24 @@ public class NARS extends NAR {
     }
 
     public final MixRouter<String,Task> nalMix = new MixRouter<>(this::inputSub,
-            new MixRouter.Classifier<>("isComplex", (x) -> {
-                return x.complexity() > termVolumeMax.intValue()/2f;
-            }),
-            new MixRouter.Classifier<>("isBelief", (x) -> {
-                return x.isBelief();
-            }),
-            new MixRouter.Classifier<>("isGoal", (x) -> {
-                return x.isGoal();
-            }),
-            new MixRouter.Classifier<>("isQuestion", (x) -> {
-                return x.isBelief();
-            }),
-            new MixRouter.Classifier<>("isQuest", (x) -> {
-                return x.isQuest();
-            })
+            new MixRouter.Classifier<>("isComplex",
+                    (x) -> x.complexity() > termVolumeMax.intValue()/2f),
+            new MixRouter.Classifier<>("isBelief", Task::isBelief),
+            new MixRouter.Classifier<>("isGoal", Task::isGoal),
+            new MixRouter.Classifier<>("isQuestion", Task::isBelief),
+            new MixRouter.Classifier<>("isQuest", Task::isQuest),
+            new MixRouter.Classifier<>("isInput", Task::isInput),
+            new MixRouter.Classifier<>("isFuture", t -> t.isFutureOf(time())),
+            new MixRouter.Classifier<>("isPast", t -> t.isPastOf(time()))
     );
 
 
 
-    public final MixSwitch<ITask> controlMix = new MixSwitch<ITask>(this::inputSub,
+    public final MixSwitch<ITask> controlMix = new MixSwitch<>(this::inputSub,
             (x) -> {
                 PostBand result;
                 if (x instanceof Task) {
-                    result = NAL;
+                    result = NAL; //should be zero
 //                    switch (x.punc()) {
 //                        case BELIEF:
 //                            result = PostBand.DerivedBelief; break;

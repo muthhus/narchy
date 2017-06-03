@@ -92,18 +92,18 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
 
     public void moveX(float x, float rate) {
         v3 center = transform();
-        move(Util.lerp(rate, x, center.x), center.y, center.z);
+        move(Util.lerp(rate, center.x, x), center.y, center.z);
     }
 
     public void moveY(float y, float rate) {
         v3 center = transform();
-        move(center.x, Util.lerp(rate, y, center.y), center.z);
+        move(center.x, Util.lerp(rate, center.y, y), center.z);
     }
 
 
     public void moveZ(float z, float rate) {
         v3 center = transform();
-        move(center.x, center.y, Util.lerp(rate, z, center.z));
+        move(center.x, center.y, Util.lerp(rate, center.z, z));
     }
 
     public void move(v3 target, float rate) {
@@ -113,9 +113,9 @@ public class SimpleSpatial<X> extends AbstractSpatial<X> {
     public void move(float x, float y, float z, float rate) {
         v3 center = transform();
         move(
-                Util.lerp(rate, x, center.x),
-                Util.lerp(rate, y, center.y),
-                Util.lerp(rate, z, center.z)
+                Util.lerp(rate, center.x, x),
+                Util.lerp(rate, center.y, y),
+                Util.lerp(rate, center.z, z)
         );
     }
 

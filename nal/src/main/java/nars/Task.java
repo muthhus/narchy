@@ -1045,4 +1045,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return s!=ETERNAL ? end() - s : 0;
     }
 
+    default boolean isFutureOf(long time) {
+        return compareTime(time) < 0;
+    }
+    default boolean isPastOf(long time) {
+        return compareTime(time) > 0;
+    }
+
+    /** uses midpoint */
+    default int compareTime(long when) {
+        long x = mid();
+        if (x == ETERNAL)
+            return 0;
+        return Long.compare(x, when);
+    }
 }

@@ -126,7 +126,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         if (c != null /* && !c.isDeleted() */) {
 
 
-            int newCap = Util.lerp(pri, space.maxEdgesPerNodeMax, space.maxEdgesPerNodeMin);
+            int newCap = Util.lerp(pri, space.maxEdgesPerNodeMin, space.maxEdgesPerNodeMax);
             edges.setCapacity(newCap);
             if (newCap > 0) {
 

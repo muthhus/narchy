@@ -50,10 +50,12 @@ public class MixRouter<X, Y extends Priority> extends Mix<X,Y> implements Consum
             Classifier<Y, X> c = possibles[i];
             if (c.test(y)) {
                 p += outs[i].floatValue(); //just use the stream for its priority value
+                outs[i].out.accept(y.priElseZero());
             }
         }
         if (p > 0) {
             y.priMult(p);
+
             actualTarget.accept(y);
         }
     }

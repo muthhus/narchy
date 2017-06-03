@@ -1,6 +1,8 @@
 package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
+import jcog.math.FloatSupplier;
+import jcog.pri.Priority;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
@@ -96,7 +98,15 @@ public class MatrixView extends Widget {
                 return Float.NaN;
         });
     }
-
+    public <P extends FloatSupplier> MatrixView(P[] d, int stride, ViewFunction1D view) {
+        this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
+            int i = y * stride + x;
+            if (i < d.length)
+                return view.update(d[i].asFloat(), gl);
+            else
+                return Float.NaN;
+        });
+    }
     public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
         this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
             double[] d = e.get();
@@ -110,6 +120,7 @@ public class MatrixView extends Widget {
         });
     }
 
+    @Override
     protected void paintComponent(GL2 gl) {
 
         float h = this.h;

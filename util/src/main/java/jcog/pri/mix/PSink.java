@@ -91,7 +91,7 @@ public class PSink<K,P extends Priority> extends FloatParam implements Function<
     }
 
     /** reset gathered statistics */
-    public void commit() {
+    public void clear() {
         in.clear();
         out.clear();
         //quaMeter.clear();

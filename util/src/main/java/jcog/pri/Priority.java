@@ -212,7 +212,7 @@ public interface Priority extends Prioritized {
     default Priority priLerp(float target, float speed) {
         float pri = pri();
         if (pri == pri)
-            setPri(lerp(speed, target, pri));
+            setPri(lerp(speed, pri, target));
         return this;
     }
 

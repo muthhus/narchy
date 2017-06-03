@@ -28,6 +28,7 @@ import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.ImmModeSink;
 import com.jogamp.opengl.util.texture.Texture;
+import jcog.Util;
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
@@ -727,6 +728,11 @@ public enum Draw {
         }
         gl.glColor3f(r, g, b);
     }
+    public static void colorUnipolarHue(GL2 gl, float v, float hueMin, float hueMax) {
+        float hue = Util.lerp(v, hueMin, hueMax);
+        hsb(gl, hue, 0.7f, 0.7f, 1f);
+    }
+
     public static void colorHash(Object x, float[] color) {
         colorHash(x.hashCode(), color, 1f);
     }

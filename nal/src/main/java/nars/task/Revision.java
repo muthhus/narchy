@@ -77,7 +77,7 @@ public class Revision {
 
             float af = a.freq();
             float bf = b.freq();
-            float f = lerp(p, af, bf);
+            float f = lerp(p, bf, af);
 
 //            //compute error (difference) in frequency TODO improve this
 //            float fError =
@@ -202,7 +202,7 @@ public class Revision {
             dt = adt;
         else {
             dt = mergeOrChoose ?
-                    (lerp(aProp, adt, bdt)) :
+                    (lerp(aProp, bdt, adt)) :
                     ((choose(a, b, aProp, rng) == a) ? adt : bdt);
         }
 

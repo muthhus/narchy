@@ -15,11 +15,11 @@ public class HaiQAgent extends HaiQ {
 
     public static final Logger logger = LoggerFactory.getLogger(HaiQAgent.class);
 
-    //Hsom...
-    final static float perceptionAlpha = 0.05f;
+
+    final static float perceptionAlpha = 0.01f;
     public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
-    float perceptionNoise = 0.01f;
+    float perceptionNoise = 0.001f;
     float perceptionCorruption = 0.0f;
 
 
