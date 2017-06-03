@@ -11,7 +11,7 @@ function generatorsStar(num) {
 
 
 // balanced tree, don't go above 11
-function generatorsBalancedTree(num) {
+function generatorsBalancedTree(g, num) {
     const n = num, count = Math.pow(2, n);
     let level;
 
@@ -30,7 +30,7 @@ function generatorsBalancedTree(num) {
 }
 
 
-function generatorCube(id, num) {
+function generatorCube(g, id, num) {
 // n dimensinonal cube don't go past 14
     var n = m = z = num;
     var k;

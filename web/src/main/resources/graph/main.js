@@ -61,7 +61,7 @@ $(document).ready(() => {
 
 
     shaders.shaderSetLoaded = function () {
-        start().animate();
+        start();
     };
 });
 
@@ -69,27 +69,22 @@ function start() {
 
     g = new Graph();
 
-
-    // generatorChain(100);
-    generatorsBalancedTree(3);
-
-
     setInterval(() => {
 
-        console.log('regen');
-
-        g = new Graph();
+        var g = new Graph();
         if (Math.random() < 0.5)
-            generatorsBalancedTree(3);
+            generatorsBalancedTree(g, 2);
         else
-            generatorCube('e', 6);
+            generatorCube(g, 'e', 4);
 
-        graphStructure = updateGraph(graphStructure);
+        // generatorChain(100);
+        // generatorCube(5);
+        // generatorsStar(50);
+
+        graphStructure = updateGraph(g);
 
 
-    }, 1500);
-    // generatorCube(5);
-    // generatorsStar(50);
+    }, 500);
 
 
     canvas = document.getElementById('c');
@@ -257,9 +252,12 @@ function start() {
     //gui.add(effectController, "k", 1, 10000).onChange(valuesChanger);
 
 
-    function updateGraph(prevGraphStructure) {
+    function updateGraph(newGraph) {
 
-        const graphStructure = new THREE.Object3D();
+        g = newGraph;
+
+        var prevGraphStructure = graphStructure;
+        const nextGraphStructure = new THREE.Object3D();
 
 
         nodesAndEdges = g.getNodesAndEdgesArray();
@@ -416,7 +414,7 @@ function start() {
         nodeMesh = new THREE.Points(nodeGeometry, nodeMaterial);
         pickingMesh = new THREE.Points(pickingNodeGeometry, pickingMaterial);
         pickingScene.add(pickingMesh);
-        graphStructure.add(nodeMesh);
+        nextGraphStructure.add(nodeMesh);
         //EDGES
         edgeGeometry = new THREE.BufferGeometry();
         const edgePositions = new THREE.BufferAttribute(new Float32Array(edgesCount * 2 * 3), 3);
@@ -470,7 +468,7 @@ function start() {
             linewidth: 5
         });
         cloudLines = new THREE.LineSegments(edgeGeometry, edgeMaterial);
-        graphStructure.add(cloudLines);
+        nextGraphStructure.add(cloudLines);
 
 
         const texture = font.texture;
@@ -641,7 +639,7 @@ function start() {
         });
 
         labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
-        graphStructure.add(labelMesh);
+        nextGraphStructure.add(labelMesh);
 
         //if (!simulator)
 
@@ -652,13 +650,13 @@ function start() {
         }
 
 
-        scene.add(graphStructure);
+        scene.add(nextGraphStructure);
 
         //if (!simulator)
             simulator = new Simulator(renderer);
         simulator.update(); //reinit
 
-        return graphStructure;
+        return nextGraphStructure;
 
 
     }
@@ -932,7 +930,7 @@ function start() {
 
     }
 
-    graphStructure = updateGraph();
+
     animate();
 
     return this;

@@ -180,8 +180,6 @@ function Simulator(renderer) {
 
 	function init() {
 
-		console.log('simulator init', nodesAndEdges);
-
 		const dtPosition = generatePositionTexture(nodesAndEdges, nodesWidth,
             1000);
 		const dtVelocity = generateVelocityTexture(nodesAndEdges, nodesWidth);
