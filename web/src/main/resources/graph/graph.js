@@ -121,7 +121,7 @@ function Graph(settings) {
 
         $.each(this.nodes, function (key, value) {
 
-            edgesArray[value.id] = _.uniq(value.edges);
+            edgesArray[value.id] = /*_.uniq*/(value.edges);
 
         });
 
@@ -176,7 +176,7 @@ function Graph(settings) {
 
             });
 
-            epochArray[value.id] = _.uniq(epochs);
+            epochArray[value.id] = /*_.uniq*/(epochs);
 
         });
 

@@ -44,7 +44,14 @@
             z-index: 2;
         }
 
-
+        #layouts {
+            position: absolute;
+            right: 50px;
+            top: 150px;
+            /*width: 800px;*/
+            /*margin-left: -400px;*/
+            z-index: 1;
+        }
 
         .overlay {
             /*-webkit-box-align: center;*/
@@ -64,11 +71,27 @@
             z-index: 1;
         }
 
+        .instruction {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            bottom: 20px;
+            padding-right: 20px;
+            padding-left: 20px;
+            pointer-events: none;
+
+            font-size: 16px;
+            color: #fff;
+            z-index: 2;
+        }
 
         .dg ac {
             z-index: 1000;
         }
 
+        html.is-white .footer {
+            color: #000;
+        }
 
         html.is-white .footer a {
             color: #121212;
@@ -81,16 +104,12 @@
     <!--vendor includes-->
 
 
-    <script src="lib/jquery.min.js"></script>
-    <script src="lib/bootstrap.min.js"></script>
-    <script src="lib/ion.rangeSlider.min.js"></script>
+    <script src="../lib/jquery/dist/jquery.min.js"></script>
+    <script src="../lib/lodash/dist/lodash.core.min.js"></script>
     <script src="lib/three.js"></script>
     <script src="lib/stats.min.js"></script>
     <script src="lib/dat.gui.min.js"></script>
     <script src="lib/OrbitControls.js"></script>
-    <script src="lib/papaparse.min.js"></script>
-    <script src="lib/moment.js"></script>
-    <script src="lib/underscore-min.js"></script>
     <script src="lib/ShaderLoader.js"></script>
     <script src="lib/UbuntuMono.js"></script>
     <script src="lib/Wagner.js"></script>
@@ -101,11 +120,9 @@
 
     <script src="graph.js"></script>
     <script src="generators.js"></script>
-    <script src="slider.js"></script>
     <script src="picking.js"></script>
     <script src="main.js"></script>
     <script src="textureGenerator.js"></script>
-    <script src="geom.js"></script>
     <script src="simulator.js"></script>
     <script src="TextParticles.js"></script>
     <script src="gui.js"></script>
@@ -115,32 +132,8 @@
 </head>
 
 <body>
+
 <canvas id="c" class="overlay"></canvas>
-<div id="slider" style="display: none;">
-    <div>
-        <input type="text" id="range" value="" name="range">
-    </div>
-    <br/>
-
-    <div id="buttons" style="display: none;">
-
-        <button type="button" id="play" class="btn btn-primary">
-            <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-        </button>
-
-        <button type="button" id="expand" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-        </button>
-
-        <button type="button" id="repeat" class="btn btn-primary">
-            <span class="glyphicon glyphicon-repeat text-muted" aria-hidden="true"></span>
-        </button>
-
-    </div>
-
-</div>
-
-
 
 <script>
 

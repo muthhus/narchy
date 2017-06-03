@@ -24,11 +24,11 @@ let mouseDblClick = false;
 let temperature = 100;
 let lastPickedNode = {};
 let last = performance.now();
-let simulator, interface;
+let simulator, gui;
 let pickingTexture, pickingScene;
 const k = 0;
 let shaders;
-let slider;
+
 
 let epochMin, epochMax;
 let epochOffset;
@@ -41,9 +41,12 @@ var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCou
 let nodesRendered = [];
 
 var g = new Graph();
+var nodeRegular, nodeThreat;
 
 
 $(document).ready(() => {
+
+
 
     shaders = new ShaderLoader('./shaders');
     shaders.load('vs-edge', 'edge', 'vertex');
@@ -57,7 +60,6 @@ $(document).ready(() => {
     shaders.load('sim-nodeAttrib', 'nodeAttrib', 'simulation');
     shaders.load('vs-text', 'text', 'vertex');
     shaders.load('fs-text', 'text', 'fragment');
-
 
 
     shaders.shaderSetLoaded = function () {
@@ -112,13 +114,12 @@ function start() {
         canvas: canvas
     });
 
+
+
     // NODES
-    nodeRegular = THREE.ImageUtils.loadTexture('textures/new_circle.png', {}, function () {
-        renderer.render(scene, camera);
-    });
-    nodeThreat = THREE.ImageUtils.loadTexture('textures/crosshair.png', {}, function () {
-        renderer.render(scene, camera);
-    });
+    var textureLoader = new THREE.TextureLoader();
+    nodeRegular = textureLoader.load('textures/new_circle.png');
+    nodeThreat = textureLoader.load('textures/crosshair.png');
 
     // WAGNER.vertexShadersPath = './shaders';
     // WAGNER.fragmentShadersPath = './shaders';
@@ -156,8 +157,6 @@ function start() {
 
     gpupicking = new GPUPick();
 
-    slider = new Slider();
-    slider.init();
 
 
     onWindowResize();
@@ -171,13 +170,13 @@ function start() {
     //epochOffset = min;
 
 
-    interface = new GUIInterface();
-    interface.init();
+    gui = new GUIInterface();
+    gui.init();
 
     const letterWidth = 20;
     const letterSpacing = 15;
 
-    const font = UbuntuMono('lib/UbuntuMono.png');
+    const font = UbuntuMono(textureLoader, 'lib/UbuntuMono.png');
     function getTextCoordinates(letter) {
         let index;
         let charCode = letter.charCodeAt(0);
@@ -300,8 +299,8 @@ function start() {
         }
 
         // console.log(bigArray);
-        min = _.min(bigArray);
-        max = _.max(bigArray);
+        var min = _.min(bigArray);
+        var max = _.max(bigArray);
 
         // console.log('min epoch:', min, 'max epoch:', max);
 
@@ -734,28 +733,7 @@ function start() {
         if (e.charCode === 115) {
             simulate = !simulate;
         }
-        if (e.charCode === 61) {
-            if (slider) {
-                slider.increaseStep();
-            }
-        }
-        if (e.charCode === 45) {
-            if (slider) {
-                slider.decreaseStep();
-            }
-        }
 
-        if (e.charCode === 93) {
-            if (slider) {
-                slider.increaseHandles();
-            }
-        }
-
-        if (e.charCode === 91) {
-            if (slider) {
-                slider.decreaseHandles();
-            }
-        }
 
     };
 
