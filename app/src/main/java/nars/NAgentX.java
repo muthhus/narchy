@@ -1,7 +1,6 @@
 package nars;
 
 import jcog.data.FloatParam;
-import jcog.pri.mix.control.RLMixControl;
 import jcog.random.XorShift128PlusRandom;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
@@ -21,6 +20,7 @@ import spacegraph.layout.Grid;
 import spacegraph.render.Draw;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;
+import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
 
 /**
@@ -139,19 +140,21 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
-        RLMixControl nalControl = new RLMixControl(n.nalMix, 25f, a.happy);
         window(grid(
-                new MatrixView(nalControl.agent.ae.W),
-                new MatrixView(nalControl.agent.q),
-                new MatrixView(nalControl.agent.et),
-                new MatrixView( nalControl.levels, 1, (x, gl) -> {
-                   Draw.colorPolarized(gl, x);
-                   return 0;
-                }),
-                new MatrixView( n.nalMix.outs, 1, (x, gl) -> {
-                   Draw.colorUnipolarHue(gl, x/4f, 0.5f, 0.8f);
-                   return 0;
-                })
+                new Plot2D(100, Plot2D.Line)
+                        .add("happy", () -> n.nalMix.lastScore)
+                        .on(a::onFrame),
+                col(
+                        new MatrixView(n.nalMix.agentIn, false),
+                        new MatrixView(n.nalMix.agent.ae.W),
+                        new MatrixView(n.nalMix.agent.ae.y, true),
+                        new MatrixView(n.nalMix.agent.q),
+                        new MatrixView(n.nalMix.agent.et),
+                        new MatrixView(n.nalMix.levels, 1, (x, gl) -> {
+                            Draw.colorBipolar(gl, x);
+                            return 0;
+                        })
+                )
         ), 800, 800);
 
         return n;
@@ -166,12 +169,12 @@ abstract public class NAgentX extends NAgent {
 
         public NARSView(NARS n, NAgent a) {
             super(
-                new MixBoard(n, n.in),
-                //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
-                new MixBoard(n, n.controlMix),
-                Vis.reflect(n),
-                new Vis.EmotionPlot(64, a)
-                //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
+                    new MixBoard(n, n.in),
+                    //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
+                    new MixBoard(n, n.controlMix),
+                    Vis.reflect(n),
+                    new Vis.EmotionPlot(64, a)
+                    //row(n.sub.stream().map(c -> Vis.reflect(n)).collect(toList()))
             );
 //                (n.sub.stream().map(c -> {
 //                int capacity = 128;
@@ -310,8 +313,8 @@ abstract public class NAgentX extends NAgent {
 
                             //"tasks", ()-> taskChart,
 
-                    new WindowButton( "conceptGraph", ()->
-                            Vis.conceptsWindow3D(nar,128, 4) )
+                            new WindowButton("conceptGraph", () ->
+                                    Vis.conceptsWindow3D(nar, 128, 4))
 
                     )
             ), 900, 600);
@@ -392,6 +395,7 @@ abstract public class NAgentX extends NAgent {
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {
         return senseCamera(id.toString(), new CameraSensor(id, bc, this));
     }
+
     protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(Term id, C bc, int outputPixels) {
         return senseCamera(id.toString(), new CameraSensor(id, new AutoencodedBitmap(bc, outputPixels), this));
     }

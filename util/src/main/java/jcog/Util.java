@@ -30,6 +30,7 @@ import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.Pair;
@@ -1663,6 +1664,13 @@ public enum Util {
 
     public static float[] doubleToFloatArray(double[] a) {
         return doubleToFloatArray(a, 0, a.length);
+    }
+    public static float[] doubleToFloatArray(double[] a, int from, int to, DoubleToFloatFunction df) {
+        float[] result = new float[to - from];
+        for (int j = 0, i = from; i < to; i++, j++) {
+            result[j] = df.valueOf(a[i]);
+        }
+        return result;
     }
 
     public static float[] doubleToFloatArray(double[] a, int from, int to) {

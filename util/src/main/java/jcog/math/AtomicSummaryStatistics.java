@@ -1,11 +1,14 @@
 package jcog.math;
 
+import com.sun.jna.platform.unix.X11;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.DoubleAccumulator;
+import java.util.function.Consumer;
 
 /** see also: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/StatCounter.scala */
 public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure, Serializable, StatisticalSummary {
@@ -15,6 +18,8 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
     protected double max;
     protected double mean;
     protected double sum;
+
+    CopyOnWriteArrayList<Consumer<AtomicSummaryStatistics>> onCommit = null;
 
     /**
      * NaN triggers reset
@@ -35,6 +40,10 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
             mean += delta / ++count;
             return ss + delta * (v - mean);
         } else {
+            if (onCommit!=null) {
+                for (Consumer<AtomicSummaryStatistics> c : onCommit)
+                    c.accept(this);
+            }
             count = 0;
             mean = 0;
             sum = 0;
@@ -205,6 +214,32 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
         long c = count;
         if (c == 0) return Double.NaN;
         return update.doubleValue() / (c);
+    }
+
+    public void on(Consumer<AtomicSummaryStatistics> o) {
+        if (onCommit==null)
+            onCommit = new CopyOnWriteArrayList<>();
+        onCommit.add(o);
+    }
+
+    /** asynchronous sum integrator */
+    public AtomicSummaryStatistics sumIntegrator() {
+        final AtomicSummaryStatistics i = new AtomicSummaryStatistics();
+        on((x) -> {
+            i.accept(x.sum);
+        });
+        return i;
+    }
+
+    public float sumThenClear() {
+        float f = (float) sum;
+        clear();
+        return f;
+    }
+    public float meanThenClear() {
+        float f = (float) mean;
+        clear();
+        return f;
     }
 
 }

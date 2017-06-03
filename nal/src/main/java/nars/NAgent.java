@@ -3,6 +3,7 @@ package nars;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.Loop;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -108,6 +109,7 @@ abstract public class NAgent implements NSense, NAct {
     private Loop senseAndMotorLoop;
     private Loop predictLoop;
     final private ConceptFire fireHappy;
+
 
     public NAgent(@NotNull NAR nar) {
         this("", nar);
@@ -245,7 +247,9 @@ abstract public class NAgent implements NSense, NAct {
             ambition.input(
                 Stream.of(happy.apply(nar), fireHappy)
             );
-
+            //contribute this agent to the NAR's global happiness measurement
+            nar.emotion.happy(reward);
+            nar.emotion.happy(dexterity());
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);
@@ -680,6 +684,8 @@ abstract public class NAgent implements NSense, NAct {
     public On<NAgent> onFrame(Consumer<NAgent> each) {
         return eventFrame.on(each);
     }
-
+    public On<NAgent> onFrame(Runnable each) {
+        return eventFrame.on((n)->each.run() );
+    }
 
 }

@@ -2,7 +2,6 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
-import jcog.pri.Priority;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
@@ -22,7 +21,7 @@ public class MatrixView extends Widget {
     public static ViewFunction2D arrayRenderer(float[][] ww) {
         return (x, y, gl) -> {
             float v = ww[x][y];
-            Draw.colorPolarized(gl, v);
+            Draw.colorBipolar(gl, v);
             return 0;
         };
     }
@@ -30,14 +29,15 @@ public class MatrixView extends Widget {
     public static ViewFunction2D arrayRenderer(float[] w) {
         return (x, y, gl) -> {
             float v = w[y];
-            Draw.colorPolarized(gl, v);
+            Draw.colorBipolar(gl, v);
             return 0;
         };
     }
-  public static ViewFunction2D arrayRenderer(double[] w) {
+
+    public static ViewFunction2D arrayRenderer(double[] w) {
         return (x, y, gl) -> {
             float v = (float) w[y];
-            Draw.colorPolarized(gl, v);
+            Draw.colorBipolar(gl, v);
             return 0;
         };
     }
@@ -72,10 +72,24 @@ public class MatrixView extends Widget {
     public MatrixView(float[][] w) {
         this(w.length, w[0].length, MatrixView.arrayRenderer(w));
     }
+
     public MatrixView(int w, int h, ViewFunction2D view) {
         this.w = w;
         this.h = h;
         this.view = view != null ? view : ((ViewFunction2D) this);
+    }
+
+    static final ViewFunction1D bipolar1 = (x, gl) -> {
+        Draw.colorBipolar(gl, x);
+        return 0;
+    };
+    static final ViewFunction1D unipolar1 = (x, gl) -> {
+        Draw.colorGrayscale(gl, x);
+        return 0;
+    };
+
+    public MatrixView(float[] d, boolean bipolar) {
+        this(d, 1, bipolar ? bipolar1 : unipolar1 );
     }
 
     public MatrixView(float[] d, int stride, ViewFunction1D view) {
@@ -98,6 +112,7 @@ public class MatrixView extends Widget {
                 return Float.NaN;
         });
     }
+
     public <P extends FloatSupplier> MatrixView(P[] d, int stride, ViewFunction1D view) {
         this((int) Math.floor(((float) d.length) / stride), stride, (x, y, gl) -> {
             int i = y * stride + x;
@@ -107,6 +122,7 @@ public class MatrixView extends Widget {
                 return Float.NaN;
         });
     }
+
     public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
         this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
             double[] d = e.get();

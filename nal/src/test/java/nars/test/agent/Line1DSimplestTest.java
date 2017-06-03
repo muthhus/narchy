@@ -112,7 +112,6 @@ public class Line1DSimplestTest {
         n.run(1);
 
         assertEquals( 0.81f, n.emotion.happy(), 0.05f);
-        assertEquals( 0.0, n.emotion.sad(), 0.01f);
 
         System.out.println("moving target away from reward..\n");
         a.i.setValue(1f);
@@ -120,7 +119,6 @@ public class Line1DSimplestTest {
 
         assertEquals(-1f, a.reward, 0.01f);
         assertEquals( 0.0f, n.emotion.happy(), 0.1f);
-        assertEquals( 0.81f, n.emotion.sad(), 0.4f); //this will be weakened by what caused the happiness in the previous cycle due to evidence decay's lingering effect
 
         assertEquals(0f, a.rewardSum(), 0.01f);
 

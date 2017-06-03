@@ -681,7 +681,7 @@ public class VncClient {
                 if (tt!=null) {
                     Draw.rectTex(gl, tt, xx, yy, sc, sc, 0);
                 } else {
-                    Draw.colorPolarized(gl, 0.5f);
+                    Draw.colorBipolar(gl, 0.5f);
                     Draw.rect(gl, xx, yy, sc, sc);
                 }
             }

@@ -2,22 +2,35 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import jcog.event.On;
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Function;
 
 import static jcog.Texts.n2;
 
 public class Plot2D extends Surface {
     private final List<Series> series;
     private String title;
+    private On on;
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Plot2D on(Function<Runnable,On> trigger) {
+        synchronized (series) {
+            if (on != null)
+                on.off(); //remove previous handler
+            this.on = trigger.apply(this::update);
+        }
+        return this;
     }
 
 //    public <X> Surface to(Consumer<Consumer<X>> y) {

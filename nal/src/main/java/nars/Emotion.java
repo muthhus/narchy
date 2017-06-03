@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.term.Compound;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -31,11 +32,10 @@ public final class Emotion implements Serializable {
 
     /** happiness rate */
     @NotNull
-    public final BufferedFloatGuage happy;
+    public final AtomicSummaryStatistics happy = new AtomicSummaryStatistics();
 
-    /** sadness rate */
-    @NotNull
-    public final BufferedFloatGuage sad;
+    float _happy;
+
 
     @NotNull
     public final BufferedFloatGuage confident;
@@ -66,9 +66,6 @@ public final class Emotion implements Serializable {
         this.learnPri = new BufferedFloatGuage("learnP");
         this.learnVol = new BufferedFloatGuage("learnV");
 
-        this.happy = new BufferedFloatGuage("happy");
-        this.sad = new BufferedFloatGuage("sad");
-
         this.confident = new BufferedFloatGuage("confidence");
 
         this.stress = new BufferedFloatGuage("stress");
@@ -83,8 +80,8 @@ public final class Emotion implements Serializable {
     /** new frame started */
     public void cycle() {
 
+        _happy = (float) happy.getSum();
         happy.clear();
-        sad.clear();
 
         busyPri.clear();
         busyVol.clear();
@@ -129,10 +126,7 @@ public final class Emotion implements Serializable {
 //    }
 
     public float happy() {
-        return happy.getSum();
-    }
-    public float sad() {
-        return sad.getSum();
+        return _happy;
     }
 
 //    public void print(@NotNull OutputStream output) {
@@ -176,18 +170,8 @@ public final class Emotion implements Serializable {
 
     //TODO use Meter subclass that will accept and transform these float parameters
 
-    @Deprecated public void happy(float delta) {
-
-//        float factor = 1f / concept.complexity(); //adjust by the complexity of the concept's term
-//
-//        delta *= factor;
-
-        //System.out.println(delta + " " + concept);
-
-        if (delta > 0)
-            happy.accept( delta );
-        else
-            sad.accept(-delta);
+    @Deprecated public void happy(float increment) {
+        happy.accept( increment );
     }
 
     @Deprecated public void busy(float pri, int vol) {
@@ -230,7 +214,7 @@ public final class Emotion implements Serializable {
         //long now = nar.time();
 
         return new StringBuilder()
-                .append(" hapy=").append(n4(happy() - sad()))
+                .append(" hapy=").append(n4(happy() ))
                 .append(" busy=").append(n4(busyVol.getSum()))
                 .append(" lern=").append(n4(learningVol()))
                 .append(" errr=").append(n4(erring()))

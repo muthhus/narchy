@@ -7,6 +7,7 @@ import jcog.event.On;
 import jcog.pri.PriReference;
 import jcog.pri.mix.MixRouter;
 import jcog.pri.mix.MixSwitch;
+import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
@@ -65,16 +66,24 @@ public class NARS extends NAR {
         Other
     }
 
-    public final MixRouter<String,Task> nalMix = new MixRouter<>(this::inputSub,
-            new MixRouter.Classifier<>("isComplex",
+    public final RLMixControl<String,Task> nalMix = new RLMixControl<String,Task>(this::inputSub,
+            30f,
+            emotion.happy.sumIntegrator()::meanThenClear,
+            new MixRouter.Classifier<>("simple",
+                    (x) -> x.complexity() <= termVolumeMax.intValue()/2f),
+            new MixRouter.Classifier<>("complex",
                     (x) -> x.complexity() > termVolumeMax.intValue()/2f),
             new MixRouter.Classifier<>("isBelief", Task::isBelief),
             new MixRouter.Classifier<>("isGoal", Task::isGoal),
-            new MixRouter.Classifier<>("isQuestion", Task::isBelief),
+            new MixRouter.Classifier<>("isQuestion", Task::isQuestion),
             new MixRouter.Classifier<>("isQuest", Task::isQuest),
-            new MixRouter.Classifier<>("isInput", Task::isInput),
+            new MixRouter.Classifier<>("isPresent", t -> t.isPresentOf(time(), dur())),
             new MixRouter.Classifier<>("isFuture", t -> t.isFutureOf(time())),
             new MixRouter.Classifier<>("isPast", t -> t.isPastOf(time()))
+//            new MixRouter.Classifier<>("original",
+//                    (x) -> x.stamp().length <= 2),
+//            new MixRouter.Classifier<>("unoriginal",
+//                    (x) -> x.stamp().length > 2),
     );
 
 

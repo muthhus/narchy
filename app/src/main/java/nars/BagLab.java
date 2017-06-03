@@ -85,7 +85,7 @@ public class BagLab  {
                             p = bag.priSafe(val, 0);
                     }
                 }
-                Draw.colorPolarized(gl, p);
+                Draw.colorBipolar(gl, p);
             } catch (Exception e) {
 
             }

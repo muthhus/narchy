@@ -141,9 +141,9 @@ public class Autoencoder {
 
 
 
-		if ((normalize)) {
+		if (normalize) {
 			float maxMin = max - min;
-			if (!Util.equals(maxMin, 0, NORMALIZATION_EPSILON)) {
+			if (maxMin > NORMALIZATION_EPSILON) {
 
 				for (int i = 0; i < outs; i++) {
 					y[i] = (y[i] - min) / maxMin;

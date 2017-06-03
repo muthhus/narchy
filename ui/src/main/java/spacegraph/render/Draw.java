@@ -715,7 +715,7 @@ public enum Draw {
     /**
      * uses the built-in color scheme for displaying values in the range -1..+1
      */
-    public static void colorPolarized(GL2 gl, float v) {
+    public static void colorBipolar(GL2 gl, float v) {
         float r, g, b;
         if (v < 0) {
             r = -v / 2f;
@@ -759,6 +759,10 @@ public enum Draw {
     }
     public static void colorHash(GL2 gl, Object o) {
         colorHash(gl, o, 1f);
+    }
+
+    public static void colorGrayscale(GL2 gl, float x) {
+        gl.glColor3f(x,x,x);
     }
 
 

@@ -175,7 +175,7 @@ public class Recog2D extends NAgentX {
                         }
 
 
-                        Draw.colorPolarized(gl,
+                        Draw.colorBipolar(gl,
                                 2f * (freq - 0.5f)
                                 //2f * (freq - 0.5f) * conf  //unipolar (1 color)
                                 //2f * (-0.5f + freq) //bipolar (2 colors)

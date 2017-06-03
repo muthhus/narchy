@@ -63,7 +63,7 @@ public class HaiQAgent extends HaiQ {
 
     @Override
     protected int perceive(float[] input) {
-        ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, true);
+        ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, true);
         int w = ae.max();
         return w;
     }
