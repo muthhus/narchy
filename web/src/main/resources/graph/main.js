@@ -1,52 +1,50 @@
-let canvas, stats;
-let camera, scene, renderer, controls;
-let composer, vignette2Pass, multiPassBloomPass;
-const backgroundColor = new THREE.Color(0x3c3c3c);
+function GraphVis(onReady) {
 
-let nodeMesh,
-    nodeGeometry,
-    nodeUniforms, labelUniforms, edgeUniforms;
-
-var cloudLines;
-var edgeGeometry, edgeMaterial;
-var pickingNodeGeometry;
-var pickingMesh;
-var nodeMaterial, pickingMaterial;
-var labelGeometry;
-var labelMaterial;
-
-let simulate = false;
-let graphStructure;
-const mouse = new THREE.Vector2();
-let mouseUp = true;
-let mouseDown = false;
-let mouseDblClick = false;
-let temperature = 100;
-let lastPickedNode = {};
-let last = performance.now();
-let simulator, gui;
-let pickingTexture, pickingScene;
-const k = 0;
-let shaders;
+    let canvas, stats;
+    let camera, scene, renderer, controls;
 
 
-let epochMin, epochMax;
-let epochOffset;
+    let nodeMesh,
+        nodeGeometry,
+        nodeUniforms, labelUniforms, edgeUniforms;
+
+    var cloudLines;
+    var edgeGeometry, edgeMaterial;
+    var pickingNodeGeometry;
+    var pickingMesh;
+    var nodeMaterial, pickingMaterial;
+    var labelGeometry;
+    var labelMaterial;
+
+    let simulate = false;
+    let graphStructure;
+    const mouse = new THREE.Vector2();
+    let mouseUp = true;
+    let mouseDown = false;
+    let mouseDblClick = false;
+    let temperature = 100;
+    let lastPickedNode = {};
+    let last = performance.now();
+    let simulator, gui;
+    let pickingTexture, pickingScene;
+    let shaders;
 
 
-var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCount, edgesCount, edgesAndEpochs,
-    edgesLookupTable,
-    pickingNodeGeometry, gpupicking;
-
-let nodesRendered = [];
-
-var g = new Graph();
-var nodeRegular, nodeThreat;
+    let epochMin, epochMax;
+    let epochOffset;
 
 
-$(document).ready(() => {
+    var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCount, edgesCount, edgesAndEpochs,
+        edgesLookupTable,
+        pick;
 
+    let nodesRendered = [];
 
+    const letterWidth = 20;
+    const letterSpacing = 15;
+
+    var g = new Graph();
+    var nodeRegular, nodeThreat;
 
     shaders = new ShaderLoader('./shaders');
     shaders.load('vs-edge', 'edge', 'vertex');
@@ -60,123 +58,26 @@ $(document).ready(() => {
     shaders.load('sim-nodeAttrib', 'nodeAttrib', 'simulation');
     shaders.load('vs-text', 'text', 'vertex');
     shaders.load('fs-text', 'text', 'fragment');
+    shaders.shaderSetLoaded = start;
 
 
-    shaders.shaderSetLoaded = function () {
-        start();
+    this.update = function (gg) {
+        "use strict";
+        graphStructure = updateGraph(gg);
     };
-});
-
-function start() {
-
-    g = new Graph();
-
-    setInterval(() => {
-
-        var g = new Graph();
-        if (Math.random() < 0.5)
-            generatorsBalancedTree(g, 2);
-        else
-            generatorCube(g, 'e', 4);
-
-        // generatorChain(100);
-        // generatorCube(5);
-        // generatorsStar(50);
-
-        graphStructure = updateGraph(g);
 
 
-    }, 500);
-
-
+    var textureLoader = new THREE.TextureLoader();
     canvas = document.getElementById('c');
-
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.0001, 100000);
-    camera.position.x = 0;
-    camera.position.y = 0;
-    camera.position.z = 1500;
-
-    controls = new THREE.OrbitControls(camera, canvas);
-    controls.damping = 0.2;
-    controls.enableDamping = true;
-
-    scene = new THREE.Scene();
-
-    pickingScene = new THREE.Scene();
-    pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-    pickingTexture.texture.minFilter = THREE.LinearFilter;
-    pickingTexture.texture.generateMipmaps = false;
-
-
     renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
         canvas: canvas
     });
-
-
-
-    // NODES
-    var textureLoader = new THREE.TextureLoader();
-    nodeRegular = textureLoader.load('textures/new_circle.png');
-    nodeThreat = textureLoader.load('textures/crosshair.png');
-
-    // WAGNER.vertexShadersPath = './shaders';
-    // WAGNER.fragmentShadersPath = './shaders';
-    // composer = new WAGNER.Composer(renderer, {useRGBA: false});
-
-    // vignette2Pass = new WAGNER.Vignette2Pass();
-    // vignette2Pass.params.boost = 1.0;
-    // vignette2Pass.params.reduction = 0.5;
-
-
-    // vignette2Pass = new WAGNER.VignettePass();
-    // vignette2Pass.params.amount = 0.45;
-    // vignette2Pass.params.falloff = 0.35;
-
-    // multiPassBloomPass = new WAGNER.MultiPassBloomPass();
-    // multiPassBloomPass.params.blurAmount = 0.2;
-
-
-    // stats = new Stats();
-    // stats.domElement.style.position = 'absolute';
-    // stats.domElement.style.top = '50px';
-    // container.appendChild(stats.domElement);
-
-    const gridHelper1 = new THREE.GridHelper(2000, 500);
-    scene.add(gridHelper1);
-
-    const gridHelper2 = new THREE.GridHelper(2000, 500);
-    gridHelper2.rotation.z = Math.PI / 2;
-    scene.add(gridHelper2);
-
-    // gridHelper3 = new THREE.GridHelper(2000, 500);
-    // gridHelper3.rotation.x = Math.PI / 2;
-    // scene.add(gridHelper3);
-
-
-    gpupicking = new GPUPick();
-
-
-
-    onWindowResize();
-    window.addEventListener('resize', onWindowResize, false);
-    document.addEventListener('mousemove', onMouseMove, false);
-    document.addEventListener('mouseup', onMouseUp, false);
-    document.addEventListener('mousedown', onMouseDown, false);
-    document.addEventListener('dblclick', onDoubleClick, false);
-
-
-    //epochOffset = min;
-
-
-    gui = new GUIInterface();
-    gui.init();
-
-    const letterWidth = 20;
-    const letterSpacing = 15;
+    scene = new THREE.Scene();
 
     const font = UbuntuMono(textureLoader, 'lib/UbuntuMono.png');
+
     function getTextCoordinates(letter) {
         let index;
         let charCode = letter.charCodeAt(0);
@@ -233,8 +134,8 @@ function start() {
     // effects.add(vignette2Pass.params, 'falloff').min(0).max(1);
 
 
-// var gui = new dat.GUI();
-// gui.close();
+    // var gui = new dat.GUI();
+    // gui.close();
 
 
     // var effectController = {
@@ -280,7 +181,7 @@ function start() {
         // console.log('edgesWidth', edgesWidth);
         // console.log('epochsWidth', epochsWidth);
 
-        edgesLookupTable = g.getLookupTable(); // needs to be after nodesWidth
+        edgesLookupTable = g.getLookupTable(nodesWidth); // needs to be after nodesWidth
 
         temperature = nodesAndEdges.length / 2;
 
@@ -314,7 +215,7 @@ function start() {
 
         nodeGeometry = new THREE.BufferGeometry();
         pickingNodeGeometry = new THREE.BufferGeometry();
-// visible geometry attributes
+        // visible geometry attributes
         const nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
         const nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
         const nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
@@ -326,13 +227,15 @@ function start() {
         nodeGeometry.addAttribute('customColor', nodeColors);
         nodeGeometry.addAttribute('pickingNode', nodePick);
         nodeGeometry.addAttribute('threat', threat);
-// picking geometry attributes (different colors)
+        nodeGeometry.addAttribute('hover', hover);
+        // picking geometry attributes (different colors)
         const pickingColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
         const pickingPick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
         pickingNodeGeometry.addAttribute('position', nodePositions);
         pickingNodeGeometry.addAttribute('texPos', nodeReferences);
         pickingNodeGeometry.addAttribute('customColor', pickingColors);
         pickingNodeGeometry.addAttribute('pickingNode', pickingPick);
+        pickingNodeGeometry.addAttribute('hover', hover);
         pickingNodeGeometry.addAttribute('threat', threat);
         const color = new THREE.Color(0x999999);
         let chromaColor;
@@ -412,6 +315,9 @@ function start() {
         });
         nodeMesh = new THREE.Points(nodeGeometry, nodeMaterial);
         pickingMesh = new THREE.Points(pickingNodeGeometry, pickingMaterial);
+
+        pickingScene = new THREE.Scene();
+
         pickingScene.add(pickingMesh);
         nextGraphStructure.add(nodeMesh);
         //EDGES
@@ -652,8 +558,11 @@ function start() {
         scene.add(nextGraphStructure);
 
         //if (!simulator)
-            simulator = new Simulator(renderer);
+        simulator = new Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, shaders);
         simulator.update(); //reinit
+
+        pick = GPUPick(window.innerWidth, window.innerHeight, renderer, simulator, pickingScene, camera, mouse, mouseDown, mouseUp, mouseDblClick, nodesAndEdges);
+        pickingTexture = pick.pickingTexture;
 
         return nextGraphStructure;
 
@@ -671,8 +580,12 @@ function start() {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
 
+
+
         renderer.setSize(width, height, false);  // YOU MUST PASS FALSE HERE!
-        gpupicking.pickingTexture.setSize(width, height);
+        if (pick && pick.pickingTexture)
+            pick.pickingTexture.setSize(width, height, false);
+
         // pickingTexture.setSize(width, height);
         // composer.setSize(width, height);
 
@@ -738,17 +651,6 @@ function start() {
     };
 
 
-    function animate() {
-
-        // stats.update();
-        controls.update();
-        //slider.update();
-
-        render();
-
-        requestAnimationFrame(animate);
-    }
-
     function highlightNode(idx, color) {
         nodeGeometry.attributes.customColor.array[idx * 3 + 0] = color[0];
         nodeGeometry.attributes.customColor.array[idx * 3 + 1] = color[1];
@@ -766,15 +668,15 @@ function start() {
         return [r, g, b];
 
     }
+    const pixelBuffer = new Uint8Array(4);
 
-    function pick() {
+    function picking() {
 
         // render the picking scene off-screen
 
-        renderer.render(scene, camera, pickingTexture);
+        //renderer.render(scene, camera, pickingTexture);
 
         // create buffer for reading single pixel
-        const pixelBuffer = new Uint8Array(4);
 
 
         // read the pixel under the mouse from the texture
@@ -782,6 +684,8 @@ function start() {
 
 
         function restoreColor(idx, color) {
+            if (!color)
+                return;
 
             nodeGeometry.attributes.customColor.array[idx * 3 + 0] = color[0];
             nodeGeometry.attributes.customColor.array[idx * 3 + 1] = color[1];
@@ -790,7 +694,6 @@ function start() {
         }
 
         const id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] ) - 1;
-        const data = nodesAndEdges[id];
 
 
         if (id !== lastPickedNode.id) {
@@ -811,6 +714,7 @@ function start() {
 
             }
 
+            const data = nodesAndEdges[id];
 
             // clear and set the new stuff
 
@@ -822,7 +726,7 @@ function start() {
                 lastPickedNode.parent = [];
                 lastPickedNode.id = id;
 
-                console.log(nodesRendered.get(id));
+                //console.log(id,data);
 
                 lastPickedNode.parent = saveNodeColor(id);
                 highlightNode(id, [0, 255, 0]);
@@ -882,21 +786,6 @@ function start() {
             // graphStructure.rotation.y += 0.0025;
         }
 
-        if (nodeGeometry) {
-
-            gpupicking.update();
-
-            if (nodeUniforms) {
-                nodeUniforms.currentTime.value = now;
-                nodeUniforms.currentTime.value = Math.sin(now * 0.0005) * 1;
-            }
-        }
-
-        // renderer.setClearColor(backgroundColor);
-        // renderer.setClearColor( 0x000, 0.0);
-        renderer.render(scene, camera);
-        renderer.autoClearColor = true;
-
 
         // composer.reset();
         // composer.render(scene, camera);
@@ -906,10 +795,133 @@ function start() {
 
         // composer.toScreen();
 
+
+
+
+        if (nodeUniforms) {
+            nodeUniforms.currentTime.value = now;
+            nodeUniforms.currentTime.value = Math.sin(now * 0.0005) * 1;
+        }
+
+        // stats.update();
+        if (controls)
+            controls.update();
+        //slider.update();
+
+        // renderer.setClearColor(backgroundColor);
+        //renderer.setClearColor( 0x000, 0.0);
+
+
+
+        if (pickingScene) {
+            renderer.setClearColor(0);
+            picking();
+            renderer.render(pickingScene, camera, pickingTexture);
+            pick.update();
+        }
+
+        renderer.render(scene, camera);
+
+
+
+
+
+        renderer.autoClearColor = true;
+
+
+
+
+        requestAnimationFrame(render);
+
     }
 
 
-    animate();
+    function animate() {
+        requestAnimationFrame(render);
+
+    }
+
+    function start() {
+
+
+
+        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.0001, 100000);
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 1500;
+
+        controls = new THREE.OrbitControls(camera, canvas);
+        controls.damping = 0.2;
+        controls.enableDamping = true;
+
+
+
+
+
+
+
+
+        // NODES
+        nodeRegular = textureLoader.load('textures/new_circle.png');
+        nodeThreat = textureLoader.load('textures/crosshair.png');
+
+        // WAGNER.vertexShadersPath = './shaders';
+        // WAGNER.fragmentShadersPath = './shaders';
+        // composer = new WAGNER.Composer(renderer, {useRGBA: false});
+
+        // vignette2Pass = new WAGNER.Vignette2Pass();
+        // vignette2Pass.params.boost = 1.0;
+        // vignette2Pass.params.reduction = 0.5;
+
+
+        // vignette2Pass = new WAGNER.VignettePass();
+        // vignette2Pass.params.amount = 0.45;
+        // vignette2Pass.params.falloff = 0.35;
+
+        // multiPassBloomPass = new WAGNER.MultiPassBloomPass();
+        // multiPassBloomPass.params.blurAmount = 0.2;
+
+
+        // stats = new Stats();
+        // stats.domElement.style.position = 'absolute';
+        // stats.domElement.style.top = '50px';
+        // container.appendChild(stats.domElement);
+
+        const gridHelper1 = new THREE.GridHelper(2000, 500);
+        scene.add(gridHelper1);
+
+        const gridHelper2 = new THREE.GridHelper(2000, 500);
+        gridHelper2.rotation.z = Math.PI / 2;
+        scene.add(gridHelper2);
+
+        // gridHelper3 = new THREE.GridHelper(2000, 500);
+        // gridHelper3.rotation.x = Math.PI / 2;
+        // scene.add(gridHelper3);
+
+
+
+
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize, false);
+        document.addEventListener('mousemove', onMouseMove, false);
+        document.addEventListener('mouseup', onMouseUp, false);
+        document.addEventListener('mousedown', onMouseDown, false);
+        document.addEventListener('dblclick', onDoubleClick, false);
+
+
+        //epochOffset = min;
+
+
+        //gui = new GUIInterface();
+        //gui.init();
+
+        onReady();
+        requestAnimationFrame(render);
+
+    }
+
+
 
     return this;
+
 }

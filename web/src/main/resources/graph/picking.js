@@ -1,112 +1,122 @@
-function GPUPick() {
+function GPUPick(width, height, renderer, simulator, pickingScene, camera, mouse, mouseDown, mouseUp, mouseDblClick, nodesAndEdges) {
 
-	let id;
-	let data;
-	//var lastData = {};
-	//var lastClickedNode = -1;
-	let lastHovereddNode = -1;
-	const nodeClicked = {down: null, up: null};
-	let selectedNode = null;
+    let id;
 
-	let pixelBuffer = new Uint8Array(4);
+    //var lastData = {};
+    //var lastClickedNode = -1;
+    let lastHovereddNode = -1;
+    const nodeClicked = {down: null, up: null};
 
+    //create buffer for reading single pixel
+    var pixelBuffer = new Uint8Array(4);
 
-	this.pickingTexture = new THREE.WebGLRenderTarget();
-	this.pickingTexture.texture.minFilter = THREE.LinearFilter;
-	this.pickingTexture.texture.generateMipmaps = false;
-
-	function clicked() {
-
-		if (nodeClicked.down === nodeClicked.up) {
-
-			if (nodeClicked.down >= 0) {
-
-				selectedNode = nodeClicked.down;
-				console.log('you successfully selected', selectedNode, nodesRendered[selectedNode]);
-				simulator.nodeAttribUniforms.selectedNode.value = selectedNode;
-				simulator.nodeAttribUniforms.hoverMode.value = 0;
-			}
-
-		}
-
-		nodeClicked.down = null;
-		nodeClicked.up = null;
-
-	}
-
-	function hoverOver(id) {
-
-		//console.log('hovered over id', id);
-		simulator.nodeAttribUniforms.selectedNode.value = id;
-
-	}
+    let selectedNode = null;
 
 
-	this.update = function () {
 
-		renderer.setClearColor(0);
-		renderer.render(pickingScene, camera, this.pickingTexture);
+    var pickingTexture = this.pickingTexture = new THREE.WebGLRenderTarget(width, height);
+    pickingTexture.texture.minFilter = THREE.LinearFilter;
+    pickingTexture.texture.generateMipmaps = false;
+    pickingTexture.texture.minFilter = THREE.LinearFilter;
+    pickingTexture.texture.generateMipmaps = false;
 
-		//create buffer for reading single pixel
-		pixelBuffer = new Uint8Array(4);
+    function clicked() {
 
-		//read the pixel under the mouse from the texture
-		renderer.readRenderTargetPixels(this.pickingTexture, mouse.x * window.devicePixelRatio, this.pickingTexture.height - mouse.y * window.devicePixelRatio, 1, 1, pixelBuffer);
+        if (nodeClicked.down === nodeClicked.up) {
 
-		//interpret the pixel as an ID
+            if (nodeClicked.down >= 0) {
 
-		id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] - 1);
+                selectedNode = nodeClicked.down;
+                console.log('you successfully selected', selectedNode, nodesRendered[selectedNode]);
+                simulator.nodeAttribUniforms.selectedNode.value = selectedNode;
+                simulator.nodeAttribUniforms.hoverMode.value = 0;
+            }
+
+        }
+
+        nodeClicked.down = null;
+        nodeClicked.up = null;
+
+    }
+
+    function hoverOver(id) {
+
+        //console.log('hovered over id', id);
+        simulator.nodeAttribUniforms.selectedNode.value = id;
+
+    }
 
 
-		data = nodesAndEdges[id];
+    return {
+        'pickingTexture': pickingTexture,
 
-		if (nodeClicked.down === null) {
+        'update': ()=> {
 
-			if (mouseDown) {
 
-				nodeClicked.down = id;
-				//console.log('down', id);
+            //read the pixel under the mouse from the texture
+            renderer.readRenderTargetPixels(pickingTexture, mouse.x * window.devicePixelRatio, pickingTexture.height - mouse.y * window.devicePixelRatio, 1, 1, pixelBuffer);
 
-			}
+            //interpret the pixel as an ID
 
-		}
+            id = ( pixelBuffer[0] << 16 ) | ( pixelBuffer[1] << 8 ) | ( pixelBuffer[2] - 1);
 
-		if (nodeClicked.down !== null && nodeClicked.up === null) {
+            var data;
+            if (id > 0 && id < nodesAndEdges.length)
+                data = nodesAndEdges[id];
+            else
+                data = undefined;
 
-			if (mouseUp) {
+            if (nodeClicked.down === null) {
 
-				nodeClicked.up = id;
-				//console.log('up', id);
+                if (mouseDown) {
 
-				clicked();
+                    nodeClicked.down = id;
+                    //console.log('down', id, data);
 
-			}
+                }
 
-		}
+            }
 
-		if (selectedNode === null && nodeClicked.down === null) {
+            if (nodeClicked.down !== null && nodeClicked.up === null) {
 
-			// we're just hovering around
+                if (mouseUp) {
 
-			if (lastHovereddNode !== id) {
+                    nodeClicked.up = id;
+                    //console.log('up', id, data);
 
-				lastHovereddNode = id;
-				hoverOver(id);
+                    clicked();
 
-			}
+                }
 
-		}
+            }
 
-		if (mouseDblClick) {
+            if (selectedNode === null && nodeClicked.down === null) {
 
-			console.log('selection cleared!');
-			simulator.nodeAttribUniforms.hoverMode.value = 1;
+                // we're just hovering around
 
-			selectedNode = null;
-			mouseDblClick = false;
+                if (lastHovereddNode !== id) {
 
-		}
+                    lastHovereddNode = id;
+                    hoverOver(id);
 
-	};
+                }
+
+            }
+
+            if (mouseDblClick) {
+
+                //console.log('selection cleared!');
+                simulator.nodeAttribUniforms.hoverMode.value = 1;
+
+                selectedNode = null;
+                mouseDblClick = false;
+
+            }
+
+
+        }
+
+    };
+
 
 }

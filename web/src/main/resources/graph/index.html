@@ -8,10 +8,7 @@
 
     <!--css imports-->
     <link rel="stylesheet" href="lib/normalize.css"/>
-    <link rel="stylesheet" href="lib/ion.rangeSlider.css"/>
-    <link rel="stylesheet" href="lib/ion.rangeSlider.skinFlat.css"/>
-    <link rel="stylesheet" href="lib/bootstrap.min.css">
-    <link rel="stylesheet" href="lib/bootstrap-theme.min.css">
+
 
 
     <style>
@@ -127,8 +124,6 @@
     <script src="TextParticles.js"></script>
     <script src="gui.js"></script>
 
-    <script src="examples/sampleData.js"></script>
-
 </head>
 
 <body>
@@ -138,6 +133,27 @@
 <script>
 
     $(document).ready(function () {
+
+        const v = new GraphVis(()=>{
+            setInterval(() => {
+
+                var g = new Graph();
+                if (Math.random() < 0.5)
+                    generatorsBalancedTree(g, 2);
+                else
+                    generatorCube(g, 'e', 4);
+
+                // generatorChain(100);
+                // generatorCube(5);
+                // generatorsStar(50);
+
+                v.update(g);
+
+
+            }, 1500);
+
+        });
+
 
 //        var csvfile = "examples/output.csv";
 //        $.get(csvfile, function (file) {

@@ -130,7 +130,7 @@ function Graph(settings) {
     };
 
 
-    this.getLookupTable = function () {
+    this.getLookupTable = function (nodesWidth) {
 
         const lookupTable = {};
         let texStartX;

@@ -1,4 +1,4 @@
-function Simulator(renderer) {
+function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, shaders) {
 
 	/*
 	 * requires globals nodesAndEdges, nodesWidth, edgesWidth, nodesCount,
@@ -210,14 +210,14 @@ function Simulator(renderer) {
 		rtNodeAttrib1 = getRenderTarget(THREE.RGBAFormat);
 		rtNodeAttrib2 = rtNodeAttrib1.clone();
 
-		simulator.renderTexture(dtPosition, rtPosition1);
-		simulator.renderTexture(rtPosition1, rtPosition2);
+		renderTexture(dtPosition, rtPosition1);
+		renderTexture(rtPosition1, rtPosition2);
 
-		simulator.renderTexture(dtVelocity, rtVelocity1);
-		simulator.renderTexture(rtVelocity1, rtVelocity2);
+		renderTexture(dtVelocity, rtVelocity1);
+		renderTexture(rtVelocity1, rtVelocity2);
 
-		simulator.renderTexture(dtNodeAttrib, rtNodeAttrib1);
-		simulator.renderTexture(rtNodeAttrib1, rtNodeAttrib2);
+		renderTexture(dtNodeAttrib, rtNodeAttrib1);
+		renderTexture(rtNodeAttrib1, rtNodeAttrib2);
 
 	}
 	this.update = init;
@@ -237,15 +237,16 @@ function Simulator(renderer) {
 				});
 	}
 
-	this.renderTexture = function(input, output) {
+	function renderTexture(input, output) {
 
 		mesh.material = passThruShader;
 		passThruUniforms.texture.value = input;
 		renderer.render(scene, camera, output);
 
 	};
+    this.renderTexture = renderTexture;
 
-	this.renderVelocity = function(position, velocity, output, delta,
+    function renderVelocity(position, velocity, output, delta,
 			temperature) {
 
 		mesh.material = velocityShader;
@@ -257,7 +258,7 @@ function Simulator(renderer) {
 
 	};
 
-	this.renderPosition = function(position, velocity, output, delta) {
+	function renderPosition(position, velocity, output, delta) {
 
 		mesh.material = positionShader;
 		positionShader.uniforms.positions.value = position;
@@ -267,7 +268,7 @@ function Simulator(renderer) {
 
 	};
 
-	this.renderNodeAttrib = function(nodeAttrib, output, epochMin, epochMax,
+	function renderNodeAttrib(nodeAttrib, output, epochMin, epochMax,
 			delta) {
 
 		mesh.material = nodeAttribShader;
@@ -288,28 +289,28 @@ function Simulator(renderer) {
 
 			/*if (temperature > 0.1)*/ {
 
-				simulator.renderVelocity(rtPosition1, rtVelocity1, rtVelocity2,
+				renderVelocity(rtPosition1, rtVelocity1, rtVelocity2,
 						delta, temperature);
-				simulator.renderPosition(rtPosition1, rtVelocity2, rtPosition2,
+				renderPosition(rtPosition1, rtVelocity2, rtPosition2,
 						delta);
 
 			}
 
-			simulator.renderNodeAttrib(rtNodeAttrib1, rtNodeAttrib2, epochMin,
+			renderNodeAttrib(rtNodeAttrib1, rtNodeAttrib2, epochMin,
 					epochMax, delta)
 
 		} else {
 
 			/*if (temperature > 0.1)*/ {
 
-				simulator.renderVelocity(rtPosition2, rtVelocity2, rtVelocity1,
+				renderVelocity(rtPosition2, rtVelocity2, rtVelocity1,
 						delta, temperature);
-				simulator.renderPosition(rtPosition2, rtVelocity1, rtPosition1,
+				renderPosition(rtPosition2, rtVelocity1, rtPosition1,
 						delta);
 
 			}
 
-			simulator.renderNodeAttrib(rtNodeAttrib2, rtNodeAttrib1, epochMin,
+			renderNodeAttrib(rtNodeAttrib2, rtNodeAttrib1, epochMin,
 					epochMax, delta)
 
 		}
