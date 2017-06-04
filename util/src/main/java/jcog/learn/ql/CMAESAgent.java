@@ -22,7 +22,7 @@ import static jcog.Texts.n4;
 
 public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
-    private final double[] mid, min, max, range, inc;
+    private final double[] mid, min, max, range;
     private final ParallelCMAESOptimizer.CMAESProcess optProcess;
 
     /** # of dimensions holding the input */
@@ -32,12 +32,12 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
     private final int out;
 
     private ParallelCMAESOptimizer opt;
-    private int population = 10;
+    private int population = 32;
     private double[] ins;
     private float reward;
     private double[] search;
 
-    private double[] outs;
+    private double[] outsNext, outs;
     final DecideSoftmax decider = new DecideSoftmax(0.25f, 0.25f, 0.5f, new XorShift128PlusRandom(1));
     private int lastAction;
 
@@ -61,12 +61,12 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
         this.ins = new double[in];
         this.outs = new double[out];
+        this.outsNext = new double[out];
 
         this.mid = new double[n];
         //double[] sigma = new double[n];
         this.min = min;
         this.max = new double[n];
-        this.inc = new double[n];
         this.range = new double[n];
 
         for (int i = 0; i < n; i++) {
@@ -77,7 +77,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         this.opt = new ParallelCMAESOptimizer(Integer.MAX_VALUE,
                 0, true, 0,
                 0, new MersenneTwister(3),
-                true, null);
+                false, null);
 
         int maxIterations = Integer.MAX_VALUE;
         optProcess = this.opt.start(
@@ -86,7 +86,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(0.5f, range)),
                 new ParallelCMAESOptimizer.PopulationSize(population));
 
     }
@@ -102,6 +102,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         arraycopy(nextObservation, 0, ins, 0, n);
 
 
+
         //System.out.println(n4(ins));
 
         optProcess.next();
@@ -115,25 +116,36 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
     public double value(double[] point) {
         this.search = point;
 
-        //replace any non-finite values with random
-        for (int i = 0; i < point.length; i++) {
-            if (!Double.isFinite(point[i]))
-                point[i] = (rng.nextFloat() + min[i])  * (max[i] - min[i]);
-        }
+
 
         //intercept the CMAES vector:
 
         //System.out.println("pre: " + n4(point));
-        //  1) replace the input information from search with current observation
+
         if (ins!=null) {
             for (int i = 0; i < in; i++) {
                 //apply random noise, for at least avoid convergence
-                point[i] = ins[i] + (noise > 0 ? ((rng.nextFloat() * noise) - 0.5f) * 2f : 0);
+                point[i] =
+                        ins[i] + (noise > 0 ? ((rng.nextFloat() * noise) - 0.5f) * 2f : 0);
             }
         }
 
+        //replace any non-finite values with random
+        for (int i = 0; i < point.length; i++) {
+            if (!Double.isFinite(point[i]))
+                point[i] = (rng.nextFloat() + min[i])  * (max[i] - min[i]);
+            else
+                point[i] = Util.unitize(point[i]);
+        }
+
         //  2) copy the output information from search vector (for action determination)
-        arraycopy(point, in, outs, 0, out);
+        arraycopy(point, in, outsNext, 0, out);
+
+        //  3) replace the action with the last actual action
+        arraycopy(outs, 0, point, in, out);
+
+        //  4) save the next action as the current action
+        arraycopy(outsNext, 0, outs, 0, out);
 
         //System.out.println(" outs: " + n4(outs));
         //System.out.println("  ins: " + n4(ins));

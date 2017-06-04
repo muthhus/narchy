@@ -78,11 +78,11 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInput() {
-        return new RLMixControl<>(this::inputSub, 30f,
+        return new RLMixControl<>(this::inputSub, 10f,
 
                 new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
 
-                16,
+                12,
 
                 new EnumClassifier<>("type", PostBand.values().length, (x) -> {
                     PostBand result;

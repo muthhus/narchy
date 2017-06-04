@@ -56,7 +56,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     float decay = 1f;
 
     private final double[] delta; //delta accumulated
-    double controlSpeed = 0.2; //increments up/down per action
+    double controlSpeed = 0.05; //increments up/down per action
     public float lastScore;
 
     final int auxStart;
@@ -87,7 +87,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
                 new TensorChain(
                         this.levels = new ArrayTensor(size),
                         this.traffic = new ArrayTensor(size)
-                ), 2));
+                ), 1));
 
         int numInputs = agentIn.volume();
 

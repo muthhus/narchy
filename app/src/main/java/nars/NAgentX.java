@@ -163,11 +163,11 @@ abstract public class NAgentX extends NAgent {
                                     return 0;
                                 })
                         ),
-                        new MatrixView(m.agentIn.data, false),
-                        new MatrixView(new RingBufferTensor(m.agentIn, 8), m.agentIn.volume(), (x, gl) -> {
-                                    Draw.colorGrays(gl, x);
-                                    return 0;
-                                })
+                        new MatrixView(m.agentIn.data, false)
+//                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
+//                                    Draw.colorGrays(gl, x);
+//                                    return 0;
+//                                })
                         //new MatrixView(m.agentIn.data, false),
 //                        new MatrixView(m.agent.ae.W),
 //                        new MatrixView(m.agent.ae.y, false),

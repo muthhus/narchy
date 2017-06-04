@@ -639,7 +639,7 @@ public class ParallelCMAESOptimizer extends MultivariateOptimizer {
         try {
             updateBD(negccov);
         } catch (MaxCountExceededException e) {
-
+            e.printStackTrace();
         }
     }
 
