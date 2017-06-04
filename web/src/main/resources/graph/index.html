@@ -102,7 +102,7 @@
 
 
     <script src="../lib/jquery/dist/jquery.min.js"></script>
-    <script src="../lib/lodash/dist/lodash.core.min.js"></script>
+    <script src="../lib/lodash/dist/lodash.min.js"></script>
     <script src="lib/three.js"></script>
     <script src="lib/stats.min.js"></script>
     <script src="lib/dat.gui.min.js"></script>
@@ -115,11 +115,12 @@
 
     <!--app includes-->
 
-    <script src="graph.js"></script>
+    <!--<script src="graph.js"></script>-->
+    <script src="../graph.js"></script>
     <script src="generators.js"></script>
     <script src="picking.js"></script>
     <script src="main.js"></script>
-    <script src="textureGenerator.js"></script>
+    <script src="texture.js"></script>
     <script src="simulator.js"></script>
     <script src="TextParticles.js"></script>
     <script src="gui.js"></script>
@@ -134,10 +135,9 @@
 
     $(document).ready(function () {
 
-        const v = new GraphVis(()=>{
+        const v = new GraphVis((g)=>{
             setInterval(() => {
 
-                var g = new Graph();
                 if (Math.random() < 0.5)
                     generatorsBalancedTree(g, 2);
                 else

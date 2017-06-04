@@ -234,15 +234,25 @@ class SpaceGraph {
         g.edgeAdded = function(src, tgt, e) {
             //console.log('added', src, target, e);
 
-            const ss = src.spatial;
-            const ssp = ss.position;
-            const tt = tgt.spatial;
-            const ttp = tt.position;
+            const ssp = src.spatial.position;
+            const ttp = tgt.spatial.position;
 
             const dir = new THREE.Vector3().subVectors(ttp, ssp);
             const len = dir.length();
+            const arrow = new THREE.ArrowHelper( dir.normalize(), ssp, len, 0xffffff );
 
-            that.scene.add( e.spatial = new THREE.ArrowHelper( dir.normalize(), ssp, len, 0xffffff ) );
+            // console.log(src.spatial);
+            // // src.spatial.position.onChange(()=>{
+            // //     console.log('ssp change');
+            // // });
+            // arrow.onBeforeRender = ()=>{
+            //     console.log('before render');
+            //     const dir = new THREE.Vector3().subVectors(src.spatial.position, tgt.spatial.position);
+            //     arrow.setLength(dir.length);
+            //     arrow.setDirection(dir.normalize());
+            // };
+
+            that.scene.add( e.spatial = arrow );
 
             //TODO supplied builder
         };

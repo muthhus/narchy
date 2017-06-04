@@ -1,10 +1,9 @@
-function Graph(settings) {
+/** the default impl that was included, not fully adapted yet */
+function MutableGraph(settings) {
 
     const nodes = {};
     const edges = {};
     var settings = {
-        epoch: 'Event Time',
-        epochFormat: 'YYYY-M-D H:m:s',
         source: 'source',
         target: 'target'
     };
@@ -130,59 +129,6 @@ function Graph(settings) {
     };
 
 
-    this.getLookupTable = function (nodesWidth) {
-
-        const lookupTable = {};
-        let texStartX;
-        let texStartY;
-
-        let i = 0;
-
-        $.each(this.nodes, function (key, value) {
-
-
-            texStartX = (i % nodesWidth) / nodesWidth;
-            texStartY = (Math.floor(i / nodesWidth)) / nodesWidth;
-
-            //console.log(i, texStartX);
-
-            lookupTable[key] = {texPos: [texStartX, texStartY]};
-
-            i++;
-
-        });
-
-        return lookupTable;
-
-    };
-
-
-    this.getEpochTextureArray = function (type) {
-
-        let thing;
-
-        if (type === 'nodes') thing = this.nodes;
-        if (type === 'edges') thing = this.edges;
-
-        const epochArray = [];
-
-
-        $.each(thing, function (key, value) {
-
-            const epochs = [];
-            $.each(value.data, function (dkey, dvalue) {
-
-                epochs.push(moment(dvalue[settings.epoch], [settings.epochFormat]).unix());
-
-            });
-
-            epochArray[value.id] = /*_.uniq*/(epochs);
-
-        });
-
-        return epochArray;
-
-    };
 
 }
 

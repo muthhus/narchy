@@ -1,4 +1,4 @@
-function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, shaders) {
+function Simulator(g, renderer, nodesRendered, nodesWidth, edgesWidth, shaders) {
 
 	/*
 	 * requires globals nodesAndEdges, nodesWidth, edgesWidth, nodesCount,
@@ -114,18 +114,6 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 	const nodeAttribShader = new THREE.ShaderMaterial({
 
         uniforms: {
-            nodeIDMappings: {
-                type: "t",
-                value: null
-            },
-            epochsIndices: {
-                type: "t",
-                value: null
-            },
-            epochsData: {
-                type: "t",
-                value: null
-            },
             nodeAttrib: {
                 type: "t",
                 value: null
@@ -161,7 +149,6 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
         },
         defines: {
             NODESWIDTH: nodesWidth.toFixed(2),
-            EPOCHSWIDTH: epochsWidth.toFixed(2),
             EDGESWIDTH: edgesWidth.toFixed(2)
         },
         vertexShader: shaders.vs.passthru,
@@ -182,26 +169,19 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 	function init() {
 
-		const dtPosition = generatePositionTexture(nodesAndEdges, nodesWidth,
-            1000);
-		const dtVelocity = generateVelocityTexture(nodesAndEdges, nodesWidth);
-		const dtNodeAttrib = generateNodeAttribTexture(nodesAndEdges, nodesWidth);
+		const dtPosition = generatePositionTexture(nodesRendered, nodesWidth, 1000);
+		const dtVelocity = generateVelocityTexture(nodesRendered, nodesWidth);
+		const dtNodeAttrib = generateNodeAttribTexture(nodesRendered, nodesWidth);
 
 		velocityShader.uniforms.edgeIndices.value = generateIndiciesTexture(
-				nodesAndEdges, nodesWidth);
+				nodesRendered, nodesWidth);
 		velocityShader.uniforms.edgeData.value = generateDataTexture(
-				nodesAndEdges, edgesWidth);
+				g, nodesRendered, edgesWidth);
 		velocityShader.uniforms.layoutPositions.value = generateZeroedPositionTexture(
-				nodesAndEdges, edgesWidth);
+            nodesRendered, edgesWidth);
 
-		nodeAttribShader.uniforms.epochsIndices.value = generateIndiciesTexture(
-				nodesAndEpochs, nodesWidth);
-		nodeAttribShader.uniforms.epochsData.value = generateEpochDataTexture(
-				nodesAndEpochs, epochsWidth);
 		nodeAttribShader.uniforms.edgeIndices.value = velocityShader.uniforms.edgeIndices.value;
 		nodeAttribShader.uniforms.edgeData.value = velocityShader.uniforms.edgeData.value;
-		nodeAttribShader.uniforms.nodeIDMappings.value = generateIdMappings(
-				nodesAndEpochs, nodesWidth);
 
 		rtPosition1 = getRenderTarget(THREE.RGBAFormat);
 		rtPosition2 = rtPosition1.clone();
@@ -271,19 +251,17 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 	};
 
-	function renderNodeAttrib(nodeAttrib, output, epochMin, epochMax,
+	function renderNodeAttrib(nodeAttrib, output,
 			delta) {
 
 		mesh.material = nodeAttribShader;
 		nodeAttribShader.uniforms.nodeAttrib.value = nodeAttrib;
-		nodeAttribShader.uniforms.minTime.value = epochMin;
-		nodeAttribShader.uniforms.maxTime.value = epochMax;
 		nodeAttribShader.uniforms.delta.value = delta;
 		renderer.render(scene, camera, output);
 
 	};
 
-	this.simulate = function(delta, temperature, epochMin, epochMax) {
+	this.simulate = function(delta, temperature) {
 
 		// TODO: always run simulation, omit small temperatures in the shader
 		// TODO: do node hovering in velocity
@@ -299,8 +277,7 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 			}
 
-			renderNodeAttrib(rtNodeAttrib1, rtNodeAttrib2, epochMin,
-					epochMax, delta)
+			renderNodeAttrib(rtNodeAttrib1, rtNodeAttrib2, delta)
 
 		} else {
 
@@ -313,12 +290,10 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 			}
 
-			renderNodeAttrib(rtNodeAttrib2, rtNodeAttrib1, epochMin,
-					epochMax, delta)
+			renderNodeAttrib(rtNodeAttrib2, rtNodeAttrib1, delta)
 
 		}
 
-		// console.log(delta, temperature, epochMin, epochMax);
 		// console.log(layoutPositions);
 
 		flipflop = !flipflop;

@@ -181,7 +181,8 @@ class LFU extends Map {
 }
 
 class Node {
-    constructor() {
+    constructor(id) {
+        this.id = id;
         //edge maps: (target, edge_value)
         //this.i = new LFU(8)
         this.i = new LFU(8);
@@ -197,12 +198,12 @@ class LFUGraph extends LFU {
         super(maxNodes, halflife);
     }
 
-    node(nid, createIfMissing) {
+    node(nid, createIfMissing=true) {
         const x = this.get(nid);
         if (x || !createIfMissing)
             return x;
 
-        const n = new Node();
+        const n = new Node(nid);
         this.set(nid, n);
         this.nodeAdded(nid, n);
         return n;
@@ -257,32 +258,33 @@ class LFUGraph extends LFU {
     edgeRemoved(src, tgt, e) {
     }
 
-    edge(src, tgt, edgeSupplier) {
+    edge(src, tgt, value) {
         if (src == tgt)
             return null; //no self-loop
 
-        if (!edgeSupplier) {
-            //TODO handle delete this way
-            throw new Error("edge delete not impl yet");
+        if (value === undefined) {
+            value = src.toString() + "_" + tgt.toString();
+        } else if (value === null) {
+
         }
 
-        const T = this.node(tgt, edgeSupplier);
+        const T = this.node(tgt, value ? true : false);
         if (!T)
             return null;
 
-        const S = this.node(src, edgeSupplier);
+        const S = this.node(src, value ? true : false);
         if (!S)
             return null;
 
         const ST = S.o.get(tgt);
         if (ST) {
             return ST;
-        } else if (edgeSupplier && S.o && T.i) {
-            const newST = (typeof edgeSupplier === "function") ? edgeSupplier() : edgeSupplier;
-            S.o.set(tgt, newST);
-            T.i.set(src, newST);
-            this.edgeAdded(S, T, newST);
-            return newST;
+        } else if (value && S.o && T.i) {
+            value = (typeof value === "function") ? value() : value;
+            S.o.set(tgt, value);
+            T.i.set(src, value);
+            this.edgeAdded(S, T, value);
+            return value;
         } else {
             return null;
         }
@@ -292,19 +294,40 @@ class LFUGraph extends LFU {
         return this.edge(src, tgt, null);
     }
 
+    forEachNode(nodeConsumer) {
+        for (var [nodeID, node] of this) {
+            const n = node.data;
+            if (n)
+                nodeConsumer(n);
+        }
+    }
+
     forEachEdge(edgeConsumer) {
-        for (var [vertexID, vertex] of this) {
-            const vv = vertex.data;
-            for (var [edgeID, edge] of vv.o) {
-                edgeConsumer(vertexID, vv, edgeID, edge.data);
+        for (var [nodeID, srcVertex] of this) {
+            const vv = srcVertex.data;
+            if (vv) {
+                for (var [targetID, edge] of vv.o) {
+                    edgeConsumer(vv, targetID, edge.data);
+                }
             }
         }
     }
 
+    // getNodesAndEdgesArray() {
+    //     var a = [];
+    //     for (var [vertexID, vertex] of this) {
+    //         a.push( vertex.data )
+    //     }
+    //     return a;
+    // }
+
+
     /** computes a node-centric Map snapshot of the values */
     treeOut() {
         var x = {};
-        this.forEachEdge((vid, v, eid, e) => {
+        this.forEachEdge((src,tgtID,E)=>{
+            const vid = src.id;
+            const eid = tgtID;
             var ex = x[vid];
             if (!ex)
                 x[vid] = ex = {};
@@ -318,8 +341,8 @@ class LFUGraph extends LFU {
 
     edgeList() {
         var x = [];
-        this.forEachEdge((vid, v, eid, e) => {
-            x.push([vid, eid]);
+        this.forEachEdge((src,tgtID,E)=>{
+            x.push([src.id, tgtID]);
         });
         return x;
     }

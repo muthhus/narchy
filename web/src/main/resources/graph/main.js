@@ -1,5 +1,6 @@
 "use strict";
 
+
 function GraphVis(onReady) {
 
     let canvas, stats;
@@ -13,13 +14,12 @@ function GraphVis(onReady) {
     var cloudLines;
     var edgeGeometry, edgeMaterial;
     var pickingNodeGeometry;
-    var pickingMesh;
+    var pickingMesh, pickingTexture;
     var nodeMaterial, pickingMaterial, nodePositions;
     var labelGeometry;
     var labelMaterial, labelMesh;
 
-    /** node position cache */
-    var pnp = {};
+    const nodePosCache = {};
 
     let simulate = false;
     let graphStructure;
@@ -30,24 +30,23 @@ function GraphVis(onReady) {
     let temperature = 100;
     let lastPickedNode = {};
     let last = performance.now();
-    let simulator, gui;
+    let simulator;
     let pickingScene;
     let shaders;
 
 
-    let epochMin, epochMax;
 
 
-    var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCount, edgesCount, edgesAndEpochs,
-        edgesLookupTable,
+
+    var nodesWidth, edgesWidth, nodesCount, edgesCount,
+        nodeTexCoord,
         pick;
 
     let nodesRendered = [];
 
-    const letterWidth = 20;
-    const letterSpacing = 15;
 
-    var g = new Graph();
+    var g = new LFUGraph(128);
+
     var nodeRegular, nodeThreat;
 
     shaders = new ShaderLoader('./shaders');
@@ -155,13 +154,16 @@ function GraphVis(onReady) {
     //gui.add(effectController, "k", 1, 10000).onChange(valuesChanger);
 
 
-    function updateGraph(newGraph) {
+    function updateGraph() {
+
+        /** node position cache */
+
 
         if (g && simulator) {
             var pos = simulator.position.image.data;
             var vb = 0;
-            $.each(g.nodes, function (key, value) {
-                pnp[key] = [
+            g.forEachNode(node => {
+                nodePosCache[node.id] = [
                     pos[vb++],
                     pos[vb++],
                     pos[vb++]
@@ -170,59 +172,29 @@ function GraphVis(onReady) {
             });
         }
 
-
-        g = newGraph;
-
         var prevGraphStructure = graphStructure;
         const nextGraphStructure = new THREE.Object3D();
 
 
-        nodesAndEdges = g.getNodesAndEdgesArray();
 
-        nodesAndEpochs = g.getEpochTextureArray('nodes');
-        edgesAndEpochs = g.getEpochTextureArray('edges');
-
-
-        nodesCount = nodesAndEdges.length;
-        edgesCount = countDataArrayItems(nodesAndEdges);
-
-        nodesWidth = indexTextureSize(nodesAndEdges.length);
-        edgesWidth = dataTextureSize(countDataArrayItems(nodesAndEdges));
-        epochsWidth = dataTextureSize(countDataArrayItems(nodesAndEpochs));
+        //console.log(nodesCount, nodesWidth, edgesCount, edgesWidth);
 
         // console.log('nodesAndEdges', nodesAndEdges);
-        // console.log('nodesAndEpochs', nodesAndEpochs);
         // console.log('nodesCount', nodesCount);
         // console.log('edgesCount', edgesCount);
         // console.log('nodesWidth', nodesWidth);
         // console.log('edgesWidth', edgesWidth);
-        // console.log('epochsWidth', epochsWidth);
-
-        edgesLookupTable = g.getLookupTable(nodesWidth); // needs to be after nodesWidth
-
-        temperature = nodesAndEdges.length / 2;
 
 
-        // get the min and max values for epoch.
+
+        nodesCount = g.size;
+        edgesCount = _.sumBy(g, (n) => n.data.o.size);/// countDataArrayItems(nodesAndEdges);
 
 
-        const bigArray = [];
-        for (var i = 0; i < nodesAndEpochs.length; i++) {
+        nodesWidth = indexTextureSize(nodesCount);
+        edgesWidth = dataTextureSize(edgesCount);
+        temperature = nodesCount / 2;
 
-            for (let j = 0; j < nodesAndEpochs[i].length; j++) {
-
-                bigArray.push(nodesAndEpochs[i][j]);
-            }
-
-        }
-
-        // console.log(bigArray);
-        // var min = _.min(bigArray);
-        // var max = _.max(bigArray);
-
-        // console.log('min epoch:', min, 'max epoch:', max);
-
-        // slider.setLimits(min, max);
 
 
         /*
@@ -260,28 +232,33 @@ function GraphVis(onReady) {
         const scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
         const chromaScale = chroma.scale(scale).domain([0, nodesCount]);
 
-        let v = 0;
-        nodesRendered = [];
-        $.each(g.nodes, function (key, value) {
 
-            nodesRendered.push(key);
+        nodesRendered = [];
+        nodeTexCoord = [];
+
+        var v = 0;
+
+        g.forEachNode(node => {
+
+            nodesRendered.push(node);
+            node._id = v++; //record serial
 
             let threatValue = 0;
 
-            $.each(value.data, function (dkey, dvalue) {
-                if (key === dvalue['source']) {
-                    if (dvalue['source_hit'] === true) threatValue = 1;
-                }
-                if (key === dvalue['target']) {
-                    if (dvalue['target_hit'] === true) threatValue = 1;
-                }
-            });
+            // $.each(node.data, function (dkey, dvalue) {
+            //     if (key === dvalue['source']) {
+            //         if (dvalue['source_hit'] === true) threatValue = 1;
+            //     }
+            //     if (key === dvalue['target']) {
+            //         if (dvalue['target_hit'] === true) threatValue = 1;
+            //     }
+            // });
 
-            var cachedPos = pnp[key];
-            if (cachedPos) {
-                nodePositions.array[v * 3] = cachedPos[0];
-                nodePositions.array[v * 3 + 1] = cachedPos[1];
-                nodePositions.array[v * 3 + 2] = cachedPos[2];
+            var np = node.pos;
+            if (np) {
+                nodePositions.array[v * 3] = np[0];
+                nodePositions.array[v * 3 + 1] = np[1];
+                nodePositions.array[v * 3 + 2] = np[2];
             } else {
                 nodePositions.array[v * 3] = 0;
                 nodePositions.array[v * 3 + 1] = 0;
@@ -296,7 +273,18 @@ function GraphVis(onReady) {
             nodeColors.array[v * 3] = chromaColor[0];
             nodeColors.array[v * 3 + 1] = chromaColor[1];
             nodeColors.array[v * 3 + 2] = chromaColor[2];
-            edgesLookupTable[key]['color'] = chromaColor;  // used later for labels and edges
+
+            const texStartX = parseInt((v % nodesWidth) / nodesWidth);
+            const texStartY = parseInt((Math.floor(v / nodesWidth)) / nodesWidth);
+
+            //console.log(i, texStartX);
+
+            nodeTexCoord.push({
+                texPos: [texStartX, texStartY],
+                color: chromaColor // used later for labels and edges
+            });
+
+
             color.setHex(v + 1);
             pickingColors.array[v * 3] = color.r;
             pickingColors.array[v * 3 + 1] = color.g;
@@ -308,8 +296,9 @@ function GraphVis(onReady) {
             nodeReferences.array[(v * 2) + 1] = (Math.floor(v / nodesWidth)) / nodesWidth;
             // threats
             threat.array[v] = threatValue;
-            v++;
         });
+
+
         //console.log(nodeReferences.array);
         nodeUniforms = {
             positionTexture: {type: "t", value: null},
@@ -321,9 +310,6 @@ function GraphVis(onReady) {
         // ShaderMaterial
         nodeMaterial = new THREE.ShaderMaterial({
             uniforms: nodeUniforms,
-            defines: {
-                EPOCHSWIDTH: epochsWidth.toFixed(2)
-            },
             vertexShader: shaders.vs.node,
             fragmentShader: shaders.fs.node,
             blending: THREE.AdditiveBlending,
@@ -334,7 +320,6 @@ function GraphVis(onReady) {
         pickingMaterial = new THREE.ShaderMaterial({
             uniforms: nodeUniforms,
             defines: {
-                EPOCHSWIDTH: epochsWidth.toFixed(2),
                 NODESWIDTH: nodesWidth.toFixed(2)
             },
             vertexShader: shaders.vs.node,
@@ -359,11 +344,18 @@ function GraphVis(onReady) {
         edgeGeometry.addAttribute('customColor', edgeColors);
         //which vertex we're on
         v = 0;
-        let line;
-        $.each(g.edges, function (key) {
-            line = key.split('<>');
-            const startNode = edgesLookupTable[line[0]];
-            const endNode = edgesLookupTable[line[1]];
+
+        g.forEachEdge((srcVert, tgtVertID, E) => {
+
+            const tgtVert = g.node(tgtVertID, false);
+            if (!tgtVert)
+                throw new Error("wtf");
+
+            //console.log(srcVert, tgtVert, E);
+
+            const startNode = nodeTexCoord[srcVert._id];
+            const endNode = nodeTexCoord[tgtVert._id];
+
             //start of line
             edgeReferences.array[v * 2] = startNode.texPos[0];
             edgeReferences.array[v * 2 + 1] = startNode.texPos[1];
@@ -409,9 +401,10 @@ function GraphVis(onReady) {
 
         // need to get particle count.
         let particleCount = 0;
-        $.each(g.nodes, function (key) {
-            particleCount += key.length;
-        });
+
+        // g.forEachNode(node=>{
+        //     particleCount += key.length;
+        // });
         //console.log('character count:', particleCount);
         labelGeometry = new THREE.BufferGeometry();
         const positions = new THREE.BufferAttribute(new Float32Array(particleCount * 6 * 3), 3);
@@ -429,151 +422,151 @@ function GraphVis(onReady) {
         labelGeometry.addAttribute('texPos', labelReferences);
         labelGeometry.addAttribute('customColor', labelColors);
         let counter = 0;
-        let nodeLookup;
-        $.each(g.nodes, function (key) {
-            nodeLookup = edgesLookupTable[key];
-            //console.log('working on word:', key);
-            for (let i = 0; i < key.length; i++) {
-                //console.log(' counter:', counter);
-                const index = counter * 3 * 2;
-                //console.log('  character:', key[i]);
-                const tc = getTextCoordinates(key[i]);
-                //console.log('  tc:', tc);
-                // Left is offset
-                const l = tc[4];
-                // Right is offset + width
-                const r = tc[4] + tc[2];
-                // bottom is y offset
-                const b = tc[5] - tc[3];
-                // top is y offset + height
-                const t = tc[5];
-                ids.array[index + 0] = i;
-                ids.array[index + 1] = i;
-                ids.array[index + 2] = i;
-                ids.array[index + 3] = i;
-                ids.array[index + 4] = i;
-                ids.array[index + 5] = i;
-                positions.array[index * 3 + 0] = 0;
-                positions.array[index * 3 + 1] = 0;
-                positions.array[index * 3 + 2] = 0;
-                positions.array[index * 3 + 3] = 0;
-                positions.array[index * 3 + 4] = 0;
-                positions.array[index * 3 + 5] = 0;
-                positions.array[index * 3 + 6] = 0;
-                positions.array[index * 3 + 7] = 0;
-                positions.array[index * 3 + 8] = 0;
-                positions.array[index * 3 + 9] = 0;
-                positions.array[index * 3 + 10] = 0;
-                positions.array[index * 3 + 11] = 0;
-                positions.array[index * 3 + 12] = 0;
-                positions.array[index * 3 + 13] = 0;
-                positions.array[index * 3 + 14] = 0;
-                positions.array[index * 3 + 15] = 0;
-                positions.array[index * 3 + 16] = 0;
-                positions.array[index * 3 + 17] = 0;
-                labelPositions.array[index * 3 + 0] = (i * letterSpacing) + l * letterWidth * 10;
-                labelPositions.array[index * 3 + 1] = t * letterWidth * 10;
-                labelPositions.array[index * 3 + 2] = 0 * letterWidth * 10;
-                labelPositions.array[index * 3 + 3] = (i * letterSpacing) + l * letterWidth * 10;
-                labelPositions.array[index * 3 + 4] = b * letterWidth * 10;
-                labelPositions.array[index * 3 + 5] = 0 * letterWidth * 10;
-                labelPositions.array[index * 3 + 6] = (i * letterSpacing) + r * letterWidth * 10;
-                labelPositions.array[index * 3 + 7] = t * letterWidth * 10;
-                labelPositions.array[index * 3 + 8] = 0 * letterWidth * 10;
-                labelPositions.array[index * 3 + 9] = (i * letterSpacing) + r * letterWidth * 10;
-                labelPositions.array[index * 3 + 10] = b * letterWidth * 10;
-                labelPositions.array[index * 3 + 11] = 0 * letterWidth * 10;
-                labelPositions.array[index * 3 + 12] = (i * letterSpacing) + r * letterWidth * 10;
-                labelPositions.array[index * 3 + 13] = t * letterWidth * 10;
-                labelPositions.array[index * 3 + 14] = 0 * letterWidth * 10;
-                labelPositions.array[index * 3 + 15] = (i * letterSpacing) + l * letterWidth * 10;
-                labelPositions.array[index * 3 + 16] = b * letterWidth * 10;
-                labelPositions.array[index * 3 + 17] = 0 * letterWidth * 10;
-                uvs.array[index * 2 + 0] = 0;
-                uvs.array[index * 2 + 1] = 1;
-                uvs.array[index * 2 + 2] = 0;
-                uvs.array[index * 2 + 3] = 0;
-                uvs.array[index * 2 + 4] = 1;
-                uvs.array[index * 2 + 5] = 1;
-                uvs.array[index * 2 + 6] = 1;
-                uvs.array[index * 2 + 7] = 0;
-                uvs.array[index * 2 + 8] = 1;
-                uvs.array[index * 2 + 9] = 1;
-                uvs.array[index * 2 + 10] = 0;
-                uvs.array[index * 2 + 11] = 0;
-                textCoords.array[index * 4 + 0] = tc[0];
-                textCoords.array[index * 4 + 1] = tc[1];
-                textCoords.array[index * 4 + 2] = tc[2];
-                textCoords.array[index * 4 + 3] = tc[3];
-                textCoords.array[index * 4 + 4] = tc[0];
-                textCoords.array[index * 4 + 5] = tc[1];
-                textCoords.array[index * 4 + 6] = tc[2];
-                textCoords.array[index * 4 + 7] = tc[3];
-                textCoords.array[index * 4 + 8] = tc[0];
-                textCoords.array[index * 4 + 9] = tc[1];
-                textCoords.array[index * 4 + 10] = tc[2];
-                textCoords.array[index * 4 + 11] = tc[3];
-                textCoords.array[index * 4 + 12] = tc[0];
-                textCoords.array[index * 4 + 13] = tc[1];
-                textCoords.array[index * 4 + 14] = tc[2];
-                textCoords.array[index * 4 + 15] = tc[3];
-                textCoords.array[index * 4 + 16] = tc[0];
-                textCoords.array[index * 4 + 17] = tc[1];
-                textCoords.array[index * 4 + 18] = tc[2];
-                textCoords.array[index * 4 + 19] = tc[3];
-                textCoords.array[index * 4 + 20] = tc[0];
-                textCoords.array[index * 4 + 21] = tc[1];
-                textCoords.array[index * 4 + 22] = tc[2];
-                textCoords.array[index * 4 + 23] = tc[3];
-                labelReferences.array[index * 2 + 0] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 1] = nodeLookup.texPos[1];
-                labelReferences.array[index * 2 + 2] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 3] = nodeLookup.texPos[1];
-                labelReferences.array[index * 2 + 4] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 5] = nodeLookup.texPos[1];
-                labelReferences.array[index * 2 + 6] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 7] = nodeLookup.texPos[1];
-                labelReferences.array[index * 2 + 8] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 9] = nodeLookup.texPos[1];
-                labelReferences.array[index * 2 + 10] = nodeLookup.texPos[0];
-                labelReferences.array[index * 2 + 11] = nodeLookup.texPos[1];
-                labelColors.array[index * 3 + 0] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 1] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 2] = nodeLookup.color[2];
-                labelColors.array[index * 3 + 3] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 4] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 5] = nodeLookup.color[2];
-                labelColors.array[index * 3 + 6] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 7] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 8] = nodeLookup.color[2];
-                labelColors.array[index * 3 + 9] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 10] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 11] = nodeLookup.color[2];
-                labelColors.array[index * 3 + 12] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 13] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 14] = nodeLookup.color[2];
-                labelColors.array[index * 3 + 15] = nodeLookup.color[0];
-                labelColors.array[index * 3 + 16] = nodeLookup.color[1];
-                labelColors.array[index * 3 + 17] = nodeLookup.color[2];
-                counter++;
-            }
-        });
-        labelUniforms = {
-            t_text: {type: "t", value: texture},
-            positionTexture: {type: "t", value: null},
-            nodeAttribTexture: {type: "t", value: null}
-        };
-        labelMaterial = new THREE.ShaderMaterial({
-            uniforms: labelUniforms,
-            vertexShader: shaders.vs.text,
-            fragmentShader: shaders.fs.text,
-            //blending: THREE.AdditiveBlending,
-            depthTest: false,
-            transparent: true
-        });
 
-        labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
-        nextGraphStructure.add(labelMesh);
+        // for (var i = 0; i < nodesRendered.length; i++) {
+        //     var nodeLookup = nodeTexCoord[i];
+        //     //console.log('working on word:', key);
+        //     for (let i = 0; i < "".length; i++) { //TODO
+        //         //console.log(' counter:', counter);
+        //         const index = counter * 3 * 2;
+        //         //console.log('  character:', key[i]);
+        //         const tc = getTextCoordinates(key[i]);
+        //         //console.log('  tc:', tc);
+        //         // Left is offset
+        //         const l = tc[4];
+        //         // Right is offset + width
+        //         const r = tc[4] + tc[2];
+        //         // bottom is y offset
+        //         const b = tc[5] - tc[3];
+        //         // top is y offset + height
+        //         const t = tc[5];
+        //         ids.array[index + 0] = i;
+        //         ids.array[index + 1] = i;
+        //         ids.array[index + 2] = i;
+        //         ids.array[index + 3] = i;
+        //         ids.array[index + 4] = i;
+        //         ids.array[index + 5] = i;
+        //         positions.array[index * 3 + 0] = 0;
+        //         positions.array[index * 3 + 1] = 0;
+        //         positions.array[index * 3 + 2] = 0;
+        //         positions.array[index * 3 + 3] = 0;
+        //         positions.array[index * 3 + 4] = 0;
+        //         positions.array[index * 3 + 5] = 0;
+        //         positions.array[index * 3 + 6] = 0;
+        //         positions.array[index * 3 + 7] = 0;
+        //         positions.array[index * 3 + 8] = 0;
+        //         positions.array[index * 3 + 9] = 0;
+        //         positions.array[index * 3 + 10] = 0;
+        //         positions.array[index * 3 + 11] = 0;
+        //         positions.array[index * 3 + 12] = 0;
+        //         positions.array[index * 3 + 13] = 0;
+        //         positions.array[index * 3 + 14] = 0;
+        //         positions.array[index * 3 + 15] = 0;
+        //         positions.array[index * 3 + 16] = 0;
+        //         positions.array[index * 3 + 17] = 0;
+        //         labelPositions.array[index * 3 + 0] = (i * letterSpacing) + l * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 1] = t * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 2] = 0 * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 3] = (i * letterSpacing) + l * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 4] = b * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 5] = 0 * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 6] = (i * letterSpacing) + r * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 7] = t * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 8] = 0 * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 9] = (i * letterSpacing) + r * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 10] = b * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 11] = 0 * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 12] = (i * letterSpacing) + r * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 13] = t * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 14] = 0 * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 15] = (i * letterSpacing) + l * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 16] = b * letterWidth * 10;
+        //         labelPositions.array[index * 3 + 17] = 0 * letterWidth * 10;
+        //         uvs.array[index * 2 + 0] = 0;
+        //         uvs.array[index * 2 + 1] = 1;
+        //         uvs.array[index * 2 + 2] = 0;
+        //         uvs.array[index * 2 + 3] = 0;
+        //         uvs.array[index * 2 + 4] = 1;
+        //         uvs.array[index * 2 + 5] = 1;
+        //         uvs.array[index * 2 + 6] = 1;
+        //         uvs.array[index * 2 + 7] = 0;
+        //         uvs.array[index * 2 + 8] = 1;
+        //         uvs.array[index * 2 + 9] = 1;
+        //         uvs.array[index * 2 + 10] = 0;
+        //         uvs.array[index * 2 + 11] = 0;
+        //         textCoords.array[index * 4 + 0] = tc[0];
+        //         textCoords.array[index * 4 + 1] = tc[1];
+        //         textCoords.array[index * 4 + 2] = tc[2];
+        //         textCoords.array[index * 4 + 3] = tc[3];
+        //         textCoords.array[index * 4 + 4] = tc[0];
+        //         textCoords.array[index * 4 + 5] = tc[1];
+        //         textCoords.array[index * 4 + 6] = tc[2];
+        //         textCoords.array[index * 4 + 7] = tc[3];
+        //         textCoords.array[index * 4 + 8] = tc[0];
+        //         textCoords.array[index * 4 + 9] = tc[1];
+        //         textCoords.array[index * 4 + 10] = tc[2];
+        //         textCoords.array[index * 4 + 11] = tc[3];
+        //         textCoords.array[index * 4 + 12] = tc[0];
+        //         textCoords.array[index * 4 + 13] = tc[1];
+        //         textCoords.array[index * 4 + 14] = tc[2];
+        //         textCoords.array[index * 4 + 15] = tc[3];
+        //         textCoords.array[index * 4 + 16] = tc[0];
+        //         textCoords.array[index * 4 + 17] = tc[1];
+        //         textCoords.array[index * 4 + 18] = tc[2];
+        //         textCoords.array[index * 4 + 19] = tc[3];
+        //         textCoords.array[index * 4 + 20] = tc[0];
+        //         textCoords.array[index * 4 + 21] = tc[1];
+        //         textCoords.array[index * 4 + 22] = tc[2];
+        //         textCoords.array[index * 4 + 23] = tc[3];
+        //         labelReferences.array[index * 2 + 0] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 1] = nodeLookup.texPos[1];
+        //         labelReferences.array[index * 2 + 2] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 3] = nodeLookup.texPos[1];
+        //         labelReferences.array[index * 2 + 4] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 5] = nodeLookup.texPos[1];
+        //         labelReferences.array[index * 2 + 6] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 7] = nodeLookup.texPos[1];
+        //         labelReferences.array[index * 2 + 8] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 9] = nodeLookup.texPos[1];
+        //         labelReferences.array[index * 2 + 10] = nodeLookup.texPos[0];
+        //         labelReferences.array[index * 2 + 11] = nodeLookup.texPos[1];
+        //         labelColors.array[index * 3 + 0] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 1] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 2] = nodeLookup.color[2];
+        //         labelColors.array[index * 3 + 3] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 4] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 5] = nodeLookup.color[2];
+        //         labelColors.array[index * 3 + 6] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 7] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 8] = nodeLookup.color[2];
+        //         labelColors.array[index * 3 + 9] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 10] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 11] = nodeLookup.color[2];
+        //         labelColors.array[index * 3 + 12] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 13] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 14] = nodeLookup.color[2];
+        //         labelColors.array[index * 3 + 15] = nodeLookup.color[0];
+        //         labelColors.array[index * 3 + 16] = nodeLookup.color[1];
+        //         labelColors.array[index * 3 + 17] = nodeLookup.color[2];
+        //         counter++;
+        //     }
+        // }
+        // labelUniforms = {
+        //     t_text: {type: "t", value: texture},
+        //     positionTexture: {type: "t", value: null},
+        //     nodeAttribTexture: {type: "t", value: null}
+        // };
+        // labelMaterial = new THREE.ShaderMaterial({
+        //     uniforms: labelUniforms,
+        //     vertexShader: shaders.vs.text,
+        //     fragmentShader: shaders.fs.text,
+        //     //blending: THREE.AdditiveBlending,
+        //     depthTest: false,
+        //     transparent: true
+        // });
+        //
+        // labelMesh = new THREE.Mesh(labelGeometry, labelMaterial);
+        // nextGraphStructure.add(labelMesh);
 
         //if (!simulator)
 
@@ -587,10 +580,10 @@ function GraphVis(onReady) {
         scene.add(nextGraphStructure);
 
         //if (!simulator)
-        simulator = new Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, shaders);
+        simulator = new Simulator(g, renderer, nodesRendered, nodesWidth, edgesWidth, shaders);
         simulator.update(); //reinit
 
-        pick = GPUPick(window.innerWidth, window.innerHeight, renderer, simulator, pickingScene, camera, mouse, mouseDown, mouseUp, mouseDblClick, nodesAndEdges);
+        pick = GPUPick(window.innerWidth, window.innerHeight, renderer, simulator, pickingScene, camera, mouse, mouseDown, mouseUp, mouseDblClick);
         pickingTexture = pick.pickingTexture;
 
         return nextGraphStructure;
@@ -731,7 +724,7 @@ function GraphVis(onReady) {
 
             // reset the old stuff to original values
 
-            const lastData = nodesAndEdges[lastPickedNode.id];
+            const lastData = nodesRendered[lastPickedNode._id];
 
             if (lastData) {
                 // console.log('restoring', lastPickedNode.id);
@@ -743,7 +736,7 @@ function GraphVis(onReady) {
 
             }
 
-            const data = nodesAndEdges[id];
+            const data = nodesRendered[id];
 
             // clear and set the new stuff
 
@@ -782,7 +775,7 @@ function GraphVis(onReady) {
 
         for (let i = 0; i < dataArray.length; i++) {
 
-            counter += dataArray[i].length;
+            counter += dataArray[i] ? dataArray[i].length : 0;
 
         }
 
@@ -804,14 +797,14 @@ function GraphVis(onReady) {
         if (simulator) {
 
             // temperature *= 0.99;
-            simulator.simulate(delta, temperature, epochMin, epochMax);
+            simulator.simulate(delta, temperature);
 
             nodeUniforms.positionTexture.value = simulator.positionUniforms.positions.value;
-            labelUniforms.positionTexture.value = simulator.positionUniforms.positions.value;
+            //labelUniforms.positionTexture.value = simulator.positionUniforms.positions.value;
 
             nodeUniforms.nodeAttribTexture.value = simulator.nodeAttribUniforms.nodeAttrib.value;
             edgeUniforms.nodeAttribTexture.value = simulator.nodeAttribUniforms.nodeAttrib.value;
-            labelUniforms.nodeAttribTexture.value = simulator.nodeAttribUniforms.nodeAttrib.value;
+            //labelUniforms.nodeAttribTexture.value = simulator.nodeAttribUniforms.nodeAttrib.value;
             // graphStructure.rotation.y += 0.0025;
         }
 
@@ -921,13 +914,7 @@ function GraphVis(onReady) {
         document.addEventListener('dblclick', onDoubleClick, false);
 
 
-        //epochOffset = min;
-
-
-        //gui = new GUIInterface();
-        //gui.init();
-
-        onReady();
+        onReady(g);
         requestAnimationFrame(render);
 
     }

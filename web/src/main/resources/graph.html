@@ -33,9 +33,9 @@
 <body>
 
 
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.slim.min.js"></script>
+<script src="lib/jquery/dist/jquery.slim.min.js"></script>
 
-<script src="http://threejs.org/build/three.min.js"></script>
+<script src="lib/threejs/build/three.min.js"></script>
 <script src="http://threejs.org/examples/js/renderers/CSS3DRenderer.js"></script>
 <script src="http://threejs.org/examples/js/controls/TrackballControls.js"></script>
 <!--<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>-->
@@ -65,32 +65,18 @@
     const s = new SpaceGraph(document.body);
 
 
-
-    const a = s.addIFrame('/index.html', 500, 300);
-    a.position.x = -550;
-
-    const b = s.addDOM($('<div><button>wtf</button><div contenteditable="true">idk</div></div>')
-            .attr('style', 'margin: 1em; border: 3px solid purple;')[0],
-             200, 300);
-    b.position.x = 650;
-    b.position.y = 350;
-
+//    {
+//        const a = s.addIFrame('/index.html', 500, 300);
+//        a.position.x = -550;
+//
+//        const b = s.addDOM($('<div><button>wtf</button><div contenteditable="true">idk</div></div>')
+//                .attr('style', 'margin: 1em; border: 3px solid purple;')[0],
+//            200, 300);
+//        b.position.x = 650;
+//        b.position.y = 350;
+//    }
 
     const g = s.addGraph(new LFUGraph(16,10));
-//    try {
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//        g.node('x' + Math.random(), true);
-//    } catch (e) {
-//        console.error(e);
-//    }
-//    console.log(g);
 
 
     var i = 0;
@@ -101,14 +87,9 @@
             const next = 'x' + (i);
             g.edge(prev, next, {id: 'e' + i });
         }
-    }, 100);
+    }, 1000);
 
 
-
-//    for (var kk = 0; kk < 16; kk++) {
-//        const ic = g.addIcon();
-//    }
-//    console.log(g.scene);
 
 </script>
 

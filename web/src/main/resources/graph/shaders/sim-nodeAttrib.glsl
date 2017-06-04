@@ -1,28 +1,15 @@
 uniform float delta;            // requestAnimationFrame delta
-uniform float minTime;          // epoch min
-uniform float maxTime;          // epoch max
 uniform float selectedNode;     // selectedNode
 uniform float hoverMode;     // selectedNode
 
 uniform sampler2D nodeAttrib;       // current self attrib values
-uniform sampler2D epochsIndices;    // for epoch detection
-uniform sampler2D epochsData;       // for epoch detection
 uniform sampler2D edgeIndices;      // for neighbor highlighting
 uniform sampler2D edgeData;         // for neighbor highlighting
-uniform sampler2D nodeIDMappings;   // for selected node
 
-const float nodesTexWidth = NODESWIDTH;     // will be the same for epoch and neighbors
-const float epochsTexWidth = EPOCHSWIDTH;   // epoch data
+const float nodesTexWidth = NODESWIDTH;
 const float edgesTexWidth = EDGESWIDTH;     // neighbor data
 
 
-float inBetweenTimes(float epochTime){
-    float increase = 0.0;
-    if (epochTime >= minTime && epochTime <= maxTime){
-        increase = 1.0;
-    }
-    return increase;
-}
 
 float hasSelectedNeighbor(float neighbor){
     float counter = 0.0;
@@ -41,25 +28,11 @@ vec3 getNeighbor(float textureIndex){
 void main()	{
 
     vec2 nodeRef = vec2(nodesTexWidth, nodesTexWidth);
-    vec2 epochsRef = vec2(epochsTexWidth, epochsTexWidth);
+
     vec2 uv = gl_FragCoord.xy / nodeRef.xy;
 
     vec4 selfAttrib = texture2D( nodeAttrib, uv );  // just using x and y right now
 
-
-    // epoch time lookups
-
-    vec4 selfEpochsIndices = texture2D( epochsIndices, uv);
-
-    float idx = selfEpochsIndices.x;
-    float idy = selfEpochsIndices.y;
-    float idz = selfEpochsIndices.z;
-    float idw = selfEpochsIndices.w;
-
-    float start = idx * 4.0 + idy;
-    float end = idz * 4.0 + idw;
-
-    float epochPixel = 0.0;
     float neighborPixel = 0.0;
     float selfPixel = texture2D( nodeIDMappings, uv ).x;
 
@@ -75,41 +48,6 @@ void main()	{
 
 
 
-
-    if(! ( idx == idz && idy == idw ) ){
-
-        float edgeIndex = 0.0;
-
-        for(float y = 0.0; y < epochsTexWidth; y++){
-            for(float x = 0.0; x < epochsTexWidth; x++){
-
-                vec2 ref = vec2( x + 0.5 , y + 0.5 ) / epochsRef;
-                vec4 pixel = texture2D(epochsData, ref);
-
-                if (edgeIndex >= start && edgeIndex < end){
-                    epochPixel += inBetweenTimes(pixel.x);
-                }
-                edgeIndex++;
-
-                if (edgeIndex >= start && edgeIndex < end){
-                    epochPixel += inBetweenTimes(pixel.y);
-                }
-                edgeIndex++;
-
-                if (edgeIndex >= start && edgeIndex < end){
-                    epochPixel += inBetweenTimes(pixel.z);
-                }
-                edgeIndex++;
-
-                if (edgeIndex >= start && edgeIndex < end){
-                    epochPixel += inBetweenTimes(pixel.w);
-                }
-                edgeIndex++;
-
-            }
-        }
-
-    }
 
 
     //  neighbor highlighting
@@ -197,23 +135,23 @@ void main()	{
 
                 selfAttrib.y = 0.8; // light up *only* self or neighbors
 
-                if ( epochPixel > 0.0){
-
-                    selfAttrib.x = 600.0;   // make bigger immediately
-                    selfAttrib.y = 1.0;     // light up
-
-                }
+//                if ( epochPixel > 0.0){
+//
+//                    selfAttrib.x = 600.0;   // make bigger immediately
+//                    selfAttrib.y = 1.0;     // light up
+//
+//                }
 
             }
 
         } else {
 
-            if ( epochPixel > 0.0){
-
-                selfAttrib.x = 600.0;   // make bigger immediately
-                selfAttrib.y = 0.8;     // light up
-
-            }
+//            if ( epochPixel > 0.0){
+//
+//                selfAttrib.x = 600.0;   // make bigger immediately
+//                selfAttrib.y = 0.8;     // light up
+//
+//            }
 
         }
 
@@ -240,12 +178,12 @@ void main()	{
 
                 selfAttrib.y = 0.3; // light up *only* self or neighbors
 
-                if ( epochPixel > 0.0){
-
-                    selfAttrib.x = 600.0;   // make bigger immediately
-                    selfAttrib.y = 1.0;     // light up
-
-                }
+//                if ( epochPixel > 0.0){
+//
+//                    selfAttrib.x = 600.0;   // make bigger immediately
+//                    selfAttrib.y = 1.0;     // light up
+//
+//                }
 
             }
 

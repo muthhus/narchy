@@ -4,7 +4,7 @@ function generatorsStar(num) {
     const bm = 50;
     for (var i = 0; i < bn; ++i) {
         for (var j = bn; j < bn + bm; ++j) {
-            g.addEdge(i, j);
+            g.edge(i, j);
         }
     }
 }
@@ -16,7 +16,7 @@ function generatorsBalancedTree(g, num) {
     let level;
 
     if (n === 0) {
-        g.addNode(1);
+        g.node(1);
     }
 
     for (level = 1; level < count; ++level) {
@@ -24,8 +24,8 @@ function generatorsBalancedTree(g, num) {
             left = root * 2,
             right = root * 2 + 1;
 
-        g.addEdge(root, left);
-        g.addEdge(root, right);
+        g.edge(root, left);
+        g.edge(root, right);
     }
 }
 
@@ -42,15 +42,15 @@ function generatorCube(g, id, num) {
         for (var i = 0; i < n; ++i) {
             for (var j = 0; j < m; ++j) {
                 const level = k * n * m;
-                const node = i + j * n + level;
+                const node = (i + j * n + level).toString();
                 if (i > 0) {
-                    g.addEdge(id + node, id + i - 1 + j * n + level);
+                    g.edge(id + node, id + (i - 1 + j * n + level).toString());
                 }
                 if (j > 0) {
-                    g.addEdge(id + node, id + i + (j - 1) * n + level);
+                    g.edge(id + node, id + (i + (j - 1) * n + level).toString());
                 }
                 if (k > 0) {
-                    g.addEdge(id + node, id + i + j * n + (k - 1) * n * m);
+                    g.edge(id + node, id + (i + j * n + (k - 1) * n * m).toString());
                 }
             }
         }
@@ -71,8 +71,8 @@ function generatorCube(g, id, num) {
 
 function generatorChain(num) {
     n = num + 1;
-    g.addNode(0);
+    g.node(0);
     for (i = 1; i < n; ++i) {
-        g.addEdge(i - 1, i);
+        g.edge(i - 1, i);
     }
 }

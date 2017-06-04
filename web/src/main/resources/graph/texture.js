@@ -1,33 +1,38 @@
-function generatePositionTexture(inputArray, textureSize, size) {
+function generatePositionTexture(nodesRendered, textureSize, size) {
 
     const bounds = size;
     const bounds_half = bounds / 2;
 
     const textureArray = new Float32Array(textureSize * textureSize * 4);
 
-    for (let i = 0; i < textureArray.length; i += 4) {
 
-        if (i < inputArray.length * 4) {
-
-            const x = Math.random() * bounds - bounds_half;
-            const y = Math.random() * bounds - bounds_half;
-            const z = Math.random() * bounds - bounds_half;
-
-            textureArray[i] = x;
-            textureArray[i + 1] = y;
-            textureArray[i + 2] = z;
-            textureArray[i + 3] = 1.0;
-
+    const lim = nodesRendered.length;
+    var j = 0;
+    for (var value of nodesRendered) {
+    //for (var [key, value] of nodesAndEdges) {
+        var x, y, z;
+        const prevPos = value.pos;//nodePosCache[key];
+        if (prevPos) {
+            x = prevPos[0];
+            y = prevPos[1];
+            z = prevPos[2];
         } else {
-
-            // fill the remaining pixels with -1
-            textureArray[i] = -1.0;
-            textureArray[i + 1] = -1.0;
-            textureArray[i + 2] = -1.0;
-            textureArray[i + 3] = -1.0;
-
+            x = Math.random() * bounds - bounds_half;
+            y = Math.random() * bounds - bounds_half;
+            z = Math.random() * bounds - bounds_half;
         }
 
+        textureArray[j++] = x;
+        textureArray[j++] = y;
+        textureArray[j++] = z;
+        textureArray[j++] = 1.0;
+    }
+    for (let i = lim; i < textureArray.length; i++) {
+        // fill the remaining pixels with -1
+        textureArray[j++] = 0;
+        textureArray[j++] = 0;
+        textureArray[j++] = 0;
+        textureArray[j++] = -1; //x 4
     }
 
     const texture = new THREE.DataTexture(textureArray, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
@@ -36,7 +41,6 @@ function generatePositionTexture(inputArray, textureSize, size) {
     return texture;
 
 }
-
 
 
 function generateIdMappings(inputArray, textureSize) {
@@ -341,48 +345,58 @@ function generateNodeAttribTexture(inputArray, textureSize) {
 }
 
 
-function generateIndiciesTexture(inputArray, textureSize) {
+function generateIndiciesTexture(nodesRendered, textureSize) {
 
-    const textureArray = new Float32Array(textureSize * textureSize * 4);
-    let currentPixel = 0;
-    let currentCoord = 0;
+    const tLen = textureSize * textureSize * 4;
+    const textureArray = new Float32Array(tLen);
+    let tgtPixel = 0;
+    let tgtCoord = 0;
 
-    for (var i = 0; i < inputArray.length; i++) {
+
+    var i = 0;
+    for (var n = 0; n < nodesRendered.length; n++) {
 
         //keep track of the beginning of the array for this node
 
-        const startPixel = currentPixel;
-        const startCoord = currentCoord;
+        var node = nodesRendered[n];
+        const srcPixel = tgtPixel;
+        const srcCoord = tgtCoord;
 
-        for (let j = 0; j < inputArray[i].length; j++) {
+        if (node.o) {
+            for (let j = 0; j < node.o.size; j++) {
 
-            // look inside each node array and see how many things it links to
+                // look inside each node array and see how many things it links to
 
-            currentCoord++;
+                tgtCoord++;
 
-            if (currentCoord === 4) {
+                if (tgtCoord === 4) {
 
-                // remainder is only 0-3.  If you hit 4, increment pixel and reset coord
+                    // remainder is only 0-3.  If you hit 4, increment pixel and reset coord
 
-                currentPixel++;
-                currentCoord = 0;
+                    tgtPixel++;
+                    tgtCoord = 0;
 
+                }
+
+                //console.log(srcPixel, srcCoord, tgtPixel, tgtCoord);
+
+                //write the two sets of texture indices out.  We'll fill up an entire pixel on each pass
+                textureArray[i * 4] = srcPixel;
+                textureArray[i * 4 + 1] = srcCoord;
+                textureArray[i * 4 + 2] = tgtPixel;
+                textureArray[i * 4 + 3] = tgtCoord;
+                i++;
             }
-
         }
 
-        //write the two sets of texture indices out.  We'll fill up an entire pixel on each pass
-        textureArray[i * 4] = startPixel;
-        textureArray[i * 4 + 1] = startCoord;
-        textureArray[i * 4 + 2] = currentPixel;
-        textureArray[i * 4 + 3] = currentCoord;
+
 
     }
 
-    for (var i = inputArray.length * 4; i < textureArray.length; i++) {
+    for (var n = nodesRendered.length * 4; n < tLen; n++) {
 
         // fill unused RGBA slots with -1
-        textureArray[i] = -1;
+        textureArray[i++] = -1;
 
     }
 
@@ -394,16 +408,19 @@ function generateIndiciesTexture(inputArray, textureSize) {
 }
 
 
-function generateDataTexture(inputArray, textureSize) {
+function generateDataTexture(g, nodesAndEdges, textureSize) {
 
     const textureArray = new Float32Array(textureSize * textureSize * 4);
 
+
     let currentIndex = 0;
-    for (var i = 0; i < inputArray.length; i++) {
+    for (var i = 0; i < nodesAndEdges.length; i++) {
 
-        for (let j = 0; j < inputArray[i].length; j++) {
 
-            textureArray[currentIndex] = inputArray[i][j];
+        for (var [targetID, edge] of nodesAndEdges[i].o) {
+        //for (let j = 0; j < nodesAndEdges[i].o.size; j++) {
+
+            textureArray[currentIndex] = g.node(targetID, false)._id; //nodesAndEdges[i][j];
             currentIndex++;
 
         }
@@ -423,36 +440,36 @@ function generateDataTexture(inputArray, textureSize) {
 
 }
 
-function generateEpochDataTexture(inputArray, textureSize) {
-
-    const textureArray = new Float32Array(textureSize * textureSize * 4);
-    //console.log(textureArray);
-
-    let currentIndex = 0;
-    for (var i = 0; i < inputArray.length; i++) {
-        //console.log('working on', i, j, inputArray[i]);
-        for (let j = 0; j < inputArray[i].length; j++) {
-
-            //console.log(currentIndex, inputArray[i][j]);
-            textureArray[currentIndex] = inputArray[i][j] - epochOffset;
-            currentIndex++;
-
-        }
-    }
-
-    for (var i = currentIndex; i < textureArray.length; i++) {
-
-        //fill unused RGBA slots with -1
-        textureArray[i] = -1;
-
-    }
-
-    const texture = new THREE.DataTexture(textureArray, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
-    texture.needsUpdate = true;
-    //console.log('epoch data texture:', texture.image.data);
-    return texture;
-
-}
+// function generateEpochDataTexture(inputArray, textureSize) {
+//
+//     const textureArray = new Float32Array(textureSize * textureSize * 4);
+//     //console.log(textureArray);
+//
+//     let currentIndex = 0;
+//     for (var i = 0; i < inputArray.length; i++) {
+//         //console.log('working on', i, j, inputArray[i]);
+//         for (let j = 0; j < inputArray[i].length; j++) {
+//
+//             //console.log(currentIndex, inputArray[i][j]);
+//             textureArray[currentIndex] = inputArray[i][j] - epochOffset;
+//             currentIndex++;
+//
+//         }
+//     }
+//
+//     for (var i = currentIndex; i < textureArray.length; i++) {
+//
+//         //fill unused RGBA slots with -1
+//         textureArray[i] = -1;
+//
+//     }
+//
+//     const texture = new THREE.DataTexture(textureArray, textureSize, textureSize, THREE.RGBAFormat, THREE.FloatType);
+//     texture.needsUpdate = true;
+//     //console.log('epoch data texture:', texture.image.data);
+//     return texture;
+//
+// }
 
 
 function indexTextureSize(num) {
