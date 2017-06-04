@@ -67,12 +67,17 @@ abstract public class HaiQ implements Agent {
     public final MutableFloat Alpha = new MutableFloat();
 
     private int inputs;
-    public float Epsilon;
 
-    protected final Deciding decide = new DecidingSoftmax(0.25f, 0.1f, 0.99f, new Random());
+    /** "horizontal" state selection */
+    protected final Deciding decideState;
+
+    /**  "vertical" action selection */
+    protected final Deciding decideAction;
 
     public HaiQ() {
         rng = new XorShift128PlusRandom(1);
+        decideState = new DecidingSoftmax(0.25f, 0.1f, 0.99f, rng);
+        decideAction = new DecidingSoftmax(0.25f, 0.1f, 0.99f, rng);
     }
 
     int learn(int state, float reward) {
@@ -106,7 +111,7 @@ abstract public class HaiQ implements Agent {
     }
 
     protected int nextAction(int state) {
-        return rng.nextFloat() < Epsilon ? randomAction() : choose(state);
+        return /*rng.nextFloat() < Epsilon ? randomAction() : */choose(state);
     }
 
     private int randomAction() {
@@ -134,7 +139,7 @@ abstract public class HaiQ implements Agent {
     }
 
     protected int choose(int state) {
-        return decide.decide(q[state], lastDecidedAction);
+        return decideAction.decide(q[state], lastDecidedAction);
 
 //		int maxk = -1;
 //		float maxval = Float.NEGATIVE_INFINITY;
@@ -165,14 +170,13 @@ abstract public class HaiQ implements Agent {
         q = new float[inputs][outputs];
         et = new float[inputs][outputs];
 
-        setQ(0.05f, 0.5f, 0.9f, 0.02f); // 0.1 0.5 0.9
+        setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
     }
 
-    public void setQ(float alpha, float gamma, float lambda, float epsilon) {
+    public void setQ(float alpha, float gamma, float lambda) {
         Alpha.setValue(alpha);
         Gamma = gamma;
         Lambda = lambda;
-        Epsilon = epsilon;
     }
 
     /**

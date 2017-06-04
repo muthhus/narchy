@@ -1688,4 +1688,10 @@ public enum Util {
         }
         return result;
     }
+
+    public static void mul(float scale, float[] ff) {
+        for (int i = 0; i< ff.length; i++)
+            ff[i] *= scale;
+    }
+
 }

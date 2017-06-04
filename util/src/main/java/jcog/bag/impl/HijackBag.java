@@ -331,8 +331,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
-        newPri = (float) Math.exp(newPri*2*reprobes); //divided by temperature, reprobes ~ 0.5/temperature
-        oldPri = (float) Math.exp(oldPri*2*reprobes);
+        //newPri = (float) Math.exp(newPri*2*reprobes); //divided by temperature, reprobes ~ 0.5/temperature
+        //oldPri = (float) Math.exp(oldPri*2*reprobes);
+        newPri = newPri*newPri*reprobes;
+        oldPri = oldPri*oldPri*reprobes;
         if (oldPri > 2 * Float.MIN_VALUE) {
             float thresh = 1f - (1f - (oldPri / (newPri + oldPri)));
             return random.nextFloat() > thresh;

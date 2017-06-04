@@ -17,8 +17,9 @@ public class BufferedTensor extends ArrayTensor {
 
     /** creates snapshot */
     public float[] get() {
-        float[] x = from.get(); //trigger any updates
-        arraycopy(x, 0, data, 0, x.length);
+        float[] x = from.get();
+        from.writeTo(data);//trigger any updates
+        //arraycopy(x, 0, data, 0, x.length);
         return data;
     }
 

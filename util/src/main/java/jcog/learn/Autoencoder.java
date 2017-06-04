@@ -1,6 +1,10 @@
 package jcog.learn;
 
 import jcog.Util;
+import jcog.decide.Deciding;
+import jcog.decide.DecidingSoftmax;
+import org.apache.commons.math3.util.MathArrays;
+import org.apache.commons.math3.util.MathUtils;
 import org.apache.commons.math3.util.MultidimensionalCounter;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
@@ -71,9 +75,8 @@ public class Autoencoder {
 	public void randomize() {
 		float a = 1f / W[0].length;
 		for (int i = 0; i < W.length; i++) {
-			for (int j = 0; j < W[0].length; j++) {
-				this.W[i][j] = uniform(-a, a);
-			}
+			float[] wi = this.W[i];
+			randomize(a, wi);
 		}
 		fill(hbias, 0);
 		fill(L_hbias, 0);
@@ -81,7 +84,15 @@ public class Autoencoder {
 		fill(L_vbias, 0);
     }
 
+	protected void randomize(float a, float[] wi) {
+		for (int j = 0; j < W[0].length; j++) {
+            wi[j] = uniform(-a, a);
+        }
+	}
+
 	private float[] preprocess(float[] x, float noiseLevel, float corruptionRate) {
+
+
 
         Random r = this.rng;
 		int ins = x.length;
@@ -93,7 +104,10 @@ public class Autoencoder {
 				v = 0;
 			}
 			if (noiseLevel > 0) {
-				v += x[i] + r.nextGaussian() * noiseLevel; // (r.nextFloat() - 0.5f) * maxNoiseAmount;
+				v +=
+					//r.nextGaussian() * noiseLevel;
+					(r.nextFloat()-0.5f) * 2 * noiseLevel; //uniform
+
 //				if (nx < 0)
 //					nx = 0;
 //				if (nx > 1)
@@ -101,6 +115,9 @@ public class Autoencoder {
 			}
 			xx[i] = v;
 		}
+
+		for (int i = 0, inputLength = xx.length; i < inputLength; i++)
+            xx[i] = Util.clamp(xx[i], 0, 1f); //safety
 
 		return xx;
 	}
@@ -130,6 +147,7 @@ public class Autoencoder {
 			if (sigmoid)
 				yi = Util.sigmoid(yi);
 
+
 			if (yi > max)
 				max = yi;
 			if (yi < min)
@@ -142,12 +160,27 @@ public class Autoencoder {
 
 
 		if (normalize) {
-			float maxMin = max - min;
-			if (maxMin > NORMALIZATION_EPSILON) {
-
+			float lengthSq = 0;
+			for (int i = 0; i < outs; i++) {
+				lengthSq += Util.sqr(y[i]);
+			}
+			float length = (float) Math.sqrt(lengthSq);
+			if (length > NORMALIZATION_EPSILON) {
 				for (int i = 0; i < outs; i++) {
-					y[i] = (y[i] - min) / maxMin;
+					y[i] /= length;
 				}
+			}
+
+//			float maxMin = max - min;
+//			if (maxMin > NORMALIZATION_EPSILON) {
+//
+//				for (int i = 0; i < outs; i++) {
+//					y[i] = Util.clamp((y[i] - min) / maxMin, 0f, +1f);
+//				}
+//			 else {
+//				//fill(y, 0);
+//				randomize(1f / y.length, y);
+//			}
 
 //to check unit result:
 //			float len = cartesianLength(y);
@@ -161,11 +194,8 @@ public class Autoencoder {
 //			for (int i = 0; i < nh; i++) {
 //				y[i] = (y[i] - min) / (max-min);
 //			}
-			} else {
-				fill(y, 0);
-			}
-		}
 
+		}
 
 
 		return y;
@@ -181,15 +211,15 @@ public class Autoencoder {
 
 	/** TODO some or all of the bias vectors may need modified too here */
 	public void forget(float rate) {
-		float f = 1f - rate;
+		float mult = 1f - rate;
 		float[][] w = this.W;
 		int O = w.length;
-		int I = w[0].length;
-		for (int o = 0; o < O; o++) {
-			float[] ii = w[o];
-			for (int i = 0; i < I; i++)
-				ii[i] *= f;
-		}
+		for (int o = 0; o < O; o++)
+			Util.mul(mult, w[o]);
+		Util.mul(mult, hbias);
+		Util.mul(mult, this.L_hbias);
+		Util.mul(mult, vbias);
+		Util.mul(mult, this.L_vbias);
 	}
 
 	// Decode
@@ -313,6 +343,10 @@ public class Autoencoder {
 		decode(encode(x, y, true, true), false);
 
 		return z;
+	}
+
+	public int decide(Deciding d) {
+		return d.decide(y, -1);
 	}
 
 	/**

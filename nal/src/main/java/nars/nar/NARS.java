@@ -71,7 +71,7 @@ public class NARS extends NAR {
     }
 
     public final RLMixControl<String,ITask> nalMix = new RLMixControl<>(this::inputSub,
-            15f,
+            30f,
             new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
 
             new EnumClassifier<>("type", PostBand.values().length, (x) -> {
@@ -156,7 +156,7 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), -1, -1, e),
                 rng, e);
     }
 

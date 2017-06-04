@@ -44,7 +44,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     float decay = 1f;
 
     private final double[] delta; //delta accumulated
-    double controlSpeed = 0.1; //increments up/down per action
+    double controlSpeed = 0.2; //increments up/down per action
     public float lastScore;
 
     public RLMixControl(Consumer<Y> target, float fps, FloatSupplier score, AbstractClassifier<Y, X>... tests) {
@@ -59,11 +59,11 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
                 new TensorChain(
                     this.levels = new ArrayTensor(size),
                     this.traffic = new ArrayTensor(size)
-                ), 2));
+                ), 4));
 
         int numInputs = agentIn.volume();
-        agent = new HaiQAgent(numInputs, size*2, outs * 2);
-        agent.setQ(0.05f, 0.25f, 0.9f, 0.01f); // 0.1 0.5 0.9
+        agent = new HaiQAgent(numInputs, size, outs * 2);
+        agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
         this.delta = new double[outs];
         this.score = score;
     }

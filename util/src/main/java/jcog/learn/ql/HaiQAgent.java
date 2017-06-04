@@ -1,5 +1,6 @@
 package jcog.learn.ql;
 
+import jcog.Util;
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
@@ -16,12 +17,14 @@ public class HaiQAgent extends HaiQ {
     public static final Logger logger = LoggerFactory.getLogger(HaiQAgent.class);
 
 
-    final static float perceptionAlpha = 0.05f;
     public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
+    final static float perceptionAlpha = 0.02f;
     float perceptionNoise = 0.005f;
-    float perceptionCorruption = 0.0f;
+    float perceptionCorruption = 0.01f;
+    float perceptionForget = 0.001f;
 
+    //float aeForget = 1f;
 
     public HaiQAgent() {
         this((inputs, outputs) ->
@@ -64,7 +67,8 @@ public class HaiQAgent extends HaiQ {
     @Override
     protected int perceive(float[] input) {
         ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, true);
-        int w = ae.max();
+        int w = ae.decide(decideState);
+        ae.forget(perceptionForget);
         return w;
     }
 
