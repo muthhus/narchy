@@ -10,6 +10,7 @@ import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.mix.Mix;
+import jcog.pri.mix.PSinks;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
@@ -119,7 +120,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     protected final NARLoop loop = new NARLoop(this);
 
-    public final Mix<Object, ITask> in;
+    @NotNull public final PSinks in;
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -191,8 +192,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.exe = exe;
 
         this.emotion = new Emotion();
-        this.in = new Mix((Consumer<ITask>)this::input);
-        this.onCycle((n) -> n.in.commit(time()));
+        this.in = newInput();
 
         this.level = 8;
 
@@ -205,6 +205,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             terms.start(this);
 
         restart();
+    }
+
+    protected PSinks newInput() {
+        return new Mix<>((Consumer<ITask>)this::input);
     }
 
 

@@ -1,6 +1,7 @@
 package nars;
 
 import jcog.data.FloatParam;
+import jcog.pri.mix.control.RLMixControl;
 import jcog.random.XorShift128PlusRandom;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
@@ -139,31 +140,32 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
+        RLMixControl m = (RLMixControl) n.in;
         window(grid(
                 new Plot2D(100, Plot2D.Line)
-                        .add("happy", () -> n.nalMix.lastScore)
+                        .add("happy", () -> m.lastScore)
                         .on(a::onFrame),
                 col(
-                        new MatrixView(n.nalMix.agentIn, n.nalMix.size(), (x, gl) -> {
+                        new MatrixView(m.agentIn, m.size(), (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
                         }),
 
                         row(
-                                new MatrixView(n.nalMix.traffic, 4, (x, gl) -> {
+                                new MatrixView(m.traffic, 4, (x, gl) -> {
                                     Draw.colorGrays(gl, x);
                                     return 0;
                                 }),
-                                new MatrixView(n.nalMix.levels, 4, (x, gl) -> {
+                                new MatrixView(m.levels, 4, (x, gl) -> {
                                     Draw.colorUnipolarHue(gl, x, 0.4f, 0.7f);
                                     return 0;
                                 })
                         ),
-                        //new MatrixView(n.nalMix.agentIn.data, false),
-                        new MatrixView(n.nalMix.agent.ae.W),
-                        new MatrixView(n.nalMix.agent.ae.y, false),
-                        new MatrixView(n.nalMix.agent.q),
-                        new MatrixView(n.nalMix.agent.et)
+                        //new MatrixView(m.agentIn.data, false),
+                        new MatrixView(m.agent.ae.W),
+                        new MatrixView(m.agent.ae.y, false),
+                        new MatrixView(m.agent.q),
+                        new MatrixView(m.agent.et)
                 )
         ), 800, 800);
 
@@ -179,7 +181,7 @@ abstract public class NAgentX extends NAgent {
 
         public NARSView(NARS n, NAgent a) {
             super(
-                    new MixBoard(n, n.in),
+                    //new MixBoard(n, n.in),
                     //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection
                     Vis.reflect(n),
                     new Vis.EmotionPlot(64, a)
@@ -260,9 +262,9 @@ abstract public class NAgentX extends NAgent {
                                     grid(
                                             //new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
                                             new WindowButton("deriverFilter", () -> ((Default) nar).budgeting)
-                                    ) : label(nar.getClass()),
+                                    ) : label(nar.getClass())
 
-                            new WindowButton("mix", () -> new MixBoard(nar, nar.in))
+                            //new WindowButton("mix", () -> new MixBoard(nar, nar.in))
                     ),
 
                     grid(

@@ -132,9 +132,9 @@ public class Line1D {
                 x.termVolumeMax.setValue(y);
 //            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
 //                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
-            }).tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
+            })/*.tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
                 x.in.streams.values().forEach(s -> s.setValue(y));
-            }).tweak("stmSize", 1, 2, 1, (y, x) -> {
+            })*/.tweak("stmSize", 1, 2, 1, (y, x) -> {
                 ((Default) x).stmLinkage.capacity.setValue(y);
             }).tweak("confMin", 0.01f, 0.9f, 0.1f, (y, x) -> {
                 x.confMin.setValue(y);

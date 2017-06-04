@@ -22,7 +22,7 @@ public class HaiQAgent extends HaiQ {
     final static float perceptionAlpha = 0.02f;
     float perceptionNoise = 0.005f;
     float perceptionCorruption = 0.01f;
-    float perceptionForget = 0.001f;
+    float perceptionForget = 0.01f;
 
     //float aeForget = 1f;
 
@@ -66,9 +66,10 @@ public class HaiQAgent extends HaiQ {
 
     @Override
     protected int perceive(float[] input) {
-        ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, true);
+        ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, false);
         int w = ae.decide(decideState);
-        ae.forget(perceptionForget);
+        if (perceptionForget > 0)
+            ae.forget(perceptionForget);
         return w;
     }
 

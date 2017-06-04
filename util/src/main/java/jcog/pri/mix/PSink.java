@@ -20,7 +20,7 @@ public class PSink<K,P extends Priority> extends FloatParam implements Function<
 
     float minThresh = Pri.EPSILON;
 
-    PSink(K id, Consumer<P> target) {
+    public PSink(K id, Consumer<P> target) {
         super(1f, 0f, 2f);
         this.id = id;
         in = new AtomicSummaryStatistics();

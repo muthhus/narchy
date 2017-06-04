@@ -6,9 +6,8 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.event.On;
 import jcog.math.FloatAveraged;
 import jcog.pri.PriReference;
-import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.classify.EnumClassifier;
-import jcog.pri.mix.MixSwitch;
+import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
 import nars.$;
@@ -22,7 +21,6 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.task.SignalTask;
 import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
@@ -35,7 +33,6 @@ import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Op.*;
@@ -52,7 +49,6 @@ import static nars.nar.NARS.PostBand.*;
  */
 public class NARS extends NAR {
 
-    private static final float SYNC_HZ_DEFAULT = 30f;
 
     public final List<NAR> sub = $.newArrayList();
     private final List<On> observers = $.newArrayList();
@@ -70,14 +66,28 @@ public class NARS extends NAR {
         Other
     }
 
-    public final RLMixControl<String,ITask> nalMix = new RLMixControl<>(this::inputSub,
-            30f,
-            new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
 
-            new EnumClassifier<>("type", PostBand.values().length, (x) -> {
-                PostBand result;
-                if (x instanceof Task) {
-                    result = NAL;
+    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
+        super(time,
+                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                new CaffeineIndex(new DefaultConceptBuilder(), -1, -1, e),
+                rng, e);
+
+
+    }
+
+    @Override
+    protected PSinks newInput() {
+        return new RLMixControl<>(this::inputSub, 30f,
+
+                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
+
+                16,
+
+                new EnumClassifier<>("type", PostBand.values().length, (x) -> {
+                    PostBand result;
+                    if (x instanceof Task) {
+                        result = NAL;
 //                    switch (x.punc()) {
 //                        case BELIEF:
 //                            result = PostBand.DerivedBelief; break;
@@ -90,82 +100,74 @@ public class NARS extends NAR {
 //                        default:
 //                            result = Other; break;
 //                    }
-                } else if (x instanceof SpreadingActivation) {
-                    result = Activation;
-                } else if (x instanceof nars.control.Premise) {
-                    result = PostBand.Premise;
-                } else if (x instanceof ConceptFire) {
-                    result = PostBand.ConceptFire;
-                } else {
-                    result = Other;
-                }
-
-                return result.ordinal();
-            }),
-
-            new EnumClassifier<>("complexity", 3, (t) -> {
-                if (t instanceof NALTask) {
-                    int c = ((NALTask)t).complexity();
-                    int m = termVolumeMax.intValue();
-                    if (c < m / 4) return 0;
-                    if (c < m / 2) return 1;
-                    return 2;
-                }
-                return -1; //n/A
-            }),
-            new EnumClassifier<>("punc", 4, (t) -> {
-                if (t instanceof NALTask) {
-                    switch (((NALTask)t).punc()) {
-                        case BELIEF:
-                            return 0;
-                        case GOAL:
-                            return 1;
-                        case QUESTION:
-                            return 2;
-                        case QUEST:
-                            return 3;
-                        default:
-                            throw new RuntimeException("unknown punc");
-                    }
-                }
-                return -1;
-            }),
-            new EnumClassifier<>("when", 3, (t) -> {
-                if (t instanceof NALTask) {
-                    long now = time();
-                    long h = ((NALTask)t).nearestStartOrEnd(now);
-                    if (Math.abs(h - now) <= dur()) {
-                        return 0; //present
-                    } else if (h > now) {
-                        return 1; //future
+                    } else if (x instanceof SpreadingActivation) {
+                        result = Activation;
+                    } else if (x instanceof nars.control.Premise) {
+                        result = PostBand.Premise;
+                    } else if (x instanceof ConceptFire) {
+                        result = PostBand.ConceptFire;
                     } else {
-                        return 2; //past
+                        result = Other;
                     }
-                }
-                return -1;
-            })
+
+                    return result.ordinal();
+                }),
+
+                new EnumClassifier<>("complexity", 3, (t) -> {
+                    if (t instanceof NALTask) {
+                        int c = ((NALTask) t).complexity();
+                        int m = termVolumeMax.intValue();
+                        if (c < m / 4) return 0;
+                        if (c < m / 2) return 1;
+                        return 2;
+                    }
+                    return -1; //n/A
+                }),
+                new EnumClassifier<>("punc", 4, (t) -> {
+                    if (t instanceof NALTask) {
+                        switch (((NALTask) t).punc()) {
+                            case BELIEF:
+                                return 0;
+                            case GOAL:
+                                return 1;
+                            case QUESTION:
+                                return 2;
+                            case QUEST:
+                                return 3;
+                            default:
+                                throw new RuntimeException("unknown punc");
+                        }
+                    }
+                    return -1;
+                }),
+                new EnumClassifier<>("when", 3, (t) -> {
+                    if (t instanceof NALTask) {
+                        long now = time();
+                        long h = ((NALTask) t).nearestStartOrEnd(now);
+                        if (Math.abs(h - now) <= dur()) {
+                            return 0; //present
+                        } else if (h > now) {
+                            return 1; //future
+                        } else {
+                            return 2; //past
+                        }
+                    }
+                    return -1;
+                })
 
 //            new MixRouter.Classifier<>("original",
 //                    (x) -> x.stamp().length <= 2),
 //            new MixRouter.Classifier<>("unoriginal",
 //                    (x) -> x.stamp().length > 2),
-    );
-
-
-
-    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(time,
-                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), -1, -1, e),
-                rng, e);
+        ); //new Mix<>(nalMix::accept);
     }
 
     @Override
     public void input(ITask x) {
-        nalMix.accept(x);
+        ((RLMixControl) in).accept(x);
     }
 
-    public void inputSub(ITask x) {
+    void inputSub(ITask x) {
         int sub = random.nextInt(num);
         this.sub.get(sub).exe.run(x);
     }

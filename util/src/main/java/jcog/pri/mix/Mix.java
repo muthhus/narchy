@@ -19,10 +19,10 @@ import java.util.function.Consumer;
  *
  * see: http://dr-lex.be/info-stuff/volumecontrols.html#about
  */
-public class Mix<K, P extends Priority>  {
+public class Mix<X, Y extends Priority> implements PSinks<X, Y>  {
 
 
-    public final Map<K, PSink> streams = new ConcurrentHashMap();
+    public final Map<X, PSink> streams = new ConcurrentHashMap();
     final List<PSink> streamList = new CopyOnWriteArrayList<>();
 
     public TelemetryRing data;
@@ -32,17 +32,17 @@ public class Mix<K, P extends Priority>  {
 
         //TODO use a WeakValue map?
 
-    final Consumer<P> target;
+    final Consumer<Y> target;
     public PSink[] streamID = new PSink[0];
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public Mix(Consumer<P> target) {
+    public Mix(Consumer<Y> target) {
         this.target = target;
     }
 
     /** gets or creates a mix stream for the given key */
-    public PSink<K,P> stream(K x) {
+    @Override public PSink<X, Y> stream(X x) {
 
         return streams.computeIfAbsent(x, xx -> {
             //nullify the history, need to create a new one for the new stream

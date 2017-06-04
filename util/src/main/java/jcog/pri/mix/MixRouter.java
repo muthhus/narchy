@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
 
     public final AbstractClassifier<Y, X>[] tests;
-    private final FloatFunction<RoaringBitmap> gain;
+    public final FloatFunction<RoaringBitmap> gain;
     public final AtomicSummaryStatistics[] traffic;
     private final int dim;
 
@@ -24,16 +24,15 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
         return dim;
     }
 
-    private final Consumer<Y> target;
+    public final Consumer<Y> target;
 
     public MixRouter(Consumer<Y> target, FloatFunction<RoaringBitmap> gain, AbstractClassifier<Y, X>... outs) {
         this.target = target;
         this.tests = outs;
         this.gain = gain;
         int dim = 0;
-        for (AbstractClassifier t : tests) {
+        for (AbstractClassifier t : tests)
             dim += t.dimension();
-        }
         this.dim = dim;
 
         traffic = new AtomicSummaryStatistics[dim];

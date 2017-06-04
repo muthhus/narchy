@@ -2,18 +2,24 @@ package jcog.pri.mix.control;
 
 import jcog.Loop;
 import jcog.learn.ql.HaiQAgent;
+import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.math.FloatSupplier;
 import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
+import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.mix.MixRouter;
+import jcog.pri.mix.PSink;
+import jcog.pri.mix.PSinks;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.BufferedTensor;
 import jcog.tensor.RingBufferTensor;
 import jcog.tensor.TensorChain;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import static jcog.Util.sqr;
@@ -25,7 +31,7 @@ import static jcog.Util.sqr;
  * which resembles a differentiable
  * RNN backprop
  */
-public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFunction<RoaringBitmap> {
+public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<X, Y>, FloatFunction<RoaringBitmap> {
 
     private final MixRouter<X, Y> mix;
     public final HaiQAgent agent;
@@ -47,22 +53,38 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     double controlSpeed = 0.2; //increments up/down per action
     public float lastScore;
 
-    public RLMixControl(Consumer<Y> target, float fps, FloatSupplier score, AbstractClassifier<Y, X>... tests) {
+    final int auxStart;
+
+    public RLMixControl(Consumer<Y> target, float fps, FloatSupplier score, int aux, AbstractClassifier<Y, X>... tests) {
         super(fps);
+
+        this.maxAux = aux;
+
+        int dim = 0;
+        for (AbstractClassifier t : tests)
+            dim += t.dimension();
+        this.auxStart = dim;
+
+        AbstractClassifier[] aa = new AbstractClassifier[aux];
+        for (int a = 0; a < aux; a++) {
+            aa[a] = new BooleanClassifier("ax"+a, (x)->false);
+        }
+        tests = ArrayUtils.addAll(tests, aa);
 
         this.mix = new MixRouter<X, Y>(target, this, tests);
 
         this.size = mix.size();
+
         int outs = size + 1 /* bias */;
 
         this.agentIn = new BufferedTensor(new RingBufferTensor(
                 new TensorChain(
-                    this.levels = new ArrayTensor(size),
-                    this.traffic = new ArrayTensor(size)
-                ), 4));
+                        this.levels = new ArrayTensor(size),
+                        this.traffic = new ArrayTensor(size)
+                ), 2));
 
         int numInputs = agentIn.volume();
-        agent = new HaiQAgent(numInputs, size, outs * 2);
+        agent = new HaiQAgent(numInputs, size*4, outs * 2);
         agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
         this.delta = new double[outs];
         this.score = score;
@@ -124,6 +146,12 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     }
 
     private void updateTraffic() {
+
+        //commit aux's
+        for (int i = 0, auxSize = aux.size(); i < auxSize; i++) {
+            traffic.set(aux.get(i).out.sumThenClear(), auxStart + i);
+        }
+
         float[] v = new float[size];
         float total = 0;
         for (int i = 0, vLength = size; i < vLength; i++) {
@@ -171,4 +199,36 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements FloatFu
     }
 
 
+    final int maxAux;
+    final List<PSink<X, Y>> aux = new FasterList();
+
+    @Override
+    public PSink<X, Y> stream(X x) {
+        synchronized (aux) {
+
+            int aux = this.aux.size();
+            if (aux >= maxAux)
+                throw new RuntimeException("no more sinks available");
+
+            //TODO return a previously created sink with exact name, using Map
+
+            PSink<X, Y> p = new PSink<X, Y>(x, (y) -> {
+
+
+                RoaringBitmap c = mix.classify(y);
+
+                c.add(auxStart + aux); //attach stream-specific classification
+
+                float g = mix.gain.floatValueOf(c);
+
+                if (g > 0) {
+                    y.priMult(g);
+                    RLMixControl.this.aux.get(aux).out.accept(y.priElseZero());
+                    mix.target.accept(y);
+                }
+            });
+            this.aux.add(p);
+            return p;
+        }
+    }
 }
