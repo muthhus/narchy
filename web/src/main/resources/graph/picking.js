@@ -4,7 +4,7 @@ function GPUPick(width, height, renderer, simulator, pickingScene, camera, mouse
 
     //var lastData = {};
     //var lastClickedNode = -1;
-    let lastHovereddNode = -1;
+    var lastHovereddNode = -1;
     const nodeClicked = {down: null, up: null};
 
     //create buffer for reading single pixel
@@ -13,10 +13,7 @@ function GPUPick(width, height, renderer, simulator, pickingScene, camera, mouse
     let selectedNode = null;
 
 
-
     var pickingTexture = this.pickingTexture = new THREE.WebGLRenderTarget(width, height);
-    pickingTexture.texture.minFilter = THREE.LinearFilter;
-    pickingTexture.texture.generateMipmaps = false;
     pickingTexture.texture.minFilter = THREE.LinearFilter;
     pickingTexture.texture.generateMipmaps = false;
 

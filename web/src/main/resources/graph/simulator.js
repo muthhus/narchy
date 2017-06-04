@@ -178,6 +178,8 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 	let rtPosition1, rtPosition2, rtVelocity1, rtVelocity2, rtNodeAttrib1, rtNodeAttrib2;
 
+	var that = this;
+
 	function init() {
 
 		const dtPosition = generatePositionTexture(nodesAndEdges, nodesWidth,
@@ -203,6 +205,7 @@ function Simulator(renderer, nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWid
 
 		rtPosition1 = getRenderTarget(THREE.RGBAFormat);
 		rtPosition2 = rtPosition1.clone();
+		that.position = dtPosition;
 
 		rtVelocity1 = getRenderTarget(THREE.RGBAFormat);
 		rtVelocity2 = rtVelocity1.clone();

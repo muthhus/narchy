@@ -1,3 +1,5 @@
+"use strict";
+
 function GraphVis(onReady) {
 
     let canvas, stats;
@@ -12,9 +14,12 @@ function GraphVis(onReady) {
     var edgeGeometry, edgeMaterial;
     var pickingNodeGeometry;
     var pickingMesh;
-    var nodeMaterial, pickingMaterial;
+    var nodeMaterial, pickingMaterial, nodePositions;
     var labelGeometry;
-    var labelMaterial;
+    var labelMaterial, labelMesh;
+
+    /** node position cache */
+    var pnp = {};
 
     let simulate = false;
     let graphStructure;
@@ -26,12 +31,11 @@ function GraphVis(onReady) {
     let lastPickedNode = {};
     let last = performance.now();
     let simulator, gui;
-    let pickingTexture, pickingScene;
+    let pickingScene;
     let shaders;
 
 
     let epochMin, epochMax;
-    let epochOffset;
 
 
     var nodesAndEdges, nodesAndEpochs, nodesWidth, edgesWidth, epochsWidth, nodesCount, edgesCount, edgesAndEpochs,
@@ -62,7 +66,6 @@ function GraphVis(onReady) {
 
 
     this.update = function (gg) {
-        "use strict";
         graphStructure = updateGraph(gg);
     };
 
@@ -154,6 +157,20 @@ function GraphVis(onReady) {
 
     function updateGraph(newGraph) {
 
+        if (g && simulator) {
+            var pos = simulator.position.image.data;
+            var vb = 0;
+            $.each(g.nodes, function (key, value) {
+                pnp[key] = [
+                    pos[vb++],
+                    pos[vb++],
+                    pos[vb++]
+                ];
+                vb++;
+            });
+        }
+
+
         g = newGraph;
 
         var prevGraphStructure = graphStructure;
@@ -200,8 +217,8 @@ function GraphVis(onReady) {
         }
 
         // console.log(bigArray);
-        var min = _.min(bigArray);
-        var max = _.max(bigArray);
+        // var min = _.min(bigArray);
+        // var max = _.max(bigArray);
 
         // console.log('min epoch:', min, 'max epoch:', max);
 
@@ -216,7 +233,7 @@ function GraphVis(onReady) {
         nodeGeometry = new THREE.BufferGeometry();
         pickingNodeGeometry = new THREE.BufferGeometry();
         // visible geometry attributes
-        const nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
+        nodePositions = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
         const nodeReferences = new THREE.BufferAttribute(new Float32Array(nodesCount * 2), 2);
         const nodeColors = new THREE.BufferAttribute(new Float32Array(nodesCount * 3), 3);
         const nodePick = new THREE.BufferAttribute(new Float32Array(nodesCount), 1);
@@ -242,12 +259,15 @@ function GraphVis(onReady) {
         //console.log(nodesCount);
         const scale = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
         const chromaScale = chroma.scale(scale).domain([0, nodesCount]);
-        let threatValue = 0;
+
         let v = 0;
         nodesRendered = [];
         $.each(g.nodes, function (key, value) {
+
             nodesRendered.push(key);
-            threatValue = 0;
+
+            let threatValue = 0;
+
             $.each(value.data, function (dkey, dvalue) {
                 if (key === dvalue['source']) {
                     if (dvalue['source_hit'] === true) threatValue = 1;
@@ -256,9 +276,18 @@ function GraphVis(onReady) {
                     if (dvalue['target_hit'] === true) threatValue = 1;
                 }
             });
-            nodePositions.array[v * 3] = 0;
-            nodePositions.array[v * 3 + 1] = 0;
-            nodePositions.array[v * 3 + 2] = 0;
+
+            var cachedPos = pnp[key];
+            if (cachedPos) {
+                nodePositions.array[v * 3] = cachedPos[0];
+                nodePositions.array[v * 3 + 1] = cachedPos[1];
+                nodePositions.array[v * 3 + 2] = cachedPos[2];
+            } else {
+                nodePositions.array[v * 3] = 0;
+                nodePositions.array[v * 3 + 1] = 0;
+                nodePositions.array[v * 3 + 2] = 0;
+            }
+
             if (threatValue === 1) {
                 chromaColor = [1.0, 0.0, 0.0];  // red
             } else {
@@ -581,7 +610,6 @@ function GraphVis(onReady) {
         camera.updateProjectionMatrix();
 
 
-
         renderer.setSize(width, height, false);  // YOU MUST PASS FALSE HERE!
         if (pick && pick.pickingTexture)
             pick.pickingTexture.setSize(width, height, false);
@@ -668,6 +696,7 @@ function GraphVis(onReady) {
         return [r, g, b];
 
     }
+
     const pixelBuffer = new Uint8Array(4);
 
     function picking() {
@@ -680,7 +709,7 @@ function GraphVis(onReady) {
 
 
         // read the pixel under the mouse from the texture
-        renderer.readRenderTargetPixels(pickingTexture, mouse.x, pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
+        renderer.readRenderTargetPixels(pick.pickingTexture, mouse.x, pick.pickingTexture.height - mouse.y, 1, 1, pixelBuffer);
 
 
         function restoreColor(idx, color) {
@@ -796,8 +825,6 @@ function GraphVis(onReady) {
         // composer.toScreen();
 
 
-
-
         if (nodeUniforms) {
             nodeUniforms.currentTime.value = now;
             nodeUniforms.currentTime.value = Math.sin(now * 0.0005) * 1;
@@ -812,23 +839,17 @@ function GraphVis(onReady) {
         //renderer.setClearColor( 0x000, 0.0);
 
 
-
         if (pickingScene) {
             renderer.setClearColor(0);
             picking();
-            renderer.render(pickingScene, camera, pickingTexture);
+            renderer.render(pickingScene, camera, pick.pickingTexture);
             pick.update();
         }
 
         renderer.render(scene, camera);
 
 
-
-
-
         renderer.autoClearColor = true;
-
-
 
 
         requestAnimationFrame(render);
@@ -844,7 +865,6 @@ function GraphVis(onReady) {
     function start() {
 
 
-
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.0001, 100000);
         camera.position.x = 0;
         camera.position.y = 0;
@@ -853,12 +873,6 @@ function GraphVis(onReady) {
         controls = new THREE.OrbitControls(camera, canvas);
         controls.damping = 0.2;
         controls.enableDamping = true;
-
-
-
-
-
-
 
 
         // NODES
@@ -899,8 +913,6 @@ function GraphVis(onReady) {
         // scene.add(gridHelper3);
 
 
-
-
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false);
         document.addEventListener('mousemove', onMouseMove, false);
@@ -919,7 +931,6 @@ function GraphVis(onReady) {
         requestAnimationFrame(render);
 
     }
-
 
 
     return this;
