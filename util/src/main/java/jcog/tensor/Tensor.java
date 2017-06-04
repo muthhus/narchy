@@ -4,6 +4,7 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatFloatProcedure
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -19,6 +20,12 @@ public interface Tensor extends Supplier<float[]> {
     //void copyTo(float[] target, int targetOffset, int... subset);
 
     int[] shape();
+
+//    //TODO
+//    default Tensor noised(float noiseFactor, Random rng) {
+//        return new
+//    }
+//    ..etc
 
     /** total # cells */
     default int volume() {

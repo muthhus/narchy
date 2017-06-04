@@ -2,13 +2,8 @@ package jcog.learn;
 
 import jcog.Util;
 import jcog.decide.Deciding;
-import jcog.decide.DecidingSoftmax;
-import org.apache.commons.math3.util.MathArrays;
-import org.apache.commons.math3.util.MathUtils;
-import org.apache.commons.math3.util.MultidimensionalCounter;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
-import java.util.Arrays;
 import java.util.Random;
 
 import static java.util.Arrays.fill;

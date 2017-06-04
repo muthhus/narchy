@@ -151,7 +151,8 @@ public class Optimize<X> {
 
         startExperiments();
 
-        PointValuePair r = optim.optimize(new MaxEval(maxIterations),
+        PointValuePair r = optim.optimize(
+                new MaxEval(maxIterations),
                 func,
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),

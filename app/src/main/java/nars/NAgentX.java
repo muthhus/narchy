@@ -3,6 +3,8 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.random.XorShift128PlusRandom;
+import jcog.tensor.ArrayTensor;
+import jcog.tensor.RingBufferTensor;
 import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -161,11 +163,16 @@ abstract public class NAgentX extends NAgent {
                                     return 0;
                                 })
                         ),
+                        new MatrixView(m.agentIn.data, false),
+                        new MatrixView(new RingBufferTensor(m.agentIn, 8), m.agentIn.volume(), (x, gl) -> {
+                                    Draw.colorGrays(gl, x);
+                                    return 0;
+                                })
                         //new MatrixView(m.agentIn.data, false),
-                        new MatrixView(m.agent.ae.W),
-                        new MatrixView(m.agent.ae.y, false),
-                        new MatrixView(m.agent.q),
-                        new MatrixView(m.agent.et)
+//                        new MatrixView(m.agent.ae.W),
+//                        new MatrixView(m.agent.ae.y, false),
+//                        new MatrixView(m.agent.q),
+//                        new MatrixView(m.agent.et)
                 )
         ), 800, 800);
 

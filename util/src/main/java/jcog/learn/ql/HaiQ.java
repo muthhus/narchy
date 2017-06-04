@@ -2,7 +2,7 @@ package jcog.learn.ql;
 
 import jcog.data.Range;
 import jcog.decide.Deciding;
-import jcog.decide.DecidingSoftmax;
+import jcog.decide.DecideSoftmax;
 import jcog.learn.Agent;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -76,8 +76,8 @@ abstract public class HaiQ implements Agent {
 
     public HaiQ() {
         rng = new XorShift128PlusRandom(1);
-        decideState = new DecidingSoftmax(0.25f, 0.1f, 0.99f, rng);
-        decideAction = new DecidingSoftmax(0.25f, 0.1f, 0.99f, rng);
+        decideState = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
+        decideAction = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
     }
 
     int learn(int state, float reward) {

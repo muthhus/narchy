@@ -1,6 +1,8 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
+import jcog.Util;
+import jcog.learn.ql.CMAESAgent;
 import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
@@ -22,6 +24,7 @@ import org.roaringbitmap.RoaringBitmap;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static jcog.Util.floatToDoubleArray;
 import static jcog.Util.sqr;
 
 /**
@@ -34,7 +37,10 @@ import static jcog.Util.sqr;
 public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<X, Y>, FloatFunction<RoaringBitmap> {
 
     private final MixRouter<X, Y> mix;
-    public final HaiQAgent agent;
+
+    //public final HaiQAgent agent;
+    CMAESAgent agent;
+
     public final FloatSupplier score;
 
     public final ArrayTensor levels;
@@ -84,8 +90,12 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
                 ), 2));
 
         int numInputs = agentIn.volume();
-        agent = new HaiQAgent(numInputs, size*4, outs * 2);
-        agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
+
+        //agent = new HaiQAgent(numInputs, size*4, outs * 2);
+        //agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
+
+        agent = CMAESAgent.build(numInputs, size*2 /* plus and minus for each */, (x) -> score.asFloat());
+
         this.delta = new double[outs];
         this.score = score;
     }
@@ -109,17 +119,15 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     @Override
     public boolean next() {
 
-        if (size == 0)
-            return true;
-
-        if (levels == null)
-            return true;
-
+        //HACK
+        if (size == 0 || levels == null || agent == null || score == null || agentIn == null) return true;
 
         updateTraffic();
 
 
-        int action = agent.act(this.lastScore = score.asFloat(), agentIn.get());
+        int action = agent.act(this.lastScore = score.asFloat(), floatToDoubleArray(agentIn.get()) );
+        if (action == -1)
+            return true; //error
 
         int which = action / 2;
         if (action % 2 == 0)

@@ -4,7 +4,7 @@ import jcog.Util;
 
 import java.util.Random;
 
-public class DecidingSoftmax implements Deciding {
+public class DecideSoftmax implements Deciding {
 
     private final float minTemperature;
     private final float temperatureDecay;
@@ -22,7 +22,7 @@ public class DecidingSoftmax implements Deciding {
     float temperature;
     private float decisiveness;
 
-    public DecidingSoftmax(float initialTemperature, float minTemperature, float decay, Random random) {
+    public DecideSoftmax(float initialTemperature, float minTemperature, float decay, Random random) {
         this.temperature = initialTemperature;
         this.minTemperature = minTemperature;
         this.temperatureDecay = decay;
