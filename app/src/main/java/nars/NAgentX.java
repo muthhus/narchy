@@ -3,9 +3,6 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.random.XorShift128PlusRandom;
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.RingBufferTensor;
-import nars.gui.MixBoard;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARS;
@@ -35,7 +32,8 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.*;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.grid;
 
 /**
  * Extensions to NAgent interface:
@@ -148,22 +146,17 @@ abstract public class NAgentX extends NAgent {
                         .add("happy", () -> m.lastScore)
                         .on(a::onFrame),
                 col(
-                        new MatrixView(m.agentIn, m.size(), (x, gl) -> {
+                        new MatrixView(m.traffic, 4, (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
                         }),
+                        new MatrixView(m.preAgentIn.data, false),
+                        new MatrixView(m.agentIn.data, false),
+                        new MatrixView(m.agentOut, 4, (x, gl) -> {
+                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
+                            return 0;
+                        })
 
-                        row(
-                                new MatrixView(m.traffic, 4, (x, gl) -> {
-                                    Draw.colorGrays(gl, x);
-                                    return 0;
-                                }),
-                                new MatrixView(m.levels, 4, (x, gl) -> {
-                                    Draw.colorUnipolarHue(gl, x, 0.4f, 0.7f);
-                                    return 0;
-                                })
-                        ),
-                        new MatrixView(m.agentIn.data, false)
 //                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
 //                                    Draw.colorGrays(gl, x);
 //                                    return 0;
@@ -439,3 +432,4 @@ abstract public class NAgentX extends NAgent {
 //    }
 
 }
+

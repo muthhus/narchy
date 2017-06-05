@@ -1,5 +1,7 @@
 package jcog.learn.DeepLearning;
 
+import jcog.Util;
+
 import java.util.Random;
 
 public class utils {
@@ -7,7 +9,7 @@ public class utils {
         return rng.nextDouble() * (max - min) + min;
     }
 
-    public static int binomial(int n, double p, Random rng) {
+    public static double binomial(int n, double p, Random rng) {
         if(p < 0 || p > 1) return 0;
 
         int c = 0;
@@ -22,7 +24,8 @@ public class utils {
     }
 
     public static double sigmoid(double x) {
-        return 1. / (1. + Math.pow(Math.E, -x));
+        return Util.sigmoid(x);
+        //return 1. / (1. + Math.pow(Math.E, -x));
     }
 
     public static double dsigmoid(double x) {

@@ -44,7 +44,8 @@ public class TensorChain implements Tensor {
 
     @Override
     public float[] snapshot() {
-        throw new UnsupportedOperationException();
+        //throw new UnsupportedOperationException();
+        return null;
     }
 
 

@@ -12,8 +12,8 @@ public class HiddenLayerDiscrete extends HiddenLayer {
     public Random rng;
 
 
-    public HiddenLayerDiscrete(int N, int n_in, int n_out, double[][] W, double[] b, Random rng) {
-        super(N, n_in, n_out, W, b, rng, null);
+    public HiddenLayerDiscrete(int n_in, int n_out, double[][] W, double[] b, Random rng) {
+        super(n_in, n_out, W, b, rng, null);
 
         this.N = N;
         this.n_in = n_in;
@@ -48,7 +48,7 @@ public class HiddenLayerDiscrete extends HiddenLayer {
         return sigmoid(linear_output);
     }
 
-    public void sample_h_given_v(int[] input, int[] sample) {
+    public void sample_h_given_v(double[] input, double[] sample) {
         for(int i=0; i<n_out; i++) {
             sample[i] = binomial(1, output(input, W[i], b[i]), rng);
         }

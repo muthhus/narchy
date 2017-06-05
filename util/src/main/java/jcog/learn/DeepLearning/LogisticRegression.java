@@ -1,14 +1,12 @@
 package jcog.learn.DeepLearning;
 
 public class LogisticRegression {
-    public int N;
     public int n_in;
     public int n_out;
     public double[][] W;
     public double[] b;
 
-    public LogisticRegression(int N, int n_in, int n_out) {
-        this.N = N;
+    public LogisticRegression(int n_in, int n_out) {
         this.n_in = n_in;
         this.n_out = n_out;
 
@@ -16,7 +14,7 @@ public class LogisticRegression {
         b = new double[n_out];
     }
 
-    public double[] train(double[] x, int[] y, double lr) {
+    public double[] train(double[] x, double[] y, double lr) {
         double[] p_y_given_x = new double[n_out];
         double[] dy = new double[n_out];
 
@@ -33,10 +31,10 @@ public class LogisticRegression {
             dy[i] = y[i] - p_y_given_x[i];
 
             for(int j=0; j<n_in; j++) {
-                W[i][j] += lr * dy[i] * x[j] / N;
+                W[i][j] += lr * dy[i] * x[j];
             }
 
-            b[i] += lr * dy[i] / N;
+            b[i] += lr * dy[i];
         }
 
         return dy;
@@ -86,7 +84,7 @@ public class LogisticRegression {
                 {0., 0., 1., 1., 1., 0.}
         };
 
-        int[][] train_Y = {
+        double[][] train_Y = {
                 {1, 0},
                 {1, 0},
                 {1, 0},
@@ -96,7 +94,7 @@ public class LogisticRegression {
         };
 
         // construct
-        LogisticRegression classifier = new LogisticRegression(train_N, n_in, n_out);
+        LogisticRegression classifier = new LogisticRegression(n_in, n_out);
 
         // train
         for(int epoch=0; epoch<n_epochs; epoch++) {

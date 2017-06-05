@@ -23,14 +23,14 @@ public class MLP {
         this.rng = rng;
 
         // construct hiddenLayer
-        this.hiddenLayer = new HiddenLayer(N, n_in, n_hidden, null, null, rng, "tanh");
+        this.hiddenLayer = new HiddenLayer(n_in, n_hidden, null, null, rng, "tanh");
 
         // construct logisticLayer
-        this.logisticLayer = new LogisticRegression(N, n_hidden, n_out);
+        this.logisticLayer = new LogisticRegression(n_hidden, n_out);
     }
 
 
-    public void train(double[][] train_X, int[][] train_Y, double lr) {
+    public void train(double[][] train_X, double[][] train_Y, double lr) {
         double[] hidden_layer_input;
         double[] logistic_layer_input;
         double[] dy;
@@ -81,7 +81,7 @@ public class MLP {
                 {1., 1.},
         };
 
-        int[][] train_Y = {
+        double[][] train_Y = {
                 {0, 1},
                 {1, 0},
                 {1, 0},

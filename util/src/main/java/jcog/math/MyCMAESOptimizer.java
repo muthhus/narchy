@@ -134,6 +134,10 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
      * Maximal number of iterations allowed.
      */
     private final int maxIterations;
+
+    /** actual maxiterations used in steps */
+    public final int lookAheadIterations = 256;
+
     /**
      * Limit for fitness value.
      */
@@ -388,7 +392,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
          * @return the sigma values.
          */
         public double[] getSigma() {
-            return sigma.clone();
+            return sigma;
         }
     }
 
@@ -805,7 +809,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
          * @param value   Function value.
          * @param penalty Out-of-bounds penalty.
          */
-        ValuePenaltyPair(final double value, final double penalty) {
+        public ValuePenaltyPair(final double value, final double penalty) {
             this.value = value;
             this.penalty = penalty;
         }
@@ -1266,16 +1270,19 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
             // number of objective variables/problem dimension
             dimension = guess.length;
             initializeCMA(guess);
-            iterations = 0;
-            ValuePenaltyPair valuePenalty = actualEval(guess);
-            double bestValue = valuePenalty.value + valuePenalty.penalty;
-            push(fitnessHistory, bestValue);
+//            ValuePenaltyPair valuePenalty = actualEval(guess);
+//            double bestValue = valuePenalty.value + valuePenalty.penalty;
+            push(fitnessHistory, 0);
             optimum = new PointValuePair(getStartPoint(),
-                    isMinimize ? bestValue : -bestValue);
+                    isMinimize ? Double.NEGATIVE_INFINITY : Double.POSITIVE_INFINITY);
             lastResult = null;
         }
 
         public void next() {
+            iterations = 0;
+
+            evaluations.resetCount();
+
             pre();
 
             int s = size();
@@ -1506,7 +1513,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
             damps = (1 + 2 * Math.max(0, Math.sqrt((mueff - 1) /
                     (dimension + 1)) - 1)) *
                     Math.max(0.3,
-                            1 - dimension / (1e-6 + maxIterations)) + cs; // minor increment
+                            1 - dimension / (1e-6 + lookAheadIterations)) + cs; // minor increment
             ccov1 = 2 / ((dimension + 1.3) * (dimension + 1.3) + mueff);
             ccovmu = Math.min(1 - ccov1, 2 * (mueff - 2 + 1 / mueff) /
                     ((dimension + 2) * (dimension + 2) + mueff));

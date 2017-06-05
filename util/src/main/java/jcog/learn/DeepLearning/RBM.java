@@ -51,13 +51,13 @@ public class RBM {
     }
 
 
-    public void contrastive_divergence(int[] input, double lr, int k) {
+    public void contrastive_divergence(double[] input, double lr, int k) {
         double[] ph_mean = new double[n_hidden];
-        int[] ph_sample = new int[n_hidden];
+        double[] ph_sample = new double[n_hidden];
         double[] nv_means = new double[n_visible];
-        int[] nv_samples = new int[n_visible];
+        double[] nv_samples = new double[n_visible];
         double[] nh_means = new double[n_hidden];
-        int[] nh_samples = new int[n_hidden];
+        double[] nh_samples = new double[n_hidden];
 		
 		/* CD-k */
         sample_h_given_v(input, ph_mean, ph_sample);
@@ -86,21 +86,21 @@ public class RBM {
     }
 
 
-    public void sample_h_given_v(int[] v0_sample, double[] mean, int[] sample) {
+    public void sample_h_given_v(double[] v0_sample, double[] mean, double[] sample) {
         for(int i=0; i<n_hidden; i++) {
             mean[i] = propup(v0_sample, W[i], hbias[i]);
-            sample[i] = binomial(1, mean[i], rng);
+            sample[i] = (int) binomial(1, mean[i], rng);
         }
     }
 
-    public void sample_v_given_h(int[] h0_sample, double[] mean, int[] sample) {
+    public void sample_v_given_h(double[] h0_sample, double[] mean, double[] sample) {
         for(int i=0; i<n_visible; i++) {
             mean[i] = propdown(h0_sample, i, vbias[i]);
-            sample[i] = binomial(1, mean[i], rng);
+            sample[i] = (int) binomial(1, mean[i], rng);
         }
     }
 
-    public double propup(int[] v, double[] w, double b) {
+    public double propup(double[] v, double[] w, double b) {
         double pre_sigmoid_activation = 0.0;
         for(int j=0; j<n_visible; j++) {
             pre_sigmoid_activation += w[j] * v[j];
@@ -109,7 +109,7 @@ public class RBM {
         return sigmoid(pre_sigmoid_activation);
     }
 
-    public double propdown(int[] h, int i, double b) {
+    public double propdown(double[] h, int i, double b) {
         double pre_sigmoid_activation = 0.0;
         for(int j=0; j<n_hidden; j++) {
             pre_sigmoid_activation += W[j][i] * h[j];
@@ -118,13 +118,13 @@ public class RBM {
         return sigmoid(pre_sigmoid_activation);
     }
 
-    public void gibbs_hvh(int[] h0_sample, double[] nv_means, int[] nv_samples, double[] nh_means, int[] nh_samples) {
+    public void gibbs_hvh(double[] h0_sample, double[] nv_means, double[] nv_samples, double[] nh_means, double[] nh_samples) {
         sample_v_given_h(h0_sample, nv_means, nv_samples);
         sample_h_given_v(nv_samples, nh_means, nh_samples);
     }
 
 
-    public void reconstruct(int[] v, double[] reconstructed_v) {
+    public void reconstruct(double[] v, double[] reconstructed_v) {
         double[] h = new double[n_hidden];
         double pre_sigmoid_activation;
 
@@ -158,7 +158,7 @@ public class RBM {
         int n_hidden = 3;
 
         // training data
-        int[][] train_X = {
+        double[][] train_X = {
                 {1, 1, 1, 0, 0, 0},
                 {1, 0, 1, 0, 0, 0},
                 {1, 1, 1, 0, 0, 0},
@@ -179,7 +179,7 @@ public class RBM {
         }
 
         // test data
-        int[][] test_X = {
+        double[][] test_X = {
                 {1, 1, 0, 0, 0, 0},
                 {0, 0, 0, 1, 1, 0}
         };

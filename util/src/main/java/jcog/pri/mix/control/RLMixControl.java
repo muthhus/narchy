@@ -1,7 +1,6 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
-import jcog.Util;
 import jcog.learn.ql.CMAESAgent;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
@@ -12,10 +11,7 @@ import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.mix.MixRouter;
 import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.BufferedTensor;
-import jcog.tensor.RingBufferTensor;
-import jcog.tensor.TensorChain;
+import jcog.tensor.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
@@ -37,12 +33,14 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
     private final MixRouter<X, Y> mix;
 
+
     //public final HaiQAgent agent;
     CMAESAgent agent;
+    public final BufferedTensor preAgentIn;
 
     public final FloatSupplier score;
 
-    public final ArrayTensor levels;
+    public final ArrayTensor agentOut;
     public final ArrayTensor traffic;
 
     public final BufferedTensor agentIn;
@@ -82,11 +80,15 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         int outs = size /* bias */;
 
-        this.agentIn = new BufferedTensor(new RingBufferTensor(
-                new TensorChain(
-                        this.levels = new ArrayTensor(size),
+        /** level values */
+        this.agentOut = new ArrayTensor(size);
+
+        this.agentIn = new BufferedTensor(new AutoTensor(/*new BufferedTensor(new RingBufferTensor(*/
+                //this.preAgentIn2 = new BufferedTensor(new AutoTensor(
+                this.preAgentIn = new BufferedTensor(new TensorChain(
                         this.traffic = new ArrayTensor(size)
-                ), 1));
+                        ,agentOut //feedback from previous
+                ))/*, 1))*/, 16));
 
         int numInputs = agentIn.volume();
 
@@ -107,7 +109,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     public float floatValueOf(RoaringBitmap t) {
         final float[] preGain = {0};
         t.forEach((int i) -> {
-            preGain[0] += 2f * (levels.get(i) - 0.5f); //bipolarize
+            preGain[0] += 2f * (agentOut.get(i) - 0.5f); //bipolarize
         });
 
         //preGain[0] += levels.get(size - 1); //bias
@@ -121,14 +123,14 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     public boolean next() {
 
         //HACK
-        if (size == 0 || levels == null || agent == null || score == null || agentIn == null) return true;
+        if (size == 0 || agentOut == null || agent == null || score == null || agentIn == null) return true;
 
         updateTraffic();
 
 
         agent.act(this.lastScore = score.asFloat(), floatToDoubleArray(agentIn.get()) );
-        if (levels!=null && agent.outs!=null) {
-            levels.set(agent.outs);
+        if (agentOut !=null && agent.outs!=null) {
+            agentOut.set(agent.outs);
 //            float[] ll = levels.data;
 //             //bipolarize
 //            for (int i = 0, dataLength = ll.length; i < dataLength; i++) {
@@ -167,18 +169,17 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     private void updateTraffic() {
 
         //commit aux's
-        for (int i = 0, auxSize = aux.size(); i < auxSize; i++) {
-            traffic.set(aux.get(i).out.sumThenClear(), auxStart + i);
-        }
+//        for (int i = 0, auxSize = aux.size(); i < auxSize; i++) {
+//            traffic.set(aux.get(i).out.sumThenClear(), auxStart + i);
+//        }
 
         float[] v = new float[size];
         float total = 0;
         for (int i = 0, vLength = size; i < vLength; i++) {
             AtomicSummaryStatistics m = mix.traffic[i];
-            double s = m.getSum();
+            double s = m.sumThenClear();
             total += s;
             v[i] = (float) s;
-            m.clear();
         }
         if (total > 0) {
             //normalize

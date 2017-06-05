@@ -4,6 +4,7 @@ import java.util.Random;
 import static jcog.learn.DeepLearning.utils.*;
 
 public class DBN {
+
     public int N;
     public int n_ins;
     public int[] hidden_layer_sizes;
@@ -39,20 +40,20 @@ public class DBN {
             }
 
             // construct sigmoid_layer
-            this.sigmoid_layers[i] = new HiddenLayerDiscrete(this.N, input_size, this.hidden_layer_sizes[i], null, null, rng);
+            this.sigmoid_layers[i] = new HiddenLayerDiscrete(input_size, this.hidden_layer_sizes[i], null, null, rng);
 
             // construct rbm_layer
-            this.rbm_layers[i] = new RBM(this.N, input_size, this.hidden_layer_sizes[i], this.sigmoid_layers[i].W, this.sigmoid_layers[i].b, null, rng);
+            this.rbm_layers[i] = new RBM(N, input_size, this.hidden_layer_sizes[i], this.sigmoid_layers[i].W, this.sigmoid_layers[i].b, null, rng);
         }
 
         // layer for output using Logistic Regression
-        this.log_layer = new LogisticRegressionDiscrete(this.N, this.hidden_layer_sizes[this.n_layers-1], this.n_outs);
+        this.log_layer = new LogisticRegressionDiscrete(this.hidden_layer_sizes[this.n_layers-1], this.n_outs);
     }
 
-    public void pretrain(int[][] train_X, double lr, int k, int epochs) {
-        int[] layer_input = new int[0];
+    public void pretrain(double[][] train_X, double lr, int k, int epochs) {
+        double[] layer_input = new double[0];
         int prev_layer_input_size;
-        int[] prev_layer_input;
+        double[] prev_layer_input;
 
         for(int i=0; i<n_layers; i++) {  // layer-wise
             for(int epoch=0; epoch<epochs; epoch++) {  // training epochs
@@ -61,16 +62,16 @@ public class DBN {
                     for(int l=0; l<=i; l++) {
 
                         if(l == 0) {
-                            layer_input = new int[n_ins];
+                            layer_input = new double[n_ins];
                             for(int j=0; j<n_ins; j++) layer_input[j] = train_X[n][j];
                         } else {
                             if(l == 1) prev_layer_input_size = n_ins;
                             else prev_layer_input_size = hidden_layer_sizes[l-2];
 
-                            prev_layer_input = new int[prev_layer_input_size];
+                            prev_layer_input = new double[prev_layer_input_size];
                             for(int j=0; j<prev_layer_input_size; j++) prev_layer_input[j] = layer_input[j];
 
-                            layer_input = new int[hidden_layer_sizes[l-1]];
+                            layer_input = new double[hidden_layer_sizes[l-1]];
 
                             sigmoid_layers[l-1].sample_h_given_v(prev_layer_input, layer_input);
                         }
@@ -82,10 +83,10 @@ public class DBN {
         }
     }
 
-    public void finetune(int[][] train_X, int[][] train_Y, double lr, int epochs) {
-        int[] layer_input = new int[0];
+    public void finetune(double[][] train_X, double[][] train_Y, double lr, int epochs) {
+        double[] layer_input = new double[0];
         // int prev_layer_input_size;
-        int[] prev_layer_input = new int[0];
+        double[] prev_layer_input = new double[0];
 
         for(int epoch=0; epoch<epochs; epoch++) {
             for(int n=0; n<N; n++) {
@@ -93,14 +94,14 @@ public class DBN {
                 // layer input
                 for(int i=0; i<n_layers; i++) {
                     if(i == 0) {
-                        prev_layer_input = new int[n_ins];
+                        prev_layer_input = new double[n_ins];
                         for(int j=0; j<n_ins; j++) prev_layer_input[j] = train_X[n][j];
                     } else {
-                        prev_layer_input = new int[hidden_layer_sizes[i-1]];
+                        prev_layer_input = new double[hidden_layer_sizes[i-1]];
                         for(int j=0; j<hidden_layer_sizes[i-1]; j++) prev_layer_input[j] = layer_input[j];
                     }
 
-                    layer_input = new int[hidden_layer_sizes[i]];
+                    layer_input = new double[hidden_layer_sizes[i]];
                     sigmoid_layers[i].sample_h_given_v(prev_layer_input, layer_input);
                 }
 
@@ -110,7 +111,7 @@ public class DBN {
         }
     }
 
-    public void predict(int[] x, double[] y) {
+    public void predict(double[] x, double[] y) {
         double[] layer_input = new double[0];
         // int prev_layer_input_size;
         double[] prev_layer_input = new double[n_ins];
@@ -167,7 +168,7 @@ public class DBN {
         int n_layers = hidden_layer_sizes.length;
 
         // training data
-        int[][] train_X = {
+        double[][] train_X = {
                 {1, 1, 1, 0, 0, 0},
                 {1, 0, 1, 0, 0, 0},
                 {1, 1, 1, 0, 0, 0},
@@ -176,7 +177,7 @@ public class DBN {
                 {0, 0, 1, 1, 1, 0}
         };
 
-        int[][] train_Y = {
+        double[][] train_Y = {
                 {1, 0},
                 {1, 0},
                 {1, 0},
@@ -197,7 +198,7 @@ public class DBN {
 
 
         // test data
-        int[][] test_X = {
+        double[][] test_X = {
                 {1, 1, 0, 0, 0, 0},
                 {1, 1, 1, 1, 0, 0},
                 {0, 0, 0, 1, 1, 0},

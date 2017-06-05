@@ -1,16 +1,14 @@
 package jcog.learn.DeepLearning;
 
 public class LogisticRegressionDiscrete extends LogisticRegression {
-    public int N;
     public int n_in;
     public int n_out;
     public double[][] W;
     public double[] b;
 
-    public LogisticRegressionDiscrete(int N, int n_in, int n_out) {
-        super(N, n_in, n_out);
+    public LogisticRegressionDiscrete(int n_in, int n_out) {
+        super(n_in, n_out);
 
-        this.N = N;
         this.n_in = n_in;
         this.n_out = n_out;
 
@@ -18,7 +16,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         b = new double[this.n_out];
     }
 
-    public void train(int[] x, int[] y, double lr) {
+    public double[] train(double[] x, double[] y, double lr) {
         double[] p_y_given_x = new double[n_out];
         double[] dy = new double[n_out];
 
@@ -35,11 +33,12 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
             dy[i] = y[i] - p_y_given_x[i];
 
             for(int j=0; j<n_in; j++) {
-                W[i][j] += lr * dy[i] * x[j] / N;
+                W[i][j] += lr * dy[i] * x[j];
             }
 
-            b[i] += lr * dy[i] / N;
+            b[i] += lr * dy[i];
         }
+        return p_y_given_x;
     }
 
     public void predict(int[] x, double[] y) {
@@ -63,7 +62,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         int n_in = 6;
         int n_out = 2;
 
-        int[][] train_X = {
+        double[][] train_X = {
                 {1, 1, 1, 0, 0, 0},
                 {1, 0, 1, 0, 0, 0},
                 {1, 1, 1, 0, 0, 0},
@@ -72,7 +71,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
                 {0, 0, 1, 1, 1, 0}
         };
 
-        int[][] train_Y = {
+        double[][] train_Y = {
                 {1, 0},
                 {1, 0},
                 {1, 0},
@@ -82,7 +81,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         };
 
         // construct
-        LogisticRegressionDiscrete classifier = new LogisticRegressionDiscrete(train_N, n_in, n_out);
+        LogisticRegressionDiscrete classifier = new LogisticRegressionDiscrete(n_in, n_out);
 
         // train
         for(int epoch=0; epoch<n_epochs; epoch++) {

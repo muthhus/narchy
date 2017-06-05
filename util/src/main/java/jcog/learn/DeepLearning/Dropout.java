@@ -40,17 +40,17 @@ public class Dropout {
             }
 
             // construct hiddenLayer
-            this.hiddenLayers[i] = new HiddenLayer(N, input_size, hidden_layer_sizes[i], null, null, rng, activation);
+            this.hiddenLayers[i] = new HiddenLayer(input_size, hidden_layer_sizes[i], null, null, rng, activation);
 
         }
 
         // construct logisticLayer
-        this.logisticLayer = new LogisticRegression(N, hidden_layer_sizes[this.n_layers-1], n_out);
+        this.logisticLayer = new LogisticRegression(hidden_layer_sizes[this.n_layers-1], n_out);
 
     }
 
-    public void train(int epochs, double[][] train_X, int[][] train_Y, boolean dropout, double p_dropout, double lr) {
-        List<int[]> dropout_masks;
+    public void train(int epochs, double[][] train_X, double[][] train_Y, boolean dropout, double p_dropout, double lr) {
+        List<double[]> dropout_masks;
         List<double[]> layer_inputs;
         double[] layer_input;
         double[] layer_output = new double[0];
@@ -74,7 +74,7 @@ public class Dropout {
                     hiddenLayers[i].forward(layer_input, layer_output);
 
                     if(dropout) {
-                        int[] mask;
+                        double[] mask;
                         mask = hiddenLayers[i].dropout(layer_output.length, p_dropout, rng);
                         for(int j=0; j<layer_output.length; j++) layer_output[j] *= mask[j];
 
@@ -180,7 +180,7 @@ public class Dropout {
                 {1., 1.},
         };
 
-        int[][] train_Y = {
+        double[][] train_Y = {
                 {0, 1},
                 {1, 0},
                 {1, 0},

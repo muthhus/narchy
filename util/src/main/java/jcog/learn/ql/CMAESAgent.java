@@ -34,18 +34,18 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
     private final int out;
 
     private MyCMAESOptimizer opt;
-    private int population = 16;
+    private int population = 64;
     private double[] ins;
     private float reward;
     private double[] search;
 
     private double[] outsNext;
     public double[] outs;
-    final DecideSoftmax decider = new DecideSoftmax(0.25f, 0.25f, 0.5f, new XorShift128PlusRandom(1));
-    private int lastAction;
+//    final DecideSoftmax decider = new DecideSoftmax(0.25f, 0.25f, 0.5f, new XorShift128PlusRandom(1));
+//    private int lastAction;
 
     final Random rng = new XorShift128PlusRandom(1);
-    double noise = 0.01f;
+    double noise = 0.0f;
 
     /**
      * assumes 0..1.0 range
@@ -90,10 +90,12 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new MyCMAESOptimizer.Sigma(MathArrays.scale(0.1f, range)),
+                new MyCMAESOptimizer.Sigma(MathArrays.scale(0.01f, range)),
                 new MyCMAESOptimizer.PopulationSize(population));
-
+        proc.pre();
     }
+
+    final static MyCMAESOptimizer.ValuePenaltyPair notChosenResult = new MyCMAESOptimizer.ValuePenaltyPair(0, 0f);
 
     public void act(float reward, double[] nextObservation) {
 
@@ -102,7 +104,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         if (nextObservation == null)
             return;
 
-        proc.pre();
+
 
         int s = proc.size();
         int best = -1;
@@ -119,8 +121,10 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
         MyCMAESOptimizer.ValuePenaltyPair result = proc.evalActual(best); //should call value(point) below
 
+
+
         for (int i = 0; i < s; i++)
-            proc.valuePenaltyPairs[i] = result; //set all to the result
+            proc.valuePenaltyPairs[i] = (i==best) ? result : notChosenResult; //set all to the result
 
         proc.post(); //commit
 
@@ -131,6 +135,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         //System.out.println(n4(ins));
 
         proc.next();
+
 
         //3. interpret the searched action vector
         //return lastAction = decider.decide(Util.doubleToFloatArray(this.outs), lastAction);
@@ -162,7 +167,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
             for (int i = 0; i < in; i++) {
                 //apply random noise, for at least avoid convergence
                 point[i] =
-                        ins[i] + (noise > 0 ? ((rng.nextFloat() * noise) - 0.5f) * 2f : 0);
+                        ins[i] + (noise > 0 ? (((rng.nextFloat()) - 0.5f) * 2f * noise) : 0);
             }
         }
 

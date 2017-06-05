@@ -5,7 +5,6 @@ import java.util.function.DoubleFunction;
 import static jcog.learn.DeepLearning.utils.*;
 
 public class HiddenLayer {
-    public int N;
     public int n_in;
     public int n_out;
     public double[][] W;
@@ -14,8 +13,7 @@ public class HiddenLayer {
     public DoubleFunction<Double> activation;
     public DoubleFunction<Double> dactivation;
 
-    public HiddenLayer(int N, int n_in, int n_out, double[][] W, double[] b, Random rng, String activation) {
-        this.N = N;
+    public HiddenLayer(int n_in, int n_out, double[][] W, double[] b, Random rng, String activation) {
         this.n_in = n_in;
         this.n_out = n_out;
 
@@ -38,14 +36,13 @@ public class HiddenLayer {
         if (b == null) this.b = new double[n_out];
         else this.b = b;
 
-        if (activation == "sigmoid" || activation == null) {
+        if (activation == null || activation.equals("sigmoid")) {
             this.activation = (double x) -> sigmoid(x);
             this.dactivation = (double x) -> dsigmoid(x);
-
-        } else if (activation == "tanh") {
+        } else if (activation.equals("tanh")) {
             this.activation = (double x) -> tanh(x);
             this.dactivation = (double x) -> dtanh(x);
-        } else if (activation == "ReLU") {
+        } else if (activation.equals("ReLU")) {
             this.activation = (double x) -> ReLU(x);
             this.dactivation = (double x) -> dReLU(x);
         } else {
@@ -88,14 +85,14 @@ public class HiddenLayer {
 
         for(int i=0; i<n_out; i++) {
             for(int j=0; j<n_in; j++) {
-                W[i][j] += lr * dy[i] * input[j] / N;
+                W[i][j] += lr * dy[i] * input[j];
             }
-            b[i] += lr * dy[i] / N;
+            b[i] += lr * dy[i];
         }
     }
 
-    public int[] dropout(int size, double p, Random rng) {
-        int[] mask = new int[size];
+    public double[] dropout(int size, double p, Random rng) {
+        double[] mask = new double[size];
 
         for(int i=0; i<size; i++) {
             mask[i] = binomial(1, p, rng);
