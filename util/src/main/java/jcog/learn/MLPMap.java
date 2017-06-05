@@ -21,7 +21,7 @@ import java.util.Random;
  proper setting of other parameters of the learning framework. The neural network
  and its training procedure work very robustly over a wide range of choices.
  */
-public class MLP {
+public class MLPMap {
 
     public static class MLPLayer {
 
@@ -96,7 +96,7 @@ public class MLP {
 
     public final MLPLayer[] layers;
 
-    public MLP(int inputSize, int[] layersSize, Random r) {
+    public MLPMap(int inputSize, int[] layersSize, Random r) {
         layers = new MLPLayer[layersSize.length];
         for (int i = 0; i < layersSize.length; i++) {
             int inSize = i == 0 ? inputSize : layersSize[i - 1];
@@ -130,7 +130,7 @@ public class MLP {
 
         float[][] res = {new float[]{0}, new float[]{1}, new float[]{1}, new float[]{0}};
 
-        MLP mlp = new MLP(2, new int[]{2, 1}, new Random());
+        MLPMap mlp = new MLPMap(2, new int[]{2, 1}, new Random());
         mlp.layers[1].setIsSigmoid(false);
         Random r = new Random();
         int en = 500;

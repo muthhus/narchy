@@ -371,17 +371,17 @@ abstract public class NAgent implements NSense, NAct {
                     question(seq(neg(action), dur, happiness), now),
 
                     question(seq(action, dur, $.varQuery(1)), now),
-                    question(seq(neg(action), dur, $.varQuery(1)), now)
+                    question(seq(neg(action), dur, $.varQuery(1)), now),
 
                     //dangerous: may lead to immobilizing self-fulfilling prophecy
                     //quest((Compound) (action.term()),now+dur)
 
 //                            //ETERNAL)
 
-                    //,question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
-                    //,quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
+                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
 
-                    //quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
+                    quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
 

@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
-import jcog.learn.MLP;
+import jcog.learn.MLPMap;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
@@ -315,7 +315,7 @@ public class Recog2D extends NAgentX {
     public static class Training {
         private final List<Concept> ins;
         private final Outputs outs;
-        private final MLP trainer;
+        private final MLPMap trainer;
         private final NAR nar;
 
         private final float learningRate = 0.3f;
@@ -336,7 +336,7 @@ public class Recog2D extends NAgentX {
             this.outs = outs;
 
 
-            this.trainer = new MLP(ins.size(), new int[]{(ins.size() + outs.states) / 2, outs.states}, nar.random());
+            this.trainer = new MLPMap(ins.size(), new int[]{(ins.size() + outs.states) / 2, outs.states}, nar.random());
             trainer.layers[1].setIsSigmoid(false);
 
         }
