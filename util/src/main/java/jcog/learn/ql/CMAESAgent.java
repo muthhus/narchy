@@ -18,37 +18,43 @@ import java.util.Random;
 import java.util.function.ToDoubleFunction;
 
 import static java.lang.System.arraycopy;
-import static jcog.Texts.n4;
 
 public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
     private final double[] mid, min, max, range;
-    private final ParallelCMAESOptimizer.CMAESProcess optProcess;
+    private final ParallelCMAESOptimizer.CMAESProcess proc;
 
-    /** # of dimensions holding the input */
+    /**
+     * # of dimensions holding the input
+     */
     private final int in;
 
-    /** # of dimensions holding the output */
+    /**
+     * # of dimensions holding the output
+     */
     private final int out;
 
     private ParallelCMAESOptimizer opt;
-    private int population = 32;
+    private int population = 16;
     private double[] ins;
     private float reward;
     private double[] search;
 
-    private double[] outsNext, outs;
+    private double[] outsNext;
+    public double[] outs;
     final DecideSoftmax decider = new DecideSoftmax(0.25f, 0.25f, 0.5f, new XorShift128PlusRandom(1));
     private int lastAction;
 
     final Random rng = new XorShift128PlusRandom(1);
     double noise = 0.01f;
 
-    /** assumes 0..1.0 range */
-    public static CMAESAgent build(int in, int out, ToDoubleFunction<double[]> eval) {
+    /**
+     * assumes 0..1.0 range
+     */
+    public static CMAESAgent build(int in, int out) {
         int dim = in + out;
-        double[] min = new double[ dim ];
-        double[] max = new double[ dim ];
+        double[] min = new double[dim];
+        double[] max = new double[dim];
         Arrays.fill(max, 1.0);
         return new CMAESAgent(in, out, min, max);
     }
@@ -64,9 +70,8 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         this.outsNext = new double[out];
 
         this.mid = new double[n];
-        //double[] sigma = new double[n];
         this.min = min;
-        this.max = new double[n];
+        this.max = max;
         this.range = new double[n];
 
         for (int i = 0; i < n; i++) {
@@ -80,35 +85,68 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
                 false, null);
 
         int maxIterations = Integer.MAX_VALUE;
-        optProcess = this.opt.start(
+        proc = this.opt.start(
                 new MaxEval(maxIterations),
                 new ObjectiveFunction(this),
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(0.5f, range)),
+                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(0.1f, range)),
                 new ParallelCMAESOptimizer.PopulationSize(population));
 
     }
 
-    public int act(float reward, double[] nextObservation) {
+    public void act(float reward, double[] nextObservation) {
 
         this.reward = reward;
 
-        if (nextObservation==null)
-            return -1;
+        if (nextObservation == null)
+            return;
+
+        proc.pre();
+
+        int s = proc.size();
+        int best = -1;
+        double minDist = Double.POSITIVE_INFINITY;
+        //find best match for observation vector
+        for (int i = 0; i < s; i++) {
+            double[] pi = proc.next(i);
+            double dist = dist(nextObservation, pi, in, minDist);
+            if (dist < minDist) {
+                best = i;
+                minDist = dist;
+            }
+        }
+
+        ParallelCMAESOptimizer.ValuePenaltyPair result = proc.evalActual(best); //should call value(point) below
+
+        for (int i = 0; i < s; i++)
+            proc.valuePenaltyPairs[i] = result; //set all to the result
+
+        proc.post(); //commit
 
         int n = nextObservation.length;
         arraycopy(nextObservation, 0, ins, 0, n);
 
 
-
         //System.out.println(n4(ins));
 
-        optProcess.next();
+        proc.next();
 
         //3. interpret the searched action vector
-        return lastAction = decider.decide(Util.doubleToFloatArray(this.outs), lastAction);
+        //return lastAction = decider.decide(Util.doubleToFloatArray(this.outs), lastAction);
+    }
+
+
+    private double dist(double[] a, double[] b, int prefixDimensions, double minDist) {
+        //hamming distance
+        double t = 0;
+        for (int i = 0; i < prefixDimensions; i++) {
+            t += Math.abs(a[i] - b[i]);
+            if (t > minDist)
+                return Double.POSITIVE_INFINITY;
+        }
+        return t;
     }
 
 
@@ -117,12 +155,11 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         this.search = point;
 
 
-
         //intercept the CMAES vector:
 
         //System.out.println("pre: " + n4(point));
 
-        if (ins!=null) {
+        if (ins != null) {
             for (int i = 0; i < in; i++) {
                 //apply random noise, for at least avoid convergence
                 point[i] =
@@ -133,9 +170,13 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         //replace any non-finite values with random
         for (int i = 0; i < point.length; i++) {
             if (!Double.isFinite(point[i]))
-                point[i] = (rng.nextFloat() + min[i])  * (max[i] - min[i]);
-            else
-                point[i] = Util.unitize(point[i]);
+                point[i] = (rng.nextFloat() + min[i]) * (max[i] - min[i]);
+
+            point[i] =
+                    //Util.sigmoid
+                    Util.unitize(
+                            point[i]
+                    );
         }
 
         //  2) copy the output information from search vector (for action determination)

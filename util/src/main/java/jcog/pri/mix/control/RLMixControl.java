@@ -3,7 +3,6 @@ package jcog.pri.mix.control;
 import jcog.Loop;
 import jcog.Util;
 import jcog.learn.ql.CMAESAgent;
-import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.math.FloatSupplier;
@@ -77,11 +76,11 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         }
         tests = ArrayUtils.addAll(tests, aa);
 
-        this.mix = new MixRouter<X, Y>(target, this, tests);
+        this.mix = new MixRouter<>(target, this, tests);
 
         this.size = mix.size();
 
-        int outs = size + 1 /* bias */;
+        int outs = size /* bias */;
 
         this.agentIn = new BufferedTensor(new RingBufferTensor(
                 new TensorChain(
@@ -94,7 +93,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         //agent = new HaiQAgent(numInputs, size*4, outs * 2);
         //agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
 
-        agent = CMAESAgent.build(numInputs, size*2 /* plus and minus for each */, (x) -> score.asFloat());
+        agent = CMAESAgent.build(numInputs, size /* level for each */ );
 
         this.delta = new double[outs];
         this.score = score;
@@ -108,12 +107,14 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     public float floatValueOf(RoaringBitmap t) {
         final float[] preGain = {0};
         t.forEach((int i) -> {
-            preGain[0] += levels.get(i);
+            preGain[0] += 2f * (levels.get(i) - 0.5f); //bipolarize
         });
 
-        preGain[0] += levels.get(size - 1); //bias
+        //preGain[0] += levels.get(size - 1); //bias
 
-        return sqr(1f + 2 * (-0.5f + Math.max(0, Math.min(1, preGain[0])))); //l^2
+        return /*sqr*/( //l^4
+                 sqr(1f + preGain[0]) //l^2
+        );
     }
 
     @Override
@@ -125,30 +126,40 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         updateTraffic();
 
 
-        int action = agent.act(this.lastScore = score.asFloat(), floatToDoubleArray(agentIn.get()) );
-        if (action == -1)
-            return true; //error
-
-        int which = action / 2;
-        if (action % 2 == 0)
-            delta[which] = -1;
-        else
-            delta[which] = +1;
-
-        for (int i = 0; i < size; i++) {
-
-            //level prefer/reject in [-1, +1]
-            float next;
-            float prev = levels.get(i);
-            if (!Double.isFinite(prev))
-                next = 0;
-            else {
-                next = (float) Math.min(+1f, Math.max(0, decay * prev + delta[i] * controlSpeed));
-            }
-
-            levels.set(next, i);
-
+        agent.act(this.lastScore = score.asFloat(), floatToDoubleArray(agentIn.get()) );
+        if (levels!=null && agent.outs!=null) {
+            levels.set(agent.outs);
+//            float[] ll = levels.data;
+//             //bipolarize
+//            for (int i = 0, dataLength = ll.length; i < dataLength; i++) {
+//                ll[i] = (ll[i] - 0.5f) * 2f;
+//            }
         }
+
+
+//        if (action == -1)
+//            return true; //error
+//
+//        int which = action / 2;
+//        if (action % 2 == 0)
+//            delta[which] = -1;
+//        else
+//            delta[which] = +1;
+//
+//        for (int i = 0; i < size; i++) {
+//
+//            //level prefer/reject in [-1, +1]
+//            float next;
+//            float prev = levels.get(i);
+//            if (!Double.isFinite(prev))
+//                next = 0;
+//            else {
+//                next = (float) Math.min(+1f, Math.max(0, decay * prev + delta[i] * controlSpeed));
+//            }
+//
+//            levels.set(next, i);
+//
+//        }
 
         return true;
     }

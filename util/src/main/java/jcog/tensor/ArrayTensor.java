@@ -3,6 +3,7 @@ package jcog.tensor;
 import jcog.Texts;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -116,11 +117,19 @@ public class ArrayTensor implements
         return f;
     }
 
-    public void set(float[] raw) {
+    public void set(@NotNull float[] raw) {
         int d = data.length;
         assert(d == raw.length);
         arraycopy(raw, 0, data, 0, d);
     }
+
+    /** downsample 64 to 32 */
+    public void set(@NotNull double[] d) {
+        assert(data.length == d.length);
+        for (int i = 0; i < d.length; i++)
+            data[i] = (float)d[i];
+    }
+
 //
 //    public void copyTo(float[] target, int targetOffset, int... subset) {
 //        //TODO

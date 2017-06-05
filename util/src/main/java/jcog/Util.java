@@ -851,6 +851,9 @@ public enum Util {
     public static float sigmoid(float v) {
         return (float) (1 / (1 + Math.exp(-v)));
     }
+    public static double sigmoid(double v) {
+        return (1 / (1 + Math.exp(-v)));
+    }
 
     public static float sigmoidDiff(float a, float b) {
         float sum = a + b;
