@@ -2,7 +2,7 @@ package jcog.learn.ql;
 
 import jcog.Util;
 import jcog.decide.DecideSoftmax;
-import jcog.math.ParallelCMAESOptimizer;
+import jcog.math.MyCMAESOptimizer;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -15,14 +15,13 @@ import org.apache.commons.math3.util.MathArrays;
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.function.ToDoubleFunction;
 
 import static java.lang.System.arraycopy;
 
 public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
     private final double[] mid, min, max, range;
-    private final ParallelCMAESOptimizer.CMAESProcess proc;
+    private final MyCMAESOptimizer.CMAESProcess proc;
 
     /**
      * # of dimensions holding the input
@@ -34,7 +33,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
      */
     private final int out;
 
-    private ParallelCMAESOptimizer opt;
+    private MyCMAESOptimizer opt;
     private int population = 16;
     private double[] ins;
     private float reward;
@@ -79,7 +78,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
             range[i] = max[i] - min[i];
         }
 
-        this.opt = new ParallelCMAESOptimizer(Integer.MAX_VALUE,
+        this.opt = new MyCMAESOptimizer(Integer.MAX_VALUE,
                 0, true, 0,
                 0, new MersenneTwister(3),
                 false, null);
@@ -91,8 +90,8 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(0.1f, range)),
-                new ParallelCMAESOptimizer.PopulationSize(population));
+                new MyCMAESOptimizer.Sigma(MathArrays.scale(0.1f, range)),
+                new MyCMAESOptimizer.PopulationSize(population));
 
     }
 
@@ -118,7 +117,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
             }
         }
 
-        ParallelCMAESOptimizer.ValuePenaltyPair result = proc.evalActual(best); //should call value(point) below
+        MyCMAESOptimizer.ValuePenaltyPair result = proc.evalActual(best); //should call value(point) below
 
         for (int i = 0; i < s; i++)
             proc.valuePenaltyPairs[i] = result; //set all to the result

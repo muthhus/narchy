@@ -79,7 +79,7 @@ import java.util.stream.IntStream;
  *
  * @since 3.0
  */
-public class ParallelCMAESOptimizer extends MultivariateOptimizer {
+public class MyCMAESOptimizer extends MultivariateOptimizer {
     // global search parameters
     /**
      * Population size, offspring number. The primary strategy parameter to play
@@ -305,14 +305,14 @@ public class ParallelCMAESOptimizer extends MultivariateOptimizer {
      * @param checker            Convergence checker.
      * @since 3.1
      */
-    public ParallelCMAESOptimizer(int maxIterations,
-                                  double stopFitness,
-                                  boolean isActiveCMA,
-                                  int diagonalOnly,
-                                  int checkFeasableCount,
-                                  RandomGenerator random,
-                                  boolean generateStatistics,
-                                  ConvergenceChecker<PointValuePair> checker) {
+    public MyCMAESOptimizer(int maxIterations,
+                            double stopFitness,
+                            boolean isActiveCMA,
+                            int diagonalOnly,
+                            int checkFeasableCount,
+                            RandomGenerator random,
+                            boolean generateStatistics,
+                            ConvergenceChecker<PointValuePair> checker) {
         super(checker);
         this.maxIterations = maxIterations;
         this.stopFitness = stopFitness;

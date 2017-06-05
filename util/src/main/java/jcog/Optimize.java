@@ -3,7 +3,7 @@ package jcog;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import jcog.list.FasterList;
-import jcog.math.ParallelCMAESOptimizer;
+import jcog.math.MyCMAESOptimizer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -11,7 +11,6 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -146,7 +145,7 @@ public class Optimize<X> {
         });
 
 
-        ParallelCMAESOptimizer optim = new ParallelCMAESOptimizer(maxIterations, 0, true, 0,
+        MyCMAESOptimizer optim = new MyCMAESOptimizer(maxIterations, 0, true, 0,
                 0, new MersenneTwister(3), true, null);
 
         startExperiments();
@@ -157,8 +156,8 @@ public class Optimize<X> {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new ParallelCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
-                new ParallelCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
+                new MyCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+                new MyCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
 
 
 //        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
