@@ -168,9 +168,11 @@ public class TaskExecutor extends Executioner {
             next = x.run(nar);
 
         } catch (Throwable e) {
+            e.printStackTrace();
             x.delete(); //TODO add to a 'bad' bag?
             if (Param.DEBUG)
                 NAR.logger.error("{} {}", x, e.getMessage());
+
             return;
         }
 

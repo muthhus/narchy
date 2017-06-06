@@ -1,10 +1,14 @@
 package nars.experiment.polecart;
 
+import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.*;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
+import nars.gui.Vis;
+import nars.term.Term;
 import org.apache.commons.math3.util.MathUtils;
+import spacegraph.SpaceGraph;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,7 +65,7 @@ public class PoleCart extends NAgentX  {
 
     // Define the Engine
     // Define InputVariable1 Theta(t) {angle with perpendicular}
-    SensorConcept inputVariable1;
+    SensorConcept inputVariable1x, inputVariable1y;
     // Define InputVariable1 x(t) {angular velocity}
     SensorConcept inputVariable2;
     // OutputVariable {force to be applied}
@@ -72,8 +76,16 @@ public class PoleCart extends NAgentX  {
     public PoleCart(NAR nar) throws Narsese.NarseseException {
         super("cart", nar);
 
-        this.inputVariable1 = senseNumber("(ang)", () -> MathUtils.normalizeAngle(angle, 0)).resolution(0.1f);
-        this.inputVariable2 = senseNumber("(angDot)", () -> Util.sigmoid(angleDot)).resolution(0.1f);
+//        this.inputVariable1 = senseNumber("(ang)",
+//                () -> MathUtils.normalizeAngle(angle, 0)).resolution(0.1f);
+        this.inputVariable1x = senseNumber("(ang,X)",
+                () -> 0.5f + 0.5f * (Math.sin(MathUtils.normalizeAngle(angle, 0)))).resolution(0.1f);
+        this.inputVariable1y = senseNumber("(ang,Y)",
+                () -> 0.5f + 0.5f * (Math.cos(MathUtils.normalizeAngle(angle, 0)))).resolution(0.1f);
+
+        this.inputVariable2 = senseNumber("(ang,d)",
+                () -> Util.sigmoid(angleDot/4f)).resolution(0.1f);
+
         this.outputVariable = actionBipolar($.p("act"), (a) -> {
             action = a * speed;
             return a;
@@ -108,7 +120,9 @@ public class PoleCart extends NAgentX  {
 //                }
 //            }
 //        });
-
+   SpaceGraph.window(Vis.beliefCharts(200,
+                    Lists.newArrayList(new Term[]{inputVariable1x, inputVariable1y, inputVariable2}),
+                    nar), 600, 600);
         this.panel = new JPanel(new BorderLayout()) {
             public Stroke stroke = new BasicStroke(4);
 
@@ -132,7 +146,7 @@ public class PoleCart extends NAgentX  {
                 }
 
                 //Erase the previous image.
-                offGraphics.setColor(new Color(0,0,0,0.5f));
+                offGraphics.setColor(new Color(0,0,0,0.25f));
                 offGraphics.fillRect(0, 0, d.width, d.height);
 
                 //Draw Track.
@@ -264,7 +278,7 @@ public class PoleCart extends NAgentX  {
 //                break;
 //            }
 
-        return (float)(1f - Math.abs(MathUtils.normalizeAngle(angle, 0)));
+        return (float)(2f - Math.abs(MathUtils.normalizeAngle(angle, 0)))/2f;
 
 //        System.out.println(angle);
 //        return (float) angleDot;

@@ -2,7 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.attention.SpreadingActivation;
+import nars.attention.Activate;
 import nars.concept.TaskConcept;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ public interface TaskTable  {
 
     static void activate(@NotNull Task t, float activation, @NotNull TaskConcept c, @NotNull NAR n) {
         n.eventTaskProcess.emit(/*post*/t);
-        n.input(new SpreadingActivation(t, c, activation));
+        n.input(new Activate(t, activation));
     }
 
     int capacity();

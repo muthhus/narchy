@@ -8,7 +8,7 @@ import org.junit.Test;
 /**
  * Created by me on 9/9/15.
  */
-public class ActivationTest {
+public class ActivateTest {
 
     @Test
     public void testDerivedBudgets() throws Narsese.NarseseException {

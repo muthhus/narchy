@@ -14,7 +14,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
-import nars.attention.SpreadingActivation;
+import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.index.term.TermIndex;
@@ -98,7 +98,7 @@ public class NARS extends NAR {
 //                        default:
 //                            result = Other; break;
 //                    }
-                    } else if (x instanceof SpreadingActivation) {
+                    } else if (x instanceof Activate) {
                         result = Activation;
                     } else if (x instanceof nars.control.Premise) {
                         result = PostBand.Premise;
