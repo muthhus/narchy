@@ -15,6 +15,8 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
+import nars.time.TimeFunctions;
+import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
@@ -491,6 +493,44 @@ public abstract class TermBuilder {
         return finish(o, index, ser);
     }
 
+    private Term conjPost(Term x /* possibly a conjunction */) {
+        if (x.op()!=CONJ)
+            return x;
+
+        //conjunction/implication reduction:
+        if (x.hasAny(IMPL)) {
+            //if there is only one implication subterm, then fold into that.
+            //if there are more than one, don't do anything (for now)
+            Compound c = ((Compound) x);
+            int whichImpl = -1;
+            for (int i = 0; i < c.size(); i++) {
+                if (c.subIs(i, Op.IMPL)) {
+                    if (whichImpl!=-1) {
+                        //a 2nd implication was found; don't continue
+                        whichImpl = -1;
+                        break;
+                    }
+                    whichImpl = i;
+                }
+            }
+            if (whichImpl != -1) {
+
+                int ww = whichImpl;
+//                Term[] precond = c.subterms().terms(
+//                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
+                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
+                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
+                Compound origImpl = (Compound)c.sub(ww);
+                Term newPre = $.terms.replace(c, origImpl, implPre);
+                return $.impl(newPre, origImpl.dt(), implPost);
+
+            }
+
+        }
+
+        return x;
+    }
+
     @NotNull
     private Term conj(int dt, final @NotNull Term... uu) {
 
@@ -514,17 +554,14 @@ public abstract class TermBuilder {
             if (n != 2)
                 throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-            if (u[0].equals(u[1]))
-                return u[0];
-
             //preserve grouping (don't flatten) but use normal commutive ordering as dternal &&
-            return finish(CONJ, XTERNAL, u);
+            return conjPost(finish(CONJ, XTERNAL, u));
         }
 
         boolean commutive = concurrent(dt);
         if (commutive) {
 
-            return junctionFlat(dt, u);
+            return conjPost(junctionFlat(dt, u));
 
         } else {
             //NON-COMMUTIVE
@@ -553,7 +590,7 @@ public abstract class TermBuilder {
                 }
             }
 
-            return finish(false /* already sorted */, CONJ, dt, u);
+            return conjPost(finish(false /* already sorted */, CONJ, dt, u));
 
         }
 

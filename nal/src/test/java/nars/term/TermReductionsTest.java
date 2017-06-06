@@ -221,7 +221,7 @@ public class TermReductionsTest {
         assertEquals(pp, disj(pp, pp));
     }
 
-    @Test public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
+    @Ignore @Test public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
         assertEquals(
                 "$.50 (x). 0⋈10 %1.0;.90%",
@@ -899,6 +899,29 @@ public class TermReductionsTest {
     @Test public void testCoNegatedImplication() throws Narsese.NarseseException {
         assertEquals(False,
             $("((--,$1) ==>+0 (((--,$1) &&+0 (--,#2)) &&+16 #2))")
+        );
+    }
+
+
+    @Test public void testConjImplReduction1() throws Narsese.NarseseException {
+        assertEquals(
+                "((inside(bob,office) &&+0 inside(john,playground))==>inside(bob,kitchen))",
+                $("(inside(bob,office) &&+0 (inside(john,playground)==>inside(bob,kitchen)))").toString()
+        );
+    }
+
+    @Test public void testConjImplReduction2() throws Narsese.NarseseException {
+        //with some dt's
+        assertEquals(
+                "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))",
+                $("(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
+        );
+    }
+      @Test public void testConjImplReduction3() throws Narsese.NarseseException {
+        //with some dt's
+        assertEquals(
+                "((inside(john,playground) &&+1 inside(bob,office)) ==>-1 inside(bob,kitchen))",
+                $("(inside(bob,office) &&-1 (inside(john,playground) ==>-1 inside(bob,kitchen)))").toString()
         );
     }
 

@@ -60,7 +60,7 @@ public class bAblTests extends AbstractNALTest {
         TestNAR t = test();
 
         t.nar.truthResolution.setValue(0.25f);
-        t.nar.termVolumeMax.setValue(24);
+        t.nar.termVolumeMax.setValue(28);
 
         //t.log();
         t.believe("((pick(#Person,$Object) &&+0 inside(#Person,$Place)) ==>+0 inside($Object,$Place))")
@@ -68,7 +68,7 @@ public class bAblTests extends AbstractNALTest {
                 .input("inside(bob,office). :|:") ////Bob is in the office.
                 .input("pick(john,football). :|:") ////John picked up the football.
                 .input("inside(bob,kitchen). :|:") ////Bob went to the kitchen.
-                .input("$0.95$ inside(football,?where)?") ////Where is the football?
+                .inputAt(150, "$0.9 inside(football,?where)?") ////Where is the football?
                 .mustOutput(0, 5000,
                         "inside(football,playground)", BELIEF,
                         1f, 1f, 0.5f, 0.99f, 0); ////A: playground
