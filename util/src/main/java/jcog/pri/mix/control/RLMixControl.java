@@ -36,7 +36,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
     //public final HaiQAgent agent;
     CMAESAgent agent;
-    public final BufferedTensor preAgentIn;
+    public final ArrayTensor preAgentIn;
 
     public final FloatSupplier score;
 
@@ -50,10 +50,10 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
      * values less than 1 eventually lowers channel volume levels to zero (flat, ie. x1)
      * unless otherwise boosted or cut
      */
-    float decay = 1f;
+    //float decay = 1f;
 
-    private final double[] delta; //delta accumulated
-    double controlSpeed = 0.05; //increments up/down per action
+    //private final double[] delta; //delta accumulated
+    //double controlSpeed = 0.05; //increments up/down per action
     public float lastScore;
 
     final int auxStart;
@@ -83,12 +83,14 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         /** level values */
         this.agentOut = new ArrayTensor(size);
 
-        this.agentIn = new BufferedTensor(new AutoTensor(/*new BufferedTensor(new RingBufferTensor(*/
-                //this.preAgentIn2 = new BufferedTensor(new AutoTensor(
-                this.preAgentIn = new BufferedTensor(new TensorChain(
-                        this.traffic = new ArrayTensor(size)
-                        ,agentOut //feedback from previous
-                ))/*, 1))*/, 16));
+        this.agentIn = new BufferedTensor(new AutoTensor(
+            this.preAgentIn = new RingBufferTensor(
+                new TensorChain(
+                        this.traffic = new ArrayTensor(size),
+                        agentOut /*feedback from previous*/
+                ), 2),
+            12)
+        );
 
         int numInputs = agentIn.volume();
 
@@ -97,7 +99,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         agent = CMAESAgent.build(numInputs, size /* level for each */ );
 
-        this.delta = new double[outs];
+        //this.delta = new double[outs];
         this.score = score;
     }
 

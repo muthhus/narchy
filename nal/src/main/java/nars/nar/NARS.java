@@ -70,17 +70,15 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), -1, -1, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, -1, e),
                 rng, e);
-
-
     }
 
     @Override
     protected PSinks newInput() {
         return new RLMixControl<>(this::inputSub, 15f,
 
-                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
+                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 5),
 
                 12,
 

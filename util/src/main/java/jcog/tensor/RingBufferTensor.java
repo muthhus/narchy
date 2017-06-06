@@ -42,6 +42,7 @@ public class RingBufferTensor extends ArrayTensor {
 
     @Override
     public float[] get() {
+        t.get();
         t.writeTo(data, target * segment);
         if (++target == num) target = 0;
         return data;

@@ -1,7 +1,6 @@
 package jcog.learn.ql;
 
 import jcog.Util;
-import jcog.decide.DecideSoftmax;
 import jcog.math.MyCMAESOptimizer;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -17,6 +16,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static java.lang.System.arraycopy;
+import static jcog.Texts.n4;
 
 public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
@@ -27,6 +27,8 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
      * # of dimensions holding the input
      */
     private final int in;
+
+    float actionMomentum = 0.5f;
 
     /**
      * # of dimensions holding the output
@@ -137,6 +139,8 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         proc.next();
 
 
+
+
         //3. interpret the searched action vector
         //return lastAction = decider.decide(Util.doubleToFloatArray(this.outs), lastAction);
     }
@@ -184,7 +188,11 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         }
 
         //  2) copy the output information from search vector (for action determination)
-        arraycopy(point, in, outsNext, 0, out);
+        //arraycopy(point, in, outsNext, 0, out);
+        for (int i = 0; i < outsNext.length; i++) {
+            outsNext[i] = point[i+in] * (1f- actionMomentum) + outsNext[i] * (actionMomentum);
+        }
+
 
         //  3) replace the action with the last actual action
         arraycopy(outs, 0, point, in, out);

@@ -22,8 +22,8 @@ import java.util.Random;
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /** rate at which ConceptFire forms premises */
-    private static final float spendRate = 0.5f;
-    private static final int premisesPerCycle = 4;
+    private static final float spendRate = 0.25f;
+    private static final int premisesPerCycle = 2;
 
 
     public ConceptFire(Concept c, float pri) {
@@ -90,14 +90,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         if (num > 0) {
             ITask[] pp = premises.array();
             float spend = this.pri * spendRate;
+            this.pri -= spend;
 
             //divide priority among the premises
             float subPri = spend / num;
             for (int i = 0; i < num; i++) {
                 pp[i].setPri(subPri);
             }
-
-            this.pri -= spend;
 
             return pp;
         } else {

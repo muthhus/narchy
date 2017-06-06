@@ -39,7 +39,10 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 /**
- * PARALLELIZED VERSION
+ *
+ * http://cma.gforge.inria.fr/cmaes_sourcecode_page.html#java
+ *
+ * MODIFIED VERSION
  * <p>
  * An implementation of the active Covariance Matrix Adaptation Evolution Strategy (CMA-ES)
  * for non-linear, non-convex, non-smooth, global function minimization.
