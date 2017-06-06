@@ -33,7 +33,8 @@ public class PoleCart extends NAgentX  {
             try {
                 NAgent a = new PoleCart(n);
                 a.curiosity.setValue(0.02f);
-                n.termVolumeMax.setValue(24);
+                n.termVolumeMax.setValue(32);
+                n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {
 
@@ -61,16 +62,15 @@ public class PoleCart extends NAgentX  {
     public static final double cartMass = 1.;
     public static final double poleMass = 0.1;
     public static final double poleLength = 1.;
-    public static final double forceMag = 10.;
-    public static final double tau = 0.01;
-    public static final double fricCart = 0.0001;
+    public static final double forceMag = 70.;
+    public static final double tau = 0.02;
+    public static final double fricCart = 0.00005;
     public static final double fricPole = 0.005;
     public static final double totalMass = cartMass + poleMass;
     public static final double halfPole = 0.5 * poleLength;
     public static final double poleMassLength = halfPole * poleMass;
     public static final double fourthirds = 4. / 3.;
 
-    float speed = 6f;
 
 
     // Define the Engine
@@ -122,7 +122,7 @@ public class PoleCart extends NAgentX  {
                 () -> Util.sigmoid(angleDot/4f)).resolution(0.02f);
 
         this.move = actionBipolar($.p("move"), (a) -> {
-            action = (a * speed);
+            action = a;
             return a;
         });
 

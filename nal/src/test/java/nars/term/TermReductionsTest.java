@@ -917,6 +917,13 @@ public class TermReductionsTest {
                 $("(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
         );
     }
+    @Test public void testConjImplReductionNeg2() throws Narsese.NarseseException {
+        //with some dt's
+        assertEquals(
+                "((inside(bob,office) &&+1 (--,inside(john,playground))) ==>+1 inside(bob,kitchen))",
+                $("(inside(bob,office) &&+1 (--inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
+        );
+    }
       @Test public void testConjImplReduction3() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(

@@ -3,9 +3,11 @@ package nars.table;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.math.Interval;
+import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
+import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.TruthPolation;
@@ -26,13 +28,46 @@ import static jcog.math.Interval.intersectLength;
  */
 public class HijackTemporalBeliefTable extends TaskHijackBag implements TemporalBeliefTable {
 
+    long now;
 
     public HijackTemporalBeliefTable(int initialCapacity) {
         super(4 /* reprobes */);
         setCapacity(initialCapacity);
     }
 
+        @Override
+    protected boolean replace(Task incoming, Task existing) {
+        float it = incoming.conf() * (1f + incoming.dtRange())/(1+Math.abs(now - incoming.nearestStartOrEnd(now)));
+        float et = existing.conf() * (1f + existing.dtRange())/(1+Math.abs(now - existing.nearestStartOrEnd(now)));
+
+        return replace(it, et);
+    }
 //    @Override
+//    protected boolean replace(Task incoming, Task existing) {
+//
+//        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
+//            return true;
+//
+//        float exPri = existing.pri();
+//        if (exPri!=exPri)
+//            return true;
+//
+//        float inPri = incoming.priSafe(0);
+//        if (!replace(inPri, exPri)) {
+//            //existing.priMult(1f - /*temperature() * */ inPri/reprobes);
+//            return false;
+//        }
+//        return true;
+//        //return super.replace(incoming, existing, scale);
+//    }
+
+    @Override
+    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+        now = n.time();
+        super.add(x, c, n);
+    }
+
+    //    @Override
 //    public Task add(@NotNull Task x) {
 //        if (x instanceof AnswerTask) {
 //            return x; //dont store interpolations/answers/projections etc
@@ -363,24 +398,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        return x -> rankTemporalByConfidence(x, when, now, dur);
 //    }
 
-    @Override
-    protected boolean replace(Task incoming, Task existing) {
 
-        if (incoming instanceof SignalTask) //intercept signal tasks and give them priority
-            return true;
-
-        float exPri = existing.pri();
-        if (exPri!=exPri)
-            return true;
-
-        float inPri = incoming.priSafe(0);
-        if (!replace(inPri, exPri)) {
-            //existing.priMult(1f - /*temperature() * */ inPri/reprobes);
-            return false;
-        }
-        return true;
-        //return super.replace(incoming, existing, scale);
-    }
 
 
 //    /**

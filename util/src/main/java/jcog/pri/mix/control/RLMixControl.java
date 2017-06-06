@@ -116,7 +116,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         //preGain[0] += levels.get(size - 1); //bias
 
-        return /*sqr*/( //l^4
+        return sqr( //l^4
                  sqr(1f + preGain[0]) //l^2
         );
     }
@@ -131,7 +131,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
 
         agent.act(this.lastScore = score.asFloat(), floatToDoubleArray(agentIn.get()) );
-        if (agentOut !=null && agent.outs!=null) {
+        if (agent.outs!=null) {
             agentOut.set(agent.outs);
 //            float[] ll = levels.data;
 //             //bipolarize
@@ -241,12 +241,16 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
                 c.add(auxStart + aux); //attach stream-specific classification
 
-                float g = mix.gain.floatValueOf(c);
-
-                if (g > 0) {
-                    y.priMult(g);
-                    RLMixControl.this.aux.get(aux).out.accept(y.priElseZero());
-                    mix.target.accept(y);
+                float yp = y.priElseZero();
+                if (yp > 0) {
+                    RLMixControl.this.aux.get(aux).in.accept(yp /* input value before multiplying */);
+                    float g = mix.gain.floatValueOf(c);
+                    if (g > 0) {
+                        if (yp > 0) {
+                            y.priMult(g);
+                            mix.target.accept(y);
+                        }
+                    }
                 }
             });
             this.aux.add(p);

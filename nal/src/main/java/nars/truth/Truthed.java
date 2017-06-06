@@ -26,11 +26,13 @@ public interface Truthed  {
 
     default float conf() {
         Truth t = truth();
-        return t == null ? Float.NaN : t.conf();
+        //return t == null ? Float.NaN : t.conf();
+        return t.conf(); //throw NPE if not a belief/goal
     }
     default float freq() {
         Truth t = truth();
-        return t == null ? Float.NaN : t.freq();
+        //return t == null ? Float.NaN : t.freq();
+        return t.freq(); //throw NPE if not a belief/goal
     }
 
 //    static float confSum(@NotNull Iterable<? extends Truthed> beliefs) {

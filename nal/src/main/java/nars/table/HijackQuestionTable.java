@@ -1,7 +1,11 @@
 package nars.table;
 
+import jcog.pri.Pri;
 import nars.NAR;
+import nars.Task;
 import nars.bag.TaskHijackBag;
+import nars.concept.TaskConcept;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by me on 2/16/17.
@@ -22,6 +26,14 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 //    }
 
 
+    @Override
+    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+        super.add(x, c, n);
+
+//        if (pressure.floatValue() >= Pri.EPSILON)
+//            commit(); //apply forgetting
+
+    }
 
     @Override
     public void capacity(int newCapacity, NAR nar) {

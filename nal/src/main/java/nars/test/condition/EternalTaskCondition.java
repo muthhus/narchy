@@ -306,21 +306,23 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (difference >= worstDiff)
                 return;
 
-            float f = task.freq();
-            float freqDiff = Math.min(
-                    Math.abs(f - freqMin),
-                    Math.abs(f - freqMax));
-            difference += 2 * freqDiff;
-            if (difference >= worstDiff)
-                return;
+            if (task.isBeliefOrGoal()) {
+                float f = task.freq();
+                float freqDiff = Math.min(
+                        Math.abs(f - freqMin),
+                        Math.abs(f - freqMax));
+                difference += 2 * freqDiff;
+                if (difference >= worstDiff)
+                    return;
 
-            float c = task.conf();
-            float confDiff = Math.min(
-                    Math.abs(c - confMin),
-                    Math.abs(c - confMax));
-            difference += 1 * confDiff;
-            if (difference >= worstDiff)
-                return;
+                float c = task.conf();
+                float confDiff = Math.min(
+                        Math.abs(c - confMin),
+                        Math.abs(c - confMax));
+                difference += 1 * confDiff;
+                if (difference >= worstDiff)
+                    return;
+            }
 
             float termDifference =
                     termDistance(tterm, term, worstDiff);

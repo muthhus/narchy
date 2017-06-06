@@ -78,7 +78,7 @@ public class NARS extends NAR {
     protected PSinks newInput() {
         return new RLMixControl<>(this::inputSub, 15f,
 
-                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 5),
+                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 2),
 
                 12,
 

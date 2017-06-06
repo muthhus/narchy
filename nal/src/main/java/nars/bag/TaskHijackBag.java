@@ -20,19 +20,10 @@ import java.util.function.Consumer;
  */
 public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements TaskTable {
 
-    private long now;
-
     public TaskHijackBag(int reprobes) {
         super(reprobes);
     }
 
-    @Override
-    protected boolean replace(Task incoming, Task existing) {
-        float it = incoming.conf() * (1f + incoming.dtRange())/(1+Math.abs(now - incoming.nearestStartOrEnd(now)));
-        float et = existing.conf() * (1f + existing.dtRange())/(1+Math.abs(now - existing.nearestStartOrEnd(now)));
-
-        return replace(it, et);
-    }
 
 
     //    @Override
@@ -98,7 +89,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
         float activation = x.priSafe(0);
 
-        this.now = n.time();
 
         MutableFloat oo = new MutableFloat();
         @Nullable Task y = put(x, oo);
@@ -111,9 +101,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         if (y!=x) {
             x.delete();
         }
-
-//        if (pressure.floatValue() >= Pri.EPSILON)
-//            commit(); //apply forgetting
 
         if (activation >= Pri.EPSILON) {
             TaskTable.activate(y, activation, c, n);

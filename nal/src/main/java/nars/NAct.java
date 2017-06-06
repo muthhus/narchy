@@ -21,6 +21,7 @@ import java.util.function.IntSupplier;
 
 import static jcog.Util.unitize;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * Created by me on 9/30/16.
@@ -81,8 +82,8 @@ public interface NAct {
         }
 
         return $.t(freq,
-                nar().confMin.floatValue());
-                //nar().confDefault(BELIEF) /*d.conf()*/);
+                //nar().confMin.floatValue());
+                nar().confDefault(GOAL) /*d.conf()*/);
     }
 
     /**
@@ -137,7 +138,7 @@ public interface NAct {
                     throw new RuntimeException();
             }
 
-            return $.t(f, nar().confDefault(BELIEF));
+            return $.t(f, nar().confDefault(GOAL));
         });
         m.resolution.setValue(0.5f/2f);
 
@@ -191,7 +192,7 @@ public interface NAct {
                     //d!=null ?
                     $.t(f,
                             //d.conf()
-                            nar().confDefault(BELIEF)
+                            nar().confDefault(GOAL)
                     )
                     //: null
                     ;
@@ -317,7 +318,7 @@ public interface NAct {
             float f = update.valueOf(o);
             if (f!=f)
                 f = 0.5f;
-            return $.t(f, nar().confDefault(BELIEF));
+            return $.t(f, nar().confDefault(GOAL));
         });
     }
 
