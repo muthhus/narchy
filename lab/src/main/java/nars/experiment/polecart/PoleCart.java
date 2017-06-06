@@ -2,6 +2,7 @@ package nars.experiment.polecart;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
@@ -12,31 +13,39 @@ import spacegraph.SpaceGraph;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
 
-/** adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java */
+/** adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
+ *  see also: https://github.com/rihardsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
+ *
+ * */
 public class PoleCart extends NAgentX  {
 
+
+    private final SensorConcept xVel, x;
+    private AtomicBoolean drawFinished = new AtomicBoolean(true);
 
     public static void main(String[] arg) {
         runRT((n) -> {
 
             try {
                 NAgent a = new PoleCart(n);
+                a.curiosity.setValue(0.02f);
+                n.termVolumeMax.setValue(24);
                 return a;
             } catch (Exception e) {
 
                 e.printStackTrace();
                 return null;
             }
-        }, 20);
+        }, 40);
     }
 
     private static final long serialVersionUID = 1L;
     private final JPanel panel;
 
-    Thread animatorThread;
     //next three are for double-buffering
     Dimension offDimension;
     Image offImage;
@@ -46,62 +55,76 @@ public class PoleCart extends NAgentX  {
     double pos, posDot, angle, angleDot;
 
     float posMin = -2f, posMax = +2f;
+    float velMax = 10;
 
     // Constants used for physics
     public static final double cartMass = 1.;
     public static final double poleMass = 0.1;
     public static final double poleLength = 1.;
     public static final double forceMag = 10.;
-    public static final double tau = 0.02;
-    public static final double fricCart = 0.00005;
+    public static final double tau = 0.01;
+    public static final double fricCart = 0.0001;
     public static final double fricPole = 0.005;
     public static final double totalMass = cartMass + poleMass;
     public static final double halfPole = 0.5 * poleLength;
     public static final double poleMassLength = halfPole * poleMass;
     public static final double fourthirds = 4. / 3.;
 
-    float speed = 2f;
+    float speed = 6f;
 
 
     // Define the Engine
     // Define InputVariable1 Theta(t) {angle with perpendicular}
-    SensorConcept inputVariable1x, inputVariable1y;
+    SensorConcept angX, angY;
     // Define InputVariable1 x(t) {angular velocity}
-    SensorConcept inputVariable2;
+    SensorConcept angVel;
     // OutputVariable {force to be applied}
-    GoalActionConcept outputVariable;
+    GoalActionConcept move;
     // Define the RuleBlock
     double action;
 
     public PoleCart(NAR nar) throws Narsese.NarseseException {
-        super("cart", nar);
+        super("", nar);
 
 //        this.inputVariable1 = senseNumber("(ang)",
 //                () -> MathUtils.normalizeAngle(angle, 0)).resolution(0.1f);
-        this.inputVariable1x = senseNumber("(ang,X)",
-                () -> 0.5f + 0.5f * (Math.sin(MathUtils.normalizeAngle(angle, 0)))).resolution(0.1f);
-        this.inputVariable1y = senseNumber("(ang,Y)",
-                () -> 0.5f + 0.5f * (Math.cos(MathUtils.normalizeAngle(angle, 0)))).resolution(0.1f);
-
-        this.inputVariable2 = senseNumber("(ang,d)",
-                () -> Util.sigmoid(angleDot/4f)).resolution(0.1f);
-
-        this.outputVariable = actionBipolar($.p("act"), (a) -> {
-            action = (a * speed);
-            return a;
-        });
 
         // Initialise pole state.
         pos = 0.;
         posDot = 0.;
-        angle = 0.2; // Pole starts off at an angle 
+        angle = 0.2; // Pole starts off at an angle
         angleDot = 0.;
         action = 0;
 
+        happy.resolution(0.05f);
 
-        // Set up animation timing.
-        //How many milliseconds between frames?
+        /**
+            returnObs.doubleArray[0] = theState.getX();
+            returnObs.doubleArray[1] = theState.getXDot();
+            returnObs.doubleArray[2] = theState.getTheta();
+            returnObs.doubleArray[3] = theState.getThetaDot();
+         */
+        //TODO extract 'senseAngle()' for NSense interface
 
+        this.x = senseNumber("(x)",
+                new FloatPolarNormalized(()->(float)pos)).resolution(0.05f);
+        this.xVel = senseNumber("(xVel)",
+                ()->Util.sigmoid((float)posDot)).resolution(0.05f);
+
+        //angle
+        this.angX = senseNumber("(angX)",
+                () -> 0.5f + 0.5f * (Math.sin(MathUtils.normalizeAngle(angle, 0)))).resolution(0.05f);
+        this.angY = senseNumber("(angY)",
+                () -> 0.5f + 0.5f * (Math.cos(MathUtils.normalizeAngle(angle, 0)))).resolution(0.05f);
+
+        //angular velocity
+        this.angVel = senseNumber("(angVel)",
+                () -> Util.sigmoid(angleDot/4f)).resolution(0.02f);
+
+        this.move = actionBipolar($.p("move"), (a) -> {
+            action = (a * speed);
+            return a;
+        });
 
 
         // Handle keyboard events 
@@ -121,7 +144,7 @@ public class PoleCart extends NAgentX  {
 //            }
 //        });
    SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{inputVariable1x, inputVariable1y, inputVariable2}),
+                    Lists.newArrayList(new Term[]{x, xVel, angX, angY, angVel}),
                     nar), 600, 600);
         this.panel = new JPanel(new BorderLayout()) {
             public Stroke stroke = new BasicStroke(4);
@@ -191,6 +214,7 @@ public class PoleCart extends NAgentX  {
                 //Last thing: Paint the image onto the screen.
                 g.drawImage(offImage, 0, 0, panel);
 
+                drawFinished.set(true);
             }
 
         };
@@ -239,6 +263,7 @@ public class PoleCart extends NAgentX  {
             //Now update current state.
             pos += posDot * tau;
 
+
             if ((pos >= posMax) || (pos <= posMin)) {
                 //bounce
                 pos = Util.clamp((float) pos, posMin, posMax);
@@ -246,7 +271,7 @@ public class PoleCart extends NAgentX  {
                 //posDot = 0;
                 //angleDDot = 0;
 
-                posDot = -0.75f * posDot;
+                posDot = -1f /* restitution */ * posDot;
 
                 //posDot = -posDot;
                 //angleDot = -angleDot;
@@ -254,6 +279,8 @@ public class PoleCart extends NAgentX  {
             }
 
             posDot += posDDot * tau;
+            posDot = Math.min(+velMax, Math.max(-velMax, posDot));
+
             angle += angleDot * tau;
             angleDot += angleDDot * tau;
 
@@ -267,8 +294,9 @@ public class PoleCart extends NAgentX  {
 
 
             //Display it.
-            panel.repaint();
 
+        if (drawFinished.compareAndSet(true, false))
+            SwingUtilities.invokeLater(panel::repaint);
 //            //Delay depending on how far we are behind.
 //            try {
 //                startTime += delay;
@@ -278,7 +306,13 @@ public class PoleCart extends NAgentX  {
 //                break;
 //            }
 
-        return (float)(2f - Math.abs(MathUtils.normalizeAngle(angle, 0)))/2f;
+        float rewardLinear = (float)(2f - Math.abs(MathUtils.normalizeAngle(angle, 0)))/2f;
+
+        //float rewardCubed = (float) Math.pow(rewardLinear, 3);
+        //float bias = -0.1f;
+        //return rewardCubed + bias;
+
+        return rewardLinear;
 
 //        System.out.println(angle);
 //        return (float) angleDot;
