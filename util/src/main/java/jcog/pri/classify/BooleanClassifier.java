@@ -1,6 +1,5 @@
 package jcog.pri.classify;
 
-import jcog.math.AtomicSummaryStatistics;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Predicate;

@@ -6,10 +6,7 @@ import jcog.learn.gng.impl.Node;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
 import static java.lang.System.arraycopy;
-import static jcog.Texts.n4;
 
 /**
  * dimension reduction applied to a neural gasnet

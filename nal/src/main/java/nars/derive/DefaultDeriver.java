@@ -1,8 +1,5 @@
 package nars.derive;
 
-import jcog.math.Distributor;
-import nars.control.premise.Derivation;
-
 /**
  * implementation of a simple distributor of derivation across rulesets
  *

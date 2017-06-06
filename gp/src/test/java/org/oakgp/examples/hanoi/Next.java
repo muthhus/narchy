@@ -43,7 +43,7 @@ class Next implements Function {
     @Override
     public Object evaluate(Arguments arguments, Assignments assignments) {
         TowersOfHanoi gameState = arguments.firstArg().eval(assignments);
-        Pole pole = arguments.secondArg().eval(assignments);
+        TowersOfHanoi.Pole pole = arguments.secondArg().eval(assignments);
         return gameState.upperDisc(pole);
     }
 }

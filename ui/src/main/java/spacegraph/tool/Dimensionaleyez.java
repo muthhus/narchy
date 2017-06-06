@@ -16,7 +16,6 @@ import spacegraph.render.Draw;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import static jcog.Texts.n4;
 import static spacegraph.SpaceGraph.window;
 
 /**

@@ -3,7 +3,6 @@ package nars;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.Loop;
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;

@@ -1,7 +1,5 @@
 package org.intelligentjava.machinelearning.decisiontree.feature;
 
-import com.fasterxml.jackson.databind.node.IntNode;
-
 import java.util.function.Predicate;
 
 /**

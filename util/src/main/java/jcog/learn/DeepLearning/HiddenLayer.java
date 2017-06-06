@@ -2,6 +2,7 @@ package jcog.learn.DeepLearning;
 
 import java.util.Random;
 import java.util.function.DoubleFunction;
+
 import static jcog.learn.DeepLearning.utils.*;
 
 public class HiddenLayer {

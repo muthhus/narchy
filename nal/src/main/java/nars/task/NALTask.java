@@ -2,12 +2,10 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
-import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -20,8 +18,6 @@ import java.util.Map;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
-import static nars.term.Terms.normalizedOrNull;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**

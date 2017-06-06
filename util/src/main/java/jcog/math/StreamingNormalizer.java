@@ -1,7 +1,6 @@
 package jcog.math;
 
 
-import jcog.learn.gng.NeuralGasMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**

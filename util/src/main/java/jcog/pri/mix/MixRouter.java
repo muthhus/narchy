@@ -3,7 +3,6 @@ package jcog.pri.mix;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
-import jcog.pri.classify.BooleanClassifier;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 

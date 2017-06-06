@@ -1,6 +1,5 @@
 package nars.util.signal;
 
-import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;

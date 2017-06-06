@@ -1,26 +1,19 @@
 package nars;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.term.Compound;
-import nars.time.Tense;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
-import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
-import java.util.function.IntSupplier;
 
-import static jcog.Util.unitize;
-import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 
 /**

@@ -114,4 +114,11 @@ class TowersOfHanoi {
     public String toString() {
         return Arrays.toString(poles);
     }
+
+    /**
+     * Represents the three poles on which discs can be placed.
+     */
+    static enum Pole {
+        LEFT, MIDDLE, RIGHT
+    }
 }

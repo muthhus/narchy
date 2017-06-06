@@ -1,6 +1,5 @@
 package jcog.tensor;
 
-import org.eclipse.collections.api.block.procedure.primitive.FloatFloatProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
 /** chains 2 or more tensors along the 0th dimension */

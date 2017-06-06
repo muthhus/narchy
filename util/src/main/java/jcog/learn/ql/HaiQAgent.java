@@ -1,6 +1,5 @@
 package jcog.learn.ql;
 
-import jcog.Util;
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;

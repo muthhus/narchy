@@ -19,23 +19,23 @@ package org.oakgp.examples.hanoi;
  * Represents the possible moves that can be used to attempt to solve the puzzle.
  */
 enum Move {
-    LEFT_MIDDLE(Pole.LEFT, Pole.MIDDLE),
-    LEFT_RIGHT(Pole.LEFT, Pole.RIGHT),
-    MIDDLE_LEFT(Pole.MIDDLE, Pole.LEFT),
-    MIDDLE_RIGHT(Pole.MIDDLE, Pole.RIGHT),
-    RIGHT_LEFT(Pole.RIGHT, Pole.LEFT),
-    RIGHT_MIDDLE(Pole.RIGHT, Pole.MIDDLE);
+    LEFT_MIDDLE(TowersOfHanoi.Pole.LEFT, TowersOfHanoi.Pole.MIDDLE),
+    LEFT_RIGHT(TowersOfHanoi.Pole.LEFT, TowersOfHanoi.Pole.RIGHT),
+    MIDDLE_LEFT(TowersOfHanoi.Pole.MIDDLE, TowersOfHanoi.Pole.LEFT),
+    MIDDLE_RIGHT(TowersOfHanoi.Pole.MIDDLE, TowersOfHanoi.Pole.RIGHT),
+    RIGHT_LEFT(TowersOfHanoi.Pole.RIGHT, TowersOfHanoi.Pole.LEFT),
+    RIGHT_MIDDLE(TowersOfHanoi.Pole.RIGHT, TowersOfHanoi.Pole.MIDDLE);
 
     /**
      * The pole to remove a disc from.
      */
-    final Pole from;
+    final TowersOfHanoi.Pole from;
     /**
      * The pole to add a disc to.
      */
-    final Pole to;
+    final TowersOfHanoi.Pole to;
 
-    private Move(Pole from, Pole to) {
+    private Move(TowersOfHanoi.Pole from, TowersOfHanoi.Pole to) {
         this.from = from;
         this.to = to;
     }

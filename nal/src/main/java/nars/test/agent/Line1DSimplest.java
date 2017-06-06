@@ -1,19 +1,15 @@
 package nars.test.agent;
 
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 
-import static jcog.Util.*;
+import static jcog.Util.round;
 
 
 /**

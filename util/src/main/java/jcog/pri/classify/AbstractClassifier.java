@@ -1,6 +1,5 @@
 package jcog.pri.classify;
 
-import jcog.math.AtomicSummaryStatistics;
 import org.roaringbitmap.RoaringBitmap;
 
 public abstract class AbstractClassifier<X, Y> {

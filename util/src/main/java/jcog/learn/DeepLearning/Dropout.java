@@ -1,8 +1,8 @@
 package jcog.learn.DeepLearning;
 
-import java.util.Random;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Dropout {
     public int N;

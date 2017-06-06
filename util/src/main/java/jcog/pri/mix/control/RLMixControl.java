@@ -83,13 +83,14 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         /** level values */
         this.agentOut = new ArrayTensor(size);
 
-        this.agentIn = new BufferedTensor(new AutoTensor(
-            this.preAgentIn = new RingBufferTensor(
-                new TensorChain(
-                        this.traffic = new ArrayTensor(size),
-                        agentOut /*feedback from previous*/
-                ), 2),
-            12)
+        this.agentIn = new BufferedTensor(
+            //new AutoTensor(
+                    this.preAgentIn = new RingBufferTensor(
+                    new TensorChain(
+                            this.traffic = new ArrayTensor(size),
+                            agentOut /*feedback from previous*/
+                    ), 1)
+            //12)
         );
 
         int numInputs = agentIn.volume();

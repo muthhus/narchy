@@ -1,7 +1,8 @@
 package jcog.learn.DeepLearning;
 
 import java.util.Random;
-import static jcog.learn.DeepLearning.utils.*;
+
+import static jcog.learn.DeepLearning.utils.sigmoid;
 
 public class DBN {
 

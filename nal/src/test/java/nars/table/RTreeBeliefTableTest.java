@@ -4,13 +4,12 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class RTreeBeliefTableTest {
 

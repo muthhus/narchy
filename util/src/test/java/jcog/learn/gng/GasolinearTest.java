@@ -3,7 +3,7 @@ package jcog.learn.gng;
 import org.junit.Test;
 
 import static java.lang.System.out;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class GasolinearTest {
 

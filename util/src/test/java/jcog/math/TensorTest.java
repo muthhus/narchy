@@ -1,12 +1,12 @@
 package jcog.math;
 
-import jcog.tensor.TensorChain;
 import jcog.tensor.ArrayTensor;
+import jcog.tensor.TensorChain;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class TensorTest {
 

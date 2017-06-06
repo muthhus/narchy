@@ -67,7 +67,7 @@ public class TowersOfHanoiExample {
         constants.add(IntegerUtils.the.zero());
         constants.add(Utils.TRUE_NODE);
         addAll(constants, createEnumConstants(Move.class, MOVE_TYPE));
-        addAll(constants, createEnumConstants(Pole.class, POLE_TYPE));
+        addAll(constants, createEnumConstants(TowersOfHanoi.Pole.class, POLE_TYPE));
         return constants;
     }
 }

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static java.lang.System.arraycopy;
-import static jcog.Texts.n4;
 
 public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 

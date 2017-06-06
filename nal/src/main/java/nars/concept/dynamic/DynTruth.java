@@ -17,8 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/4/16.

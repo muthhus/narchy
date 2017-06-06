@@ -1,6 +1,5 @@
 package jcog.math;
 
-import com.sun.jna.platform.unix.X11;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;

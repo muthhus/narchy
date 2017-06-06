@@ -1,8 +1,8 @@
 package jcog.learn.ql;
 
 import jcog.data.Range;
-import jcog.decide.Deciding;
 import jcog.decide.DecideSoftmax;
+import jcog.decide.Deciding;
 import jcog.learn.Agent;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;

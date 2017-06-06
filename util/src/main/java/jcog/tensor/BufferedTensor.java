@@ -1,11 +1,5 @@
 package jcog.tensor;
 
-import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
-
-import java.util.function.Supplier;
-
-import static java.lang.System.arraycopy;
-
 public class BufferedTensor extends ArrayTensor {
 
     private final Tensor from;

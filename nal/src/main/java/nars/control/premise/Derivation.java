@@ -1,6 +1,5 @@
 package nars.control.premise;
 
-import jcog.math.Interval;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -9,7 +8,6 @@ import nars.control.Premise;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
-import nars.task.TruthPolation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -18,7 +16,6 @@ import nars.term.subst.Unify;
 import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;
 import nars.term.var.CommonVariable;
-import nars.time.TimeFunctions;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

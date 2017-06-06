@@ -9,7 +9,6 @@ import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 

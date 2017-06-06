@@ -1,11 +1,7 @@
 package jcog.tensor;
 
-import org.eclipse.collections.api.block.procedure.primitive.FloatFloatProcedure;
-import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
-import java.util.Random;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface Tensor extends Supplier<float[]> {
