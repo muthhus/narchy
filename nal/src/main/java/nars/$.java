@@ -803,9 +803,7 @@ public enum $ {
 
     @Nullable
     public static Truth t(float f, float c, float minConf) {
-        return (f != f || c != c || c < minConf) ?
-                null :
-                new PreciseTruth(f, c);
+        return new PreciseTruth(f, c);
     }
 
     public static Priority b(float p) {

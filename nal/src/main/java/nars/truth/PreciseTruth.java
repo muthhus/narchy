@@ -20,10 +20,12 @@ public class PreciseTruth implements Truth {
     }
 
     public PreciseTruth(float freq, float x, boolean xIsConfOrEvidence) {
-        assert ((freq == freq) && (freq >= 0) && (freq <= 1));
+        assert ((freq == freq) && (freq >= 0) && (freq <= 1)):
+                freq + " isinvalid freq value";
         this.f = freq;
         float e = xIsConfOrEvidence ? c2w(x) : x;
-        assert ((e == e) && (e > 0));
+        assert ((e == e) && (e > 0)):
+                e + " is invalid evidence value";
         this.e = e;
     }
 

@@ -87,7 +87,7 @@ public class PoleCart extends NAgentX  {
                 () -> Util.sigmoid(angleDot/4f)).resolution(0.1f);
 
         this.outputVariable = actionBipolar($.p("act"), (a) -> {
-            action = a * speed;
+            action = (a * speed);
             return a;
         });
 

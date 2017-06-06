@@ -18,7 +18,7 @@ import java.util.List;
 public final class AndCondition extends GenericCompound implements BoolPred<Derivation> {
 
     @NotNull
-    public final BoolPred[] termCache;
+    public final BoolPred<Derivation>[] termCache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
@@ -39,7 +39,7 @@ public final class AndCondition extends GenericCompound implements BoolPred<Deri
 
     @Override
     public final boolean test(@NotNull Derivation m) {
-        for (BoolPred x : termCache) {
+        for (BoolPred<Derivation> x : termCache) {
             boolean b = x.test(m);
 
 //            if (m.now() > 0)

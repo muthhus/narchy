@@ -49,7 +49,7 @@ public final class TruthFunctions  {
     public static Truth conversion(@NotNull Truth t, float minConf) {
         float w = and(t.freq(), t.conf());
         float c = w2c(w);
-        return t(1, c, minConf);
+        return c >= minConf ? t(1, c, minConf) : null;
     }
 
     /* ----- Single argument functions, called in StructuralRules ----- */
