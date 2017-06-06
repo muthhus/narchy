@@ -64,40 +64,39 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-
     public E remove(int index) {
-//        if (size < index)
-//            throw new ArrayIndexOutOfBoundsException(index);
-//            //return null;
 
-        E[] list = this.list;
-        E previous = list[index];
         int totalOffset = this.size - index - 1;
-        if (totalOffset > 0) {
-            System.arraycopy(list, index + 1, list, index, totalOffset);
+        if (totalOffset >= 0) {
+            E[] list = this.list;
+            E previous = list[index];
+            if (totalOffset > 0) {
+                System.arraycopy(list, index + 1, list, index, totalOffset);
+            }
+            list[--this.size] = null;
+            return previous;
         }
-        list[--this.size] = null;
-        return previous;
+        return null;
     }
 
     public void removeFast(int index) {
-        E[] list = this.list;
         int totalOffset = this.size - index - 1;
-        if (totalOffset > 0)
-            System.arraycopy(list, index + 1, list, index, totalOffset);
-        list[--this.size] = null;
+        if (totalOffset >= 0) {
+            E[] list = this.list;
+            if (totalOffset > 0) {
+                System.arraycopy(list, index + 1, list, index, totalOffset);
+            }
+            list[--this.size] = null;
+        }
     }
 
 
-
-
-
-    /**
-     * set the size as a quick way to remove null entries from the end
-     */
-    public void _setSize(int s) {
-        this.size = s;
-    }
+//    /**
+//     * set the size as a quick way to remove null entries from the end
+//     */
+//    public void _setSize(int s) {
+//        this.size = s;
+//    }
 
     public boolean remove(E removed, FloatFunction<E> cmp) {
         int i = indexOf(removed, cmp);
@@ -137,7 +136,6 @@ public class SortedArray<E> implements Iterable<E> {
 //     * the type of the sorting algorithm
 //     */
 //    private final SearchType sortType;
-
 
 
     public SortedArray() {
@@ -205,7 +203,6 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
 
-
     public final boolean isEmpty() {
         return size == 0;
     }
@@ -249,7 +246,9 @@ public class SortedArray<E> implements Iterable<E> {
         list[index] = element;
     }
 
-    /** generally, uses grow(oldSize) (not oldSize directly!) to get the final constructed array length */
+    /**
+     * generally, uses grow(oldSize) (not oldSize directly!) to get the final constructed array length
+     */
     protected E[] newArray(int oldSize) {
         throw new UnsupportedOperationException("impl in subclasses");
     }

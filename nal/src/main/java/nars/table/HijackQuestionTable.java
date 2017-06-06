@@ -30,8 +30,8 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     public void add(@NotNull Task x, TaskConcept c, NAR n) {
         super.add(x, c, n);
 
-//        if (pressure.floatValue() >= Pri.EPSILON)
-//            commit(); //apply forgetting
+        if (pressure.floatValue() >= Pri.EPSILON)
+            commit(); //apply forgetting
 
     }
 

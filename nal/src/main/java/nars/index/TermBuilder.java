@@ -522,7 +522,8 @@ public abstract class TermBuilder {
                 Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
                 Compound origImpl = (Compound)c.sub(ww);
                 Term newPre = $.terms.replace(c, origImpl, implPre);
-                return $.impl(newPre, origImpl.dt(), implPost);
+                if (newPre!=null)
+                    return $.impl(newPre, origImpl.dt(), implPost);
 
             }
 
