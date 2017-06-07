@@ -247,7 +247,7 @@ abstract public class NAgent implements NSense, NAct {
                 Stream.of(happy.apply(nar), fireHappy)
             );
             //contribute this agent to the NAR's global happiness measurement
-            nar.emotion.happy(reward);
+            //nar.emotion.happy(reward);
             nar.emotion.happy(dexterity());
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));

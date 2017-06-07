@@ -84,13 +84,13 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         this.agentOut = new ArrayTensor(size);
 
         this.agentIn = new BufferedTensor(
-            //new AutoTensor(
+            new AutoTensor(
                     this.preAgentIn = new RingBufferTensor(
                     new TensorChain(
                             this.traffic = new ArrayTensor(size),
                             agentOut /*feedback from previous*/
                     ), 1)
-            //12)
+            ,12)
         );
 
         int numInputs = agentIn.volume();
@@ -117,9 +117,10 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         //preGain[0] += levels.get(size - 1); //bias
 
-        return sqr( //l^4
+        return //sqr( //l^4
                  sqr(1f + preGain[0]) //l^2
-        );
+        //)
+        ;
     }
 
     @Override
