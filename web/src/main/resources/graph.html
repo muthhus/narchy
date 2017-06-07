@@ -76,18 +76,24 @@
 //        b.position.y = 350;
 //    }
 
-    const g = s.addGraph(new LFUGraph(16,10));
+    const g = new LFUGraph(16,10);
+    const gs = s.addGraph(g);
 
 
     var i = 0;
     setInterval(()=>{
-        g.node('x' + (i++), true);
+        gs.node('x' + (i++), true);
         if (i > 1) {
             const prev = 'x' + (i-1);
             const next = 'x' + (i);
-            g.edge(prev, next, {id: 'e' + i });
+            gs.edge(prev, next, {id: 'e' + i });
         }
     }, 1000);
+
+    const m = new HyperassociativeMap(g, 3);
+    setInterval(()=>{
+        m.update();
+    }, 100);
 
 
 

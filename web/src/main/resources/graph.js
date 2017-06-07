@@ -198,7 +198,7 @@ class LFUGraph extends LFU {
         super(maxNodes, halflife);
     }
 
-    node(nid, createIfMissing=true) {
+    node(nid, createIfMissing = true) {
         const x = this.get(nid);
         if (x || !createIfMissing)
             return x;
@@ -221,9 +221,9 @@ class LFUGraph extends LFU {
             //console.log('evict', nid, n, tgtNode);
             tgtNode = this.get(tgtNode);
 
-                const e = tgtNode.i.remove(nid);
-                if (e)
-                    this.edgeRemoved(n, tgtNode, e);
+            const e = tgtNode.i.remove(nid);
+            if (e)
+                this.edgeRemoved(n, tgtNode, e);
 
         }
 
@@ -232,9 +232,9 @@ class LFUGraph extends LFU {
             //console.log('evict', nid, n, this.get(srcNode));
             srcNode = this.get(srcNode);
 
-                const e = srcNode.o.remove(nid);
-                if (e)
-                    this.edgeRemoved(srcNode, n, e);
+            const e = srcNode.o.remove(nid);
+            if (e)
+                this.edgeRemoved(srcNode, n, e);
 
         }
 
@@ -325,7 +325,7 @@ class LFUGraph extends LFU {
     /** computes a node-centric Map snapshot of the values */
     treeOut() {
         var x = {};
-        this.forEachEdge((src,tgtID,E)=>{
+        this.forEachEdge((src, tgtID, E) => {
             const vid = src.id;
             const eid = tgtID;
             var ex = x[vid];
@@ -341,7 +341,7 @@ class LFUGraph extends LFU {
 
     edgeList() {
         var x = [];
-        this.forEachEdge((src,tgtID,E)=>{
+        this.forEachEdge((src, tgtID, E) => {
             x.push([src.id, tgtID]);
         });
         return x;
@@ -357,3 +357,87 @@ class LFUGraph extends LFU {
 }(typeof exports === 'undefined' ? this.share = {} : exports));
 
 
+/** see: https://github.com/Syncleus/dANN-core/blob/v2.x/src/main/java/com/syncleus/dann/graph/drawing/hyperassociativemap/HyperassociativeMap.java */
+class HyperassociativeMap {
+    constructor(graph, dimensions) {
+        this.dimensions = dimensions;
+        this.graph = graph;
+
+        this.repulseWeakness = 2.0;
+        this.attractStrength = 4.0;
+        this.initialLearningRate = this.learningRate = 0.4;
+        this.initialMaxMovement = this.maxMovement = 0.0;
+        this.initialTotalMovement = this.totalMovement = 0.0;
+        this.initialAcceptableDistanceFactor = this.acceptableDistanceFactor = 0.75;
+        this.equilibriumDistance = 1.0;
+        this.EQUILIBRIUM_ALIGNMENT_FACTOR = 0.005;
+        this.LEARNING_RATE_INCREASE_FACTOR = 0.9;
+        this.LEARNING_RATE_PROCESSING_ADJUSTMENT = 1.01;
+        //private final boolean useWeights;
+
+    }
+
+    reset() {
+        this.learningRate = this.initialLearningRate;
+        this.maxMovement = this.initialMaxMovement;
+        this.totalMovement = this.initialTotalMovement;
+        this.acceptableDistanceFactor = this.initialAcceptableDistanceFactor;
+    }
+
+    update() {
+        const nodes = [];
+        this.graph.forEachNode(x => {
+            const xs = x.spatial;
+            if (!xs) return;
+            const p = xs.position;
+
+            //attract
+            var vx = 0;
+            var vy = 0;
+            var vz = 0;
+            x.o.forEach((v,k)=>{
+                const t = v.data.spatial;
+                if (t) {
+                    const dir =new THREE.Vector3().subVectors(t.position, p);
+                    const dist = dir.length();
+
+                    vx += dir.x / dist * 1;
+                    vy += dir.y / dist * 1;
+                    vz += dir.z / dist * 1;
+                }
+            });
+            p.x += vx;
+            p.y += vy;
+            p.z += vz;
+
+            nodes.push(xs);
+        });
+        //repel
+        for (var i = 0; i < nodes.length; i++) {
+            for (var j = i+1; j < nodes.length; j++) {
+                const s = nodes[i].spatial;
+                if (!s) continue;
+
+
+                const t = nodes[j].spatial;
+                if (!t) continue;
+
+                const ss = s.position;
+                const tt = t.position;
+
+                const dir =new THREE.Vector3().subVectors(ss, tt);
+                const dist = dir.length();
+                const vx = dir.x/dist;
+                const vy = dir.y/dist;
+                const vz = dir.z/dist;
+                ss.x -= vx;
+                ss.y -= vy;
+                ss.z -= vz;
+                tt.x += vx;
+                tt.y += vy;
+                tt.z += vz;
+            }
+        }
+    }
+
+}

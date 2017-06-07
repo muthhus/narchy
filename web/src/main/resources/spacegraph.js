@@ -305,11 +305,8 @@ class SpaceGraph {
                 // object.position.z = (ssp.z);
                 object.lookAt(ttp);
 
-                // Changes to the vertices
-                geometry.verticesNeedUpdate = true;
-
-                // Changes to the normals
-                geometry.normalsNeedUpdate = true;
+                //geometry.verticesNeedUpdate = true;
+                //geometry.normalsNeedUpdate = true;
 
 
             };
