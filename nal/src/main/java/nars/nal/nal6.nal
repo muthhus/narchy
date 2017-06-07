@@ -72,9 +72,11 @@
         (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), C, time(dtTaskExact), task(".") |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
+    (M ==> C), M, time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
+        ((--,%M) ==> C), M, time(dtTaskExact) |- ((--,%M) ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), C, time(dtTaskExact), task(".") |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
+    (C ==> M), M, time(dtTaskExact) |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
+        (C ==> (--,%M)), M, time(dtTaskExact) |- (dropAnyConj(C) ==>+- (--,%M)), (Belief:StructuralDeduction)
         //((&&,(--,%S),A..+) ==> M), M, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
@@ -85,10 +87,10 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
-    B, ((--,%A) ==> C), belief(positive), time(belief, C, A), neq(B,C), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), time(belief, C, A), neq(B,C), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
+        B, (A ==> C), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
+    B, ((--,%A) ==> C), belief(positive), time(belief, C, A), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
+        B, ((--,%A) ==> C), belief(negative), time(belief, C, A), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
 
     B, (C ==> A), belief(positive), time(decomposeBeliefLate), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
         B, (C ==> A), belief(negative), time(decomposeBeliefLate), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)

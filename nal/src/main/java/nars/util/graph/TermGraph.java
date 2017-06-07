@@ -3,6 +3,7 @@ package nars.util.graph;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import jcog.pri.Priority;
 import nars.$;
@@ -19,15 +20,35 @@ import java.util.Set;
 import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
 
-public abstract class TermGraph {
+public enum TermGraph {
+    ;
 
-    protected TermGraph() {
 
+    public static MutableValueGraph<Term, Float> termlink(NAR nar) {
+        MutableValueGraph<Term, Float> g = ValueGraphBuilder.directed().allowsSelfLoops(false).build();
+        return termlink(nar, g);
     }
 
-    public static class ImplGraph extends TermGraph {
+    private static MutableValueGraph<Term, Float> termlink(NAR nar, MutableValueGraph<Term, Float> g) {
+        nar.forEachConceptActive(cf -> {
+            Concept c = cf.get();
+            Term s = c.term();
+            g.addNode(s);
+            c.termlinks().forEach(tl -> {
+                Term t = tl.get();
+                g.addNode(t);
+                float p = tl.pri();
+                if (p==p)
+                    g.putEdgeValue(s, t, p);
+            });
+        });
+        return g;
+    }
 
-        final static String VERTEX = "V";
+
+    public static class ImplGraph  {
+
+        //final static String VERTEX = "V";
 
         public ImplGraph() {
             super();

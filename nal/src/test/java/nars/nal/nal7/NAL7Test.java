@@ -8,6 +8,7 @@ import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -319,7 +320,7 @@ public class NAL7Test extends AbstractNALTest {
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( enter(John, room) ==>-4 open(John, door) )",
-                        1.00f, 0.45f, 0);
+                        1.00f, 0.45f, 0, 4);
     }
 
     @Test
@@ -1231,6 +1232,7 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Ignore
     @Test public void testImplInductionAndConjReduction() {
         /*
         test for 2 things:

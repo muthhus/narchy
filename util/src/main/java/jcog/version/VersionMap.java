@@ -1,8 +1,8 @@
 package jcog.version;
 
+import jcog.list.ArrayUnenforcedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jgrapht.util.ArrayUnenforcedSet;
 
 import java.util.AbstractMap;
 import java.util.LinkedHashMap;

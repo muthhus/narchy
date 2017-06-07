@@ -1,6 +1,9 @@
 package nars.nal;
 
 import com.google.common.collect.Lists;
+import com.google.common.graph.Graphs;
+import com.google.common.graph.MutableValueGraph;
+import com.google.common.graph.ValueGraph;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -11,10 +14,11 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import nars.test.TestNAR;
-import nars.util.graph.TermLinkGraph;
+
+import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jgrapht.alg.ConnectivityInspector;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -138,29 +142,35 @@ public class LinkageTest extends AbstractNALTest {
 
 
         //System.err.println(premise1 + " not linked with " + premise2);
-        TermLinkGraph g = new TermLinkGraph(nar);
-        assertTrue(g.vertexSet().size() > 0);
-        assertTrue(g.toString(), g.edgeSet().size() > 0);
+        MutableValueGraph<Term, Float> g = TermGraph.termlink(nar);
+        int numNodes = g.nodes().size();
+        assertTrue(numNodes > 0);
+        assertTrue(g.toString(), g.edges().size() > 0);
 
-        g.print(System.out);
-        //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
-        if (!g.isConnected()) {
-//        if (!g.isStronglyConnected()) {
-//            StrongConnectivityInspector ci =
-            ConnectivityInspector ci = new ConnectivityInspector(g);
-//                    new StrongConnectivityInspector(g);
 
-            System.out.println("premises: " + premise1 + " and " + premise2 + " termlink subgraph connectivity:");
-
-            ci
-                .connectedSets()
-                //.stronglyConnectedSubgraphs()
-                .forEach( s -> System.out.println("\t" + s));
-
-            nar.forEachConceptActive(x -> x.get().print());
-
+        for (Term x : g.nodes()) {
+            assertEquals(numNodes, Graphs.reachableNodes(g.asGraph(), x).size());
         }
-        assertTrue(g.isConnected());
+
+//        //g.print(System.out);
+//        //System.out.println(g.isConnected() + " " + g.vertexSet().size() + " " + g.edgeSet().size());
+//        if (!g.isConnected()) {
+////        if (!g.isStronglyConnected()) {
+////            StrongConnectivityInspector ci =
+//            ConnectivityInspector ci = new ConnectivityInspector(g);
+////                    new StrongConnectivityInspector(g);
+//
+//            System.out.println("premises: " + premise1 + " and " + premise2 + " termlink subgraph connectivity:");
+//
+//            ci
+//                .connectedSets()
+//                //.stronglyConnectedSubgraphs()
+//                .forEach( s -> System.out.println("\t" + s));
+//
+//            nar.forEachConceptActive(x -> x.get().print());
+//
+//        }
+//        assertTrue(g.isConnected());
 
 
     }

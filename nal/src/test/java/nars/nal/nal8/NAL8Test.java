@@ -332,11 +332,11 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void condition_goal_deduction_eternal_belief()  {
         test()
-            
-            .input("<(SELF,{t002}) --> reachable>! :|:")
-            .inputAt(10, "((<($1,#2) --> on> &&+0 <(SELF,#2) --> at>) ==>+0 <(SELF,$1) --> reachable>).")
-            .mustDesire(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", 1.0f, 0.81f, 0)
-            .mustNotOutput(cycles, "(<(SELF,#1) --> at> &&+0 <({t002},#1) --> on>)", GOAL, ETERNAL, 10);
+            .log()
+            .input("reachable(SELF,{t002})! :|:")
+            .inputAt(5, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
+            .mustDesire(cycles, "(on({t002},#1) &&+0 at(SELF,#1))", 1.0f, 0.81f, 0)
+            .mustNotOutput(cycles, "(at(SELF,#1) &&+0 on({t002},#1))", GOAL, ETERNAL, 5);
 
     }
 

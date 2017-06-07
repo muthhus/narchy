@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 
 /**
@@ -468,11 +470,20 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
 
-        Term y = transform(x, x.dt()==XTERNAL ? r.dt(x) : x.dt(),  r);
+        Term y = transform(x, r);
         if (!(y instanceof Compound)) {
             return null;
         } else {
-            return normalize((Compound) y);
+            Compound yy = (Compound)y;
+            int ydt = yy.dt();
+            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
+                int zdt = r.dt(x);
+                if (ydt!=zdt)
+                    yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
+            }
+            if (yy == null)
+                return null;
+            return normalize(yy);
         }
 
     }

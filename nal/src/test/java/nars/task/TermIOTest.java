@@ -1,6 +1,8 @@
 package nars.task;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
+import jcog.Util;
 import nars.*;
 import nars.nar.Default;
 import nars.nar.Terminal;
@@ -210,5 +212,14 @@ public class TermIOTest {
         return sb.toString();
     }
 
+
+//    @Test public void testJacksonCompound() throws Narsese.NarseseException, IOException {
+//        Compound c = $.$("(a-->b)");
+//        byte[] b = Util.toBytes(c);
+//        System.out.println(b.length + " " + Arrays.toString(b));
+//        Compound c2 = Util.fromBytes(b, c.getClass() /*Compound.class*/);
+//        System.out.println(c2);
+//        assertEquals(c, c2);
+//    }
 }
 

@@ -128,11 +128,11 @@
         </dependency>
 
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
-        <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jgrapht</groupId>-->
+            <!--<artifactId>jgrapht-core</artifactId>-->
+            <!--<version>1.0.1</version>-->
+        <!--</dependency>-->
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
         <!--<dependency>-->
             <!--<groupId>org.jgrapht</groupId>-->

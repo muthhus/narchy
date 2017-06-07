@@ -6,12 +6,12 @@ import nars.term.Term;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
-import org.jgrapht.graph.SimpleDirectedGraph;
 
 
 public class TermGraphTest {
-    public static final Compound ROOT = $.p(new Term[] { });
 
+
+//    public static final Compound ROOT = $.p(new Term[] { });
 
 //    NAR n = new Default();
 
@@ -204,36 +204,36 @@ public class TermGraphTest {
     }
 
 
-    class TermGraph extends SimpleDirectedGraph<Term, ObjectIntPair<Compound>> {
-
-        @NotNull
-        private final Compound root;
-
-        public TermGraph(@NotNull Compound t) {
-            super((Class)null);
-
-            this.root = t;
-
-            addCompound(t);
-        }
-
-        private void addCompound(@NotNull Compound t) {
-            addVertex(t);
-
-            int n = 0;
-            for (Term x : t.toArray()) {
-                addVertex(x);
-
-                ObjectIntPair<Compound> e =
-                            PrimitiveTuples.pair(t, n);
-
-                addEdge(x, t, e);
-                if (x instanceof Compound)
-                    addCompound((Compound) x);
-                n++;
-            }
-        }
-    }
+//    class TermGraph extends SimpleDirectedGraph<Term, ObjectIntPair<Compound>> {
+//
+//        @NotNull
+//        private final Compound root;
+//
+//        public TermGraph(@NotNull Compound t) {
+//            super((Class)null);
+//
+//            this.root = t;
+//
+//            addCompound(t);
+//        }
+//
+//        private void addCompound(@NotNull Compound t) {
+//            addVertex(t);
+//
+//            int n = 0;
+//            for (Term x : t.toArray()) {
+//                addVertex(x);
+//
+//                ObjectIntPair<Compound> e =
+//                            PrimitiveTuples.pair(t, n);
+//
+//                addEdge(x, t, e);
+//                if (x instanceof Compound)
+//                    addCompound((Compound) x);
+//                n++;
+//            }
+//        }
+//    }
 
 //    static class PermutationIsomorphismInspector<V, E>
 //            extends AbstractExhaustiveIsomorphismInspector<V, E>

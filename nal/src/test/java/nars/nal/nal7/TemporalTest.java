@@ -123,11 +123,11 @@ public class TemporalTest {
 
     @Test
     public void testAnonymization2() throws Narsese.NarseseException {
-        Termed<Term> nn = n.term("(do(that) &&+1 ((a) ==>+2 (b)))");
-        assertEquals("(do(that) &&+1 ((a) ==>+2 (b)))", nn.toString());
+        Termed<Term> nn = n.term("((do(that) &&+1 (a)) ==>+2 (b))");
+        assertEquals("((do(that) &&+1 (a)) ==>+2 (b))", nn.toString());
 
 
-        assertEquals("(do(that)&&((a)==>(b)))", n.conceptualize(nn).toString());
+        assertEquals("((do(that)&&(a))==>(b))", n.conceptualize(nn).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ??
 
@@ -720,7 +720,9 @@ public class TemporalTest {
         assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", xe.toString());
         Term xz = $.terms.retemporalize(t, $.terms.retemporalizationZero);
         assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", xz.toString());
-
+    }
+    @Test
+    public void testRetermporalization2() throws Narsese.NarseseException {
         String su = "((--,(happy)) &&+- (--,((--,(o))&&+-(happy))))";
         Compound u = $.$(su);
         assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());

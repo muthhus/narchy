@@ -3,9 +3,11 @@ package nars.term.transform;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.index.TermBuilder;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +92,8 @@ abstract public class substituteIfUnifies extends Functor {
 //        }
 
         Term input = a.sub(0);
+        if (input instanceof AtomicSingleton)
+            return input;
 
         Term x = a.sub(1);
         Term y = a.sub(2);

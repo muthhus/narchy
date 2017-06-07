@@ -547,6 +547,9 @@ public interface TimeFunctions {
         long occOther = (otherTask != null) ? otherTask.start() : ETERNAL;
         Term otherTerm = decomposeTask ? p.beliefTerm : p.taskTerm;
 
+        if (occDecomposed==ETERNAL && occOther!=ETERNAL)
+            occDecomposed = occOther; //use the only specified time
+
         if ((occDecomposed == ETERNAL) && (occOther == ETERNAL)) {
             //no temporal basis that can apply. only derive an eternal result
             // if there is no actual temporal relation in the decomposition
