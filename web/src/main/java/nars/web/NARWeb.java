@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class NARWeb extends WebServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(nars.web.NARWeb.class);
+    //private static final Logger logger = LoggerFactory.getLogger(nars.web.NARWeb.class);
 
     private final NarseseIOService io;
     private final ActiveConceptService active;

@@ -21,6 +21,8 @@ class SpaceGraph {
         controls.staticMoving = true;
         controls.dynamicDampingFactor = 0.5;
 
+        this.updates = new Set();
+
         const scene = this.scene = new THREE.Scene();
         { //LIGHTING
             scene.add(new THREE.AmbientLight(0x909090));
@@ -111,8 +113,12 @@ class SpaceGraph {
 
         var lastTimeMsec = null;
 
+        var that = this;
         function animate(nowMsec) {
-            // keep looping
+
+            that.updates.forEach(x => {
+                x.update();
+            });
 
             // measure time
             lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60.0;
@@ -191,7 +197,10 @@ class SpaceGraph {
 
         if (opt.draggable) {
             object.draggable = true;
-            that.draggable.push(object);
+            this.draggable.push(object);
+        }
+        if (object.update) {
+            this.updates.add(object);
         }
 
         return object;
@@ -202,6 +211,10 @@ class SpaceGraph {
             this.draggable.splice(this.draggable.indexOf(object), 1);
             delete object.draggable;
         }
+        if (object.update) {
+            this.updates.delete(object);
+        }
+
         if (object.focusSteal) {
             this.focusSteal(object, false);
             delete object.focusSteal;
@@ -234,25 +247,85 @@ class SpaceGraph {
         g.edgeAdded = function(src, tgt, e) {
             //console.log('added', src, target, e);
 
-            const ssp = src.spatial.position;
-            const ttp = tgt.spatial.position;
+            //const ssp = src.spatial.position;
+            //const ttp = tgt.spatial.position;
 
-            const dir = new THREE.Vector3().subVectors(ttp, ssp);
-            const len = dir.length();
-            const arrow = new THREE.ArrowHelper( dir.normalize(), ssp, len, 0xffffff );
+
+            // var shape = new THREE.Shape();
+            // shape.moveTo( 0, 0 );
+            // shape.lineTo( 1, 0.5 );
+            // shape.lineTo( 0, 1 );
+
+            /*shape.moveTo( 0, 0 );
+            shape.lineTo( 0.5, 1 );
+            shape.lineTo( 1, 0 );*/
+            //var geometry = new THREE.ShapeGeometry( shape );
+
+
+            //var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+            var geometry = new THREE.BoxGeometry(1, 1, 1);
+            var object = new THREE.Mesh(geometry,
+                new THREE.MeshLambertMaterial({color: Math.random() * 0xffffff})
+            );
+            //object.position.x = Math.random() * 1000 - 500;
+            //object.position.y = Math.random() * 600 - 300;
+            //object.position.z = Math.random() * 800 - 400;
+            // object.rotation.x = Math.random() * 2 * Math.PI;
+            // object.rotation.y = Math.random() * 2 * Math.PI;
+            // object.rotation.z = Math.random() * 2 * Math.PI;
+            object.up.x = 0;
+            object.up.y = 0;
+            object.up.z = 1;
+
+            object.scale.x = 1;
+            object.scale.y = 1;
+            object.scale.z = 1;
+
+            object.castShadow = false; object.receiveShadow = false;
+            object.update = () => {
+                const ssp = src.spatial.position;
+                const ttp = tgt.spatial.position;
+                //console.log(ssp, ttp);
+
+                const dir =new THREE.Vector3().subVectors(ttp, ssp);
+                const len = dir.length();
+                /*object.scale.x = len;
+                object.scale.y = len/4;
+                object.scale.z = 1;*/
+
+                var thick = 2;
+                object.scale.x = thick;
+                object.scale.y = thick;
+                object.scale.z = len;
+                object.position.x = 0.5 * (ssp.x + ttp.x);
+                object.position.y = 0.5 * (ssp.y + ttp.y);
+                object.position.z = 0.5 * (ssp.z + ttp.z);
+                // object.position.x = (ssp.x);
+                // object.position.y = (ssp.y);
+                // object.position.z = (ssp.z);
+                object.lookAt(ttp);
+
+                // Changes to the vertices
+                geometry.verticesNeedUpdate = true;
+
+                // Changes to the normals
+                geometry.normalsNeedUpdate = true;
+
+
+            };
+            e.spatial = object;
+            that.add( object, { draggable: false })
+
+            //edges.push(object);
+
+            //const arrow = new THREE.ArrowHelper( dir.normalize(), ssp, len, 0xffffff );
 
             // console.log(src.spatial);
             // // src.spatial.position.onChange(()=>{
             // //     console.log('ssp change');
             // // });
-            // arrow.onBeforeRender = ()=>{
-            //     console.log('before render');
-            //     const dir = new THREE.Vector3().subVectors(src.spatial.position, tgt.spatial.position);
-            //     arrow.setLength(dir.length);
-            //     arrow.setDirection(dir.normalize());
-            // };
 
-            that.scene.add( e.spatial = arrow );
+            //that.scene.add( e.spatial = arrow );
 
             //TODO supplied builder
         };
