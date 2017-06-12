@@ -34,8 +34,8 @@ public class InterNARTest {
     void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 
         final int CONNECTION_TIME = 200;
-        int preCycles = 5;
-        int postCycles = 200;
+        int preCycles = 15;
+        int postCycles = 500;
 
         Param.ANSWER_REPORTING = false;
 
@@ -89,7 +89,7 @@ public class InterNARTest {
         return new Default(
                 new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
                 new RealTime.DSHalf(true),
-                new TaskExecutor(512)
+                new TaskExecutor(256)
         );
     }
 

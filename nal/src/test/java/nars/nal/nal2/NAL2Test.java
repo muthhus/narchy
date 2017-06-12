@@ -239,9 +239,9 @@ public class NAL2Test extends AbstractNALTest {
         TestNAR tester = test();
         tester.believe("<p1 --> p2>");
         tester.believe("<p2 <-> p3>");
-        tester.mustBelieve(100, "<p1 --> p3>",
+        tester.mustBelieve(cycles, "<p1 --> p3>",
                 1.0f, 1.0f, 0.81f, 1.0f);
-        tester.debug();
+        //tester.debug();
     }
 
     @Test

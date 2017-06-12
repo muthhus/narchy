@@ -9,11 +9,12 @@ public class DelayedFloat implements FloatSupplier {
 
     final FloatSupplier input;
 
-    private final float[] data;
+    public final float[] data;
 
     public DelayedFloat(FloatSupplier input, int history) {
+        assert(history > 0);
         this.input = input;
-        this.data = new float[history+1];
+        this.data = new float[history];
         Arrays.fill(data, input.asFloat()); //fill with initial value, HACK
     }
 

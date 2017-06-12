@@ -272,21 +272,21 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense_reverse() {
-        TestNAR tester = test();
-
-        tester.input("((($x, key) --> hold) ==>+7 (($x, room) --> enter)).");
-        tester.input("<(John, room) --> enter>. :|:");
-
-        tester.mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
+        test()
+            .input("(hold($x, key) ==>+7 enter($x, room)).")
+            .input("enter(John, room). :|:")
+            .mustBelieve(cycles, "hold(John,key)",
+                    1.00f, 0.45f, -7);
     }
 
     @Test
     public void inference_on_tense_reverse_novar() {
         test()
-            .input("(((John, key) --> hold) ==>+7 ((John, room) --> enter)).")
-            .input("<(John, room) --> enter>. :|:")
-            .mustBelieve(cycles, "<(John,key) --> hold>", 1.00f, 0.45f, -7);
-
+            //.log()
+            .input("(hold(John, key) ==>+7 enter(John, room)).")
+            .input("enter(John, room). :|:")
+            .mustBelieve(cycles, "hold(John,key)",
+                    1.00f, 0.45f, -7);
     }
 
     @Test

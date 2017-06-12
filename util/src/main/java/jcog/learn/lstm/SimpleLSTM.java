@@ -194,8 +194,7 @@ public class SimpleLSTM  {
 			for (int j = 0; j < cell_blocks + 1; j++)
 				s += wk[j] * full_hidden[j];
 
-			out[k] = s;
-			//output not squashed
+			out[k] = s; //output not squashed
 		}
 
 		//////////////////////////////////////////////////////////////

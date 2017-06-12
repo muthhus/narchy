@@ -1,6 +1,5 @@
 package nars.util.signal;
 
-import com.google.common.collect.Lists;
 import jcog.learn.lstm.Interaction;
 import jcog.learn.lstm.test.LiveSTM;
 import jcog.list.FasterList;
@@ -9,7 +8,10 @@ import jcog.math.FloatSupplier;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Collection;
+
+import static java.lang.System.arraycopy;
+import static jcog.Texts.n4;
 
 /**
  * NOT TESTED YET
@@ -19,28 +21,32 @@ public class LSTMPredictor {
     @NotNull
     private final LiveSTM net;
     @NotNull
-    private final DelayedFloats INSprev;
+    private final DelayedFloats INhistoric;
     //private final List<FloatSupplier> OUTSSprev;
-    @NotNull
-    private final List<FloatSupplier> INS;
-    @NotNull
-    private final List<FloatSupplier> OUTS;
-    boolean training = true;
+    private final @NotNull FloatSupplier[] INS;
+    private final @NotNull FloatSupplier[] OUTS;
 
-    public LSTMPredictor(@NotNull List<FloatSupplier> INS, @NotNull List<FloatSupplier> OUTS, int delay  /* used when training */) {
+    /** history length */
+    private final int history;
 
-        int numInputs = INS.size();
-        int numOutputs = OUTS.size();
+    float learningRate = 0.05f;
+
+    //boolean training = true;
+
+    public LSTMPredictor(@NotNull FloatSupplier[] INS, @NotNull FloatSupplier[] OUTS, int history  /* used when training */) {
+
+        int numInputs = INS.length;
+        int numOutputs = OUTS.length;
 
 
         this.INS = INS;
         this.OUTS = OUTS;
-        this.INSprev = delay(INS, delay);
-        //this.OUTSSprev = delay(OUTS, 1);
+        this.INhistoric = delay(INS, history);
+        this.history = history;
 
-        this.net = new LiveSTM(numInputs, numOutputs, numInputs * numOutputs) {
+        this.net = new LiveSTM(numInputs*history, numOutputs, numInputs * numOutputs) {
 
-            final Interaction i = Interaction.the(numInputs, numOutputs); //reused
+            //final Interaction i = Interaction.the(numInputs, numOutputs); //reused
 
             @NotNull
             @Override
@@ -92,50 +98,79 @@ public class LSTMPredictor {
 
 
     @NotNull
-    public static DelayedFloats delay(@NotNull List<FloatSupplier> vector, int history) {
-        DelayedFloats delayed = new DelayedFloats(vector.size());
-        for (int i = 0; i< vector.size(); i++)
-            delayed.add( new DelayedFloat(vector.get(i), history) );
+    public static DelayedFloats delay(@NotNull FloatSupplier[] vector, int history) {
+        DelayedFloats delayed = new DelayedFloats(vector.length);
+        for (FloatSupplier f : vector)
+            delayed.add( new DelayedFloat(f, history) );
         return delayed;
     }
 
     public double[] next() {
-        INSprev.next();
+        INhistoric.next();
 
         //train on previous
-        net.agent.forget(0.002f);
-        net.agent.learn(d(INSprev),d(OUTS), 0.05f);
+        //net.agent.forget(0.002f);
 
+        double[] q = net.agent.learn(dH(INhistoric, history),d(OUTS), learningRate);
 
-        double[] p = net.agent.predict(d(INS)); //predict with current
+        //double[] p = net.agent.predict(d(INS)); //predict with current
+        //System.out.println(n4(q) + " " + n4(p));
 
-        return p;
+        return q;
     }
 
     @NotNull
-    public static double[] d(@NotNull List<? extends FloatSupplier> f) {
+    public static double[] d(@NotNull FloatSupplier[] f) {
+        double[] d = new double[f.length];
+        int i = 0;
+        for (FloatSupplier g : f)
+            d[i++] = g.asFloat();
+        return d;
+    }
+
+    @NotNull
+    public static double[] d(@NotNull Collection<? extends FloatSupplier> f) {
         double[] d = new double[f.size()];
-        for (int i = 0; i < f.size(); i++)
-            d[i] = f.get(i).asFloat();
+        int i = 0;
+        for (FloatSupplier g : f)
+            d[i++] = g.asFloat();
+        return d;
+    }
+
+    @NotNull
+    static double[] dH(@NotNull Collection<? extends DelayedFloat> f, int history) {
+        double[] d = new double[f.size() * history];
+        int i = 0;
+        for (DelayedFloat g : f) {
+            float[] gd = g.data;
+            for (int k = 0; k < gd.length; k++)
+                d[i++] = gd[k];
+        }
         return d;
     }
 
     public static void main(String[] args) {
         MutableFloat m = new MutableFloat();
 
+        FloatSupplier[] in = {
+                () -> 1f * (m.floatValue() % 2),
+                () -> 1f * ((m.floatValue() % 3) > 1 ? 1 : 0)
+        };
+        FloatSupplier[] out = {
+                () -> 1f * (((m.floatValue() % 2) + (m.floatValue() % 3)) > 2 ? 1 : 0)
+        };
         LSTMPredictor l = new LSTMPredictor(
-                Lists.newArrayList(
-                        () -> m.floatValue() % 2,
-                        () -> (m.floatValue() % 3) > 1 ?  1 : 0
-                ),
-                Lists.newArrayList(
-                        () -> ((m.floatValue() % 2) + (m.floatValue() % 3)) > 2 ? 1 : 0
-                ), 1
+                in,
+                out,
+                5
         );
 
-        for (int i= 0 ;i < 5000; i++) {
+        double[] lastPredict = new double[0];
+        for (int i= 0 ;i < 500; i++) {
             m.increment();
-            l.next();
+            System.out.println(n4(d(in)) + "\t\t" + n4(d(out)) + "\t=?=\t" + n4(lastPredict));
+            double[] prediction = l.next();
+            lastPredict = prediction;
         }
 
     }
