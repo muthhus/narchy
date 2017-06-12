@@ -63,9 +63,11 @@ public interface TaskTable  {
 //        return null;
 //    }
 
-    default void forEachTask(Consumer<? super Task> x) {
-        taskIterator().forEachRemaining(x);
-    }
+    void forEachTask(Consumer<? super Task> x);
+//    default void forEachTask(Consumer<? super Task> x) {
+//        //TODO filter deleted tasks
+//        taskIterator().forEachRemaining(x);
+//    }
 
     default void forEach(int _maxPerConcept, @NotNull Consumer<? super Task> recip) {
         int s = size();

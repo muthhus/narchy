@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.time.Tense.ETERNAL;
@@ -38,6 +39,10 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return Collections.emptyIterator();
         }
 
+        @Override
+        public void forEachTask(Consumer<? super Task> x) {
+
+        }
 
         @Override
         public boolean removeTask(Task x) {

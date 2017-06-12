@@ -63,8 +63,13 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
-        eternal.forEach(action);
+        eternal.forEachTask(action);
         temporal.forEachTask(action);
+    }
+
+    @Override
+    public final void forEachTask(Consumer<? super Task> x) {
+        forEach(x);
     }
 
     @Override

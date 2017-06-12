@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRect<Long1D>> {
@@ -115,7 +116,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         //return id.keySet().iterator();
 
         //TODO tree.stream().iterator()
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
+    public void forEachTask(Consumer<? super Task> x) {
+        throw new UnsupportedOperationException("TODO");
     }
 
     @Override

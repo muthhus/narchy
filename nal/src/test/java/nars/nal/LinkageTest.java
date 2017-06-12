@@ -149,7 +149,7 @@ public class LinkageTest extends AbstractNALTest {
 
 
         for (Term x : g.nodes()) {
-            assertEquals(numNodes, Graphs.reachableNodes(g.asGraph(), x).size());
+            assertEquals(x + " not reachable by all other nodes", numNodes, Graphs.reachableNodes(g.asGraph(), x).size());
         }
 
 //        //g.print(System.out);

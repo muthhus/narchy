@@ -102,7 +102,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        forEach(x);
+        forEach((y) -> { if (!y.isDeleted()) x.accept(y); } );
     }
 
 

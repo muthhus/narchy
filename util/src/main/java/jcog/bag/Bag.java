@@ -105,7 +105,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 //        }
 
 
-    @Deprecated
     V put(@NotNull V b, @Nullable MutableFloat overflowing);
 
 
