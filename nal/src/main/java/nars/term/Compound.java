@@ -94,6 +94,8 @@ public interface Compound extends Term, IPair, TermContainer {
             return Sets.mutable.empty();
 
         MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
+
+        //TODO use an additional predicate to cull subterms which don't contain the target type
         recurseTerms((t1) -> {
             if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
                 t.add(t1);
@@ -176,6 +178,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @Override
     default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+
         return recurseTerms(whileTrue, this);
     }
 
@@ -190,7 +193,8 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
         v.accept(this);
-        subterms().forEach(s -> s.recurseTerms(v));
+        //subterms().forEach(s -> s.recurseTerms(v));
+        subterms().recurseTerms(v);
     }
 
     @Override

@@ -63,10 +63,12 @@ public final class TermVector2 extends TermVector {
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
-        if (start == 0)
+        if (start == stop) {
+            action.accept( start == 0 ? x : y );
+        } else if (start == 0 && stop == 1) {
             action.accept(x);
-        if (stop == 1)
             action.accept(y);
+        }
     }
 
     @Override
@@ -74,4 +76,10 @@ public final class TermVector2 extends TermVector {
         action.accept(x);
         action.accept(y);
     }
+
+    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
+        x.recurseTerms(v);
+        y.recurseTerms(v);
+    }
+
 }

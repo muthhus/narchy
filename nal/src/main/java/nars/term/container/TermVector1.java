@@ -102,6 +102,10 @@ public class TermVector1 implements TermContainer {
         return "(" + sub + ')';
     }
 
+    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
+        sub.recurseTerms(v);
+    }
+
     @Override
     public Iterator<Term> iterator() {
         return Iterators.singletonIterator(sub);

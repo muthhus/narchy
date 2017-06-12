@@ -89,9 +89,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
     @Override
     int hashCode();
 
-    void recurseTerms(@NotNull Consumer<Term> v);
-
-
 
     default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
         return recurseTerms(whileTrue, null);

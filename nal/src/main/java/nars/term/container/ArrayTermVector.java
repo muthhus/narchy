@@ -94,4 +94,11 @@ public class ArrayTermVector extends TermVector {
                 return false;
         return true;
     }
+
+    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
+        for (Term sub : terms)
+            sub.recurseTerms(v);
+    }
+
+
 }

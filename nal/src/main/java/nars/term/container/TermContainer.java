@@ -876,4 +876,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
     }
 
+    @Override default void recurseTerms(@NotNull Consumer<Term> v) {
+        forEach(s -> s.recurseTerms(v));
+    }
+
 }

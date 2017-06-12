@@ -4,6 +4,7 @@ import nars.Op;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -128,6 +129,9 @@ public interface Termlike extends Termed {
 
     /** returns false if the supplied predicate fails for any of the recursive subterms of the specified type */
     boolean ANDrecurse(@NotNull Predicate<Term> v);
+
+    void recurseTerms(@NotNull Consumer<Term> v);
+
 
     /** recurses all subterms until the result of the predicate becomes true;
      *  returns true if any true
