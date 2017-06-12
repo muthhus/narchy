@@ -12,17 +12,17 @@ class LFU extends Map {
     }
 
     get(key) {
-        var el = super.get(key);
+        let el = super.get(key);
         if (!el) return;
-        var cur = el.parent;
-        var next = cur.next;
+        const cur = el.parent;
+        let next = cur.next;
         if (!next || next.weight !== cur.weight + 1) {
             next = this.entry(cur.weight + 1, cur, next);
         }
         this.removeFromParent(el.parent, key);
         next.items.add(key);
         el.parent = next;
-        var now = Date.now();
+        const now = Date.now();
         el.atime = now;
         if (this.halflife && now - this.lastDecay >= this.halflife)
             this.decay(now);
@@ -37,7 +37,7 @@ class LFU extends Map {
         // the idea is that if there is 10 hits / minute, and a minute gap,
 
         this.lastDecay = now;
-        var diff = now - this.halflife;
+        const diff = now - this.halflife;
         //var halflife = this.halflife;
         var weight, cur, prev;
         for (var [key, value] of this) {
@@ -74,7 +74,7 @@ class LFU extends Map {
             return;
         }
 
-        var now = Date.now();
+        const now = Date.now();
 
         while (this.size + 1 > this.cap) {
             if (this.halflife && now - this.lastDecay >= this.halflife) {
@@ -210,7 +210,7 @@ class LFUGraph extends LFU {
     }
 
     nodeIfPresent(nodeID) {
-        return this.get(nodeID);
+        return this.get(nodeID, false);
     }
 
     evicted(nid, n) {
@@ -268,11 +268,11 @@ class LFUGraph extends LFU {
 
         }
 
-        const T = this.node(tgt, value ? true : false);
+        const T = this.node(tgt, !!value);
         if (!T)
             return null;
 
-        const S = this.node(src, value ? true : false);
+        const S = this.node(src, !!value);
         if (!S)
             return null;
 
@@ -385,13 +385,16 @@ class HyperassociativeMap {
     }
 
     update() {
+        var attract = 1;
+        var repel = 1;
+
+        //attract
         const nodes = [];
         this.graph.forEachNode(x => {
             const xs = x.spatial;
             if (!xs) return;
             const p = xs.position;
 
-            //attract
             var vx = 0;
             var vy = 0;
             var vz = 0;
@@ -400,10 +403,10 @@ class HyperassociativeMap {
                 if (t) {
                     const dir =new THREE.Vector3().subVectors(t.position, p);
                     const dist = dir.length();
-
-                    vx += dir.x / dist * 1;
-                    vy += dir.y / dist * 1;
-                    vz += dir.z / dist * 1;
+                    const factor = attract / dist;
+                    vx += dir.x * factor;
+                    vy += dir.y * factor;
+                    vz += dir.z * factor;
                 }
             });
             p.x += vx;
@@ -412,6 +415,7 @@ class HyperassociativeMap {
 
             nodes.push(xs);
         });
+
         //repel
         for (var i = 0; i < nodes.length; i++) {
             for (var j = i+1; j < nodes.length; j++) {
@@ -427,9 +431,10 @@ class HyperassociativeMap {
 
                 const dir =new THREE.Vector3().subVectors(ss, tt);
                 const dist = dir.length();
-                const vx = dir.x/dist;
-                const vy = dir.y/dist;
-                const vz = dir.z/dist;
+                const factor = repel / dist / 2.0;
+                const vx = dir.x * factor;
+                const vy = dir.y * factor;
+                const vz = dir.z * factor;
                 ss.x -= vx;
                 ss.y -= vy;
                 ss.z -= vz;
