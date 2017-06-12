@@ -39,6 +39,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<
             reject = new MwCounter(), //item prevented from insertion by existing items
             evict = new MwCounter(); //removal of existing item on insertion of new item
 
+
     //hit + miss + reject = total insertions
 
 
@@ -72,15 +73,22 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<
     public void setCapacity(int i) {
         super.setCapacity(i);
 
-        this.CACHE_HIT_BOOST = i > 0 ?
-                (0.5f / capacity()) : 0;
+        float b = i > 0 ?
+                (1f / capacity()) : 0;
+
+        set(b, b/(reprobes));
+
         //reprobes / (float)Math.sqrt(i) : 0;
-        this.CACHE_DENY_DAMAGE = CACHE_HIT_BOOST / (reprobes);
+
         //return true;
 
         //return false;
     }
 
+    public void set(float boost, float cut) {
+        this.CACHE_HIT_BOOST = boost;
+        this.CACHE_DENY_DAMAGE = cut;
+    }
 
     @NotNull
     @Override

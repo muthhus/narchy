@@ -9,10 +9,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-/**
- * note: has an internal cache by extending the MaplikeTermIndex
- */
-public class StaticTermIndex extends /*Maplike*/TermIndex {
+
+public class StaticTermIndex extends TermIndex {
 
 
 //        public StaticTermBuilder() {

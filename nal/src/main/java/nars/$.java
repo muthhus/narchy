@@ -22,6 +22,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.AtomInt;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
+import nars.term.util.CachedTermIndex;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
@@ -822,10 +823,13 @@ public enum $ {
     }
 
 
+
     /**
      * static storeless term builder
      */
-    public static final StaticTermIndex terms = new StaticTermIndex();
+    public static final CachedTermIndex terms =
+            new CachedTermIndex();
+            //new StaticTermIndex();
 
     /**
      * determines if the string is invalid as an unquoted term according to the characters present

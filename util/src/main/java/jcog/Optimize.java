@@ -3,7 +3,6 @@ package jcog;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import jcog.list.FasterList;
-import jcog.math.MyCMAESOptimizer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -11,6 +10,7 @@ import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -84,12 +84,12 @@ public class Optimize<X> {
 //    }
 
 
-    @NotNull
+    /*@NotNull*/
     public Result run(int maxIterations, @NotNull FloatFunction<X> eval) {
         return run(maxIterations, 1, eval);
     }
 
-    @NotNull
+    /*@NotNull*/
     public Result run(int maxIterations, int repeats, @NotNull FloatFunction<X> eval) {
 
         int i = 0;
@@ -145,20 +145,38 @@ public class Optimize<X> {
         });
 
 
-        MyCMAESOptimizer optim = new MyCMAESOptimizer(maxIterations, 0, true, 0,
+//        MyCMAESOptimizer optim = new MyCMAESOptimizer(maxIterations, 0, true, 0,
+//                0, new MersenneTwister(3), true, null);
+//
+//        startExperiments();
+//
+//        /*PointValuePair r = */optim.start(
+//                new MaxEval(maxIterations), //<- ignored?
+//                func,
+//                GoalType.MAXIMIZE,
+//                new SimpleBounds(min, max),
+//                new InitialGuess(mid),
+//                new MyCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+//                new MyCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */))
+//        .run(maxIterations);
+//        return null;
+
+
+        CMAESOptimizer optim = new CMAESOptimizer(maxIterations, Double.NEGATIVE_INFINITY, true, 0,
                 0, new MersenneTwister(3), true, null);
 
         startExperiments();
 
         PointValuePair r = optim.optimize(
-                new MaxEval(maxIterations),
+                new MaxEval(maxIterations), //<- ignored?
                 func,
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new MyCMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
-                new MyCMAESOptimizer.PopulationSize(2 * tweaks.size() /* estimate */));
+                new CMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
+                new CMAESOptimizer.PopulationSize((int)(16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */));
 
+            return new Result(experiments, r);
 
 //        final int numIterpolationPoints = 3 * dim; //2 * dim + 1 + 1;
 //        PointValuePair r = new BOBYQAOptimizer(numIterpolationPoints, dim * 2.0, 1.0E-8D)
@@ -178,7 +196,7 @@ public class Optimize<X> {
 //        );
 
 
-        return new Result(experiments, r);
+
 
     }
 

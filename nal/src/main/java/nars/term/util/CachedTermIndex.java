@@ -20,21 +20,32 @@ public class CachedTermIndex extends StaticTermIndex {
 
     final static Logger logger = LoggerFactory.getLogger(nars.term.util.CachedTermIndex.class);
 
-    protected static final HijackMemoize<ProtoCompound, Term> terms = new HijackMemoize<>(
-            256 * 1024, 3,
-            (C) -> {
-                try {
-                    return $.terms.the(C.op(), C.dt(), C.subterms());
-                } catch (InvalidTermException e) {
-                    if (Param.DEBUG_EXTRA)
-                        logger.error("{}", e);
-                    return Null;
-                } catch (Throwable t) {
-                    logger.error("{}", t);
-                    return Null;
+    public static final HijackMemoize<ProtoCompound, Term> terms =
+            termMemoize(256 * 1024, 3, Float.NaN, Float.NaN);
+
+    public static final StaticTermIndex _terms = new StaticTermIndex();
+
+    public static HijackMemoize<ProtoCompound, Term> termMemoize(int capacity, int reprobes, float boost, float cut) {
+        HijackMemoize<ProtoCompound, Term> h = new HijackMemoize<>( capacity, reprobes,
+                (C) -> {
+                    try {
+                        return _terms.the(C.op(), C.dt(), C.subterms());
+                    } catch (InvalidTermException e) {
+                        if (Param.DEBUG_EXTRA)
+                            logger.error("{}", e);
+                        return Null;
+                    } catch (Throwable t) {
+                        logger.error("{}", t);
+                        return Null;
+                    }
                 }
-            }
-    );
+        );
+
+        if (boost==boost && cut==cut)
+            h.set(boost, cut);
+
+        return h;
+    }
 
 
 //        @Override

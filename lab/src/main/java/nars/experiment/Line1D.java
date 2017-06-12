@@ -35,7 +35,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.01f; //in time units
         float yResolution = 0.2f; //in 0..1.0
-        float periods = 16;
+        float periods = 2;
 
         final int runtime = Math.round(periods /tHz);
 
