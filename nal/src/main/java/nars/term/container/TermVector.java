@@ -193,12 +193,12 @@ public abstract class TermVector implements TermContainer {
 //        return true;
 //    }
 
-    @NotNull
-    public TermContainer reverse() {
-        if (size() < 2)
-            return this; //no change needed
-
-        return TermVector.the( Util.reverse( toArray().clone() ) );
-    }
+//    @NotNull
+//    public TermContainer reverse() {
+//        if (size() < 2)
+//            return this; //no change needed
+//
+//        return TermVector.the( Util.reverse( toArray().clone() ) );
+//    }
 
 }

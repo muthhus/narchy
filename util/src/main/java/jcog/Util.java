@@ -892,15 +892,15 @@ public enum Util {
         return s;
     }
 
-    /**
-     * modifies the input array
-     */
-    public static <X> X[] reverse(X[] array) {
-        if (array != null) {
-            ArrayUtils.reverse(array, 0, array.length);
-        }
-        return array;
-    }
+//    /**
+//     * modifies the input array
+//     */
+//    public static <X> X[] reverse(X[] array) {
+//        if (array != null) {
+//            reverse(array, 0, array.length);
+//        }
+//        return array;
+//    }
 
     public static int[] reverse(IntArrayList l) {
         switch (l.size()) {

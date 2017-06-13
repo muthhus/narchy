@@ -158,9 +158,9 @@ public enum Texts {
 //    }
 
 
-    public static int fuzzyDistance(CharSequence a, CharSequence b) {
-        return StringUtils.getFuzzyDistance(a, b, Locale.getDefault());
-    }
+//    public static int fuzzyDistance(CharSequence a, CharSequence b) {
+//        return StringUtils.getFuzzyDistance(a, b, Locale.getDefault());
+//    }
 
     /*
     public static void main(String[] args) {
