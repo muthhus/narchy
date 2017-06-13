@@ -7,11 +7,15 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector1;
+import org.eclipse.collections.api.set.MutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterators.singletonIterator;
 import static nars.Op.NEG;
@@ -58,6 +62,23 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         meta[4]++; //for wrapping it
         meta[5] |= op().bit;
     }
+
+    @Override
+    public void recurseTerms(@NotNull Consumer<Term> v) {
+        v.accept(this);
+        sub.recurseTerms(v);
+    }
+
+    @Override
+    public boolean OR(@NotNull Predicate<Term> p) {
+        return p.test(sub);
+    }
+
+    @Override
+    public boolean AND(@NotNull Predicate<Term> p) {
+        return p.test(sub);
+    }
+
 
     @Override
     public int hashCode() {

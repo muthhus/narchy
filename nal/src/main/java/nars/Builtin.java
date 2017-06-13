@@ -30,7 +30,7 @@ public class Builtin {
             new intersect(),
             new differ(),
             new union(),
-            DepIndepVarIntroduction.the,
+//            DepIndepVarIntroduction.the,
 
             //Functor.f0("date", () -> quote(new Date().toString())),
 

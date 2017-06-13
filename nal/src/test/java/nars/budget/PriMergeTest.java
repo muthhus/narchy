@@ -83,9 +83,9 @@ public class PriMergeTest {
         return testMerge(x, y, m, ouPri, -1f);
     }
     private static Priority testMerge(Priority x, Priority y, @NotNull PriMerge m, float ouPri, float expectedOverflow) {
-        x = x.clone();
+        x = x.clonePri();
 
-        Priority x0 = x.clone();
+        Priority x0 = x.clonePri();
 
         float overflow = m.merge(x, y);
 

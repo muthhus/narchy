@@ -705,7 +705,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     @Nullable
     static NALTask clone(@NotNull Task x, long created, long start, long end) {
-        Priority b = x.priority().clone(); //snapshot its budget
+        Priority b = x.priority().clonePri(); //snapshot its budget
         if (b.isDeleted())
             return null;
 

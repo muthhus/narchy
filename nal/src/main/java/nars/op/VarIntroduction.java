@@ -2,6 +2,7 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
+import nars.NAR;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -27,13 +28,13 @@ public abstract class VarIntroduction {
 
     }
 
-    public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each) {
+    public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each, NAR n) {
 
         if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
             return; //earliest failure test
 
         if (!(c.isNormalized())) {
-            c = normalizedOrNull(c, $.terms);
+            c = normalizedOrNull(c, n.terms);
             if (c == null)
                 return;
         }
@@ -51,7 +52,7 @@ public abstract class VarIntroduction {
             //choose randomly
             //assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
             selections = $.newArrayList(
-                    selections.get(ThreadLocalRandom.current().nextInt(sels))
+                    selections.get(n.random().nextInt(sels))
             );
         }
 
@@ -72,7 +73,7 @@ public abstract class VarIntroduction {
             return; //nothing found to introduce a variable for
 
 
-        Term newContent = $.terms.replace(c, substs);
+        Term newContent = n.terms.replace(c, substs);
 
         if ((newContent instanceof Compound) && !newContent.equals(c)) {
             each.accept((Compound) newContent);

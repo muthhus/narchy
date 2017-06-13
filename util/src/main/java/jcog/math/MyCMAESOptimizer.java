@@ -133,18 +133,11 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
     private final boolean generateStatistics;
 
     // termination criteria
-    /**
-     * Maximal number of iterations allowed.
-     */
-    private final int maxIterations;
 
     /** actual maxiterations used in steps */
-    public final int lookAheadIterations = 256;
+    public final int lookAheadIterations = 1;
 
-    /**
-     * Limit for fitness value.
-     */
-    private final double stopFitness;
+
     /**
      * Stop if x-changes larger stopTolUpX.
      */
@@ -299,9 +292,6 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
 
 
     /**
-     * @param maxIterations      Maximal number of iterations.
-     * @param stopFitness        Whether to stop if objective function value is smaller than
-     *                           {@code stopFitness}.
      * @param isActiveCMA        Chooses the covariance matrix update method.
      * @param diagonalOnly       Number of initial iterations, where the covariance matrix
      *                           remains diagonal.
@@ -312,17 +302,13 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
      * @param checker            Convergence checker.
      * @since 3.1
      */
-    public MyCMAESOptimizer(int maxIterations,
-                            double stopFitness,
-                            boolean isActiveCMA,
+    public MyCMAESOptimizer(boolean isActiveCMA,
                             int diagonalOnly,
                             int checkFeasableCount,
                             RandomGenerator random,
                             boolean generateStatistics,
                             ConvergenceChecker<PointValuePair> checker) {
         super(checker);
-        this.maxIterations = maxIterations;
-        this.stopFitness = stopFitness;
         this.isActiveCMA = isActiveCMA;
         this.diagonalOnly = diagonalOnly;
         this.checkFeasableCount = checkFeasableCount;
@@ -464,9 +450,6 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
         return null;
     }
 
-    public void run(OptimizationData... optData) {
-        start(optData).run(maxIterations);
-    }
 
     public CMAESProcess start(OptimizationData... optData) {
         super.optimize(optData);
@@ -1260,7 +1243,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
         private PointValuePair optimum;
         private PointValuePair lastResult;
         public ValuePenaltyPair[] valuePenaltyPairs;
-        private boolean[] done;
+        //private boolean[] done;
         RealMatrix arx, arz;
 
         private double[] fitness;
@@ -1338,10 +1321,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
                 }
             }
             // handle termination criteria
-            // Break, if fitness is good enough
-            if (stopFitness != 0 && bestFitness < (isMinimize ? stopFitness : -stopFitness)) {
-                return;
-            }
+
             final double[] sqrtDiagC = sqrt(diagC).getColumn(0);
             final double[] pcCol = pc.getColumn(0);
             for (int i = 0; i < dimension; i++) {
@@ -1405,7 +1385,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
             try {
                 return evalActual(k); // compute fitness
             } catch (TooManyEvaluationsException e) {
-                done[0] = true;
+                //done[0] = true;
                 return null;
             }
         }
@@ -1448,7 +1428,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
             valuePenaltyPairs = new ValuePenaltyPair[lambda];
             // generate random offspring
 
-            done = new boolean[]{false};
+            //done = new boolean[]{false};
         }
 
         public PointValuePair run(int maxIterations) {
@@ -1464,8 +1444,8 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
 //                    il = il.parallel();
                 il.forEach(this::next);
 
-                if (done[0])
-                    break;
+                /*if (done[0])
+                    break;*/
 
 
             }

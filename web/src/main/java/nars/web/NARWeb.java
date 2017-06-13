@@ -12,8 +12,6 @@ import nars.nar.NARBuilder;
 import nars.op.Command;
 import nars.term.Term;
 import nars.time.RealTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.TreeMap;

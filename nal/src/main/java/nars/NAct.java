@@ -42,7 +42,7 @@ public interface NAct {
         });
         actions().add(m);
 
-        m.resolution.setValue(1f/2f);
+        m.resolution.setValue(1f);
 
         return m;
     }
@@ -92,8 +92,8 @@ public interface NAct {
     default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
 
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
-            //radius of dead zone; diameter = 2x this
-            float deadZoneFreq =
+            //radius of center dead zone; diameter = 2x this
+            float deadZoneFreqRadius =
                      1f/6;
                     // 1f/4;
                     //1f/3f;
@@ -104,9 +104,9 @@ public interface NAct {
                 ii = 0;
             } else {
                 float f = d.freq();
-                if (f > 0.5f + deadZoneFreq)
+                if (f > 0.5f + deadZoneFreqRadius)
                     ii = +1;
-                else if (f < 0.5f - deadZoneFreq)
+                else if (f < 0.5f - deadZoneFreqRadius)
                     ii = -1;
                 else
                     ii = 0;
@@ -133,7 +133,7 @@ public interface NAct {
 
             return $.t(f, nar().confDefault(GOAL));
         });
-        m.resolution.setValue(0.5f/2f);
+        m.resolution.setValue(0.5f);
 
         actions().add(m);
 

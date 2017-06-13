@@ -57,7 +57,7 @@ public class Activate extends UnaryTask<Task> {
             TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
             float remain = a.linkOverflow.floatValue();
             priSub(p - remain);
-            return a.activations!=null ? a.activations.array() : null;
+            return a.activations != null ? a.activations.array() : null;
         } else {
             return DeleteMe;
         }
@@ -168,20 +168,18 @@ public class Activate extends UnaryTask<Task> {
             int ss = 0;
 
             /* HEURISTIC estimate */
-                spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
-                spread.clear();
-                linkOverflow.setValue(0);
+            spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
+            spread.clear();
+            linkOverflow.setValue(0);
 
-                link(origin, p, 0);
-                nar.emotion.stress(linkOverflow);
+            link(origin, p, 0);
+            nar.emotion.stress(linkOverflow);
 
-                ss = spread.size();
-                if (ss > 0) {
-                    this.activations = new FasterList<>(0, a = new ITask[ss]);
-                    this.spread.forEachKeyValue(this);
-                }
-
-
+            ss = spread.size();
+            if (ss > 0) {
+                this.activations = new FasterList<>(0, a = new ITask[ss]);
+                this.spread.forEachKeyValue(this);
+            }
 
 
         }
@@ -211,7 +209,7 @@ public class Activate extends UnaryTask<Task> {
         }
 
         @Nullable
-        void link(@NotNull Termed target, float scale, int depth) {
+        void link(@NotNull Termed target /* parent */, float scale, int depth) {
 
             if (scale < Pri.EPSILON)
                 return;
@@ -219,9 +217,9 @@ public class Activate extends UnaryTask<Task> {
             if ((target instanceof Variable)) {
 
             } else {
-                @Nullable Concept termConcept = nar.conceptualize(target);
-                if (termConcept != null)
-                    target = termConcept;
+                @Nullable Concept targetConcept = nar.conceptualize(target);
+                if (targetConcept != null)
+                    target = targetConcept;
             }
 
             float parentActivation = scale;
@@ -235,8 +233,15 @@ public class Activate extends UnaryTask<Task> {
                                 ((Concept) target).templates() : //allow concept to override its templates
                                 target instanceof Compound ? ((Compound) target).subterms() : null;
 
-                if (t != null && t.size() > 0)
-                    parentActivation = linkSubterms(t, scale, depth + 1);
+                if (t!=null) {
+                    int ts = t.size();
+                    if (ts > 0) {
+                        float childScale = ((1f - momentum) * scale);
+                        parentActivation = momentum * scale;
+                        float overflow = linkSubterms(t, ts, childScale, depth + 1);
+                        parentActivation += overflow;
+                    }
+                }
 
 
             } /*else {
@@ -247,7 +252,6 @@ public class Activate extends UnaryTask<Task> {
 
             if (parentActivation > 0)
                 spread.addToValue(target, parentActivation);
-
         }
 
         protected float activateAtom(AtomConcept atom, float scale) {
@@ -315,27 +319,28 @@ public class Activate extends UnaryTask<Task> {
             return scale;
         }
 
-        protected float linkSubterms(@NotNull TermContainer targetSubs, float scale, int nextDepth) {
+        /**
+         * returns overflow
+         */
+        protected float linkSubterms(@NotNull TermContainer targetSubs, int n /* since cached */, float scale, int nextDepth) {
 
-            int n = targetSubs.size();
-            if (n > 0) {
 
-                float childScale = ((1f - momentum) * scale) / (n);
-                float parentActivation = scale * momentum;
-                for (int i = 0; i < n; i++) {
-                    Term si = targetSubs.sub(i).unneg();
-                    if (linkableSub(si)) {
-                        link(si, childScale, nextDepth); //link and recurse to the concept
-                    } else {
-                        parentActivation += childScale; //absorb to parent
-                    }
+            //if (n > 0) {
+
+            float childScale = scale / (n);
+            float overflow = 0;
+            for (int i = 0; i < n; i++) {
+                Term si = targetSubs.sub(i).unneg();
+                if (linkableSub(si)) {
+                    link(si, childScale, nextDepth); //link and recurse to the concept
+                } else {
+                    overflow += childScale; //absorb to parent
                 }
-
-                return parentActivation;
-
             }
 
-            return scale;
+            return overflow;
+
+
         }
 
         private static boolean linkableSub(Term x) {

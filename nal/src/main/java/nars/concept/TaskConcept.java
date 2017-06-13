@@ -170,7 +170,7 @@ public class TaskConcept extends CompoundConcept {
      * Directly process a new task, if belief tables agree to store it.
      * Called exactly once on each task.
      */
-    public final void process(@NotNull Task t, @NotNull NAR n) {
+    public void process(@NotNull Task t, @NotNull NAR n) {
         switch (t.punc()) {
             case BELIEF:
                 tableOrNew(n, true).add(t, this, n);

@@ -569,7 +569,7 @@ public enum Terms { ;
      */
     @NotNull
     public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull ToIntFunction<Term> score) {
-        HashBag<Term> uniques = new HashBag<>(c.volume());
+        HashBag<Term> uniques = new HashBag<>(c.volume()/2);
 
         c.recurseTerms((Term subterm) -> {
             int s = score.applyAsInt(subterm);

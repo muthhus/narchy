@@ -4,11 +4,14 @@ import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
+import nars.concept.FuzzyScalarConcepts;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.term.Term;
+import nars.time.RealTime;
 import org.apache.commons.math3.util.MathUtils;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;
@@ -34,9 +37,12 @@ public class PoleCart extends NAgentX {
 
             try {
                 NAgent a = new PoleCart(n);
+                //((RealTime)n.time).durFPS(80f);
+                n.beliefConfidence(0.5f);
+                n.goalConfidence(0.5f);
                 a.curiosity.setValue(0.02f);
-                n.termVolumeMax.setValue(32);
-                n.goalConfidence(0.75f);
+                n.termVolumeMax.setValue(24);
+                //n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {
 
@@ -67,7 +73,7 @@ public class PoleCart extends NAgentX {
     public static final double poleLength = 1.;
     public static final double forceMag = 30.;
     public static final double tau = 0.01;
-    public static final double fricCart = 0.00005;
+    public static final double fricCart = 0.0001;
     public static final double fricPole =
             0.007f;
             //0.005;
@@ -79,7 +85,8 @@ public class PoleCart extends NAgentX {
 
     // Define the Engine
     // Define InputVariable1 Theta(t) {angle with perpendicular}
-    SensorConcept angX, angY;
+    @NotNull FuzzyScalarConcepts angX;
+    @NotNull FuzzyScalarConcepts angY;
     // Define InputVariable1 x(t) {angular velocity}
     SensorConcept angVel;
     // OutputVariable {force to be applied}
@@ -111,19 +118,26 @@ public class PoleCart extends NAgentX {
         //TODO extract 'senseAngle()' for NSense interface
 
         this.x = senseNumber("(x)",
-                new FloatPolarNormalized(() -> (float) pos)).resolution(0.05f);
+                new FloatPolarNormalized(() -> (float) pos)).resolution(0.02f);
         this.xVel = senseNumber("(xVel)",
-                () -> Util.sigmoid((float) posDot)).resolution(0.05f);
+                //() -> Util.sigmoid((float) posDot)
+                new FloatPolarNormalized(() -> (float) posDot)
+        ).resolution(0.02f);
 
         //angle
-        this.angX = senseNumber("(angX)",
-                () -> 0.5f + 0.5f * (Math.sin(MathUtils.normalizeAngle(angle, 0)))).resolution(0.05f);
-        this.angY = senseNumber("(angY)",
-                () -> 0.5f + 0.5f * (Math.cos(MathUtils.normalizeAngle(angle, 0)))).resolution(0.05f);
+
+        this.angX = senseNumberBi($.p("angX"),
+                () -> (float)(0.5f + 0.5f * (Math.sin(angle))))
+                .resolution(0.02f);
+        this.angY = senseNumberBi($.p("angY"),
+                () -> (float)(0.5f + 0.5f * (Math.cos(angle))))
+                .resolution(0.02f);
 
         //angular velocity
         this.angVel = senseNumber("(angVel)",
-                () -> Util.sigmoid(angleDot / 4f)).resolution(0.02f);
+                //() -> Util.sigmoid(angleDot / 4f)
+                new FloatPolarNormalized(()->(float)angleDot)
+        ).resolution(0.02f);
 
         this.move = actionBipolar($.p("move"), (a) -> {
             if (!manualOverride)
@@ -133,7 +147,10 @@ public class PoleCart extends NAgentX {
 
 
         SpaceGraph.window(Vis.beliefCharts(200,
-                Lists.newArrayList(new Term[]{x, xVel, angX, angY, angVel}),
+                Lists.newArrayList(x, xVel,
+                        angX.get(0), angX.get(1),
+                        angY.get(0), angY.get(1),
+                        angVel),
                 nar), 600, 600);
         this.panel = new JPanel(new BorderLayout()) {
             public Stroke stroke = new BasicStroke(4);
@@ -319,7 +336,9 @@ public class PoleCart extends NAgentX {
 //                break;
 //            }
 
-        float rewardLinear = (float) (2f - Math.abs(MathUtils.normalizeAngle(angle, 0))) / 2f;
+        //float rewardLinear = (float) (2f - Math.abs(MathUtils.normalizeAngle(angle, 0))) / 2f;
+
+        float rewardLinear = (float) (Math.cos(angle));
 
         //float rewardCubed = (float) Math.pow(rewardLinear, 3);
         //float bias = -0.1f;

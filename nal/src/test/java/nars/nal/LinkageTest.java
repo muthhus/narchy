@@ -3,7 +3,6 @@ package nars.nal;
 import com.google.common.collect.Lists;
 import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.ValueGraph;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -14,11 +13,9 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
 import nars.test.TestNAR;
-
 import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

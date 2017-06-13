@@ -2,6 +2,7 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Random;
 import java.util.function.ToIntFunction;
 
 import static nars.Op.*;
@@ -24,8 +26,8 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     public static final VarIntro the = new VarIntro();
 
-    public final static Term varIntro(Term x) {
-        return the.introduce(x);
+    public final static Term varIntro(Term x, NAR n) {
+        return the.introduce(x, n);
     }
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
@@ -142,25 +144,10 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         //return o == IMPL || o == EQUI;
     }
 
-    public static final class VarIntro extends Functor {
+    public static final class VarIntro extends DepIndepVarIntroduction {
 
         @NotNull
-        final DepIndepVarIntroduction introducer;
-
-        public VarIntro() {
-            super("varIntro");
-            this.introducer = new DepIndepVarIntroduction();
-        }
-
-
-
-        @Override
-        public @NotNull Term apply(@NotNull TermContainer args) {
-            return introduce(args.sub(0));
-        }
-
-        @NotNull
-        public Term introduce(Term x) {
+        public Term introduce(Term x, NAR n) {
             Term[] only = { Null };
 
             //temporarily unwrap negation
@@ -170,7 +157,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             if (!(xx instanceof Compound))
                 return x;
 
-            introducer.accept((Compound)xx, y -> only[0] = y);
+            accept((Compound)xx, y -> only[0] = y, n);
 
             Term o = only[0];
             return (o == Null) ? Null : $.negIf(o, negated);

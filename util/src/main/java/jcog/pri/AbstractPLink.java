@@ -2,7 +2,6 @@ package jcog.pri;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
 
 public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {

@@ -1,7 +1,6 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
-import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.index.term.AppendProtoCompound;

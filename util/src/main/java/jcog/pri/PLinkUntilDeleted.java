@@ -1,7 +1,5 @@
 package jcog.pri;
 
-import jcog.pri.Deleteable;
-import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 
 /**

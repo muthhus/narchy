@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-import static java.lang.System.arraycopy;
 import static jcog.Texts.n4;
 
 /**

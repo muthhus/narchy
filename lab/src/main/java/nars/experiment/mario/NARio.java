@@ -47,8 +47,8 @@ public class NARio extends NAgentX {
         mario.start();
 
 
-        PixelBag cc = PixelBag.of(() -> mario.image, 32, 24);
-        cc.setClarity(0.5f, 1f);
+        PixelBag cc = PixelBag.of(() -> mario.image, 48, 32);
+        cc.setClarity(0.75f, 1f);
 
 
         onFrame((z)->{
@@ -65,17 +65,17 @@ public class NARio extends NAgentX {
                 float y = ( M.y - yCam) / 240f;
                 cc.setXRelative(x);
                 cc.setYRelative(y);
-                cc.setZoom(0.05f);
+                cc.setZoom(0.5f);
             }
             //cc.setXRelative( mario.)
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.resolution(0.1f);
+        sc.resolution(0.15f);
         //sc.pri(0.1f);
 
-        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 16)
-            .resolution(0.1f);
+//        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 16)
+//            .resolution(0.1f);
         //ccAe.pri(0.1f);
 
 

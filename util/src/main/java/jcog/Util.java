@@ -52,10 +52,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
@@ -1695,6 +1692,15 @@ public enum Util {
     public static void mul(float scale, float[] ff) {
         for (int i = 0; i< ff.length; i++)
             ff[i] *= scale;
+    }
+
+    public static <X> X[] map(int from, int to, IntFunction<X> build, IntFunction<X[]> arrayizer) {
+        assert(to > from);
+        X[] x = arrayizer.apply(to-from);
+        for (int i = from, j = 0; i < to; ) {
+            x[j++] = build.apply(i++);
+        }
+        return x;
     }
 
 }

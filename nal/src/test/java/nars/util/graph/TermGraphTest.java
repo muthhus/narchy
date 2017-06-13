@@ -1,13 +1,5 @@
 package nars.util.graph;
 
-import nars.$;
-import nars.term.Compound;
-import nars.term.Term;
-import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
-import org.jetbrains.annotations.NotNull;
-
-
 public class TermGraphTest {
 
 

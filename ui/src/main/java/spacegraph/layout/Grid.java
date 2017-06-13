@@ -2,12 +2,14 @@ package spacegraph.layout;
 
 import com.google.common.collect.Iterables;
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import spacegraph.Surface;
 import spacegraph.math.v2;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 import static jcog.Util.lerp;
 
@@ -204,6 +206,9 @@ public class Grid<S extends Surface> extends Layout<S> {
     }
     public static Grid col(Surface... content) {
         return new Grid(VERTICAL, content);
+    }
+    public static Grid grid(int num, IntFunction<Surface> build) {
+        return new Grid(Util.map(0, num, build, Surface[]::new));
     }
 
 }

@@ -93,7 +93,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         if (task instanceof AbbreviationTask)
             return;
 
-        Priority b = task.priority().clone();
+        Priority b = task.priority().clonePri();
         if (b != null)
             input(b, each, task.term(), 1f);
     }

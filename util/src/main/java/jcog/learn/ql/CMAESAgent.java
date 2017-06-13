@@ -27,7 +27,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
      */
     private final int in;
 
-    float actionMomentum = 0.5f;
+    float actionMomentum = 0.9f;
 
     /**
      * # of dimensions holding the output
@@ -35,10 +35,10 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
     private final int out;
 
     private MyCMAESOptimizer opt;
-    private int population = 64;
+    private final int population;
     private double[] ins;
     private float reward;
-    private double[] search;
+    //private double[] search;
 
     private double[] outsNext;
     public double[] outs;
@@ -56,10 +56,10 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         double[] min = new double[dim];
         double[] max = new double[dim];
         Arrays.fill(max, 1.0);
-        return new CMAESAgent(in, out, min, max);
+        return new CMAESAgent(in, out, min, max, in );
     }
 
-    public CMAESAgent(int in, int out, double[] min, double[] max) {
+    public CMAESAgent(int in, int out, double[] min, double[] max, int population) {
         int n = min.length;
         assert (n == max.length);
         this.in = in;
@@ -79,11 +79,12 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
             range[i] = max[i] - min[i];
         }
 
-        this.opt = new MyCMAESOptimizer(Integer.MAX_VALUE,
-                0, true, 0,
-                0, new MersenneTwister(3),
+        this.opt = new MyCMAESOptimizer(
+                true, 0,
+                1, new MersenneTwister(3),
                 false, null);
 
+        this.population = population;
         int maxIterations = Integer.MAX_VALUE;
         proc = this.opt.start(
                 new MaxEval(maxIterations),
@@ -91,7 +92,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
                 GoalType.MAXIMIZE,
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
-                new MyCMAESOptimizer.Sigma(MathArrays.scale(0.01f, range)),
+                new MyCMAESOptimizer.Sigma(MathArrays.scale(0.5f, range)),
                 new MyCMAESOptimizer.PopulationSize(population));
         proc.pre();
     }
@@ -159,7 +160,7 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
 
     @Override
     public double value(double[] point) {
-        this.search = point;
+        //this.search = point;
 
 
         //intercept the CMAES vector:
@@ -189,7 +190,9 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
         //  2) copy the output information from search vector (for action determination)
         //arraycopy(point, in, outsNext, 0, out);
         for (int i = 0; i < outsNext.length; i++) {
-            outsNext[i] = point[i+in] * (1f- actionMomentum) + outsNext[i] * (actionMomentum);
+            outsNext[i] =
+                    point[i+in] * (1f- actionMomentum) +
+                    outsNext[i] * (actionMomentum);
         }
 
 

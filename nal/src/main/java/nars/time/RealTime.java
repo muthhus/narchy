@@ -89,6 +89,7 @@ public abstract class RealTime implements Time {
 
     @Override
     public Time dur(int cycles) {
+        assert(cycles > 0);
         this.dur = cycles;
         return this;
     }

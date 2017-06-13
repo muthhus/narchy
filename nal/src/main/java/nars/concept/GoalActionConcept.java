@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -46,6 +47,7 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
+
     @Override
     public Stream<Task> apply(NAR nar) {
 
@@ -70,14 +72,14 @@ public class GoalActionConcept extends ActionConcept {
                     curiConf - (goal != null ? goal.conf() : 0);
             if (cc > 0) {
 
-                float nextCurious =
+                float f =
                       Util.round(nar.random().nextFloat(), resolution.floatValue());
 //                    ((float)Math.sin(
 //                        hashCode() /* for phase shift */
 //                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
 
-                Truth ct = $.t(nextCurious, cc);
+                Truth ct = $.t(f, cc);
                 goal = ct; //curiosity overrides goal
 
 //                if (goal == null) {

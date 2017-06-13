@@ -261,61 +261,64 @@ public class Plot2D extends Surface {
     public float[] backgroundColor = { 0, 0, 0, 0.75f };
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
-        if (minValue != maxValue) {
+        if (minValue == maxValue) {
+            float center = minValue;
+            minValue = center - (center/2);
+            maxValue = center + (center/2);
+        }
 
-            gl.glColor4f(1f,1f,1f, 1f); //gray
+        gl.glColor4f(1f,1f,1f, 1f); //gray
+
+        gl.glLineWidth(2);
+
+        float W = 1.0f;
+        Draw.line(gl, 0, 0, W, 0);
+        float H = 1.0f;
+        Draw.line(gl, 0, H, W, H);
+
+        Draw.text(gl, n2(minValue), 0.04f, 0, 0, 0, Draw.TextAlignment.Left);
+        Draw.text(gl, n2(maxValue), 0.04f, 0, H, 0, Draw.TextAlignment.Left);
+
+
+        for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
+
+            Series s = series.get(si);
+
+            float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
+
+
+            int ss = s.size();
+
+            float[] ssh = s.array();
+
+            int histSize = ss;
+
+            //float py = 0;
 
             gl.glLineWidth(2);
+            gl.glColor3fv(s.color, 0);
 
-            float W = 1.0f;
-            Draw.line(gl, 0, 0, W, 0);
-            float H = 1.0f;
-            Draw.line(gl, 0, H, W, H);
+            gl.glBegin(GL.GL_LINE_STRIP);
+            float range = maxValue - minValue;
+            float ny = mid;
+            float x = 0;
+            float dx = (W / histSize);
+            for (int i = 0; i < ss; i++) {
 
-            Draw.text(gl, n2(minValue), 0.04f, 0, 0, 0, Draw.TextAlignment.Left);
-            Draw.text(gl, n2(maxValue), 0.04f, 0, H, 0, Draw.TextAlignment.Left);
-
-
-            for (int si = 0, seriesSize = series.size(); si < seriesSize; si++) {
-
-                Series s = series.get(si);
-
-                float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
-
-
-                int ss = s.size();
-
-                float[] ssh = s.array();
-
-                int histSize = ss;
-
-                //float py = 0;
-
-                gl.glLineWidth(2);
-                gl.glColor3fv(s.color, 0);
-
-                gl.glBegin(GL.GL_LINE_STRIP);
-                float range = maxValue - minValue;
-                float ny = mid;
-                float x = 0;
-                float dx = (W / histSize);
-                for (int i = 0; i < ss; i++) {
-
-                    float v = ssh[i];
-                    if (v==v) {
-                        ny = ypos(minValue, range, v);
-                        gl.glVertex2f(x, ny);
-                    }
-
-                    x += dx;
-                    //py = ny;
+                float v = ssh[i];
+                if (v==v) {
+                    ny = ypos(minValue, range, v);
+                    gl.glVertex2f(x, ny);
                 }
-                gl.glEnd();
 
-                gl.glLineWidth(2);
-                Draw.text(gl, s.name, 0.04f, W, ny, 0, Draw.TextAlignment.Right);
-
+                x += dx;
+                //py = ny;
             }
+            gl.glEnd();
+
+            gl.glLineWidth(2);
+            Draw.text(gl, s.name, 0.04f, W, ny, 0, Draw.TextAlignment.Right);
+
         }
     };
 

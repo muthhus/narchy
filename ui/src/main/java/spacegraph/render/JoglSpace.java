@@ -303,6 +303,9 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
         GameAnimatorControl(float initialFPS) {
             super();
+
+            setIgnoreExceptions(true);
+
             final boolean isARM = Platform.CPUFamily.ARM == Platform.getCPUFamily();
             fpsCounter = new FPSCounterImpl();
             fpsCounter.setUpdateFPSFrames(isARM ? 60 : 4 * 60, System.err);

@@ -1,5 +1,6 @@
 package nars.video;
 
+import jcog.Util;
 import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
@@ -222,7 +223,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         public PixelConcept(Compound cell, int x, int y) {
             super(cell, nar, null, brightnessTruth);
-            setSignal(() -> src.brightness(x, y));
+            setSignal(() -> Util.unitize(src.brightness(x, y)));
 
             //            this.x = x;
 //            this.y = y;

@@ -26,7 +26,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {
-        int time = 2500;
+        int time = 3500;
 
         //Global.DEBUG = true;
 
@@ -51,7 +51,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
     @Test
     public void nal4_everyday_reasoning_easiest() throws Narsese.NarseseException {
-        int time = 150;
+        int time = 550;
 
         //Global.DEBUG = true;
 

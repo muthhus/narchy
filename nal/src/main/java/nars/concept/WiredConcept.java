@@ -1,11 +1,14 @@
 package nars.concept;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.TemporalBeliefTable;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +40,25 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         n.on(this);
     }
 
+
+    public void process(@NotNull Task t, @NotNull NAR n) {
+        //dither the task frequency
+        if (!t.isInput() && t.isBeliefOrGoal()) {
+            float f = t.freq();
+            float r = resolution.floatValue();
+            float ff = Util.round(f, r);
+            if (f!=ff) {
+                Task tt = new NALTask(t.term(), t.punc(),
+                        t.truth().ditherFreqAdjustConf(r),
+                        t.creation(), t.start(), t.end(), t.stamp()
+                );
+                tt.pri(t.pri());
+                t = tt;
+            }
+        }
+
+        super.process(t, n);
+    }
 
 
     @NotNull

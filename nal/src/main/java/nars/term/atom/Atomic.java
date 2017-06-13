@@ -21,10 +21,18 @@ import static java.lang.Integer.MIN_VALUE;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
+    @Override
+    default boolean OR(Predicate<Term> v) {
+        return v.test(this);
+    }
+    @Override
+    default boolean AND(Predicate<Term> v) {
+        return v.test(this);
+    }
 
     @NotNull
     static Atomic the(@NotNull String id) {
-        assert(id.length() > 0);
+        assert(!id.isEmpty());
 
         //special cases
         switch (id) {
@@ -68,21 +76,13 @@ public interface Atomic extends Term {
         v.accept(this);
     }
 
-    @Override
-    default boolean AND(@NotNull Predicate<Term> v) {
-        return v.test(this);
-    }
+
 
     @Override
     default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
 
     @Override
     default boolean ORrecurse(@NotNull Predicate<Term> v) { return AND(v); }
-
-    @Override
-    default boolean OR(@NotNull Predicate<Term> v) {
-        return AND(v); //re-use and, even though it's so similar
-    }
 
 //    @Override
 //    default String toString() {

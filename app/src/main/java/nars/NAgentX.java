@@ -96,9 +96,17 @@ abstract public class NAgentX extends NAgent {
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
 
-        Time clock = new RealTime.
-                DSHalf(true)
-                .durFPS(fps);
+        float durFPS =
+                fps;
+                //fps * 2f; //nyquist
+
+        RealTime clock =
+            durFPS >= 20 ?
+                new RealTime.CS(true) :
+                new RealTime.DSHalf(true);
+
+        clock.durFPS(durFPS);
+
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
         NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
@@ -142,10 +150,14 @@ abstract public class NAgentX extends NAgent {
 
         RLMixControl m = (RLMixControl) n.in;
         window(grid(
-                new Plot2D(100, Plot2D.Line)
-                        .add("happy", () -> m.lastScore)
-                        .on(a::onFrame),
+
+                mixPlot(a, m, 100),
+
                 col(
+                    new Plot2D(100, Plot2D.Line)
+                            .add("happy", () -> m.lastScore)
+                            .on(a::onFrame),
+
                         new MatrixView(m.traffic, 4, (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
@@ -415,6 +427,19 @@ abstract public class NAgentX extends NAgent {
         //sense(c);
         cam.put(id, c);
         return c;
+    }
+
+    static Surface mixPlot(NAgent a, RLMixControl m, int history) {
+        return Grid.grid(m.size, i -> new MixGainPlot(a, m, history, i));
+    }
+
+    private static class MixGainPlot extends Plot2D {
+        public MixGainPlot(NAgent a, RLMixControl m, int history, int i) {
+            super(history, Line);
+
+            add(m.name(i), () -> m.gain(i), -1f, +1f);
+            a.onFrame(this::update);
+        }
     }
 
 //    private static class CorePanel extends Surface{

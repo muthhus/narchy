@@ -1,8 +1,6 @@
 package nars.task;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
-import jcog.Util;
 import nars.*;
 import nars.nar.Default;
 import nars.nar.Terminal;

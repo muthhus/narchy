@@ -25,10 +25,6 @@ public interface ITask extends Priority {
     }
 
 
-    default Priority clone() {
-        throw new UnsupportedOperationException();
-    }
-
     default boolean isInput() {
         return false;
     }

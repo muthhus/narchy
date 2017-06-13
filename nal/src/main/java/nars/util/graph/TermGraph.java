@@ -3,7 +3,6 @@ package nars.util.graph;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.ValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import jcog.pri.Priority;
 import nars.$;

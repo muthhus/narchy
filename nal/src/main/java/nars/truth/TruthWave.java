@@ -92,12 +92,15 @@ public class TruthWave {
     }
 
     public static void load(float[] array, int index, long start, long end, @Nullable Truthed truth) {
-        if (truth == null)
-            return;
         array[index++] = start == Tense.ETERNAL ? Float.NaN : start;
         array[index++] = end == Tense.ETERNAL ? Float.NaN : end;
-        array[index++] = truth.freq();
-        array[index++] = truth.conf();
+        if (truth != null) {
+            array[index++] = truth.freq();
+            array[index++] = truth.conf();
+        } else {
+            array[index++] = Float.NaN;
+            array[index++] = 0f;
+        }
     }
 
     public void ensureSize(int s) {
@@ -127,11 +130,8 @@ public class TruthWave {
         float[] data = this.truth;
         int j = 0;
         for (int i = 0; i < points; i++) {
-            int lt = Math.round(t);
-            Truth x = table.truth(lt, dur);
-            if (x!=null) {
-                load(data, (j++) * ENTRY_SIZE, lt, lt, x);
-            }
+            long lt = (long)t;
+            load(data, (j++) * ENTRY_SIZE, lt, lt, table.truth(lt, dur));
             t+= dt;
         }
         this.current = null;

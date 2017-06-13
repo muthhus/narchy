@@ -3,8 +3,6 @@ package jcog.pri;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Supplier;
-
 /**
  * Immutable PriReference
  */
@@ -18,7 +16,7 @@ public class PLink<X> extends AbstractPLink<X> {
     }
 
     @Nullable @Override
-    public PLink<X> clone() {
+    public PLink<X> clonePri() {
         float p = pri();
         return (p==p) ? new PLink<>(id, p) : null;
     }

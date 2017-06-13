@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.aveAri;
 
 /**
  * Defines the conditions used in an instance of a derivation
@@ -120,6 +119,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
                             //now + dur;
 
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
+
                 }
 
                 if (match != null) {
@@ -135,6 +135,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
         }
 
+        if (belief!=null && belief.equals(task)) //do not repeat the same task for belief
+            belief = null;
 
         float beliefPriority;
         if (belief!=null) {

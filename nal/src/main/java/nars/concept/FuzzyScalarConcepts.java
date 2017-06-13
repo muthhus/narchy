@@ -7,6 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -30,6 +31,24 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 
     float conf;
 
+
+    public final static FuzzyModel Hard = (v, i, indices, n) -> {
+
+        float vv = v * indices;
+
+        int which = (int)Math.floor(vv);
+        float f;
+        if (i < which) {
+            f = 1f;
+        } else if ( i > which) {
+            f = 0f;
+        } else {
+            f = vv - which;
+        }
+
+        return $.t( f, n.confDefault(Op.BELIEF) );
+
+    };
 
     /** TODO need to analyze the interaction of the produced frequency values being reported by all concepts. */
     public final static FuzzyModel FuzzyTriangle = (v, i, indices, n) -> {
@@ -66,6 +85,16 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
         this(input::floatValue, nar, truther, states);
     }
 
+    public Term get(int i) {
+        return sensors.get(i);
+    }
+
+    public FuzzyScalarConcepts resolution(float r) {
+        for (SensorConcept s: sensors)
+            s.resolution(r);
+        return this;
+    }
+
     @FunctionalInterface  public interface FuzzyModel {
         Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
     }
@@ -84,13 +113,10 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
         if (num > 1) {
             int i = 0;
             for (Compound s : states) {
-
-                int ii = i;
-
+                final int ii = i++;
                 sensors.add( new SensorConcept(s, nar, this.input,
                         (x) -> truther.truth(x, ii, num, nar)
                 ));
-                i++;
             }
         } else {
            throw new RuntimeException("should be >1 states");

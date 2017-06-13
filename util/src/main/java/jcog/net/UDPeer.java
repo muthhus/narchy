@@ -813,7 +813,7 @@ public class UDPeer extends UDP {
         }
 
         @Override
-        public @Nullable Priority clone() {
+        public @Nullable Priority clonePri() {
             throw new UnsupportedOperationException();
         }
 

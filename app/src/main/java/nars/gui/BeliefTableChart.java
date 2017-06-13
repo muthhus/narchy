@@ -402,11 +402,13 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 return;
             }
 
-            float a = 0.45f + 0.5f * conf;
+            float a =
+                    conf;
+                    //0.45f + 0.5f * conf;
             if (beliefOrGoal) {
-                gl.glColor4f(0.5f + 0.5f * conf, 0.25f, 0f, a);
+                gl.glColor4f(0.5f, 0.25f, 0f, a);
             } else {
-                gl.glColor4f(0f, 0.5f + 0.5f * conf, 0.25f, a);
+                gl.glColor4f(0f, 0.5f, 0.25f, a);
             }
 
             //r.renderTask(gl, qua, conf, pw, ph, x, freq);

@@ -142,6 +142,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
+
     @NotNull
     @Override
     default public Term unneg() { //probably rarely called; UnitCompound1 should be used for NEG's
@@ -197,11 +198,22 @@ public interface Compound extends Term, IPair, TermContainer {
         subterms().recurseTerms(v);
     }
 
+
+
+
+
     @Override
-    default boolean ANDrecurse(@NotNull Predicate<Term> v) {
-        if (!v.test(this))
+    default boolean ORrecurse(@NotNull Predicate<Term> p) {
+        if (p.test(this))
+            return true;
+        return subterms().ORrecurse(p);
+    }
+
+    @Override
+    default boolean ANDrecurse(@NotNull Predicate<Term> p) {
+        if (!p.test(this))
             return false;
-        return subterms().ANDrecurse(v);
+        return subterms().ANDrecurse(p);
     }
 
     @Override
@@ -672,7 +684,7 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean isTemporal() {
         return (isAny(Op.TemporalBits) && (dt() != DTERNAL))
                 ||
-                (hasAny(Op.TemporalBits) && OR(Term::isTemporal));
+                (hasAny(Op.TemporalBits) && subterms().OR(Term::isTemporal));
     }
 
     @Override

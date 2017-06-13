@@ -33,7 +33,7 @@ public final class PriRO implements Priority {
 
     @NotNull
     @Override
-    public Priority clone() {
+    public Priority clonePri() {
         return new Pri(this);
     }
 

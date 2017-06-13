@@ -77,7 +77,7 @@ public class TermIndexTest {
 //        );
 //        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
 //    }
-    @Test public void testTermSharing5c() throws Narsese.NarseseException {
+    @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
                 new Default.DefaultTermIndex(1024)
         );

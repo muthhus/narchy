@@ -330,7 +330,7 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(--,open(John,door)). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",
-                        1.00f, 0.45f, 0)
+                        1.00f, 0.45f, 0, 4)
                 .mustBelieve(cycles, "( (--,open(John, door)) &&+4 enter(John, room) )",
                         1f, 0.81f, 0, 4)
         ;
@@ -561,14 +561,14 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,
                         "(b:x ==>-10 a:x)",
                         0.1f, 0.37f,
-                        0)
+                        0, 10)
                 .mustBelieve(cycles,
                         "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
-                        0)
+                        0, 10)
                 .mustBelieve(cycles,
                         "(($1 --> a) <=>+10 ($1 -->b))",
                         0.27f, 0.41f,
-                        0)
+                        0, 10)
         ;
 
     }

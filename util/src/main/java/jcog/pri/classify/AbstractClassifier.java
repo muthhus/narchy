@@ -16,4 +16,7 @@ public abstract class AbstractClassifier<X, Y> {
     /** sets the applicable bits between offset and offset+dimensoinality (exclusive) */
     abstract public void classify(X x, RoaringBitmap bmp, int offset);
 
+    public String name(int i) {
+        return dimension()==1 ? name.toString() : name.toString() + i; //default
+    }
 }

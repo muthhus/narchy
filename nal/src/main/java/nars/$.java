@@ -23,7 +23,6 @@ import nars.term.atom.AtomInt;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.util.CachedTermIndex;
-import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.VarPattern;

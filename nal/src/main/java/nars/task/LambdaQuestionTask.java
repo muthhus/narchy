@@ -1,11 +1,11 @@
 package nars.task;
 
 import jcog.bag.impl.ArrayBag;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import jcog.pri.PLinkUntilDeleted;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

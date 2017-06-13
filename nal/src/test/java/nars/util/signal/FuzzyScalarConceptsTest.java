@@ -11,6 +11,7 @@ import nars.nar.Default;
 import nars.nar.Terminal;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.stream.StreamSupport;
@@ -38,6 +39,7 @@ public class FuzzyScalarConceptsTest {
 //        );
 //    }
 
+    @Ignore
     @Test
     public void testRewardConceptsFuzzification3() {
         NAR d = new Terminal();

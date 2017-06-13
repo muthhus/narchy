@@ -243,7 +243,7 @@ public interface Priority extends Prioritized {
     /**
      * returns null if already deleted
      */
-    @Nullable Priority clone();
+    @Nullable Priority clonePri();
 
 
     /**
