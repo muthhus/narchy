@@ -42,7 +42,7 @@ public interface NAct {
         });
         actions().add(m);
 
-        m.resolution.setValue(1f);
+        m.resolution.setValue(1f/3f);
 
         return m;
     }
@@ -94,6 +94,7 @@ public interface NAct {
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
             float deadZoneFreqRadius =
+                    //1/7f;
                      1f/6;
                     // 1f/4;
                     //1f/3f;
@@ -133,7 +134,7 @@ public interface NAct {
 
             return $.t(f, nar().confDefault(GOAL));
         });
-        m.resolution.setValue(0.5f);
+        m.resolution.setValue(0.5f/3f);
 
         actions().add(m);
 

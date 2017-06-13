@@ -48,8 +48,12 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
             float r = resolution.floatValue();
             float ff = Util.round(f, r);
             if (f!=ff) {
+                Truth tr = t.truth().ditherFreqAdjustConf(r);
+                if (tr == null)
+                    return;
+
                 Task tt = new NALTask(t.term(), t.punc(),
-                        t.truth().ditherFreqAdjustConf(r),
+                        tr,
                         t.creation(), t.start(), t.end(), t.stamp()
                 );
                 tt.pri(t.pri());

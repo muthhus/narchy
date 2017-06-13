@@ -237,7 +237,10 @@ public interface Truth extends Truthed {
         float f = freq();
         float ff = freq(f, resolution);
         float e = evi() * (Math.abs(f - ff)/resolution);
-        return new PreciseTruth(ff, e, true);
+        if (e > 0)
+            return new PreciseTruth(ff, e, false);
+        else
+            return null;
     }
 
 
