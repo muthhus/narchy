@@ -6,7 +6,6 @@ import io.undertow.websockets.core.WebSocketChannel;
 import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.NAR;
-import nars.Narsese;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import spacegraph.web.WebsocketService;
@@ -16,7 +15,7 @@ import java.io.IOException;
 /**
  * Created by me on 4/21/16.
  */
-public class NarseseIOService extends WebsocketService  {
+public class NarseseIOService extends WebsocketService {
 
     //static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
@@ -44,9 +43,10 @@ public class NarseseIOService extends WebsocketService  {
 //        appender.start();
 
         output = new LeakOut(n, 16, 1f) {
-            @Override protected float send(Task task) {
+            @Override
+            protected float send(Task task) {
 
-                DynByteSeq dos = new DynByteSeq(8 + task.volume()*6 /* estimate */);
+                DynByteSeq dos = new DynByteSeq(8 + task.volume() * 6 /* estimate */);
 
                 try {
                     IO.writeTask2(dos, task);
@@ -65,13 +65,8 @@ public class NarseseIOService extends WebsocketService  {
     //TODO decode binary msgpack array, like send does for outgoing
     @Override
     protected void onFullTextMessage(WebSocketChannel socket, BufferedTextMessage message) throws IOException {
-        try {
-            Hear.hear(nar, message.getData(), "ui", 25);
-        } catch (Narsese.NarseseException e) {
-            e.printStackTrace();
-        }
+       Hear.hear(nar, message.getData(), "ui", 25);
     }
-
 
 
 }

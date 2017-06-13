@@ -24,6 +24,7 @@ import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
@@ -151,8 +152,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
-                aveAri
-                //or
+                //aveAri
+                or
                     (taskPri, beliefPriority);
 
         BufferedDerivation d = derivation.get();

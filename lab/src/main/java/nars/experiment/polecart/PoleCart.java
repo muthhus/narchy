@@ -13,15 +13,17 @@ import spacegraph.SpaceGraph;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static jcog.Texts.n2;
 
-/** adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
- *  see also: https://github.com/rihardsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
- *
- * */
-public class PoleCart extends NAgentX  {
+/**
+ * adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
+ * see also: https://github.com/rihardsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
+ */
+public class PoleCart extends NAgentX {
 
 
     private final SensorConcept xVel, x;
@@ -57,20 +59,22 @@ public class PoleCart extends NAgentX  {
 
     float posMin = -2f, posMax = +2f;
     float velMax = 10;
+    public boolean manualOverride = false;
 
     // Constants used for physics
     public static final double cartMass = 1.;
     public static final double poleMass = 0.1;
     public static final double poleLength = 1.;
-    public static final double forceMag = 70.;
-    public static final double tau = 0.02;
+    public static final double forceMag = 30.;
+    public static final double tau = 0.01;
     public static final double fricCart = 0.00005;
-    public static final double fricPole = 0.005;
+    public static final double fricPole =
+            0.007f;
+            //0.005;
     public static final double totalMass = cartMass + poleMass;
     public static final double halfPole = 0.5 * poleLength;
     public static final double poleMassLength = halfPole * poleMass;
     public static final double fourthirds = 4. / 3.;
-
 
 
     // Define the Engine
@@ -99,17 +103,17 @@ public class PoleCart extends NAgentX  {
         happy.resolution(0.05f);
 
         /**
-            returnObs.doubleArray[0] = theState.getX();
-            returnObs.doubleArray[1] = theState.getXDot();
-            returnObs.doubleArray[2] = theState.getTheta();
-            returnObs.doubleArray[3] = theState.getThetaDot();
+         returnObs.doubleArray[0] = theState.getX();
+         returnObs.doubleArray[1] = theState.getXDot();
+         returnObs.doubleArray[2] = theState.getTheta();
+         returnObs.doubleArray[3] = theState.getThetaDot();
          */
         //TODO extract 'senseAngle()' for NSense interface
 
         this.x = senseNumber("(x)",
-                new FloatPolarNormalized(()->(float)pos)).resolution(0.05f);
+                new FloatPolarNormalized(() -> (float) pos)).resolution(0.05f);
         this.xVel = senseNumber("(xVel)",
-                ()->Util.sigmoid((float)posDot)).resolution(0.05f);
+                () -> Util.sigmoid((float) posDot)).resolution(0.05f);
 
         //angle
         this.angX = senseNumber("(angX)",
@@ -119,33 +123,18 @@ public class PoleCart extends NAgentX  {
 
         //angular velocity
         this.angVel = senseNumber("(angVel)",
-                () -> Util.sigmoid(angleDot/4f)).resolution(0.02f);
+                () -> Util.sigmoid(angleDot / 4f)).resolution(0.02f);
 
         this.move = actionBipolar($.p("move"), (a) -> {
-            action = a;
+            if (!manualOverride)
+                action = a;
             return a;
         });
 
 
-        // Handle keyboard events 
-        // LEFT KEY = push the cart left APPLY FORCE FROM RIGHT
-        // RIGHT KEY = push the cart right APPLY FORCE FROM LEFT
-        // SPACE KEY = Reset pole to centre
-//        this.addKeyListener(new KeyAdapter() {
-//            public void keyPressed(KeyEvent e) {
-//                if (e.getKeyCode() == KeyEvent.VK_LEFT)
-//                    action = -1;
-//                else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-//                    action = 1;
-//                else if (e.getKeyChar() == ' ') {
-//                    action = 0;
-//                    resetPole();
-//                }
-//            }
-//        });
-   SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{x, xVel, angX, angY, angVel}),
-                    nar), 600, 600);
+        SpaceGraph.window(Vis.beliefCharts(200,
+                Lists.newArrayList(new Term[]{x, xVel, angX, angY, angVel}),
+                nar), 600, 600);
         this.panel = new JPanel(new BorderLayout()) {
             public Stroke stroke = new BasicStroke(4);
 
@@ -169,7 +158,7 @@ public class PoleCart extends NAgentX  {
                 }
 
                 //Erase the previous image.
-                offGraphics.setColor(new Color(0,0,0,0.25f));
+                offGraphics.setColor(new Color(0, 0, 0, 0.25f));
                 offGraphics.fillRect(0, 0, d.width, d.height);
 
                 //Draw Track.
@@ -192,7 +181,7 @@ public class PoleCart extends NAgentX  {
                 offGraphics.setColor(cartColor);
                 offGraphics.fillRect(pixX(d, pos - 0.2), pixY(d, 0), pixDX(d, 0.4), pixDY(d, -0.2));
 
-                ((Graphics2D)offGraphics).setStroke(stroke);
+                ((Graphics2D) offGraphics).setStroke(stroke);
                 //Draw pole.
                 //    offGraphics.setColor(cartColor);
                 offGraphics.drawLine(pixX(d, pos), pixY(d, 0),
@@ -218,10 +207,34 @@ public class PoleCart extends NAgentX  {
             }
 
         };
+
+        // Handle keyboard events
+        // LEFT KEY = push the cart left APPLY FORCE FROM RIGHT
+        // RIGHT KEY = push the cart right APPLY FORCE FROM LEFT
+        // SPACE KEY = Reset pole to centre
+
         JFrame f = new JFrame();
         f.setContentPane(panel);
         f.setSize(800, 600);
         f.setVisible(true);
+
+        f.addKeyListener(new KeyAdapter() {
+
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyChar() == 'o') {
+                    manualOverride = !manualOverride;
+                    System.out.println("manualOverride=" + manualOverride);
+                }
+                if (e.getKeyCode() == KeyEvent.VK_LEFT)
+                    action = -1;
+                else if (e.getKeyCode() == KeyEvent.VK_RIGHT)
+                    action = 1;
+                else if (e.getKeyChar() == ' ') {
+                    action = 0;
+                    //resetPole();
+                }
+            }
+        });
 
         //start();
     }
@@ -244,56 +257,56 @@ public class PoleCart extends NAgentX  {
 
     @Override
     protected float act() {
-                    //Update the state of the pole;
-            // First calc derivatives of state variables
-            double force = forceMag * action;
-            //double force = action;
-            double sinangle = Math.sin(angle);
-            double cosangle = Math.cos(angle);
-            double angleDotSq = angleDot * angleDot;
-            double common = (force + poleMassLength * angleDotSq * sinangle
-                    - fricCart * (posDot < 0 ? -1 : 0)) / totalMass;
-            double angleDDot = (9.8 * sinangle - cosangle * common
-                    - fricPole * angleDot / poleMassLength) /
-                    (halfPole * (fourthirds - poleMass * cosangle * cosangle /
-                            totalMass));
-            double posDDot = common - poleMassLength * angleDDot * cosangle /
-                    totalMass;
+        //Update the state of the pole;
+        // First calc derivatives of state variables
+        double force = forceMag * action;
+        //double force = action;
+        double sinangle = Math.sin(angle);
+        double cosangle = Math.cos(angle);
+        double angleDotSq = angleDot * angleDot;
+        double common = (force + poleMassLength * angleDotSq * sinangle
+                - fricCart * (posDot < 0 ? -1 : 0)) / totalMass;
+        double angleDDot = (9.8 * sinangle - cosangle * common
+                - fricPole * angleDot / poleMassLength) /
+                (halfPole * (fourthirds - poleMass * cosangle * cosangle /
+                        totalMass));
+        double posDDot = common - poleMassLength * angleDDot * cosangle /
+                totalMass;
 
-            //Now update current state.
-            pos += posDot * tau;
-
-
-            if ((pos >= posMax) || (pos <= posMin)) {
-                //bounce
-                pos = Util.clamp((float) pos, posMin, posMax);
-
-                //posDot = 0;
-                //angleDDot = 0;
-
-                posDot = -1f /* restitution */ * posDot;
-
-                //posDot = -posDot;
-                //angleDot = -angleDot;
-                //angleDDot = -angleDDot;
-            }
-
-            posDot += posDDot * tau;
-            posDot = Math.min(+velMax, Math.max(-velMax, posDot));
-
-            angle += angleDot * tau;
-            angleDot += angleDDot * tau;
-
-            /**TODO
-             // Above values represent current state of the cart and pole
-             // Control system should take these values and make decision.
-             // We are interested in angle and angleDot;
-             // So we need a function here to set the state of the action for the next
-             // update in time.
-             **/
+        //Now update current state.
+        pos += posDot * tau;
 
 
-            //Display it.
+        if ((pos >= posMax) || (pos <= posMin)) {
+            //bounce
+            pos = Util.clamp((float) pos, posMin, posMax);
+
+            //posDot = 0;
+            //angleDDot = 0;
+
+            posDot = -1f /* restitution */ * posDot;
+
+            //posDot = -posDot;
+            //angleDot = -angleDot;
+            //angleDDot = -angleDDot;
+        }
+
+        posDot += posDDot * tau;
+        posDot = Math.min(+velMax, Math.max(-velMax, posDot));
+
+        angle += angleDot * tau;
+        angleDot += angleDDot * tau;
+
+        /**TODO
+         // Above values represent current state of the cart and pole
+         // Control system should take these values and make decision.
+         // We are interested in angle and angleDot;
+         // So we need a function here to set the state of the action for the next
+         // update in time.
+         **/
+
+
+        //Display it.
 
         if (drawFinished.compareAndSet(true, false))
             SwingUtilities.invokeLater(panel::repaint);
@@ -306,7 +319,7 @@ public class PoleCart extends NAgentX  {
 //                break;
 //            }
 
-        float rewardLinear = (float)(2f - Math.abs(MathUtils.normalizeAngle(angle, 0)))/2f;
+        float rewardLinear = (float) (2f - Math.abs(MathUtils.normalizeAngle(angle, 0))) / 2f;
 
         //float rewardCubed = (float) Math.pow(rewardLinear, 3);
         //float bias = -0.1f;
@@ -317,8 +330,6 @@ public class PoleCart extends NAgentX  {
 //        System.out.println(angle);
 //        return (float) angleDot;
     }
-
-
 
 
     public int pixX(Dimension d, double v) {

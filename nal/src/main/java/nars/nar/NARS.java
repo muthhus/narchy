@@ -17,6 +17,7 @@ import nars.Task;
 import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -76,7 +77,7 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInput() {
-        return new RLMixControl<>(this::inputSub, 15f,
+        return new RLMixControl<>(this::inputSub, 20f,
 
                 new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 5),
 

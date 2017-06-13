@@ -1,18 +1,19 @@
 
 package nars.web;
 
-import com.google.common.base.Joiner;
 import jcog.bag.impl.ArrayBag;
-import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.nar.Default;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
+import nars.time.CycleTime;
 import nars.time.RealTime;
 import nars.time.Tense;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -21,10 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /**
  * $0.9;0.9;0.99$
@@ -121,7 +120,9 @@ public class IRCNLP extends IRC {
 
     }
 
-    /** identical with IRCAgent, TODO share them */
+    /**
+     * identical with IRCAgent, TODO share them
+     */
     private class MyLeakOut extends LeakOut {
         private final NAR nar;
         private final String[] channels;
@@ -138,7 +139,7 @@ public class IRCNLP extends IRC {
             if (cmd || (trace && !task.isDeleted())) {
                 String s = (!cmd) ? task.toString() : task.term().toString();
                 Runnable r = IRCNLP.this.send(channels, s);
-                if (r!=null) {
+                if (r != null) {
                     nar.runLater(r);
                     if (Param.DEBUG && !task.isCommand())
                         logger.info("{}\n{}", task, task.proof());
@@ -213,7 +214,7 @@ public class IRCNLP extends IRC {
     void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
             Compound f = $.func("SENTENCE", Hear.tokenize(t));
-            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f );
+            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
             return null;
         });
     }
@@ -255,157 +256,167 @@ public class IRCNLP extends IRC {
     }
 
 
-
     public static void main(String[] args) throws Exception {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = //newRealtimeNAR(2048, 0, 2000);
-                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false));
+        @NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
+            new RealTime.DS(true),
+            new TaskExecutor(64, 0.25f));
 
-//        Control c = n.getControl();
-//        n.setControl(new ChainedControl(c) {
-////            @Override
-////            public void activate(Termed term, float priToAdd) {
-////
-////                synchronized(this) {
-////                    System.out.print(term + " " + priToAdd + "\t===");
-////                    super.activate(term, priToAdd);
-////                    System.out.println(pri(term));
-////                }
-////            }
-//        });
+//        NARS n = new NARS(new RealTime.DS(true), new XorShift128PlusRandom(1), 1);
+//        n.addNAR(16, 0.25f);
+        //n.addNAR(512, 0.25f);
+
+        n.startFPS(2f);
+
+        n.log();
 
 
-        Hear.wiki(n);
+//        IRCNLP bot = new IRCNLP(n,
+//                "exp" + Math.round(10000 * Math.random()),
+//
+//                "localhost", //"irc.freenode.net",
+//                //"#123xyz"
+//                //"#netention"
+//                "#x"
+//        );
 
-        IRCNLP bot = new IRCNLP(n,
-                "experiment1", "irc.freenode.net",
-                //"#123xyz"
-                //"#netention"
-                "#nars"
-        );
+        //bot.start();
 
-        n.truthResolution.setValue(0.01f);
 
-        n.on("say", (x, aa, nn) -> {
-            String msg = Joiner.on(' ').join(
-                Stream.of(aa).map(t -> {
-                    if (t.op()== Op.VAR_DEP) {
-                        return "a";
-                    }
-                    return $.unquote(t);
-                }).toArray()
-            );
+        new Thread(() -> {
+            try {
+                Hear.hear(n, "what is a sentence?", "", 200, 0.1f);
+                Thread.sleep(2000);
+                Hear.hear(n, "this is a sentence.", "", 200, 0.1f);
 
-            System.out.println(Arrays.toString(aa));
+                Thread.sleep(2000);
+                n.clear();
+                n.input("$0.9 hear(\"what\")! :|:");
 
-            if (!bot.prevOut.contains(msg)) {
-                bot.out.commit();
-                bot.out.put(new PLink<String>(msg, 1f));
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        });
+        }).start();
 
-        //n.log();
-        //n.logBudgetMin(System.out, 0.6f);
-        //n.log(System.out, x -> x instanceof Task && ((Task)x).isGoal());
-
-        n.input(
-                "( (RANGE:{$range} && SENTENCE:$x) ==> SENTENCE:slice($x, $range)).",
-
-                //"((VERB:{$V} && FRAG($X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
-
-                //"((FRAG:$XY && ($XY <-> flat((FRAG($X), and, FRAG($Y))))) <=> ((/,MEANS,$X,_) && (/,MEANS,$Y,_))).",
-
-                "((VERB:{$V} && SENTENCE($X,$V))                   ==> (((/,MEANS,$X,_),(/,MEANS,$X,_)) --> (/,MEANS,$V,_))).",
-                "((VERB:{$V} && SENTENCE($X,$V,$Y))                ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
-                "((&&, VERB:{$V}, ADV:{$A}, SENTENCE($X,$V,$A,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,($V|$A),_))).",
-                "((&&, VERB:{$V}, PREP:{$P}, SENTENCE($X,$V,$P,$Y)) ==> (((/,MEANS,$X,_),$P,(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
-                "((&&, VERB:{$V}, DET:{#a}, SENTENCE($X,$V,#a,$Y)) ==> (((/,MEANS,$X,_),{(/,MEANS,$Y,_)}) --> (/,MEANS,$V,_))).",
-                "((&&, VERB:{$V}, DET:{#a}, SENTENCE(#a,$X,$V,$Y)) ==> (({(/,MEANS,$X,_)},(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
-
-                "(SENTENCE($x,\"is\",$y) <=> ($x --> $y)).",
-                "(SENTENCE($x,\"is\",\"a\",$y) <=> ({$x} --> $y)).",
-                "(SENTENCE($x,\"has\",$y) <=> ($x --> [$y])).",
-                "(SENTENCE($x,\"isnt\",$y) <=> (--,($x --> $y))).",
-                "(SENTENCE($x,\"and\",$y,\"are\",$z) <=> (($x & $y)-->$z)).",
-                "(SENTENCE($x,\"and\",$y) <=> ($x && $y)).",
-                "(SENTENCE($x,\"or\",$y) <=> ($x || $y)).",
-                "(SENTENCE($x,\"then\",$y) <=> ($x &&+1 $y)).",
-                "(SENTENCE($x,\"after\",$y) <=> ($x &&-1 $y)).",
-                "(($x --> \"verb\") <=> VERB:{$x}).",
-                "(($x --> \"noun\") <=> NOUN:{$x}).",
-                "(($x --> \"adverb\") <=> ADV:{$x}).",
-                "(($x --> \"preposition\") <=> PREP:{$x}).",
-                "(#x <-> \"it\"). %0.5;0.5%",
-                "(#x <-> \"that\"). %0.5;0.5%",
-                "(#x <-> \"the\"). %0.5;0.5%",
-                "(#x <-> \"what\"). %0.5;0.5%",
-                "(#x <-> \"who\"). %0.5;0.5%",
-                "(#x <-> \"where\"). %0.5;0.5%",
-                "(#x <-> \"which\"). %0.5;0.5%",
-
-                //NAL9 integration
-                "(believe <-> \"believe\").",
-                "(wonder <-> \"wonder\").",
-                "(want <-> \"want\").",
-
-                //"((WHERE_PREP:{#in} && FRAG(#in,$where)) ==> WHERE:(/,MEANS,$where,_))."
-
-                //"(FRAG<->SENTENCE).", //sentence is also its own fragment
-
-                "RANGE:{(0,2),(0,3),(1,4)}.",
-                //"RANGE:{(0,3),(1,4),(4,7),(0,7)}.",
-                //"RANGE:{(0,3)}.",
-                //"RANGE:{0,1,2,3,4,(0,1),(0,2),(0,3)}.",
-
-                "VERB:{\"is\",\"maybe\",\"isnt\",\"was\",\"willBe\",\"wants\",\"can\",\"likes\"}.",
-                "DET:{\"a\",\"the\"}.",
-                "PREP:{\"for\",\"on\",\"in\",\"with\"}.",
-                "ADV:{\"never\",\"always\",\"maybe\"}.",
-
-//                "SENTENCE(tom,is,never,sky).",
-//                "SENTENCE(tom,is,always,cat).",
-//                "SENTENCE(tom,is,cat).",
-//                "SENTENCE(tom,is,a,cat).",
-//                "SENTENCE(tom,likes,the,sky).",
-//                "SENTENCE(tom,likes,maybe,cat).",
-//                "SENTENCE(the,sky,is,blue).",
-//                "SENTENCE(a,cat,likes,blue).",
-//                "SENTENCE(sky,wants,the,blue).",
-//                "SENTENCE(sky,is,always,blue).",
+//        Hear.wiki(n);
+//        n.on("say", (x, aa, nn) -> {
+//            String msg = Joiner.on(' ').join(
+//                Stream.of(aa).map(t -> {
+//                    if (t.op()== Op.VAR_DEP) {
+//                        return "a";
+//                    }
+//                    return $.unquote(t);
+//                }).toArray()
+//            );
 //
-//            "SENTENCE(yes,wants,no).",
-//            "SENTENCE(yes,is,no).",
-//            "SENTENCE(yes,isnt,no).",
+//            System.out.println(Arrays.toString(aa));
 //
-//            "SENTENCE(it,is,my,good).",
-//            //"SENTENCE(it,is,bad,and,it,can,good).",
-//            "SENTENCE(good,was,bad).",
-//            "SENTENCE(right,willBe,wrong).",
-//            "SENTENCE(true,can,false).",
-
-
-
-                //"$0.9$ (?y --> (/,MEANS,?x,_))?",
-
-                //"$0.9$ SENTENCE(?z,?x,?y)?"
-
-                //"$0.9$ SENTENCE(?y)?",
-
-                //"$0.9;0.9$ (VERB:{$v} ==> say(DO, $v))."
-                //"$0.9;0.9$ say(#y)!",
-
-                "$0.9;0.9$ (SENTENCE:#y ==> say:#y).",
-                "$0.9;0.9$ (SENTENCE:#y && say:#y)!"
-                //"say(cat,is,blue)!",
-                //"say(#x,is,#y)!"
-
-
-        );
-
-
-        bot.start();
+//            if (!bot.prevOut.contains(msg)) {
+//                bot.out.commit();
+//                bot.out.put(new PLink<String>(msg, 1f));
+//            }
+//        });
+//
+//        //n.log();
+//        //n.logBudgetMin(System.out, 0.6f);
+//        //n.log(System.out, x -> x instanceof Task && ((Task)x).isGoal());
+//
+//        n.input(
+//                "( (RANGE:{$range} && SENTENCE:$x) ==> SENTENCE:slice($x, $range)).",
+//
+//                //"((VERB:{$V} && FRAG($X,$V,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+//
+//                //"((FRAG:$XY && ($XY <-> flat((FRAG($X), and, FRAG($Y))))) <=> ((/,MEANS,$X,_) && (/,MEANS,$Y,_))).",
+//
+////                "((VERB:{$V} && SENTENCE($X,$V))                   ==> (((/,MEANS,$X,_),(/,MEANS,$X,_)) --> (/,MEANS,$V,_))).",
+////                "((VERB:{$V} && SENTENCE($X,$V,$Y))                ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+////                "((&&, VERB:{$V}, ADV:{$A}, SENTENCE($X,$V,$A,$Y)) ==> (((/,MEANS,$X,_),(/,MEANS,$Y,_)) --> (/,MEANS,($V|$A),_))).",
+////                "((&&, VERB:{$V}, PREP:{$P}, SENTENCE($X,$V,$P,$Y)) ==> (((/,MEANS,$X,_),$P,(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+////                "((&&, VERB:{$V}, DET:{#a}, SENTENCE($X,$V,#a,$Y)) ==> (((/,MEANS,$X,_),{(/,MEANS,$Y,_)}) --> (/,MEANS,$V,_))).",
+////                "((&&, VERB:{$V}, DET:{#a}, SENTENCE(#a,$X,$V,$Y)) ==> (({(/,MEANS,$X,_)},(/,MEANS,$Y,_)) --> (/,MEANS,$V,_))).",
+//
+//                "(SENTENCE($x,\"is\",$y) <=> ($x --> $y)).",
+//                "(SENTENCE($x,\"is\",\"a\",$y) <=> ({$x} --> $y)).",
+//                "(SENTENCE($x,\"has\",$y) <=> ($x --> [$y])).",
+//                "(SENTENCE($x,\"isnt\",$y) <=> (--,($x --> $y))).",
+//                "(SENTENCE($x,\"and\",$y,\"are\",$z) <=> (($x & $y)-->$z)).",
+//                "(SENTENCE($x,\"and\",$y) <=> ($x && $y)).",
+//                "(SENTENCE($x,\"or\",$y) <=> ($x || $y)).",
+//                "(SENTENCE($x,\"then\",$y) <=> ($x &&+1 $y)).",
+//                "(SENTENCE($x,\"after\",$y) <=> ($x &&-1 $y)).",
+//                "(($x --> \"verb\") <=> VERB:{$x}).",
+//                "(($x --> \"noun\") <=> NOUN:{$x}).",
+//                "(($x --> \"adverb\") <=> ADV:{$x}).",
+//                "(($x --> \"preposition\") <=> PREP:{$x}).",
+//                "(#x <-> \"it\"). %0.5;0.5%",
+//                "(#x <-> \"that\"). %0.5;0.5%",
+//                "(#x <-> \"the\"). %0.5;0.5%",
+//                "(#x <-> \"what\"). %0.5;0.5%",
+//                "(#x <-> \"who\"). %0.5;0.5%",
+//                "(#x <-> \"where\"). %0.5;0.5%",
+//                "(#x <-> \"which\"). %0.5;0.5%",
+//
+//                //NAL9 integration
+//                "(believe <-> \"believe\").",
+//                "(wonder <-> \"wonder\").",
+//                "(want <-> \"want\").",
+//
+//                //"((WHERE_PREP:{#in} && FRAG(#in,$where)) ==> WHERE:(/,MEANS,$where,_))."
+//
+//                //"(FRAG<->SENTENCE).", //sentence is also its own fragment
+//
+//                "RANGE:{(0,2),(0,3),(1,4)}.",
+//                //"RANGE:{(0,3),(1,4),(4,7),(0,7)}.",
+//                //"RANGE:{(0,3)}.",
+//                //"RANGE:{0,1,2,3,4,(0,1),(0,2),(0,3)}.",
+//
+//                "VERB:{\"is\",\"maybe\",\"isnt\",\"was\",\"willBe\",\"wants\",\"can\",\"likes\"}.",
+//                "DET:{\"a\",\"the\"}.",
+//                "PREP:{\"for\",\"on\",\"in\",\"with\"}.",
+//                "ADV:{\"never\",\"always\",\"maybe\"}.",
+//
+////                "SENTENCE(tom,is,never,sky).",
+////                "SENTENCE(tom,is,always,cat).",
+////                "SENTENCE(tom,is,cat).",
+////                "SENTENCE(tom,is,a,cat).",
+////                "SENTENCE(tom,likes,the,sky).",
+////                "SENTENCE(tom,likes,maybe,cat).",
+////                "SENTENCE(the,sky,is,blue).",
+////                "SENTENCE(a,cat,likes,blue).",
+////                "SENTENCE(sky,wants,the,blue).",
+////                "SENTENCE(sky,is,always,blue).",
+////
+////            "SENTENCE(yes,wants,no).",
+////            "SENTENCE(yes,is,no).",
+////            "SENTENCE(yes,isnt,no).",
+////
+////            "SENTENCE(it,is,my,good).",
+////            //"SENTENCE(it,is,bad,and,it,can,good).",
+////            "SENTENCE(good,was,bad).",
+////            "SENTENCE(right,willBe,wrong).",
+////            "SENTENCE(true,can,false).",
+//
+//
+//
+//                //"$0.9$ (?y --> (/,MEANS,?x,_))?",
+//
+//                //"$0.9$ SENTENCE(?z,?x,?y)?"
+//
+//                //"$0.9$ SENTENCE(?y)?",
+//
+//                //"$0.9 (VERB:{$v} ==> say(DO, $v))."
+//                //"$0.9 say(#y)!",
+//
+//                "$0.9 (SENTENCE:$y ==> say:$y).",
+//                "$0.9 (SENTENCE:#y && say:#y)!"
+//                //"say(cat,is,blue)!",
+//                //"say(#x,is,#y)!"
+//
+//
+//        );
 
 
     }

@@ -59,14 +59,13 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
             t += c.dimension();
         }
 
-        if (!truths.isEmpty()) {
-            truths.runOptimize();
+        //truths.runOptimize();
 
-            float ypri = y.priElseZero();
-            truths.forEach((int b) -> {
-                traffic[b].accept(ypri);
-            });
-        }
+        float ypri = y.priElseZero();
+        truths.forEach((int b) -> {
+            traffic[b].accept(ypri);
+        });
+
         return truths;
     }
 

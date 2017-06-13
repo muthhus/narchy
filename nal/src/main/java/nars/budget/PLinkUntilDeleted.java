@@ -17,7 +17,7 @@ public class PLinkUntilDeleted<X extends Deleteable> extends PLink<X> {
 
 
     @Override
-    public float pri() {
+    public final float pri() {
         float p = this.pri;
         if (p == p && id.isDeleted()) {
             return (this.pri = Float.NaN);

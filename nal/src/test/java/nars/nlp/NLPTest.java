@@ -12,14 +12,19 @@ import java.util.Arrays;
 /**
  * Created by me on 2/18/17.
  */
-public class NLPOperatorTest {
+public class NLPTest {
 
+//    @Test
+//    public void testNLP1() throws IOException, Narsese.NarseseException {
+//        NAR n = new Default();
+//
+//    }
 
     @Test @Ignore
-    public void testNLP1() throws IOException, Narsese.NarseseException {
+    public void testNLP0() throws IOException, Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        NAR n = new Default(1024);
+        NAR n = new Default();
         //n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         //n.quaMin.setValue(0.1f);

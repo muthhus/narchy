@@ -26,29 +26,39 @@ public class Hear extends Loop {
     final static Atomic START = Atomic.the("start");
 
     private final NAR nar;
-    private final Term[] context;
+    //private final Term[] context;
     //private final Term[] contextAnonymous;
     private final List<Term> tokens;
     public final On onReset;
+    private final Term context;
     int token;
 
     float priorityFactor = 1f;
     float confFactor = 1f;
-    float offConf = 0.1f; //nar.confidenceDefault(BELIEF) * confFactor/2f;
+
+    /** use 0 to disable the eternal off */
+    float offConf;
+
+    public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
+        return hear(nar ,msg ,src, wordDelayMS, 1f);
+    }
 
     /** set wordDelayMS to 0 to disable twenglish function */
-    public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) throws Narsese.NarseseException {
+    public static Loop hear(NAR nar, String msg, String src, int wordDelayMS, float pri) {
         return hear(nar, msg, src, (m) -> {
             if (wordDelayMS > 0) {
                 List<Term> tokens = tokenize(m);
-                if (!tokens.isEmpty())
-                    return new Hear(nar, tokens, src, wordDelayMS);
+                if (!tokens.isEmpty()) {
+                    Hear hear = new Hear(nar, tokens, src, wordDelayMS);
+                    hear.priorityFactor = pri;
+                    return hear;
+                }
             }
             return null;
         });
     }
 
-    public static Loop hear(NAR nar, String msg, String src, Function<String,Loop> ifNotNarsese) throws Narsese.NarseseException {
+    public static Loop hear(NAR nar, String msg, String src, Function<String,Loop> ifNotNarsese) {
         @NotNull List<Task> parsed = $.newArrayList();
         @NotNull List<Narsese.NarseseException> errors = $.newArrayList();
 
@@ -73,7 +83,7 @@ public class Hear extends Loop {
 
         onReset = nar.eventReset.on(this::onReset);
         tokens = msg;
-        context = new Term[]{Atomic.the("hear"), $.quote(who), Op.Imdex};
+        context = who.isEmpty() ? null : $.the(who);
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
         setPeriodMS(wordDelayMS);
     }
@@ -104,23 +114,22 @@ public class Hear extends Loop {
     }
 
     private void hear(Term prev, Term next) {
-        Compound term = $.inh(next, $.imge(context));
-        //Compound termAnonymous = $.inh(next, $.imge(contextAnonymous));
-        //$.inh($.p(prev,next), $.imge(context)), //bigram
-        //$.prop(next, (context[1])),
-        //$.func("hear", chan_nick, tokens.get(token++))
 
-        float onConf = nar.confDefault(BELIEF) * confFactor;
+        Compound term =
+                context!=null ?
+                        $.func("hear", next, context) :
+                        $.func("hear", next);
 
-        Concept concept = nar.concept(term);
-
-        //if (((DefaultBeliefTable) concept.beliefs()).eternal.isEmpty()) {
-        if (concept == null) {
-            //input a constant negative bias - we dont hear the word when it is not spoken
-            //only input when first conceptualized
-            nar.believe(term, Tense.Eternal, 0f, offConf);
+        if (offConf > 0) {
+            Concept concept = nar.concept(term);
+            if (concept == null) {
+                //input a constant negative bias - we dont hear the word when it is not spoken
+                //only input when first conceptualized
+                nar.believe(term, Tense.Eternal, 0f, offConf);
+            }
         }
 
+        float onConf = nar.confDefault(BELIEF) * confFactor;
         nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
                 term, //1 word
                 Tense.Present, 1f, onConf);

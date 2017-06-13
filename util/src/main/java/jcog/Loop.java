@@ -77,8 +77,10 @@ abstract public class Loop implements Runnable {
             } else if (prevPeriodMS >= 0 && nextPeriodMS < 0) {
                 Thread prevThread;
                 if ((prevThread = thread.getAndSet(null)) != null) {
+                    try {
+                        prevThread.stop();
+                    } catch (Throwable ignored) { }
                     logger.info("stop {}", this);
-                    prevThread.stop();
                 }
             } else if (prevPeriodMS >= 0 && nextPeriodMS >= 0) {
                 //change speed
