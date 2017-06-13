@@ -3,13 +3,9 @@ package nars.attention;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
 import jcog.map.SaneObjectFloatHashMap;
-import jcog.pri.PLink;
-import jcog.pri.Pri;
-import jcog.pri.PriReference;
-import jcog.pri.Priority;
+import jcog.pri.*;
 import nars.NAR;
 import nars.Task;
-import nars.budget.PLinkUntilDeleted;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -327,9 +323,9 @@ public class Activate extends UnaryTask<Task> {
                 float childScale = ((1f - momentum) * scale) / (n);
                 float parentActivation = scale * momentum;
                 for (int i = 0; i < n; i++) {
-                    Term si = targetSubs.sub(i);
+                    Term si = targetSubs.sub(i).unneg();
                     if (linkableSub(si)) {
-                        link(si.unneg(), childScale, nextDepth); //link and recurse to the concept
+                        link(si, childScale, nextDepth); //link and recurse to the concept
                     } else {
                         parentActivation += childScale; //absorb to parent
                     }
@@ -373,8 +369,8 @@ public class Activate extends UnaryTask<Task> {
             rcpt.tasklinks().put(
                     //new RawPLink(value, pri),
                     new PLinkUntilDeleted(task, pri),
+                    //new WeakPLinkUntilDeleted(task, pri),
                     null);
-
         }
 
         void termlink(Concept recipient, Term target, float pri) {

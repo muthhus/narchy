@@ -193,6 +193,17 @@ public interface Termlike extends Termed {
         Term x = sub(i, null);
         return x != null && x.op() == o;
     }
+    default boolean subIs(int i, Term maybeEquals) {
+        Term x = sub(i, null);
+        return x != null && x.equals(maybeEquals);
+    }
 
+    /** compares this term's op with 'thisOp', then performs subIs(i, sub) */
+    default boolean subIs(Op thisOp, int i, Term sub) {
+        if (op()!=thisOp)
+            return false;
+
+        return subIs(i, sub);
+    }
 
 }

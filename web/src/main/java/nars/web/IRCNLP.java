@@ -1,6 +1,7 @@
 
 package nars.web;
 
+import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
@@ -262,15 +263,14 @@ public class IRCNLP extends IRC {
 
         @NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
-            new TaskExecutor(64, 0.25f));
+            new TaskExecutor(256, 0.25f));
 
 //        NARS n = new NARS(new RealTime.DS(true), new XorShift128PlusRandom(1), 1);
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(2f);
-
-        n.log();
+        n.startFPS(20f);
+        //n.log();
 
 
 //        IRCNLP bot = new IRCNLP(n,
@@ -284,16 +284,38 @@ public class IRCNLP extends IRC {
 
         //bot.start();
 
+        Param.DEBUG = true;
+
+        n.onTask(t -> {
+            if (t.isGoal()) {
+                 //feedback
+                if (t.term().subIs(Op.INH, 1, $.the("hear"))) {
+                    n.believe(t.term(), Tense.Present);
+                    System.err.println(t);
+                }
+            }
+        });
 
         new Thread(() -> {
             try {
-                Hear.hear(n, "what is a sentence?", "", 200, 0.1f);
-                Thread.sleep(2000);
-                Hear.hear(n, "this is a sentence.", "", 200, 0.1f);
 
-                Thread.sleep(2000);
+                for (int i = 0; i < 5; i++) {
+                    Hear.hear(n, "what is a sentence?", "", 100, 0.01f);
+                    Util.sleep(1000);
+
+                    Hear.hear(n, "this is a sentence.", "", 100, 0.01f);
+                    Util.sleep(1000);
+                }
+
                 n.clear();
+
+                //n.input("$0.9 hear(#1)! :|:");
+
                 n.input("$0.9 hear(\"what\")! :|:");
+
+                Util.sleep(500);
+
+                n.input("$0.9 hear(\"is\")! :|:");
 
 
             } catch (Exception e) {

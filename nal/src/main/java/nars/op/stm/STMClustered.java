@@ -11,7 +11,7 @@ import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import nars.budget.PLinkUntilDeleted;
+import jcog.pri.PLinkUntilDeleted;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;

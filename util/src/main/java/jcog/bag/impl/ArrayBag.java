@@ -161,7 +161,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
         int trashed = trash.size();
         for (int i = 0; i < trashed; i++) {
-            PriReference<X> w = trash.get(i);
+            PriReference w = trash.get(i);
             map.remove(key(w));
         }
     }

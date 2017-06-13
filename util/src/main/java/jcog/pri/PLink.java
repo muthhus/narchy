@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * Immutable PriReference
  */
-public class PLink<X> extends Pri implements PriReference<X> {
+public class PLink<X> extends AbstractPLink<X> {
 
     @NotNull protected final X id;
 
@@ -24,12 +24,6 @@ public class PLink<X> extends Pri implements PriReference<X> {
     }
 
     @Override
-    public boolean equals(@NotNull Object that) {
-        return ((this == that) || this.id.equals(that)) ||
-                ((that instanceof Supplier) && id.equals(((Supplier) that).get()));
-    }
-
-    @Override
     public int hashCode() {
         return id.hashCode();
     }
@@ -38,11 +32,6 @@ public class PLink<X> extends Pri implements PriReference<X> {
     @NotNull
     final public X get() {
         return id;
-    }
-
-    @Override
-    public String toString() {
-        return id + "=" + pri();
     }
 
 }

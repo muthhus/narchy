@@ -498,7 +498,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     public final Retemporalization retemporalizationZero = new Retemporalization(0);
 
 
-    private class Retemporalization implements CompoundTransform {
+    public class Retemporalization implements CompoundTransform {
 
         final int dtIfXternal;
 

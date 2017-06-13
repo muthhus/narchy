@@ -112,7 +112,7 @@ abstract public class Loop implements Runnable {
 
         onStart();
 
-        logger.info("{} start period={}ms", this, periodMS.get());
+        logger.info("start {} @ {}ms period", this, periodMS.get());
 
         prevTime = System.currentTimeMillis();
 

@@ -5,7 +5,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import nars.budget.PLinkUntilDeleted;
+import jcog.pri.PLinkUntilDeleted;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

@@ -406,6 +406,10 @@ public enum Terms { ;
     }
     @Nullable
     public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
+        return normalizedOrNull(t, i, i.retemporalizationDTERNAL);
+    }
+    @Nullable
+    public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, TermIndex.Retemporalization r) {
         Compound c = compoundOrNull(t);
         if (c == null)
             return null;

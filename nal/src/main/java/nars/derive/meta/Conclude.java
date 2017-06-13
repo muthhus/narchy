@@ -234,7 +234,10 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                 Compound C = c3n.getOne();
                 if (varIntro) {
-                    Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(C), d.terms);
+                    Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(C), d.terms,
+                            d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
+                    );
+
                     if (Cv == null || Cv.equals(C) /* keep only if it differs */)
                         return;
                     else {
