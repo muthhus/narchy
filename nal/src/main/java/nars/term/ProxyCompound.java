@@ -17,6 +17,11 @@ public class ProxyCompound extends ProxyTerm<Compound> implements Compound  {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        return Compound.equals(this, obj);
+    }
+
+    @Override
     public void append(@NotNull Appendable p) throws IOException {
         IO.Printer.append(this, p);
     }
