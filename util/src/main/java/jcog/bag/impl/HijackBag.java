@@ -209,8 +209,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             }
                             if (toReturn == p) {
                                 float oo = pri(p);
-                                pressurize(-oo); //undo pressurization
-                                if (overflowing!=null) overflowing.add(oo);
+                                if (oo==oo) {
+                                    pressurize(-oo); //undo pressurization
+                                    if (overflowing != null) overflowing.add(oo);
+                                }
                             }
                             break;
 
@@ -316,11 +318,16 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * a potential eviction can be intercepted here
      */
     protected boolean replace(V incoming, V existing) {
-        return replace(pri(incoming), pri(existing));
+        float e = pri(existing);
+        if (e!=e)
+            return true;
+        float i = pri(incoming);
+        if (i!=i)
+            return false;
+        return replace(i, e);
     }
 
     protected boolean replace(float incoming, float existing) {
-
         return hijackSoftmax(incoming, existing, random());
     }
 
@@ -363,9 +370,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     @Override
     public final V put(@NotNull V v,  /* TODO */ @Nullable MutableFloat overflowing) {
 
-        float p = pri(v);
-        if (p != p)
-            return null; //already deleted
+//        float p = pri(v);
+//        if (p != p)
+//            return null; //already deleted
 
         V y = update(key(v), v, PUT, overflowing);
 

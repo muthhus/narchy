@@ -20,6 +20,7 @@ public class CaffeineMemoize<K,V> implements Memoize<K,V> {
 
     public static <K,V> Memoize<K,V> build(Function<K,V> compute) {
         return new CaffeineMemoize(Caffeine.newBuilder()
+                //.maximumSize(512*1024)
                 .weakValues()
                 //.softValues()
                 .recordStats()
