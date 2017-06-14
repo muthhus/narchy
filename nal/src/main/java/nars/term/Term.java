@@ -412,13 +412,13 @@ public interface Term extends Termlike, Comparable<Termlike> {
     }
 
     /** for convenience, delegates to the byte function */
-    static int opX(Op o, int subOp) {
+    static int opX(@NotNull Op o, int subOp) {
         return opX(o, (byte)subOp);
     }
 
     /** if filterTrueFalse is false, only filters Null's */
-    static boolean filterAbsolute(Term u, boolean filterTrueFalse) {
-        return u instanceof AtomicSingleton && (isAbsolute(u) || (filterTrueFalse && Op.isTrueOrFalse(u)));
+    static boolean filterAbsolute(@NotNull Term u, boolean filterTrueFalse) {
+        return u instanceof AtomicSingleton && (filterTrueFalse || (u == Null));
     }
 
 }

@@ -30,6 +30,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.AtomInt;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -1193,6 +1194,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @Nullable
     private Concept concept(@NotNull Termed termed, boolean createIfMissing) {
 
+        termed = termed.unneg();
+
         if (termed instanceof Concept) {
             Concept ct = (Concept) termed;
             if (!ct.isDeleted())
@@ -1200,7 +1203,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             //otherwise if it is deleted, continue
         }
 
-        Term term = conceptTerm(termed.unneg());
+        Term term = conceptTerm(termed.term());
         return (term == null) ? null : terms.concept(term, createIfMissing);
 
 
@@ -1211,6 +1214,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     @Nullable
     public Term conceptTerm(@NotNull Term term) {
+
+        if (term instanceof Atom)
+            return term;
 
         if (term instanceof Variable) {
             return null;
@@ -1246,7 +1252,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
 
 
-        if (term == null || (term instanceof Variable) || (isAbsolute(term)))
+        if (term == null || (term instanceof Variable) || (isAbsolute(term)) || term instanceof AtomInt)
             return null;
         return term;
     }

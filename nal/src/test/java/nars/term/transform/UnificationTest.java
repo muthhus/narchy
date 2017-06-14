@@ -131,8 +131,7 @@ public class UnificationTest {
 
 
         } catch (Narsese.NarseseException e) {
-            assertTrue(false);
-            return null;
+            throw new RuntimeException(e);
         }
 
     }

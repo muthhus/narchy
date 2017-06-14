@@ -35,7 +35,7 @@ public class Pri implements Priority {
 
     @Override
     public boolean isDeleted() {
-        float p = pri;
+        float p = pri();
         return p!=p; //fast NaN check
     }
 
@@ -48,7 +48,7 @@ public class Pri implements Priority {
     @Deprecated @Override
     public Priority clonePri() {
 //        throw new UnsupportedOperationException();
-        float p = pri;
+        float p = pri();
         return p != p /* deleted? */ ? null : new Pri(p);
     }
 

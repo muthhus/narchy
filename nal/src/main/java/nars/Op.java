@@ -311,7 +311,7 @@ public enum Op {
     }
 
     public static boolean isAbsolute(@NotNull Term x) {
-        return x instanceof AtomicSingleton && (isTrue(x) || isFalse(x) || x==Null);
+        return x instanceof AtomicSingleton;
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {

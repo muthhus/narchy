@@ -339,12 +339,12 @@ public class PoleCart extends NAgentX {
         //float rewardLinear = (float) (2f - Math.abs(MathUtils.normalizeAngle(angle, 0))) / 2f;
 
         float rewardLinear = (float) (Math.cos(angle));
+        //return rewardLinear;
 
-        //float rewardCubed = (float) Math.pow(rewardLinear, 3);
-        //float bias = -0.1f;
-        //return rewardCubed + bias;
+        float rewardCubed = (float) Math.pow(rewardLinear, 3);
+        float bias = 0; //-0.1f;
+        return rewardCubed + bias;
 
-        return rewardLinear;
 
 //        System.out.println(angle);
 //        return (float) angleDot;

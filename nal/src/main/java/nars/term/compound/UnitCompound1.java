@@ -100,7 +100,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         }
 
         Compound t = (Compound) that;
-
         return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ sub.equals(t.sub(0));
     }
 
