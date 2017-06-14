@@ -353,7 +353,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     @Deprecated
     @Override
     public boolean isTemporal() {
-        return term.isTemporal();
+        return false; //term.isTemporal();
     }
 
     @Nullable

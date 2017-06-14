@@ -217,8 +217,8 @@ public class RevisionTest {
                 );
         n.run(1);
         Task t = n.concept("(a)").beliefs().matchEternal();
-        assertEquals(0.37f, t.freq(), 0.01f);
-        assertEquals(0.75f, t.conf(), 0.01f);
+        assertEquals(0.37f, t.freq(), 0.02f);
+        assertEquals(0.75f, t.conf(), 0.02f);
     }
 
     @Test public void testRevision2EternalImpl() throws Narsese.NarseseException {

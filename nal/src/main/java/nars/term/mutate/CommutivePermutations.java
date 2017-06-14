@@ -1,5 +1,7 @@
 package nars.term.mutate;
 
+import nars.$;
+import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -17,7 +19,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     private final TermContainer x;
 
     public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
-        super();
+        super(x, y);
         this.y = y;
         this.x = x;
     }

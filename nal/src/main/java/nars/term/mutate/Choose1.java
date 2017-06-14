@@ -1,5 +1,6 @@
 package nars.term.mutate;
 
+import nars.$;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.term.Term;
@@ -23,7 +24,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
     private final Term[] yy;
 
     public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
-        super();
+        super(x, xEllipsis, $.sete(yFree));
 
         int ysize = yFree.size();
         if (ysize < 2) {

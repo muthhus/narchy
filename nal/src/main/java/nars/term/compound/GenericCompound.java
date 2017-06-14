@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 public class GenericCompound implements Compound {
@@ -84,6 +85,11 @@ public class GenericCompound implements Compound {
     @Override
     public final void setNormalized() {
         this.normalized = true;
+    }
+
+    @Override
+    public boolean isCommutative() {
+        return op().commutative && size() > 1;
     }
 
     @NotNull

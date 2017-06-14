@@ -377,7 +377,7 @@ public interface Compound extends Term, IPair, TermContainer {
                         if (dt() != y.dt())
                             return false;
                     } else if (op.temporal) {
-                        if (!matchTemporalDT(dt(), y.dt()))
+                        if (!matchTemporalDT(dt(), y.dt(), subst.dur))
                             return false;
 
                         //fast test for subterm equality because the compound may not be equal (different but matching dt)
@@ -405,10 +405,10 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     //TODO generalize
-    static boolean matchTemporalDT(int a, int b) {
+    static boolean matchTemporalDT(int a, int b, int dur) {
         if (a == XTERNAL || b == XTERNAL) return true;
         if (a == DTERNAL || b == DTERNAL) return true;
-        return a == b;
+        return Math.abs(a-b) <= dur;
     }
 
     @Override
@@ -725,7 +725,7 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean isTemporal() {
         return (isAny(Op.TemporalBits) && (dt() != DTERNAL))
                 ||
-                (hasAny(Op.TemporalBits) && subterms().OR(Term::isTemporal));
+                (hasAny(Op.TemporalBits) && subterms().isTemporal());
     }
 
     @Override

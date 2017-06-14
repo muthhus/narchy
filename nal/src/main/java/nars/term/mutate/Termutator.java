@@ -1,5 +1,11 @@
 package nars.term.mutate;
 
+import jcog.Util;
+import nars.$;
+import nars.term.Compound;
+import nars.term.ProxyCompound;
+import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,40 +25,22 @@ public interface Termutator {
         return -1; /* unknown */
     }
 
-    abstract class AbstractTermutator implements Termutator {
+    abstract class AbstractTermutator extends ProxyCompound implements Termutator {
 
-        /**
-         * cached key
-         */
-//        private final Object key;
-
-//        @Override
-//        public String toString() {
-//            return key().toString();
-//        }
-
-        @Override
-        public final boolean equals(@NotNull Object obj) {
-            throw new UnsupportedOperationException();
-//            return (this == obj) ||
-//                    obj instanceof AbstractTermutator
-//                        &&
-//                    key().equals(((AbstractTermutator) obj).key());
+        protected static Term wrap(TermContainer y) {
+            return $.p(y instanceof Term ? (Term)y : $.p(y.toArray()));
         }
 
-        @Override
-        public final int hashCode() {
-            throw new UnsupportedOperationException();
-            //return key().hashCode();
+        public AbstractTermutator(TermContainer... keyComponents) {
+            this(Util.map(AbstractTermutator::wrap, new Term[keyComponents.length], keyComponents));
         }
 
-//        public Object key() {
-//            Object k = this.key;
-//            if (k == null) {
-//                k = newKey();
-//            }
-//            return k;
-//        }
+        public AbstractTermutator(Term... keyComponents) {
+            this($.p(keyComponents));
+        }
 
+        public AbstractTermutator(Compound key) {
+            super(key);
+        }
     }
 }

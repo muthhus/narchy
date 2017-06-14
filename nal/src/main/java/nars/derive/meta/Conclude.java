@@ -103,7 +103,7 @@ public final class Conclude extends AbstractPred<Derivation> {
      * start for derivation concluder
      */
     private void accept(@NotNull Derivation d) {
-        NAR nar = d.nar;
+         NAR nar = d.nar;
 
         if (rule.minNAL > nar.level())  //HACK
             return;

@@ -18,6 +18,7 @@ public class ProxyCompound extends ProxyTerm<Compound> implements Compound  {
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) return true;
         return Compound.equals(this, obj);
     }
 

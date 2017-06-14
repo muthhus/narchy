@@ -504,19 +504,19 @@ public abstract class TermBuilder {
                 }
             }
 
-//            if (whichImpl != -1) {
-//
-//                int ww = whichImpl;
-////                Term[] precond = c.subterms().terms(
-////                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
-//                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
-//                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
-//                Compound origImpl = (Compound)c.sub(ww);
-//                Term newPre = replace(c, origImpl, implPre);
-//                if (newPre!=null)
-//                    return finish(IMPL, origImpl.dt(), newPre, implPost);
-//
-//            }
+            if (whichImpl != -1) {
+
+                int ww = whichImpl;
+//                Term[] precond = c.subterms().terms(
+//                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
+                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
+                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
+                Compound origImpl = (Compound)c.sub(ww);
+                Term newPre = replace(c, origImpl, implPre);
+                if (newPre!=null)
+                    return finish(IMPL, origImpl.dt(), newPre, implPost);
+
+            }
 
         }
 
@@ -1257,7 +1257,7 @@ public abstract class TermBuilder {
         Term[] newSubs = oldSubs;
 
         Op o = c.op();
-        int pdt = c.dt();
+        int pdt = !o.temporal ? c.dt() : DTERNAL; //preserve image dt
         if (st.hasAny(Op.TemporalBits)) {
 
             boolean subsChanged = false;
@@ -1280,7 +1280,7 @@ public abstract class TermBuilder {
                 newSubs = maybeNewSubs;
         }
 
-        //resolve XTERNAL temporals to lexical order
+        //resolve XTERNAL temporals to lexical order //TODO does this even matter?
         if (pdt == XTERNAL /*&& cs == 2*/) {
             if (newSubs[0].compareTo(newSubs[1]) > 0) {
                 newSubs = (newSubs == oldSubs) ? newSubs.clone() : newSubs;
@@ -1291,13 +1291,17 @@ public abstract class TermBuilder {
         }
 
 
-        boolean dtChanged = (pdt != DTERNAL && o.temporal);
-        boolean subsChanged = (newSubs != oldSubs);
+        boolean dtChanged = (pdt != c.dt());
+        boolean subsChanged = (!newSubs.equals(oldSubs));
 
         if (subsChanged || dtChanged) {
 
-            if (subsChanged && o.temporal && newSubs.length == 1) {
-                //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+            if (o.temporal && (
+                    (subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+                            //||
+                    //(newSubs.length == 2 && !newSubs[0].equals(newSubs[1])) && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+            )) {
+
 
                 if (pdt != DTERNAL)
                     pdt = XTERNAL;

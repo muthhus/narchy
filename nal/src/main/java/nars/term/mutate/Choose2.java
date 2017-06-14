@@ -2,6 +2,7 @@ package nars.term.mutate;
 
 import jcog.data.array.IntArrays;
 import jcog.math.Combinations;
+import nars.$;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.term.Term;
@@ -30,15 +31,15 @@ public class Choose2 extends Termutator.AbstractTermutator {
     @NotNull
     private final ShuffledSubterms yy;
 
-    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFreeSet) {
-        super();
+    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFree) {
+        super($.sete(x), xEllipsis, $.sete(yFree));
         this.f = f;
         this.xEllipsis = xEllipsis;
         this.x = x.toArray(new Term[x.size()]);
 
-        int yFreeSize = yFreeSet.size();
-        Term[] yFree = yFreeSet.toArray(new Term[yFreeSize]);
-        this.yy = new ShuffledSubterms(f.random, yFree);
+        int yFreeSize = yFree.size();
+
+        this.yy = new ShuffledSubterms(f.random, yFree.toArray(new Term[yFreeSize]));
 
         this.comb = new Combinations(yFreeSize, 2);
     }

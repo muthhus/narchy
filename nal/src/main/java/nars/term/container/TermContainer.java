@@ -641,6 +641,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return num > 1 && op.commutative && concurrent(dt);
     }
 
+    @Override
+    default boolean isTemporal() {
+        return OR(Term::isTemporal);
+    }
+
+
     default boolean isSorted() {
         int s = size();
         if (s < 2) return true;
@@ -841,7 +847,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     default boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
         //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
-        return unifyPossible(subst.type) && subst.addTermutator(new CommutivePermutations(this, y));
+        if (unifyPossible(subst.type)) {
+            subst.termutes.add(new CommutivePermutations(this, y));
+            return true;
+        }
+        return false;
     }
 
 

@@ -78,7 +78,6 @@ abstract public class Derivation extends Unify implements TermContext {
 
     /** current NAR time, set at beginning of derivation */
     public long time = ETERNAL;
-    public int dur = -1;
 
     @Nullable
     public  Truth taskTruth;

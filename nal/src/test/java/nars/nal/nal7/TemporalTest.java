@@ -260,17 +260,23 @@ public class TemporalTest {
         for (String op : new String[]{"&&", "<=>"}) {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
             Concept b = n.conceptualize($("(x " + op + "+1 y)"));
-            Concept c = n.conceptualize($("(x " + op + "+2 y)"));
-            Concept d = n.conceptualize($("(x " + op + "-1 y)"));
-            Concept e = n.conceptualize($("(x " + op + "+- y)"));
-            Concept f = n.conceptualize($("(y " + op + "+- x)"));
-
-            //n.concepts.forEach(System.out::println);
 
             assertTrue(a == b);
+
+            Concept c = n.conceptualize($("(x " + op + "+2 y)"));
+
             assertTrue(b == c);
+
+            Concept d = n.conceptualize($("(x " + op + "-1 y)"));
+
             assertTrue(c == d);
+
+            Concept e = n.conceptualize($("(x " + op + "+- y)"));
+
             assertTrue(d == e);
+
+            Concept f = n.conceptualize($("(y " + op + "+- x)"));
+
             assertTrue(e == f);
         }
 
@@ -579,7 +585,11 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && y)"), $.$("(x &&+1 y)")));
+        //assertEquals("", $.terms.atemporalize())
+        @NotNull Term a = $("(x && y)");
+        Term b = $.$("(x &&+1 y)");
+        assertEquals("(x&&y)", $.terms.atemporalize(b).toString());
+        assertTrue(Terms.equalAtemporally(a, b));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -587,7 +597,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && y)"), $.$("(y &&+1 x)")));
+        assertTrue(Terms.equalAtemporally(a, $.$("(y &&+1 x)")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -595,7 +605,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(x && y)"), $.$("(z &&+1 x)")));
+        assertFalse(Terms.equalAtemporally(a, $.$("(z &&+1 x)")));
 
         //        if (as == bs) {
 //            return true;
@@ -612,7 +622,11 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertFalse(Terms.equalAtemporally($("(x ==> y)"), $.$("(y ==>+1 x)")));
+        Term f = $("(x ==> y)");
+        Term g = $("(y ==>+1 x)");
+        assertEquals("(x==>y)", $.terms.atemporalize(f).toString());
+        assertEquals("(y==>x)", $.terms.atemporalize(g).toString());
+        assertFalse(Terms.equalAtemporally(f, g));
     }
 
     @Test

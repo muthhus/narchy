@@ -25,7 +25,6 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void revision()  {
         TestNAR tester = test();
-        tester.log();
         tester.mustBelieve(cycles,"<robin <-> swan>",0.87f,0.91f) ;//;//Robin is probably similar to swan.");
         tester.believe("<robin <-> swan>") ;//;//Robin is similar to swan.");
         tester.believe("<robin <-> swan>", 0.1f, 0.6f);
@@ -99,7 +98,6 @@ public class NAL2Test extends AbstractNALTest {
     @Test
     public void inheritanceToSimilarity2()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
         tester.believe("<bird <-> swan>",0.1f,0.9f);//Bird is different from swan.");
         tester.mustBelieve(cycles*4,"<bird --> swan>",0.1f,0.73f);//Bird is probably not a type of swan.");
@@ -220,7 +218,7 @@ public class NAL2Test extends AbstractNALTest {
     public void backwardInference() throws nars.Narsese.NarseseException {
         TestNAR tester = test();
 
-        tester.log();
+
         //<bird --> swimmer>. <{?x} --> swimmer>?
         tester.believe("<bird --> swimmer>");//Bird is a type of swimmer. ");
         tester.ask("<{?x} --> swimmer>");//What is a swimmer?");

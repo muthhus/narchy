@@ -412,12 +412,14 @@ abstract public class PatternCompound extends GenericCompound {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
                 case 1:
                     Term theFreeX = xFree.iterator().next();
-                    return yFree.size() == 1 ? subst.putXY(theFreeX, yFree.iterator().next()) :
-                            subst.addTermutator(
-                                    new Choose1(ellipsis, theFreeX, yFree));
+                    if (yFree.size() == 1) return subst.putXY(theFreeX, yFree.iterator().next());
+                    else {
+                        subst.termutes.add(new Choose1(ellipsis, theFreeX, yFree));
+                        return true;
+                    }
                 case 2:
-                    return subst.addTermutator(
-                            new Choose2(subst, ellipsis, xFree, yFree));
+                    subst.termutes.add(new Choose2(subst, ellipsis, xFree, yFree));
+                    return true;
                 default:
                     //3 or more combination
                     throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");

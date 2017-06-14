@@ -1,18 +1,22 @@
 package nars.term.compound;
 
 import jcog.Util;
+import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 public class GenericCompoundDT extends ProxyCompound {
 
@@ -53,12 +57,31 @@ public class GenericCompoundDT extends ProxyCompound {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (hashDT!=obj.hashCode()) return false;
 
         if (obj instanceof GenericCompoundDT) {
             GenericCompoundDT d = (GenericCompoundDT)obj;
+            if (hashDT!=d.hashDT) return false;
             if (dt!=d.dt()) return false;
             return ref.equals(d.ref);
+        } else if (obj instanceof ProxyCompound) {
+            return equals(((ProxyCompound)obj).ref);
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean isCommutative() {
+        if (op().commutative) { //TODO only test dt() if equiv or conj
+            int dt = dt();
+            switch (dt) {
+                case 0:
+                case DTERNAL:
+                    return (size() > 1);
+                case XTERNAL:
+                default:
+                    return false;
+            }
         }
         return false;
     }
@@ -86,12 +109,22 @@ public class GenericCompoundDT extends ProxyCompound {
     }
 
     @Override
-    public Term dt(int dt) {
-        if (dt == DTERNAL) {
-            return ref;
-        } else if (dt == this.dt)
+    public Term dt(int nextDT) {
+        if (nextDT == this.dt)
             return this;
-        else
-            return ref.dt(dt);
+
+            if (op().commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
+                //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
+                @NotNull TermContainer st = subterms();
+                if (!st.isSorted()) {
+                    GenericCompound g = new GenericCompound(op(), TermVector.the(Terms.sorted(subterms().toArray())));
+                    if (nextDT!=DTERNAL)
+                        return new GenericCompoundDT( g, nextDT);
+                    else
+                        return g;
+                }
+
+        }
+        return ref.dt(nextDT);
     }
 }

@@ -17,9 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static nars.Param.UnificationConstraintsMax;
 
@@ -50,7 +48,7 @@ public abstract class Unify implements Termutator, Subst {
     public final Op type;
 
     @NotNull
-    protected final List<Termutator> termutes = $.newArrayList();
+    public final Set<Termutator> termutes = new LinkedHashSet();
 
     @NotNull
     public final Versioning versioning;
@@ -61,6 +59,8 @@ public abstract class Unify implements Termutator, Subst {
     @NotNull
     public final VersionMap<Term, Term> xy;
 
+    /** temporal tolerance */
+    public int dur = 0;
 
 
     protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int ttl) {
@@ -140,13 +140,16 @@ public abstract class Unify implements Termutator, Subst {
                 if (!finish) {
                     result = true; //return to callee to continue in subsequent operation
                 } else {
-                    List<Termutator> t = termutes;
-                    if (t.isEmpty()) {
+                    int ts = termutes.size();
+                    if (ts == 0) {
                         result = onMatch();
                     } else {
 
+                        List<Termutator> t = $.newArrayList(ts+1);
+                        t.addAll(termutes);
+
                         //shuffle the ordering of the termutes themselves
-                        if (t.size() > 1)
+                        if (ts > 1)
                             Collections.shuffle(t, random);
 
                         t.add(this); //append call-back at the end
@@ -217,11 +220,6 @@ public abstract class Unify implements Termutator, Subst {
     @Nullable
     public Term resolve(@NotNull Term x) {
         return transform(x, terms);
-    }
-
-
-    public final boolean addTermutator(@NotNull Termutator x) {
-        return this.termutes.add(x);
     }
 
 
