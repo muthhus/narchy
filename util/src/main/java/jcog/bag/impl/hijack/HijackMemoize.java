@@ -3,6 +3,7 @@ package jcog.bag.impl.hijack;
 import jcog.Texts;
 import jcog.bag.impl.HijackBag;
 import jcog.data.MwCounter;
+import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jcog.util.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
@@ -134,10 +135,14 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     public void setCapacity(int i) {
         super.setCapacity(i);
 
-        float b = i > 0 ?
-                (1f / capacity()) : 0;
+        float boost = i > 0 ?
+                (float) (1f / Math.sqrt(capacity())) : 0;
 
-        set(b, b/(reprobes));
+        float cut = boost/(reprobes);
+
+        assert(cut > Pri.EPSILON);
+
+        set(boost, cut);
 
         //reprobes / (float)Math.sqrt(i) : 0;
 

@@ -42,21 +42,6 @@ public class CachedTermIndex extends StaticTermIndex {
             //CaffeineMemoize.build(buildTerm);
 
 
-
-
-
-//        @Override
-//        public float value(@NotNull ProtoCompound protoCompound) {
-//            //??
-//        }
-//    };
-
-//    final HijackMemoize<Compound,Term> normalize = new HijackMemoize<>(
-//        64 * 1024, 2,
-//        super::normalize
-//    );
-
-
     @Override
     public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u) {
         if (u.length < 2)

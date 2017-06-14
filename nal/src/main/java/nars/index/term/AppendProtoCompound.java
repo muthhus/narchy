@@ -78,7 +78,7 @@ public class AppendProtoCompound implements ProtoCompound {
         if (ss.length == s) {
             return ss; //dont reallocate it's just fine to share
         } else {
-            return this.subs = Arrays.copyOfRange(ss, 0, s);
+            return this.subs = Arrays.copyOfRange(ss, 0, s); //trim
         }
     }
 
@@ -104,21 +104,38 @@ public class AppendProtoCompound implements ProtoCompound {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
-            int newCapacity = len + Math.max(1,(len /2));
-            Term[] newItems = new Term[newCapacity];
-            System.arraycopy(this.subs, 0, newItems, 0, Math.min(len, newCapacity));
-            subs = newItems;
+            ensureCapacity(len, len + Math.max(1,(len /2)));
         }
 
-        subs[size++] = x;
-        hash = Util.hashCombine(x.hashCode(), hash);
+        _add(x);
 
         return true;
     }
 
+    protected void _add(@NotNull Term x) {
+        subs[size++] = x;
+        hash = Util.hashCombine(x.hashCode(), hash);
+    }
+
+    protected void ensureCapacity(int newCapacity) {
+        int s = this.size;
+        if (s < newCapacity)
+            ensureCapacity(s, newCapacity);
+    }
+
+    private void ensureCapacity(int curCap, int newCapacity) {
+        Term[] newItems = new Term[newCapacity];
+        System.arraycopy(this.subs, 0, newItems, 0, Math.min(curCap, newCapacity));
+        subs = newItems;
+    }
+
     public void addAll(@NotNull Term[] u) {
-        for (Term x : u)
-            add(x);
+        int ul = u.length;
+        if (ul > 0) {
+            ensureCapacity(size + ul);
+            for (Term x : u)
+                _add(x);
+        }
     }
 
     @Override
