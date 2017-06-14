@@ -1,6 +1,8 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
+import jcog.util.CaffeineMemoize;
+import jcog.util.Memoize;
 import nars.Op;
 import nars.Param;
 import nars.index.term.AppendProtoCompound;
@@ -9,6 +11,8 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Function;
 
 import static nars.Op.Null;
 
@@ -19,32 +23,26 @@ public class CachedTermIndex extends StaticTermIndex {
 
     final static Logger logger = LoggerFactory.getLogger(nars.term.util.CachedTermIndex.class);
 
-    public static final HijackMemoize<ProtoCompound, Term> terms =
-            termMemoize(256 * 1024, 3, Float.NaN, Float.NaN);
-
     public static final StaticTermIndex _terms = new StaticTermIndex();
+    static final Function<ProtoCompound, Term> buildTerm = (C) -> {
+            try {
+                return _terms.the(C.op(), C.dt(), C.subterms());
+            } catch (InvalidTermException e) {
+                if (Param.DEBUG_EXTRA)
+                    logger.error("{}", e);
+                return Null;
+            } catch (Throwable t) {
+                logger.error("{}", t);
+                return Null;
+            }
+        };
 
-    public static HijackMemoize<ProtoCompound, Term> termMemoize(int capacity, int reprobes, float boost, float cut) {
-        HijackMemoize<ProtoCompound, Term> h = new HijackMemoize<>( capacity, reprobes,
-                (C) -> {
-                    try {
-                        return _terms.the(C.op(), C.dt(), C.subterms());
-                    } catch (InvalidTermException e) {
-                        if (Param.DEBUG_EXTRA)
-                            logger.error("{}", e);
-                        return Null;
-                    } catch (Throwable t) {
-                        logger.error("{}", t);
-                        return Null;
-                    }
-                }
-        );
+    public static final Memoize<ProtoCompound, Term> terms =
+            //new HijackMemoize<>( 256 * 1024, 3, buildTerm);
+            CaffeineMemoize.build(buildTerm);
 
-        if (boost==boost && cut==cut)
-            h.set(boost, cut);
 
-        return h;
-    }
+
 
 
 //        @Override

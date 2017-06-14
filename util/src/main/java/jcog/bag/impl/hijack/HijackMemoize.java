@@ -5,6 +5,7 @@ import jcog.bag.impl.HijackBag;
 import jcog.data.MwCounter;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
+import jcog.util.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
@@ -26,7 +27,7 @@ import java.util.function.Function;
  * TODO add an instrumentation wrapper to collect statistics
  * about cache efficiency and also processing time of the calculations
  */
-public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<K, V>>> implements Function<K, V> {
+public class HijackMemoize<K, V> extends PriorityHijackBag<K, PriReference<Pair<K, V>>> implements Memoize<K,V> {
 
     float CACHE_HIT_BOOST;
     float CACHE_DENY_DAMAGE; //damage taken by a cell in rejecting an attempted hijack
