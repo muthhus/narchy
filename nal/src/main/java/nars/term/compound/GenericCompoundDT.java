@@ -1,12 +1,10 @@
 package nars.term.compound;
 
 import jcog.Util;
-import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.container.TermContainer;
@@ -59,10 +57,29 @@ public class GenericCompoundDT extends ProxyCompound {
         if (this == obj) return true;
 
         if (obj instanceof GenericCompoundDT) {
+
             GenericCompoundDT d = (GenericCompoundDT)obj;
-            if (hashDT!=d.hashDT) return false;
-            if (dt!=d.dt()) return false;
-            return ref.equals(d.ref);
+
+            Compound ref = this.ref;
+            Compound dref = d.ref;
+
+            if (ref == dref) {
+                //ok
+            } else if (ref.equals(dref)) {
+                //share equivalent instance
+                d.ref = ref;
+
+//                if (System.identityHashCode(ref) < System.identityHashCode(dref)) {
+//                    this.ref = dref;
+//                } else {
+//                    d.ref = this.ref;
+//                }
+
+            } else {
+                return false;
+            }
+
+            return (hashDT == d.hashDT && dt == d.dt);
         } else if (obj instanceof ProxyCompound) {
             return equals(((ProxyCompound)obj).ref);
         }

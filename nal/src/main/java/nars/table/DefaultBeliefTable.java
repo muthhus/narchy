@@ -22,9 +22,9 @@ import static nars.time.Tense.ETERNAL;
 public class DefaultBeliefTable implements BeliefTable {
 
     @Nullable
-    public EternalTable eternal = EternalTable.EMPTY;
+    public EternalTable eternal = null;
     @Nullable
-    public TemporalBeliefTable temporal = TemporalBeliefTable.EMPTY;
+    public TemporalBeliefTable temporal = null;
 
 
     /**
@@ -34,21 +34,21 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Truth truth(long when, long now, int dur) {
 
-        Truth tt = temporal.truth(when, dur, eternal);
+        Truth tt = temporal().truth(when, dur, eternal);
 
-        return (tt != null) ? tt : eternal.truth();
+        return (tt != null) ? tt : eternal().truth();
 
     }
 
     @Override
     public boolean removeTask(Task x) {
-        return (x.isEternal()) ? eternal.removeTask(x) : temporal.removeTask(x);
+        return (x.isEternal()) ? eternal().removeTask(x) : temporal().removeTask(x);
     }
 
     @Override
     public void clear() {
-        temporal.clear();
-        eternal.clear();
+        temporal().clear();
+        eternal().clear();
     }
 
     @NotNull
@@ -56,15 +56,15 @@ public class DefaultBeliefTable implements BeliefTable {
     @Deprecated
     public final Iterator<Task> iterator() {
         return Iterators.concat(
-                eternal.iterator(),
-                temporal.taskIterator()
+                eternal().taskIterator(),
+                temporal().taskIterator()
         );
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
-        eternal.forEachTask(action);
-        temporal.forEachTask(action);
+        eternal().forEachTask(action);
+        temporal().forEachTask(action);
     }
 
     @Override
@@ -76,27 +76,38 @@ public class DefaultBeliefTable implements BeliefTable {
     public float priSum() {
         final float[] total = {0};
         Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
-        eternal.forEachTask(totaler);
-        temporal.forEachTask(totaler);
+        eternal().forEachTask(totaler);
+        temporal().forEachTask(totaler);
         return total[0];
     }
 
     @Override
     public int size() {
-        return eternal.size() + temporal.size();
+        return eternal().size() + temporal().size();
     }
 
     @Override
     @Deprecated
     public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
-        return eternal.capacity() + temporal.capacity();
+        return eternal().capacity() + temporal().capacity();
     }
 
     @Override
     public final void capacity(int eternals, int temporals) {
-        temporal.setCapacity(temporals);
-        eternal.setCapacity(eternals);
+        temporal().setCapacity(temporals);
+        eternal().setCapacity(eternals);
+    }
+
+    public EternalTable eternal() {
+        @Nullable EternalTable e = eternal;
+        if (e == null) return EternalTable.EMPTY;
+        return e;
+    }
+    public TemporalBeliefTable temporal() {
+        @Nullable TemporalBeliefTable t = temporal;
+        if (t == null) return TemporalBeliefTable.EMPTY;
+        return t;
     }
 
     /**
@@ -105,18 +116,16 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, Random rng) {
 
-        final Task ete = eternal.strongest();
-        if (when == ETERNAL) {
-            if (ete != null) {
-                return ete;
-            }
+        final Task ete = eternal().strongest();
+        if (ete!=null && when == ETERNAL) {
+            return ete;
         }
 
         if (now != ETERNAL) {
             if (when == ETERNAL)
                 when = now;
 
-            Task tmp = temporal.match(when, now, dur, against, rng);
+            Task tmp = temporal().match(when, now, dur, against, rng);
 
             if (tmp == null) {
                 return ete;
@@ -139,7 +148,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
-            if (eternal == EternalTable.EMPTY) {
+            if (eternal == null) {
                 //synchronized (concept) {
                     /*if (eternal == EternalTable.EMPTY)*/ {
                         int cap = concept.state().beliefCap(concept, input.isBelief(), true);
@@ -154,7 +163,7 @@ public class DefaultBeliefTable implements BeliefTable {
             eternal.add(input, concept, nar);
 
         } else {
-            if (temporal == TemporalBeliefTable.EMPTY) {
+            if (temporal == null) {
                 //synchronized (concept) {
                     /*if (temporal == TemporalBeliefTable.EMPTY)*/ { //HACK double boiler
                         int cap = concept.state().beliefCap(concept, input.isBelief(), false);

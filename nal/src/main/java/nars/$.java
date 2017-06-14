@@ -174,13 +174,12 @@ public enum $ {
     /**
      * function ((a,b)==>c) aka: c(a,b)
      */
-    @NotNull
     public static Compound func(@NotNull Atomic opTerm, @Nullable Term... arg) {
-        return (Compound) the(
+        return compoundOrNull(the(
                 INH,
                 arg == null ? Terms.ZeroProduct : $.p(arg),
                 opTerm
-        );
+        ));
     }
 
     @NotNull

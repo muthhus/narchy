@@ -2,7 +2,7 @@ package nars.derive.meta;
 
 import nars.$;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
+import nars.term.compound.ProxyCompound;
 
 /**
  * Created by me on 4/21/17.

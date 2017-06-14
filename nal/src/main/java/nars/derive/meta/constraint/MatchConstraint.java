@@ -4,7 +4,7 @@ import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.AbstractPred;
 import nars.derive.meta.BoolPred;
-import nars.term.ProxyCompound;
+import nars.term.compound.ProxyCompound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.apache.commons.lang3.ArrayUtils;

@@ -12,6 +12,7 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
@@ -26,7 +27,7 @@ import java.util.function.Function;
  */
 public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K,V> {
 
-    public static class HalfWeakPair<K,V> extends WeakReference<V> implements Priority {
+    public static class HalfWeakPair<K,V> extends SoftReference<V> implements Priority {
         public final K key;
         private final int hash;
         private float pri;
@@ -138,7 +139,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         float boost = i > 0 ?
                 (float) (1f / Math.sqrt(capacity())) : 0;
 
-        float cut = boost/(reprobes);
+        float cut = boost;// /(reprobes);
 
         assert(cut > Pri.EPSILON);
 

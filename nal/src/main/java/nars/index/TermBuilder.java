@@ -443,11 +443,7 @@ public abstract class TermBuilder {
             else return Null;
         }
 
-        Term y = compound(NEG, x);
-        if (y instanceof Compound && x.isNormalized()) {
-            ((Compound) y).setNormalized(); //share normalization state
-        }
-        return y;
+        return new UnitCompound1(NEG, x);
     }
 
 

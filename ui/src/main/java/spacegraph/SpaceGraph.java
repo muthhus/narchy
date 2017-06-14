@@ -47,15 +47,13 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         preAdd.clear();
     }
 
-    public SpaceGraph() {
-        this(2 * 1024);
-    }
+
 
     /**
      * number of items that will remain cached, some (ideally most)
      * will not be visible but once were and may become visible again
      */
-    public SpaceGraph(int cacheCapacity) {
+    public SpaceGraph() {
         super();
 
         Cache<X, Spatial<X>> atoms =
@@ -66,8 +64,8 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                         .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
                             v.delete(dyn);
                         })
-                        .maximumSize(cacheCapacity)
-                        //.weakValues()
+                        //.maximumSize(cacheCapacity)
+                        .weakValues()
                         .build();
 
         this.atoms = atoms;

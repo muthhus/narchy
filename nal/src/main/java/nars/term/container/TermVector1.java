@@ -20,25 +20,25 @@ import java.util.function.Predicate;
 public class TermVector1 implements TermContainer {
 
     public final Term sub;
+    private final int hash1;
 
     public TermVector1(Term sub) {
+
         this.sub = sub;
+        this.hash1 = Util.hashCombine(sub.hashCode(), 1); //HACK consistent with Terms.hash(..)
     }
 
     @Override
     public int hashCode() {
-        return Util.hashCombine(sub.hashCode(), 1); //HACK consistent with Terms.hash(..)
+        return hash1;
     }
-
-
-
 
     @Override
     public boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
         if (obj instanceof TermContainer) {
             TermContainer t = (TermContainer) obj;
-            if (t.size()==1 && sub.equals(t.sub(0)))
+            if (hash1 == t.hashCode() && t.size()==1 && sub.equals(t.sub(0)))
                 return true;
         }
         return false;

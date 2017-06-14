@@ -3,11 +3,10 @@ package nars.term.mutate;
 import jcog.Util;
 import nars.$;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
+import nars.term.compound.ProxyCompound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 

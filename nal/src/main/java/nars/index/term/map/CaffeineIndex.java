@@ -109,7 +109,13 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public void start(NAR nar) {
         super.start(nar);
-        nar.onCycle(concepts::cleanUp);
+        nar.onCycle(this::cleanUp);
+    }
+
+    protected void cleanUp() {
+        concepts.cleanUp();
+        if (subterms!=null)
+            subterms.cleanUp();
     }
 
     @NotNull
@@ -121,8 +127,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
         if (subterms!=null) {
             int len = a.length;
-            if (len < 2)
-                return v; //dont intern 1-element containers
+            if (len < 1)
+                return v; //dont intern small or empty containers
 
             //        //HACK
             //        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
