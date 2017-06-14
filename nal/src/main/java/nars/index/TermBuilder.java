@@ -128,7 +128,7 @@ public abstract class TermBuilder {
                 return statement(op, dt, u[0], u[1]);
 
             case PROD:
-                return (arity != 0) ? compound(op, dt, u) : Terms.ZeroProduct;
+                return (arity != 0) ? compound(op, u) : Terms.ZeroProduct;
 
         }
 
@@ -282,21 +282,23 @@ public abstract class TermBuilder {
         return TermVector.the(s);
     }
 
-    protected Compound newCompound(@NotNull Op op, int dt, Term[] subterms) {
-        if (!(this instanceof PatternTermIndex) /* HACK */ && subterms.length==1 && dt == DTERNAL) {
+    protected Compound newCompound(@NotNull Op op, Term[] subterms) {
+        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.length==1) {
             return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
         }
-        return newCompound(op, dt, intern(subterms));
+        return newCompound(op, intern(subterms));
     }
 
     /**
      * directly constructs a new instance, applied at the end.
      */
-    protected Compound newCompound(@NotNull Op op, int dt, TermContainer subterms) {
-        if (!(this instanceof PatternTermIndex) /* HACK */ && subterms.size()==1 && dt == DTERNAL) {
+    protected Compound newCompound(@NotNull Op op, TermContainer subterms) {
+        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.size()==1) {
             return new UnitCompound1(op, subterms.sub(0)); //HACK avoid creating the TermContainer if possible
         }
-        return new GenericCompound(op, dt, subterms);
+
+
+        return new GenericCompound(op, subterms);
     }
 
 
@@ -351,26 +353,16 @@ public abstract class TermBuilder {
     }
 
     @NotNull
-    private Term finalize(@NotNull Op op, int dt, @NotNull Set<Term> args) {
-        return compound(op, dt, Terms.sorted(args));
+    private Term compound(@NotNull Op op, @NotNull Set<Term> argsToBeSorted) {
+        return compound(op, Terms.sorted(argsToBeSorted));
     }
 
-    @NotNull
-    private Term finalize(@NotNull Op op, @NotNull Set<Term> args) {
-        return finalize(op, DTERNAL, args);
-    }
-
-
-    @NotNull
-    private Term finalize(@NotNull Op op, @NotNull Term... args) {
-        return compound(op, DTERNAL, args);
-    }
 
     /**
      * NOTE: terms must be sorted, if they need to be, before calling.
      */
     @NotNull
-    protected Term compound(@NotNull Op op, int dt, @NotNull Term... args) {
+    protected Term compound(@NotNull Op op, @NotNull Term... args) {
 
         int s = args.length;
         assert (s != 0);
@@ -408,7 +400,7 @@ public abstract class TermBuilder {
             }
         }
 
-        return newCompound(op, dt, args);
+        return newCompound(op, args);
         //}
     }
 
@@ -451,7 +443,7 @@ public abstract class TermBuilder {
             else return Null;
         }
 
-        Term y = compound(NEG, DTERNAL, x);
+        Term y = compound(NEG, x);
         if (y instanceof Compound && x.isNormalized()) {
             ((Compound) y).setNormalized(); //share normalization state
         }
@@ -511,23 +503,28 @@ public abstract class TermBuilder {
                     whichImpl = i;
                 }
             }
-            if (whichImpl != -1) {
 
-                int ww = whichImpl;
-//                Term[] precond = c.subterms().terms(
-//                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
-                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
-                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
-                Compound origImpl = (Compound)c.sub(ww);
-                Term newPre = $.terms.replace(c, origImpl, implPre);
-                if (newPre!=null)
-                    return $.impl(newPre, origImpl.dt(), implPost);
-
-            }
+//            if (whichImpl != -1) {
+//
+//                int ww = whichImpl;
+////                Term[] precond = c.subterms().terms(
+////                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
+//                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
+//                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
+//                Compound origImpl = (Compound)c.sub(ww);
+//                Term newPre = replace(c, origImpl, implPre);
+//                if (newPre!=null)
+//                    return finish(IMPL, origImpl.dt(), newPre, implPost);
+//
+//            }
 
         }
 
         return x;
+    }
+
+    public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
+        return $.terms.replace(c, x, y);
     }
 
     @NotNull
@@ -643,13 +640,28 @@ public abstract class TermBuilder {
                 if (csa != null)
                     cs.addAll(csa);
 
-                return finalize(CONJ, dt, cs);
+                return compound(CONJ, dt, cs);
             }
         }
 
         return False;
     }
 
+    private Term compound(Op op, int dt, Set<Term> cs) {
+        Term x = compound(op, cs);
+        if (dt!=DTERNAL && x instanceof GenericCompound) {
+            return ((GenericCompound)x).dt(dt);
+        }
+        return x;
+    }
+
+    private Term compound(Op op, int dt, Term... cs) {
+        Term x = compound(op, cs);
+        if (dt!=DTERNAL && x instanceof GenericCompound) {
+            return ((GenericCompound)x).dt(dt);
+        }
+        return x;
+    }
 
     /**
      * this is necessary to keep term structure consistent for intermpolation.
@@ -789,7 +801,7 @@ public abstract class TermBuilder {
 
                 if (subject.equals(predicate))
                     return True;
-                if (isTrue(subject) || isFalse(subject) || isTrue(predicate) || isFalse(predicate))
+                if (isAbsolute(subject) || isAbsolute(predicate))
                     return False;
                 break;
 
@@ -845,7 +857,7 @@ public abstract class TermBuilder {
 
                 if (dt == XTERNAL) {
                     //create as-is
-                    return compound(op, XTERNAL, subject, predicate);
+                    return finish(op, XTERNAL, subject, predicate);
                 } else {
                     boolean equal = subject.equals(predicate);
                     if (concurrent(dt)) {
@@ -886,7 +898,7 @@ public abstract class TermBuilder {
 
                 if (dt == XTERNAL) {
                     //create as-is
-                    return compound(op, XTERNAL, subject, predicate);
+                    return finish(op, XTERNAL, subject, predicate);
                 } else {
                     if (concurrent(dt)) {
                         if (subject.equals(predicate))
@@ -1026,7 +1038,7 @@ public abstract class TermBuilder {
 
         }
 
-        return compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
+        return finish(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
 
 
     }
@@ -1146,7 +1158,7 @@ public abstract class TermBuilder {
             args.add(term2);
         }
 
-        return finalize(intersection, args);
+        return compound(intersection, args);
     }
 
 
@@ -1158,7 +1170,7 @@ public abstract class TermBuilder {
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s == null || s.isEmpty() ? Null : (Compound) finalize(o, s);
+        return s == null || s.isEmpty() ? Null : (Compound) compound(o, s);
     }
 
 
@@ -1177,7 +1189,7 @@ public abstract class TermBuilder {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
         }
-        return (Compound) finalize(o, t);
+        return (Compound) compound(o, t);
     }
 
     @NotNull
@@ -1301,9 +1313,9 @@ public abstract class TermBuilder {
 //            }
 
             Compound xx = compoundOrNull(
-                    compound(o,
-                            pdt,
-                            subsChanged ? newSubs : oldSubs)
+                    subsChanged ? compound(o, newSubs).dt(pdt)
+                            :
+                            c.dt(pdt)
             );
             if (xx == null)
                 throw new InvalidTermException("unable to atemporalize", c);

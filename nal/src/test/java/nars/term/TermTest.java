@@ -637,7 +637,8 @@ public class TermTest {
         assertValidTermValidConceptInvalidTaskContent(()->imageExt(Atomic.the("X"), Atomic.the("Y")));
         assertValidTermValidConceptInvalidTaskContent(()->imageInt(Atomic.the("X"), Atomic.the("Y")));
 
-        assertEquals("(/,X,_)", $("(/,X,_)").toString());
+        Term xx = $("(/,X,_)");
+        assertEquals("(/,X,_)", xx.toString());
         assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
 
         assertEquals("(/,X,Y,_)", imageExt($("X"), $("Y"), $("_")).toString());

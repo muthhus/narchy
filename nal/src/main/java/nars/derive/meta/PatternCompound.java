@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import nars.$;
+import nars.IO;
 import nars.Op;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
@@ -23,18 +24,40 @@ abstract public class PatternCompound extends GenericCompound {
     public final int sizeCached;
     public final int structureCached;
     public final boolean commutativeCached;
+    private final int dt;
+    private final int hashDT;
 
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
-        super(seed.op(), seed.dt(), subterms);
+        super(seed.op(), subterms);
 
         if (seed.isNormalized())
             this.setNormalized();
+
+        this.dt = seed.dt();
+        this.hashDT = seed.hashCode();
 
         sizeCached = seed.size();
         structureCached =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
         commutativeCached = super.isCommutative();
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return IO.Printer.stringify(this).toString();
+    }
+
+
+    @Override
+    public int dt() {
+        return dt;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashDT;
     }
 
     @Override
@@ -61,12 +84,11 @@ abstract public class PatternCompound extends GenericCompound {
         }
 
 
-
         abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return op == y.op() && y.hasAll(structureCached) && matchEllipsis((Compound)y, subst);
+            return op == y.op() && y.hasAll(structureCached) && matchEllipsis((Compound) y, subst);
         }
 
 
@@ -313,7 +335,7 @@ abstract public class PatternCompound extends GenericCompound {
             int dir = subst.random.nextBoolean() ? +1 : -1;
             int i = subst.random.nextInt(s);
             int ik = i;
-            for (int k = 0; k < s; k++, ik+=dir) {
+            for (int k = 0; k < s; k++, ik += dir) {
                 if (ik < 0) ik += s;
                 else ik = ik % s;
                 Term x = sub(ik);
@@ -392,7 +414,7 @@ abstract public class PatternCompound extends GenericCompound {
                     Term theFreeX = xFree.iterator().next();
                     return yFree.size() == 1 ? subst.putXY(theFreeX, yFree.iterator().next()) :
                             subst.addTermutator(
-                                new Choose1(ellipsis, theFreeX, yFree));
+                                    new Choose1(ellipsis, theFreeX, yFree));
                 case 2:
                     return subst.addTermutator(
                             new Choose2(subst, ellipsis, xFree, yFree));
@@ -435,7 +457,6 @@ abstract public class PatternCompound extends GenericCompound {
 
 
     }
-
 
 
 }

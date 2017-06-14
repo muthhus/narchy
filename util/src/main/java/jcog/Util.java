@@ -383,7 +383,7 @@ public enum Util {
 
     public static int hashCombine(int a, int b, int c) {
 
-        return hashCombine(a, hashCombine(b, c)); //TODO decide if this is efficient and hashes well
+        return hashCombine(hashCombine(a, b), c); //TODO decide if this is efficient and hashes well
 
         //https://gist.github.com/badboy/6267743
 //        a=a-b;  a=a-c;  a=a^(c >>> 13);

@@ -66,7 +66,7 @@ public class UnitCompound1Test {
 //        System.out.println(u.sub(0));
         assertEquals(UnitCompound1.class, u.getClass());
 
-        GenericCompound g = new GenericCompound(NEG, DTERNAL, TermVector.the(x));
+        GenericCompound g = new GenericCompound(NEG, TermVector.the(x));
         assertNotSame(u, g);
         assertEquals(u, g);
         assertEquals(g, u);

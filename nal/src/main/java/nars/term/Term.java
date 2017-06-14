@@ -114,11 +114,14 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
 
     /**
+     * equlity has already been tested prior to calling this
      * @param y     another term
      * @param subst the unification context
      * @return whether unification succeeded
      */
-    boolean unify(@NotNull Term y, @NotNull Unify subst);
+    default boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        return false;
+    }
 
 
     /**
@@ -331,8 +334,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
         if (d != 0)
             return d;
 
-        if (y instanceof ProxyTerm)
-            y = ((ProxyTerm)y).ref; //de-ref
+//        if (y instanceof ProxyTerm)
+//            y = ((ProxyTerm)y).ref; //de-ref
 
         if (this.equals(y)) return 0;
 
@@ -419,6 +422,12 @@ public interface Term extends Termlike, Comparable<Termlike> {
     /** if filterTrueFalse is false, only filters Null's */
     static boolean filterAbsolute(@NotNull Term u, boolean filterTrueFalse) {
         return u instanceof AtomicSingleton && (filterTrueFalse || (u == Null));
+    }
+
+    default Term dt(int dt) {
+        if (dt!=DTERNAL)
+            throw new UnsupportedOperationException("temporality not supported");
+        return this;
     }
 
 }

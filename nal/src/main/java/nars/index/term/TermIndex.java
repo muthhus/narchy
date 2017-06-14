@@ -427,12 +427,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
 
     @Nullable
-    public final Term replace(@NotNull Term src, Map<Term, Term> m) {
+    public final Term replace(@NotNull Term src, @NotNull Map<Term, Term> m) {
         return new MapSubst(m).transform(src, this);
     }
 
     @Nullable
-    public final Term replace(@NotNull Term src, Term from, Term to) {
+    public final Term replace(@NotNull Term src, @NotNull Term from, @NotNull Term to) {
         return new MapSubst1(from, to).transform(src, this);
     }
 

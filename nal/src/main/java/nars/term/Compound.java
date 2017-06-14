@@ -64,6 +64,45 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface Compound extends Term, IPair, TermContainer {
 
+    static boolean equals(Compound a, @Nullable Object b) {
+        if (a == b)
+            return true;
+
+
+        Compound bc;
+        if (b instanceof Compound) {
+            bc = (Compound) b;
+        } /*else if (that instanceof CompoundConcept) { //Termed but not Task
+            cthat = ((CompoundConcept) that).term();
+            if (this == cthat)
+                return true;
+        } */ else {
+            return false;
+        }
+
+        return
+                (a.hashCode() == b.hashCode())
+                        &&
+                        (a.op() == bc.op())
+                        &&
+                        (a.dt() == bc.dt())
+                        &&
+                        (a.subterms().equals(bc.subterms()))
+                ;
+
+        //subterm sharing:
+//        if (as != cs) {
+//            if (!as.equivalent(cs)) {
+//                return false;
+//            } else {
+//                //share the subterms vector
+//                if (cthat instanceof GenericCompound) {
+//                    this.subterms = cs; //HACK cast sucks
+//                }
+//            }
+//        }
+    }
+
     @NotNull
     TermContainer subterms();
 
@@ -306,6 +345,8 @@ public interface Compound extends Term, IPair, TermContainer {
         });
         return appendTo;
     }
+
+
 
     /**
      * unification matching entry point (default implementation)

@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.subst.Unify;
@@ -62,10 +63,6 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.toString();
     }
 
-    @Override
-    public int compareTo(@NotNull Termlike y) {
-        return (ref == y) ? 0 : ref.compareTo(y);
-    }
 
     @Override
     public boolean AND(Predicate<Term> v) {
@@ -142,20 +139,21 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.isCommutative();
     }
 
-    @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        return ref.unify(y, subst);
-    }
+//    @Override
+//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+//        return ref.unify(y, subst);
+//    }
+//    @Override
+//    public Term eval(TermContext index) {
+//        return ref.eval(index);
+//    }
 
     @Override
-    public void append(@NotNull Appendable w) throws IOException {
-        ref.append(w);
+    public void append(@NotNull Appendable p) throws IOException {
+        ref.append(p);
     }
 
-    @Override
-    public Term eval(TermContext index) {
-        return ref.eval(index);
-    }
+
 
     @Override
     public boolean isDynamic() {

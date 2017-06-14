@@ -141,7 +141,7 @@ public class TermReductionsTest {
     public void testSimilarityNegatedSubterms() throws Narsese.NarseseException {
 //        assertEquals(("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))").toString());
 //        assertEquals(("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))").toString());
-        assertEquals("((P)<->(--,(Q)))", $("((P)<->(--,(Q)))").toString()); //NO change
+        assertEquals("((--,(Q))<->(P))", $("((P)<->(--,(Q)))").toString()); //NO change
         assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
     }
     @Test public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
