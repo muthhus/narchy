@@ -47,7 +47,7 @@ public class HaiQAgent extends HaiQ {
     }
 
     protected void start(int inputs, int states, int outputs) {
-        logger.info("start {} -> {} -> {}", inputs, states, outputs);
+        //logger.info("start {} -> {} -> {}", inputs, states, outputs);
         ae = perception(inputs, states);
         super.start(states, outputs);
     }

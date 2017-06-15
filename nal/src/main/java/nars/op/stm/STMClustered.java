@@ -184,6 +184,18 @@ public abstract class STMClustered extends STM {
 
         }
 
+        /** returns the range of values seen for the given dimension */
+        public double range(int dim) {
+            final double[] min = {Double.POSITIVE_INFINITY};
+            final double[] max = {Double.NEGATIVE_INFINITY};
+            tasks.forEach(x -> {
+                double v = x.coord[dim];
+                if (v < min[0]) min[0] = v;
+                if (v > max[0]) max[0] = v;
+            });
+            return Double.isFinite(min[0]) ? max[0] - min[0] : 0;
+        }
+
 //        public float confMin() {
 //            return (float)tasks.stream().mapToDouble(t->t.get().conf()).min().getAsDouble();
 //        }
@@ -228,7 +240,7 @@ public abstract class STMClustered extends STM {
 
 
         private TasksNode nearest() {
-            return net.put(coord);
+            return net.put(filter(coord));
         }
 
         @Override
@@ -257,6 +269,13 @@ public abstract class STMClustered extends STM {
 ////                return -1;
 //            return id.compareTo(oid);
 //        }
+    }
+
+
+    /** allows transparent filtering of a task's coord vector just prior to gasnet learning.
+     * ex: for normalization or shifting of time etc */
+    protected double[] filter(@NotNull double[] coord) {
+        return coord;
     }
 
 //    @Deprecated final float baseForgetRate = 0.01f;
@@ -333,6 +352,8 @@ public abstract class STMClustered extends STM {
 
         if (busy.compareAndSet(false, true)) {
 
+            now = nar.time();
+
             int rr = removed.size();
             for (int i = 0; i < rr; i++) {
                 TasksNode t = removed.pollFirst();
@@ -345,7 +366,6 @@ public abstract class STMClustered extends STM {
 
             net.compact();
 
-            now = nar.time();
 
             input.forEach(t -> {
 

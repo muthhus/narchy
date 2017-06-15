@@ -2,6 +2,7 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.data.MutableInteger;
+import jcog.learn.gng.impl.Node;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import jcog.pri.mix.PSink;
@@ -22,10 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static nars.Op.CONJ;
 import static nars.term.Terms.normalizedOrNull;
@@ -55,6 +53,7 @@ public class MySTMClustered extends STMClustered {
     float confMin;
 
     long lastIteration;
+    private int dur;
 
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, float drainRatePerDuration) {
         this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float)size/maxGroupSize * drainRatePerDuration));
@@ -96,12 +95,19 @@ public class MySTMClustered extends STMClustered {
         return c;
     }
 
+    @Override
+    protected double[] filter(@NotNull double[] coord) {
+        double[] d = coord.clone();
+        d[0] -= now;
+        d[1] -= now;
+        return d;
+    }
 
     @Override
     protected TasksNode newCentroid(int id) {
         TasksNode t = new TasksNode(id);
-        t.randomizeUniform(0, now - 1, now + 1);
-        t.randomizeUniform(1, now - 1, now + 1);
+        t.randomizeUniform(0, -dur*2, +dur*2);
+        t.randomizeUniform(1, -dur*2, +dur*2);
         t.randomizeUniform(2, 0f, 1f);
         t.randomizeUniform(3, 0f, 1f);
         return t;
@@ -113,6 +119,7 @@ public class MySTMClustered extends STMClustered {
         if (super.iterate()) {
 
             confMin = nar.confMin.floatValue();
+            dur = nar.dur();
 
             //LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
 
@@ -123,7 +130,7 @@ public class MySTMClustered extends STMClustered {
             float deltaT = now - lastIteration;
             lastIteration = now;
 
-            int inputs = Math.round(inputsPerDur * deltaT / nar.dur());
+            int inputs = Math.round(inputsPerDur * deltaT / dur);
             if (inputs > 0) {
                 cluster(inputs, minGroupSize, maxGroupSize);
             }
@@ -139,21 +146,22 @@ public class MySTMClustered extends STMClustered {
     }
 
     private void cluster(int limit, int minGroupSize, int maxGroupSize) {
-        List<ITask> toInput = $.newArrayList(0);
+
+        Map<Term, Task> vv = new HashMap();
+
         net.nodeStream()
-                //.parallel()
-                //.sorted((a, b) -> Float.compare(a.priSum(), b.priSum()))
+                .filter(x -> x.size() >= minGroupSize)
+                .sorted(Comparator.comparingDouble(x -> x.localError() / (x.size() )))
                 .filter(n -> {
+
+                    //System.out.println(n.localError() + " " + n.size() + " " + n.toString());
 
                     if (n == null || n.size() < minGroupSize)
                         return false;
 
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
-                    double[] ts = n.coherence(0);
-                    double[] te = n.coherence(1);
 
-                    if (ts != null && (maxGroupSize == 2 || (ts[1] >= timeCoherenceThresh && te[1] >= timeCoherenceThresh))) {
                         double[] fc = n.coherence(2);
                         if (fc != null && fc[1] >= freqCoherenceThresh) {
                             double[] cc = n.coherence(3);
@@ -162,18 +170,15 @@ public class MySTMClustered extends STMClustered {
                             }
                             //return true;
                         }
-                    }
+
                     return false;
                 })
-                .flatMap(node -> {
+                .flatMap(n -> {
 
-                    @Nullable double[] freqDim = node.coherence(2);
+                    @Nullable double[] freqDim = n.coherence(2);
                     if (freqDim == null)
                         return null;
 
-                    @Nullable double[] startDim = node.coherence(0);
-                    if (startDim == null)
-                        return null;
 
                     float freq = (float) freqDim[0];
 
@@ -187,15 +192,21 @@ public class MySTMClustered extends STMClustered {
 
                     float finalFreq = freq;
                     int maxVol = nar.termVolumeMax.intValue();
-                    return node.chunk(maxGroupSize, maxVol - 1).map(tt -> {
+
+                    //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
+                    int gSize = ((n.range(0) <= dur && n.range(1) <= dur)) ? maxGroupSize : 2;
+
+                    System.out.println(gSize);
+
+                    return n.chunk(gSize, maxVol - 1).map(tt -> {
 
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
                         //get only the maximum confidence task for each term
                         final long[] start = {Long.MAX_VALUE};
                         final long[] end = {Long.MIN_VALUE};
-                        Map<Term, Task> vv = new HashMap(tt.size());
 
+                        vv.clear();
                         tt.forEach(_z -> {
                             Task z = _z.get();
                             //if (z != null) {
@@ -275,10 +286,8 @@ public class MySTMClustered extends STMClustered {
 
                     }).filter(Objects::nonNull);
 
-                }).limit(limit).forEach(toInput::add);
+                }).limit(limit).forEach(in::input);
 
-        if (!toInput.isEmpty())
-            in.input(toInput);
 
     }
 
