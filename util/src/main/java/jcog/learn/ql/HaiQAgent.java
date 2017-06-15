@@ -21,7 +21,7 @@ public class HaiQAgent extends HaiQ {
     final static float perceptionAlpha = 0.02f;
     float perceptionNoise = 0.005f;
     float perceptionCorruption = 0.01f;
-    float perceptionForget = 0.01f;
+    float perceptionForget = 0.0f;
 
     //float aeForget = 1f;
 
@@ -48,13 +48,14 @@ public class HaiQAgent extends HaiQ {
 
     protected void start(int inputs, int states, int outputs) {
         logger.info("start {} -> {} -> {}", inputs, states, outputs);
-        ae = new Autoencoder(inputs, states, new XorShift128PlusRandom(1));
+        ae = perception(inputs, states);
         super.start(states, outputs);
     }
 
-    public Autoencoder perception() {
-        return ae;
+    protected Autoencoder perception(int inputs, int states) {
+        return new Autoencoder(inputs, states, rng);
     }
+
 
     @Override
     protected int nextAction(int state) {

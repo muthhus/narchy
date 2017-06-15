@@ -75,7 +75,7 @@ abstract public class HaiQ implements Agent {
     protected final Deciding decideAction;
 
     public HaiQ() {
-        rng = new XorShift128PlusRandom(1);
+        rng = new XorShift128PlusRandom();
         decideState = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
         decideAction = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
     }
@@ -85,6 +85,9 @@ abstract public class HaiQ implements Agent {
     }
 
     int learn(int state, float reward, float confidence, boolean decide) {
+
+        if (reward!=reward)
+            reward = 0; //interpret NaN as neutral 0
 
         // 1. decide next action
         int action = decide ? nextAction(state) : -1;
@@ -184,8 +187,6 @@ abstract public class HaiQ implements Agent {
      */
     @Override
     public final int act(float reward, float[] input) {
-        if (reward!=reward)
-            reward = 0; //interpret NaN as neutral 0
 
         return learn(perceive(input), reward);
     }

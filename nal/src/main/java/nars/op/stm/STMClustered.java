@@ -6,9 +6,9 @@ import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Node;
-import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
+import jcog.pri.WeakPLinkUntilDeleted;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
@@ -49,9 +49,9 @@ public abstract class STMClustered extends STM {
 
     final Deque<TasksNode> removed =
             new ArrayDeque<>();
-            //new ConcurrentLinkedDeque<>();
+    //new ConcurrentLinkedDeque<>();
 
-    final static double[] noCoherence = { 0, 0 };
+    final static double[] noCoherence = {0, 0};
 
     public final class TasksNode extends Node {
 
@@ -113,29 +113,18 @@ public abstract class STMClustered extends STM {
         }
 
         public void insert(@NotNull TLink x) {
-            Task xx = x.get();
-            //priSub(cycleCost(id));
 
-            if (xx != null) {
-
-                if (x.node != this) {
-                    tasks.add(x);
-                    x.node = this;
-                }
-
-            } else {
-                //task is deleted
-                if (x.node == this) {
-                    tasks.remove(x);
-                    x.node = null;
-                }
+            if (x.node != this) {
+                tasks.add(x);
+                x.node = this;
             }
+
+
         }
 
         public void delete() {
             tasks.clear();
         }
-
 
 
         /**
@@ -146,7 +135,7 @@ public abstract class STMClustered extends STM {
 
             double[] v = Util.variance(tasks.stream().mapToDouble(t -> t.coord[dim])); //HACK slow
 
-            if (v==null)
+            if (v == null)
                 return noCoherence;
 
             v[1] = 1f / (1f + Math.sqrt(v[1])); //convert variance to coherence
@@ -167,7 +156,7 @@ public abstract class STMClustered extends STM {
             final int[] currentVolume = {0};
             return tasks.stream().
                     //filter(x -> x.get() != null).
-                    collect(Collectors.groupingBy(tx -> {
+                            collect(Collectors.groupingBy(tx -> {
 
                         Task x = tx.get();
                         if (x == null)
@@ -205,7 +194,7 @@ public abstract class STMClustered extends STM {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends PLinkUntilDeleted<Task> implements Truthed {
+    public final class TLink extends WeakPLinkUntilDeleted<Task> implements Truthed {
 
         /**
          * feature vector representing the item as learned by clusterer
@@ -219,7 +208,7 @@ public abstract class STMClustered extends STM {
         @Nullable TasksNode node;
 
         public TLink(@NotNull Task t) {
-            super(t, t.priSafe(0));
+            super(t, t.priElseZero());
             this.coord = getCoord(t);
         }
 
@@ -231,7 +220,7 @@ public abstract class STMClustered extends STM {
         @NotNull
         @Override
         public String toString() {
-            return id + "<<" +
+            return get() + "<<" +
                     (coord != null ? Arrays.toString(coord) : "0") +
                     '|' + (node != null ? node.id : "null") +
                     ">>";
@@ -239,9 +228,7 @@ public abstract class STMClustered extends STM {
 
 
         private TasksNode nearest() {
-            synchronized (net) {
-                return net.put(coord);
-            }
+            return net.put(coord);
         }
 
         @Override
@@ -286,13 +273,12 @@ public abstract class STMClustered extends STM {
     abstract double[] getCoord(@NotNull Task t);
 
 
-    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int expectedTasksPerNode) {
+    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int centroids) {
         super(nar, capacity);
 
         this.dims = dims;
 
-        //TODO make this adaptive
-        clusters = (short) Math.max(2f, 1f + capacity.floatValue() / expectedTasksPerNode);
+        this.clusters = (short) centroids;
 
         this.punc = punc;
 
@@ -309,20 +295,14 @@ public abstract class STMClustered extends STM {
 //            }
 
 
+                    @Override
+                    public void onRemoved(@NotNull PriReference<Task> value) {
+                        TasksNode owner = ((TLink) value).node;
+                        if (owner != null)
+                            owner.remove((TLink) value);
+                    }
 
-            @Override
-            public void onRemoved(@NotNull PriReference<Task> value) {
-                super.onRemoved(value);
-                drop((TLink) value);
-            }
-
-
-//            @Override
-//            public void onRemoved(@Nullable BLink<Task> value) {
-//                drop((TLink) value);
-//            }
-
-        };
+                };
 
         this.net = new NeuralGasNet<>(dims, clusters) {
             @NotNull
@@ -368,10 +348,10 @@ public abstract class STMClustered extends STM {
             now = nar.time();
 
             input.forEach(t -> {
-                if (t != null) {
-                    TLink tt = (TLink) t;
-                    tt.nearest().transfer(tt);
-                }
+
+                TLink tt = (TLink) t;
+                tt.nearest().transfer(tt);
+
             });
 
             busy.set(false);
@@ -395,12 +375,6 @@ public abstract class STMClustered extends STM {
             input.put(new TLink(t));
         }
 
-    }
-
-    protected void drop(@NotNull TLink displaced) {
-        TasksNode owner = displaced.node;
-        if (owner != null)
-            owner.remove(displaced);
     }
 
     public int size() {

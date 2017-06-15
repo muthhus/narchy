@@ -37,9 +37,13 @@ public final class STMTemporalLinkage extends STM {
 
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
+        this(nar, capacity, false);
+    }
+
+    public STMTemporalLinkage(@NotNull NAR nar, int capacity, boolean allowNonInput) {
         super(nar, new MutableInteger(capacity));
 
-        allowNonInput = false;
+        this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
 
         //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();

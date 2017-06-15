@@ -109,7 +109,7 @@ abstract public class NAgentX extends NAgent {
 
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
-        NARS n = new NARS(clock, new XorShift128PlusRandom(1), 2);
+        NARS n = new NARS(clock, new XorShift128PlusRandom(), 2);
 
 //        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
 //        conceptState.beliefsMaxTemp.set(32);
@@ -119,18 +119,18 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.beliefConfidence(0.5f);
+        n.goalConfidence(0.5f);
 
-        float p = 0.5f;
-        n.DEFAULT_BELIEF_PRIORITY = 1f * p;
-        n.DEFAULT_GOAL_PRIORITY = 1f * p;
-        n.DEFAULT_QUESTION_PRIORITY = 0.75f * p;
-        n.DEFAULT_QUEST_PRIORITY = 0.75f * p;
+
+        n.DEFAULT_BELIEF_PRIORITY = 1;
+        n.DEFAULT_GOAL_PRIORITY = 1;
+        n.DEFAULT_QUESTION_PRIORITY = 1;
+        n.DEFAULT_QUEST_PRIORITY = 1;
         n.termVolumeMax.setValue(40);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 4, false, 16);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, true);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, false, 0.25f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 

@@ -63,6 +63,10 @@ public class XorShift128PlusRandom extends Random {
 		setSeed( seed );
 	}
 
+	public XorShift128PlusRandom(  ) {
+		this(System.nanoTime());
+	}
+
 	@Override
 	public long nextLong() {
 		long s1 = s0;

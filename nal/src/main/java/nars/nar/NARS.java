@@ -8,6 +8,8 @@ import jcog.math.FloatAveraged;
 import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
+import jcog.pri.mix.control.HaiQMixAgent;
+import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
 import nars.$;
@@ -36,7 +38,6 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Op.*;
-import static nars.nar.NARS.PostBand.*;
 
 /**
  * recursive cluster of NAR's
@@ -57,16 +58,6 @@ public class NARS extends NAR {
     private AffinityExecutor pool;
     private List<NARLoop> loops;
 
-
-    enum PostBand {
-        Premise,
-        NAL,
-        Activation,
-        ConceptFire,
-        Other
-    }
-
-
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
@@ -76,39 +67,41 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInput() {
-        return new RLMixControl<>(this::inputSub, 10f,
+        return new RLMixControl<>(this::inputSub, 30f,
+
+                //new HaiQMixAgent(),
+                new MultiHaiQMixAgent(),
 
                 new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 5),
 
                 12,
 
-                new EnumClassifier<>("type", PostBand.values().length, (x) -> {
-                    PostBand result;
+                new EnumClassifier<>("type", new String[] {
+                    "Belief", "Goal", "Question", "Quest",
+                    "Activation", "Premise", "ConceptFire"
+                }, (x) -> {
+
                     if (x instanceof Task) {
-                        result = NAL;
-//                    switch (x.punc()) {
-//                        case BELIEF:
-//                            result = PostBand.DerivedBelief; break;
-//                        case GOAL:
-//                            result = PostBand.DerivedGoal; break;
-//                        case QUESTION:
-//                            result = PostBand.DerivedQuestion; break;
-//                        case QUEST:
-//                            result = PostBand.DerivedQuest; break;
-//                        default:
-//                            result = Other; break;
-//                    }
+                        //NAL
+                        switch (x.punc()) {
+                            case BELIEF:
+                                return 0;
+                            case GOAL:
+                                return 1;
+                            case QUESTION:
+                                return 2;
+                            case QUEST:
+                                return 3;
+                        }
                     } else if (x instanceof Activate) {
-                        result = Activation;
+                        return 4;
                     } else if (x instanceof nars.control.Premise) {
-                        result = PostBand.Premise;
+                        return 5;
                     } else if (x instanceof ConceptFire) {
-                        result = PostBand.ConceptFire;
-                    } else {
-                        result = Other;
+                        return 6;
                     }
 
-                    return result.ordinal();
+                    return -1;
                 }),
 
                 new EnumClassifier<>("complexity", 3, (t) -> {
@@ -119,26 +112,10 @@ public class NARS extends NAR {
                         if (c < m / 2) return 1;
                         return 2;
                     }
-                    return -1; //n/A
-                }),
-                new EnumClassifier<>("punc", 4, (t) -> {
-                    if (t instanceof NALTask) {
-                        switch (((NALTask) t).punc()) {
-                            case BELIEF:
-                                return 0;
-                            case GOAL:
-                                return 1;
-                            case QUESTION:
-                                return 2;
-                            case QUEST:
-                                return 3;
-                            default:
-                                throw new RuntimeException("unknown punc");
-                        }
-                    }
                     return -1;
                 }),
-                new EnumClassifier<>("when", 3, (t) -> {
+
+                new EnumClassifier<>("when", new String[] { "Present", "Future", "Past" }, (t) -> {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
@@ -157,7 +134,7 @@ public class NARS extends NAR {
 //                    (x) -> x.stamp().length <= 2),
 //            new MixRouter.Classifier<>("unoriginal",
 //                    (x) -> x.stamp().length > 2),
-        ); //new Mix<>(nalMix::accept);
+        );
     }
 
     @Override

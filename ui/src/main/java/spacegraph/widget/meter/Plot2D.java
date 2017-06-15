@@ -2,6 +2,7 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import jcog.event.On;
 import jcog.list.FasterList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -23,7 +24,7 @@ public class Plot2D extends Surface {
         this.title = title;
     }
 
-    public Plot2D on(Function<Runnable,On> trigger) {
+    public Plot2D on(Function<Runnable, On> trigger) {
         synchronized (series) {
             if (on != null)
                 on.off(); //remove previous handler
@@ -46,12 +47,14 @@ public class Plot2D extends Surface {
 
         String name;
 
-        /** history size */
+        /**
+         * history size
+         */
         private final int capacity;
 
         protected transient float maxValue, minValue;
 
-        public float[] color = { 1, 1, 1, 0.75f };
+        public float[] color = {1, 1, 1, 0.75f};
 
         @Override
         public float[] toArray() {
@@ -74,7 +77,7 @@ public class Plot2D extends Surface {
 
         public void setName(String name) {
             this.name = name;
-            Draw.colorHash( name, color );
+            Draw.colorHash(name, color);
         }
 
 
@@ -96,13 +99,14 @@ public class Plot2D extends Surface {
                 //mean += v;
             });
         }
+
         public void range(float min, float max) {
             minValue = min;
             maxValue = max;
         }
 
         protected void limit() {
-            int over = size() - (this.capacity-1);
+            int over = size() - (this.capacity - 1);
             for (int i = 0; i < over; i++)
                 removeAtIndex(0);
         }
@@ -139,17 +143,18 @@ public class Plot2D extends Surface {
     public Plot2D add(String name, DoubleSupplier valueFunc, float min, float max) {
         Series s;
         add(s = new Series(name, maxHistory) {
-            @Override public void update() {
+            @Override
+            public void update() {
                 double v = valueFunc.getAsDouble();
 
                 limit();
-                if (v!=v) {
+                if (v != v) {
                     //throw new RuntimeException("invalid value");
                     add(Float.NaN);
                 } else {
                     if (v < min) v = min;
                     if (v > max) v = max;
-                    add((float)v);
+                    add((float) v);
                 }
 
             }
@@ -160,13 +165,14 @@ public class Plot2D extends Surface {
     }
 
     public Plot2D add(String name, DoubleSupplier valueFunc) {
-            add(new Series(name, maxHistory) {
-                @Override public void update() {
-                    limit();
-                    add((float) valueFunc.getAsDouble());
-                    autorange();
-                }
-            });
+        add(new Series(name, maxHistory) {
+            @Override
+            public void update() {
+                limit();
+                add((float) valueFunc.getAsDouble());
+                autorange();
+            }
+        });
 
         return this;
     }
@@ -200,7 +206,7 @@ public class Plot2D extends Surface {
 
         plotVis.draw(series, gl, minValue, maxValue);
 
-        if (title!=null) {
+        if (title != null) {
 //            gl.glEnable(GL2.GL_COLOR_LOGIC_OP);
 //            gl.glLogicOp(GL2.GL_XOR);
 
@@ -258,16 +264,16 @@ public class Plot2D extends Surface {
         }
     };
 
-    public float[] backgroundColor = { 0, 0, 0, 0.75f };
+    public float[] backgroundColor = {0, 0, 0, 0.75f};
 
     public static final PlotVis Line = (List<Series> series, GL2 gl, float minValue, float maxValue) -> {
         if (minValue == maxValue) {
             float center = minValue;
-            minValue = center - (center/2);
-            maxValue = center + (center/2);
+            minValue = center - (center / 2);
+            maxValue = center + (center / 2);
         }
 
-        gl.glColor4f(1f,1f,1f, 1f); //gray
+        gl.glColor4f(1f, 1f, 1f, 1f); //gray
 
         gl.glLineWidth(2);
 
@@ -284,7 +290,7 @@ public class Plot2D extends Surface {
 
             Series s = series.get(si);
 
-            float mid = ypos(minValue ,maxValue, (s.minValue + s.maxValue)/2f);
+            float mid = ypos(minValue, maxValue, (s.minValue + s.maxValue) / 2f);
 
 
             int ss = s.size();
@@ -300,29 +306,34 @@ public class Plot2D extends Surface {
 
             gl.glBegin(GL.GL_LINE_STRIP);
             float range = maxValue - minValue;
-            float ny = mid;
+            float yy = Float.NaN;
             float x = 0;
             float dx = (W / histSize);
+            //float epsilon = 0.001f * range;
+            //int repeats = 0;
             for (int i = 0; i < ss; i++) {
 
                 float v = ssh[i];
-                if (v==v) {
-                    ny = ypos(minValue, range, v);
-                    gl.glVertex2f(x, ny);
-                }
+                float ny = (v == v) ? ypos(minValue, range, v) : mid /*HACK for NaN*/;
+//                if (Util.equals(ny, yy, epsilon))
+//                    repeats++;
+//                else
+//                    repeats = 0;
+//                if (repeats < 3 || (i == ss - 1) || (i == 0)) {
+                    gl.glVertex2f(x, yy = ny);
+                //}
 
                 x += dx;
-                //py = ny;
             }
             gl.glEnd();
 
             gl.glLineWidth(2);
-            Draw.text(gl, s.name, 0.04f, W, ny, 0, Draw.TextAlignment.Right);
+            Draw.text(gl, s.name, 0.04f, W, yy, 0, Draw.TextAlignment.Right);
 
         }
     };
 
-//    private static float ypos(float minValue, float maxValue, float v) {
+    //    private static float ypos(float minValue, float maxValue, float v) {
 //        float ny = (v - minValue) / (maxValue - minValue);
 //        //if (ny < 0) ny = 0;
 //        //else if (ny > 1.0) ny = 1.0f;

@@ -44,9 +44,8 @@ public class MySTMClustered extends STMClustered {
     //public final Topic<Task> generate = new ArrayTopic<>();
 
     private final int maxGroupSize;
-    private final int maxInputVolume;
     private final int minGroupSize;
-    private final int inputsPerFrame;
+    private final int inputsPerDur;
     private final PSink<Object, ITask> in;
 
     float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
@@ -55,29 +54,30 @@ public class MySTMClustered extends STMClustered {
 
     float confMin;
 
+    long lastIteration;
 
-    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize) {
-        this(nar, size, punc, maxGroupSize, false, 1);
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, float drainRatePerDuration) {
+        this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float)size/maxGroupSize * drainRatePerDuration));
+    }
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int inputsPerDuration) {
+        this(nar, size, punc, 2, maxGroupSize,
+                //Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
+                allowNonInput,
+                inputsPerDuration);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int intinputsPerCycle) {
-        this(nar, size, punc, maxGroupSize, maxGroupSize,
-                Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
-                , allowNonInput,
-                intinputsPerCycle);
-    }
-
-    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, int maxInputVolume, boolean allowNonInput, int inputsPerFrame) {
-        super(4, nar, new MutableInteger(size), punc, maxGroupSize*3 /* groups per node */);
+    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, boolean allowNonInput, int inputsPerDur) {
+        super(4, nar, new MutableInteger(size), punc, (int) Math.round(Math.sqrt(size)) /* estimate */);
 
         this.minGroupSize = minGroupSize;
         this.maxGroupSize = maxGroupSize;
-        this.maxInputVolume = maxInputVolume;
 
-        this.inputsPerFrame = inputsPerFrame;
+        this.inputsPerDur = inputsPerDur;
         //this.logger = LoggerFactory.getLogger(toString());
 
         this.allowNonInput = allowNonInput;
+
+        lastIteration = nar.time();
 
         this.in = nar.in.stream(this);
         net.setAlpha(0.05f);
@@ -108,16 +108,6 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Override
-    public void accept(@NotNull Task t) {
-
-        if (t.punc() == punc && t.volume() <= maxInputVolume) {
-
-            input.put(new TLink(t));
-        }
-
-    }
-
-    @Override
     protected boolean iterate() {
 
         if (super.iterate()) {
@@ -129,9 +119,14 @@ public class MySTMClustered extends STMClustered {
             //clusters where all terms occurr simultaneously at precisely the same time
             //cluster(maxConjunctionSize, 1.0f, freqCoherenceThresh);
 
-            cluster((int)Math.max(0, (inputsPerFrame
-                    //* (1f-nar.exe.load())
-            )), minGroupSize, maxGroupSize);
+            long now = nar.time();
+            float deltaT = now - lastIteration;
+            lastIteration = now;
+
+            int inputs = Math.round(inputsPerDur * deltaT / nar.dur());
+            if (inputs > 0) {
+                cluster(inputs, minGroupSize, maxGroupSize);
+            }
 
             //clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
             //if (maxGroupSize != 2)
@@ -144,9 +139,6 @@ public class MySTMClustered extends STMClustered {
     }
 
     private void cluster(int limit, int minGroupSize, int maxGroupSize) {
-        if (limit == 0)
-            return;
-
         List<ITask> toInput = $.newArrayList(0);
         net.nodeStream()
                 //.parallel()
