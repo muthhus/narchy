@@ -360,14 +360,14 @@ public interface Stamp {
 
     //Stamp setEvidence(long... evidentialSet);
 
-    @NotNull
-    static long[] zip(@NotNull Task a, @NotNull Task b) {
-        @Nullable long[] bb = b.stamp();
-        @Nullable long[] aa = a.stamp();
-        return (a.creation() > b.creation()) ?
-                Stamp.zip(bb, aa) :
-                Stamp.zip(aa, bb);
-    }
+//    @NotNull
+//    static long[] zip(@NotNull Task a, @NotNull Task b) {
+//        @Nullable long[] bb = b.stamp();
+//        @Nullable long[] aa = a.stamp();
+//        return (a.creation() > b.creation()) ?
+//                Stamp.zip(bb, aa) :
+//                Stamp.zip(aa, bb);
+//    }
 
     static int evidenceLength(int aLen, int bLen) {
         return Math.max(Param.STAMP_CAPACITY, aLen + bLen);

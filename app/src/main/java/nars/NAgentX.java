@@ -38,6 +38,7 @@ import static spacegraph.layout.Grid.*;
  */
 abstract public class NAgentX extends NAgent {
 
+
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
     public NAgentX(String id, NAR nar) {
@@ -113,13 +114,14 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
+        int HISTORY = 24;
         RLMixControl m = (RLMixControl) n.in;
         window(row(
 
-                mixPlot(a, m, 32),
+                mixPlot(a, m, HISTORY),
 
                 col(
-                        new Plot2D(32, Plot2D.Line)
+                        new Plot2D(HISTORY, Plot2D.Line)
                                 .add("happy", () -> m.lastScore)
                                 .on(a::onFrame),
 
@@ -141,8 +143,8 @@ abstract public class NAgentX extends NAgent {
                         new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
 
                         row(
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[5].q),
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[4].q)
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[10].q),
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[13].q)
                         ),
                         //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 

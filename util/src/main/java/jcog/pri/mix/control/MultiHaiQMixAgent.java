@@ -66,7 +66,7 @@ public class MultiHaiQMixAgent implements MixAgent {
         agent = new HaiQAgent[o];
         for (int oo = 0; oo < o; oo++) {
             int ooo = oo;
-            agent[oo] = new HaiQAgent(in.volume(), in.volume() / 4,
+            agent[oo] = new HaiQAgent(in.volume(), in.volume() / 2,
                     controlRelative ? 3 : controlResolution + 1) {
 
                 @Override

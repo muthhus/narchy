@@ -112,7 +112,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
                 //new RingBufferTensor(
                             TensorChain.get(
                                 this.traffic = new ArrayTensor(size), //sum is normalized to 1
-                                agentOut.scale(1f/agentOut.volume())
+                                agentOut //.scale(1f/size)
                             )
                   //      , 1)
                 //,12)

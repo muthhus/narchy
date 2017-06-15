@@ -347,7 +347,12 @@ abstract public class Derivation extends Unify implements TermContext {
     @Nullable
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
-            evidenceDouble = Stamp.zip(task.stamp(), belief.stamp());
+            Truth tt = task.truth();
+            float te = tt!=null ?
+                    tt.conf() :  //for belief/goal use the task conf
+                    task.priElseZero(); //for question/quest, use the task priority
+            float be = belief.conf();
+            evidenceDouble = Stamp.zip(task.stamp(), belief.stamp(), te/(te+be));
 //            if ((task.cyclic() || belief.cyclic()) && Stamp.isCyclic(evidenceDouble))
 //                throw new RuntimeException("cyclic should not be propagated");
             //System.out.println(Arrays.toString(task.evidence()) + " " + Arrays.toString(belief.evidence()) + " -> " + Arrays.toString(evidenceDouble));

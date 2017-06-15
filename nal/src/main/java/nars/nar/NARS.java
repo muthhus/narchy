@@ -73,7 +73,7 @@ public class NARS extends NAR {
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
 
-                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 4),
+                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 1),
 
                 8,
 
