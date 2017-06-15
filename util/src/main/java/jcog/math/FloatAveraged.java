@@ -9,7 +9,14 @@ public class FloatAveraged implements FloatSupplier {
     //TODO use a primitive deque
     final FloatArrayList data;
 
-    public FloatAveraged(FloatSupplier src, int history) {
+    public static FloatSupplier averaged(FloatSupplier src, int history) {
+        if (history <= 1)
+            return src;
+        return new FloatAveraged(src, history);
+    }
+
+    FloatAveraged(FloatSupplier src, int history) {
+        assert(history > 1);
         data = new FloatArrayList(history);
         this.src = src;
         this.history = history;

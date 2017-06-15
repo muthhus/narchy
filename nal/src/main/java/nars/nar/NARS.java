@@ -19,6 +19,7 @@ import nars.Task;
 import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
+import nars.control.Premise;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -67,14 +68,14 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInput() {
-        return new RLMixControl<>(this::inputSub, 30f,
+        return new RLMixControl<>(this::inputSub, 20f,
 
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
 
-                new FloatAveraged(emotion.happy.sumIntegrator()::meanThenClear, 5),
+                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 4),
 
-                12,
+                8,
 
                 new EnumClassifier<>("type", new String[] {
                     "Belief", "Goal", "Question", "Quest",
@@ -95,7 +96,7 @@ public class NARS extends NAR {
                         }
                     } else if (x instanceof Activate) {
                         return 4;
-                    } else if (x instanceof nars.control.Premise) {
+                    } else if (x instanceof Premise) {
                         return 5;
                     } else if (x instanceof ConceptFire) {
                         return 6;

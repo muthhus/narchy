@@ -1,6 +1,7 @@
 package jcog.math;
 
 import jcog.tensor.ArrayTensor;
+import jcog.tensor.Tensor;
 import jcog.tensor.TensorChain;
 import org.junit.Test;
 
@@ -58,7 +59,7 @@ public class TensorTest {
         a.set(1, 2);
         ArrayTensor b = new ArrayTensor(2);
         b.set(2, 0);
-        TensorChain ab = new TensorChain(a, b);
+        Tensor ab = TensorChain.get(a, b);
         assertEquals(1, ab.shape().length);
         assertEquals(6, ab.shape()[0]);
 

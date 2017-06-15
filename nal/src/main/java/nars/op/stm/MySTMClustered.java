@@ -39,14 +39,11 @@ public class MySTMClustered extends STMClustered {
 
     private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
 
-    //public final Topic<Task> generate = new ArrayTopic<>();
-
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
     private final PSink<Object, ITask> in;
 
-    float timeCoherenceThresh = 0.99f; //only used when not in group=2 sequence pairs phase
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;
 
@@ -58,6 +55,7 @@ public class MySTMClustered extends STMClustered {
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, float drainRatePerDuration) {
         this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float)size/maxGroupSize * drainRatePerDuration));
     }
+
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int inputsPerDuration) {
         this(nar, size, punc, 2, maxGroupSize,
                 //Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
@@ -65,7 +63,7 @@ public class MySTMClustered extends STMClustered {
                 inputsPerDuration);
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, boolean allowNonInput, int inputsPerDur) {
+    MySTMClustered(@NotNull NAR nar, int size, byte punc, int minGroupSize, int maxGroupSize, boolean allowNonInput, int inputsPerDur) {
         super(4, nar, new MutableInteger(size), punc, (int) Math.round(Math.sqrt(size)) /* estimate */);
 
         this.minGroupSize = minGroupSize;
@@ -195,8 +193,6 @@ public class MySTMClustered extends STMClustered {
 
                     //if temporal clustering is close enough, allow up to maxGroupSize in &&, otherwise lmiit to 2
                     int gSize = ((n.range(0) <= dur && n.range(1) <= dur)) ? maxGroupSize : 2;
-
-                    System.out.println(gSize);
 
                     return n.chunk(gSize, maxVol - 1).map(tt -> {
 

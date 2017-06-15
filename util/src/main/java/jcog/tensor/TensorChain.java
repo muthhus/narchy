@@ -3,15 +3,17 @@ package jcog.tensor;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
 /** chains 2 or more tensors along the 0th dimension */
-public class TensorChain implements Tensor {
+public class TensorChain extends BatchArrayTensor {
 
     private final Tensor[] sub;
-    private final int[] shape;
 
+    public static Tensor get(Tensor... t) {
+        assert(t.length > 0);
 
-    public TensorChain(Tensor... t) {
-        this.sub = t;
-        this.shape = t[0].shape().clone();
+        if (t.length==1)
+            return t[0];
+
+        int[] shape = t[0].shape().clone();
         shape[0] = 0;
         for (Tensor x : t) {
             int[] xs = x.shape();
@@ -21,20 +23,26 @@ public class TensorChain implements Tensor {
             }
             shape[0] += xs[0];
         }
+        return new TensorChain(shape, t);
     }
 
-    @Override
-    public float get(int... cell) {
-        //TODO test
-        Tensor target = sub[0];
-        int x = cell[0];
-        int i = 0;
-        int next;
-        while (x > (next = target.shape()[i++]))
-            x -= next;
-        cell[0] = x;
-        return sub[i-1].get(cell);
+    TensorChain(int[] shape, Tensor... sub) {
+        super(shape);
+        this.sub = sub;
     }
+
+//    @Override
+//    public float get(int... cell) {
+//        //TODO test
+//        Tensor target = sub[0];
+//        int x = cell[0];
+//        int i = 0;
+//        int next;
+//        while (x > (next = target.shape()[i++]))
+//            x -= next;
+//        cell[0] = x;
+//        return sub[i-1].get(cell);
+//    }
 
     @Override
     public float get(int linearCell) {
@@ -42,16 +50,16 @@ public class TensorChain implements Tensor {
     }
 
     @Override
-    public float[] snapshot() {
-        //throw new UnsupportedOperationException();
-        return null;
+    protected void update() {
+        int[] p = new int[] { 0 };
+
+        for (Tensor x : sub) {
+            x.forEach((i,v) -> {
+               data[p[0]++] = v;
+            });
+        }
     }
 
-
-    @Override
-    public int[] shape() {
-        return shape;
-    }
 
     @Override
     public void forEach(IntFloatProcedure  sequential, int start, int end) {
@@ -65,8 +73,4 @@ public class TensorChain implements Tensor {
         }
     }
 
-    @Override
-    public float[] get() {
-        return snapshot();
-    }
 }

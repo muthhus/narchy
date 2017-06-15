@@ -3,6 +3,7 @@ package jcog.pri.mix.control;
 import jcog.Util;
 import jcog.learn.ql.HaiQAgent;
 import jcog.tensor.ArrayTensor;
+import jcog.tensor.Tensor;
 
 public class HaiQMixAgent implements MixAgent {
 
@@ -10,12 +11,8 @@ public class HaiQMixAgent implements MixAgent {
     float delta = 0.25f;
 
     @Override
-    public void act(ArrayTensor in, float score, ArrayTensor out) {
+    public void act(Tensor in, float score, ArrayTensor out) {
         if (agent == null) {
-            //TODO wrap input with chain that includes feedback from previous
-            /*   new TensorChain(
-                                //agentOut
-            */
             agent = new HaiQAgent(in.volume(), in.volume() / 2, out.volume() * 2);
         }
 

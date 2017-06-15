@@ -1,11 +1,11 @@
 package jcog.tensor;
 
+import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
 import java.util.function.Supplier;
 
 public interface Tensor extends Supplier<float[]> {
-
 
     float get(int... cell);
 
@@ -23,7 +23,9 @@ public interface Tensor extends Supplier<float[]> {
 //    }
 //    ..etc
 
-    /** total # cells */
+    /**
+     * total # cells
+     */
     default int volume() {
         int[] s = shape();
         int v = s[0];
@@ -32,24 +34,50 @@ public interface Tensor extends Supplier<float[]> {
         return v;
     }
 
-    /** receives the pair: linearIndex,value (in increasing order) */
+    /**
+     * receives the pair: linearIndex,value (in increasing order)
+     */
     default void forEach(IntFloatProcedure sequential) {
         forEach(sequential, 0, volume());
     }
 
-    /** receives the pair: linearIndex,value (in increasing order within provided subrange, end <= volume()) */
-    void forEach(IntFloatProcedure  sequential, int start, int end);
+    /**
+     * receives the pair: linearIndex,value (in increasing order within provided subrange, end <= volume())
+     */
+    void forEach(IntFloatProcedure sequential, int start, int end);
 
     default void writeTo(float[] target) {
-        forEach((i,v)->{
-           target[i] = v;
+        forEach((i, v) -> {
+            target[i] = v;
         });
     }
 
     default void writeTo(float[] target, int offset) {
-        forEach((i,v)->{
-           target[i + offset] = v;
+        forEach((i, v) -> {
+            target[i + offset] = v;
         });
+    }
+
+    default void writeTo(FloatToFloatFunction perElement, float[] target) {
+        writeTo(perElement, target, 0);
+    }
+
+    default void writeTo(FloatToFloatFunction perElement, float[] target, int offset) {
+        forEach((i, v) -> {
+            target[i + offset] = perElement.valueOf(v);
+        });
+    }
+
+    default Tensor apply(FloatToFloatFunction f) {
+        return new FuncTensor(this, f);
+    }
+
+    default Tensor add(float v) {
+        return apply((x) -> x + v);
+    }
+
+    default Tensor scale(float v) {
+        return apply((x) -> x * v);
     }
 
 //    int[] coord(int index, int[] coord);

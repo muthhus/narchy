@@ -87,18 +87,18 @@ public class Pacman extends NAgentX {
             return 2f * (Util.sigmoid(r) - 0.5f);
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
-        Default n = NARBuilder.newMultiThreadNAR(
-                2,
-                new RealTime.DSHalf(true)
-                        .durFPS(5f), true);
-
-        Pacman a = new Pacman(n);
-        a.startRT(5f);
-
-
-        NAgentX.chart(a);
-
-    }
+//    public static void main(String[] args) throws Narsese.NarseseException {
+//        Default n = NARBuilder.newMultiThreadNAR(
+//                2,
+//                new RealTime.DSHalf(true)
+//                        .durFPS(5f));
+//
+//        Pacman a = new Pacman(n);
+//        a.startRT(5f);
+//
+//
+//        NAgentX.chart(a);
+//
+//    }
 
 }

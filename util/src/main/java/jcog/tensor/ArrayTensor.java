@@ -60,7 +60,7 @@ public class ArrayTensor implements
 
     @Override
     public float get(int... cell) {
-        return data[index(cell)];
+        return get(index(cell));
     }
 
     @Override
@@ -76,12 +76,12 @@ public class ArrayTensor implements
 
     @Override
     public void set(float newValue, int... cell) {
-        data[index(cell)] = newValue;
+        set(newValue, index(cell));
     }
 
     @Override
     public float[] snapshot() {
-        return data.clone();
+        return get().clone();
     }
 
     @Override
@@ -104,8 +104,9 @@ public class ArrayTensor implements
 
     @Override
     public void forEach(IntFloatProcedure each, int start, int end) {
+        float[] d = get();
         for (int i = start; i < end; i++ ) {
-            each.value(i, data[i]);
+            each.value(i, d[i]);
         }
     }
 

@@ -3,6 +3,7 @@ package jcog.learn.ql;
 import jcog.data.Range;
 import jcog.decide.DecideSoftmax;
 import jcog.decide.Deciding;
+import jcog.decide.DecideEpsilonGreedy;
 import jcog.learn.Agent;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -76,15 +77,19 @@ abstract public class HaiQ implements Agent {
 
     public HaiQ() {
         rng = new XorShift128PlusRandom();
-        decideState = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
-        decideAction = new DecideSoftmax(0.25f, 0.1f, 0.99f, rng);
+        decideState =
+                //DecideEpsilonGreedy.ArgMax;
+                new DecideSoftmax(0.1f, rng);
+        decideAction =
+                //new DecideEpsilonGreedy(0.05f, rng);
+                new DecideSoftmax(0.1f, rng);
     }
 
     int learn(int state, float reward) {
         return learn(state, reward, 1f, true);
     }
 
-    int learn(int state, float reward, float confidence, boolean decide) {
+    int learn(int state, float reward, float learningFactor, boolean decide) {
 
         if (reward!=reward)
             reward = 0; //interpret NaN as neutral 0
@@ -99,10 +104,10 @@ abstract public class HaiQ implements Agent {
 
             float DeltaQ = (reward + (Gamma * q[state][action]))
                     - q[lastState][lastAction];
-            et[lastState][lastAction] += confidence;
+            et[lastState][lastAction] += learningFactor;
 
             // 3. update
-            update(DeltaQ);
+            update(DeltaQ, Alpha.floatValue() * learningFactor);
         }
 
         if (decide) {
@@ -121,12 +126,12 @@ abstract public class HaiQ implements Agent {
         return rng.nextInt(actions);
     }
 
-    private void update(float deltaQ) {
+    private void update(float deltaQ, float alpha) {
 
         float[][] q = this.q;
         float[][] et = this.et;
 
-        float alphaDelta = Alpha.floatValue() * deltaQ;
+        float alphaDelta = alpha * deltaQ;
         float gammaLambda = Gamma * Lambda;
 
 
@@ -173,7 +178,7 @@ abstract public class HaiQ implements Agent {
         q = new float[inputs][outputs];
         et = new float[inputs][outputs];
 
-        setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
+        setQ(1f, 0.5f, 0.9f); // 0.1 0.5 0.9
     }
 
     public void setQ(float alpha, float gamma, float lambda) {
@@ -186,7 +191,7 @@ abstract public class HaiQ implements Agent {
      * main control function
      */
     @Override
-    public final int act(float reward, float[] input) {
+    public int act(float reward, float[] input) {
 
         return learn(perceive(input), reward);
     }

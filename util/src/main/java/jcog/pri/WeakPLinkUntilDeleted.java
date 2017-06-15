@@ -12,7 +12,7 @@ public class WeakPLinkUntilDeleted<X extends Deleteable> extends WeakPLink<X> {
         float p = this.pri;
         if (p==p) {
             X x = get();
-            if (x.isDeleted()) {
+            if (x == null || x.isDeleted()) {
                 ref.clear();
                 return (pri = Float.NaN);
             }

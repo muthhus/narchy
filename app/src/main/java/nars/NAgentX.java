@@ -1,17 +1,14 @@
 package nars;
 
 import jcog.data.FloatParam;
+import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
-import jcog.random.XorShift128PlusRandom;
 import nars.gui.Vis;
 import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.NARS;
-import nars.op.mental.Inperience;
-import nars.op.stm.MySTMClustered;
-import nars.op.stm.STMTemporalLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
-import nars.time.Time;
 import nars.truth.Truth;
 import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -29,11 +26,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.Op.BELIEF;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.col;
-import static spacegraph.layout.Grid.grid;
+import static spacegraph.layout.Grid.*;
 
 /**
  * Extensions to NAgent interface:
@@ -98,46 +93,16 @@ abstract public class NAgentX extends NAgent {
 
         float durFPS =
                 fps;
-                //fps * 2f; //nyquist
+        //fps * 2f; //nyquist
 
         RealTime clock =
-            durFPS >= 20 ?
-                new RealTime.CS(true) :
-                new RealTime.DSHalf(true);
+                durFPS >= 20 ?
+                        new RealTime.CS(true) :
+                        new RealTime.DSHalf(true);
 
         clock.durFPS(durFPS);
 
-//        Default nar =
-//                NARBuilder.newMultiThreadNAR(1, clock, true);
-        NARS n = new NARS(clock, new XorShift128PlusRandom(), 2);
-
-//        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
-//        conceptState.beliefsMaxTemp.set(32);
-//        conceptState.goalsMaxTemp.set(32);
-
-
-        n.confMin.setValue(0.01f);
-        n.truthResolution.setValue(0.01f);
-
-        n.beliefConfidence(0.5f);
-        n.goalConfidence(0.5f);
-
-
-        n.DEFAULT_BELIEF_PRIORITY = 1;
-        n.DEFAULT_GOAL_PRIORITY = 1;
-        n.DEFAULT_QUESTION_PRIORITY = 1;
-        n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(40);
-
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, true);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, false, 0.25f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.01f, 4);
-
-        int threads = 3;
-        for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 0.25f);
-        }
+        NARS n = NARBuilder.newMultiThreadNAR(3, clock);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -149,35 +114,42 @@ abstract public class NAgentX extends NAgent {
         chart(n, a);
 
         RLMixControl m = (RLMixControl) n.in;
-        window(grid(
+        window(row(
 
-                mixPlot(a, m, 100),
+                mixPlot(a, m, 32),
 
                 col(
-                    new Plot2D(100, Plot2D.Line)
-                            .add("happy", () -> m.lastScore)
-                            .on(a::onFrame),
+                        new Plot2D(32, Plot2D.Line)
+                                .add("happy", () -> m.lastScore)
+                                .on(a::onFrame),
 
-                        new MatrixView(m.traffic, 4, (x, gl) -> {
+//                        new MatrixView(m.traffic, 4, (x, gl) -> {
+//                            Draw.colorGrays(gl, x);
+//                            return 0;
+//                        }),
+                        MatrixView.get(m.agentIn, 4, (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
                         }),
-                        new MatrixView(m.preAgentIn.data, false),
-                        new MatrixView(m.agentIn.data, false),
-                        new MatrixView(m.agentOut, 4, (x, gl) -> {
-                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
-                            return 0;
-                        })
+
 
 //                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
 //                                    Draw.colorGrays(gl, x);
 //                                    return 0;
 //                                })
-                        //new MatrixView(m.agentIn.data, false),
-//                        new MatrixView(m.agent.ae.W),
-//                        new MatrixView(m.agent.ae.y, false),
-//                        new MatrixView(m.agent.q),
-//                        new MatrixView(m.agent.et)
+                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
+                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
+
+                        row(
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[5].q),
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[4].q)
+                        ),
+                        //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
+
+                        MatrixView.get(m.agentOut, 4, (x, gl) -> {
+                            Draw.colorGrays(gl, (x - 0.5f) * 2f);
+                            return 0;
+                        })
                 )
         ), 800, 800);
 
@@ -430,7 +402,10 @@ abstract public class NAgentX extends NAgent {
     }
 
     static Surface mixPlot(NAgent a, RLMixControl m, int history) {
-        return Grid.grid(m.size, i -> new MixGainPlot(a, m, history, i));
+        return Grid.grid(m.size, i -> col(
+                new MixGainPlot(a, m, history, i),
+                new MixTrafficPlot(a, m, history, i)
+        ));
     }
 
     private static class MixGainPlot extends Plot2D {
@@ -438,6 +413,15 @@ abstract public class NAgentX extends NAgent {
             super(history, Line);
 
             add(m.name(i), () -> m.gain(i), -1f, +1f);
+            a.onFrame(this::update);
+        }
+    }
+
+    private static class MixTrafficPlot extends Plot2D {
+        public MixTrafficPlot(NAgent a, RLMixControl m, int history, int i) {
+            super(history, BarWave);
+
+            add(m.name(i), () -> m.traffic(i), 0f, 1f);
             a.onFrame(this::update);
         }
     }

@@ -1,9 +1,10 @@
 package jcog.pri.mix.control;
 
 import jcog.tensor.ArrayTensor;
+import jcog.tensor.Tensor;
 
 public interface MixAgent {
-    void act(ArrayTensor in, float score, ArrayTensor out);
+    void act(Tensor in, float score, ArrayTensor out);
 
     //agent = new HaiQAgent(numInputs, size*4, outs * 2);
     //agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9

@@ -7,6 +7,7 @@ import nars.Narsese;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -29,7 +30,7 @@ import static nars.audio.MIDI.MidiInReceiver.channelKey;
 public class MIDI {
 
     public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException, FileNotFoundException {
-        Default d = NARBuilder.newMultiThreadNAR(2,
+        NARS d = NARBuilder.newMultiThreadNAR(2,
             new RealTime.CS(true).durFPS(10f)
         );
         //d.nal(4);

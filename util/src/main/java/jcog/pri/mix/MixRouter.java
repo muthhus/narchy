@@ -3,6 +3,7 @@ package jcog.pri.mix;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
@@ -42,15 +43,19 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
 
     @Override
     public void accept(Y y) {
-        float g = gain.floatValueOf(classify(y));
-        if (g > 0) {
+        this.accept(y, ArrayUtils.EMPTY_INT_ARRAY);
+    }
+
+    public void accept(Y y, int... additionalBits) {
+        float g = gain.floatValueOf(classify(y, additionalBits));
+        if (g >= 0) {
             y.priMult(g);
             target.accept(y);
         }
     }
 
 
-    public RoaringBitmap classify(Y y) {
+    public RoaringBitmap classify(Y y, int... additionalBits) {
         RoaringBitmap truths = new RoaringBitmap();
         int t = 0;
         for (int i = 0, outsLength = tests.length; i < outsLength; i++) {
@@ -58,12 +63,14 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
             c.classify(y, truths, t);
             t += c.dimension();
         }
+        for (int b : additionalBits)
+            truths.add(b);
 
         //truths.runOptimize();
 
-        float ypri = y.priElseZero();
+        float inputPri = y.priElseZero();
         truths.forEach((int b) -> {
-            traffic[b].accept(ypri);
+            traffic[b].accept(inputPri);
         });
 
         return truths;

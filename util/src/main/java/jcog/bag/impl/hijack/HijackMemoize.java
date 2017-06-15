@@ -27,7 +27,7 @@ import java.util.function.Function;
  */
 public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K,V> {
 
-    public static class HalfWeakPair<K,V> extends SoftReference<V> implements Priority {
+    public static class HalfWeakPair<K,V> extends WeakReference/*SoftReference*/<V> implements Priority {
         public final K key;
         private final int hash;
         private float pri;

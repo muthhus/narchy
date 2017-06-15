@@ -4,6 +4,15 @@ import jcog.Util;
 
 import java.util.Random;
 
+/**
+ *  https://en.wikipedia.org/wiki/Softmax_function
+ *  For high temperatures ( {\displaystyle \tau \to \infty } \tau \to \infty ),
+ *  all actions have nearly the same probability and the lower the temperature,
+ *  the more expected rewards affect the probability.
+ *
+ *  For a low temperature ( {\displaystyle \tau \to 0^{+}} \tau \to 0^{+}),
+ *  the probability of the action with the highest expected reward tends to 1.
+ */
 public class DecideSoftmax implements Deciding {
 
     private final float minTemperature;
@@ -21,6 +30,10 @@ public class DecideSoftmax implements Deciding {
 
     float temperature;
     private float decisiveness;
+
+    public DecideSoftmax(float constantTemp, Random random) {
+        this(constantTemp, constantTemp, 1f, random);
+    }
 
     public DecideSoftmax(float initialTemperature, float minTemperature, float decay, Random random) {
         this.temperature = initialTemperature;

@@ -2,6 +2,8 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
+import jcog.tensor.ArrayTensor;
+import jcog.tensor.BufferedTensor;
 import jcog.tensor.Tensor;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
@@ -101,7 +103,6 @@ public class MatrixView extends Widget {
             else
                 return Float.NaN;
         });
-
     }
 
     public MatrixView(double[] d, int stride, ViewFunction1D view) {
@@ -123,11 +124,22 @@ public class MatrixView extends Widget {
                 return Float.NaN;
         });
     }
-    public MatrixView(Tensor t, int stride, ViewFunction1D view) {
-        this((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) ->
-            view.update(t.get(x * stride + y), gl)
-        );
+//    public MatrixView(Tensor t, int stride, ViewFunction1D view) {
+//        this((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) ->
+//            view.update(t.get(x * stride + y), gl)
+//        );
+//    }
+
+    public static MatrixView get(Tensor t, int stride, ViewFunction1D view) {
+        final float[][] d = new float[1][];
+        return new MatrixView((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) -> {
+            if (x == 0 && y == 0)
+                d[0] = t.get(); //update on first cell
+            float v = d[0][x * stride + y];
+            return view.update(v, gl);
+        });
     }
+
     public MatrixView(Supplier<double[]> e, int length, int stride, ViewFunction1D view) {
         this((int) Math.floor(((float) length) / stride), stride, (x, y, gl) -> {
             double[] d = e.get();

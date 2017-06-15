@@ -239,7 +239,7 @@ public class Plot2D extends Surface {
                 float dx = (w / histSize);
 
                 float x = 0;
-                float prevX = -1;
+                float prevX = 0;
 
                 float[] ss = s.toArray();
                 int len = Math.min(s.size(), ss.length);

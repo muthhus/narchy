@@ -2,13 +2,17 @@ package jcog.decide;
 
 import jcog.Util;
 import jcog.data.array.Arrays;
+import jcog.random.XorShift128PlusRandom;
 
 import java.util.Random;
 
 /**
  * Created by me on 6/9/16.
  */
-public class DecidingEpsilonGreedy implements Deciding {
+public class DecideEpsilonGreedy implements Deciding {
+
+    /** argmax, with shuffling in case of a tie */
+    public static final Deciding ArgMax = new DecideEpsilonGreedy(0, new XorShift128PlusRandom());
 
     private final Random random;
     float epsilonRandom; //0.01f;
@@ -19,7 +23,7 @@ public class DecidingEpsilonGreedy implements Deciding {
             epsilonRandom = Math.max(epsilonRandom, epsilonRandomMin);
      */
 
-    public DecidingEpsilonGreedy(float epsilonRandom, Random random) {
+    public DecideEpsilonGreedy(float epsilonRandom, Random random) {
 
         this.epsilonRandom = epsilonRandom;
         this.random = random;
@@ -37,7 +41,7 @@ public class DecidingEpsilonGreedy implements Deciding {
                 motivationOrder[i] = i;
 
         }
-        if (random.nextFloat() < epsilonRandom) {
+        if (epsilonRandom > 0 && random.nextFloat() < epsilonRandom) {
             return random.nextInt(actions);
         }
 
@@ -47,7 +51,7 @@ public class DecidingEpsilonGreedy implements Deciding {
 
         Arrays.shuffle(motivationOrder, random);
 
-        for (int j = 0; j < motivation.length; j++) {
+        for (int j = 0; j < actions; j++) {
             int i = motivationOrder[j];
             float m = motivation[i];
 
@@ -60,10 +64,10 @@ public class DecidingEpsilonGreedy implements Deciding {
             }
 
         }
-        if (equalToPreviousAction) //all equal?
-            return lastAction;
-
-
-        return nextAction;
+        //all equal?
+        int a = equalToPreviousAction ? -1 : nextAction;
+        if (a < 0)
+            return random.nextInt(actions);
+        return a;
     }
 }

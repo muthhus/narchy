@@ -73,7 +73,7 @@ public class NARWeb extends WebServer {
 
 
         NAR nar =
-                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false), true);
+                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false));
 
         //nar.log();
 

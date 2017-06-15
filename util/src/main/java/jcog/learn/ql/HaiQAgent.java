@@ -1,6 +1,9 @@
 package jcog.learn.ql;
 
+import jcog.TriConsumer;
 import jcog.learn.Autoencoder;
+import jcog.math.FloatAveraged;
+import jcog.math.FloatSupplier;
 import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -18,10 +21,12 @@ public class HaiQAgent extends HaiQ {
 
     public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
-    final static float perceptionAlpha = 0.02f;
-    float perceptionNoise = 0.005f;
-    float perceptionCorruption = 0.01f;
+    final static float perceptionAlpha = 0.01f;
+    float perceptionNoise = 0f;
+    float perceptionCorruption = 0f;
     float perceptionForget = 0.0f;
+    public FloatSupplier perceptionError;
+    public float lastPerceptionError = 0;
 
     //float aeForget = 1f;
 
@@ -48,6 +53,7 @@ public class HaiQAgent extends HaiQ {
 
     protected void start(int inputs, int states, int outputs) {
         //logger.info("start {} -> {} -> {}", inputs, states, outputs);
+        this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs);
         ae = perception(inputs, states);
         super.start(states, outputs);
     }
@@ -66,13 +72,26 @@ public class HaiQAgent extends HaiQ {
 
     @Override
     protected int perceive(float[] input) {
-        ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, false);
+        lastPerceptionError = ae.put(input, perceptionAlpha, perceptionNoise, perceptionCorruption, false, true, false);
         int w = ae.decide(decideState);
         if (perceptionForget > 0)
             ae.forget(perceptionForget);
         return w;
     }
+    @Override
+    public int act(float reward, float[] input) {
 
+        //learn more slowly while the perception is not settled
+        float pErr = perceptionError.asFloat();
+        return act(reward, input, pErr);
+    }
+
+    protected int act(float reward, float[] input, float pErr) {
+        float learningRate = 1f / (1f + pErr);
+        int a = learn(perceive(input), reward, learningRate, true);
+
+        return a;
+    }
 
 //		@Override
 //		protected int lastAction() {

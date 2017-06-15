@@ -11,17 +11,18 @@ import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.mix.MixRouter;
 import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
-import jcog.tensor.ArrayTensor;
-import jcog.tensor.BufferedTensor;
-import jcog.tensor.RingBufferTensor;
-import jcog.tensor.TensorChain;
+import jcog.tensor.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static jcog.Texts.n4;
 import static jcog.Util.sqr;
 
 /**
@@ -34,19 +35,27 @@ import static jcog.Util.sqr;
 public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<X, Y>, FloatFunction<RoaringBitmap> {
 
     private final MixRouter<X, Y> mix;
+
+    /** normalized to sum to 1.0 */
     private final float[] nextTraffic;
-    private final MixAgent agent;
 
+    public final MixAgent agent;
 
-    public final ArrayTensor preAgentIn;
 
     public final FloatSupplier score;
 
     public final ArrayTensor agentOut;
     public final ArrayTensor traffic;
 
-    public final BufferedTensor agentIn;
+    /** unipolar vector, 0..1.0 */
+    public final Tensor agentIn;
+
     public final int size;
+
+
+
+    final int maxAux;
+    final List<PSink<X, Y>> aux = new FasterList();
 
     /**
      * values less than 1 eventually lowers channel volume levels to zero (flat, ie. x1)
@@ -94,19 +103,20 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
             names[j] = "aux" + j;
 
 
-        /** level values */
+        /** level values. between 0 and 1: 0 = max cut, 1 = max boost, 0.5 = x1 */
         this.agentOut = new ArrayTensor(size);
         this.nextTraffic = new float[size];
 
-
-        this.agentIn = new BufferedTensor(
+        this.agentIn =
                 //new AutoTensor(
-                this.preAgentIn = new RingBufferTensor(
-
-                                this.traffic = new ArrayTensor(size)
-                        , 1)
+                //new RingBufferTensor(
+                            TensorChain.get(
+                                this.traffic = new ArrayTensor(size), //sum is normalized to 1
+                                agentOut.scale(1f/agentOut.volume())
+                            )
+                  //      , 1)
                 //,12)
-        );
+        ;
 
 
         this.agent = agent;
@@ -132,9 +142,9 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         //preGain[0] += levels.get(size - 1); //bias
 
-        return //sqr( //l^4
+        return sqr( //l^4
                 sqr(1f + preGain[0]) //l^2
-                //)
+                )
                 ;
     }
 
@@ -164,41 +174,22 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
             for (int i = 0, vLength = nextTraffic.length; i < vLength; i++) {
                 nextTraffic[i] /= total;
             }
+        } else {
+            Arrays.fill(nextTraffic, 0);
         }
+
         traffic.set(nextTraffic);
+        //System.out.println(summary());
     }
 
-//    /** returns a snapshot of the mixer levels, in an array directly corresponding to channel id */
-//    public double[] levels() {
-//        return Stream.of(mix.outs).mapToDouble(MutableFloat::floatValue).toArray();
-//    }
+    public String summary() {
+        return IntStream.range(0, size).mapToObj(i -> name(i) + " " + n4(traffic(i)) ).collect(Collectors.joining(", "));
+    }
 
-//    /**
-//     * score in range -1..+1
-//     */
-//    public void train(X x, float score) {
-//        double[] l = this.levels;
-//        if (l != null) {
-//            int[] eligible = eligibile(x);
-//            for (int i = 0; i < delta.length; i++) {
-//                if (eligible[i] > 0) {
-//                    delta[i] += score;
-//                }
-//            }
-//        }
-//    }
-
-//    private int[] eligibile(X x) {
-//        return Stream.of(mix.tests).mapToInt(z -> z.test(x) ? 1 : 0).toArray();
-//    }
 
     public int size() {
         return size;
     }
-
-
-    final int maxAux;
-    final List<PSink<X, Y>> aux = new FasterList();
 
     @Override
     public PSink<X, Y> stream(X x) {
@@ -213,25 +204,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
             int id = auxStart + aux;
             names[id] = x.toString();
 
-            PSink<X, Y> p = new PSink<X, Y>(x, (y) -> {
-
-
-                RoaringBitmap c = mix.classify(y);
-
-                c.add(id); //attach stream-specific classification
-
-                float yp = y.priElseZero();
-                if (yp > 0) {
-                    RLMixControl.this.aux.get(aux).in.accept(yp /* input value before multiplying */);
-                    float g = mix.gain.floatValueOf(c);
-                    if (g > 0) {
-                        if (yp > 0) {
-                            y.priMult(g);
-                            mix.target.accept(y);
-                        }
-                    }
-                }
-            });
+            PSink<X, Y> p = new PSink<>(x, (y) -> mix.accept(y, id));
 
             this.aux.add(p);
 
@@ -242,4 +215,10 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     public String name(int i) {
         return names[i];
     }
+
+    /** value in 0..1.0, percentage of traffic this channel contributes */
+    public double traffic(int i) {
+        return traffic.get(i);
+    }
+
 }
