@@ -1020,7 +1020,9 @@ public interface TimeFunctions {
                 occReturn[1] = intersection.b;
             } else {
                 //not overlapping at all, compute point interpolation
-                occReturn[0] = occInterpolate(t, b);
+                //occReturn[0] = occInterpolate(t, b);
+
+                return null;
             }
         } else {
             occReturn[0] = occReturn[1] = ETERNAL;

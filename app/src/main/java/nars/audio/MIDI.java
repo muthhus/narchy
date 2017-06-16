@@ -41,8 +41,10 @@ public class MIDI {
 
     public MIDI() throws LineUnavailableException {
         NARS nar = NARBuilder.newMultiThreadNAR(3,
-                new RealTime.MS(true).durFPS(60f)
+                new RealTime.DS(true).durFPS(10f)
         );
+        nar.termVolumeMax.setValue(16);
+
         Param.DEBUG = true;
         nar.onTask(t -> {
             if (t instanceof DerivedTask && t.isGoal()) {
@@ -53,7 +55,7 @@ public class MIDI {
         //d.nal(4);
         //nar.log();
 
-        nar.termVolumeMax.setValue(32);
+
         MidiInReceiver midi = MIDI(nar);
 
         Arrays.fill(volume, Float.NaN);
@@ -97,6 +99,7 @@ public class MIDI {
                 else
                     return null;
             });
+            c.resolution.setValue(0.1f);
 
             nar.on(c);
             //c.beliefs().capacity(1, c.beliefs().capacity());

@@ -2,6 +2,7 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
@@ -30,7 +31,7 @@ public class Arkancide extends NAgentX {
 
     //final int afterlife = 60;
 
-    float maxPaddleSpeed;
+    final float maxPaddleSpeed;
 
 
     final Arkanoid noid;
@@ -63,7 +64,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 20);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -98,20 +99,18 @@ public class Arkancide extends NAgentX {
         };
 
 
+        maxPaddleSpeed = 20 * noid.BALL_VELOCITY;
 
-
-        maxPaddleSpeed = 50 * noid.BALL_VELOCITY;
-
-        float resX = 0.02f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.15f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
             Scale sw = new Scale(new SwingBitmap2D(noid), visW, visH);
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
-                    .resolution(0.1f);
-            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
                     .resolution(0.25f);
+//            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
+//                    .resolution(0.25f);
 
             //senseCameraRetina("noid", noid, visW/2, visH/2, (v) -> $.t(v, alpha));
             //new CameraGasNet($.the("camF"),new Scale(new SwingCamera(noid), 80, 80), this, 64);
@@ -120,19 +119,19 @@ public class Arkancide extends NAgentX {
 
         if (numeric) {
             SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept ab = senseNumber("noid:dx", (() -> (Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
+            SensorConcept ab = senseNumber("noid:dx", (() -> Math.sqrt /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth())));
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
-            SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
-            SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
+            //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
+            //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 
             //experimental cheat
 //            nar.input("--(paddle-ball):x! :|:",
 //                      "--(ball-paddle):x! :|:"
 //            );
 
-            SpaceGraph.window(Vis.beliefCharts(200,
-                    Lists.newArrayList(new Term[]{ab, a, b, c, d, e}),
+            SpaceGraph.window(Vis.beliefCharts(100,
+                    Lists.newArrayList(new Term[]{ab, a, b, c}),
                     nar), 600, 600);
             nar.onTask(t -> {
                 if (t instanceof DerivedTask && t.isGoal()) {
@@ -152,14 +151,22 @@ public class Arkancide extends NAgentX {
 //        actionUnipolarTransfer(paddleControl, (v) -> {
 //            return noid.paddle.moveTo(v, maxPaddleSpeed);
 //        });
-        actionTriState(paddleControl, (s) -> {
-           switch (s) {
-               case 0:
-                   break;
-               case -1:
-               case 1: noid.paddle.move(0.5f * maxPaddleSpeed * s);
-                    break;
-           }
+        /*actionTriState*/
+        actionBipolar
+                (paddleControl, (s) -> {
+//           switch (s) {
+//               case 0:
+//                   break;
+//               case -1:
+//               case 1:
+                    if (s > 0 && Util.equals(noid.paddle.x, noid.getWidth(), 1f))
+                        return 0f; //edge
+                    if (s < 0 && Util.equals(noid.paddle.x, 0, 1f))
+                        return 0f; //edge
+                   noid.paddle.move( maxPaddleSpeed * s);
+//                    break;
+//           }
+                    return s;
 
         });
 

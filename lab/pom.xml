@@ -109,12 +109,12 @@
         <!--<version>5.0.2</version>-->
         <!--</dependency>-->
 
-        <!-- https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp -->
-        <dependency>
-            <groupId>edu.stanford.nlp</groupId>
-            <artifactId>stanford-corenlp</artifactId>
-            <version>3.7.0</version>
-        </dependency>
+        <!--&lt;!&ndash; https://mvnrepository.com/artifact/edu.stanford.nlp/stanford-corenlp &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>edu.stanford.nlp</groupId>-->
+            <!--<artifactId>stanford-corenlp</artifactId>-->
+            <!--<version>3.7.0</version>-->
+        <!--</dependency>-->
 
         <!--<dependency>-->
         <!--<groupId>org.openpnp</groupId>-->

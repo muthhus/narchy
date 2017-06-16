@@ -34,13 +34,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         setCapacity(initialCapacity);
     }
 
-        @Override
-    protected boolean replace(Task incoming, Task existing) {
-        float it = incoming.conf() * (1f + incoming.dtRange())/(1+Math.abs(now - incoming.nearestStartOrEnd(now)));
-        float et = existing.conf() * (1f + existing.dtRange())/(1+Math.abs(now - existing.nearestStartOrEnd(now)));
-
-        return replace(it, et);
+    @Override
+    public float pri(@NotNull Task t) {
+        return t.conf() * (1f + t.dtRange())/(1+Math.abs(now - t.nearestStartOrEnd(now)));
     }
+
+
 //    @Override
 //    protected boolean replace(Task incoming, Task existing) {
 //

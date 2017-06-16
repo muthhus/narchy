@@ -344,8 +344,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     protected boolean hijackSoftmax(float newPri, float oldPri) {
-        return hijackSoftmax(newPri, oldPri, 0.5f);
+        return hijackSoftmax(newPri, oldPri, 1f);
     }
+
     protected boolean hijackSoftmax(float newPri, float oldPri, float temperature) {
 
 

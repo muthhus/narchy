@@ -164,7 +164,7 @@ public class SoNAR extends TimerTask {
 
         //v.setAmplitude(0.1f * p);
 
-        Truth b = nar.beliefTruth(c, now);
+        Truth b = nar.goalTruth(c, now);
 
         //System.out.println(c + " "+ b + " " + nar.time() + " " + nar.dur());
 

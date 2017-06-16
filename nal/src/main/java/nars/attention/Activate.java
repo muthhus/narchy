@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.math.Interval.unionLength;
+import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -386,6 +387,10 @@ public class Activate extends UnaryTask<Task> {
                 pri += x;
                 linkOverflow.subtract(x);
             }
+
+            if (target.op()==NEG)
+                throw new RuntimeException("should not create NEG termlinks");
+
             recipient.termlinks().put(new PLink<>(target, pri), linkOverflow);
         }
 

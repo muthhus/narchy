@@ -253,7 +253,9 @@ abstract public class NAgent implements NSense, NAct {
             //contribution of this agent to the NAR's global happiness measurement
             //nar.emotion.happy(reward);
             float dxm = c2w(dexterity());
-            nar.emotion.happy( (float) Math.pow(dxm - lastDexterity, 1/8f));
+            nar.emotion.happy(
+                    Math.signum(dxm - lastDexterity) *
+                            (float) Math.pow( Math.abs(dxm - lastDexterity), 1/8f));
             this.lastDexterity = dxm;
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));

@@ -23,7 +23,7 @@ public class NARio extends NAgentX {
     private SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        super("nario", nar);
+        super("", nar);
 
         //Param.ANSWER_REPORTING = false;
         //Param.DEBUG = true;
@@ -93,7 +93,7 @@ public class NARio extends NAgentX {
         vx = senseNumberDifference($("nario:vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
         senseNumberDifference($("nario:vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
 
-        actionTriState($("nario:x"), i -> {
+        actionTriState($("(x)"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -115,7 +115,7 @@ public class NARio extends NAgentX {
             mario.scene.toggleKey(Mario.KEY_RIGHT, p);
             return true;
         });
-        actionTriState($("nario:y"), i -> {
+        actionTriState($("(y)"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -140,7 +140,7 @@ public class NARio extends NAgentX {
         });
 
 
-        actionToggle($("nario:speed"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+        actionToggle($("(speed)"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
 
 
 //        frame.addKeyListener(mario);
@@ -149,9 +149,9 @@ public class NARio extends NAgentX {
 
     int lastCoins;
 
-    public final FloatParam Depress = new FloatParam(0.1f, 0f, 1f);
-    public final FloatParam MoveRight = new FloatParam(0.5f, 0f, 1f);
-    public final FloatParam EarnCoin = new FloatParam(0.5f, 0f, 1f);
+    public final FloatParam Depress = new FloatParam(0.05f, 0f, 1f);
+    public final FloatParam MoveRight = new FloatParam(0.75f, 0f, 1f);
+    public final FloatParam EarnCoin = new FloatParam(0.9f, 0f, 1f);
 
     @Override
     protected float act() {
@@ -215,7 +215,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 10);
+        }, 20);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

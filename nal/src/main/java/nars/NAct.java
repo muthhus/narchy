@@ -123,8 +123,8 @@ public interface NAct {
                     f = 1f;
                     break;
                 case 0:
-                    //f = 0.5f; break;
-                    return null;
+                    f = 0.5f;
+                    break;
                 case -1:
                     f = 0f;
                     break;
@@ -308,7 +308,7 @@ public interface NAct {
     @NotNull
     default GoalActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatToFloatFunction update) {
         return action(s, (b, d) -> {
-            float o = (d != null) ? d.freq() : Float.NaN;
+            float o = (d != null) ? d.freq() : 0.5f /*Float.NaN*/;
             float f = update.valueOf(o);
             if (f!=f)
                 f = 0.5f;
