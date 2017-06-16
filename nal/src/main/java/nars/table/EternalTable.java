@@ -31,6 +31,16 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     public static final EternalTable EMPTY = new EternalTable(0) {
 
         @Override
+        public Task strongest() {
+            return null;
+        }
+
+        @Override
+        public Task weakest() {
+            return null;
+        }
+
+        @Override
         public @Nullable Task put(@NotNull Task incoming) {
             throw new UnsupportedOperationException();
         }
@@ -38,6 +48,16 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         @Override
         public boolean removeTask(Task x) {
             return false;
+        }
+
+        @Override
+        public @Nullable void add(@NotNull Task input, TaskConcept c, @NotNull NAR nar) {
+            //nothing
+        }
+
+        @Override
+        public void forEach(int _maxPerConcept, @NotNull Consumer<? super Task> recip) {
+
         }
 
         @Override
@@ -122,12 +142,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 //    }
 
 
-    public final Task strongest() {
+    public Task strongest() {
         Object[] l = this.list;
         return (l.length == 0) ? null : (Task) l[0];
     }
 
-    public final Task weakest() {
+    public Task weakest() {
         Object[] l = this.list;
         if (l.length == 0) return null;
         int n = l.length - 1;
@@ -142,6 +162,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         return iterator();
     }
 
+    /** for ranking purposes */
     public final float floatValueOf(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
         return -w.conf();

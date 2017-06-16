@@ -151,9 +151,10 @@ public class DefaultBeliefTable implements BeliefTable {
             if (eternal == null) {
                 //synchronized (concept) {
                     /*if (eternal == EternalTable.EMPTY)*/ {
-                        int cap = concept.state().beliefCap(concept, input.isBelief(), true);
+                    boolean isBeliefOrGoal = input.isBelief();
+                    int cap = concept.state().beliefCap(concept, isBeliefOrGoal, true);
                         if (cap > 0)
-                            eternal = concept.newEternalTable(cap); //allocate
+                            eternal = concept.newEternalTable(cap, isBeliefOrGoal); //allocate
                         else
                             return;
                     }

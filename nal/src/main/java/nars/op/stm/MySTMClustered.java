@@ -32,10 +32,10 @@ import static nars.term.Terms.normalizedOrNull;
 
 /**
  * Task Dimension Mapping:
- *  0: Start time
- *  1: End time
- *  2: Freq
- *  3: Conf (grouping by confidence preserves the maximum collective confidence of any group, which is multiplied in conjunction truth)
+ * 0: Start time
+ * 1: End time
+ * 2: Freq
+ * 3: Conf (grouping by confidence preserves the maximum collective confidence of any group, which is multiplied in conjunction truth)
  */
 public class MySTMClustered extends STMClustered {
 
@@ -55,7 +55,7 @@ public class MySTMClustered extends STMClustered {
     private int dur;
 
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, float drainRatePerDuration) {
-        this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float)size/maxGroupSize * drainRatePerDuration));
+        this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float) size / maxGroupSize * drainRatePerDuration));
     }
 
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int inputsPerDuration) {
@@ -106,8 +106,8 @@ public class MySTMClustered extends STMClustered {
     @Override
     protected TasksNode newCentroid(int id) {
         TasksNode t = new TasksNode(id);
-        t.randomizeUniform(0, -dur*2, +dur*2);
-        t.randomizeUniform(1, -dur*2, +dur*2);
+        t.randomizeUniform(0, -dur * 2, +dur * 2);
+        t.randomizeUniform(1, -dur * 2, +dur * 2);
         t.randomizeUniform(2, 0f, 1f);
         t.randomizeUniform(3, 0f, 1f);
         return t;
@@ -151,7 +151,7 @@ public class MySTMClustered extends STMClustered {
 
         net.nodeStream()
                 .filter(x -> x.size() >= minGroupSize)
-                .sorted(Comparator.comparingDouble(x -> x.localError() / (x.size() )))
+                .sorted(Comparator.comparingDouble(x -> x.localError() / (x.size())))
                 .filter(n -> {
 
                     //System.out.println(n.localError() + " " + n.size() + " " + n.toString());
@@ -162,14 +162,14 @@ public class MySTMClustered extends STMClustered {
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
 
-                        double[] fc = n.coherence(2);
-                        if (fc != null && fc[1] >= freqCoherenceThresh) {
-                            double[] cc = n.coherence(3);
-                            if (cc != null && cc[1] >= confCoherenceThresh) {
-                                return true;
-                            }
-                            //return true;
+                    double[] fc = n.coherence(2);
+                    if (fc != null && fc[1] >= freqCoherenceThresh) {
+                        double[] cc = n.coherence(3);
+                        if (cc != null && cc[1] >= confCoherenceThresh) {
+                            return true;
                         }
+                        //return true;
+                    }
 
                     return false;
                 })
@@ -207,7 +207,8 @@ public class MySTMClustered extends STMClustered {
                         vv.clear();
                         tt.forEach(_z -> {
                             Task z = _z.get();
-                            //if (z != null) {
+                            if (z == null)
+                                return;
                             long zs = z.start();
                             long ze = z.end();
                             if (start[0] > zs) start[0] = zs;
@@ -238,17 +239,17 @@ public class MySTMClustered extends STMClustered {
                             return null;
 
                         @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
-                        if (cp!=null) {
+                        if (cp != null) {
                             int uuLen = uu.length;
-                            long[] evidence = Stamp.zip(()->new ArrayIterator<Stamp>(uu), uuLen); //HACK
+                            long[] evidence = Stamp.zip(() -> new ArrayIterator<Stamp>(uu), uuLen); //HACK
 
                             Task m = new GeneratedTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                             float maxPri = new FasterList<Task>(uuLen, uu)
-                                                .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
+                                    .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
 
-                            m.priority().setPri( BudgetFunctions.fund( maxPri, false, uu ) );
+                            m.priority().setPri(BudgetFunctions.fund(maxPri, false, uu));
                             return m;
 
                         }
@@ -319,7 +320,7 @@ public class MySTMClustered extends STMClustered {
             Term[] u = Util.map((tx) -> $.negIf(tx.term(), negated), new Term[uu.length], uu);
 
             //just assume they occurr simultaneously
-            return normalizedOrNull( index.the(CONJ, 0, u ), index);
+            return normalizedOrNull(index.the(CONJ, 0, u), index);
         }
     }
 }

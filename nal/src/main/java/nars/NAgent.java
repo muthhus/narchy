@@ -143,7 +143,7 @@ abstract public class NAgent implements NSense, NAct {
 //                }
             ) {
             @Override
-            public EternalTable newEternalTable(int eCap) {
+            public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {
                 return new EternalTable(1); //for storing the eternal happiness goal
             }
         };

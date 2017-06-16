@@ -1,20 +1,26 @@
 package nars.audio;
 
+import jcog.Loop;
+import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
+import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Tense;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
+import spacegraph.audio.synth.SineWave;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
@@ -23,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -34,7 +42,7 @@ public class MIDI {
 
     public MIDI() throws LineUnavailableException {
         NARS nar = NARBuilder.newMultiThreadNAR(3,
-                new RealTime.CS(true).durFPS(20f)
+                new RealTime.MS(true).durFPS(60f)
         );
         //d.nal(4);
         //nar.log();
@@ -53,10 +61,8 @@ public class MIDI {
 //            });
 //        });
 
-        SoNAR.SampleDirectory sd = new SoNAR.SampleDirectory();
-        sd.samples("/home/me/wav/legoweltkord");
 
-        final List<SensorConcept> keys = $.newArrayList();
+        final List<Concept> keys = $.newArrayList();
         for (int i = 36; i <= 51; i++) {
             Term key =
                     channelKey(9, i);
@@ -65,28 +71,77 @@ public class MIDI {
                     $.p(key);
 
             int finalI = i;
-            SensorConcept c = new SensorConcept(keyTerm, nar, () -> {
+//            SensorConcept c = new SensorConcept(keyTerm, nar, () -> {
+//                float v = volume[finalI];
+//                if (v == 0)
+//                    volume[finalI] = Float.NaN;
+//                return v;
+//            }, (v) -> $.t(v, nar.confDefault(BELIEF)));
+             GoalActionConcept c = new GoalActionConcept(keyTerm, nar, new FloatParam(0), (b, d)->{
+//                float v = volume[finalI];
+//                if (v == 0)
+//                    volume[finalI] = Float.NaN;
+                if (d == null)
+                    return null;
+                float v = d.freq();
+                if (v > 0.55f)
+                    return $.t(v, nar.confDefault(BELIEF));
+                else if (b!=null && b.freq() > 0.5f)
+                    return $.t(0, nar.confDefault(BELIEF));
+                else
+                    return null;
+             });
+
+             nar.on(c);
+             //c.beliefs().capacity(1, c.beliefs().capacity());
+             c.process(new NALTask(c, BELIEF, $.t(0f, 0.35f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
+             c.process(new NALTask(c, GOAL, $.t(0f, 0.1f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
+             nar.onCycle(n -> {
+
                 float v = volume[finalI];
-                if (v == 0)
+
+                if (v == 0) {
                     volume[finalI] = Float.NaN;
-                return v;
-            }, (v) -> $.t(v, nar.confDefault(BELIEF)));
-            nar.on(c);
+                }
+
+                n.input(c.feedbackGoal.set(c.term(), v==v ? $.t(v, nar.confDefault(GOAL)) : null, n));
+
+                n.input(c.apply(n));
+            });
+
+
             keys.add(c);//senseNumber(on2, midi.key(key) ));
-            s.listen(c, sd::byHash);
+
+//        SoNAR.SampleDirectory sd = new SoNAR.SampleDirectory();
+//        sd.samples("/home/me/wav/legoweltkord");
+//            s.listen(c, sd::byHash);
+            s.listen(c, (k) -> {
+               return new SineWave((float) (100 + Math.random()*1000));
+            });
 
         }
 
 
-        nar.onCycle(()->{
-            keys.forEach(k -> nar.input(k.apply(nar)));
-        });
+        //metronome
+        new Loop(2f) {
+
+            final Compound now = $.p("now");
+
+            @Override
+            public boolean next() {
+                nar.believe(now, Tense.Present);
+                return true;
+            }
+        };
+//        nar.onCycle(()->{
+//            keys.forEach(k -> nar.input(k.apply(nar)));
+//        });
 
 
-        SpaceGraph.window(Vis.beliefCharts(64, keys, nar), 500, 500);
+        SpaceGraph.window(Vis.beliefCharts(64, keys, nar), 900, 900);
 
 
-        nar.startFPS(20f);
+        nar.startFPS(60f);
 
 
     }
@@ -160,7 +215,8 @@ public class MIDI {
                 int cmd = s.getCommand();
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
-                        volume[s.getData1()] = 0;
+                        if ((volume[s.getData1()] == volume[s.getData1()]) && (volume[s.getData1()]>0))
+                            volume[s.getData1()] = 0;
 
 //                        Compound t = $.inh(channelKey(s), Atomic.the("on"));
 //
@@ -168,7 +224,7 @@ public class MIDI {
                         //System.out.println(key(t));
                         break;
                     case ShortMessage.NOTE_ON:
-                        volume[s.getData1()] = 0.5f + 0.5f * s.getData2()/128f;
+                        volume[s.getData1()] = 0.6f + 0.4f * s.getData2()/128f;
 
 //                        Compound u = $.inh(channelKey(s), Atomic.the("on"));
 //                        nar.believe(u, Tense.Present);

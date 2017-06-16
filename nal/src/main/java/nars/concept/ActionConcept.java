@@ -41,12 +41,6 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 //    }
 
 
-    @Override
-    public EternalTable newEternalTable(int eCap) {
-        return EternalTable.EMPTY;
-    }
-
-
 //    /** produces a curiosity exploratoin task */
 //    @Nullable public abstract Task curiosity(float conf, long next, NAR nar);
 

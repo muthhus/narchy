@@ -103,7 +103,7 @@ public class TaskConcept extends CompoundConcept {
         return new HijackTemporalBeliefTable(tCap);
     }
 
-    public EternalTable newEternalTable(int eCap) {
+    public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {
         return eCap > 0 ? new EternalTable(eCap) : EternalTable.EMPTY;
     }
 

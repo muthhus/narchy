@@ -70,8 +70,8 @@ public class NARS extends NAR {
     protected PSinks newInput() {
         RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 20f,
 
-                new HaiQMixAgent(),
-                //new MultiHaiQMixAgent(),
+                //new HaiQMixAgent(),
+                new MultiHaiQMixAgent(),
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 1),
 

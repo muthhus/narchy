@@ -164,7 +164,8 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
     protected void in(Task task, @NotNull Consumer<PriReference<Task>> each) {
 
 
-        if (task.isCommand() || task instanceof Abbreviation.AbbreviationTask /*|| task instanceof InperienceTask*/) //no infinite loops in the present moment
+        if (task.isCommand() || task.isInput() || task instanceof Abbreviation.AbbreviationTask
+            /*|| task instanceof InperienceTask*/) //for disabling recursive inperience
             return;
 
         boolean full = bag.isFull();

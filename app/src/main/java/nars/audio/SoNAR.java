@@ -5,9 +5,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.concept.SensorConcept;
 import nars.nar.Default;
-import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.Audio;
@@ -16,11 +14,15 @@ import spacegraph.audio.SoundProducer;
 import spacegraph.audio.granular.Granulize;
 import spacegraph.audio.sample.SampleLoader;
 import spacegraph.audio.sample.SonarSample;
+import spacegraph.audio.synth.SineWave;
 
 import javax.sound.sampled.LineUnavailableException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -72,9 +74,10 @@ public class SoNAR extends TimerTask {
 //            return new SamplePlayer(
 //                sample(term.hashCode()), 1f
 //            );
-            return new Granulize(
-                    sample(x.hashCode()), 0.1f, 0.5f, random
-            );
+//            return new Granulize(
+//                    sample(x.hashCode()), 0.1f, 0.5f, random
+//            );
+            return new SineWave((float) (Math.random() * 1000 + 200));
         }
     }
 
@@ -153,46 +156,51 @@ public class SoNAR extends TimerTask {
         termSounds.forEach(this::update);
     }
 
-    private boolean update(@NotNull Concept c, Sound<Granulize> s) {
-        if (s.producer instanceof Granulize) {
-            Granulize v = s.producer;
+    private boolean update(@NotNull Concept c, Sound s) {
 
-            //float p = nar.pri(k);
-            //if (p == p && p > 0) {
 
-            //v.setAmplitude(0.1f * p);
+        //float p = nar.pri(k);
+        //if (p == p && p > 0) {
 
-            Truth b = nar.beliefTruth(c, now);
+        //v.setAmplitude(0.1f * p);
 
-            //System.out.println(c + " "+ b + " " + nar.time() + " " + nar.dur());
+        Truth b = nar.beliefTruth(c, now);
 
-            if (b != null && b.freq() > 0.5f) {
+        //System.out.println(c + " "+ b + " " + nar.time() + " " + nar.dur());
+
+        float thresh = 0.55f;
+        if (b != null && b.freq() > thresh) {
+
+            if (s.producer instanceof Granulize) {
                 float stretchFactor = (b.freq() - 0.5f) * 2f;
                 if (stretchFactor > 0 && stretchFactor < 0.05f) stretchFactor = 0.05f;
                 else if (stretchFactor < 0 && stretchFactor > -0.05f) stretchFactor = -0.05f;
-
-                v.setStretchFactor(stretchFactor);
-                //v.setAmplitude(1f);
-                v.setAmplitude(2f * (b.freq()-0.5f));
-                //v.setAmplitude(b.expectation());
-                //v.play();
-            } else {
-                v.setAmplitude(0f);
-                //v.stop();
-                //v.setStretchFactor(1f);
+                ((Granulize) s.producer).setStretchFactor(stretchFactor);
             }
-
-            //
-            //v.setStretchFactor();
-            //v.pitchFactor.setValue(1f / Math.log(c.volume()));
-            //g.setStretchFactor(1f/(1f+kk.volume()/4f));
+            if (s.producer instanceof SoundProducer.Amplifiable) {
+                //v.setAmplitude(1f);
+                ((SoundProducer.Amplifiable) s.producer).setAmplitude(2f * (b.freq() - 0.5f));
+            }
+            //v.setAmplitude(b.expectation());
+            //v.play();
             return true;
-            //}
-
+        } else {
+            if (s.producer instanceof SoundProducer.Amplifiable) {
+                ((SoundProducer.Amplifiable) s.producer).setAmplitude(0f);
+            }
+            return false;
             //v.stop();
-            //return false;
+            //v.setStretchFactor(1f);
         }
-        return true;
+
+        //
+        //v.setStretchFactor();
+        //v.pitchFactor.setValue(1f / Math.log(c.volume()));
+        //g.setStretchFactor(1f/(1f+kk.volume()/4f));
+        //}
+
+        //v.stop();
+        //return false;
     }
 
     public void join() throws InterruptedException {

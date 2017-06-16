@@ -38,27 +38,27 @@ public interface NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.8f);
+        n.goalConfidence(0.9f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(36);
+        n.termVolumeMax.setValue(40);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, true);
-        MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 4, true, 64f);
+        MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 5, true, 64f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.05f, 4);
+        Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(1024, 0.1f);
+            n.addNAR(512, 0.1f);
         }
 
         n.onTask(t -> {
            if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
-               n.emotion.happy(t.conf()/(threads * 100)); //learned something
+               n.emotion.happy(t.conf()/(threads * 300)); //learned something
            }
         });
 

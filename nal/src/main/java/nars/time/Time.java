@@ -7,28 +7,46 @@ import java.io.Serializable;
  */
 public interface Time extends Serializable {
 
-	//Timer real = new Timer("Realtime");
+    //Timer real = new Timer("Realtime");
 
-	/** called when memory reset */
-	void clear();
+    /**
+     * called when memory reset
+     */
+    void clear();
 
-	/** returns the current time, as measured in units determined by this clock */
-	long time();
+    /**
+     * returns the current time, as measured in units determined by this clock
+     */
+    long time();
 
-	/** returns a new stamp evidence id */
-	long nextStamp();
+    /**
+     * returns a new stamp evidence id
+     */
+    long nextStamp();
 
-		/** called each cycle */
-	void cycle();
+    /**
+     * called each cycle
+     */
+    void cycle();
 
 
+    long elapsed();
 
-	long elapsed();
+    /**
+     * the default duration applied to input tasks that do not specify one
+     */
+    int dur();
 
-	/** the default duration applied to input tasks that do not specify one */
-	int dur();
-
-	/** set the duration, return this
-	 * @param d*/
+    /**
+     * set the duration, return this
+     *
+     * @param d
+     */
     Time dur(int d);
+
+    default long[] nextInputStamp() {
+        return new long[]{nextStamp()};
+    }
+
+
 }
