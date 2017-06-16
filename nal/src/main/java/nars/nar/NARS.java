@@ -295,24 +295,9 @@ public class NARS extends NAR {
 //                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
 //        );
 
-        @Override
-        public <X> X withBags(Term t, BiFunction<Bag<Term, PriReference<Term>>, Bag<Task, PriReference<Task>>, X> f) {
 
-            Bag<Term, PriReference<Term>> termlink =
-                    new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
-            //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
 
-            Bag<Task, PriReference<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
 
-            return f.apply(termlink, tasklink);
-        }
-
-        @NotNull
-        @Deprecated
-        @Override
-        public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
-            return new DefaultHijackBag<>(blend, reprobes);
-        }
     }
 
 

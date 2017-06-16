@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.*;
 import nars.term.Compound;
@@ -25,13 +26,13 @@ public class TaskConcept extends CompoundConcept {
     @Nullable
     protected BeliefTable goals;
 
-    public TaskConcept(@NotNull Compound term, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
-        super(term, termLinks, taskLinks, nar);
+    public TaskConcept(@NotNull Compound term, @NotNull NAR nar, @NotNull Bag... linkBags) {
+        super(term, nar, linkBags);
     }
 
-    @Deprecated
+
     public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
-        super(term, n);
+        this(term, n, ((DefaultConceptBuilder)n.terms.conceptBuilder()).newLinkBags(term));
     }
 
 

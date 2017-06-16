@@ -27,8 +27,8 @@ public class AtomConcept extends Atom implements Concept {
     @Nullable
     private Map meta;
 
-    public AtomConcept(@NotNull Atom term, Bag<Term, PriReference<Term>> termLinks, Bag<Task, PriReference<Task>> taskLinks) {
-        this(term.toString(), termLinks, taskLinks);
+    public AtomConcept(@NotNull Atom term, Bag... bags) {
+        this(term.toString(), bags[0], bags[1]);
     }
 
     protected AtomConcept(@NotNull String term,  Bag<Term,PriReference<Term>> termLinks, Bag<Task,PriReference<Task>> taskLinks) {

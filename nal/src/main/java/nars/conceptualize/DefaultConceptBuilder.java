@@ -24,15 +24,12 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 
 import static jcog.pri.op.PriMerge.plus;
 import static nars.Op.*;
@@ -50,8 +47,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-            new DefaultConceptState("sleep", 32, 32, 5, 24, 16),
-            new DefaultConceptState("awake", 32, 32, 5, 24, 16)
+                new DefaultConceptState("sleep", 32, 32, 5, 24, 16),
+                new DefaultConceptState("awake", 32, 32, 5, 24, 16)
         );
     }
 
@@ -67,11 +64,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //        return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
 //    }
 
-    @NotNull
-    @Deprecated public <X> Bag<X,PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
-        return new CurveBag<>(8, blend, m);
-    }
-
 
     @NotNull
     private final ConceptState init;
@@ -81,21 +73,30 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     private final ConceptState sleep;
     private NAR nar;
 
+    public Bag[] newLinkBags(Term t) {
+        int v = t.volume();
+        Map sharedMap = newBagMap(v);
+        @NotNull Bag<Term, PriReference<Term>> termbag =
+                new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+        @NotNull Bag<Task, PriReference<Task>> taskbag =
+                new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
 
 
-//    final Function<Variable, VariableConcept> varBuilder =
-//            (Variable v) -> new VariableConcept(v);
+//        public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
+//            return new DefaultHijackBag<>(blend, reprobes);
+//        }
+//        public <X> X withBags(Term t, BiFunction<Bag<Term, PriReference<Term>>, Bag<Task, PriReference<Task>>, X> f) {
+//
+//            Bag<Term, PriReference<Term>> termlink =
+//                    new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//            //BloomBag<Term> termlink = new BloomBag<Term>(32, IO::termToBytes);
+//
+//            Bag<Task, PriReference<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//
+//            return f.apply(termlink, tasklink);
+//        }
 
-    public <X> X withBags(Term t, BiFunction<Bag<Term,PriReference<Term>>,Bag<Task,PriReference<Task>>,X> f) {
-        Map sharedMap = newBagMap(t.volume());
-        @NotNull Bag<Term,PriReference<Term>> termbag = newBag(sharedMap, DEFAULT_BLEND);
-        @NotNull Bag<Task,PriReference<Task>> taskbag = newBag(sharedMap, DEFAULT_BLEND);
-
-
-//        @NotNull Bag<Term,BLink<Term>> termbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);
-//        @NotNull Bag<Task,BLink<Task>> taskbag = new BLinkHijackBag<>(3, BudgetMerge.maxBlend, nar.random);
-
-        return f.apply(termbag, taskbag);
+        return new Bag[]{termbag, taskbag};
     }
 
     @Nullable
@@ -109,24 +110,26 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         }
 
         @NotNull Compound tt = t;
-        return withBags(tt, (termbag, taskbag) -> {
-            boolean validForTask = Task.taskContentValid(t, (byte)0, null /*nar -- checked above */, true);
-            if (!validForTask) {
-                return newCompound(tt, termbag, taskbag);
-            } else {
-                return newTask(tt, termbag, taskbag);
-            }
-        });
+        boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
+        if (!validForTask) {
+            return newCompound(tt, newLinkBags(tt));
+        } else {
+            return newTask(tt, newLinkBags(tt));
+        }
     }
 
-    /** for fragmentary concepts which by themselves or due to being un-normalizable,
+    /**
+     * for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private CompoundConcept newCompound(@NotNull Compound t, Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag) {
-        return new CompoundConcept(t, termbag, taskbag, nar);
+    private CompoundConcept newCompound(@NotNull Compound t,
+                                        Bag... bags
+                                        //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
+    ) {
+        return new CompoundConcept(t, nar, bags);
     }
 
-    private TaskConcept newTask(@NotNull Compound t, Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag) {
+    private TaskConcept newTask(@NotNull Compound t, Bag... bags) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {
@@ -254,8 +257,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         return
                 dmt != null ?
-                        new DynamicConcept(t, dmt, null, termbag, taskbag, nar) :
-                        new TaskConcept(t, termbag, taskbag, nar)
+                        new DynamicConcept(t, dmt, null, nar, newLinkBags(t)) :
+                        new TaskConcept(t, nar, newLinkBags(t))
                 ;
     }
 
@@ -263,7 +266,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return !subterms.OR(x -> x instanceof Variable);
     }
 
-    @Override public void start(@NotNull NAR nar) {
+    @Override
+    public void start(@NotNull NAR nar) {
         this.nar = nar;
     }
 
@@ -294,8 +298,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 return term;
             } else if (term instanceof Atom) {
 
-                return withBags(term, (termbag, taskbag) ->
-                        new AtomConcept((Atom)term, termbag, taskbag));
+                return
+                        new AtomConcept((Atom) term, newLinkBags(term));
 
 //                result = new AtomConcept((Atomic)term,
 //                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),
@@ -350,8 +354,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
             if (volume < 16) {
-                //return new ConcurrentHashMap(0, loadFactor);
-                return new ConcurrentHashMapUnsafe(0);
+                return new ConcurrentHashMap(0, loadFactor);
+                //return new ConcurrentHashMapUnsafe(0);
             } else if (volume < 32) {
                 return new SynchronizedHashMap(0, loadFactor);
                 //return new TrieMap();

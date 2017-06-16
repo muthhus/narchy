@@ -40,12 +40,18 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     /**
      * Constructor, called in Memory.getConcept only
-     *
-     * @param term      A term corresponding to the concept
+     *  @param term      A term corresponding to the concept
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull Bag<Term,PriReference<Term>> termLinks, @NotNull Bag<Task,PriReference<Task>> taskLinks, @NotNull NAR nar) {
+    public CompoundConcept(@NotNull Compound term, @NotNull NAR nar,
+                           Bag... bags) {
+        this(term, nar, bags[0], bags[1]);
+    }
+
+    public CompoundConcept(@NotNull Compound term, @NotNull NAR nar,
+                           @NotNull Bag<Term, PriReference<Term>> termLinks, @NotNull Bag<Task, PriReference<Task>> taskLinks
+    ) {
 
         this.term = term;
         this.termLinks = termLinks;
@@ -123,13 +129,13 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
-    @Deprecated public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder(), n, ((DefaultConceptBuilder) n.terms.conceptBuilder()).newBagMap(term.volume()));
+    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder(), n);
     }
 
 
-    @Deprecated CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar, @NotNull Map sharedMap) {
-        this(term, b.newBag(sharedMap, DefaultConceptBuilder.DEFAULT_BLEND), b.newBag(sharedMap, DefaultConceptBuilder.DEFAULT_BLEND), nar);
+    CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar) {
+        this(term, nar, b.newLinkBags(term));
     }
 
     @Override

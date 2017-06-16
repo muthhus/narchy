@@ -13,8 +13,8 @@ public class DynamicConcept extends TaskConcept {
     @NotNull
     @Deprecated final NAR nar;
 
-    public DynamicConcept(@NotNull Compound term, @Nullable DynamicTruthModel beliefModel, @Nullable DynamicTruthModel goalModel, @NotNull Bag termLinks, @NotNull Bag taskLinks, @NotNull NAR nar) {
-        super(term, termLinks, taskLinks, nar);
+    public DynamicConcept(@NotNull Compound term, @Nullable DynamicTruthModel beliefModel, @Nullable DynamicTruthModel goalModel, @NotNull NAR nar, @NotNull Bag... bags) {
+        super(term, nar, bags);
         this.nar = nar;
         this.beliefs =
                 beliefModel!=null ?
