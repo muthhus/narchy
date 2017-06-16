@@ -1,5 +1,6 @@
 package nars.concept.dynamic;
 
+import jcog.list.FasterList;
 import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
@@ -64,7 +65,22 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b) {
 
         DynTruth yy = truth(when, template, true);
-        return yy != null ? yy.task(template, beliefOrGoal, now, when, b, dynamicConcept.nar) : null;
+        if (yy == null)
+            return null;
+
+        //compute the optimistic temporal union of the component's occurrences
+        long start = Long.MAX_VALUE;
+        long end = Long.MIN_VALUE;
+        @Nullable FasterList<Task> ee = yy.e;
+        for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
+            Task x = ee.get(i);
+            long s = x.start();
+            long e = x.end();
+            if (s < start) start = s;
+            if (e > end) end = e;
+        }
+
+        return yy.task(template, beliefOrGoal, now, start, end, b, dynamicConcept.nar);
     }
 
     @Override

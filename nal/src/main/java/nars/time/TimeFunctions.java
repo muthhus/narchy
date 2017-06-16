@@ -43,6 +43,7 @@ public interface TimeFunctions {
     @Nullable Compound compute(@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
+    /** this duplicates most of what is in decomposeBeliefLate, TODO merge them */
     static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
 
         if (derived.op() == CONJ && occReturn[0] != ETERNAL)
@@ -64,7 +65,7 @@ public interface TimeFunctions {
 
                 if (taskStart > occReturn[0]) {
 
-                    long range = occReturn[1] - occReturn[0];
+                    long range = Math.max(occReturn[1] - occReturn[0], p.task.dtRange());
 
                     occReturn[0] = taskStart;
                     occReturn[1] = taskStart + range;
@@ -382,18 +383,14 @@ public interface TimeFunctions {
 
             //dont derive a past-tense goal (before the task)
             if (taskStart != ETERNAL) {
-
-
                 long now = p.nar.time();
-
-                assert (occReturn[1] != ETERNAL);
 
                 //occReturn[1] = occReturn[0]; //HACK
 
                 long derivedStart = occReturn[0];
                 if (taskStart > derivedStart) {
 
-                    long range = occReturn[1] - occReturn[0];
+                    long range = Math.max(occReturn[1] - occReturn[0], p.task.dtRange());
 
                     occReturn[0] = taskStart;
                     occReturn[1] = taskStart + range;
@@ -930,7 +927,7 @@ public interface TimeFunctions {
 
         occReturn[0] = occurrenceTarget(p, earliestOccurrence);
 
-        if (pre && derived.sub(0) instanceof Compound) {
+        if (pre && derived.sub(0).unneg() instanceof Compound) {
             //set subterm 0's DT
 
 
@@ -1008,22 +1005,22 @@ public interface TimeFunctions {
         Task t = p.task;
         Task b = p.belief;
 
-        boolean te = p.task.isEternal();
-        boolean be = b.isEternal();
+        boolean te = t.isEternal();
+        boolean be = b!=null ? b.isEternal() : true;
         if (te && !be) {
             occReturn[0] = b.start();
             occReturn[1] = b.end();
         } else if (!te && be) {
-            occReturn[0] = p.task.start();
-            occReturn[1] = p.task.end();
+            occReturn[0] = t.start();
+            occReturn[1] = t.end();
         } else if (!te && !be) {
             Interval intersection = Interval.intersect(t.start(), t.end(), b.start(), b.end());
             if (intersection != null) {
                 occReturn[0] = intersection.a;
                 occReturn[1] = intersection.b;
             } else {
-                //not overlapping at all
-                return null;
+                //not overlapping at all, compute point interpolation
+                occReturn[0] = occInterpolate(t, b);
             }
         } else {
             occReturn[0] = occReturn[1] = ETERNAL;

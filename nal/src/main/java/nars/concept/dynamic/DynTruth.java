@@ -76,7 +76,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, @Nullable Priority b, NAR nar) {
+    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
 
         Truth tr = truth();
         if (tr == null)
@@ -114,7 +114,7 @@ public final class DynTruth implements Truthed {
         }
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
-                tr, cre, start, start /*+ dur*/, evidence());
+                tr, cre, start, end /*+ dur*/, evidence());
         dyn.setPri(priority);
 
         //        if (srcCopy == null) {
