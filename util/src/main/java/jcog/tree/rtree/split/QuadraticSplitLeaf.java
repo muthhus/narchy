@@ -48,8 +48,8 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         int r1Max = 0, r2Max = size - 1;
         for (int i = 0; i < size; i++) {
             for (int j = i + 1; j < size; j++) {
-                final HyperRect mbr = r[i].mbr(r[j]);
-                final double cost = mbr.cost() - (r[i].cost() + r[j].cost());
+                final HyperRect mbr = rect[i].mbr(rect[j]);
+                final double cost = mbr.cost() - (rect[i].cost() + rect[j].cost());
                 if (cost > minCost) {
                     r1Max = i;
                     r2Max = j;
@@ -59,13 +59,13 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(entry[r1Max]);
-        l2Node.add(entry[r2Max]);
+        l1Node.add(data[r1Max], this);
+        l2Node.add(data[r2Max], this);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Max) && (i != r2Max)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, entry[i]);
+                classify(l1Node, l2Node, data[i]);
             }
         }
 

@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 /**
  * Created by jcovert on 12/30/15.
  */
-public interface Spatialized<T> {
+public interface Spatialized<T> extends Nodelike<T> {
 
     int DEFAULT_MIN_M = 2;
     int DEFAULT_MAX_M = 8;
@@ -91,13 +91,15 @@ public interface Spatialized<T> {
      * Add the data entry to the SpatialSearch structure
      *
      * @param t Data entry to be added
+     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
-    void add(final T t);
+    boolean add(final T t);
 
     /**
      * Remove the data entry from the SpatialSearch structure
      *
      * @param t Data entry to be removed
+     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
     boolean remove(final T t);
 

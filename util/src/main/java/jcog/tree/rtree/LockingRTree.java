@@ -65,10 +65,10 @@ public class LockingRTree<T> implements Spatialized<T> {
      * @param t - entry to add
      */
     @Override
-    public void add(T t) {
+    public boolean add(T t) {
         writeLock.lock();
         try {
-            tree.add(t);
+            return tree.add(t);
         } finally {
             writeLock.unlock();
         }
@@ -88,6 +88,7 @@ public class LockingRTree<T> implements Spatialized<T> {
             writeLock.unlock();
         }
     }
+
     public void removeAll(Iterable<? extends T> t) {
         writeLock.lock();
         try {
@@ -268,5 +269,10 @@ public class LockingRTree<T> implements Spatialized<T> {
     @Override
     public String toString() {
         return tree.toString();
+    }
+
+    @Override
+    public void reportSizeDelta(int i) {
+        tree.reportSizeDelta(i);
     }
 }

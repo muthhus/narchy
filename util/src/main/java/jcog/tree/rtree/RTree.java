@@ -46,13 +46,12 @@ public class RTree<T> implements Spatialized<T> {
     private static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
-    private final int mMin;
-    private final int mMax;
-    private final Function<T,HyperRect> spatialize;
-    private final Split splitType;
+    private final short mMin;
+    private final short mMax;
+
     @NotNull
     private Node<T> root;
-    private int entryCount;
+    private int size;
 
     protected RTree() {
         this(null);
@@ -63,15 +62,13 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     public RTree(@Nullable Function<T,HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
-        this.mMin = mMin;
-        this.mMax = mMax;
+        this.mMin = (short) mMin;
+        this.mMax = (short) mMax;
 
         if (spatialize == null)
             spatialize = (Function)this; //attempt to use subclass implementations of the Function<>
 
-        this.spatialize = spatialize;
-        this.splitType = splitType;
-        this.entryCount = 0;
+        this.size = 0;
         this.root = splitType.newLeaf(spatialize, mMin, mMax);
     }
 
@@ -108,19 +105,23 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     /** TODO handle duplicate items (ie: dont increase entryCount if exists) */
-    @Override public void add(final T t) {
-        root = root.add(t);
-        entryCount++;
+    @Override public boolean add(final T t) {
+        int before = size;
+        root = root.add(t, this);
+        int after = size;
+        assert(after == before || after == before + 1);
+        return after > before;
     }
 
     @Override
     public boolean remove(final T t) {
-        Node<T> removed = root.remove(t);
-        if (removed != null) {
-            entryCount--;
-            return true;
-        }
-        return false;
+        int before = size;
+        if (before == 0)
+            return false;
+        root = root.remove(t, this);
+        int after = size;
+        assert(after == before || after == before - 1);
+        return before > after;
     }
 
     @Override
@@ -149,7 +150,7 @@ public class RTree<T> implements Spatialized<T> {
      */
     @Override
     public int size() {
-        return entryCount;
+        return size;
     }
 
 //    static boolean isEqual(final double a, final double b, final double eps) {
@@ -186,7 +187,7 @@ public class RTree<T> implements Spatialized<T> {
     @Override
     public Stats stats() {
         Stats stats = new Stats();
-        stats.setType(splitType);
+        //stats.setType(splitType);
         stats.setMaxFill(mMax);
         stats.setMinFill(mMin);
         root.collectStats(stats, 0);
@@ -200,6 +201,11 @@ public class RTree<T> implements Spatialized<T> {
 
     @NotNull public Node<T> getRoot() {
         return this.root;
+    }
+
+    @Override
+    public void reportSizeDelta(int i) {
+        this.size += i;
     }
 
 

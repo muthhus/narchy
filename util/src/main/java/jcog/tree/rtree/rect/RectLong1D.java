@@ -8,7 +8,7 @@ import jcog.tree.rtree.point.Long1D;
  */
 public class RectLong1D implements HyperRect<Long1D> {
 
-    public final long from, to;
+    public final long min, max;
 
     /** point */
     public RectLong1D(long f) {
@@ -17,16 +17,35 @@ public class RectLong1D implements HyperRect<Long1D> {
 
     /** range */
     public RectLong1D(long f, long t) {
-        this.from = f;
-        this.to = t;
+        this.min = f;
+        this.max = t;
+    }
+
+    @Override
+    public HyperRect<Long1D> mbr(HyperRect<Long1D>[] rect) {
+        int n = rect.length;
+        assert(n > 0);
+        if (n == 1)
+            return rect[0];
+        long min = Long.MAX_VALUE, max = Long.MIN_VALUE;
+        for (HyperRect h : rect) {
+            if (h == null)
+                break;
+            RectLong1D r = (RectLong1D) h;
+            long rmin = r.min;
+            if (rmin < min) min = rmin;
+            long rmax = r.max;
+            if (rmax > max) max = rmax;
+        }
+        return new RectLong1D(min, max);
     }
 
     @Override
     public HyperRect<Long1D> mbr(HyperRect<Long1D> r) {
 
         RectLong1D s = (RectLong1D) r;
-        long f = Math.min(from, s.from);
-        long t = Math.max(to, s.to);
+        long f = Math.min(min, s.min);
+        long t = Math.max(max, s.max);
         return new RectLong1D(f, t);
     }
 
@@ -37,41 +56,41 @@ public class RectLong1D implements HyperRect<Long1D> {
 
     @Override
     public Long1D min() {
-        return new Long1D(from);
+        return new Long1D(min);
     }
 
     @Override
     public Long1D max() {
-        return new Long1D(to);
+        return new Long1D(max);
     }
 
     @Override
     public Long1D center() {
-        return new Long1D((from + to)/2 );
+        return new Long1D((min + max)/2 );
     }
 
     @Override
     public double center(int d) {
         assert(d==0);
-        return (from + to) / 2.0;
+        return (min + max) / 2.0;
     }
 
     @Override
     public double getRange(int d) {
         assert(d==0);
-        return Math.abs(from - to);
+        return Math.abs(min - max);
     }
 
     @Override
     public boolean contains(HyperRect<Long1D> r) {
         RectLong1D inner = (RectLong1D) r;
-        return inner.from >= from && inner.to <= to;
+        return inner.min >= min && inner.max <= max;
     }
 
     @Override
     public boolean intersects(HyperRect<Long1D> r) {
         RectLong1D rr = (RectLong1D) r;
-        return (Math.max(from, rr.from) <= Math.min(to, rr.to));
+        return (Math.max(min, rr.min) <= Math.min(max, rr.max));
     }
 
     @Override

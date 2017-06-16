@@ -44,7 +44,7 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
         final int MIN = 0;
         final int MAX = 1;
         final int NRANGE = 2;
-        final int nD = r[0].dim();
+        final int nD = rect[0].dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double[] separation = new double[nD];
@@ -59,31 +59,31 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
             for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
 
-                HyperRect rj = r[j];
+                HyperRect rj = rect[j];
                 Comparable rjMin = rj.min().coord(d);
-                if (r[rd[MIN][MIN]].min().coord(d).compareTo(rjMin) > 0) {
+                if (rect[rd[MIN][MIN]].min().coord(d).compareTo(rjMin) > 0) {
                     rd[MIN][MIN] = j;
                 }
 
-                if (r[rd[MIN][MAX]].min().coord(d).compareTo(rjMin) < 0) {
+                if (rect[rd[MIN][MAX]].min().coord(d).compareTo(rjMin) < 0) {
                     rd[MIN][MAX] = j;
                 }
 
                 Comparable rjMax = rj.max().coord(d);
-                if (r[rd[MAX][MIN]].max().coord(d).compareTo(rjMax) > 0) {
+                if (rect[rd[MAX][MIN]].max().coord(d).compareTo(rjMax) > 0) {
                     rd[MAX][MIN] = j;
                 }
 
-                if (r[rd[MAX][MAX]].max().coord(d).compareTo(rjMax) < 0) {
+                if (rect[rd[MAX][MAX]].max().coord(d).compareTo(rjMax) < 0) {
                     rd[MAX][MAX] = j;
                 }
             }
 
             // highest max less lowest min
-            final double width = r[rIndex[d][MAX][MAX]].max().distance(r[rIndex[d][MIN][MIN]].min(), d);
+            final double width = rect[rIndex[d][MAX][MAX]].max().distance(rect[rIndex[d][MIN][MIN]].min(), d);
 
             // lowest max less highest min (normalized)
-            separation[d] = r[rIndex[d][MAX][MIN]].max().distance(r[rIndex[d][MIN][MAX]].min(), d) / width;
+            separation[d] = rect[rIndex[d][MAX][MIN]].max().distance(rect[rIndex[d][MIN][MAX]].min(), d) / width;
         }
 
         int r1Ext = rIndex[0][MAX][MIN], r2Ext = rIndex[0][MIN][MAX];
@@ -103,13 +103,13 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(entry[r1Ext]);
-        l2Node.add(entry[r2Ext]);
+        l1Node.add(data[r1Ext], this);
+        l2Node.add(data[r2Ext], this);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Ext) && (i != r2Ext)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, entry[i]);
+                classify(l1Node, l2Node, data[i]);
             }
         }
 

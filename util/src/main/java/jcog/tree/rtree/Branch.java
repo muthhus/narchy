@@ -47,6 +47,7 @@ public final class Branch<T> implements Node<T> {
     private final int mMin;
     private final RTree.Split splitType;
 
+    short childDiff = 0;
 
     public Branch(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
@@ -56,6 +57,11 @@ public final class Branch<T> implements Node<T> {
         this.size = 0;
         this.child = new Node[mMax];
         this.splitType = splitType;
+    }
+
+    @Override
+    public void reportSizeDelta(int i) {
+        childDiff += i;
     }
 
     /**
@@ -90,47 +96,63 @@ public final class Branch<T> implements Node<T> {
      * Adds a data entry to one of the child nodes of this branch
      *
      * @param t data entry to add
+     * @param parent
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T> add(final T t) {
+    public Node<T> add(final T t, Nodelike<T> parent) {
         final HyperRect tRect = builder.apply(t);
         if (size < mMin) {
             for (int i = 0; i < size; i++) {
                 Node ci = child[i];
                 if (ci.bounds().contains(tRect)) {
-                    child[i] = ci = ci.add(t);
-                    grow(ci);
-                    return ci;
+                    Node<T> m = child[i] = ci.add(t, this);
+                    if (reportSizeDelta(parent)) {
+                        grow(m);
+                    }
+                    return m;
                 }
             }
             // no overlapping node - grow
             final Node<T> nextLeaf = splitType.newLeaf(builder, mMin, mMax);
-            nextLeaf.add(t);
+            nextLeaf.add(t, this);
             final int nextChild = addChild(nextLeaf);
-            grow(nextChild);
+            if (reportSizeDelta(parent))
+                grow(nextChild);
 
             return this;
 
         } else {
             final int bestLeaf = chooseLeaf(t, tRect);
 
-            child[bestLeaf] = child[bestLeaf].add(t);
+            child[bestLeaf] = child[bestLeaf].add(t, this);
 
-            grow(bestLeaf);
+            if (reportSizeDelta(parent)) {
+                grow(bestLeaf);
 
-            // optimize on split to remove the extra created branch when there
-            // is space for the children here
-            if (child[bestLeaf].size() == 2 &&
-                    size < mMax &&
-                    !child[bestLeaf].isLeaf()) {
-                final Branch<T> branch = (Branch<T>) child[bestLeaf];
-                child[bestLeaf] = branch.child[0];
-                child[size++] = branch.child[1];
+                // optimize on split to remove the extra created branch when there
+                // is space for the children here
+                if (child[bestLeaf].size() == 2 &&
+                        size < mMax &&
+                        !child[bestLeaf].isLeaf()) {
+                    final Branch<T> branch = (Branch<T>) child[bestLeaf];
+                    child[bestLeaf] = branch.child[0];
+                    child[size++] = branch.child[1];
+                }
             }
 
             return this;
         }
+    }
+
+    private boolean reportSizeDelta(Nodelike<T> parent) {
+        int x = childDiff;
+        if (x == 0)
+            return false; //nothing changed
+
+        this.childDiff = 0; //clear
+        parent.reportSizeDelta(x);
+        return true;
     }
 
     private void grow(int i) {
@@ -142,17 +164,18 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(final T t) {
+    public Node<T> remove(final T t, Nodelike<T> parent) {
         final HyperRect tRect = builder.apply(t);
 
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(tRect)) {
-                child[i] = child[i].remove(t);
-
-                if (child[i].size() == 0) {
-                    System.arraycopy(child, i + 1, child, i, size - i - 1);
-                    child[--size] = null;
-                    if (size > 0) i--;
+                child[i] = child[i].remove(t, this);
+                if (reportSizeDelta(parent)) {
+                    if (child[i].size() == 0) {
+                        System.arraycopy(child, i + 1, child, i, size - i - 1);
+                        child[--size] = null;
+                        if (size > 0) i--;
+                    }
                 }
             }
         }
@@ -181,11 +204,15 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> update(final T told, final T tnew) {
-        final HyperRect tRect = builder.apply(told);
+    public Node<T> update(final T OLD, final T NEW) {
+        final HyperRect tRect = builder.apply(OLD);
+
+        //TODO may be able to avoid recomputing bounds if the old was not found
+        boolean found = false;
         for (int i = 0; i < size; i++) {
-            if (tRect.intersects(child[i].bounds())) {
-                child[i] = child[i].update(told, tnew);
+            if (!found && tRect.intersects(child[i].bounds())) {
+                child[i] = child[i].update(OLD, NEW);
+                found = true;
             }
             if (i == 0) {
                 mbr = child[0].bounds();
@@ -193,6 +220,7 @@ public final class Branch<T> implements Node<T> {
                 grow(child[i]);
             }
         }
+
         return this;
 
     }
@@ -259,7 +287,7 @@ public final class Branch<T> implements Node<T> {
             return bestNode;
         } else {
             final Node<T> n = splitType.newLeaf(builder, mMin, mMax);
-            n.add(t);
+            n.add(t, this);
             child[size++] = n;
 
             mbr = (mbr == null) ? n.bounds() : mbr.mbr(n.bounds());

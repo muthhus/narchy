@@ -32,7 +32,7 @@ import java.util.function.Predicate;
 /**
  * Created by jcairns on 4/30/15.
  */
-public interface Node<T> {
+public interface Node<T> extends Nodelike<T> {
     /**
      * @return boolean - true if this node is a leaf
      */
@@ -45,17 +45,17 @@ public interface Node<T> {
 
     /**
      * Add t to the index
-     *
-     * @param t - value to add to index
+     *  @param t - value to add to index
+     * @param parent - the callee which is the parent of this instance
      */
-    @NotNull Node<T> add(T t);
+    Node<T> add(T t, Nodelike<T> parent);
 
     /**
      * Remove t from the index
-     *
-     * @param t - value to remove from index
+     *  @param t - value to remove from index
+     * @param parent - the callee which is the parent of this instance
      */
-    @NotNull Node<T> remove(T t);
+    Node<T> remove(T t, Nodelike<T> parent);
 
     /**
      * update an existing t in the index
@@ -125,4 +125,5 @@ public interface Node<T> {
      * @return instrumented node wrapper
      */
     Node<T> instrument();
+
 }

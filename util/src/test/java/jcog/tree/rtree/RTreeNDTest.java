@@ -438,16 +438,18 @@ public class RTreeNDTest {
             rect[i] = new RectDouble2D(i, i, i + 1, i + 1);
             rTree.add(rect[i]);
         }
+        assertEquals(2, rTree.size());
 
         for (int i = 0; i < NENTRY; i++) {
             rTree.add(rect[1]);
         }
 
-        assertEquals(NENTRY + 2, rTree.size());
+        assertEquals(2, rTree.size());
 
         for (int i = 0; i < rect.length; i++) {
             rTree.remove(rect[i]);
         }
+        assertEquals(0, rTree.size());
 
         for (int i = 0; i < rect.length; i++) {
             Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.getRoot().containedSet(rect[i]).isEmpty());
@@ -468,7 +470,8 @@ public class RTreeNDTest {
         assertEquals(N, rTree.size());
 
         for (int i = 0; i < N; i++) {
-            assertTrue(rTree.remove(rect[i]));
+            boolean removed = rTree.remove(rect[i]);
+            assertTrue(removed);
         }
 
         assertEquals(0, rTree.size());

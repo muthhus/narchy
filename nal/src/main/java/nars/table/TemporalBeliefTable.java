@@ -13,21 +13,25 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.function.Consumer;
 
-/**
- * Created by me on 5/7/16.
- */
+
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
 
-    /** finds the strongest match to the specified parameters. Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
+    /** finds or generates the strongest match to the specified parameters.
+     * Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
     Task match(long when, long now, int dur, @Nullable Task against, Random rng);
 
+    /** estimates the truth value for the provided time.
+     * the eternal table's top value, if existent, contributes a 'background'
+     * level in interpolation.
+     * */
     Truth truth(long when, int dur, EternalTable eternal);
 
     @Override
     void clear();
 
+    void setCapacity(int temporals);
 
     @Override
     default Iterator<Task> iterator() {
@@ -88,5 +92,5 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
     };
 
-    void setCapacity(int temporals);
+
 }

@@ -30,11 +30,26 @@ public interface HyperRect<X extends HyperPoint> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
+     * use custom implementations of mbr(HyperRect[]) when possible, it is potentially more efficient
      *
      * @param r - mbr to add
      * @return new HyperRect representing mbr of both HyperRects combined
      */
-    HyperRect<X> mbr(HyperRect<X> r);
+    @Deprecated HyperRect<X> mbr(HyperRect<X> r);
+
+
+    /** warning, the array may contain nulls. in which case, break because these will be at the end */
+    default HyperRect<X> mbr(HyperRect<X>[] rect) {
+        HyperRect<X> bounds = rect[0];
+        for (int k = 1; k < rect.length; k++) {
+            HyperRect<X> r = rect[k];
+            if (r==null)
+                break;
+            bounds = bounds.mbr(r);
+        }
+        return bounds;
+    }
+
 
     /**
      * Get number of dimensions used in creating the HyperRect

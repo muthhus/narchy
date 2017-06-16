@@ -22,6 +22,7 @@ package jcog.tree.rtree.util;
 
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.Node;
+import jcog.tree.rtree.Nodelike;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -49,13 +50,13 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(T t) {
-        return this.node.add(t);
+    public Node<T> add(T t, Nodelike<T> parent) {
+        return this.node.add(t, this);
     }
 
     @Override
-    public Node<T> remove(T t) {
-        return this.node.remove(t);
+    public Node<T> remove(T t, Nodelike<T> parent) {
+        return this.node.remove(t, this);
     }
 
     @Override
@@ -110,5 +111,10 @@ public final class CounterNode<T> implements Node<T> {
     @Override
     public Node<T> instrument() {
         return this;
+    }
+
+    @Override
+    public void reportSizeDelta(int i) {
+        node.reportSizeDelta(i);
     }
 }

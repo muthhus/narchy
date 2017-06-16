@@ -3,6 +3,7 @@ package nars.table;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.LockingRTree;
 import jcog.tree.rtree.RTree;
+import jcog.tree.rtree.Spatialized;
 import jcog.tree.rtree.point.Long1D;
 import jcog.tree.rtree.rect.RectLong1D;
 import nars.$;
@@ -26,7 +27,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 //    final AtomicInteger serial = new AtomicInteger(0);
 //    final ConcurrentHashMap<Task,Integer> id = new ConcurrentHashMap<>();
     //final com.metamx.collections.spatial.RTree tree = new com.metamx.collections.spatial.RTree(1);
-    final LockingRTree<Task> tree;
+    final Spatialized<Task> tree;
 
     public RTreeBeliefTable() {
         this.tree = new LockingRTree<Task>(new RTree(this), new ReentrantReadWriteLock(false));
