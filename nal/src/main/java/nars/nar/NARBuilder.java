@@ -56,11 +56,11 @@ public interface NARBuilder {
             n.addNAR(128, 0.2f);
         }
 
-        n.onTask(t -> {
-           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
-               n.emotion.happy(t.conf()/(threads * 300)); //learned something
-           }
-        });
+//        n.onTask(t -> {
+//           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
+//               n.emotion.happy(t.conf()/(threads * 300)); //learned something
+//           }
+//        });
 
         return n;
     }

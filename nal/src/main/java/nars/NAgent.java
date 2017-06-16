@@ -253,7 +253,7 @@ abstract public class NAgent implements NSense, NAct {
             //contribution of this agent to the NAR's global happiness measurement
             //nar.emotion.happy(reward);
             float dxm = c2w(dexterity());
-            nar.emotion.happy(dxm - lastDexterity);
+            nar.emotion.happy( (float) Math.pow(dxm - lastDexterity, 1/8f));
             this.lastDexterity = dxm;
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
@@ -354,11 +354,11 @@ abstract public class NAgent implements NSense, NAct {
                 )
         );
 
-        p.add(
-            question(seq($.varQuery(1), dur, happiness),
-                now)
-                //ETERNAL)
-        );
+//        p.add(
+//            question(seq($.varQuery(1), dur, happiness),
+//                now)
+//                //ETERNAL)
+//        );
 
 
 //        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
@@ -371,22 +371,24 @@ abstract public class NAgent implements NSense, NAct {
 
                     question(impl(action, dur, happiness), now),
                     question(impl(neg(action), dur, happiness), now),
+                    question(impl(action, dur, varQuery(1)), now),
+                    question(impl(neg(action), dur, varQuery(1)), now),
 
-                    question(seq(action, dur, happiness), now),
-                    question(seq(neg(action), dur, happiness), now),
+                    //question(seq(action, dur, happiness), now),
+                    //question(seq(neg(action), dur, happiness), now),
 
-                    question(seq(action, dur, $.varQuery(1)), now),
-                    question(seq(neg(action), dur, $.varQuery(1)), now),
+                    //question(seq(action, dur, $.varQuery(1)), now),
+                    //question(seq(neg(action), dur, $.varQuery(1)), now),
 
                     //dangerous: may lead to immobilizing self-fulfilling prophecy
                     //quest((Compound) (action.term()),now+dur)
 
 //                            //ETERNAL)
 
-                    question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                    quest((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now)
 
-                    quest((Compound)$.conj(varQuery(1), happy.term(), (Compound) (action.term())), now)
+                    //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
 
