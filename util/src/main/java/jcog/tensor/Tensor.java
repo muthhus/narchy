@@ -1,5 +1,6 @@
 package jcog.tensor;
 
+import jcog.util.FloatFloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
@@ -68,6 +69,16 @@ public interface Tensor extends Supplier<float[]> {
         });
     }
 
+    default void writeTo(FloatFloatToFloatFunction perElement, float[] target) {
+        writeTo(perElement, target, 0);
+    }
+
+    default void writeTo(FloatFloatToFloatFunction perElement, float[] target, int offset) {
+        forEach((i, v) -> {
+            target[i + offset] = perElement.apply(target[i+offset], v);
+        });
+    }
+
     default Tensor apply(FloatToFloatFunction f) {
         return new FuncTensor(this, f);
     }
@@ -79,6 +90,8 @@ public interface Tensor extends Supplier<float[]> {
     default Tensor scale(float v) {
         return apply((x) -> x * v);
     }
+
+
 
 //    int[] coord(int index, int[] coord);
 

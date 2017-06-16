@@ -28,6 +28,10 @@ import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 
 /**
+ * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
+ * from that superclass. this is temporary until the Premise behavior is determined
+ * to be either reified or virtual (executed within a conceptfire execution only)
+ *
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.
  * <p>
@@ -62,17 +66,15 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
         PriReference<Task> taskLink = getOne();
         Task task = taskLink.get();
         float taskPri = task.pri();
-        if (taskPri != taskPri) {
-            return ITask.DeleteMe; //task deleted
-        }
+        if (taskPri != taskPri)
+            return ITask.DeleteMe; //task deleted so completely erase this premise
 
         float premisePri = priElseZero();
-        if (premisePri < Pri.EPSILON)
-            return null;
+        if (premisePri < Pri.EPSILON * 128) //multiplier to compensate for the fact that each derived task will use only a fraction of this
+            return ITask.DeleteMe;
 
         Term beliefTerm = getTwo().get();
         Task belief = null;
-
 
         if (beliefTerm instanceof Compound) {
 
@@ -106,11 +108,13 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
                 Task match;
                 long now = nar.time();
 
-                long when = when(task, now);
+
 
                 if (task.isQuestOrQuestion()) {
+                    long when = whenAnswer(task, now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
                 } else {
+                    long when = whenMatch(task, now, nar);
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
                 }
 
@@ -161,8 +165,6 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
 
         DefaultDeriver.the.test(d);
 
-        priSub(premisePri); //absorb starting priority here
-
         ITask[] r = d.flush(parentTaskPri);
 //
         return r;
@@ -171,18 +173,25 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    protected long when(Task task, long now) {
+    protected long whenMatch(Task task, long now, NAR nar) {
         if (task.isEternal()) {
             return ETERNAL;
         } else if (task.isInput()) {
             return task.nearestStartOrEnd(now);
         } else {
-            return Math.max(now, task.start());
-            //other options: now + dur, a random range between the task time and now, etc
+            if (task.isBelief()) {
+                return now + nar.dur() * nar.random().nextInt( 4); //predictive belief
+            } else {
+                return Math.max(now, task.start()); //the corresponding belief for a goal or question task
+            }
         }
 
         //now;
         //now + dur;
+    }
+
+    protected long whenAnswer(Task task, long now) {
+        return task.nearestStartOrEnd(now);
     }
 
 

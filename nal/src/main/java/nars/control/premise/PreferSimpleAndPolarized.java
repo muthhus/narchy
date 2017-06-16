@@ -1,15 +1,18 @@
 package nars.control.premise;
 
-import jcog.Util;
 import nars.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.Util.unitize;
+
 /**
  * prioritizes derivations exhibiting polarization (confident and discerning)
  * and low complexity
+ * see: http://sciencing.com/calculate-growth-rate-percent-change-4532706.html
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
@@ -60,20 +63,30 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
         float p = d.premise.pri();
 
-        if (truth!=null) { //belief and goal:
-            p *=
-                 simplicityFactorRelative(conclusion, punc, d.task, d.belief)  * truth.polarization();
+        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm);
+        if (truth != null) { //belief and goal:
+            p *= simplicityFactor;
+            float freqFactor = polarization(truth.freq());
+            p *= freqFactor;
+            float confFactor = evidencePreservationRelative(truth, d);
+            p *= confFactor;
+
 //                    simplicity.floatValue() * simplicityFactorRelative(conclusion, punc, d.task, d.belief) +
 //                 polarity.floatValue()   * truth.polarization();
         } else {
             //p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-            p *= simplicityFactorRelative(conclusion, punc, d.task, d.belief);
+            p *= (simplicityFactor * simplicityFactor * simplicityFactor);
         }
 
 //        p *= puncFactor(punc).floatValue();
 //        p *= opFactor(conclusion).floatValue();
 
         return p;
+    }
+
+    /** returns a value between 0.5 and 1.0 relative to the polarity of the frequency */
+    float polarization(float freq) {
+        return 0.5f + Math.abs(freq - 0.5f);
     }
 
 //    static float polarizationFactor(@Nullable Truth truth) {
@@ -84,34 +97,25 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     /**
      * occam's razor: penalize relative complexity growth
+     *
      * @return a value between 0 and 1 that priority will be scaled by
      */
     public static float complexityFactorAbsolute(Compound conclusion, byte punc, Task task, Task belief) {
         //return 1f / (1f + conclusion.complexity());
-        return 1f / (1f + (float)Math.sqrt(
+        return 1f / (1f + (float) Math.sqrt(
                 conclusion.complexity()
         ));
     }
 
     /**
      * occam's razor: penalize relative complexity growth
+     *
      * @return a value between 0 and 1 that priority will be scaled by
      */
-    public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, Task belief) {
-        int parentComplexity;
-        int taskCompl = task.complexity();
-        if (belief != null) // && parentBelief.complexity() > parentComplexity)
-        {
-            int beliefCompl = belief.complexity();
-            parentComplexity =
-                    //(int)Math.ceil(UtilityFunctions.aveAri(taskCompl, beliefCompl));
-                    Math.max(taskCompl, beliefCompl);
-        } else {
-            parentComplexity = taskCompl;
-        }
-
-        int derivedComplexity = conclusion.complexity();
-
+    public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, @NotNull Term belief) {
+        float premCmp = task.complexity() + belief.complexity();
+        float concCmp = conclusion.complexity();
+        return (premCmp/(premCmp + concCmp));
         //controls complexity decay rate
 //        int penaltyComplexity;
 //        if (punc == QUESTION || punc == QUEST) {
@@ -122,30 +126,19 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 //        } else {
 //            penaltyComplexity = 1;
 //        }
-        int derivationPenalty = 0;
-        return
-                //Util.sqr(Util.unitize( //sharpen
-
-            1f -
-                //(float)Math.sqrt(
-                /*Util.sqr*/(
-                    Util.unitize(
-                        ((float)derivedComplexity) / (derivationPenalty + parentComplexity + derivedComplexity)
-                    )
-                    //)
-                    //Math.max(0, (float)(derivedComplexity - parentComplexity) / (derivationPenalty + parentComplexity + derivedComplexity))
-                    //((float) parentComplexity) / (parentComplexity + derivedComplexity)
-                    //Util.unitize( 1f / (1f + Math.max(0, (derivedComplexity - parentComplexity)) ))
-                )
-            ;
+//        float complexityGrowth = (combinedComplexity - premiseComplexity) /
+//                ((combinedComplexity + premiseComplexity) / 2f);
+//        return
+//            1f / (1f + Math.max(0, complexityGrowth))
+//
+//        ;
     }
 
-//    protected float confidencePreservationFactor(@NotNull Truth truth, @NotNull Derivation conclude) {
-//        float w = truth.evi(dur);
-//        return 1f - unitize(
-//                (conclude.premiseEvidence - w) / (conclude.premiseEvidence + w)
-//            //truth.conf() / w2c( conclude.premiseEvidence )
-//        );
-//    }
+    protected float evidencePreservationRelative(@NotNull Truth truth, @NotNull Derivation d) {
+        float concEvi = truth.evi();
+        float premiseEvi = d.premiseEvi;
+        float evidenceShrink = (premiseEvi - concEvi) / ((premiseEvi + concEvi)/2f);
+        return 1f / (1f + Math.max(0, evidenceShrink));
+    }
 
 }

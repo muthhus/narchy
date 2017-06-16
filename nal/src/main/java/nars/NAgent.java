@@ -41,6 +41,7 @@ import static jcog.Texts.n4;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -109,6 +110,7 @@ abstract public class NAgent implements NSense, NAct {
     private Loop senseAndMotorLoop;
     private Loop predictLoop;
     final private ConceptFire fireHappy;
+    private float lastDexterity;
 
 
     public NAgent(@NotNull NAR nar) {
@@ -250,7 +252,9 @@ abstract public class NAgent implements NSense, NAct {
 
             //contribution of this agent to the NAR's global happiness measurement
             //nar.emotion.happy(reward);
-            nar.emotion.happy(dexterity());
+            float dxm = c2w(dexterity());
+            nar.emotion.happy(dxm - lastDexterity);
+            this.lastDexterity = dxm;
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);

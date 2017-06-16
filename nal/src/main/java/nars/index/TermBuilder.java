@@ -121,8 +121,8 @@ public abstract class TermBuilder {
                 //fall-through:
             case INH:
             case SIM:
-//                if (arity == 1)
-//                    return True;
+                if (arity == 1)
+                    return True;
                 if (arity != 2)
                     throw new InvalidTermException(op, dt, "Statement without exactly 2 arguments", u);
                 return statement(op, dt, u[0], u[1]);

@@ -1,5 +1,7 @@
 package nars.derive.meta;
 
+import jcog.pri.Pri;
+import jcog.pri.Priority;
 import nars.*;
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRule;
@@ -260,6 +262,9 @@ public final class Conclude extends AbstractPred<Derivation> {
                 float priority = d.budgeting.budget(d, C, truth, punc, start, end);
                 if (priority == priority) {
 
+                    if (priority < Priority.EPSILON) {
+                        return; //wasted
+                    }
 
                     if (negating && truth != null)
                         truth = truth.negated();
@@ -278,6 +283,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     if (Param.DEBUG)
                         t.log(rule);
 
+                    d.premise.priSub(priority);
                     d.derive(t);
 
                 }

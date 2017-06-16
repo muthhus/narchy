@@ -52,7 +52,7 @@ abstract public class Derivation extends Unify implements TermContext {
     public Premise premise;
 
 
-    public  float premiseEvidence;
+    public  float premiseEvi;
 
     /**
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
@@ -260,10 +260,10 @@ abstract public class Derivation extends Unify implements TermContext {
 
         this.temporal = temporal(task, belief);
 
-        float premiseEvidence = task.isBeliefOrGoal() ? task.evi() : 0;
-        if (belief!=null)
-            premiseEvidence = Math.max(premiseEvidence, belief.evi());
-        this.premiseEvidence = premiseEvidence;
+        float premiseEvidence = task.isBeliefOrGoal() ? taskTruth.evi() : 0;
+        if (beliefTruth!=null)
+            premiseEvidence = (premiseEvidence + beliefTruth.evi());
+        this.premiseEvi = premiseEvidence;
 
         return this;
     }

@@ -12,6 +12,7 @@ import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -31,17 +32,17 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(512);
+        this(256);
     }
 
-    public Default(int activeConcepts) {
+    public Default(int activeTasks) {
         this(
-            new DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
+            new DefaultTermIndex(activeTasks * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new TaskExecutor(activeConcepts, 0.25f));
+            new TaskExecutor(activeTasks, 0.2f));
     }
 
-    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 8;
+    public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 16;
 
 
     public Default(@NotNull TermIndex concepts, @NotNull Time time, Executioner exe) {
@@ -66,8 +67,10 @@ public class Default extends NAR {
         public DefaultTermIndex(int capacity, ConceptBuilder cb) {
             super(
                     cb,
-                    new HashMap<>(capacity),
-                    new HashMap<>(capacity)
+                    //new HashMap<>(capacity, 0.9f),
+                    //new HashMap<>(capacity, 0.9f)
+                    new UnifiedMap(capacity, 0.9f),
+                    new UnifiedMap(capacity, 0.9f)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)

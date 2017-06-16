@@ -2,6 +2,7 @@ package spacegraph.widget.meter;
 
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
+import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
@@ -128,12 +129,10 @@ public class MatrixView extends Widget {
 //        );
 //    }
 
-    public static MatrixView get(Tensor t, int stride, ViewFunction1D view) {
-        final float[][] d = new float[1][];
+    public static MatrixView get(ArrayTensor t, int stride, ViewFunction1D view) {
+        float[] d = t.data;
         return new MatrixView((int) Math.floor(((float) t.volume()) / stride), stride, (x, y, gl) -> {
-            if (x == 0 && y == 0)
-                d[0] = t.get(); //update on first cell
-            float v = d[0][x * stride + y];
+            float v = d[x * stride + y];
             return view.update(v, gl);
         });
     }

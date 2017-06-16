@@ -91,6 +91,8 @@ public class DynamicBeliefTableTest {
             assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
         }
 
+        n.clear();
+
         //test change after a component's revision:
         n.believe("a:y", 0, 0.95f);
         n.run(1);

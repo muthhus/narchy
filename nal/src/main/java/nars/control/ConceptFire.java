@@ -3,6 +3,7 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
@@ -19,8 +20,8 @@ import java.util.Random;
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /** rate at which ConceptFire forms premises */
-    private static final float spendRate = 0.25f;
-    private static final int premisesPerCycle = 2;
+    private static final int maxPremisesPerCycle = 2;
+    private static final float minPri = Pri.EPSILON * 512;
 
 
     public ConceptFire(Concept c, float pri) {
@@ -31,7 +32,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     @Override
     public ITask[] run(NAR nar) {
         float pri = this.pri;
-        if (pri!=pri)
+        if (pri!=pri || pri < minPri)
             return null;
 
         final Concept c = id;
@@ -44,7 +45,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         @Nullable PriReference<Term> termlink = null;
         float taskLinkPri = -1f, termLinkPri = -1f;
 
-        FasterList<Premise> premises = new FasterList<>(0,new Premise[premisesPerCycle]);
+        //FasterList<Premise> premises = new FasterList<>(0,new Premise[maxPremisesPerCycle]);
         //also maybe Set is appropriate here
 
         float taskMargin = 1f/(1+tasklinks.size());
@@ -59,10 +60,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
          * budgeting directly.
          */
 
-        int ttl = premisesPerCycle;
+        int ttl = maxPremisesPerCycle;
 
         Random rng = nar.random();
-        while (ttl > 0) {
+        while (ttl-- > 0 && pri >= minPri) {
             if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
                 tasklink = tasklinks.sample();
                 if (tasklink == null)
@@ -79,26 +80,37 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 termLinkPri = Util.clamp(termlinks.normalizeMinMax(termlink.priSafe(0)), termMargin, 1f-termMargin);
             }
 
-            premises.add(new Premise(tasklink, termlink));
-            ttl--;
-        }
-
-        int num = premises.size();
-        if (num > 0) {
-            ITask[] pp = premises.array();
-            float spend = this.pri * spendRate;
-            this.pri -= spend;
-
-            //divide priority among the premises
-            float subPri = spend / num;
-            for (int i = 0; i < num; i++) {
-                pp[i].setPri(subPri);
+            Premise p = new Premise(tasklink, termlink);
+            float thisPri = priElseZero()/maxPremisesPerCycle;
+            if (thisPri > minPri) {
+                p.pri(thisPri);
+                ITask[] result = p.run(nar);
+                if (result!=null) {
+                    nar.input(result);
+                    float cost = thisPri - p.priElseZero();
+                    priSub(cost);
+                }
+                //premises.add(new Premise(tasklink, termlink));
             }
-
-            return pp;
-        } else {
-            return null;
         }
+
+        return null;
+//        int num = premises.size();
+//        if (num > 0) {
+//            ITask[] pp = premises.array();
+//            float spend = this.pri * spendRate;
+//            this.pri -= spend;
+//
+//            //divide priority among the premises
+//            float subPri = spend / num;
+//            for (int i = 0; i < num; i++) {
+//                pp[i].setPri(subPri);
+//            }
+//
+//            return pp;
+//        } else {
+//            return null;
+//        }
     }
 
     @NotNull

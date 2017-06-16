@@ -82,8 +82,8 @@ public class PoleCart extends NAgentX {
 
     // Define the Engine
     // Define InputVariable1 Theta(t) {angle with perpendicular}
-    @NotNull FuzzyScalarConcepts angX;
-    @NotNull FuzzyScalarConcepts angY;
+    SensorConcept angX;
+    SensorConcept angY;
     // Define InputVariable1 x(t) {angular velocity}
     SensorConcept angVel;
     // OutputVariable {force to be applied}
@@ -123,10 +123,10 @@ public class PoleCart extends NAgentX {
 
         //angle
 
-        this.angX = senseNumberBi($.p("angX"),
+        this.angX = senseNumber($.p("angX"),
                 () -> (float)(0.5f + 0.5f * (Math.sin(angle))))
                 .resolution(0.02f);
-        this.angY = senseNumberBi($.p("angY"),
+        this.angY = senseNumber($.p("angY"),
                 () -> (float)(0.5f + 0.5f * (Math.cos(angle))))
                 .resolution(0.02f);
 
@@ -143,10 +143,10 @@ public class PoleCart extends NAgentX {
         });
 
 
-        SpaceGraph.window(Vis.beliefCharts(200,
+        SpaceGraph.window(Vis.beliefCharts(100,
                 Lists.newArrayList(x, xVel,
-                        angX.get(0), angX.get(1),
-                        angY.get(0), angY.get(1),
+                        angX,
+                        angY,
                         angVel),
                 nar), 600, 600);
         this.panel = new JPanel(new BorderLayout()) {

@@ -2,6 +2,7 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
@@ -301,9 +302,10 @@ public abstract class STMClustered extends STM {
 
         this.punc = punc;
 
-        //this.input = new ArrayBag<Task>(capacity.intValue(), BudgetMerge.maxBlend, new ConcurrentHashMap<>(capacity.intValue())) {
+
         this.input =
-                new DefaultHijackBag<Task>(PriMerge.max, capacity.intValue(), 3) {
+                //new ArrayBag<>(capacity.intValue(), PriMerge.max, new ConcurrentHashMap<>(capacity.intValue())) {
+                new DefaultHijackBag<>(PriMerge.max, capacity.intValue(), 3) {
 
 //            @NotNull
 //            @Override
@@ -319,6 +321,7 @@ public abstract class STMClustered extends STM {
                         TasksNode owner = ((TLink) value).node;
                         if (owner != null)
                             owner.remove((TLink) value);
+                        value.delete();
                     }
 
                 };
@@ -362,7 +365,6 @@ public abstract class STMClustered extends STM {
             }
 
             input.setCapacity(capacity.intValue());
-            input.commit();
 
             net.compact();
 
@@ -373,6 +375,7 @@ public abstract class STMClustered extends STM {
                 tt.nearest().transfer(tt);
 
             });
+            input.clear();
 
             busy.set(false);
             return true;
@@ -391,7 +394,11 @@ public abstract class STMClustered extends STM {
     @Override
     public void accept(@NotNull Task t) {
 
+
         if (t.punc() == punc) {
+            if (t.isEternal())
+                return;
+
             input.put(new TLink(t));
         }
 

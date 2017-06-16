@@ -131,6 +131,10 @@ public class ArrayTensor implements
             data[i] = (float)d[i];
     }
 
+    public void fill(float v) {
+        Arrays.fill(data, v);
+    }
+
 //
 //    public void copyTo(float[] target, int targetOffset, int... subset) {
 //        //TODO

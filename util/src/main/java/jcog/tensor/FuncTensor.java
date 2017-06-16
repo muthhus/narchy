@@ -1,5 +1,6 @@
 package jcog.tensor;
 
+import jcog.util.FloatFloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 
 public class FuncTensor extends BatchArrayTensor {
@@ -14,8 +15,10 @@ public class FuncTensor extends BatchArrayTensor {
     }
 
 
-    @Override public void update() {
+    @Override
+    public void update() {
         from.get();
         from.writeTo(func, data);//trigger any updates but using the iterator HACK, not:
     }
+
 }

@@ -5,14 +5,19 @@ import jcog.bag.impl.HijackBag;
 import jcog.data.MwCounter;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
+import jcog.random.XorShift128PlusRandom;
 import jcog.util.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static jcog.Texts.n4;
 
 /**
  * TODO add an instrumentation wrapper to collect statistics
@@ -20,7 +25,9 @@ import java.util.function.Function;
  */
 public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K,V> {
 
-    public static class HalfWeakPair<K,V> extends WeakReference/*SoftReference*/<V> implements Priority {
+    private final Random rng = new XorShift128PlusRandom();
+
+    public static class HalfWeakPair<K,V> extends /*WeakReference*/SoftReference<V> implements Priority {
         public final K key;
         private final int hash;
         private float pri;
@@ -65,6 +72,11 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         }
 
         @Override
+        public String toString() {
+            return "$" + n4(pri) + " " +  key;
+        }
+
+        @Override
         public boolean delete() {
             clear();
             this.pri = Float.NaN;
@@ -82,6 +94,8 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
             float p = pri();
             return p!=p;
         }
+
+
     }
 
     float CACHE_HIT_BOOST;
@@ -133,9 +147,10 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
                 (float) (1f / Math.sqrt(capacity())) : 0;
 
         //note: cut should probably be some factor less than 1/reprobes
-        // for example, 1/(2*reprobes)
+        // for example, 1/(N*reprobes)
         // to ammortize additional attempts where the cut was not necessary
-        float cut = boost/(2*reprobes);
+        //TODO make this a momentum parameter
+        float cut = boost;///(1.5f*reprobes);
 
         assert(cut > Pri.EPSILON);
 
@@ -188,11 +203,11 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         V v = getIfPresent(k);
         if (v == null) {
             v = func.apply(k);
-            if (put(
-                    new HalfWeakPair(k, v)
+            HalfWeakPair h = new HalfWeakPair(k, v);
                     //new PLink<>(key, value)
                     //new WeakPLink<>(key, value)
-            ) != null) {
+            h.setPri(this.CACHE_HIT_BOOST);
+            if (put(h) != null) {
                 miss.inc();
             } else {
                 reject.inc();
@@ -211,6 +226,10 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         return true;
     }
 
+    @Override
+    protected Random random() {
+        return rng;
+    }
 
     @NotNull
     @Override
@@ -226,6 +245,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     @Override
     public void onRemoved(@NotNull HijackMemoize.HalfWeakPair<K, V> value) {
+        value.delete();
         evict.inc();
     }
 

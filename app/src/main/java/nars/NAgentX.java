@@ -3,6 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
+import jcog.tensor.ArrayTensor;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.nar.NARBuilder;
@@ -129,7 +130,7 @@ abstract public class NAgentX extends NAgent {
 //                            Draw.colorGrays(gl, x);
 //                            return 0;
 //                        }),
-                        MatrixView.get(m.agentIn, 4, (x, gl) -> {
+                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
                             Draw.colorGrays(gl, x);
                             return 0;
                         }),

@@ -1,6 +1,7 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.FloatSupplier;
 import jcog.pri.Priority;
@@ -12,6 +13,7 @@ import jcog.pri.mix.PSinks;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import jcog.tensor.TensorChain;
+import jcog.tensor.TensorLERP;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;
@@ -36,8 +38,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
     private final MixRouter<X, Y> mix;
 
-    /** normalized to sum to 1.0 */
-    private final float[] nextTraffic;
+
 
     public final MixAgent agent;
 
@@ -45,7 +46,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
     public final FloatSupplier score;
 
     public final ArrayTensor agentOut;
-    public final ArrayTensor traffic;
+    public final ArrayTensor rawTraffic, traffic;
 
     /** unipolar vector, 0..1.0 */
     public final Tensor agentIn;
@@ -105,13 +106,16 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         /** level values. between 0 and 1: 0 = max cut, 1 = max boost, 0.5 = x1 */
         this.agentOut = new ArrayTensor(size);
-        this.nextTraffic = new float[size];
+
+        this.rawTraffic = new ArrayTensor(size);
+        this.rawTraffic.fill(0.5f);
 
         this.agentIn =
                 //new AutoTensor(
                 //RingBufferTensor.get(
                             TensorChain.get(
-                                this.traffic = new ArrayTensor(size), //sum is normalized to 1
+                                this.traffic = rawTraffic,
+                                //this.traffic = new TensorLERP(rawTraffic, 0.75f), //sum is normalized to 1
                                 agentOut.scale(1f/(size/2f))
                             )
                   //      , 2)
@@ -164,6 +168,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
     private void updateTraffic() {
         float total = 0;
+        float[] nextTraffic = rawTraffic.data;
         for (int i = 0, vLength = size; i < vLength; i++) {
             float s = mix.traffic[i].sumThenClear();
             nextTraffic[i] = s;
@@ -178,7 +183,6 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
             Arrays.fill(nextTraffic, 0);
         }
 
-        traffic.set(nextTraffic);
         //System.out.println(summary());
     }
 

@@ -24,6 +24,8 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -338,7 +340,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @NotNull
     public Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
-        float loadFactor = 0.9f;
+        float loadFactor = 0.95f;
 
         if (nar.exe.concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);
@@ -348,16 +350,17 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
             if (volume < 16) {
-                return new ConcurrentHashMap(8, loadFactor);
+                //return new ConcurrentHashMap(0, loadFactor);
+                return new ConcurrentHashMapUnsafe(0);
             } else if (volume < 32) {
-                return new SynchronizedHashMap(2, loadFactor);
+                return new SynchronizedHashMap(0, loadFactor);
                 //return new TrieMap();
             } else {
-                return new SynchronizedUnifiedMap(2, loadFactor);
+                return new SynchronizedUnifiedMap(0, loadFactor);
             }
         } else {
             //return new UnifiedMap(0, loadFactor);
-            return new HashMap(2, loadFactor);
+            return new HashMap(0, loadFactor);
         }
 
     }

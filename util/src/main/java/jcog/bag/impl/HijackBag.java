@@ -209,7 +209,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             }
                             if (toReturn == p) {
                                 float oo = pri(p);
-                                if (oo==oo) {
+                                if (oo == oo) {
                                     pressurize(-oo); //undo pressurization
                                     if (overflowing != null) overflowing.add(oo);
                                 }
@@ -242,14 +242,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                         break inserting; //took empty slot, done
 
                     } else {
-                            //attempt HIJACK (tm)
-                            if (replace(v, p)) {
-                                if (map.compareAndSet(i, p, v)) { //inserted
-                                    toRemove = p;
-                                    toReturn = toAdd = v;
-                                    break inserting; //hijacked replaceable slot, done
-                                }
+                        //attempt HIJACK (tm)
+                        if (replace(v, p)) {
+                            if (map.compareAndSet(i, p, v)) { //inserted
+                                toRemove = p;
+                                toReturn = toAdd = v;
+                                break inserting; //hijacked replaceable slot, done
                             }
+                        }
 
                     }
 
@@ -319,16 +319,16 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      */
     protected boolean replace(V incoming, V existing) {
         float e = pri(existing);
-        if (e!=e)
+        if (e != e)
             return true;
         float i = pri(incoming);
-        if (i!=i)
+        if (i != i)
             return false;
         return replace(i, e);
     }
 
     protected boolean replace(float incoming, float existing) {
-        return hijackSoftmax(incoming, existing, random());
+        return hijackSoftmax(incoming, existing);
     }
 
     @Nullable
@@ -337,15 +337,22 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return update(k, null, REMOVE, null);
     }
 
-      protected boolean hijackSoftmax(float newPri, float oldPri, Random random) {
+    protected boolean hijackSoftmax(float newPri, float oldPri) {
+        return hijackSoftmax(newPri, oldPri, 0.5f);
+    }
+    protected boolean hijackSoftmax(float newPri, float oldPri, float temperature) {
+
 
         float priEpsilon = Pri.EPSILON;
 
         if (oldPri > priEpsilon) {
-            float thresh = 1f - (1f - (oldPri / (newPri + oldPri))) / reprobes;
-            return random.nextFloat() > thresh;
+            assert(temperature < reprobes);
+
+            float newPriSlice = newPri/(reprobes/temperature);
+            float thresh = newPriSlice / (newPriSlice + oldPri);
+            return random().nextFloat() < thresh;
         } else {
-            return (newPri >= priEpsilon) || random.nextBoolean();// / reprobes;
+            return (newPri >= priEpsilon) || random().nextBoolean();// / reprobes;
             // random.nextBoolean(); //50/50 chance
         }
     }
@@ -354,8 +361,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     protected boolean hijackSoftmax2(float newPri, float oldPri, Random random) {
         //newPri = (float) Math.exp(newPri*2*reprobes); //divided by temperature, reprobes ~ 0.5/temperature
         //oldPri = (float) Math.exp(oldPri*2*reprobes);
-        newPri = newPri*newPri*reprobes;
-        oldPri = oldPri*oldPri*reprobes;
+        newPri = newPri * newPri * reprobes;
+        oldPri = oldPri * oldPri * reprobes;
         if (oldPri > 2 * Float.MIN_VALUE) {
             float thresh = 1f - (1f - (oldPri / (newPri + oldPri)));
             return random.nextFloat() > thresh;
@@ -473,7 +480,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     }
 
     public float depressurize() {
-        return (float)pressure.getAndSet(0);
+        return (float) pressure.getAndSet(0);
     }
 
     @Override
@@ -495,6 +502,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     public float priMin() {
         return min;
     }
+
     @Override
     public float priMax() {
         return max;
