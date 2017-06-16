@@ -417,7 +417,7 @@ public enum Terms { ;
         if (c.isTemporal()) {
             //the compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-            return i.retemporalize(c); //retemporalize does normalize at the end
+            return i.retemporalize(c, r); //retemporalize does normalize at the end
         } else  {
             return i.normalize(c);
         }

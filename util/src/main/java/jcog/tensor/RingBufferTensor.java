@@ -8,7 +8,12 @@ public class RingBufferTensor extends ArrayTensor {
     private final int num;
     int target;
 
-    public RingBufferTensor(Tensor t, int history) {
+    public static Tensor get(Tensor t, int history) {
+        if (history == 1) return t;
+        return new RingBufferTensor(t, history);
+    }
+
+    RingBufferTensor(Tensor t, int history) {
         super(t.volume() * history);
         this.t = t;
         this.segment = t.volume();

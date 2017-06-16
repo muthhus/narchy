@@ -19,8 +19,8 @@ public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> exten
 
     private final On onTask, onReset, onCycle;
 
-    public TaskLeak(@NotNull Bag<X, V> bag, float rate, @NotNull NAR n) {
-        this(bag, new FloatParam(rate), n);
+    public TaskLeak(@NotNull Bag<X, V> bag, float ratePerDuration, @NotNull NAR n) {
+        this(bag, new FloatParam(ratePerDuration), n);
     }
 
     TaskLeak(@NotNull Bag<X, V> bag, @NotNull FloatParam rate, @NotNull NAR n) {

@@ -1,9 +1,9 @@
 package jcog.learn.ql;
 
 import jcog.data.Range;
+import jcog.decide.DecideEpsilonGreedy;
 import jcog.decide.DecideSoftmax;
 import jcog.decide.Deciding;
-import jcog.decide.DecideEpsilonGreedy;
 import jcog.learn.Agent;
 import jcog.random.XorShift128PlusRandom;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -59,8 +59,7 @@ abstract public class HaiQ implements Agent {
      * more of the path to be updated with higher rewards. This suited our
      * implementation, because our high initial epsilon was able to correct any
      * state values which might have been incorrectly reinforced and create a
-     * more defined path to the goal in fewer episodes. Because of this, we
-     * chose a final lambda of 0.9.
+     * more defined path to the goal in fewer episodes.
      */
     public float Gamma, Lambda;
 
@@ -69,17 +68,21 @@ abstract public class HaiQ implements Agent {
 
     private int inputs;
 
-    /** "horizontal" state selection */
+    /**
+     * "horizontal" state selection
+     */
     protected final Deciding decideState;
 
-    /**  "vertical" action selection */
+    /**
+     * "vertical" action selection
+     */
     protected final Deciding decideAction;
 
     public HaiQ() {
         rng = new XorShift128PlusRandom();
         decideState =
-                //DecideEpsilonGreedy.ArgMax;
-                new DecideSoftmax(0.1f, rng);
+                DecideEpsilonGreedy.ArgMax;
+                //new DecideSoftmax(0.01f, rng);
         decideAction =
                 //new DecideEpsilonGreedy(0.05f, rng);
                 new DecideSoftmax(0.1f, rng);
@@ -91,7 +94,7 @@ abstract public class HaiQ implements Agent {
 
     int learn(int state, float reward, float learningFactor, boolean decide) {
 
-        if (reward!=reward)
+        if (reward != reward)
             reward = 0; //interpret NaN as neutral 0
 
         // 1. decide next action
@@ -102,12 +105,20 @@ abstract public class HaiQ implements Agent {
         final int lastState = this.lastState;
         if (lastAction != -1) {
 
-            float DeltaQ = (reward + (Gamma * q[state][action]))
-                    - q[lastState][lastAction];
+            //SARSA? (see: http://www.cse.unsw.edu.au/~cs9417ml/RL1/source/RLearner.java )
+            float lastQ = q[lastState][lastAction];
+            float delta = reward + (Gamma * q[state][action]) - lastQ;
+            q[state][action] = lastQ +
+                    (learningFactor * Alpha.floatValue()) *
+                            delta;
             et[lastState][lastAction] += learningFactor;
+            update(delta, Alpha.floatValue() * learningFactor);
 
+            //Q-Lambda? TODO
             // 3. update
-            update(DeltaQ, Alpha.floatValue() * learningFactor);
+//            float DeltaQ = (reward + (Gamma * q[state][action]))
+//                    - q[lastState][lastAction];
+            //update(DeltaQ, Alpha.floatValue() * learningFactor);
         }
 
         if (decide) {
@@ -116,6 +127,15 @@ abstract public class HaiQ implements Agent {
         }
 
         return action;
+    }
+
+    private void etScale(float s) {
+        for (int i = 0; i < inputs; i++) {
+            float[] eti = et[i];
+            for (int k = 0; k < actions; k++) {
+                eti[k] *= s;
+            }
+        }
     }
 
     protected int nextAction(int state) {
@@ -178,7 +198,7 @@ abstract public class HaiQ implements Agent {
         q = new float[inputs][outputs];
         et = new float[inputs][outputs];
 
-        setQ(1f, 0.5f, 0.9f); // 0.1 0.5 0.9
+        setQ(1f, 0.5f, 0.5f); // 0.1 0.5 0.9
     }
 
     public void setQ(float alpha, float gamma, float lambda) {
@@ -202,7 +222,7 @@ abstract public class HaiQ implements Agent {
      * TODO make abstract
      */
     /*protected int perceive(float[] input) {
-		som.learn(input);
+        som.learn(input);
 		return som.winnerx + (som.winnery * som.SomSize);
 	}*/
     protected int lastAction() {

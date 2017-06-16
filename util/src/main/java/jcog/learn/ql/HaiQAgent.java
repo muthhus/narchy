@@ -21,9 +21,9 @@ public class HaiQAgent extends HaiQ {
 
     public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
-    final static float perceptionAlpha = 0.01f;
+    float perceptionAlpha;
     float perceptionNoise = 0f;
-    float perceptionCorruption = 0f;
+    float perceptionCorruption = 0.01f;
     float perceptionForget = 0.0f;
     public FloatSupplier perceptionError;
     public float lastPerceptionError = 0;
@@ -53,7 +53,8 @@ public class HaiQAgent extends HaiQ {
 
     protected void start(int inputs, int states, int outputs) {
         //logger.info("start {} -> {} -> {}", inputs, states, outputs);
-        this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs);
+        this.perceptionAlpha = 1f/(inputs);
+        this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs/2);
         ae = perception(inputs, states);
         super.start(states, outputs);
     }

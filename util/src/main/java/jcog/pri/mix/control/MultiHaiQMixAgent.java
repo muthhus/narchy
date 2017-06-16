@@ -15,7 +15,7 @@ public class MultiHaiQMixAgent implements MixAgent {
 
     final boolean controlRelative = true;
 
-    final int controlResolution = 10;
+    final int controlResolution = 9;
     final float controlGranularity = 1.0f / (controlResolution);
 
     /**
@@ -40,8 +40,9 @@ public class MultiHaiQMixAgent implements MixAgent {
             if (action == -1)
                 return; //error
 
-            float next = out.get(a);
+            float next;
             if (controlRelative) {
+                next = out.get(a);
                 switch (action) {
                     case 0: //no change
                         break;

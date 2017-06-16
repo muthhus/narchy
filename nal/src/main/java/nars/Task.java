@@ -1019,11 +1019,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         boolean negated = false;
 
-        //Compound c3 = Task.content(c2, nar);
-
-        if ((cc = normalizedOrNull(cc, index)) == null)
-            return null;
-
         if (cc.op() == NEG) {
             cc = compoundOrNull(cc.unneg());
             if (cc == null)
@@ -1031,6 +1026,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             negated = !negated;
         }
+
+        if ((cc = normalizedOrNull(cc, index)) == null)
+            return null;
 
         if (Task.taskContentValid(cc, punc, null, true))
             return PrimitiveTuples.pair(cc, negated);

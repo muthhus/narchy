@@ -109,12 +109,12 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         this.agentIn =
                 //new AutoTensor(
-                //new RingBufferTensor(
+                //RingBufferTensor.get(
                             TensorChain.get(
                                 this.traffic = new ArrayTensor(size), //sum is normalized to 1
-                                agentOut //.scale(1f/size)
+                                agentOut.scale(1f/(size/2f))
                             )
-                  //      , 1)
+                  //      , 2)
                 //,12)
         ;
 

@@ -914,7 +914,7 @@ public interface TimeFunctions {
                     }
                 }
 
-                Task chosen = chooseByConf(task, p.belief, p);
+                Task chosen = task.isBeliefOrGoal() ? chooseByConf(task, p.belief, p) : p.belief;
                 if (chosen == task)
                     eventDelta = dtT;
                 else
@@ -1005,285 +1005,306 @@ public interface TimeFunctions {
         Term tp = rule.getTask();
         Term bp = rule.getBelief();
 
-        Task task = p.task;
-        Task belief = p.belief;
+        Task t = p.task;
+        Task b = p.belief;
 
-        long occ = occInterpolate(task, belief); //reset
-
-        Compound tt = (Compound) p.taskTerm.unneg();
-        Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
-
-        int td = tt.dt();
-        int bd = bb instanceof Compound ? ((Compound) bb).dt() : DTERNAL;
-
-        int t = DTERNAL;
-
-        Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
-
-        if (derived.op().temporal && cp instanceof Compound) {
-
-            Compound ccc = (Compound) cp;
-            Term ca = ccc.sub(0);
-
-            //System.out.println(tt + " "  + bb);
-
-        /* CASES:
-            conclusion pattern size 1
-                equal to task subterm
-                equal to belief subterm
-                unique term
-            conclusion pattern size 2 (a, b)
-                a equal to task subterm
-                b equal to task subterm
-                a equal to belief subterm
-                b equal to belief subterm
-
-         */
-            int s = cp.size();
-            if (s == 2) {
-                Term cb = ccc.sub(1);
-
-                //chained relations
-//                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
-//
-//                    Compound tpp = (Compound) tp;
-//                    Compound bpp = (Compound) bp;
-//
-//                    if (derivationMatch(tpp.term(1), bpp.term(0))) {
-//                        t = td + bd;
-//
-//                        //chained inner
-//                        if (!derivationMatch(cb, bpp.term(1))) {
-//                            t = -t; //invert direction
-//                        }
-//                    } else if (derivationMatch(tpp.term(0), bpp.term(1))) {
-//                        //chain outer
-//                        t = td + bd; //?? CHECK
-//                    } else if (derivationMatch(tpp.term(0), bpp.term(0))) {
-//                        //common left
-//                        t = td - bd;
-//                    } else if (derivationMatch(tpp.term(1), bpp.term(1))) {
-//                        //common right
-//                        t = bd - td;
-//                    } else {
-//                        //throw new RuntimeException("unhandled case");
-//                        t = (bd + td) / 2; //???
-//                    }
-//
-//                }
-
-                long to = task.start();
-                long bo = belief != null ? belief.start() : to;
-
-                int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
-
-                if (td == DTERNAL && bd == DTERNAL) {
-
-//                    int aTask = tp.subtermTime(ca, DTERNAL);
-//                    int aBelief = bp.subtermTime(ca, DTERNAL);
-//                    int bTask = tp.subtermTime(cb, DTERNAL);
-//                    int bBelief = bp.subtermTime(cb, DTERNAL);
-//
-//                    if (belief != null) {
-//
-//                        boolean reversed = false;
-//                    /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
-//                        if (derived.op().commutative) {
-//                            if (!derivationMatch(
-//                                    p.resolve(((Compound) cp).term(0)),
-//                                    derived.term(0))) {
-//                                occDiff = -occDiff;
-//                                reversed = true;
-//                            }
-//                        }
-//
-//
-//                        if (aTask != DTERNAL && aBelief == DTERNAL &&
-//                                bBelief != DTERNAL && bTask == DTERNAL) {
-//                            //forward: task -> belief
-//                            //t = (int) (task.occurrence() - belief().occurrence());
-//                            t = occDiff;
-//                            if (reversed) occ -= t;
-//                            else occ += t;
-//
-//                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
-//                                bBelief == DTERNAL && bTask != DTERNAL) {
-//                            //reverse: belief -> task
-//                            t = -occDiff;
-//                            //t = (int) (belief().occurrence() - task.occurrence());
-//                            //t = (int) (task.occurrence() - belief().occurrence());
-//
-//                            if (!reversed) {
-//                                occ -= t;
-//                            } else {
-//                                occ += t;
-//                            }
-//
-//
-//                        } else {
-//
-//                            //both ITERNAL
-//
-//                            if ((to != ETERNAL) && (bo != ETERNAL)) {
-//                                t = occDiff;
-//                                if (reversed) occ -= t;
-//                                else occ += t;
-//                            }
-//
-//                        }
-//                    }
-
-                } else if (td == DTERNAL) {
-                    //belief has dt
-                    t = bd;// + occDiff;
-                    //TODO align
-                } else if (bd == DTERNAL) {
-                    //task has dt
-                    t = td + occDiff;
-                    //occ += t; //TODO check this alignment
-
-                } else {
-                    //t = occDiff;
-                    //throw new RuntimeException("unhandled case");
-                    //???
-                    //t = (td+bd)/2;
-                }
+        boolean te = p.task.isEternal();
+        boolean be = b.isEternal();
+        if (te && !be) {
+            occReturn[0] = b.start();
+            occReturn[1] = b.end();
+        } else if (!te && be) {
+            occReturn[0] = p.task.start();
+            occReturn[1] = p.task.end();
+        } else if (!te && !be) {
+            Interval intersection = Interval.intersect(t.start(), t.end(), b.start(), b.end());
+            if (intersection != null) {
+                occReturn[0] = intersection.a;
+                occReturn[1] = intersection.b;
+            } else {
+                //not overlapping at all
+                return null;
             }
-
+        } else {
+            occReturn[0] = occReturn[1] = ETERNAL;
         }
 
-
-        //apply occurrence shift
-        if (occ != ETERNAL) {
-
-            Term T = resolve(tt, p);
-            if (T != null) {
-                Term B = resolve(bb, p);
-
-                if (belief != null) {
-                    //TODO cleanup simplify this is messy and confusing
-
-                    if (task.isEternal() && !belief.isEternal()) {
-                        //find relative time of belief in the task, relative time of the conclusion, and subtract
-                        //the occ (=belief time's)
-                        long timeOfBeliefInTask = T.subtermTime(B) + td;
-                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
-                        if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
-                            occ += (timeOfDerivedInTask - timeOfBeliefInTask);
-                        else if (timeOfDerivedInTask != DTERNAL)
-                            occ += timeOfDerivedInTask;
-                    } else if (!task.isEternal() && belief.isEternal() && B != null) {
-                        long timeOfTaskInBelief = B.subtermTime(T) + bd;
-                        long timeOfDerivedInBelief = B.subtermTime(derived) + bd;
-
-                        if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
-                            occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
-                        else if (timeOfDerivedInBelief != DTERNAL)
-                            occ += timeOfDerivedInBelief;
-                        else {
-                            long timeOfDerivedInTask = T.subtermTime(derived) + td;
-                            if (timeOfDerivedInTask != DTERNAL) {
-                                occ += timeOfDerivedInTask;
-                            } else {
-                                //??
-                            }
-                        }
-                    } else if (!task.isEternal() && !belief.isEternal()) {
-                        //throw new RuntimeException("ambiguous task or belief");
-
-                        //long ot = T.subtermTime(C, td);
-                        //long ob = B.subtermTime(C, bd);
-                        //if (t!=ITERNAL)
-                        //    occ -= t;
-                    }
-                } else {
-
-                    if (!task.isEternal()) {
-                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
-                        if (timeOfDerivedInTask != DTERNAL)
-                            occ += timeOfDerivedInTask;
-                    } else {
-
-//                        int ot = tp.subtermTime(cp, td);
-//                        int ob = bp.subtermTime(cp, bd);
+//        long occ = occInterpolate(t, b); //reset
 //
-//                        if (ot != DTERNAL) {
-//                            if (tp instanceof Compound) {
-//                                Compound ctp = (Compound) tp;
-//                                if (derivationMatch(ctp.term(0), cp)) {
-//                                    ot -= td;
-//                                }
-//                            }
-//                            occ += ot; //occ + ot;
-//                        } else if (ob != DTERNAL) {
+//        Compound tt = (Compound) p.taskTerm.unneg();
+//        Term bb = p.beliefTerm; // belief() != null ? belief().term() : null;
 //
-//                            if (belief.start() != task.start()) { //why?
-//                                if (bp instanceof Compound) {
-//                                    Compound cbp = (Compound) bp;
-//                                    if (!derivationMatch(cbp.term(1), cp)) {
-//                                        ob -= bd;
-//                                    }
-//                                }
-//                            }
+//        int td = tt.dt();
+//        int bd = bb instanceof Compound ? ((Compound) bb).dt() : DTERNAL;
 //
-//                            occ += ob;
+//        int t = DTERNAL;
 //
-//                        } else {
-//                            //neither, remain eternal
-//                            throw new RuntimeException("unhandled case");
-//                        }
-                    }
-                }
-            }
-
-
-        }
-        //}
-        //}
-
-
-        if ((t != DTERNAL) && (t != derived.dt())) {
-        /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
-                t, derived.subterms());*/
-
-            if (derived.size() == 2 || t == 0)
-                derived = dt(derived, t, occReturn, p);
-
-//            int nt = derived.t();
-//            if (occ > TIMELESS) {
-//                if (Math.signum(t) != Math.signum(nt)) {
-//                    //re-align the occurrence
-//                    occ -= t;
+//        Term cp = d.conclusionPattern; //TODO this may be a wrapped immediatefunction?
+//
+//        if (derived.op().temporal && cp instanceof Compound) {
+//
+//            Compound ccc = (Compound) cp;
+//            Term ca = ccc.sub(0);
+//
+//            //System.out.println(tt + " "  + bb);
+//
+//        /* CASES:
+//            conclusion pattern size 1
+//                equal to task subterm
+//                equal to belief subterm
+//                unique term
+//            conclusion pattern size 2 (a, b)
+//                a equal to task subterm
+//                b equal to task subterm
+//                a equal to belief subterm
+//                b equal to belief subterm
+//
+//         */
+//            int s = cp.size();
+//            if (s == 2) {
+//                Term cb = ccc.sub(1);
+//
+//                //chained relations
+////                if (td != DTERNAL && bd != DTERNAL && (tp.size() == 2) && (bp.size() == 2)) {
+////
+////                    Compound tpp = (Compound) tp;
+////                    Compound bpp = (Compound) bp;
+////
+////                    if (derivationMatch(tpp.term(1), bpp.term(0))) {
+////                        t = td + bd;
+////
+////                        //chained inner
+////                        if (!derivationMatch(cb, bpp.term(1))) {
+////                            t = -t; //invert direction
+////                        }
+////                    } else if (derivationMatch(tpp.term(0), bpp.term(1))) {
+////                        //chain outer
+////                        t = td + bd; //?? CHECK
+////                    } else if (derivationMatch(tpp.term(0), bpp.term(0))) {
+////                        //common left
+////                        t = td - bd;
+////                    } else if (derivationMatch(tpp.term(1), bpp.term(1))) {
+////                        //common right
+////                        t = bd - td;
+////                    } else {
+////                        //throw new RuntimeException("unhandled case");
+////                        t = (bd + td) / 2; //???
+////                    }
+////
+////                }
+//
+//                long to = t.start();
+//                long bo = b != null ? b.start() : to;
+//
+//                int occDiff = (to != ETERNAL && bo != ETERNAL) ? (int) (bo - to) : 0;
+//
+//                if (td == DTERNAL && bd == DTERNAL) {
+//
+////                    int aTask = tp.subtermTime(ca, DTERNAL);
+////                    int aBelief = bp.subtermTime(ca, DTERNAL);
+////                    int bTask = tp.subtermTime(cb, DTERNAL);
+////                    int bBelief = bp.subtermTime(cb, DTERNAL);
+////
+////                    if (belief != null) {
+////
+////                        boolean reversed = false;
+////                    /* reverse subterms if commutive and the terms are opposite the corresponding pattern */
+////                        if (derived.op().commutative) {
+////                            if (!derivationMatch(
+////                                    p.resolve(((Compound) cp).term(0)),
+////                                    derived.term(0))) {
+////                                occDiff = -occDiff;
+////                                reversed = true;
+////                            }
+////                        }
+////
+////
+////                        if (aTask != DTERNAL && aBelief == DTERNAL &&
+////                                bBelief != DTERNAL && bTask == DTERNAL) {
+////                            //forward: task -> belief
+////                            //t = (int) (task.occurrence() - belief().occurrence());
+////                            t = occDiff;
+////                            if (reversed) occ -= t;
+////                            else occ += t;
+////
+////                        } else if (aTask == DTERNAL && aBelief != DTERNAL &&
+////                                bBelief == DTERNAL && bTask != DTERNAL) {
+////                            //reverse: belief -> task
+////                            t = -occDiff;
+////                            //t = (int) (belief().occurrence() - task.occurrence());
+////                            //t = (int) (task.occurrence() - belief().occurrence());
+////
+////                            if (!reversed) {
+////                                occ -= t;
+////                            } else {
+////                                occ += t;
+////                            }
+////
+////
+////                        } else {
+////
+////                            //both ITERNAL
+////
+////                            if ((to != ETERNAL) && (bo != ETERNAL)) {
+////                                t = occDiff;
+////                                if (reversed) occ -= t;
+////                                else occ += t;
+////                            }
+////
+////                        }
+////                    }
+//
+//                } else if (td == DTERNAL) {
+//                    //belief has dt
+//                    t = bd;// + occDiff;
+//                    //TODO align
+//                } else if (bd == DTERNAL) {
+//                    //task has dt
+//                    t = td + occDiff;
+//                    //occ += t; //TODO check this alignment
+//
 //                } else {
-//                    occ -= nt;
+//                    //t = occDiff;
+//                    //throw new RuntimeException("unhandled case");
+//                    //???
+//                    //t = (td+bd)/2;
 //                }
 //            }
-        }
-
-//        if (belief!=null) {
-//            long taskOcc = task.start();
-//            if (taskOcc!=ETERNAL) {
-//                long belOcc = belief.start();
-//                if (belOcc!=ETERNAL) {
-//                    Interval ii = Interval.union(taskOcc, task.end(), belOcc, belief.end() );
-//                    if (ii != null) {
-//                        occReturn[0] = ii.a;
-//                        occReturn[1] = ii.b;
 //
-//                        return derived;
+//        }
+//
+//
+//        //apply occurrence shift
+//        if (occ != ETERNAL) {
+//
+//            Term T = resolve(tt, p);
+//            if (T != null) {
+//                Term B = resolve(bb, p);
+//
+//                if (b != null) {
+//                    //TODO cleanup simplify this is messy and confusing
+//
+//                    if (t.isEternal() && !b.isEternal()) {
+//                        //find relative time of belief in the task, relative time of the conclusion, and subtract
+//                        //the occ (=belief time's)
+//                        long timeOfBeliefInTask = T.subtermTime(B) + td;
+//                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
+//                        if (timeOfDerivedInTask != DTERNAL && timeOfBeliefInTask != DTERNAL)
+//                            occ += (timeOfDerivedInTask - timeOfBeliefInTask);
+//                        else if (timeOfDerivedInTask != DTERNAL)
+//                            occ += timeOfDerivedInTask;
+//                    } else if (!t.isEternal() && b.isEternal() && B != null) {
+//                        long timeOfTaskInBelief = B.subtermTime(T) + bd;
+//                        long timeOfDerivedInBelief = B.subtermTime(derived) + bd;
+//
+//                        if (timeOfTaskInBelief != DTERNAL && timeOfDerivedInBelief != DTERNAL)
+//                            occ += (timeOfDerivedInBelief - timeOfTaskInBelief);
+//                        else if (timeOfDerivedInBelief != DTERNAL)
+//                            occ += timeOfDerivedInBelief;
+//                        else {
+//                            long timeOfDerivedInTask = T.subtermTime(derived) + td;
+//                            if (timeOfDerivedInTask != DTERNAL) {
+//                                occ += timeOfDerivedInTask;
+//                            } else {
+//                                //??
+//                            }
+//                        }
+//                    } else if (!t.isEternal() && !b.isEternal()) {
+//                        //throw new RuntimeException("ambiguous task or belief");
+//
+//                        //long ot = T.subtermTime(C, td);
+//                        //long ob = B.subtermTime(C, bd);
+//                        //if (t!=ITERNAL)
+//                        //    occ -= t;
+//                    }
+//                } else {
+//
+//                    if (!t.isEternal()) {
+//                        long timeOfDerivedInTask = T.subtermTime(derived) + td;
+//                        if (timeOfDerivedInTask != DTERNAL)
+//                            occ += timeOfDerivedInTask;
 //                    } else {
-//                        //no intersection: point-like below
+//
+////                        int ot = tp.subtermTime(cp, td);
+////                        int ob = bp.subtermTime(cp, bd);
+////
+////                        if (ot != DTERNAL) {
+////                            if (tp instanceof Compound) {
+////                                Compound ctp = (Compound) tp;
+////                                if (derivationMatch(ctp.term(0), cp)) {
+////                                    ot -= td;
+////                                }
+////                            }
+////                            occ += ot; //occ + ot;
+////                        } else if (ob != DTERNAL) {
+////
+////                            if (belief.start() != task.start()) { //why?
+////                                if (bp instanceof Compound) {
+////                                    Compound cbp = (Compound) bp;
+////                                    if (!derivationMatch(cbp.term(1), cp)) {
+////                                        ob -= bd;
+////                                    }
+////                                }
+////                            }
+////
+////                            occ += ob;
+////
+////                        } else {
+////                            //neither, remain eternal
+////                            throw new RuntimeException("unhandled case");
+////                        }
 //                    }
 //                }
 //            }
-//        } else {
-//            //inherit task's occurrence exactly
-//            occReturn[0] = task.start();
-//            occReturn[1] = task.end();
-//            return derived;
+//
+//
 //        }
-
-        occReturn[0] = occ;
+//        //}
+//        //}
+//
+//
+//        if ((t != DTERNAL) && (t != derived.dt())) {
+//        /*derived = (Compound) p.premise.nar.memory.index.newTerm(derived.op(), derived.relation(),
+//                t, derived.subterms());*/
+//
+//            if (derived.size() == 2 || t == 0)
+//                derived = dt(derived, t, occReturn, p);
+//
+////            int nt = derived.t();
+////            if (occ > TIMELESS) {
+////                if (Math.signum(t) != Math.signum(nt)) {
+////                    //re-align the occurrence
+////                    occ -= t;
+////                } else {
+////                    occ -= nt;
+////                }
+////            }
+//        }
+//
+////        if (belief!=null) {
+////            long taskOcc = task.start();
+////            if (taskOcc!=ETERNAL) {
+////                long belOcc = belief.start();
+////                if (belOcc!=ETERNAL) {
+////                    Interval ii = Interval.union(taskOcc, task.end(), belOcc, belief.end() );
+////                    if (ii != null) {
+////                        occReturn[0] = ii.a;
+////                        occReturn[1] = ii.b;
+////
+////                        return derived;
+////                    } else {
+////                        //no intersection: point-like below
+////                    }
+////                }
+////            }
+////        } else {
+////            //inherit task's occurrence exactly
+////            occReturn[0] = task.start();
+////            occReturn[1] = task.end();
+////            return derived;
+////        }
+//
+//        occReturn[0] = occ;
         return derived;
 
     };

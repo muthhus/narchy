@@ -4,14 +4,18 @@ import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.CompoundConcept;
+import nars.concept.GoalActionConcept;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
 import java.util.function.IntFunction;
 import java.util.stream.IntStream;
+
+import static nars.Op.BELIEF;
 
 
 /**
@@ -104,7 +108,7 @@ public class Outputs {
         this.out = new LinkedHashMap<>(maxStates);
         this.outVector = IntStream.range(0, maxStates).mapToObj((int i) -> {
                     Compound tt = namer.apply(i);
-                    return a.action(tt, (b, d) -> {
+                    @NotNull GoalActionConcept aa = a.action(tt, (b, d) -> {
 //                        if (train) {
 //                            float ee = expected(i);
 //
@@ -124,12 +128,13 @@ public class Outputs {
 //                        } else {
                         //return d!=null ? d.confWeightMult(0.5f) : null;
                         //}
-                        if (d != null)
-                            return $.t(transferFunction.valueOf(d.freq()), d.conf());
-                        else
-                            return null;
+
+                        return $.t(transferFunction.valueOf(d!=null ? d.freq() : 0), nar.confDefault(BELIEF));
+
                         //return d!=null ? new PreciseTruth(d.freq(), d.conf()goalInfluence.d.eviMult(goalInfluence, a.nar.dur()) : null;
                     });
+                    aa.resolution.setValue(1f);
+                    return aa;
                 }
 //                        a.sense(namer.apply(i), () -> {
 //                            if (train) {

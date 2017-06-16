@@ -22,6 +22,7 @@ import nars.control.ConceptFire;
 import nars.control.Premise;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -68,18 +69,18 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInput() {
-        return new RLMixControl<>(this::inputSub, 20f,
+        RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 20f,
 
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 1),
 
-                8,
+                10,
 
-                new EnumClassifier<>("type", new String[] {
-                    "Belief", "Goal", "Question", "Quest",
-                    "Activation", "Premise", "ConceptFire"
+                new EnumClassifier<>("type", new String[]{
+                        "Belief", "Goal", "Question", "Quest",
+                        "Activation", "Premise", "ConceptFire"
                 }, (x) -> {
 
                     if (x instanceof Task) {
@@ -116,7 +117,7 @@ public class NARS extends NAR {
                     return -1;
                 }),
 
-                new EnumClassifier<>("when", new String[] { "Present", "Future", "Past" }, (t) -> {
+                new EnumClassifier<>("when", new String[]{"Present", "Future", "Past"}, (t) -> {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
@@ -136,6 +137,13 @@ public class NARS extends NAR {
 //            new MixRouter.Classifier<>("unoriginal",
 //                    (x) -> x.stamp().length > 2),
         );
+
+        onTask(t -> {
+           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
+               emotion.happy(t.conf()/100f); //learned something
+           }
+        });
+        return r;
     }
 
     @Override

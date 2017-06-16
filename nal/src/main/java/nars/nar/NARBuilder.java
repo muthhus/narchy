@@ -36,23 +36,23 @@ public interface NARBuilder {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.5f);
-        n.goalConfidence(0.5f);
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.8f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(40);
+        n.termVolumeMax.setValue(30);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, true);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, false, 0.25f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, false, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.01f, 4);
+        Inperience inp = new Inperience(n, 0.05f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 0.25f);
+            n.addNAR(1024, 0.25f);
         }
 
         return n;

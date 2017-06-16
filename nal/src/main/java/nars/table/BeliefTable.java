@@ -17,6 +17,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static java.util.stream.StreamSupport.stream;
+import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.and;
 
@@ -245,12 +246,16 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (when == ETERNAL)
                 when = now;
 
-            Truth aProj = answer.truth(when, dur, 0 /* nar.confMin.floatValue() */);
+
+            Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
             if (aProj != null) {
 
+                Compound at = normalizedOrNull(answer.term(), nar.terms, nar.terms.retemporalizationZero);
+                if (at==null)
+                    return null;
 
                 AnswerTask a = new AnswerTask(
-                        answer.term(),
+                        at,
                         answer,
                         question,
                         aProj, now, when, when, 0.5f);

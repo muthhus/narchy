@@ -66,8 +66,16 @@ public class GenericCompoundDT extends ProxyCompound {
             if (ref == dref) {
                 //ok
             } else if (ref.equals(dref)) {
-                //share equivalent instance
-                d.ref = ref;
+                //share equivalent instance, prefer to maintain a normalized term as it is likely used elsewhere (ie. in task content)
+                if (ref.isNormalized()) {
+                    d.ref.setNormalized(); //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
+                    d.ref = ref;
+                } else if (d.ref.isNormalized()) {
+                    ref.setNormalized();  //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
+                    this.ref = d.ref;
+                } else {
+                    d.ref = ref;
+                }
 
 //                if (System.identityHashCode(ref) < System.identityHashCode(dref)) {
 //                    this.ref = dref;

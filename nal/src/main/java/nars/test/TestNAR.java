@@ -2,6 +2,7 @@ package nars.test;
 
 import jcog.event.Topic;
 import nars.*;
+import nars.task.ITask;
 import nars.task.Tasked;
 import nars.test.condition.EternalTaskCondition;
 import nars.test.condition.NARCondition;
@@ -131,6 +132,16 @@ public class TestNAR {
             } catch (Narsese.NarseseException e) {
                 assertTrue(e.toString(), false);
             }
+        return this;
+    }
+    @NotNull
+    public TestNAR input(@NotNull ITask... s) {
+        finished = false;
+        for (ITask x : s) {
+            if (x.pri()==0 || x.isDeleted())
+                throw new RuntimeException("input task has zero or deleted priority");
+            nar.input(x);
+        }
         return this;
     }
 

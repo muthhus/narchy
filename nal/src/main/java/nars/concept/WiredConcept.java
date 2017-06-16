@@ -41,28 +41,28 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
     }
 
 
-    public void process(@NotNull Task t, @NotNull NAR n) {
-        //dither the task frequency
-        if (!t.isInput() && t.isBeliefOrGoal()) {
-            float f = t.freq();
-            float r = resolution.floatValue();
-            float ff = Util.round(f, r);
-            if (f!=ff) {
-                Truth tr = t.truth().ditherFreqAdjustConf(r);
-                if (tr == null)
-                    return;
-
-                Task tt = new NALTask(t.term(), t.punc(),
-                        tr,
-                        t.creation(), t.start(), t.end(), t.stamp()
-                );
-                tt.pri(t.pri());
-                t = tt;
-            }
-        }
-
-        super.process(t, n);
-    }
+//    public void process(@NotNull Task t, @NotNull NAR n) {
+//        //dither the task frequency
+//        if (!t.isInput() && /*t.isBeliefOrGoal()*/ t.isBelief()) {
+//            float f = t.freq();
+//            float r = resolution.floatValue();
+//            float ff = Util.round(f, r);
+//            if (f!=ff) {
+//                Truth tr = t.truth().ditherFreqAdjustConf(r);
+//                if (tr == null)
+//                    return;
+//
+//                Task tt = new NALTask(t.term(), t.punc(),
+//                        tr,
+//                        t.creation(), t.start(), t.end(), t.stamp()
+//                );
+//                tt.pri(t.pri());
+//                t = tt;
+//            }
+//        }
+//
+//        super.process(t, n);
+//    }
 
 
     @NotNull

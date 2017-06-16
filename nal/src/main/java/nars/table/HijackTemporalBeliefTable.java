@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.list.FasterList;
+import jcog.list.Top2;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
@@ -513,16 +514,16 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
 
         //choose only top:
-        return maxBy(evidence(when, now, dur));
+        //return maxBy(evidence(when, now, dur));
 
 
         //choose top 2 and merge them:
-//        Top2<Task> s = new Top2(evidence(when, now, dur), this);
-//        Task a = s.a;
-//        if (s.b == null)
-//            return a;
-//        Task c = merge(a, s.b, now, a.conf(), rng);
-//        return c != null ? c : a;
+        Top2<Task> s = new Top2(evidence(when, now, dur), this);
+        Task a = s.a;
+        if (s.b == null)
+            return a;
+        Task c = merge(a, s.b, now, a.conf(), rng);
+        return c != null ? c : a;
     }
 
 
