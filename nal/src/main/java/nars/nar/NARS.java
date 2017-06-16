@@ -8,6 +8,7 @@ import jcog.math.FloatAveraged;
 import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
+import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
@@ -69,8 +70,8 @@ public class NARS extends NAR {
     protected PSinks newInput() {
         RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 20f,
 
-                //new HaiQMixAgent(),
-                new MultiHaiQMixAgent(),
+                new HaiQMixAgent(),
+                //new MultiHaiQMixAgent(),
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 1),
 

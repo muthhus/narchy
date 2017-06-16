@@ -165,6 +165,9 @@ public class TaskExecutor extends Executioner {
         ITask[] next;
         try {
 
+            if (x.isDeleted())
+                return;
+
             next = x.run(nar);
 
         } catch (Throwable e) {

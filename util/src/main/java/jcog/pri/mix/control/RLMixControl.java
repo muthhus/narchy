@@ -142,7 +142,7 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
         //preGain[0] += levels.get(size - 1); //bias
 
-        return sqr( //l^4
+        return /*sqr*/( //l^4
                 sqr(1f + preGain[0]) //l^2
                 )
                 ;

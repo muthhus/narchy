@@ -316,8 +316,6 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
         @Override
         public ITask[] run(NAR n) {
-            if (isDeleted())
-                throw new RuntimeException("wtf");
             logger.info(" {}", this);
             return super.run(n);
         }

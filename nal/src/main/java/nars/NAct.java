@@ -123,8 +123,8 @@ public interface NAct {
                     f = 1f;
                     break;
                 case 0:
-                    f = 0.5f;
-                    break;
+                    //f = 0.5f; break;
+                    return null;
                 case -1:
                     f = 0f;
                     break;

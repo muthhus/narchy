@@ -63,7 +63,6 @@ public class Signal {
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;
 
-        int dur = nar.dur();
 
         long last = this.lastInputTime;
         if (last == ETERNAL)
@@ -73,7 +72,7 @@ public class Signal {
 
         if (this.current != null) {
             this.current.setEnd(now);
-            if (current.isDeleted() || now - current.start() >= (dur * MAX_PERCEPT_DURATIONS)) {
+            if (current.isDeleted() || now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)) {
                 if (nextTruth == null)
                     nextTruth = current.truth;
                 this.current = null;
