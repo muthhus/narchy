@@ -8,7 +8,6 @@ import jcog.math.FloatAveraged;
 import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
-import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
 import jcog.pri.op.PriMerge;
@@ -22,7 +21,6 @@ import nars.control.ConceptFire;
 import nars.control.Premise;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -144,6 +142,8 @@ public class NARS extends NAR {
 
     @Override
     public void input(ITask x) {
+        if (x == null)
+            return;
         ((RLMixControl) in).accept(x);
     }
 

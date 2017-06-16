@@ -6,8 +6,6 @@ import jcog.learn.ql.HaiQAgent;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 
-import static jcog.Texts.n2;
-
 public class MultiHaiQMixAgent implements MixAgent {
 
     public HaiQAgent[] agent;

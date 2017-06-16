@@ -80,6 +80,7 @@ public class Signal {
             }
         }
 
+            this.lastInputTime = now;
 
 
         //no signal
@@ -90,7 +91,6 @@ public class Signal {
 
 
 
-            this.lastInputTime = now;
 
             if (current != null && current.truth.equals(nextTruth, resolution.asFloat())) {
 //                if (residualBudgetFactor > 0) {

@@ -1,7 +1,5 @@
 package nars.term.mutate;
 
-import nars.$;
-import nars.term.Term;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;

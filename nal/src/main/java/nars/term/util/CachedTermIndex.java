@@ -1,7 +1,6 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.util.CaffeineMemoize;
 import jcog.util.Memoize;
 import nars.Op;
 import nars.Param;

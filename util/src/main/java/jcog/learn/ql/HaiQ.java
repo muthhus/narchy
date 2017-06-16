@@ -1,7 +1,6 @@
 package jcog.learn.ql;
 
 import jcog.data.Range;
-import jcog.decide.DecideEpsilonGreedy;
 import jcog.decide.DecideSoftmax;
 import jcog.decide.Deciding;
 import jcog.learn.Agent;

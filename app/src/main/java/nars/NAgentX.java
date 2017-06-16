@@ -109,7 +109,7 @@ abstract public class NAgentX extends NAgent {
         //a.trace = true;
 
 
-        a.runRT(fps, endTime);
+        a.startRT(fps, endTime);
 
         chart(a);
         chart(n, a);

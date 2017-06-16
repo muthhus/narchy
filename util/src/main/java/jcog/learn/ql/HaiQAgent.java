@@ -1,10 +1,8 @@
 package jcog.learn.ql;
 
-import jcog.TriConsumer;
 import jcog.learn.Autoencoder;
 import jcog.math.FloatAveraged;
 import jcog.math.FloatSupplier;
-import jcog.random.XorShift128PlusRandom;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,14 +1,11 @@
 package nars.concept;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.table.EternalTable;
 import nars.table.HijackTemporalBeliefTable;
 import nars.table.TemporalBeliefTable;
-import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

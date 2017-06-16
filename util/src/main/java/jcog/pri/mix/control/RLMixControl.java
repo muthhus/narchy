@@ -1,8 +1,6 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
-import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
 import jcog.list.FasterList;
 import jcog.math.FloatSupplier;
 import jcog.pri.Priority;
@@ -11,7 +9,9 @@ import jcog.pri.classify.BooleanClassifier;
 import jcog.pri.mix.MixRouter;
 import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
-import jcog.tensor.*;
+import jcog.tensor.ArrayTensor;
+import jcog.tensor.Tensor;
+import jcog.tensor.TensorChain;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.roaringbitmap.RoaringBitmap;

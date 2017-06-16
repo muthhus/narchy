@@ -491,7 +491,7 @@ public final class TruthFunctions  {
 
     private static float w2c(float w, float horizon) {
         if ((w != w) || (w < 0))
-            throw new InvalidParameterException();
+            throw new IllegalArgumentException();
         return clamp(w / (w + horizon), 0, MAX_CONF);
     }
 

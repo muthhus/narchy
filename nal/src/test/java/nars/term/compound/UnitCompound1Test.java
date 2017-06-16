@@ -14,7 +14,6 @@ import java.util.Arrays;
 import static junit.framework.TestCase.assertNotSame;
 import static nars.Op.NEG;
 import static nars.Op.PROD;
-import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 /**

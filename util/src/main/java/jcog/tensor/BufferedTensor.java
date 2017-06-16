@@ -1,7 +1,5 @@
 package jcog.tensor;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class BufferedTensor extends BatchArrayTensor {
 
     protected final Tensor from;

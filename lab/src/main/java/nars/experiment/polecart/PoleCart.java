@@ -8,9 +8,6 @@ import nars.concept.FuzzyScalarConcepts;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import nars.term.Term;
-import nars.time.RealTime;
-import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 

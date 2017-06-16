@@ -5,6 +5,7 @@ import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.jetbrains.annotations.NotNull;
 import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Consumer;
@@ -55,7 +56,7 @@ public class MixRouter<X, Y extends Priority> implements Consumer<Y> {
     }
 
 
-    public RoaringBitmap classify(Y y, int... additionalBits) {
+    public RoaringBitmap classify(@NotNull Y y, int... additionalBits) {
         RoaringBitmap truths = new RoaringBitmap();
         int t = 0;
         for (int i = 0, outsLength = tests.length; i < outsLength; i++) {

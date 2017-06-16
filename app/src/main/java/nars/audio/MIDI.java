@@ -2,10 +2,10 @@ package nars.audio;
 
 import nars.$;
 import nars.NAR;
-import nars.NAgentX;
 import nars.Narsese;
+import nars.concept.Concept;
+import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
 import nars.term.Compound;
@@ -19,9 +19,10 @@ import spacegraph.SpaceGraph;
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
-import static nars.audio.MIDI.MidiInReceiver.channelKey;
+import static nars.Op.BELIEF;
 
 
 /**
@@ -29,18 +30,21 @@ import static nars.audio.MIDI.MidiInReceiver.channelKey;
  */
 public class MIDI {
 
-    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException, FileNotFoundException {
-        NARS d = NARBuilder.newMultiThreadNAR(2,
-            new RealTime.CS(true).durFPS(10f)
+    float volume[] = new float[128];
+
+    public MIDI() throws LineUnavailableException {
+        NARS nar = NARBuilder.newMultiThreadNAR(3,
+                new RealTime.CS(true).durFPS(20f)
         );
         //d.nal(4);
-        //d.log();
-        d.termVolumeMax.setValue(32);
-        MidiInReceiver midi = MIDI(d);
+        //nar.log();
 
-        d.in.stream("Derive").setValue(0.25f);
+        nar.termVolumeMax.setValue(32);
+        MidiInReceiver midi = MIDI(nar);
 
-        SoNAR s = new SoNAR(d);
+        Arrays.fill(volume, Float.NaN);
+
+        SoNAR s = new SoNAR(nar);
         //s.audio.record("/tmp/midi2.raw");
 
 //        d.onCycle(()->{
@@ -52,44 +56,49 @@ public class MIDI {
         SoNAR.SampleDirectory sd = new SoNAR.SampleDirectory();
         sd.samples("/home/me/wav/legoweltkord");
 
-        new NAgentX("MIDI", d) {
+        final List<SensorConcept> keys = $.newArrayList();
+        for (int i = 36; i <= 51; i++) {
+            Term key =
+                    channelKey(9, i);
 
-            final List<Term> keys = $.newArrayList();
+            Compound keyTerm =
+                    $.p(key);
 
-            @Override
-            public synchronized void init() {
-                super.init();
+            int finalI = i;
+            SensorConcept c = new SensorConcept(keyTerm, nar, () -> {
+                float v = volume[finalI];
+                if (v == 0)
+                    volume[finalI] = Float.NaN;
+                return v;
+            }, (v) -> $.t(v, nar.confDefault(BELIEF)));
+            nar.on(c);
+            keys.add(c);//senseNumber(on2, midi.key(key) ));
+            s.listen(c, sd::byHash);
 
-                for (int i = 36; i <= 51; i ++) {
-                    Compound key =
-                        channelKey(9, i);
+        }
 
-                    Compound on2 =
-                            $.inh(key, Atomic.the("on"));
 
-                    keys.add(on2);//senseNumber(on2, midi.key(key) ));
-                    s.listen(on2, sd::byHash);
-                }
+        nar.onCycle(()->{
+            keys.forEach(k -> nar.input(k.apply(nar)));
+        });
 
-                SpaceGraph.window(Vis.beliefCharts(64, keys, nar), 500, 500);
-                NAgentX.chart(this);
-            }
 
-            @Override
-            protected float act() {
-                return 0;
-            }
-        }.startRT(5f);
+        SpaceGraph.window(Vis.beliefCharts(64, keys, nar), 500, 500);
 
-        //d.loop();
+
+        nar.startFPS(20f);
+
 
     }
 
-    public static MidiInReceiver MIDI(NAR nar) {
+    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException, FileNotFoundException {
+        new MIDI();
+    }
+
+    public MidiInReceiver MIDI(NAR nar) {
         // Obtain information about all the installed synthesizers.
         MidiDevice device;
         MidiDevice.Info[] infos = MidiSystem.getMidiDeviceInfo();
-
 
 
         for (int i = 0; i < infos.length; i++) {
@@ -124,7 +133,7 @@ public class MIDI {
         return device.getDeviceInfo().getName().startsWith("MPD218");
     }
 
-    public static class MidiInReceiver implements Receiver {
+    public class MidiInReceiver implements Receiver {
 
         //public final Map<Term,FloatParam> key = new ConcurrentHashMap<>();
 
@@ -145,22 +154,31 @@ public class MIDI {
         @Override
         public void send(MidiMessage m, long timeStamp) {
 
+
             if (m instanceof ShortMessage) {
-                ShortMessage s = (ShortMessage)m;
+                ShortMessage s = (ShortMessage) m;
                 int cmd = s.getCommand();
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
-                        Compound t = $.inh(channelKey(s), Atomic.the("on"));
-                        nar.believe($.neg(t), Tense.Present);
+                        volume[s.getData1()] = 0;
+
+//                        Compound t = $.inh(channelKey(s), Atomic.the("on"));
+//
+//                        nar.believe($.neg(t), Tense.Present);
                         //System.out.println(key(t));
                         break;
                     case ShortMessage.NOTE_ON:
-                        Compound u = $.inh(channelKey(s), Atomic.the("on"));
-                        nar.believe(u, Tense.Present);
+                        volume[s.getData1()] = 0.5f + 0.5f * s.getData2()/128f;
+
+//                        Compound u = $.inh(channelKey(s), Atomic.the("on"));
+//                        nar.believe(u, Tense.Present);
                         //key(u, 0.5f + 0.5f * s.getData2()/64f);
                         //System.out.println(key(t));
                         break;
-                        //case ShortMessage.CONTROL_CHANGE:
+                    default:
+                        //System.out.println("unknown command: " + s);
+                        break;
+                    //case ShortMessage.CONTROL_CHANGE:
                 }
             }
 
@@ -176,17 +194,20 @@ public class MIDI {
 //            m.setValue(v);
 //        }
 
-        public static @NotNull Compound channelKey(ShortMessage s) {
-            return channelKey(s.getChannel(), s.getData1() /* key */);
-        }
-
-        public static @NotNull Compound channelKey(int channel, int key) {
-            return $.p($.the(channel), $.the(key));
-        }
-
         @Override
         public void close() {
 
         }
     }
+
+//    public static @NotNull Compound channelKey(ShortMessage s) {
+//        return channelKey(s.getChannel(), s.getData1() /* key */);
+//    }
+
+    public static @NotNull Term channelKey(int channel, int key) {
+        return $.the(key);
+        //return $.p($.the(channel), $.the(key));
+    }
+
+
 }

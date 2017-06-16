@@ -5,16 +5,13 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Terms;
-import nars.term.container.TermContainer;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.ToIntFunction;
 
 import static nars.Op.*;

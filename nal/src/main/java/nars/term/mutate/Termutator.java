@@ -3,8 +3,8 @@ package nars.term.mutate;
 import jcog.Util;
 import nars.$;
 import nars.term.Compound;
-import nars.term.compound.ProxyCompound;
 import nars.term.Term;
+import nars.term.compound.ProxyCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 

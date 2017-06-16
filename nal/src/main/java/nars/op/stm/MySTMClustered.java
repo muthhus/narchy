@@ -2,7 +2,6 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.data.MutableInteger;
-import jcog.learn.gng.impl.Node;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import jcog.pri.mix.PSink;
@@ -23,7 +22,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static nars.Op.CONJ;
 import static nars.term.Terms.normalizedOrNull;

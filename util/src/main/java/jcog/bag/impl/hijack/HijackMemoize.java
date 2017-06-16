@@ -7,17 +7,10 @@ import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jcog.util.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

@@ -2,7 +2,10 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.*;
+import nars.NAR;
+import nars.NAgentX;
+import nars.Narsese;
+import nars.Param;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;

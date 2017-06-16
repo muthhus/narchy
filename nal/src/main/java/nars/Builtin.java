@@ -2,7 +2,6 @@ package nars;
 
 import nars.concept.Concept;
 import nars.op.Command;
-import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.term.Compound;

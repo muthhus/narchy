@@ -1,7 +1,6 @@
 package jcog.tensor;
 
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
-import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
 public class FuncTensor extends BatchArrayTensor {
 

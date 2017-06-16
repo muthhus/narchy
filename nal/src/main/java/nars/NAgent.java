@@ -521,7 +521,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public NARLoop startRT(float fps) {
-        return runRT(fps, -1);
+        return startRT(fps, -1);
     }
 
 
@@ -529,7 +529,7 @@ abstract public class NAgent implements NSense, NAct {
     /**
      * synchronous execution which runs a NAR directly at a given framerate
      */
-    public NARLoop runRT(float fps, long stopTime) {
+    public NARLoop startRT(float fps, long stopTime) {
         init();
 
         NARLoop loop = nar.startFPS(fps);

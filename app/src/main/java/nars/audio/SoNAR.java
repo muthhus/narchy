@@ -1,12 +1,15 @@
 package nars.audio;
 
+import jcog.Loop;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
+import nars.concept.SensorConcept;
 import nars.nar.Default;
 import nars.term.Term;
 import nars.truth.Truth;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.Audio;
 import spacegraph.audio.Sound;
 import spacegraph.audio.SoundProducer;
@@ -31,7 +34,8 @@ public class SoNAR extends TimerTask {
 
     private final NAR nar;
     public final Audio audio;
-    final static Timer real = new Timer("Audio");
+    //final static Timer real = new Timer("Audio");
+    private long now;
 
     public static class SampleDirectory {
         final Map<String, SonarSample> samples = new ConcurrentHashMap<>();
@@ -69,7 +73,7 @@ public class SoNAR extends TimerTask {
 //                sample(term.hashCode()), 1f
 //            );
             return new Granulize(
-                sample(x.hashCode()), 0.5f, 1.0f, random
+                    sample(x.hashCode()), 0.1f, 0.5f, random
             );
         }
     }
@@ -89,7 +93,15 @@ public class SoNAR extends TimerTask {
         this.audio = audio;
 
 
-        real.schedule(this, 0, updatePeriodMS);
+        new Loop(updatePeriodMS) {
+
+            @Override
+            public boolean next() {
+                SoNAR.this.run();
+                return true;
+            }
+        };
+        //real.schedule(this, 0, updatePeriodMS);
 
 //        Granulize ts =
 //                new Granulize(sample("/tmp/awake.wav"), 0.25f, 0.9f)
@@ -107,12 +119,14 @@ public class SoNAR extends TimerTask {
     /**
      * updated each cycle
      */
-    final Map<Term, Sound> termSounds = new ConcurrentHashMap();
+    final Map<Concept, Sound> termSounds = new ConcurrentHashMap();
 
-    /** vol of each individual sound */
-    float soundVolume = 0.1f;
+    /**
+     * vol of each individual sound
+     */
+    float soundVolume = 0.25f;
 
-    public void listen(Term k, Function<? super Term, ? extends SoundProducer> p) {
+    public void listen(Concept k, Function<? super Concept, ? extends SoundProducer> p) {
         termSounds.computeIfAbsent(k, kk -> {
             SoundProducer ss = p.apply(kk);
             return audio.play(ss, soundVolume,
@@ -133,49 +147,48 @@ public class SoNAR extends TimerTask {
 //
 //    }
 
-    @Override public void run() {
+    @Override
+    public void run() {
+        now = nar.time();
         termSounds.forEach(this::update);
     }
 
-    private boolean update(Term k, Sound<Granulize> s) {
+    private boolean update(@NotNull Concept c, Sound<Granulize> s) {
         if (s.producer instanceof Granulize) {
             Granulize v = s.producer;
-            Concept c = nar.concept(k);
-            if (c != null) {
-                //float p = nar.pri(k);
-                //if (p == p && p > 0) {
 
-                    //v.setAmplitude(0.1f * p);
+            //float p = nar.pri(k);
+            //if (p == p && p > 0) {
 
-                    Truth b = c.belief(nar.time(), nar.dur());
+            //v.setAmplitude(0.1f * p);
 
-                    //System.out.println(c + " "+ b + " " + nar.time() + " " + nar.dur());
+            Truth b = nar.beliefTruth(c, now);
 
-                    if (b != null && b.freq() > 0.5f) {
-                        float stretchFactor = (b.freq() - 0.5f) * 2f;
-                        if (stretchFactor > 0 && stretchFactor < 0.05f) stretchFactor = 0.05f;
-                        else if (stretchFactor < 0 && stretchFactor > -0.05f) stretchFactor = -0.05f;
+            //System.out.println(c + " "+ b + " " + nar.time() + " " + nar.dur());
 
-                        v.setStretchFactor(stretchFactor);
-                        //v.setAmplitude(1f);
-                        v.setAmplitude(b.conf());
-                        //v.setAmplitude(b.expectation());
-                        //v.play();
-                    } else {
-                        v.setAmplitude(0f);
-                        //v.stop();
-                        //v.setStretchFactor(1f);
-                    }
+            if (b != null && b.freq() > 0.5f) {
+                float stretchFactor = (b.freq() - 0.5f) * 2f;
+                if (stretchFactor > 0 && stretchFactor < 0.05f) stretchFactor = 0.05f;
+                else if (stretchFactor < 0 && stretchFactor > -0.05f) stretchFactor = -0.05f;
 
-                    //
-                    //v.setStretchFactor();
-                    //v.pitchFactor.setValue(1f / Math.log(c.volume()));
-                    //g.setStretchFactor(1f/(1f+kk.volume()/4f));
-                    return true;
-               //}
+                v.setStretchFactor(stretchFactor);
+                //v.setAmplitude(1f);
+                v.setAmplitude(2f * (b.freq()-0.5f));
+                //v.setAmplitude(b.expectation());
+                //v.play();
+            } else {
+                v.setAmplitude(0f);
+                //v.stop();
+                //v.setStretchFactor(1f);
             }
 
-            v.setAmplitude(0f);
+            //
+            //v.setStretchFactor();
+            //v.pitchFactor.setValue(1f / Math.log(c.volume()));
+            //g.setStretchFactor(1f/(1f+kk.volume()/4f));
+            return true;
+            //}
+
             //v.stop();
             //return false;
         }
@@ -191,24 +204,24 @@ public class SoNAR extends TimerTask {
 
         //n.log();
         n.input("a:b. :|: (--,b:c). c:d. d:e. (--,e:f). f:g. b:f. a:g?");
-        n.startPeriodMS(64);
+        n.startPeriodMS(16);
         SoNAR s = new SoNAR(n);
         SampleDirectory d = new SampleDirectory();
-        d.samples("/home/me/wav");
-        s.listen($("a"), d::byHash);
-        s.listen($("b"), d::byHash);
-        s.listen($("c"), d::byHash);
-        s.listen($("d"), d::byHash);
-        s.listen($("e"), d::byHash);
-        s.listen($("f"), d::byHash);
-        s.listen($("g"), d::byHash);
-        s.listen($("a:b"), d::byHash);
-        s.listen($("b:c"), d::byHash);
-        s.listen($("c:d"), d::byHash);
-        s.listen($("d:e"), d::byHash);
-        s.listen($("e:f"), d::byHash);
-        s.listen($("f:g"), d::byHash);
-        s.listen($("a:g"), d::byHash);
+        d.samples("/home/me/wav/legoweltkord");
+        s.listen(n.conceptualize($("a")), d::byHash);
+        s.listen(n.conceptualize($("b")), d::byHash);
+        s.listen(n.conceptualize($("c")), d::byHash);
+        s.listen(n.conceptualize($("d")), d::byHash);
+        s.listen(n.conceptualize($("e")), d::byHash);
+        s.listen(n.conceptualize($("f")), d::byHash);
+        s.listen(n.conceptualize($("g")), d::byHash);
+        s.listen(n.conceptualize($("a:b")), d::byHash);
+        s.listen(n.conceptualize($("b:c")), d::byHash);
+        s.listen(n.conceptualize($("c:d")), d::byHash);
+        s.listen(n.conceptualize($("d:e")), d::byHash);
+        s.listen(n.conceptualize($("e:f")), d::byHash);
+        s.listen(n.conceptualize($("f:g")), d::byHash);
+        s.listen(n.conceptualize($("a:g")), d::byHash);
         try {
             s.audio.record("/tmp/test.raw");
         } catch (FileNotFoundException e) {

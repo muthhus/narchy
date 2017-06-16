@@ -1,7 +1,5 @@
 package jcog;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.nio.CharBuffer;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -9,7 +7,6 @@ import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Utilities for process Text & String input/output, ex: encoding/escaping and decoding/unescaping Terms

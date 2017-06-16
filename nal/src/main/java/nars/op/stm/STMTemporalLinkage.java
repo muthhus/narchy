@@ -4,7 +4,6 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
-import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
 import nars.Task;

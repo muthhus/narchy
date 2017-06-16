@@ -4,7 +4,6 @@ import nars.IO;
 import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.container.TermContainer;
-import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

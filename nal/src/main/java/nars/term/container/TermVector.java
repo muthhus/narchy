@@ -1,7 +1,6 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
-import jcog.Util;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;

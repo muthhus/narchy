@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 
 public class GenericCompound implements Compound {
