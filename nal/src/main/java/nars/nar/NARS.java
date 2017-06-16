@@ -121,7 +121,7 @@ public class NARS extends NAR {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur()) {
+                        if (Math.abs(h - now) <= dur()*2) {
                             return 0; //present
                         } else if (h > now) {
                             return 1; //future
@@ -138,11 +138,7 @@ public class NARS extends NAR {
 //                    (x) -> x.stamp().length > 2),
         );
 
-        onTask(t -> {
-           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
-               emotion.happy(t.conf()/100f); //learned something
-           }
-        });
+
         return r;
     }
 

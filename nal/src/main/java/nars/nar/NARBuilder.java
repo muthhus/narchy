@@ -8,6 +8,7 @@ import nars.index.term.TermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
+import nars.task.DerivedTask;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.util.MathArrays;
@@ -44,16 +45,22 @@ public interface NARBuilder {
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(30);
+        n.termVolumeMax.setValue(36);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, false, 16f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, true);
+        MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 4, true, 64f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.05f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(1024, 0.25f);
+            n.addNAR(1024, 0.1f);
         }
+
+        n.onTask(t -> {
+           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
+               n.emotion.happy(t.conf()/(threads * 100)); //learned something
+           }
+        });
 
         return n;
     }

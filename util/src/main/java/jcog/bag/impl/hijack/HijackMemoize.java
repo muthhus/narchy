@@ -139,7 +139,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         float boost = i > 0 ?
                 (float) (1f / Math.sqrt(capacity())) : 0;
 
-        float cut = boost;// /(reprobes);
+        float cut = boost/(reprobes);
 
         assert(cut > Pri.EPSILON);
 

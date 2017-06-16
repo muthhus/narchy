@@ -33,7 +33,7 @@ public final class STMTemporalLinkage extends STM {
     public final Deque<Task> stm;
 
     final FloatParam strength = new FloatParam(1f, 0f, 1f);
-    private final PSink<Object, ITask> in;
+    //private final PSink<Object, ITask> in;
 
 
     public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
@@ -50,7 +50,7 @@ public final class STMTemporalLinkage extends STM {
         stm = new ArrayDeque<>(capacity);
         //stm = new ConcurrentLinkedDeque<>();
 
-        this.in = nar.in.stream(this);
+        //this.in = nar.in.stream(this);
     }
 
     @Override
@@ -124,7 +124,9 @@ public final class STMTemporalLinkage extends STM {
                     /** current task's... */
                     float interStrength = tPri * u.priSafe(0) * strength;
                     if (interStrength >= Pri.EPSILON) {
-                        in.input(new STMLink(t, u, interStrength));
+                        STMLink s = new STMLink(t, u, interStrength);
+                        s.run(nar);
+                        //in.input(s); //<- spams the executor
                     }
                 }
             }
