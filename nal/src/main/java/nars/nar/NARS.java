@@ -79,7 +79,7 @@ public class NARS extends NAR {
 
                 new EnumClassifier<>("type", new String[]{
                         "Belief", "Goal", "Question", "Quest",
-                        "Activation", "Premise", "ConceptFire"
+                        "Activation", "ConceptFire"
                 }, (x) -> {
 
                     if (x instanceof Task) {
@@ -96,10 +96,8 @@ public class NARS extends NAR {
                         }
                     } else if (x instanceof Activate) {
                         return 4;
-                    } else if (x instanceof Premise) {
-                        return 5;
                     } else if (x instanceof ConceptFire) {
-                        return 6;
+                        return 5;
                     }
 
                     return -1;

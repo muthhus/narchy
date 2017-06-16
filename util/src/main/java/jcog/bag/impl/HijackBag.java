@@ -163,7 +163,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         GET, PUT, REMOVE
     }
 
-    private V update(Object k, @Nullable V v /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
+    private V update(Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
@@ -174,6 +174,15 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
 
         final int hash = k.hashCode(); /*hash(x)*/
+
+        float incomingPri;
+        if (mode == Mode.PUT) {
+            incomingPri = pri(incoming);
+            if (incomingPri != incomingPri)
+                return null;
+        } else {
+            incomingPri = Float.POSITIVE_INFINITY; /* shouldnt be used */
+        }
 
         try {
 
@@ -195,10 +204,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                             break;
 
                         case PUT:
-                            if (p == v) {
+                            if (p == incoming) {
                                 toReturn = p; //identical match found, keep original
                             } else {
-                                V next = merge(p, v, overflowing);
+                                V next = merge(p, incoming, overflowing);
                                 if (next != null && (next == p || map.compareAndSet(i, p, next))) {
                                     if (next != p) {
                                         toRemove = p; //replaced
@@ -234,19 +243,19 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 inserting:
                 for (int i = start, probe = reprobes; probe > 0; probe--) {
 
-                    V p = map.compareAndExchange(i, null, v);//probed value 'p'
+                    V existing = map.compareAndExchange(i, null, incoming);//probed value 'p'
 
-                    if (p == null) {
+                    if (existing == null) {
 
-                        toReturn = toAdd = v;
+                        toReturn = toAdd = incoming;
                         break inserting; //took empty slot, done
 
                     } else {
                         //attempt HIJACK (tm)
-                        if (replace(v, p)) {
-                            if (map.compareAndSet(i, p, v)) { //inserted
-                                toRemove = p;
-                                toReturn = toAdd = v;
+                        if (replace(incomingPri, existing)) {
+                            if (map.compareAndSet(i, existing, incoming)) { //inserted
+                                toRemove = existing;
+                                toReturn = toAdd = incoming;
                                 break inserting; //hijacked replaceable slot, done
                             }
                         }
@@ -317,13 +326,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
      * <p>
      * a potential eviction can be intercepted here
      */
-    protected boolean replace(V incoming, V existing) {
+    protected boolean replace(float i, V existing) {
         float e = pri(existing);
         if (e != e)
             return true;
-        float i = pri(incoming);
-        if (i != i)
-            return false;
         return replace(i, e);
     }
 

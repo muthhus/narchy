@@ -27,7 +27,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     private final Random rng = new XorShift128PlusRandom();
 
-    public static class HalfWeakPair<K,V> extends /*WeakReference*/SoftReference<V> implements Priority {
+    public static class HalfWeakPair<K,V> extends WeakReference/*SoftReference*/<V> implements Priority {
         public final K key;
         private final int hash;
         private float pri;
@@ -218,7 +218,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
 
     @Override
-    protected boolean replace(HalfWeakPair<K, V> incoming, HalfWeakPair<K, V> existing) {
+    protected boolean replace(float incoming, HalfWeakPair<K, V> existing) {
         if (!super.replace(incoming, existing)) {
             existing.priSub(CACHE_DENY_DAMAGE);
             return false;

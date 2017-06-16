@@ -344,7 +344,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @NotNull
     public Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
-        float loadFactor = 0.95f;
+        float loadFactor = 0.75f;
 
         if (nar.exe.concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);
@@ -353,15 +353,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-            if (volume < 16) {
+         //   if (volume < 16) {
                 return new ConcurrentHashMap(0, loadFactor);
                 //return new ConcurrentHashMapUnsafe(0);
-            } else if (volume < 32) {
-                return new SynchronizedHashMap(0, loadFactor);
-                //return new TrieMap();
-            } else {
-                return new SynchronizedUnifiedMap(0, loadFactor);
-            }
+//            } else if (volume < 32) {
+//                return new SynchronizedHashMap(0, loadFactor);
+//                //return new TrieMap();
+//            } else {
+//                return new SynchronizedUnifiedMap(0, loadFactor);
+//            }
         } else {
             //return new UnifiedMap(0, loadFactor);
             return new HashMap(0, loadFactor);
