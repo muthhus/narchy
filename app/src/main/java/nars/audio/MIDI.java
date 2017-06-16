@@ -5,19 +5,18 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
+import nars.Param;
 import nars.concept.Concept;
 import nars.concept.GoalActionConcept;
-import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
+import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.time.RealTime;
 import nars.time.Tense;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.synth.SineWave;
@@ -44,6 +43,13 @@ public class MIDI {
         NARS nar = NARBuilder.newMultiThreadNAR(3,
                 new RealTime.MS(true).durFPS(60f)
         );
+        Param.DEBUG = true;
+        nar.onTask(t -> {
+            if (t instanceof DerivedTask && t.isGoal()) {
+                //if (t.term().equals(ab))
+                System.err.println(t.proof());
+            }
+        });
         //d.nal(4);
         //nar.log();
 
@@ -77,7 +83,7 @@ public class MIDI {
 //                    volume[finalI] = Float.NaN;
 //                return v;
 //            }, (v) -> $.t(v, nar.confDefault(BELIEF)));
-             GoalActionConcept c = new GoalActionConcept(keyTerm, nar, new FloatParam(0), (b, d)->{
+            GoalActionConcept c = new GoalActionConcept(keyTerm, nar, new FloatParam(0), (b, d) -> {
 //                float v = volume[finalI];
 //                if (v == 0)
 //                    volume[finalI] = Float.NaN;
@@ -86,17 +92,17 @@ public class MIDI {
                 float v = d.freq();
                 if (v > 0.55f)
                     return $.t(v, nar.confDefault(BELIEF));
-                else if (b!=null && b.freq() > 0.5f)
+                else if (b != null && b.freq() > 0.5f)
                     return $.t(0, nar.confDefault(BELIEF));
                 else
                     return null;
-             });
+            });
 
-             nar.on(c);
-             //c.beliefs().capacity(1, c.beliefs().capacity());
-             c.process(new NALTask(c, BELIEF, $.t(0f, 0.35f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
-             c.process(new NALTask(c, GOAL, $.t(0f, 0.1f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
-             nar.onCycle(n -> {
+            nar.on(c);
+            //c.beliefs().capacity(1, c.beliefs().capacity());
+            c.process(new NALTask(c, BELIEF, $.t(0f, 0.35f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
+            c.process(new NALTask(c, GOAL, $.t(0f, 0.1f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
+            nar.onCycle(n -> {
 
                 float v = volume[finalI];
 
@@ -104,7 +110,7 @@ public class MIDI {
                     volume[finalI] = Float.NaN;
                 }
 
-                n.input(c.feedbackGoal.set(c.term(), v==v ? $.t(v, nar.confDefault(GOAL)) : null, n));
+                n.input(c.feedbackGoal.set(c.term(), v == v ? $.t(v, nar.confDefault(GOAL)) : null, n));
 
                 n.input(c.apply(n));
             });
@@ -116,7 +122,7 @@ public class MIDI {
 //        sd.samples("/home/me/wav/legoweltkord");
 //            s.listen(c, sd::byHash);
             s.listen(c, (k) -> {
-               return new SineWave((float) (100 + Math.random()*1000));
+                return new SineWave((float) (100 + Math.random() * 1000));
             });
 
         }
@@ -215,7 +221,7 @@ public class MIDI {
                 int cmd = s.getCommand();
                 switch (cmd) {
                     case ShortMessage.NOTE_OFF:
-                        if ((volume[s.getData1()] == volume[s.getData1()]) && (volume[s.getData1()]>0))
+                        if ((volume[s.getData1()] == volume[s.getData1()]) && (volume[s.getData1()] > 0))
                             volume[s.getData1()] = 0;
 
 //                        Compound t = $.inh(channelKey(s), Atomic.the("on"));
@@ -224,7 +230,7 @@ public class MIDI {
                         //System.out.println(key(t));
                         break;
                     case ShortMessage.NOTE_ON:
-                        volume[s.getData1()] = 0.6f + 0.4f * s.getData2()/128f;
+                        volume[s.getData1()] = 0.6f + 0.4f * s.getData2() / 128f;
 
 //                        Compound u = $.inh(channelKey(s), Atomic.the("on"));
 //                        nar.believe(u, Tense.Present);

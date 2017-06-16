@@ -393,6 +393,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         if (s == ETERNAL)
             return ETERNAL;
         long e = end();
+        if (e == s)
+            return s; //point
 
         if (when >= s && when <= e) {
             return when; //internal

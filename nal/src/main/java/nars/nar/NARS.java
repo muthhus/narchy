@@ -62,18 +62,18 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 192*1024, 128*1024, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
                 rng, e);
     }
 
     @Override
     protected PSinks newInput() {
-        RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 20f,
+        RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 15f,
 
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
 
-                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 1),
+                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 2),
 
                 10,
 

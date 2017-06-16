@@ -34,13 +34,13 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
+public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> {
 
     static final ThreadLocal<BufferedDerivation> derivation =
             ThreadLocal.withInitial(BufferedDerivation::new);
 
     public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
-        super(tasklink, termlink, 0 /* priority assigned after construction */ );
+        super(tasklink, termlink, 0 /* priority assigned after construction */);
     }
 
     /**
@@ -74,19 +74,18 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         Task belief = null;
 
 
-
         if (beliefTerm instanceof Compound) {
 
             Compound taskTerm = task.term();
 
             boolean beliefIsTask =
                     beliefTerm.equals(taskTerm);
-                    //Terms.equalAtemporally(task.term(), (beliefTerm));
+            //Terms.equalAtemporally(task.term(), (beliefTerm));
 
             boolean reUnified = false;
             if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
                 Term unified = unify(taskTerm, (Compound) beliefTerm, nar);
-                if (unified!=null) {
+                if (unified != null) {
                     beliefTerm = unified;
                     reUnified = true;
                 }
@@ -99,27 +98,20 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
                 BeliefTable table =
                         ((task.isQuestion() && task.isGoal()) || task.isQuest()) ?
-                            beliefConcept.goals() :
-                            beliefConcept.beliefs();
+                                beliefConcept.goals() :
+                                beliefConcept.beliefs();
 
                 int dur = nar.dur();
 
                 Task match;
                 long now = nar.time();
+
+                long when = when(task, now);
+
                 if (task.isQuestOrQuestion()) {
-                    //answer projects to the question time
-                    long when = task.isEternal() ? ETERNAL : task.nearestStartOrEnd(now);
-                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept)beliefConcept, nar);
+                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
                 } else {
-
-                    //temporal focus control
-                    long when =
-                            task.nearestStartOrEnd(now);
-                            //now;
-                            //now + dur;
-
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
-
                 }
 
                 if (match != null) {
@@ -127,21 +119,21 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
                         belief = match;
                     }
 
-                    if ((task.isQuestion() && match.isBelief()) || (task.isQuest() && match.isGoal()))  {
-                            tryAnswer(reUnified, taskLink, match, nar);
+                    if ((task.isQuestion() && match.isBelief()) || (task.isQuest() && match.isGoal())) {
+                        tryAnswer(reUnified, taskLink, match, nar);
                     }
                 }
             }
 
         }
 
-        if (belief!=null && belief.equals(task)) //do not repeat the same task for belief
+        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
             belief = null;
 
         float beliefPriority;
-        if (belief!=null) {
+        if (belief != null) {
             beliefPriority = belief.pri();
-            if (beliefPriority!=beliefPriority) {
+            if (beliefPriority != beliefPriority) {
                 belief = null; //belief was deleted
             } else {
                 beliefTerm = belief.term();
@@ -156,7 +148,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
                 //Math.max
                 //aveAri
                 or
-                    (taskPri, beliefPriority);
+                        (taskPri, beliefPriority);
 
         BufferedDerivation d = derivation.get();
 
@@ -176,6 +168,23 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         return r;
     }
 
+    /**
+     * temporal focus control: determines when a matching belief or answer should be projected to
+     */
+    protected long when(Task task, long now) {
+        if (task.isEternal()) {
+            return ETERNAL;
+        } else if (task.isInput()) {
+            return task.nearestStartOrEnd(now);
+        } else {
+            return Math.max(now, task.start());
+            //other options: now + dur, a random range between the task time and now, etc
+        }
+
+        //now;
+        //now + dur;
+    }
+
 
     static boolean tryAnswer(boolean reUnified, PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
         Task Q = question.get();
@@ -183,7 +192,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
         Compound answerTerm = answer.term();
         if (!reUnified && !nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
             //see if belief unifies with task (in reverse of previous unify)
-            if (questionTerm.varQuery()==0 || (unify(answerTerm, questionTerm, nar)==null)) {
+            if (questionTerm.varQuery() == 0 || (unify(answerTerm, questionTerm, nar) == null)) {
                 return false;
             }
         }
@@ -197,8 +206,8 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
             //float qBefore = taskBudget.priSafe(0);
             //float aBefore = answered.priSafe(0);
             BudgetFunctions.fund(question, answered, (float) Math.sqrt(answered.conf()), false);
-                    //(1f - taskBudget.qua())
-                    //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
+            //(1f - taskBudget.qua())
+            //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
 
             if (Q.isInput())
                 nar.eventTaskProcess.emit(answer);
@@ -229,16 +238,18 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
     }
 
 
-    /** unify any (and only) query variables which may be present in
+    /**
+     * unify any (and only) query variables which may be present in
      * the 'a' term with any non-query terms in the 'q' term
      * returns non-null if unification succeeded and resulted in a transformed 'a' term
-     * */
-    @Nullable private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+     */
+    @Nullable
+    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
         if (q.op() != a.op())
             return null; //fast-fail: no chance
 
-        final Compound[] result = { null };
+        final Compound[] result = {null};
         new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
             if (aa instanceof Compound) {
 
@@ -252,7 +263,7 @@ public class Premise extends BinaryTask<PriReference<Task>,PriReference<Term>> {
 
             return true; //keep trying
 
-        }, Param.BeliefMatchTTL ).unifyAll(a, q);
+        }, Param.BeliefMatchTTL).unifyAll(a, q);
 
         return result[0];
 

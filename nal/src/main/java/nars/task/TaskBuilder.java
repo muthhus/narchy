@@ -37,7 +37,7 @@ import static nars.time.Tense.*;
  * <p>
  * once input, input tasks will have unique serial numbers anyway
  */
-public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, Task> {
+@Deprecated public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, Task> {
 
     @NotNull
     private Compound term;

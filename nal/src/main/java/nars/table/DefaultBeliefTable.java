@@ -104,6 +104,7 @@ public class DefaultBeliefTable implements BeliefTable {
         if (e == null) return EternalTable.EMPTY;
         return e;
     }
+
     public TemporalBeliefTable temporal() {
         @Nullable TemporalBeliefTable t = temporal;
         if (t == null) return TemporalBeliefTable.EMPTY;
@@ -117,29 +118,25 @@ public class DefaultBeliefTable implements BeliefTable {
     public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, Random rng) {
 
         final Task ete = eternal().strongest();
-        if (ete!=null && when == ETERNAL) {
+//        if (ete != null && when == ETERNAL) {
+//            return ete;
+//        }
+
+        Task tmp = temporal().match(when, now, dur, against, rng);
+
+        if (tmp == null) {
             return ete;
-        }
-
-        if (now != ETERNAL) {
-            if (when == ETERNAL)
-                when = now;
-
-            Task tmp = temporal().match(when, now, dur, against, rng);
-
-            if (tmp == null) {
-                return ete;
+        } else {
+            if (ete == null) {
+                return tmp;
             } else {
-                if (ete == null) {
-                    return tmp;
-                } else {
-                    return (ete.evi() > tmp.evi(when, dur)) ?
-                            ete : tmp;
-                }
+                return (ete.evi() > tmp.evi(when, dur)) ?
+                        ete : tmp;
             }
         }
 
-        return null;
+
+        //return null;
 
     }
 
@@ -150,14 +147,15 @@ public class DefaultBeliefTable implements BeliefTable {
 
             if (eternal == null) {
                 //synchronized (concept) {
-                    /*if (eternal == EternalTable.EMPTY)*/ {
+                    /*if (eternal == EternalTable.EMPTY)*/
+                {
                     boolean isBeliefOrGoal = input.isBelief();
                     int cap = concept.state().beliefCap(concept, isBeliefOrGoal, true);
-                        if (cap > 0)
-                            eternal = concept.newEternalTable(cap, isBeliefOrGoal); //allocate
-                        else
-                            return;
-                    }
+                    if (cap > 0)
+                        eternal = concept.newEternalTable(cap, isBeliefOrGoal); //allocate
+                    else
+                        return;
+                }
                 //}
             }
 
@@ -166,13 +164,14 @@ public class DefaultBeliefTable implements BeliefTable {
         } else {
             if (temporal == null) {
                 //synchronized (concept) {
-                    /*if (temporal == TemporalBeliefTable.EMPTY)*/ { //HACK double boiler
-                        int cap = concept.state().beliefCap(concept, input.isBelief(), false);
-                        if (cap > 0)
-                            temporal = concept.newTemporalTable(cap, nar); //allocate
-                        else
-                            return;
-                    }
+                    /*if (temporal == TemporalBeliefTable.EMPTY)*/
+                { //HACK double boiler
+                    int cap = concept.state().beliefCap(concept, input.isBelief(), false);
+                    if (cap > 0)
+                        temporal = concept.newTemporalTable(cap, nar); //allocate
+                    else
+                        return;
+                }
                 //}
             }
 

@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
+import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
-/**
- * Created by me on 12/4/16.
- */
+
 public class DynamicBeliefTable extends DefaultBeliefTable {
 
     private final DynamicConcept dynamicConcept;
@@ -27,12 +27,11 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     //static final boolean rejectDerivations = false;
 
-
     @Override
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
-//        if (input instanceof AnswerTask) {
-//            return input; //dont insert its own dynamic belief task, causing a feedback loop
-//        }
+        if (input instanceof AnswerTask) {
+            return; //dont insert its own dynamic belief task, causing a feedback loop
+        }
 
         super.add(input, concept, nar);
     }
@@ -44,22 +43,12 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         this.beliefOrGoal = beliefOrGoal;
     }
 
-//    @Override
-//    public TruthDelta add(@NotNull Task input, @NotNull QuestionTable questions, @NotNull CompoundConcept<?> concept, @NotNull NAR nar) {
-//        if (rejectDerivations && !input.isInput())
-//            return null;
-//        return super.add(input, questions, concept, nar);
-//    }
 
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when) {
         return generate(template, when, dynamicConcept.nar.time(), null);
     }
 
-//    @Nullable
-//    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now) {
-//        return generate(template, when, now, null);
-//    }
 
     @Nullable
     public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b) {
@@ -103,73 +92,30 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     public DynTruth truth(long when, int dt, boolean evidence) {
-        return truth(when, (Compound) $.terms.the(dynamicConcept, dt), evidence);
+        return truth(when, (Compound)(dynamicConcept.term().dt(dt)), evidence);
     }
 
     @Nullable
-    public DynTruth truth(long when, long now, Compound template, boolean evidence) {
-
-//        if (templateConcept == null)
-//            return null;
-
-
+    public DynTruth truth(long when, long now, @NotNull Compound template, boolean evidence) {
         return model.eval(template, beliefOrGoal, when, now, evidence, dynamicConcept.nar); //newDyn(evidence);
-//            } else {
-//                @NotNull BeliefTable table = beliefOrGoal ? templateConcept.beliefs() : templateConcept.goals();
-//                if (table instanceof DynamicBeliefTable) {
-//                    return ((DynamicBeliefTable)table).dyntruth(when, now, evidence);
-//                } else {
-//                    Task x = table.match(when, now);
-//                    if (x == null)
-//                        return null;
-//                    else {
-//                        DynTruth d = newDyn(evidence);
-//                        if (d.add(x.truth().negated(negated))) {
-//                            if (d.e != null)
-//                                d.e.add(x);
-//                        }
-//                        return d;
-//                    }
-//                }
-//            }
-
     }
-
-//    @NotNull
-//    private DynTruth newDyn(boolean evidence) {
-//        final List<Task> e = evidence ? $.newArrayList(size()) : null;
-//        return new DynTruth(dynamicConcept.op(), dynamicConcept.nar.confMin.floatValue(), e);
-//    }
 
     @Override
     public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
+
         if (template == null) {
             template =
                     dynamicConcept.nar.terms.retemporalize(target.term(),
-                            when == DTERNAL ?
+                            target.isEternal() ?
                                     dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
         }
 
-//        Compound template =
-//                //use the provided target task as a temporal template if it matches with this
-//                ((target != null) && Terms.equal(localTerm, target.term(), false, false, false)) ?
-//                        target.term()
-//                    :
-//                localTerm;
-
         Task y = generate(template, when);
 
-        //try {
         Task x = super.match(when, now, dur, target, template, noOverlap, rng);
-//        } catch (InvalidTaskException e) {
-//            if (Param.DEBUG_EXTRA) {
-//                System.err.println(e);
-//            }
-//            x = null;
-//        }
 
         if (x == null) return y;
-        if (y == null) return x;
+        if (y == null || x.equals(y)) return x;
 
 //        //choose the non-overlapping one
 //        if (noOverlap && target != null) {

@@ -17,6 +17,7 @@ import nars.concept.SensorConcept;
 import nars.control.ConceptFire;
 import nars.nar.Default;
 import nars.table.EternalTable;
+import nars.task.GeneratedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -669,7 +670,7 @@ abstract public class NAgent implements NSense, NAct {
 
         term = nar.terms.normalize(term);
 
-        NALTask t = new NALTask(term, punct, tFinal, now, start, end, new long[]{nar.time.nextStamp()});
+        GeneratedTask t = new GeneratedTask(term, punct, tFinal, now, start, end, new long[]{nar.time.nextStamp()});
         t.setPri(nar.priorityDefault(punct));
         return t;
     }

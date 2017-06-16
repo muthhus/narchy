@@ -11,9 +11,9 @@ public class MultiHaiQMixAgent implements MixAgent {
     public HaiQAgent[] agent;
 
 
-    final boolean controlRelative = true;
+    final boolean controlRelative = false;
 
-    final int controlResolution = 9;
+    final int controlResolution = 5;
     final float controlGranularity = 1.0f / (controlResolution);
 
     /**
@@ -65,7 +65,7 @@ public class MultiHaiQMixAgent implements MixAgent {
         agent = new HaiQAgent[o];
         for (int oo = 0; oo < o; oo++) {
             int ooo = oo;
-            agent[oo] = new HaiQAgent(in.volume(), in.volume() / 2,
+            agent[oo] = new HaiQAgent(in.volume(), in.volume() / 4,
                     controlRelative ? 3 : controlResolution + 1) {
 
                 @Override
