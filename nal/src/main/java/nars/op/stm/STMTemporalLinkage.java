@@ -43,15 +43,11 @@ public final class STMTemporalLinkage extends STM {
         this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
 
-        //stm = Global.THREADS == 1 ? new ArrayDeque(this.capacity.intValue()) : new ConcurrentLinkedDeque<>();
-        //stm = new ArrayDeque<>(capacity);
-        stm = new DisruptorBlockingQueue<Task>(capacity);
+        stm = new DisruptorBlockingQueue<>(capacity);
         for (int i = 0; i < capacity; i++) {
             stm.add(null);
         }
 
-        //stm = new ConcurrentLinkedDeque<>();
-        //this.in = nar.in.stream(this);
     }
 
     @Override
@@ -62,22 +58,10 @@ public final class STMTemporalLinkage extends STM {
     @Override
     public final void accept(@NotNull Task t) {
 
-        if (!t.isBeliefOrGoal()) {
-            return;
-        }
-
-
-        int stmCapacity = capacity.intValue();
-
-
-        Term tt = t.term();
-
-
-        List<Task> queued;
-        /*synchronized (stm)*/
-
         float strength = this.strength.floatValue();
         float tPri = t.priSafe(0);
+        if (tPri == 0)
+            return;
 
         Iterator<Task> ss = stm.iterator();
         while (ss.hasNext()) {

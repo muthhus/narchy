@@ -2,7 +2,6 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -17,10 +16,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
+import static jcog.Util.clamp;
+
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /** rate at which ConceptFire forms premises */
-    private static final int maxPremisesPerCycle = 2;
+    private static final int sampleLimit = 2;
     private static final float minPri = Pri.EPSILON * 512;
 
 
@@ -60,7 +61,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
          * budgeting directly.
          */
 
-        int ttl = maxPremisesPerCycle;
+        int ttl = sampleLimit;
 
         Random rng = nar.random();
         while (ttl-- > 0 && pri >= minPri) {
@@ -69,7 +70,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 if (tasklink == null)
                     break;
 
-                taskLinkPri = Util.clamp(tasklinks.normalizeMinMax(tasklink.priSafe(0)), taskMargin, 1f-taskMargin);
+                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
             }
 
 
@@ -77,11 +78,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 termlink = termlinks.sample();
                 if (termlink == null)
                     break;
-                termLinkPri = Util.clamp(termlinks.normalizeMinMax(termlink.priSafe(0)), termMargin, 1f-termMargin);
+                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
             }
 
             Premise p = new Premise(tasklink, termlink);
-            float thisPri = priElseZero()/maxPremisesPerCycle;
+            float thisPri = priElseZero()/ sampleLimit;
             if (thisPri > minPri) {
                 p.pri(thisPri);
                 ITask[] result = p.run(nar);

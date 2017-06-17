@@ -23,14 +23,14 @@ abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> 
         this.nar = nar;
         this.capacity = capacity;
         nar.onTask(t -> {
-            if (temporallyInductable(t, allowNonInput))
+            if (stmLinkable(t, allowNonInput))
                 accept(t);
         });
         nar.eventReset.on(n -> clear());
     }
 
-    static boolean temporallyInductable(@NotNull Task newEvent, boolean allowNonInput) {
-        return ( !newEvent.isEternal() && (allowNonInput || newEvent.isInput()) && newEvent.isBeliefOrGoal());
+    static boolean stmLinkable(@NotNull Task newEvent, boolean allowNonInput) {
+        return ( !newEvent.isEternal() && (allowNonInput || newEvent.isInput()));
     }
 
     abstract public void clear();

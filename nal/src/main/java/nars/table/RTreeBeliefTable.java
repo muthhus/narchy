@@ -81,7 +81,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public void add(@NotNull Task t, TaskConcept c, NAR n) {
-        float activation = t.priElseZero();;
+        float activation = t.priElseZero();
         if (activation==0)
             return;
 
