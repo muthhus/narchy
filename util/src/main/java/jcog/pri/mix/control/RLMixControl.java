@@ -45,7 +45,9 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
 
     public final FloatSupplier score;
 
+    /** range 0..1.0, 0.5 is middle (1x) */
     public final ArrayTensor agentOut;
+
     public final ArrayTensor rawTraffic, traffic;
 
     /** unipolar vector, 0..1.0 */
@@ -158,10 +160,9 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         //HACK
         if (size == 0 || agentOut == null || score == null || agentIn == null) return true;
 
-        updateTraffic();
-
         agent.act(agentIn, this.lastScore = score.asFloat(), agentOut);
 
+        updateTraffic();
 
         return true;
     }
@@ -177,7 +178,12 @@ public class RLMixControl<X, Y extends Priority> extends Loop implements PSinks<
         if (total > 0) {
             //normalize
             for (int i = 0, vLength = nextTraffic.length; i < vLength; i++) {
-                nextTraffic[i] /= total;
+                if (nextTraffic[i]==0) {
+                    agentOut.set(0f, i); //set the gain for this knob to minimum, so it doesnt need to learn that whtever particular setting exists had any effect
+                    nextTraffic[i] = 0;
+                } else {
+                    nextTraffic[i] /= total;
+                }
             }
         } else {
             Arrays.fill(nextTraffic, 0);

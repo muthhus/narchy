@@ -165,6 +165,19 @@
     ((A..+) <-> Z), (X <-> Y), task("?") |- ((A..+) <-> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         //this one needs reviewed, it might need to be subIfUnified, and other problems
 
+//goal search
+    X, X, task("!") |-          (?1 ==> X), (Punctuation:Question)
+    X, X, task("!") |-          (X ==> ?1), (Punctuation:Question)
+    X, X, task("!") |-     ((--,X) ==> ?1), (Punctuation:Question)
+
+    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
+    X, X, task("!") |-           (?1 && X), (Punctuation:Quest)
+    X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Question)
+    X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Quest)
+
+    X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
+    X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)
+
 
 //query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
 //  A, B, task("?") |- subIfUnifiesQuery(B, A, B), (Belief:BeliefIdentity, Punctuation:Belief)

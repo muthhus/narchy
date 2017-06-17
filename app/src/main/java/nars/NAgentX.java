@@ -104,16 +104,16 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        NARS n = NARBuilder.newMultiThreadNAR(3, clock);
+        NARS n = NARBuilder.newMultiThreadNAR(4, clock);
 
         NAgent a = init.apply(n);
         //a.trace = true;
 
 
         NARLoop narLoop = a.startRT(fps, endTime);
-        n.onCycle(nn->{
-           float lag = narLoop.lagSumThenClear()  + a.running().lagSumThenClear();
-           n.emotion.happy(-lag);
+        n.onCycle(nn -> {
+            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
+            n.emotion.happy(-lag);
         });
 
         chart(a);
@@ -126,12 +126,14 @@ abstract public class NAgentX extends NAgent {
                 mixPlot(a, m, HISTORY),
 
                 col(
-                        new Plot2D(HISTORY, Plot2D.Line)
-                                .add("lag", () -> narLoop.lag())
-                                .on(a::onFrame),
-                        new Plot2D(HISTORY, Plot2D.Line)
-                                .add("happy", () -> m.lastScore)
-                                .on(a::onFrame),
+                        row(
+                                new Plot2D(HISTORY, Plot2D.Line)
+                                        .add("lag", () -> narLoop.lag())
+                                        .on(a::onFrame),
+                                new Plot2D(HISTORY, Plot2D.Line)
+                                        .add("happy", () -> m.lastScore)
+                                        .on(a::onFrame)
+                        ),
 
 //                        new MatrixView(m.traffic, 4, (x, gl) -> {
 //                            Draw.colorGrays(gl, x);
@@ -151,8 +153,10 @@ abstract public class NAgentX extends NAgent {
                         new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
 
                         row(
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[10].q),
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[13].q)
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
+                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
                         ),
                         //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
