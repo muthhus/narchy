@@ -32,6 +32,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     public RTreeBeliefTable() {
         this.tree = new LockingRTree<Task>(new RTree(this), new ReentrantReadWriteLock(false));
     }
+    public RTreeBeliefTable(int cap) {
+        this();
+        setCapacity(cap);
+    }
 
     private int capacity;
 
@@ -53,7 +57,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         if (!tt.isEmpty())
             return TruthPolation.truth(e, when, dur, tt);
         else
-            return e.truth();
+            return e!=null ? e.truth() : null;
     }
 
     @Override
@@ -122,7 +126,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        throw new UnsupportedOperationException("TODO");
+        tree.forEach(x);
     }
 
     @Override
@@ -144,6 +148,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
             return new float[]{ (float)(x.start()) };
         //}
     }
+
     @Override
     public void clear() {
         throw new UnsupportedOperationException();

@@ -47,9 +47,11 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         double minCost = Double.MIN_VALUE;
         int r1Max = 0, r2Max = size - 1;
         for (int i = 0; i < size; i++) {
+            HyperRect ii = builder.apply(data[i]);
             for (int j = i + 1; j < size; j++) {
-                final HyperRect mbr = rect[i].mbr(rect[j]);
-                final double cost = mbr.cost() - (rect[i].cost() + rect[j].cost());
+                HyperRect jj = builder.apply(data[j]);
+                final HyperRect mbr = ii.mbr(jj);
+                final double cost = mbr.cost() - (ii.cost() + jj.cost());
                 if (cost > minCost) {
                     r1Max = i;
                     r2Max = j;

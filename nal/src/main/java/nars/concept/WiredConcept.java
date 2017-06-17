@@ -37,7 +37,7 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         n.on(this);
     }
 
-
+// THIS DITHERING AND CLONING IS DANGEROUS
 //    public void process(@NotNull Task t, @NotNull NAR n) {
 //        //dither the task frequency
 //        if (!t.isInput() && /*t.isBeliefOrGoal()*/ t.isBelief()) {
@@ -81,26 +81,26 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
 //            };
 //    }
 
-   @Override
-    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
-        return
-
-            new HijackTemporalBeliefTable(tCap) {
-            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
-            //new HijackTemporalExtendedBeliefTable2(tCap, tCap*4) {
+//   @Override
+//    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {
+//        return
+//
+//            new HijackTemporalBeliefTable(tCap) {
+//            //new MyListTemporalBeliefTable(tCap * 2, tCap * 4);
+//            //new HijackTemporalExtendedBeliefTable2(tCap, tCap*4) {
+////                @Override
+////                protected boolean include(Task t) {
+////                    return true;
+////                    //return t instanceof SignalTask || t.isGoal();
+////                }
+//
 //                @Override
-//                protected boolean include(Task t) {
-//                    return true;
-//                    //return t instanceof SignalTask || t.isGoal();
+//                public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
+//                    Truth tt = super.truth(when, dur, eternal);
+//                    return tt!=null ? tt.ditherFreq(resolution.floatValue()) : null;
 //                }
-
-                @Override
-                public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
-                    Truth tt = super.truth(when, dur, eternal);
-                    return tt!=null ? tt.ditherFreq(resolution.floatValue()) : null;
-                }
-            };
-    }
+//            };
+//    }
 
     //    @Override
 //    protected TermContainer buildTemplates(Compound term, NAR nar) {

@@ -24,6 +24,7 @@ import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -39,7 +40,6 @@ public abstract class Leaf<T> implements Node<T> {
     public final RTree.Split splitType;
     protected final short mMax;       // max entries per node
     protected final short mMin;       // least number of entries per node
-    protected final HyperRect[] rect;
     protected final T[] data;
     @Deprecated
     protected final Function<T, HyperRect> builder;
@@ -52,7 +52,6 @@ public abstract class Leaf<T> implements Node<T> {
         this.mMax = (short) mMax;
         this.bounds = null;
         this.builder = builder;
-        this.rect = new HyperRect[mMax];
         this.data = (T[]) new Object[mMax];
         this.size = 0;
         this.splitType = splitType;
@@ -68,7 +67,6 @@ public abstract class Leaf<T> implements Node<T> {
                 final HyperRect tRect = builder.apply(t);
                 bounds = bounds != null ? bounds.mbr(tRect) : tRect;
 
-                rect[size] = tRect;
                 data[size++] = t;
 
                 next = this;
@@ -128,28 +126,16 @@ public abstract class Leaf<T> implements Node<T> {
             final int nRemoved = j - i;
             if (j < size) {
                 final int nRemaining = size - j;
-                System.arraycopy(rect, j, rect, i, nRemaining);
                 System.arraycopy(data, j, data, i, nRemaining);
-
-                //TODO use Array.fill
-                for (int k = size - nRemoved; k < size; k++) {
-                    rect[k] = null;
-                    data[k] = null;
-                }
+                Arrays.fill(data, size-nRemoved, size, null);
             } else {
-                //TODO use Array.fill
-                for (int k = i; k < size; k++) {
-                    rect[k] = null;
-                    data[k] = null;
-
-                }
-
+                Arrays.fill(data, i, size, null);
             }
 
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? bounds.mbr(rect) : null;
+            bounds = size > 0 ? HyperRect.mbr(data, builder) : null;
 
         }
 
@@ -163,15 +149,12 @@ public abstract class Leaf<T> implements Node<T> {
         if (size <= 0)
             return this;
 
-        final HyperRect bbox = builder.apply(tnew);
-
         for (int i = 0; i < size; i++) {
             if (data[i].equals(told)) {
-                rect[i] = bbox;
                 data[i] = tnew;
             }
 
-            bounds = i == 0 ? rect[0] : bounds.mbr(rect[i]);
+            bounds = i == 0 ? builder.apply(data[0]) : bounds.mbr(builder.apply(data[i]));
         }
 
         return this;
@@ -181,8 +164,9 @@ public abstract class Leaf<T> implements Node<T> {
     @Override
     public boolean containing(HyperRect R, Predicate<T> t) {
         for (int i = 0; i < size; i++) {
-            if (R.contains(rect[i])) {
-                if (!t.test(data[i]))
+            T d = data[i];
+            if (R.contains(builder.apply(d))) {
+                if (!t.test(d))
                     return false;
             }
         }
@@ -195,8 +179,9 @@ public abstract class Leaf<T> implements Node<T> {
         final int n0 = n;
 
         for (int i = 0; i < size && n < tLen; i++) {
-            if (R.contains(rect[i])) {
-                t[n++] = data[i];
+            T d = data[i];
+            if (R.contains(builder.apply(d))) {
+                t[n++] = d;
             }
         }
         return n - n0;
@@ -229,7 +214,7 @@ public abstract class Leaf<T> implements Node<T> {
     protected abstract Node<T> split(final T t);
 
     @Override
-    public void forEach(Consumer<T> consumer) {
+    public void forEach(Consumer<? super T> consumer) {
         for (int i = 0; i < size; i++) {
             consumer.accept(data[i]);
         }
@@ -238,8 +223,9 @@ public abstract class Leaf<T> implements Node<T> {
     @Override
     public boolean intersecting(HyperRect rect, Predicate<T> t) {
         for (int i = 0; i < size; i++) {
-            if (rect.intersects(this.rect[i])) {
-                if (!t.test(data[i]))
+            T d = data[i];
+            if (rect.intersects(this.builder.apply(d))) {
+                if (!t.test(d))
                     return false;
             }
         }

@@ -165,7 +165,7 @@ public class RTree<T> implements Spatialized<T> {
 //    }
 
     @Override
-    public void forEach(Consumer<T> consumer) {
+    public void forEach(Consumer<? super T> consumer) {
         root.forEach(consumer);
     }
 

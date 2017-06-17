@@ -90,7 +90,7 @@ public interface Node<T> extends Nodelike<T> {
      *
      * @param consumer
      */
-    void forEach(Consumer<T> consumer);
+    void forEach(Consumer<? super T> consumer);
 
     boolean AND(Predicate<T> p);
 

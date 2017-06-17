@@ -94,7 +94,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public void forEach(Consumer<T> consumer) {
+    public void forEach(Consumer<? super T> consumer) {
         this.node.forEach(consumer);
     }
 

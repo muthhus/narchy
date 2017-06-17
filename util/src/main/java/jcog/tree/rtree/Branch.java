@@ -39,14 +39,16 @@ import java.util.function.Predicate;
 public final class Branch<T> implements Node<T> {
 
     private final Node<T>[] child;
+
     //TODO move these to a shared builder class
-    private final Function<T, HyperRect> builder;
-    private final int mMax;
-    private final int mMin;
-    private final RTree.Split splitType;
+    @Deprecated private final Function<T, HyperRect> builder;
+    @Deprecated private final int mMax;
+    @Deprecated private final int mMin;
+    @Deprecated private final RTree.Split splitType;
+
     short childDiff;
     private HyperRect mbr;
-    private int size;
+    short size;
 
     public Branch(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
@@ -324,7 +326,7 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public void forEach(Consumer<T> consumer) {
+    public void forEach(Consumer<? super T> consumer) {
         for (int i = 0; i < size; i++) {
             child[i].forEach(consumer);
         }

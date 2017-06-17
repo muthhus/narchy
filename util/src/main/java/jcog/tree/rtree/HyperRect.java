@@ -21,6 +21,8 @@ package jcog.tree.rtree;
  */
 
 
+import java.util.function.Function;
+
 /**
  * An N dimensional rectangle or "hypercube" that is a representation of a data entry.
  * <p>
@@ -38,6 +40,17 @@ public interface HyperRect<X extends HyperPoint> {
     @Deprecated
     HyperRect<X> mbr(HyperRect<X> r);
 
+
+    static <X> HyperRect mbr(X[] rect, Function<X,HyperRect> builder) {
+        HyperRect bounds = builder.apply(rect[0]);
+        for (int k = 1; k < rect.length; k++) {
+            HyperRect r = builder.apply(rect[k]);
+            if (r == null)
+                break;
+            bounds = bounds.mbr(r);
+        }
+        return bounds;
+    }
 
     /**
      * warning, the array may contain nulls. in which case, break because these will be at the end
@@ -136,6 +149,14 @@ public interface HyperRect<X extends HyperPoint> {
             p += 2.0 * this.getRangeFinite(d, 0);
         }
         return p;
+    }
+
+    static <T> HyperRect[] toArray(T[] data, int size, Function<T, HyperRect> builder) {
+        HyperRect[] h = new HyperRect[size];
+        for (int i = 0; i < size; i++) {
+            h[i] = builder.apply(data[i]);
+        }
+        return h;
     }
 
 

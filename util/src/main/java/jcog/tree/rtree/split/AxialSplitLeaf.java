@@ -44,7 +44,7 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
 
 
-        final int nD = rect[0].dim();
+        final int nD = builder.apply(data[0]).dim(); //TODO builder.dim()
 
         // choose axis to split
         int axis = 0;
@@ -60,7 +60,7 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
         // sort along split dimension
         final int splitDimension = axis;
-        final HyperRect[] sortedMbr = rect.clone();
+        final HyperRect[] sortedMbr = HyperRect.toArray(data, size, builder);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
@@ -85,8 +85,9 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
             outerLoop:
             for (int j = 0; j < size; j++) {
-                if (rect[j] == si) {
-                    target.add(data[j], this);
+                T d = data[j];
+                if (builder.apply(d).equals( si )) {
+                    target.add(d, this);
                     break outerLoop;
                 }
             }

@@ -117,7 +117,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      */
     int size();
 
-    void forEach(Consumer<T> consumer);
+    void forEach(Consumer<? super T> consumer);
 
     boolean intersecting(HyperRect rect, Predicate<T> consumer);
 
