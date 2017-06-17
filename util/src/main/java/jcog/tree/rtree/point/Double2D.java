@@ -23,13 +23,16 @@ package jcog.tree.rtree.point;
 import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.rect.RectDouble2D;
+import org.eclipse.collections.impl.block.factory.Comparators;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 /**
  * Created by jcovert on 6/15/15.
  */
-public class Double2D implements HyperPoint {
+public class Double2D implements HyperPoint, Comparable<Double2D> {
     public final double x;
     public final double y;
 
@@ -100,6 +103,14 @@ public class Double2D implements HyperPoint {
         temp = Double.doubleToLongBits(y);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public int compareTo(@NotNull Double2D o) {
+        int a = Double.compare(x, o.x);
+        if (a != 0) return a;
+        int b = Double.compare(y, o.y);
+        return b;
     }
 
     public final static class Builder implements Function<Double2D, HyperRect> {

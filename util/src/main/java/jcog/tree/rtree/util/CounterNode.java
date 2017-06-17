@@ -23,6 +23,7 @@ package jcog.tree.rtree.util;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.Node;
 import jcog.tree.rtree.Nodelike;
+import jcog.tree.rtree.RTreeModel;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -50,18 +51,18 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(T t, Nodelike<T> parent) {
-        return this.node.add(t, this);
+    public Node<T> add(T t, Nodelike<T> parent, RTreeModel<T> model) {
+        return this.node.add(t, this, model);
     }
 
     @Override
-    public Node<T> remove(T t, Nodelike<T> parent) {
-        return this.node.remove(t, this);
+    public Node<T> remove(T t, Nodelike<T> parent, RTreeModel<T> model) {
+        return this.node.remove(t, this, model);
     }
 
     @Override
-    public Node<T> update(T told, T tnew) {
-        return this.node.update(told, tnew);
+    public Node<T> update(T told, T tnew, RTreeModel<T> model) {
+        return this.node.update(told, tnew, model);
     }
 
     @Override
@@ -74,18 +75,12 @@ public final class CounterNode<T> implements Node<T> {
         throw new UnsupportedOperationException("TODO");
     }
 
-    @Override
-    public int containing(HyperRect rect, T[] t, int n) {
-        searchCount++;
-        bboxEvalCount += this.node.size();
-        return this.node.containing(rect, t, n);
-    }
 
     @Override
-    public boolean containing(HyperRect rect, Predicate<T> t) {
+    public boolean containing(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
         searchCount++;
         bboxEvalCount += this.node.size();
-        return this.node.containing(rect, t);
+        return this.node.containing(rect, t, model);
     }
 
     @Override
@@ -99,8 +94,8 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> consumer) {
-        this.node.intersecting(rect, consumer);
+    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+        this.node.intersecting(rect, t, model);
         return false;
     }
 
@@ -120,7 +115,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public boolean contains(T t) {
-        return node.contains(t);
+    public boolean contains(T t, RTreeModel<T> model) {
+        return node.contains(t, model);
     }
 }

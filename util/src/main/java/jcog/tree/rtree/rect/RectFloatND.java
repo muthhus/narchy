@@ -23,6 +23,7 @@ package jcog.tree.rtree.rect;
 
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.point.FloatND;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.function.Function;
@@ -34,7 +35,7 @@ import static java.lang.Float.POSITIVE_INFINITY;
  * Created by jcovert on 6/15/15.
  */
 
-public class RectFloatND implements HyperRect<FloatND>, Serializable {
+public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable<RectFloatND> {
 
     public static final HyperRect ALL_1 = RectFloatND.all(1);
     public static final HyperRect ALL_2 = RectFloatND.all(2);
@@ -201,6 +202,14 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
 
         RectFloatND r = (RectFloatND) o;
         return min.equals(r.min) && max.equals(r.max);
+    }
+
+    @Override
+    public int compareTo(@NotNull RectFloatND o) {
+        int a = min.compareTo(o.min);
+        if (a != 0) return a;
+        int b = max.compareTo(o.max);
+        return b;
     }
 
     @Override

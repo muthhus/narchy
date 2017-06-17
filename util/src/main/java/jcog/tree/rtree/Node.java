@@ -45,37 +45,29 @@ public interface Node<T> extends Nodelike<T> {
 
     /**
      * Add t to the index
-     *
-     * @param t      - value to add to index
+     *  @param t      - value to add to index
      * @param parent - the callee which is the parent of this instance
+     * @param model
      */
-    Node<T> add(T t, Nodelike<T> parent);
+    Node<T> add(T t, Nodelike<T> parent, RTreeModel<T> model);
 
     /**
      * Remove t from the index
-     *
-     * @param t      - value to remove from index
+     *  @param t      - value to remove from index
      * @param parent - the callee which is the parent of this instance
+     * @param model
      */
-    Node<T> remove(T t, Nodelike<T> parent);
+    Node<T> remove(T t, Nodelike<T> parent, RTreeModel<T> model);
 
     /**
      * update an existing t in the index
-     *
      * @param told - old index to be updated
      * @param tnew - value to update old index to
+     * @param model
      */
-    Node<T> update(T told, T tnew);
+    Node<T> update(T told, T tnew, RTreeModel<T> model);
 
-    /**
-     * Search for rect within this node
-     *
-     * @param rect - HyperRect to search for
-     * @param t    - array of found results
-     * @param n    - total result count so far (from recursive call)
-     * @return result count from search of this node
-     */
-    int containing(HyperRect rect, T[] t, int n);
+
 
 
     /**
@@ -100,23 +92,24 @@ public interface Node<T> extends Nodelike<T> {
      * Consumer "accepts" every node in the given rect
      *
      * @param rect     - limiting rect
-     * @param consumer
+     * @param t
+     * @param model
      * @return whether to continue visit
      */
-    boolean intersecting(HyperRect rect, Predicate<T> consumer);
+    boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model);
 
-    boolean containing(HyperRect rect, Predicate<T> t);
+    boolean containing(HyperRect rect, Predicate<T> t, RTreeModel<T> model);
 
-    default <C extends Collection> C containing(HyperRect rect, C t) {
-        containing(rect, (Predicate) x -> {
+    default Collection<T> containing(HyperRect rect, Collection t, RTreeModel<T> model) {
+        containing(rect, x -> {
             t.add(x);
             return true;
-        });
+        }, model);
         return t;
     }
 
-    default Set<T> containedSet(HyperRect rect) {
-        return containing(rect, new HashSet());
+    default Set<T> containedSet(HyperRect rect, RTreeModel<T> model) {
+        return (Set<T>) containing(rect, new HashSet(), model);
     }
 
     /**

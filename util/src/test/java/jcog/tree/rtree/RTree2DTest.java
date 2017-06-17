@@ -20,6 +20,7 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import com.google.common.collect.Lists;
 import jcog.tree.rtree.point.Double2D;
 import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.rect.RectFloatND;
@@ -50,7 +51,7 @@ public class RTree2DTest {
         final RectDouble2D rect = new RectDouble2D(new Double2D(2,2), new Double2D(8,8));
         final Double2D[] result = new Double2D[10];
 
-        final int n = pTree.containing(rect, result);
+        final int n = pTree.containedToArray(rect, result);
         Assert.assertEquals(7, n);
 
         for(int i=0; i<n; i++) {
@@ -91,6 +92,8 @@ public class RTree2DTest {
             //Assert.assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
             Assert.assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
 
+            Collections.sort(results);
+
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
                 assertTrue("Unexpected result found", results.get(i).min.x == i + 2 && results.get(i).min.y == i + 2 && results.get(i).max.x == i + 5 && results.get(i).max.y == i + 5);
@@ -117,7 +120,7 @@ public class RTree2DTest {
             final RectDouble2D searchRect = new RectDouble2D(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
             RectDouble2D[] results = new RectDouble2D[entryCount];
 
-            final int foundCount = rTree.containing(searchRect, results);
+            final int foundCount = rTree.containedToArray(searchRect, results);
             int resultCount = 0;
             for(int i = 0; i < results.length; i++) {
                 if(results[i] != null) {
@@ -181,7 +184,7 @@ public class RTree2DTest {
 
             final RectDouble2D searchRect = new RectDouble2D(100, 100, 120, 120);
             RectDouble2D[] results = new RectDouble2D[entryCount];
-            int foundCount = rTree.containing(searchRect, results);
+            int foundCount = rTree.containedToArray(searchRect, results);
 
             CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.root();
 
@@ -204,7 +207,7 @@ public class RTree2DTest {
         }
         RectDouble2D[] searchResults = new RectDouble2D[10];
         for(int i = 0; i < rects.length; i++) {
-            assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containing(rects[i], searchResults) == 0);
+            assertTrue("Found hyperRect that should have been removed on search " + i, rTree.containedToArray(rects[i], searchResults) == 0);
         }
 
         rTree.add(new RectDouble2D(0,0,5,5));
@@ -270,7 +273,7 @@ public class RTree2DTest {
         RectDouble2D newRect = new RectDouble2D(1,2,3,4);
         rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
-        int num = rTree.containing(newRect, results);
+        int num = rTree.containedToArray(newRect, results);
         assertTrue("Did not find the updated HyperRect", num == 1);
         String st = results[0].toString();
         System.out.print(st);

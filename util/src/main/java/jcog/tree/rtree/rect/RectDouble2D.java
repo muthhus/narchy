@@ -23,14 +23,16 @@ package jcog.tree.rtree.rect;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
+import org.eclipse.collections.impl.block.factory.Comparators;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 /**
  * Created by jcovert on 6/15/15.
  */
-public class RectDouble2D implements HyperRect<Double2D> {
+public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2D> {
     public final Double2D min;
     public final Double2D max;
 
@@ -198,6 +200,14 @@ public class RectDouble2D implements HyperRect<Double2D> {
         sb.append(')');
 
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(@NotNull RectDouble2D o) {
+        int a = min.compareTo(o.min);
+        if (a != 0) return a;
+        int b = max.compareTo(o.max);
+        return b;
     }
 
     public final static class Builder implements Function<RectDouble2D, HyperRect> {

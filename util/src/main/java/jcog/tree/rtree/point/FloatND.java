@@ -3,6 +3,7 @@ package jcog.tree.rtree.point;
 
 import jcog.tree.rtree.HyperPoint;
 import jcog.tree.rtree.RTree;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import static jcog.tree.rtree.RTree.FPSILON;
 /**
  * Created by me on 12/21/16.
  */
-public class FloatND implements HyperPoint, Serializable {
+public class FloatND implements HyperPoint, Serializable, Comparable<FloatND> {
 
     public final float[] coord;
     private int hash;
@@ -89,4 +90,8 @@ public class FloatND implements HyperPoint, Serializable {
     }
 
 
+    @Override
+    public int compareTo(@NotNull FloatND o) {
+        return Arrays.compare(coord, o.coord);
+    }
 }

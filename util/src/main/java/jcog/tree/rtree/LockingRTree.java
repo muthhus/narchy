@@ -50,10 +50,10 @@ public class LockingRTree<T> implements Spatialized<T> {
      * @return number of entries found
      */
     @Override
-    public int containing(HyperRect rect, T[] t) {
+    public int containedToArray(HyperRect rect, T[] t) {
         readLock.lock();
         try {
-            return tree.containing(rect, t);
+            return tree.containedToArray(rect, t);
         } finally {
             readLock.unlock();
         }
@@ -154,7 +154,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public int trySearch(HyperRect rect, T[] t) {
         if (readLock.tryLock()) {
             try {
-                return tree.containing(rect, t);
+                return tree.containedToArray(rect, t);
             } finally {
                 readLock.unlock();
             }
@@ -277,7 +277,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     }
 
     @Override
-    public boolean contains(T t) {
-        return tree.contains(t);
+    public boolean contains(T t, RTreeModel<T> model) {
+        return tree.contains(t, model);
     }
 }

@@ -131,7 +131,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @return Number of results found
      */
     @Deprecated
-    int containing(final HyperRect rect, final T[] t);
+    int containedToArray(final HyperRect rect, final T[] t);
 
 
     Stats stats();

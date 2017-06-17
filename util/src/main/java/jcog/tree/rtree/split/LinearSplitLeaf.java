@@ -22,8 +22,6 @@ package jcog.tree.rtree.split;
 
 import jcog.tree.rtree.*;
 
-import java.util.function.Function;
-
 /**
  * Guttmann's Linear split
  * <p>
@@ -31,20 +29,20 @@ import java.util.function.Function;
  */
 public final class LinearSplitLeaf<T> extends Leaf<T> {
 
-    public LinearSplitLeaf(final Function<T, HyperRect> builder, final int mMin, final int mMax) {
-        super(builder, mMin, mMax, RTree.Split.LINEAR);
+    public LinearSplitLeaf(int cap) {
+        super(cap);
     }
 
     @Override
-    protected Node<T> split(final T t) {
-        final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
-        final Node<T> l1Node = splitType.newLeaf(builder, mMin, mMax);
-        final Node<T> l2Node = splitType.newLeaf(builder, mMin, mMax);
+    protected Node<T> split(final T t, RTreeModel<T> model) {
+        final Branch<T> pNode = model.newBranch();
+        final Node<T> l1Node = model.splitType.newLeaf(model.max);
+        final Node<T> l2Node = model.splitType.newLeaf(model.max);
 
         final int MIN = 0;
         final int MAX = 1;
         final int NRANGE = 2;
-        final int nD = builder.apply(data[0]).dim();
+        final int nD = model.builder.apply(data[0]).dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double[] separation = new double[nD];
@@ -59,31 +57,31 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
             for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
 
-                HyperRect rj = builder.apply(data[j]);
+                HyperRect rj = model.builder.apply(data[j]);
                 Comparable rjMin = rj.min().coord(d);
-                if (builder.apply(data[rd[MIN][MIN]]).min().coord(d).compareTo(rjMin) > 0) {
+                if (model.builder.apply(data[rd[MIN][MIN]]).min().coord(d).compareTo(rjMin) > 0) {
                     rd[MIN][MIN] = j;
                 }
 
-                if (builder.apply(data[rd[MIN][MAX]]).min().coord(d).compareTo(rjMin) < 0) {
+                if (model.builder.apply(data[rd[MIN][MAX]]).min().coord(d).compareTo(rjMin) < 0) {
                     rd[MIN][MAX] = j;
                 }
 
                 Comparable rjMax = rj.max().coord(d);
-                if (builder.apply(data[rd[MAX][MIN]]).max().coord(d).compareTo(rjMax) > 0) {
+                if (model.builder.apply(data[rd[MAX][MIN]]).max().coord(d).compareTo(rjMax) > 0) {
                     rd[MAX][MIN] = j;
                 }
 
-                if (builder.apply(data[rd[MAX][MAX]]).max().coord(d).compareTo(rjMax) < 0) {
+                if (model.builder.apply(data[rd[MAX][MAX]]).max().coord(d).compareTo(rjMax) < 0) {
                     rd[MAX][MAX] = j;
                 }
             }
 
             // highest max less lowest min
-            final double width = builder.apply(data[rIndex[d][MAX][MAX]]).max().distance(builder.apply(data[rIndex[d][MIN][MIN]]).min(), d);
+            final double width = model.builder.apply(data[rIndex[d][MAX][MAX]]).max().distance(model.builder.apply(data[rIndex[d][MIN][MIN]]).min(), d);
 
             // lowest max less highest min (normalized)
-            separation[d] = builder.apply(data[rIndex[d][MAX][MIN]]).max().distance(builder.apply(data[rIndex[d][MIN][MAX]]).min(), d) / width;
+            separation[d] = model.builder.apply(data[rIndex[d][MAX][MIN]]).max().distance(model.builder.apply(data[rIndex[d][MIN][MAX]]).min(), d) / width;
         }
 
         int r1Ext = rIndex[0][MAX][MIN], r2Ext = rIndex[0][MIN][MAX];
@@ -103,17 +101,17 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(data[r1Ext], this);
-        l2Node.add(data[r2Ext], this);
+        l1Node.add(data[r1Ext], this, model);
+        l2Node.add(data[r2Ext], this, model);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Ext) && (i != r2Ext)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, data[i]);
+                classify(l1Node, l2Node, data[i], model);
             }
         }
 
-        classify(l1Node, l2Node, t);
+        classify(l1Node, l2Node, t, model);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);

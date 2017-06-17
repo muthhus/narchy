@@ -34,7 +34,7 @@ public class RTreeNDTest {
         final RectDouble2D rect = new RectDouble2D(new Double2D(2, 2), new Double2D(8, 8));
         final Double2D[] result = new Double2D[10];
 
-        final int n = pTree.containing(rect, result);
+        final int n = pTree.containedToArray(rect, result);
         assertEquals(7, n);
 
         for (int i = 0; i < n; i++) {
@@ -80,6 +80,7 @@ public class RTreeNDTest {
             assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
+            Collections.sort(results);
             for (int i = 0; i < resultCount; i++) {
                 assertTrue("Unexpected result found", results.get(i).min.coord(0) == i + 2 && results.get(i).min.coord(1) == i + 2 && results.get(i).max.coord(0) == i + 5 && results.get(i).max.coord(1) == i + 5);
             }
@@ -129,7 +130,7 @@ public class RTreeNDTest {
 
                 RectFloatND[] results = new RectFloatND[rects.length];
 
-                final int foundCount = rTree.containing(searchRect, results);
+                final int foundCount = rTree.containedToArray(searchRect, results);
                 int resultCount = 0;
                 for (int i = 0; i < results.length; i++) {
                     if (results[i] != null) {
@@ -155,7 +156,7 @@ public class RTreeNDTest {
                 Stats s = rTree.stats();
                 s.print(System.out);
                 //System.out.println("\t" + rTree.getRoot());
-                assertTrue(s.getMaxDepth() < 8 /* reasonable */);
+                assertTrue(s.getMaxDepth() <= 8 /* reasonable */);
             }
         }
     }
@@ -177,9 +178,9 @@ public class RTreeNDTest {
             }
 
             final RectDouble2D searchRect = new RectDouble2D(5, 5, 10, 10);
-            RectDouble2D[] results = new RectDouble2D[entryCount];
+            RectDouble2D[] results = new RectDouble2D[3];
 
-            final int foundCount = rTree.containing(searchRect, results);
+            final int foundCount = rTree.containedToArray(searchRect, results);
             int resultCount = 0;
             for (int i = 0; i < results.length; i++) {
                 if (results[i] != null) {
@@ -191,9 +192,11 @@ public class RTreeNDTest {
             assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + foundCount, expectedCount, foundCount);
             assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
 
+            Arrays.sort(results);
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                Assert.assertTrue("Unexpected result found", RTree.equals(results[i].min().coord(0), i + 5) &&
+                Assert.assertTrue("Unexpected result found:" + results[i],
+                RTree.equals(results[i].min().coord(0), i + 5) &&
                         RTree.equals(results[i].min().coord(1), i + 5) &&
                         RTree.equals(results[i].max().coord(0), i + 8) &&
                         RTree.equals(results[i].max().coord(1), i + 8));
@@ -227,6 +230,8 @@ public class RTreeNDTest {
 
             assertEquals("[" + type + "] Search returned incorrect search result count - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
             assertEquals("[" + type + "] Search returned incorrect number of rectangles - expected: " + expectedCount + " actual: " + resultCount, expectedCount, resultCount);
+
+            Collections.sort(results);
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
@@ -281,7 +286,7 @@ public class RTreeNDTest {
             final RectDouble2D searchRect = new RectDouble2D(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
             RectDouble2D[] results = new RectDouble2D[entryCount];
 
-            final int foundCount = rTree.containing(searchRect, results);
+            final int foundCount = rTree.containedToArray(searchRect, results);
             int resultCount = 0;
             for (int i = 0; i < results.length; i++) {
                 if (results[i] != null) {
@@ -352,7 +357,7 @@ public class RTreeNDTest {
                 final RectDouble2D searchRect = new RectDouble2D(100, 100, 120, 120);
                 RectDouble2D[] results = new RectDouble2D[entryCount];
                 final long start = System.nanoTime();
-                int foundCount = rTree.containing(searchRect, results);
+                int foundCount = rTree.containedToArray(searchRect, results);
                 final long end = System.nanoTime() - start;
                 CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.root();
 
@@ -377,9 +382,10 @@ public class RTreeNDTest {
         assertEquals(rTree.size(), rects.length);
 
         for (int i = 0; i < rects.length; i++) {
-            Assert.assertFalse(rTree.root().containedSet(rects[i]).isEmpty());
+            Assert.assertFalse(rTree.containedAsSet(rects[i]).isEmpty());
         }
     }
+
 
 
     @Test
@@ -399,15 +405,15 @@ public class RTreeNDTest {
 
         assertEquals(1, rTree.size());
 
-        Assert.assertFalse("Missing hyperRect that should  be found " + rects[0], rTree.root().containedSet(rects[0]).isEmpty());
+        Assert.assertFalse("Missing hyperRect that should  be found " + rects[0], rTree.containedAsSet(rects[0]).isEmpty());
 
         for (int i = 1; i < rects.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed on search " + rects[i], rTree.root().containedSet(rects[i]).isEmpty());
+            Assert.assertTrue("Found hyperRect that should have been removed on search " + rects[i], rTree.containedAsSet(rects[i]).isEmpty());
         }
 
         final RectDouble2D hr = new RectDouble2D(0, 0, 5, 5);
         rTree.add(hr);
-        Assert.assertFalse(rTree.root().containedSet(hr).isEmpty());
+        Assert.assertFalse(rTree.containedAsSet(hr).isEmpty());
         Assert.assertTrue("Found hyperRect that should have been removed on search", rTree.size() != 0);
     }
 
@@ -453,7 +459,7 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < rect.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.root().containedSet(rect[i]).isEmpty());
+            Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.containedAsSet(rect[i]).isEmpty());
         }
     }
 
@@ -478,7 +484,7 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < N; i++) {
-            Assert.assertTrue("#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i], rTree.root().containedSet(rect[i]).isEmpty());
+            Assert.assertTrue("#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i], rTree.containedAsSet(rect[i]).isEmpty());
         }
 
         Assert.assertFalse("Found hyperRect that should have been removed on search ", rTree.size() > 0);
@@ -560,7 +566,7 @@ public class RTreeNDTest {
         RectDouble2D newRect = new RectDouble2D(1, 2, 3, 4);
         rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
-        final int num = rTree.containing(newRect, results);
+        final int num = rTree.containedToArray(newRect, results);
         Assert.assertTrue("Did not find the updated HyperRect", num == 1);
         System.out.print(results[0]);
     }

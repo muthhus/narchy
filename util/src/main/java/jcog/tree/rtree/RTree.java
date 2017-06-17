@@ -29,6 +29,7 @@ import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -46,30 +47,24 @@ public class RTree<T> implements Spatialized<T> {
     private static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
-    private final short mMin;
-    private final short mMax;
-
     @NotNull
     private Node<T> root;
     private int size;
+    private RTreeModel<T> model;
 
-    protected RTree() {
-        this(null);
-    }
 
     public RTree(@Nullable final Function<T, HyperRect> spatialize) {
         this(spatialize, 2, 8, Split.AXIAL);
     }
 
     public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
-        this.mMin = (short) mMin;
-        this.mMax = (short) mMax;
+        this(new RTreeModel<>(spatialize, splitType, mMin, mMax));
+    }
 
-        if (spatialize == null)
-            spatialize = (Function) this; //attempt to use subclass implementations of the Function<>
-
+    public RTree(RTreeModel<T> model) {
+        this.model = model;
         this.size = 0;
-        this.root = splitType.newLeaf(spatialize, mMin, mMax);
+        this.root = model.newLeaf();
     }
 
     public static boolean equals(float a, float b) {
@@ -114,9 +109,9 @@ public class RTree<T> implements Spatialized<T> {
     @Override
     public boolean add(final T t) {
         int before = size;
-        root = root.add(t, this);
+        root = root.add(t, this, model);
         int after = size;
-        assert (after == before || after == before + 1): "after=" + after + ", before=" + before;
+        assert (after == before || after == before + 1) : "after=" + after + ", before=" + before;
         return after > before;
     }
 
@@ -125,7 +120,7 @@ public class RTree<T> implements Spatialized<T> {
         int before = size;
         if (before == 0)
             return false;
-        root = root.remove(t, this);
+        root = root.remove(t, this, model);
         int after = size;
         assert (after == before || after == before - 1);
         return before > after;
@@ -133,7 +128,7 @@ public class RTree<T> implements Spatialized<T> {
 
     @Override
     public void replace(final T told, final T tnew) {
-        root.update(told, tnew);
+        root.update(told, tnew, model);
     }
 
 //    /**
@@ -171,18 +166,26 @@ public class RTree<T> implements Spatialized<T> {
 
     @Override
     public boolean intersecting(HyperRect intersecting, Predicate<T> consumer) {
-        return root.intersecting(intersecting, consumer);
+        return root.intersecting(intersecting, consumer, model);
     }
 
-    @Override
-    @Deprecated
-    public int containing(HyperRect rect, final T[] t) {
-        return root.containing(rect, t, 0);
+    /** returns how many items were filled */
+    @Override public int containedToArray(HyperRect rect, final T[] t) {
+        final int[] i = {0};
+        root.containing(rect, (x) -> {
+            t[i[0]++] = x;
+            return i[0] < t.length;
+        }, model);
+        return i[0];
+    }
+
+    public Set<T> containedAsSet(HyperRect rect) {
+        return root.containedSet(rect, model);
     }
 
     @Override
     public boolean containing(HyperRect rect, final Predicate<T> t) {
-        return root.containing(rect, t);
+        return root.containing(rect, t, model);
     }
 
     void instrumentTree() {
@@ -194,9 +197,9 @@ public class RTree<T> implements Spatialized<T> {
     @Override
     public Stats stats() {
         Stats stats = new Stats();
-        //stats.setType(splitType);
-        stats.setMaxFill(mMax);
-        stats.setMinFill(mMin);
+        stats.setType(model.splitType);
+        stats.setMaxFill(model.max);
+        stats.setMinFill(model.min);
         root.collectStats(stats, 0);
         return stats;
     }
@@ -217,8 +220,8 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     @Override
-    public boolean contains(T t) {
-        return root.contains(t);
+    public boolean contains(T t, RTreeModel<T> model) {
+        return root.contains(t, model);
     }
 
 
@@ -232,25 +235,24 @@ public class RTree<T> implements Spatialized<T> {
     public enum Split {
         AXIAL {
             @Override
-            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
-                return new AxialSplitLeaf<>(builder, mMin, m);
+            public <R> Node<R> newLeaf(int cap) {
+                return new AxialSplitLeaf<>(cap);
             }
         },
         LINEAR {
             @Override
-            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
-                return new LinearSplitLeaf<>(builder, mMin, m);
+            public <R> Node<R> newLeaf(int cap) {
+                return new LinearSplitLeaf<>(cap);
             }
         },
         QUADRATIC {
             @Override
-            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
-                return new QuadraticSplitLeaf<>(builder, mMin, m);
+            public <R> Node<R> newLeaf(int cap) {
+                return new QuadraticSplitLeaf<>(cap);
             }
         },;
 
-        @NotNull
-        abstract public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m);
+        abstract public <R> Node<R> newLeaf(int cap);
 
     }
 }

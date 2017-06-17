@@ -26,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -36,42 +35,32 @@ import java.util.function.Predicate;
  */
 public abstract class Leaf<T> implements Node<T> {
 
-    @Deprecated
-    public final RTree.Split splitType;
-    protected final short mMax;       // max entries per node
-    protected final short mMin;       // least number of entries per node
+
     protected final T[] data;
-    @Deprecated
-    protected final Function<T, HyperRect> builder;
     protected short size;
     protected HyperRect bounds;
 
-
-    protected Leaf(@Deprecated final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
-        this.mMin = (short) mMin;
-        this.mMax = (short) mMax;
+    protected Leaf(int mMax) {
         this.bounds = null;
-        this.builder = builder;
         this.data = (T[]) new Object[mMax];
         this.size = 0;
-        this.splitType = splitType;
     }
 
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent) {
+    public Node<T> add(final T t, Nodelike<T> parent, RTreeModel<T> model) {
 
-        if (!contains(t)) {
+        if (!contains(t, model)) {
             Node<T> next;
 
-            if (size < mMax) {
-                final HyperRect tRect = builder.apply(t);
+            if (size < model.max) {
+                final HyperRect tRect = model.builder.apply(t);
                 bounds = bounds != null ? bounds.mbr(tRect) : tRect;
 
                 data[size++] = t;
 
                 next = this;
             } else {
-                next = split(t);
+                next = split(t, model);
             }
             parent.reportSizeDelta(+1);
 
@@ -102,13 +91,13 @@ public abstract class Leaf<T> implements Node<T> {
         return false;
     }
 
-    public boolean contains(T t) {
+    public boolean contains(T t, RTreeModel<T> model) {
         return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 
     @Override
-    public Node<T> remove(final T t, Nodelike<T> parent) {
+    public Node<T> remove(final T t, Nodelike<T> parent, RTreeModel<T> model) {
 
         int i = 0;
 
@@ -135,7 +124,7 @@ public abstract class Leaf<T> implements Node<T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRect.mbr(data, builder) : null;
+            bounds = size > 0 ? HyperRect.mbr(data, model.builder) : null;
 
         }
 
@@ -145,7 +134,7 @@ public abstract class Leaf<T> implements Node<T> {
 
 
     @Override
-    public Node<T> update(final T told, final T tnew) {
+    public Node<T> update(final T told, final T tnew, RTreeModel<T> model) {
         if (size <= 0)
             return this;
 
@@ -154,7 +143,7 @@ public abstract class Leaf<T> implements Node<T> {
                 data[i] = tnew;
             }
 
-            bounds = i == 0 ? builder.apply(data[0]) : bounds.mbr(builder.apply(data[i]));
+            bounds = i == 0 ? model.builder.apply(data[0]) : bounds.mbr(model.builder.apply(data[i]));
         }
 
         return this;
@@ -162,10 +151,10 @@ public abstract class Leaf<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(HyperRect R, Predicate<T> t) {
+    public boolean containing(HyperRect R, Predicate<T> t, RTreeModel<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (R.contains(builder.apply(d))) {
+            if (R.contains(model.builder.apply(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -173,19 +162,6 @@ public abstract class Leaf<T> implements Node<T> {
         return true;
     }
 
-    @Override
-    public int containing(final HyperRect R, final T[] t, int n) {
-        final int tLen = t.length;
-        final int n0 = n;
-
-        for (int i = 0; i < size && n < tLen; i++) {
-            T d = data[i];
-            if (R.contains(builder.apply(d))) {
-                t[n++] = d;
-            }
-        }
-        return n - n0;
-    }
 
     @Override
     public int size() {
@@ -209,9 +185,10 @@ public abstract class Leaf<T> implements Node<T> {
      * of the entries in each one.
      *
      * @param t entry to be added to the full leaf node
+     * @param model
      * @return newly created node storing half the entries of this node
      */
-    protected abstract Node<T> split(final T t);
+    protected abstract Node<T> split(final T t, RTreeModel<T> model);
 
     @Override
     public void forEach(Consumer<? super T> consumer) {
@@ -221,10 +198,10 @@ public abstract class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t) {
+    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (rect.intersects(this.builder.apply(d))) {
+            if (rect.intersects(model.builder.apply(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -243,14 +220,14 @@ public abstract class Leaf<T> implements Node<T> {
 
     /**
      * Figures out which newly made leaf node (see split method) to add a data entry to.
-     *
-     * @param l1Node left node
+     *  @param l1Node left node
      * @param l2Node right node
      * @param t      data entry to be added
+     * @param model
      */
-    protected final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t) {
+    protected final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, RTreeModel<T> model) {
 
-        final HyperRect tRect = builder.apply(t);
+        final HyperRect tRect = model.builder.apply(t);
         final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);
 
         double tCost = tRect.cost();
@@ -261,27 +238,27 @@ public abstract class Leaf<T> implements Node<T> {
         double l2c = l2Mbr.cost();
         final double l2CostInc = Math.max(l2c - (l2Node.bounds().cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
-            l1Node.add(t, this);
+            l1Node.add(t, this, model);
         } else if (RTree.equals(l1CostInc, l2CostInc)) {
             if (l1c < l2c) {
-                l1Node.add(t, this);
+                l1Node.add(t, this, model);
             } else if (RTree.equals(l1c, l2c)) {
                 final double l1MbrMargin = l1Mbr.perimeter();
                 final double l2MbrMargin = l2Mbr.perimeter();
                 if (l1MbrMargin < l2MbrMargin) {
-                    l1Node.add(t, this);
+                    l1Node.add(t, this, model);
                 } else if (RTree.equals(l1MbrMargin, l2MbrMargin)) {
                     // break ties with least number
-                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this);
+                    ((l1Node.size() < l2Node.size()) ? l1Node : l2Node).add(t, this, model);
 
                 } else {
-                    l2Node.add(t, this);
+                    l2Node.add(t, this, model);
                 }
             } else {
-                l2Node.add(t, this);
+                l2Node.add(t, this, model);
             }
         } else {
-            l2Node.add(t, this);
+            l2Node.add(t, this, model);
         }
 
     }
@@ -293,6 +270,6 @@ public abstract class Leaf<T> implements Node<T> {
 
     @Override
     public String toString() {
-        return "Leaf" + splitType + '{' + bounds + 'x' + size + '}';
+        return "Leaf" + '{' + bounds + 'x' + size + '}';
     }
 }

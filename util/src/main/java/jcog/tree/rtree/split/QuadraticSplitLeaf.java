@@ -22,8 +22,6 @@ package jcog.tree.rtree.split;
 
 import jcog.tree.rtree.*;
 
-import java.util.function.Function;
-
 /**
  * Guttmann's Quadratic split
  * <p>
@@ -31,25 +29,26 @@ import java.util.function.Function;
  */
 public final class QuadraticSplitLeaf<T> extends Leaf<T> {
 
-    public QuadraticSplitLeaf(final Function<T, HyperRect> builder, final int mMin, final int mMax) {
-        super(builder, mMin, mMax, RTree.Split.QUADRATIC);
+    public QuadraticSplitLeaf(int cap) {
+        super(cap);
     }
 
 
     @Override
-    protected Node<T> split(final T t) {
+    protected Node<T> split(final T t, RTreeModel<T> model) {
 
-        final Branch<T> pNode = new Branch<>(builder, mMin, mMax, splitType);
-        final Node<T> l1Node = splitType.newLeaf(builder, mMin, mMax);
-        final Node<T> l2Node = splitType.newLeaf(builder, mMin, mMax);
+        final Branch<T> pNode = model.newBranch();
+
+        final Node<T> l1Node = model.splitType.newLeaf(model.max);
+        final Node<T> l2Node = model.splitType.newLeaf(model.max);
 
         // find the two rectangles that are most wasteful
         double minCost = Double.MIN_VALUE;
         int r1Max = 0, r2Max = size - 1;
         for (int i = 0; i < size; i++) {
-            HyperRect ii = builder.apply(data[i]);
+            HyperRect ii = model.builder.apply(data[i]);
             for (int j = i + 1; j < size; j++) {
-                HyperRect jj = builder.apply(data[j]);
+                HyperRect jj = model.builder.apply(data[j]);
                 final HyperRect mbr = ii.mbr(jj);
                 final double cost = mbr.cost() - (ii.cost() + jj.cost());
                 if (cost > minCost) {
@@ -61,17 +60,17 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(data[r1Max], this);
-        l2Node.add(data[r2Max], this);
+        l1Node.add(data[r1Max], this, model);
+        l2Node.add(data[r2Max], this, model);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Max) && (i != r2Max)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, data[i]);
+                classify(l1Node, l2Node, data[i], model);
             }
         }
 
-        classify(l1Node, l2Node, t);
+        classify(l1Node, l2Node, t, model);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);

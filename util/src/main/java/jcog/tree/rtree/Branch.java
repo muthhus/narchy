@@ -25,10 +25,8 @@ import com.google.common.base.Joiner;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
-import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -40,32 +38,22 @@ public final class Branch<T> implements Node<T> {
 
     private final Node<T>[] child;
 
-    //TODO move these to a shared builder class
-    @Deprecated private final Function<T, HyperRect> builder;
-    @Deprecated private final int mMax;
-    @Deprecated private final int mMin;
-    @Deprecated private final RTree.Split splitType;
-
     short childDiff;
     private HyperRect mbr;
     short size;
 
-    public Branch(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
-        this.mMin = mMin;
-        this.mMax = mMax;
-        this.builder = builder;
+    public Branch(int cap) {
         this.mbr = null;
         this.size = 0;
-        this.child = new Node[mMax];
-        this.splitType = splitType;
+        this.child = new Node[cap];
     }
 
     @Override
-    public boolean contains(T t) {
-        if (!bounds().contains(builder.apply(t)))
+    public boolean contains(T t, RTreeModel<T> model) {
+        if (!bounds().contains(model.builder.apply(t)))
             return false;
         for (int i = 0; i < size; i++) {
-            if (child[i].contains(t))
+            if (child[i].contains(t, model))
                 return true;
         }
         return false;
@@ -83,7 +71,7 @@ public final class Branch<T> implements Node<T> {
      * @return position of the added node
      */
     public int addChild(final Node<T> n) {
-        if (size < mMax) {
+        if (size < child.length) {
             child[size++] = n;
 
             HyperRect nr = n.bounds();
@@ -110,22 +98,23 @@ public final class Branch<T> implements Node<T> {
      *
      * @param t      data entry to add
      * @param parent
+     * @param model
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent) {
+    public Node<T> add(final T t, Nodelike<T> parent, RTreeModel<T> model) {
         assert (childDiff == 0);
 
-        final HyperRect tRect = builder.apply(t);
+        final HyperRect tRect = model.builder.apply(t);
 
         for (int i = 0; i < size; i++) {
             Node ci = child[i];
             if (ci.bounds().contains(tRect)) {
                 //check for existing item
-                if (ci.contains(t))
+                if (ci.contains(t, model))
                     return this; // duplicate detected (subtree not changed)
 
-                Node<T> m = ci.add(t, this);
+                Node<T> m = ci.add(t, this, model);
                 if (reportNextSizeDelta(parent)) {
                     child[i] = m;
                     grow(m); //subtree was changed
@@ -134,18 +123,18 @@ public final class Branch<T> implements Node<T> {
             }
         }
 
-        if (size < mMin) {
+        if (size < child.length) {
 
             // no overlapping node - grow
-            grow(addChild(splitType.newLeaf(builder, mMin, mMax).add(t, parent)));
+            grow(addChild(model.newLeaf().add(t, parent, model)));
 
             return this;
 
         } else {
 
-            final int bestLeaf = chooseLeaf(t, tRect, parent);
+            final int bestLeaf = chooseLeaf(t, tRect, parent, model);
 
-            child[bestLeaf] = child[bestLeaf].add(t, this);
+            child[bestLeaf] = child[bestLeaf].add(t, this, model);
 
             if (reportNextSizeDelta(parent)) {
                 grow(bestLeaf);
@@ -153,7 +142,7 @@ public final class Branch<T> implements Node<T> {
                 // optimize on split to remove the extra created branch when there
                 // is space for the children here
                 if (child[bestLeaf].size() == 2 &&
-                        size < mMax &&
+                        size < child.length &&
                         !child[bestLeaf].isLeaf()) {
                     final Branch<T> branch = (Branch<T>) child[bestLeaf];
                     child[bestLeaf] = branch.child[0];
@@ -188,12 +177,12 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(final T t, Nodelike<T> parent) {
-        final HyperRect tRect = builder.apply(t);
+    public Node<T> remove(final T t, Nodelike<T> parent, RTreeModel<T> model) {
+        final HyperRect tRect = model.builder.apply(t);
 
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(tRect)) {
-                child[i] = child[i].remove(t, this);
+                child[i] = child[i].remove(t, this, model);
                 if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
                         System.arraycopy(child, i + 1, child, i, size - i - 1);
@@ -228,14 +217,14 @@ public final class Branch<T> implements Node<T> {
 //    }
 
     @Override
-    public Node<T> update(final T OLD, final T NEW) {
-        final HyperRect tRect = builder.apply(OLD);
+    public Node<T> update(final T OLD, final T NEW, RTreeModel<T> model) {
+        final HyperRect tRect = model.builder.apply(OLD);
 
         //TODO may be able to avoid recomputing bounds if the old was not found
         boolean found = false;
         for (int i = 0; i < size; i++) {
             if (!found && tRect.intersects(child[i].bounds())) {
-                child[i] = child[i].update(OLD, NEW);
+                child[i] = child[i].update(OLD, NEW, model);
                 found = true;
             }
             if (i == 0) {
@@ -249,26 +238,15 @@ public final class Branch<T> implements Node<T> {
 
     }
 
-    @Override
-    public int containing(final HyperRect rect, final T[] t, int n) {
-        final int tLen = t.length;
-        final int n0 = n;
-        for (int i = 0; i < size && n < tLen; i++) {
-            Node c = child[i];
-            if (rect.intersects(c.bounds())) {
-                n += c.containing(rect, t, n);
-            }
-        }
-        return n - n0;
-    }
+
 
     @Override
-    public boolean containing(final HyperRect rect, final Predicate<T> t) {
+    public boolean containing(final HyperRect rect, final Predicate<T> t, RTreeModel<T> model) {
 
         for (int i = 0; i < size; i++) {
             Node c = child[i];
             if (rect.intersects(c.bounds())) {
-                if (!c.containing(rect, t))
+                if (!c.containing(rect, t, model))
                     return false;
             }
         }
@@ -283,7 +261,7 @@ public final class Branch<T> implements Node<T> {
         return size;
     }
 
-    private int chooseLeaf(final T t, final HyperRect tRect, Nodelike<T> parent) {
+    private int chooseLeaf(final T t, final HyperRect tRect, Nodelike<T> parent, RTreeModel<T> model) {
         if (size > 0) {
             int bestNode = 0;
             HyperRect childMbr = child[0].bounds().mbr(tRect);
@@ -310,7 +288,7 @@ public final class Branch<T> implements Node<T> {
             }
             return bestNode;
         } else {
-            final Node<T> n = splitType.newLeaf(builder, mMin, mMax);
+            final Node<T> n = model.newLeaf();
             child[size++] = n;
             return size - 1;
         }
@@ -358,8 +336,8 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> consumer) {
-        return nodeAND(ci -> !(rect.intersects(ci.bounds()) && !ci.intersecting(rect, consumer)));
+    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+        return nodeAND(ci -> !(rect.intersects(ci.bounds()) && !ci.intersecting(rect, t, model)));
     }
 
     @Override
@@ -378,6 +356,6 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public String toString() {
-        return "Branch" + splitType + '{' + mbr + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
+        return "Branch" + '{' + mbr + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
     }
 }

@@ -11,22 +11,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-public class TimeMap extends RTree<Task> implements Consumer<Task>, Function<Task,HyperRect> {
+public class TimeMap extends RTree<Task> implements Consumer<Task> {
 
     public TimeMap() {
-
+        super((task) -> new RectDouble2D(task.start(), task.end(), task.hashCode(), task.hashCode()));
     }
 
     public TimeMap(@NotNull NAR n) {
         this();
         n.forEachConceptTask(this, true, true, false, false);
-    }
-
-    @Override
-    public HyperRect apply(Task task) {
-        //return new RectLong1D(task.start(), task.end());
-        int h = task.hashCode();
-        return new RectDouble2D(task.start(), task.end(), h, h);
     }
 
     @Override

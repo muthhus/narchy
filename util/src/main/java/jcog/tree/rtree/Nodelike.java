@@ -6,5 +6,5 @@ public interface Nodelike<T> {
      */
     void reportSizeDelta(int i);
 
-    boolean contains(T t);
+    boolean contains(T t, RTreeModel<T> model);
 }
