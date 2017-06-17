@@ -43,10 +43,10 @@ public final class STMTemporalLinkage extends STM {
         this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
 
-        stm = new DisruptorBlockingQueue<>(capacity);
-        for (int i = 0; i < capacity; i++) {
-            stm.add(null);
-        }
+        stm = new DisruptorBlockingQueue<>(capacity+1 /* extra slot for good measure */);
+        for (int i = 0; i < capacity+1; i++)
+            stm.add(null); //fill with nulls initially
+
 
     }
 

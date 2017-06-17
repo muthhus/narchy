@@ -47,7 +47,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         Default n = new Default(
                 new Default.DefaultTermIndex(512, new DefaultConceptBuilder()),
-                new CycleTime(), new TaskExecutor(64, 0.5f));
+                new CycleTime(), new TaskExecutor(64, 0.25f));
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -89,7 +89,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */, 64, 64, 2, 5);
+                /* TODO */, 64, 64, 1, 3);
 
 
         SpaceGraph<Term> s = new SpaceGraph(
@@ -106,7 +106,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //                            }
 //                        }
 
-                        new Flatten()
+                        //new Flatten()
 //                        new Flatten() {
 //                            protected void locate(SimpleSpatial s, v3 f) {
 //                                f.set(s.x(), s.y(), 10 - ((Term) (s.key)).volume() * 1);
@@ -161,9 +161,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        for (int i = 1; i < 24; i++)
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
-        new DeductiveMeshTest(n, new int[]{5, 5}, 16384);
+        new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
 
-        n.startFPS(1f).join();
+        n.startFPS(15f).join();
 
 
         //n.input("(a-->b).", "(b-->c).","(c-->d).");

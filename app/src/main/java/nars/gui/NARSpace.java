@@ -47,7 +47,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
     @Override
     public boolean animate(float dt) {
 
-            updateIfNotBusy(this::update);
+            updateIfNotBusy(this::render);
 
 
         return true;
@@ -81,7 +81,7 @@ public abstract class NARSpace<X extends Term, Y extends Spatial<X>> extends Lis
 
 
     /** swap buffers */
-    protected void update() {
+    protected void render() {
 
         List<Y> prev = this.active;
         prev.forEach(Active::deactivate);
