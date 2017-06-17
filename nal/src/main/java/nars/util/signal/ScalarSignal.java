@@ -55,7 +55,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
 
-        this.lastInputTime = n.time() - 1;
+        this.lastInputTime = n.time();
 
         this.currentValue = Float.NaN;
     }
