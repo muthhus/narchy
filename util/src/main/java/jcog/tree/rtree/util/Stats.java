@@ -20,7 +20,7 @@ package jcog.tree.rtree.util;
  * #L%
  */
 
-import jcog.tree.rtree.RTree;
+import jcog.tree.rtree.RTreeModel;
 
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ public class Stats {
     private final int[] entriesAtDepth = new int[MAX_DEPTH];
     private final int[] branchesAtDepth = new int[MAX_DEPTH];
     private final int[] leavesAtDepth = new int[MAX_DEPTH];
-    private RTree.Split type;
+    private RTreeModel type;
     private int maxFill;
     private int minFill;
     private int maxDepth;
@@ -73,11 +73,11 @@ public class Stats {
         return (getEntriesPerLeaf() * 100) / maxFill;
     }
 
-    public RTree.Split getType() {
+    public RTreeModel getType() {
         return type;
     }
 
-    public void setType(RTree.Split type) {
+    public void setType(RTreeModel type) {
         this.type = type;
     }
 

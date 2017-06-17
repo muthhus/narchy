@@ -33,7 +33,7 @@ public class Rect1DTest {
         final int entryCount = 20;
 
         //for (RTree.Split type : RTree.Split.values()) {
-            RTree<Double> t = new RTree<>((x) -> new RectDouble1D.DefaultRect1D(x, x), 2, 3, RTree.Split.LINEAR);
+            RTree<Double> t = new RTree<>((x) -> new RectDouble1D.DefaultRect1D(x, x), 2, 3, RTreeModel.DefaultSplits.LINEAR);
             for (int i = 0; i < entryCount; i++) {
                 t.add((double)(i*i));
             }

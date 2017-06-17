@@ -25,7 +25,7 @@ public class RTreeNDTest {
     @Test
     public void pointSearchTest() {
 
-        final RTree<Double2D> pTree = new RTree<>(new Double2D.Builder(), 2, 8, RTree.Split.AXIAL);
+        final RTree<Double2D> pTree = new RTree<>(new Double2D.Builder(), 2, 8, RTreeModel.DefaultSplits.AXIAL);
 
         for (int i = 0; i < 10; i++) {
             pTree.add(new Double2D(i, i));
@@ -57,7 +57,7 @@ public class RTreeNDTest {
 
         System.out.println("rectNDSearchTest2");
 
-        for (RTree.Split type : RTree.Split.values()) {
+        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
             RTree<RectFloatND> rTree = RTree2DTest.createRectNDTree(2, 8, type);
             for (int i = 0; i < entryCount; i++) {
                 rTree.add(new RectFloatND(new FloatND(i, i), new FloatND(i + 3, i + 3)));
@@ -117,7 +117,7 @@ public class RTreeNDTest {
 
             System.out.println("\tRectNDSearchAllTest[dim=" + dim + ']');
 
-            for (RTree.Split type : RTree.Split.values()) {
+            for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
                 RTree<RectFloatND> rTree = RTree2DTest.createRectNDTree(2, 8, type);
                 for (int i = 0; i < rects.length; i++) {
                     rTree.add(rects[i]);
@@ -171,7 +171,7 @@ public class RTreeNDTest {
 
         final int entryCount = 20;
 
-        for (RTree.Split type : RTree.Split.values()) {
+        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRectDouble2DTree(2, 8, type);
             for (int i = 0; i < entryCount; i++) {
                 rTree.add(new RectDouble2D(i, i, i + 3, i + 3));
@@ -213,7 +213,7 @@ public class RTreeNDTest {
 
         final int entryCount = 20;
 
-        for (RTree.Split type : RTree.Split.values()) {
+        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRectDouble2DTree(2, 8, type);
             for (int i = 0; i < entryCount; i++) {
                 rTree.add(new RectDouble2D(i, i, i + 3, i + 3));
@@ -277,7 +277,7 @@ public class RTreeNDTest {
         final int entryCount = 1000;
         final RectDouble2D[] rects = generateRandomRects(entryCount);
 
-        for (RTree.Split type : RTree.Split.values()) {
+        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRectDouble2DTree(2, 8, type);
             for (int i = 0; i < rects.length; i++) {
                 rTree.add(rects[i]);
@@ -318,7 +318,7 @@ public class RTreeNDTest {
         final int entryCount = 50_000;
 
         final RectDouble2D[] rects = generateRandomRects(entryCount);
-        for (RTree.Split type : RTree.Split.values()) {
+        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRectDouble2DTree(2, 8, type);
             for (int i = 0; i < rects.length; i++) {
                 rTree.add(rects[i]);
@@ -346,7 +346,7 @@ public class RTreeNDTest {
         final RectDouble2D[] rects = generateRandomRects(entryCount);
 
         for (int j = 0; j < 6; j++) {
-            for (RTree.Split type : RTree.Split.values()) {
+            for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
                 RTree<RectDouble2D> rTree = createRectDouble2DTree(2, 12, type);
                 for (int i = 0; i < rects.length; i++) {
                     rTree.add(rects[i]);
@@ -371,7 +371,7 @@ public class RTreeNDTest {
 
     @Test
     public void treeContainsTest() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         final RectDouble2D[] rects = new RectDouble2D[5];
         for (int i = 0; i < rects.length; i++) {
@@ -390,7 +390,7 @@ public class RTreeNDTest {
 
     @Test
     public void treeRemovalTest5Entries() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         final RectDouble2D[] rects = new RectDouble2D[5];
         for (int i = 0; i < rects.length; i++) {
@@ -422,7 +422,7 @@ public class RTreeNDTest {
 
         final int NENTRY = 500;
 
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         for (int i = 0; i < NENTRY; i++) {
             final RectDouble2D rect = new RectDouble2D(i, i, i + 1, i + 1);
@@ -438,7 +438,7 @@ public class RTreeNDTest {
 
         final int NENTRY = 50;
 
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         final RectDouble2D[] rect = new RectDouble2D[2];
         for (int i = 0; i < rect.length; i++) {
@@ -465,7 +465,7 @@ public class RTreeNDTest {
 
     @Test
     public void treeRemovalTest1000Entries() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         int N = 1000;
         final RectDouble2D[] rect = new RectDouble2D[N];
@@ -492,7 +492,7 @@ public class RTreeNDTest {
 
     @Test
     public void treeSingleRemovalTest() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         RectDouble2D rect = new RectDouble2D(0, 0, 2, 2);
         rTree.add(rect);
@@ -506,7 +506,7 @@ public class RTreeNDTest {
     @Ignore
     // This test ignored because output needs to be manually evaluated.
     public void treeRemoveAndRebalanceTest() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         RectDouble2D[] rect = new RectDouble2D[65];
         for (int i = 0; i < rect.length; i++) {
@@ -558,7 +558,7 @@ public class RTreeNDTest {
 
     @Test
     public void treeUpdateTest() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(RTreeModel.DefaultSplits.QUADRATIC);
 
         RectDouble2D rect = new RectDouble2D(0, 1, 2, 3);
         rTree.add(rect);
@@ -571,17 +571,17 @@ public class RTreeNDTest {
         System.out.print(results[0]);
     }
 
-    static RTree<RectDouble2D> createRectDouble2DTree(RTree.Split splitType) {
+    static RTree<RectDouble2D> createRectDouble2DTree(RTreeModel.DefaultSplits splitType) {
         return createRectDouble2DTree(2, 8, splitType);
     }
 
-    static RTree<RectDouble2D> createRectDouble2DTree(int minM, int maxM, RTree.Split splitType) {
+    static RTree<RectDouble2D> createRectDouble2DTree(int minM, int maxM, RTreeModel.DefaultSplits splitType) {
         return new RTree<>(new RectDouble2D.Builder(), minM, maxM, splitType);
     }
 
     @Test
     @Ignore public void testAddsubtreeWithSideTree() {
-        final RTree<RectDouble2D> rTree = createRectDouble2DTree(3, 6, RTree.Split.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRectDouble2DTree(3, 6, RTreeModel.DefaultSplits.QUADRATIC);
 
         final RectDouble2D search;
 

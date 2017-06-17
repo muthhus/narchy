@@ -21,9 +21,6 @@ package jcog.tree.rtree;
  */
 
 
-import jcog.tree.rtree.split.AxialSplitLeaf;
-import jcog.tree.rtree.split.LinearSplitLeaf;
-import jcog.tree.rtree.split.QuadraticSplitLeaf;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
@@ -54,10 +51,10 @@ public class RTree<T> implements Spatialized<T> {
 
 
     public RTree(@Nullable final Function<T, HyperRect> spatialize) {
-        this(spatialize, 2, 8, Split.AXIAL);
+        this(spatialize, 2, 8, RTreeModel.DefaultSplits.AXIAL);
     }
 
-    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
+    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final RTreeModel.DefaultSplits splitType) {
         this(new RTreeModel<>(spatialize, splitType, mMin, mMax));
     }
 
@@ -202,7 +199,7 @@ public class RTree<T> implements Spatialized<T> {
     @Override
     public Stats stats() {
         Stats stats = new Stats();
-        stats.setType(model.splitType);
+        stats.setType(model);
         stats.setMaxFill(model.max);
         stats.setMinFill(model.min);
         root.collectStats(stats, 0);
@@ -230,34 +227,4 @@ public class RTree<T> implements Spatialized<T> {
     }
 
 
-    /**
-     * Different methods for splitting nodes in an RTree.
-     * AXIAL has been shown to give the best performance and should be used
-     * in the AdServer
-     * <p>
-     * Created by ewhite on 10/28/15.
-     */
-    public enum Split {
-        AXIAL {
-            @Override
-            public <R> Node<R> newLeaf(int cap) {
-                return new AxialSplitLeaf<>(cap);
-            }
-        },
-        LINEAR {
-            @Override
-            public <R> Node<R> newLeaf(int cap) {
-                return new LinearSplitLeaf<>(cap);
-            }
-        },
-        QUADRATIC {
-            @Override
-            public <R> Node<R> newLeaf(int cap) {
-                return new QuadraticSplitLeaf<>(cap);
-            }
-        },;
-
-        abstract public <R> Node<R> newLeaf(int cap);
-
-    }
 }

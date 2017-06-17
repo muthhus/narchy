@@ -27,15 +27,10 @@ import jcog.tree.rtree.*;
  * <p>
  * Created by jcairns on 5/5/15.
  */
-public final class QuadraticSplitLeaf<T> extends Leaf<T> {
-
-    public QuadraticSplitLeaf(int cap) {
-        super(cap);
-    }
-
+public final class QuadraticSplitLeaf<T> implements Split<T> {
 
     @Override
-    protected Node<T> split(final T t, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
 
         final Branch<T> pNode = model.newBranch();
 
@@ -44,7 +39,9 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
 
         // find the two rectangles that are most wasteful
         double minCost = Double.MIN_VALUE;
+        short size = leaf.size;
         int r1Max = 0, r2Max = size - 1;
+        T[] data = leaf.data;
         for (int i = 0; i < size; i++) {
             HyperRect ii = model.builder.apply(data[i]);
             for (int j = i + 1; j < size; j++) {
@@ -60,17 +57,17 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(data[r1Max], this, model);
-        l2Node.add(data[r2Max], this, model);
+        l1Node.add(data[r1Max], leaf, model);
+        l2Node.add(data[r2Max], leaf, model);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Max) && (i != r2Max)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, data[i], model);
+                leaf.classify(l1Node, l2Node, data[i], model);
             }
         }
 
-        classify(l1Node, l2Node, t, model);
+        leaf.classify(l1Node, l2Node, t, model);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);

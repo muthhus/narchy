@@ -32,7 +32,7 @@ import java.util.Random;
  */
 public class QuadraticSplitLeafTest {
 
-    private static final RTree.Split TYPE = RTree.Split.QUADRATIC;
+    private static final RTreeModel.DefaultSplits TYPE = RTreeModel.DefaultSplits.QUADRATIC;
 
     /**
      * Adds enough entries to force a single split and confirms that

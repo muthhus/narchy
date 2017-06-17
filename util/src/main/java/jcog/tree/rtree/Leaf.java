@@ -33,12 +33,12 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public abstract class Leaf<T> implements Node<T> {
+public class Leaf<T> implements Node<T> {
 
 
-    protected final T[] data;
-    protected short size;
-    protected HyperRect bounds;
+    public final T[] data;
+    public short size;
+    public HyperRect bounds;
 
     protected Leaf(int mMax) {
         this.bounds = null;
@@ -60,7 +60,7 @@ public abstract class Leaf<T> implements Node<T> {
 
                 next = this;
             } else {
-                next = split(t, model);
+                next = model.split(t, this);
             }
             parent.reportSizeDelta(+1);
 
@@ -180,15 +180,6 @@ public abstract class Leaf<T> implements Node<T> {
         return bounds;
     }
 
-    /**
-     * Splits a lead node that has the maximum number of entries into 2 leaf nodes of the same type with half
-     * of the entries in each one.
-     *
-     * @param t entry to be added to the full leaf node
-     * @param model
-     * @return newly created node storing half the entries of this node
-     */
-    protected abstract Node<T> split(final T t, RTreeModel<T> model);
 
     @Override
     public void forEach(Consumer<? super T> consumer) {
@@ -225,7 +216,7 @@ public abstract class Leaf<T> implements Node<T> {
      * @param t      data entry to be added
      * @param model
      */
-    protected final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, RTreeModel<T> model) {
+    public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, RTreeModel<T> model) {
 
         final HyperRect tRect = model.builder.apply(t);
         final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);

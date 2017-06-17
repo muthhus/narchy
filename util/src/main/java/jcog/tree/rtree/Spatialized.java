@@ -33,7 +33,7 @@ public interface Spatialized<T> extends Nodelike<T> {
 
     int DEFAULT_MIN_M = 2;
     int DEFAULT_MAX_M = 8;
-    RTree.Split DEFAULT_SPLIT_TYPE = RTree.Split.AXIAL;
+    RTreeModel.DefaultSplits DEFAULT_SPLIT_TYPE = RTreeModel.DefaultSplits.AXIAL;
 
     /**
      * Create an R-Tree with default values for m, M, and split type
@@ -56,7 +56,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param <T>       - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Spatialized<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final RTree.Split splitType) {
+    static <T> Spatialized<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final RTreeModel.DefaultSplits splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
 //

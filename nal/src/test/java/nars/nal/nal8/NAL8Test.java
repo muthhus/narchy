@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 1400;
+    final int cycles = 2400;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -776,7 +776,8 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(x)", Tense.Present, 1f, 0.9f)
                 .believe("((x)==>+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
-                .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
+                .mustDesire(cycles, "(y)", 1f, 0.66f, ETERNAL)
+                ;
     }
 
     @Test public void testGoalConjunctionDecompose() {

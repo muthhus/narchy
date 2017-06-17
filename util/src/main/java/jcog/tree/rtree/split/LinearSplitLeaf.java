@@ -27,14 +27,10 @@ import jcog.tree.rtree.*;
  * <p>
  * Created by jcairns on 5/5/15.
  */
-public final class LinearSplitLeaf<T> extends Leaf<T> {
-
-    public LinearSplitLeaf(int cap) {
-        super(cap);
-    }
+public final class LinearSplitLeaf<T> implements Split<T> {
 
     @Override
-    protected Node<T> split(final T t, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
         final Branch<T> pNode = model.newBranch();
         final Node<T> l1Node = model.newLeaf();
         final Node<T> l2Node = model.newLeaf();
@@ -42,17 +38,20 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
         final int MIN = 0;
         final int MAX = 1;
         final int NRANGE = 2;
+        T[] data = leaf.data;
         final int nD = model.builder.apply(data[0]).dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double[] separation = new double[nD];
 
+        short size = leaf.size;
         for (int d = 0; d < nD; d++) {
 
 //            rIndex[d][MIN][MIN] = 0;
 //            rIndex[d][MIN][MAX] = 0;
 //            rIndex[d][MAX][MIN] = 0;
 //            rIndex[d][MAX][MAX] = 0;
+
 
             for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
@@ -101,21 +100,23 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
         }
 
         // two seeds
-        l1Node.add(data[r1Ext], this, model);
-        l2Node.add(data[r2Ext], this, model);
+        l1Node.add(data[r1Ext], leaf, model);
+        l2Node.add(data[r2Ext], leaf, model);
 
         for (int i = 0; i < size; i++) {
             if ((i != r1Ext) && (i != r2Ext)) {
                 // classify with respect to nodes
-                classify(l1Node, l2Node, data[i], model);
+                leaf.classify(l1Node, l2Node, data[i], model);
             }
         }
 
-        classify(l1Node, l2Node, t, model);
+        leaf.classify(l1Node, l2Node, t, model);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);
 
         return pNode;
     }
+
+
 }

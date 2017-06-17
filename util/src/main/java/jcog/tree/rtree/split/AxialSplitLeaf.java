@@ -32,24 +32,21 @@ import java.util.Comparator;
  * <p>
  * Created by jcairns on 5/5/15.
  */
-public final class AxialSplitLeaf<T> extends Leaf<T> {
+public final class AxialSplitLeaf<T> implements Split<T> {
 
-    public AxialSplitLeaf(int cap) {
-        super(cap);
-    }
 
     @Override
-    protected Node<T> split(final T t, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
         final Branch<T> pNode = model.newBranch();
 
-        final int nD = model.builder.apply(data[0]).dim(); //TODO builder.dim()
+        final int nD = model.builder.apply(leaf.data[0]).dim(); //TODO builder.dim()
 
         // choose axis to split
         int axis = 0;
-        double rangeD = bounds.getRange(0);
+        double rangeD = leaf.bounds.getRange(0);
         for (int d = 1; d < nD; d++) {
             // split along the greatest range extent
-            final double dr = bounds.getRangeFinite(d, 0);
+            final double dr = leaf.bounds.getRangeFinite(d, 0);
             if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;
@@ -58,17 +55,19 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
         // sort along split dimension
         final int splitDimension = axis;
-        final HyperRect[] sortedMbr = HyperRect.toArray(data, size, model.builder);
+
+        short size = leaf.size;
+        final HyperRect[] sortedMbr = HyperRect.toArray(leaf.data, size, model.builder);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
         final Node<T> l1Node = model.newLeaf();
-        transfer(sortedMbr, l1Node, 0, size / 2, model);
+        transfer(leaf, sortedMbr, l1Node, 0, size / 2, model);
 
         final Node<T> l2Node = model.newLeaf();
-        transfer(sortedMbr, l2Node, size / 2, size, model);
+        transfer(leaf, sortedMbr, l2Node, size / 2, size, model);
 
-        classify(l1Node, l2Node, t, model);
+        leaf.classify(l1Node, l2Node, t, model);
 
         pNode.addChild(l1Node);
         pNode.addChild(l2Node);
@@ -77,23 +76,24 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
     }
 
 
-    private void transfer(HyperRect[] sortedSrc, Node<T> target, int from, int to, RTreeModel<T> model) {
+    private static <T> void transfer(Leaf<T> leaf, HyperRect[] sortedSrc, Node<T> target, int from, int to, RTreeModel<T> model) {
 
-        for (int j = 0; j < size; j++) {
-            T jd = data[j];
+        for (int j = 0; j < leaf.size; j++) {
+            T jd = leaf.data[j];
             HyperRect jr = model.builder.apply(jd);
 
             for (int i = from; i < to; i++) {
                 HyperRect si = sortedSrc[i];
 
                 if (si!=null && jr.equals(si)) {
-                    target.add(jd, this, model);
+                    target.add(jd, leaf, model);
                     sortedSrc[i] = null;
                     break;
                 }
             }
         }
-        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + " " + Arrays.toString(data) + " -> " + Arrays.toString(sortedSrc);
+        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + " " + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
     }
+
 
 }

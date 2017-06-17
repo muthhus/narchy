@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static jcog.Util.unitize;
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * prioritizes derivations exhibiting polarization (confident and discerning)
@@ -75,7 +77,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 //                 polarity.floatValue()   * truth.polarization();
         } else {
             //p *= complexityFactorAbsolute(conclusion, punc, d.task, d.belief);
-            p *= (simplicityFactor * simplicityFactor * simplicityFactor);
+            p *= (simplicityFactor); // * simplicityFactor * simplicityFactor);
         }
 
 //        p *= puncFactor(punc).floatValue();
@@ -113,7 +115,13 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
      * @return a value between 0 and 1 that priority will be scaled by
      */
     public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, @NotNull Term belief) {
-        float premCmp = task.complexity() + belief.complexity();
+        float premCmp =
+                punc==BELIEF || punc==GOAL ?
+                        task.complexity() + belief.complexity()
+                        :
+                        Math.max(task.complexity(), belief.complexity()) //questions, more strict
+                    ;
+
         float concCmp = conclusion.complexity();
         return (premCmp/(premCmp + concCmp));
         //controls complexity decay rate

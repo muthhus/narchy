@@ -1,10 +1,7 @@
 package nars.table;
 
 import jcog.list.LimitedFasterList;
-import jcog.tree.rtree.HyperRect;
-import jcog.tree.rtree.LockingRTree;
-import jcog.tree.rtree.RTree;
-import jcog.tree.rtree.Spatialized;
+import jcog.tree.rtree.*;
 import jcog.tree.rtree.point.Long1D;
 import jcog.tree.rtree.rect.RectLong1D;
 import nars.$;
@@ -33,7 +30,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     public RTreeBeliefTable() {
         this.tree = new LockingRTree<Task>(
-                new RTree(this, 2,8, RTree.Split.LINEAR),
+                new RTree(this, 2,8, RTreeModel.DefaultSplits.LINEAR),
                 new ReentrantReadWriteLock(false));
     }
     public RTreeBeliefTable(int cap) {
