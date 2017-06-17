@@ -17,6 +17,9 @@ import static nars.Op.*;
 public abstract class Param  {
 
 
+    /** belief projection lookahead time in premise formation, in multiples of duration */
+    public static final int PREDICTION_HORIZON = 16;
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.

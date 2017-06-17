@@ -180,7 +180,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
             return task.nearestStartOrEnd(now);
         } else {
             if (task.isBelief()) {
-                return now + nar.dur() * nar.random().nextInt( 4); //predictive belief
+                return now + nar.dur() * nar.random().nextInt(Param.PREDICTION_HORIZON); //predictive belief
             } else {
                 return Math.max(now, task.start()); //the corresponding belief for a goal or question task
             }

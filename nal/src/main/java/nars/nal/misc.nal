@@ -178,10 +178,13 @@
     X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
     X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)
 
+    X, (Y==>X), task("!") |-          Y, (Punctuation:Quest)
+    X, (X==>Y), task("!") |-          Y, (Punctuation:Quest)
+    X, (Y<=>X), task("!") |-          Y, (Punctuation:Quest)
+    X,  (X&&Y), task("!") |-          Y, (Punctuation:Quest)
 
-//query-variable queston answering HACK currently this is done better in PremiseGeneration, not here. but this sort of works
-//  A, B, task("?") |- subIfUnifiesQuery(B, A, B), (Belief:BeliefIdentity, Punctuation:Belief)
-
+    //question the precondition state
+    X, (Y==>X), task("!") |-          Y, (Punctuation:Question)
 
 
 //WASTEPAPER ===
