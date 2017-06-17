@@ -27,7 +27,7 @@ public interface NARBuilder {
     static NARS newMultiThreadNAR(int threads, Time clock) {
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
-        NARS n = new NARS(clock, new XorShift128PlusRandom(), 2);
+        NARS n = new NARS(clock, new XorShift128PlusRandom(), 1);
 
 //        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
 //        conceptState.beliefsMaxTemp.set(32);
@@ -38,7 +38,7 @@ public interface NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.75f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
@@ -47,13 +47,13 @@ public interface NARBuilder {
         n.DEFAULT_QUEST_PRIORITY = 1;
         n.termVolumeMax.setValue(40);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, false);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3, true);
         MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 5, true, 32f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 0.1f);
+            n.addNAR(512, 0.25f);
         }
 
 //        n.onTask(t -> {

@@ -19,7 +19,6 @@ import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.GeneratedTask;
 import nars.task.ITask;
-import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -107,10 +106,9 @@ abstract public class NAgent implements NSense, NAct {
      * range: -1..+1
      */
     public float reward;
-    private Loop senseAndMotorLoop;
-    private Loop predictLoop;
+    private Loop loop;
     final private ConceptFire fireHappy;
-    private float lastDexterity;
+
 
 
     public NAgent(@NotNull NAR nar) {
@@ -184,7 +182,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public void stop() {
-        nar.stop();
+        nar.stop(); loop = null;
     }
 
     /**
@@ -252,11 +250,14 @@ abstract public class NAgent implements NSense, NAct {
 
             //contribution of this agent to the NAR's global happiness measurement
             //nar.emotion.happy(reward);
-            float dxm = c2w(dexterity());
-            nar.emotion.happy(
-                    Math.signum(dxm - lastDexterity) *
-                            (float) Math.pow( Math.abs(dxm - lastDexterity), 1/8f));
-            this.lastDexterity = dxm;
+
+            nar.emotion.happy((float) Math.sqrt(dexterity()));
+
+//              float dxm = c2w(dexterity());
+//            nar.emotion.happy(
+//                    Math.signum(dxm - lastDexterity) *
+//                            (float) Math.sqrt( Math.abs(dxm - lastDexterity) ));
+//            this.lastDexterity = dxm;
 
             motor.input(actions.stream().flatMap(a -> a.apply(nar)));
             //motor.input(curious(next), nar::input);
@@ -543,7 +544,7 @@ abstract public class NAgent implements NSense, NAct {
 
         NARLoop loop = nar.startFPS(fps);
 
-        this.senseAndMotorLoop = nar.exe.loop(fps,()->{
+        this.loop = nar.exe.loop(fps,()->{
             if (enabled.get()) {
                 this.now = nar.time();
                 senseAndMotor();
@@ -551,6 +552,10 @@ abstract public class NAgent implements NSense, NAct {
             }
         });
 
+        return loop;
+    }
+
+    public Loop running() {
         return loop;
     }
 

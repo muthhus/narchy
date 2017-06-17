@@ -13,7 +13,7 @@ public class MultiHaiQMixAgent implements MixAgent {
 
     final boolean controlRelative = false;
 
-    final int controlResolution = controlRelative ? 9 : 2;
+    final int controlResolution = controlRelative ? 9 : 4;
     final float controlGranularity = 1.0f / (controlResolution);
 
     /**

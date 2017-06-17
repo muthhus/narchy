@@ -21,10 +21,11 @@ public class HaiQAgent extends HaiQ {
     final BiFunction<Integer,Integer,Integer> numStates;
     float perceptionAlpha;
     float perceptionNoise = 0f;
-    float perceptionCorruption = 0.1f;
+    float perceptionCorruption = 0.05f;
     float perceptionForget = 0.0f;
     public FloatSupplier perceptionError;
     public float lastPerceptionError = 0;
+    private int states;
 
     //float aeForget = 1f;
 
@@ -51,9 +52,12 @@ public class HaiQAgent extends HaiQ {
 
     protected void start(int inputs, int states, int outputs) {
         //logger.info("start {} -> {} -> {}", inputs, states, outputs);
-        this.perceptionAlpha = 0.5f/(inputs);
+        this.perceptionAlpha =
+                //1f/(inputs);
+                0.1f;
         this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs/2);
         ae = perception(inputs, states);
+        this.states = states;
         super.start(states, outputs);
     }
 
@@ -86,10 +90,18 @@ public class HaiQAgent extends HaiQ {
     }
 
     protected int act(float reward, float[] input, float pErr) {
-        float learningRate = 1f / (1f + pErr);
-        int a = learn(perceive(input), reward, learningRate, true);
+        //float learningRate = 1f / (1f + pErr);
+        float learningRate = 1f - (pErr); //pErr/states is more lenient
+        if (learningRate > 0) {
+            //System.out.println(learningRate + "  "+ pErr);
+            int a = learn(perceive(input), reward, learningRate, true);
+            return a;
+        } else {
+            perceive(input); //perceive only
+            return rng.nextInt(actions);
+        }
 
-        return a;
+
     }
 
 //		@Override

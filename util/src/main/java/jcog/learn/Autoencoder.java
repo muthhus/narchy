@@ -263,7 +263,7 @@ public class Autoencoder {
 		return put(x, y, learningRate);
 	}
 
-	/** returns the total error (not sqr(error) and not avg_error = error sum divided by # items) */
+	/** returns the total error across all outputs */
 	float put(float[] x, float[] y, float learningRate) {
 		float[][] W = this.W;
 		float[] L_hbias = this.L_hbias;
@@ -276,24 +276,18 @@ public class Autoencoder {
 
 		float error = 0;
 
-		float[] zz = z;
+		float[] z = this.z;
 
 		// vbias
 		for (int i = 0; i < ins; i++) {
 
-			float lv = x[i] - zz[i];
+			float delta = x[i] - z[i];
 
-			error += Math.abs(lv);
+			error += Math.abs(delta);
 
-			L_vbias[i] = lv;
-
-			//errorSq += lv * lv; // square of difference
-
-			vbias[i] += learningRate * lv;
+			L_vbias[i] = delta;
+			vbias[i] += learningRate * delta;
 		}
-
-		//error /= ins;
-
 
 		float[] hbias = this.hbias;
 

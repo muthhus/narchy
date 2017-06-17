@@ -110,7 +110,11 @@ abstract public class NAgentX extends NAgent {
         //a.trace = true;
 
 
-        a.startRT(fps, endTime);
+        NARLoop narLoop = a.startRT(fps, endTime);
+        n.onCycle(nn->{
+           float lag = narLoop.lagSumThenClear()  + a.running().lagSumThenClear();
+           n.emotion.happy(-lag);
+        });
 
         chart(a);
         chart(n, a);
@@ -122,6 +126,9 @@ abstract public class NAgentX extends NAgent {
                 mixPlot(a, m, HISTORY),
 
                 col(
+                        new Plot2D(HISTORY, Plot2D.Line)
+                                .add("lag", () -> narLoop.lag())
+                                .on(a::onFrame),
                         new Plot2D(HISTORY, Plot2D.Line)
                                 .add("happy", () -> m.lastScore)
                                 .on(a::onFrame),

@@ -1377,6 +1377,19 @@ public enum Util {
     }
 
 
+    /** semi-busy wait loop */
+    public static void stall(int delayMS) {
+        stall(System.currentTimeMillis(), delayMS);
+    }
+
+    public static void stall(long start, int delayMS) {
+        long end = start + delayMS;
+        int pauseCount = 0;
+        do {
+            pauseNext(pauseCount++);
+        } while (System.currentTimeMillis() < end);
+    }
+
     /**
      * adaptive spinlock behavior
      */
@@ -1418,7 +1431,7 @@ public enum Util {
     }
 
     public static boolean sleep(long periodMS) {
-        if (periodMS <= 0) {
+        if (periodMS < 0) {
             Thread.yield();
         } else {
             try {

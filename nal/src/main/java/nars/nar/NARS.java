@@ -17,6 +17,7 @@ import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.index.term.HijackTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.time.Time;
@@ -56,8 +57,8 @@ public class NARS extends NAR {
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                //new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
+                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
                 rng, e);
     }
 
@@ -68,7 +69,7 @@ public class NARS extends NAR {
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
 
-                FloatAveraged.averaged(emotion.happy.sumIntegrator()::meanThenClear, 2),
+                FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
 
                 10,
 
@@ -160,6 +161,7 @@ public class NARS extends NAR {
         }
     }
 
+
     private static class RootExecutioner extends Executioner implements Runnable {
 
         private final int passiveThreads;
@@ -206,24 +208,25 @@ public class NARS extends NAR {
             if (!busy.compareAndSet(false, true))
                 return; //already in the cycle
 
+            try {
 
-            if (lastCycle != null) {
-                //System.out.println(lastCycle + " " + lastCycle.isDone());
-                if (!lastCycle.isDone()) {
-                    //long start = System.currentTimeMillis();
-                    lastCycle.join(); //wait for lastCycle's to finish
-                    //long end = System.currentTimeMillis();
-                    //System.out.println("cycle lag: " + (end - start) + "ms");
+                if (lastCycle != null) {
+                    //System.out.println(lastCycle + " " + lastCycle.isDone());
+                    if (!lastCycle.isDone()) {
+                        //long start = System.currentTimeMillis();
+                        lastCycle.join(); //wait for lastCycle's to finish
+                        //System.out.println("cycle lag: " + (System.currentTimeMillis() - start) + "ms");
+                    }
+
+                    lastCycle.reinitialize();
+                    passive.execute(lastCycle);
+
+                } else {
+                    lastCycle = passive.submit(this);
                 }
-
-                lastCycle.reinitialize();
-                passive.execute(lastCycle);
-
-            } else {
-                lastCycle = passive.submit(this);
+            } finally {
+                busy.set(false);
             }
-
-            busy.set(false);
         }
 
         /**

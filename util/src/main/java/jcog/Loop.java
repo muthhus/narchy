@@ -19,6 +19,8 @@ abstract public class Loop implements Runnable {
 
     protected final int windowLength = 4;
 
+    private float lag = 0, lagSum = 0;
+
     protected long prevTime;
 
     public final DescriptiveStatistics frameTime = new DescriptiveStatistics(windowLength); //in millisecond
@@ -29,6 +31,7 @@ abstract public class Loop implements Runnable {
      * > 0: delay in milliseconds
      */
     protected final AtomicInteger periodMS = new AtomicInteger(-1);
+
 
     @Override
     public String toString() {
@@ -144,11 +147,16 @@ abstract public class Loop implements Runnable {
                 long afterTime = System.currentTimeMillis();
                 long frameTime = afterTime - beforeTime;
 
+                lagSum += (this.lag = Math.max(0, (frameTime - periodMS) / ((float) periodMS)));
+
+                //System.out.println(getClass() + " " + frameTime + " " + periodMS + " " + lag);
+
                 this.frameTime.addValue(frameTime);
-                Util.sleep( periodMS - ((long) this.frameTime.getMean()));
+
+                Util.sleep((int)( periodMS - ((long) this.frameTime.getMean()) ));
 
             } else {
-                Thread.yield();
+                //Thread.yield();
             }
 
 
@@ -157,6 +165,8 @@ abstract public class Loop implements Runnable {
         stop();
 
         onStop();
+
+        lag = lagSum = 0;
     }
 
 
@@ -178,5 +188,16 @@ abstract public class Loop implements Runnable {
 
     public Thread thread() {
         return thread.get();
+    }
+
+    /** lag in proportion to the current FPS, >= 0 */
+    public float lag() {
+        return lag;
+    }
+
+    public float lagSumThenClear() {
+        float l = lagSum;
+        this.lagSum = 0;
+        return l;
     }
 }
