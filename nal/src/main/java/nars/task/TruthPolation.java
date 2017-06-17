@@ -6,6 +6,10 @@ import nars.truth.PreciseTruth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
+import static nars.truth.TruthFunctions.w2c;
+
 /**
  * Truth Interpolation and Extrapolation of Temporal Beliefs/Goals
  * see:
@@ -47,43 +51,114 @@ public enum TruthPolation {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
-
     /**
-     * returns (freq, evid) pair
+     * computes truth at a given time from iterative task samples
+     * includes variance calculation for reduction of evidence in proportion to confusion/conflict
+     * uses "waldorf method" to calculate a running variance
+     * additionally, the variance is weighted by the contributor's confidences
      */
+    public static class TruthPolationWithVariance implements Consumer<Task> {
+        float eviSum = 0, wFreqSum = 0;
+        float meanSum = 0.5f, deltaSum = 0;
+        int count = 0;
+
+        final long when;
+        final int dur;
+
+        public TruthPolationWithVariance(long when, int dur) {
+            this.when = when;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Task t) {
+             float tw = t.evi(when, dur);
+
+            if (tw > 0) {
+                eviSum += tw;
+
+                float f = t.freq();
+                wFreqSum += tw * f;
+
+                //        double delta = value - tmpMean;
+                //        mean += delta / ++count;
+                //        sSum += delta * (value - mean);
+                float tmpMean = meanSum;
+                float delta = f - tmpMean;
+                meanSum += delta / ++count;
+                deltaSum += delta * (f - meanSum) * w2c(tw); //scale the delta sum by the conf so that not all tasks contribute to the variation equally
+            }
+
+        }
+
+
+        public PreciseTruth truth() {
+            if (eviSum > 0) {
+                float f = wFreqSum / eviSum;
+
+                float var = deltaSum / count;
+
+                return new PreciseTruth(f, eviSum * (1f / (1f + var)), false);
+
+            } else {
+                return null;
+            }
+
+        }
+    }
+
     @Nullable
     public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
-        float[] fe = new float[2];
 
+        TruthPolationWithVariance t = new TruthPolationWithVariance(when, dur);
 
         // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
-        tasks.forEach(t -> {
-
-            float tw = t.evi(when, dur);
-
-            if (tw > 0) {
-                fe[0] += tw;
-                fe[1] += tw * t.freq();
-            }
-
-        });
-        float evidence = fe[0];
-        float freqEvi = fe[1];
-
+        tasks.forEach(t);
         if (topEternal != null) {
-            float ew = topEternal.evi();
-            evidence += ew;
-            freqEvi += ew * topEternal.freq();
+            t.accept(topEternal);
         }
 
-        if (evidence > 0) {
-            float f = freqEvi / evidence;
-            return new PreciseTruth(f, evidence, false);
-        } else {
-            return null;
-        }
+        return t.truth();
     }
+
+//    /**
+//     * returns (freq, evid) pair
+//     */
+//    @Nullable
+//    public static PreciseTruth truthRaw(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
+//
+//        float[] fe = new float[2];
+//
+//
+//        // Contribution of each task's truth
+//        // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
+//        tasks.forEach(t -> {
+//
+//            float tw = t.evi(when, dur);
+//
+//            if (tw > 0) {
+//                freqSum += tw;
+//                wFreqSum += tw * t.freq();
+//            }
+//
+//        });
+//        float evidence = freqSum;
+//        float freqEvi = wFreqSum;
+//
+//        if (topEternal != null) {
+//            float ew = topEternal.evi();
+//            evidence += ew;
+//            freqEvi += ew * topEternal.freq();
+//        }
+//
+//        if (evidence > 0) {
+//            float f = freqEvi / evidence;
+//            return new PreciseTruth(f, evidence, false);
+//        } else {
+//            return null;
+//        }
+//    }
 
 }
