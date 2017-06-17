@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.list.LimitedFasterList;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.LockingRTree;
 import jcog.tree.rtree.RTree;
@@ -32,7 +33,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     public RTreeBeliefTable() {
         this.tree = new LockingRTree<Task>(
-                new RTree(this), new ReentrantReadWriteLock(false));
+                new RTree(this, 2,8, RTree.Split.LINEAR),
+                new ReentrantReadWriteLock(false));
     }
     public RTreeBeliefTable(int cap) {
         this();
@@ -43,16 +45,20 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
-        return null;
-    }
 
-    @Override
-    public HyperRect<Long1D> apply(Task task) {
-        return !task.isInput() ? new RectLong1D(task.start(), task.end()) : new RectLong1D(task.start(), task.start());
+        //HACK
+        int window = 8;
+        long radius = dur * window;
+        LimitedFasterList<Task> m = new LimitedFasterList(8);
+        tree.intersecting(new RectLong1D(when- radius, when+radius), (t) -> m.add(t) );
+        if (!m.isEmpty())
+            return m.get(0);
+        else
+            return null;
     }
-
-    @Override
+      @Override
     public Truth truth(long when, int dur, EternalTable eternal) {
+        //HACK
         List<Task> tt = $.newArrayList(2);
         tree.intersecting(new RectLong1D(when - dur * 4, when + dur * 4), tt::add);
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
@@ -63,30 +69,35 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     }
 
     @Override
+    public HyperRect<Long1D> apply(Task task) {
+        return !task.isInput() ? new RectLong1D(task.start(), task.end()) : new RectLong1D(task.start(), task.start());
+    }
+
+    @Override
     public void setCapacity(int capacity) {
         this.capacity = capacity;
-        //TODO compression
+        //TODO compress on shrink
     }
 
     @Override
     public void add(@NotNull Task t, TaskConcept c, NAR n) {
+        float activation = t.priElseZero();;
+        if (activation==0)
+            return;
+
         final Task found = find(t);
         if (found==null) {
             tree.add(t);
         } else {
-            if (t!=found)
-                merge(found, t);
+            if (t!=found) {
+                float overflow = found.priAddOverflow(activation);
+                activation -= overflow;
+            }
         }
-//        id.compute(t, (tt, pp) -> {
-//            if (pp==null) {
-//                int s = serial.getAndIncrement();
-//                tree.insert(coord(t), s);
-//                return s;
-//            } else {
-//                merge(tt, t);
-//                return pp;
-//            }
-//        });
+
+        if (activation > 0)
+            TaskTable.activate(t, activation, c, n);
+
     }
 
     protected Task find(@NotNull Task t) {
@@ -102,11 +113,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     }
 
 
-    private Task merge(@NotNull Task exist, @NotNull Task incoming) {
-        exist.merge(incoming);
-        return exist;
-    }
-
     @Override
     public int capacity() {
         return capacity;
@@ -115,7 +121,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     @Override
     public int size() {
         return tree.size();
-        //return id.size();
     }
 
     @Override
@@ -134,22 +139,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     @Override
     public boolean removeTask(Task x) {
         return tree.remove(x);
-//        final boolean[] removed = {false};
-//        id.computeIfPresent(x, (xx, pi) -> {
-//            tree.remove(coord(xx), pi);
-//            removed[0] = true;
-//            return null;
-//        });
-//        return removed[0];
     }
-
-//    public static float[] coord(Task x) {
-//        //if (x.isInput()) {
-//            //only store this by the start because the end is allowed to tretch
-//        //TODO handle this loss of precisoin
-//            return new float[]{ (float)(x.start()) };
-//        //}
-//    }
 
     @Override
     public void clear() {
