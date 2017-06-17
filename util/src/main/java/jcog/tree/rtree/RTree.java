@@ -63,6 +63,11 @@ public class RTree<T> implements Spatialized<T> {
 
     public RTree(RTreeModel<T> model) {
         this.model = model;
+        clear();
+    }
+
+    @Override
+    public void clear() {
         this.size = 0;
         this.root = model.newLeaf();
     }

@@ -484,7 +484,7 @@ import static nars.time.Tense.*;
 
     @NotNull
     public final TaskBuilder time(long when) {
-        return TaskBuilder.this.time(when, when);
+        return TaskBuilder.this.time(when, when, when);
     }
 
     @NotNull

@@ -223,6 +223,16 @@ public class LockingRTree<T> implements Spatialized<T> {
     }
 
     @Override
+    public void clear() {
+        writeLock.lock();
+        try {
+            tree.clear();
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @Override
     public void forEach(Consumer<? super T> consumer) {
         readLock.lock();
         try {

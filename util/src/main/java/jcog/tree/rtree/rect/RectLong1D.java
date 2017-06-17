@@ -1,5 +1,6 @@
 package jcog.tree.rtree.rect;
 
+import jcog.Util;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.point.Long1D;
 
@@ -53,6 +54,20 @@ public class RectLong1D implements HyperRect<Long1D> {
         return new RectLong1D(f, t);
     }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof RectLong1D)) return false;
+        RectLong1D o = (RectLong1D)obj;
+        return min == o.min && max == o.max;
+    }
+
+    @Override
+    public int hashCode() {
+        return Util.hashCombine(Long.hashCode(min), Long.hashCode(max));
+    }
+
     @Override
     public int dim() {
         return 1;
@@ -82,7 +97,7 @@ public class RectLong1D implements HyperRect<Long1D> {
     @Override
     public double getRange(int d) {
         assert (d == 0);
-        return Math.abs(min - max);
+        return Math.abs(max - min);
     }
 
     @Override

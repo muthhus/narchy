@@ -36,8 +36,8 @@ public final class LinearSplitLeaf<T> extends Leaf<T> {
     @Override
     protected Node<T> split(final T t, RTreeModel<T> model) {
         final Branch<T> pNode = model.newBranch();
-        final Node<T> l1Node = model.splitType.newLeaf(model.max);
-        final Node<T> l2Node = model.splitType.newLeaf(model.max);
+        final Node<T> l1Node = model.newLeaf();
+        final Node<T> l2Node = model.newLeaf();
 
         final int MIN = 0;
         final int MAX = 1;

@@ -37,7 +37,6 @@ public interface HyperRect<X extends HyperPoint> {
      * @param r - mbr to add
      * @return new HyperRect representing mbr of both HyperRects combined
      */
-    @Deprecated
     HyperRect<X> mbr(HyperRect<X> r);
 
 

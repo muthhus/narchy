@@ -39,8 +39,8 @@ public final class QuadraticSplitLeaf<T> extends Leaf<T> {
 
         final Branch<T> pNode = model.newBranch();
 
-        final Node<T> l1Node = model.splitType.newLeaf(model.max);
-        final Node<T> l2Node = model.splitType.newLeaf(model.max);
+        final Node<T> l1Node = model.newLeaf();;
+        final Node<T> l2Node = model.newLeaf();
 
         // find the two rectangles that are most wasteful
         double minCost = Double.MIN_VALUE;

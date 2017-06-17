@@ -140,5 +140,5 @@ public interface Spatialized<T> extends Nodelike<T> {
         return size() == 0;
     }
 
-
+    void clear();
 }

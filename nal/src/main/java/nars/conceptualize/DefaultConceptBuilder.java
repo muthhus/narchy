@@ -59,12 +59,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
 
-//    @NotNull
-//    public <X> Bag<X> newHijackBag(int reprobes) {
-//        return new HijackBag<>(1, reprobes, mergeDefault, nar.random);
-//    }
-
-
     @NotNull
     private final ConceptState init;
     @NotNull

@@ -62,10 +62,10 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
-        final Node<T> l1Node = model.splitType.newLeaf(model.max);
+        final Node<T> l1Node = model.newLeaf();
         transfer(sortedMbr, l1Node, 0, size / 2, model);
 
-        final Node<T> l2Node = model.splitType.newLeaf(model.max);
+        final Node<T> l2Node = model.newLeaf();
         transfer(sortedMbr, l2Node, size / 2, size, model);
 
         classify(l1Node, l2Node, t, model);
@@ -78,18 +78,22 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
 
     private void transfer(HyperRect[] sortedSrc, Node<T> target, int from, int to, RTreeModel<T> model) {
-        for (int i = from; i < to; i++) {
-            HyperRect si = sortedSrc[i];
 
-            outerLoop:
-            for (int j = 0; j < size; j++) {
-                T d = data[j];
-                if (model.builder.apply(d).equals( si )) {
-                    target.add(d, this, model);
-                    break outerLoop;
+        for (int j = 0; j < size; j++) {
+            T jd = data[j];
+            HyperRect jr = model.builder.apply(jd);
+
+            for (int i = from; i < to; i++) {
+                HyperRect si = sortedSrc[i];
+
+                if (si!=null && jr.equals(si)) {
+                    target.add(jd, this, model);
+                    sortedSrc[i] = null;
+                    break;
                 }
             }
         }
+        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + " " + Arrays.toString(data) + " -> " + Arrays.toString(sortedSrc);
     }
 
 }

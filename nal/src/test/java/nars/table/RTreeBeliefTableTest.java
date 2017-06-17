@@ -17,8 +17,7 @@ public class RTreeBeliefTableTest {
     public void testBasicOperations() throws Narsese.NarseseException {
         NAR n = new Terminal();
         TaskConcept X = (TaskConcept) n.conceptualize($.$("a:b"));
-        RTreeBeliefTable t = new RTreeBeliefTable();
-        t.setCapacity(4);
+        RTreeBeliefTable t = new RTreeBeliefTable(4);
 
         assertEquals(0, t.size());
 
@@ -35,10 +34,12 @@ public class RTreeBeliefTableTest {
         Task c = $.belief(x, 0.1f, 0.9f).time(3).apply(n);
         t.add(c, X, n);
 
-        Task d = $.belief(x, 0.1f, 0.9f).time(5).apply(n);
+        Task d = $.belief(x, 0.1f, 0.9f).time(0,3, 4).apply(n);
         t.add(d, X, n);
 
         assertEquals(4, t.size()); //no change for inserted duplicate
+
+        t.print(System.out);
     }
 
 }

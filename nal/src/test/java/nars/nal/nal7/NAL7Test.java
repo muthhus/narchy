@@ -923,7 +923,7 @@ public class NAL7Test extends AbstractNALTest {
         for (int i = 0; i < cycles; i++) {
 
             if (i == cycles-1) {
-                $.task($("(y)"), QUESTION, null).time(x, x+2*eventDT).setPriThen(1f).apply(t.nar);
+                $.task($("(y)"), QUESTION, null).time(0, x, x+2*eventDT).setPriThen(1f).apply(t.nar);
             }
 
             t

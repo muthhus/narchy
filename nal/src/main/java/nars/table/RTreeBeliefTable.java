@@ -15,6 +15,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -30,7 +31,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     final Spatialized<Task> tree;
 
     public RTreeBeliefTable() {
-        this.tree = new LockingRTree<Task>(new RTree(this), new ReentrantReadWriteLock(false));
+        this.tree = new LockingRTree<Task>(
+                new RTree(this), new ReentrantReadWriteLock(false));
     }
     public RTreeBeliefTable(int cap) {
         this();
@@ -141,17 +143,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 //        return removed[0];
     }
 
-    public static float[] coord(Task x) {
-        //if (x.isInput()) {
-            //only store this by the start because the end is allowed to tretch
-        //TODO handle this loss of precisoin
-            return new float[]{ (float)(x.start()) };
-        //}
-    }
+//    public static float[] coord(Task x) {
+//        //if (x.isInput()) {
+//            //only store this by the start because the end is allowed to tretch
+//        //TODO handle this loss of precisoin
+//            return new float[]{ (float)(x.start()) };
+//        //}
+//    }
 
     @Override
     public void clear() {
-        throw new UnsupportedOperationException();
-        //tree.clear();
+        tree.clear();
+    }
+
+    public void print(PrintStream out) {
+        forEachTask(out::println);
+        tree.stats().print(out);
     }
 }
