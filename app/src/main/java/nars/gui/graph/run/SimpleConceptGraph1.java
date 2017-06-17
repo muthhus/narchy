@@ -3,6 +3,7 @@ package nars.gui.graph.run;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
@@ -45,7 +46,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         Param.DEBUG = false;
 
         Default n = new Default(
-                new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
+                new Default.DefaultTermIndex(512, new DefaultConceptBuilder()),
                 new CycleTime(), new TaskExecutor(64, 0.5f));
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),

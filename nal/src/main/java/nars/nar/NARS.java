@@ -1,17 +1,14 @@
 package nars.nar;
 
 import jcog.AffinityExecutor;
-import jcog.bag.Bag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.Loop;
+import jcog.Util;
 import jcog.event.On;
 import jcog.math.FloatAveraged;
-import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
-import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.RLMixControl;
-import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -19,22 +16,21 @@ import nars.Task;
 import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
-import nars.control.Premise;
-import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
+import nars.index.term.HijackTermIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
@@ -52,17 +48,16 @@ import static nars.Op.*;
 public class NARS extends NAR {
 
 
-    public final List<NAR> sub = $.newArrayList();
-    private final List<On> observers = $.newArrayList();
-    int num;
+    public final List<SubExecutor> sub = $.newArrayList();
+    private int num;
 
     private AffinityExecutor pool;
-    private List<NARLoop> loops;
+    private List<Loop> loops;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
-                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
+                new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                //new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
                 rng, e);
     }
 
@@ -118,7 +113,7 @@ public class NARS extends NAR {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur()*2) {
+                        if (Math.abs(h - now) <= dur() * 2) {
                             return 0; //present
                         } else if (h > now) {
                             return 1; //future
@@ -147,36 +142,22 @@ public class NARS extends NAR {
     }
 
     void inputSub(ITask x) {
-        int sub = random.nextInt(num);
-        this.sub.get(sub).exe.run(x);
+        int sub =
+                //random.nextInt(num);
+                Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
+        this.sub.get(sub).run(x);
     }
 
-
-    @FunctionalInterface
-    public interface NARSSupplier {
-        NAR build(Time time, TermIndex terms, Random rng);
-    }
-
-    public void addNAR(NARSSupplier n) {
-        synchronized (terms) {
-            assert (!running());
-            NAR x = n.build(time, terms, random());
-            sub.add(x);
-            num = sub.size();
-            observers.add(x.eventTaskProcess.on(eventTaskProcess::emit)); //proxy
-        }
-    }
 
     /**
      * default implementation convenience method
      */
     public void addNAR(int capacity, float rate) {
-        addNAR((time, terms, rng) -> {
-            SubExecutor e = new SubExecutor(capacity, rate);
-            Default d = new Default(rng, terms, time, e);
-            d.stmLinkage.capacity.set(0); //disabled
-            return d;
-        });
+        synchronized (sub) {
+            SubExecutor x = new SubExecutor(capacity, rate);
+            sub.add(x);
+            num = sub.size();
+        }
     }
 
     private static class RootExecutioner extends Executioner implements Runnable {
@@ -265,7 +246,7 @@ public class NARS extends NAR {
 
         @Override
         public void forEach(Consumer<ITask> each) {
-            ((NARS) nar).sub.forEach(s -> s.exe.forEach(each));
+            ((NARS) nar).sub.forEach(s -> s.forEach(each));
         }
 
     }
@@ -284,18 +265,18 @@ public class NARS extends NAR {
         public void runLater(@NotNull Runnable r) {
             pool.execute(r); //use the common threadpool
         }
-    }
 
-    public static class ExperimentalConceptBuilder extends DefaultConceptBuilder {
-        public static final int reprobes = 3;
-        //                (
-//                new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
-//                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
-//        );
-
-
-
-
+        public Loop start() {
+            start(NARS.this);
+            Loop l = new Loop(0) {
+                @Override
+                public boolean next() {
+                    flush();
+                    return true;
+                }
+            };
+            return l;
+        }
     }
 
 
@@ -317,16 +298,11 @@ public class NARS extends NAR {
 
             int num = sub.size();
 
-            this.loops = $.newArrayList(num);
-            sub.forEach(n -> {
-                NARLoop l = new NARLoop(n);
-                l.prePeriodMS(0); //preset for infinite loop
-                loops.add(l);
-            });
-
-            //this.pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(num);
-            //this.pool.prestartAllCoreThreads();
             this.pool = new AffinityExecutor(self().toString());
+
+            this.loops = $.newArrayList(num);
+            sub.forEach(s -> loops.add(s.start()));
+
             loops.forEach(pool::execute);
         }
 
@@ -341,7 +317,7 @@ public class NARS extends NAR {
 
             super.stop();
 
-            loops.forEach(NARLoop::stop);
+            loops.forEach(Loop::stop);
             this.loops = null;
 
             this.pool.shutdownNow();
@@ -356,15 +332,6 @@ public class NARS extends NAR {
 
             m.put("now", new Date());
 
-            for (NAR n : sub) {
-                m.put(n.self() + "_emotion", n.emotion.summary());
-            }
-            if (loops != null) {
-                for (NARLoop l : loops) {
-                    NAR n = l.nar;
-                    m.put(n.self() + "_cycles", l.cycleCount());
-                }
-            }
             m.put("terms", terms.summary());
             return m;
         }

@@ -88,7 +88,7 @@ public class TaskExecutor extends Executioner {
     @Override
     public void start(NAR nar) {
         super.start(nar);
-        flush();
+        flush(); //<- may not be necessary
     }
 
 //    @Override
@@ -111,7 +111,7 @@ public class TaskExecutor extends Executioner {
         r.run(); //synchronous
     }
 
-    private void flush() {
+    protected void flush() {
         if (!busy.compareAndSet(false, true))
             return;
 
