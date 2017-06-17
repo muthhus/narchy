@@ -68,6 +68,7 @@ public final class CounterNode<T> implements Node<T> {
     public boolean AND(Predicate<T> p) {
         throw new UnsupportedOperationException("TODO");
     }
+
     @Override
     public boolean OR(Predicate<T> p) {
         throw new UnsupportedOperationException("TODO");
@@ -116,5 +117,10 @@ public final class CounterNode<T> implements Node<T> {
     @Override
     public void reportSizeDelta(int i) {
         node.reportSizeDelta(i);
+    }
+
+    @Override
+    public boolean contains(T t) {
+        return node.contains(t);
     }
 }

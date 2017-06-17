@@ -39,10 +39,10 @@ public interface Spatialized<T> extends Nodelike<T> {
      * Create an R-Tree with default values for m, M, and split type
      *
      * @param spatializer - Builder implementation used to create HyperRects out of T's
-     * @param <T>     - The store type of the bound
+     * @param <T>         - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Spatialized<T> rTree(final Function<T,HyperRect> spatializer) {
+    static <T> Spatialized<T> rTree(final Function<T, HyperRect> spatializer) {
         return new RTree<>(spatializer, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
     }
 
@@ -56,7 +56,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param <T>       - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Spatialized<T> rTree(final Function<T,HyperRect> builder, final int minM, final int maxM, final RTree.Split splitType) {
+    static <T> Spatialized<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final RTree.Split splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
 //
@@ -86,7 +86,6 @@ public interface Spatialized<T> extends Nodelike<T> {
 //    }
 
 
-
     /**
      * Add the data entry to the SpatialSearch structure
      *
@@ -109,7 +108,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param told - Entry to update
      * @param tnew - Entry to update it to
      */
-    void update(final T told, final T tnew);
+    void replace(final T told, final T tnew);
 
     /**
      * Get the number of entries in the tree
@@ -121,6 +120,7 @@ public interface Spatialized<T> extends Nodelike<T> {
     void forEach(Consumer<T> consumer);
 
     boolean intersecting(HyperRect rect, Predicate<T> consumer);
+
     boolean containing(HyperRect rect, Predicate<T> consumer);
 
     /**
@@ -130,13 +130,14 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param t    - Array to store found entries
      * @return Number of results found
      */
-    @Deprecated int containing(final HyperRect rect, final T[] t);
+    @Deprecated
+    int containing(final HyperRect rect, final T[] t);
 
 
     Stats stats();
 
     default boolean isEmpty() {
-        return size()==0;
+        return size() == 0;
     }
 
 

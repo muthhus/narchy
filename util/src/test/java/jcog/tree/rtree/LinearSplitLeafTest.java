@@ -22,10 +22,13 @@ package jcog.tree.rtree;
 
 import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.util.Stats;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by jcovert on 6/12/15.
@@ -54,10 +57,10 @@ public class LinearSplitLeafTest {
         rTree.add(new RectDouble2D(8, 8, 9, 9));
 
         Stats stats = rTree.stats();
-        Assert.assertTrue("Unexpected max depth after basic split", stats.getMaxDepth() == 1);
-        Assert.assertTrue("Unexpected number of branches after basic split", stats.getBranchCount() == 1);
-        Assert.assertTrue("Unexpected number of leaves after basic split", stats.getLeafCount() == 2);
-        Assert.assertTrue("Unexpected number of entries per leaf after basic split", stats.getEntriesPerLeaf() == 4.5);
+        assertTrue("Unexpected max depth after basic split", stats.getMaxDepth() == 1);
+        assertTrue("Unexpected number of branches after basic split", stats.getBranchCount() == 1);
+        assertTrue("Unexpected number of leaves after basic split", stats.getLeafCount() == 2);
+        assertTrue("Unexpected number of entries per leaf after basic split", stats.getEntriesPerLeaf() == 4.5);
     }
 
     @Test
@@ -71,27 +74,27 @@ public class LinearSplitLeafTest {
         // 5 entrees guarantees a split
         rTree.add(new RectDouble2D(0, 2, 1, 4));
 
-        Branch root = (Branch) rTree.getRoot();
+        Branch root = (Branch) rTree.root();
         Node<RectDouble2D>[] children = root.children();
         int childCount = 0;
-        for(Node c : children) {
+        for (Node c : children) {
             if (c != null) {
                 childCount++;
             }
         }
-        Assert.assertEquals("Expected different number of children after split", 2, childCount);
+        assertEquals("Expected different number of children after split", 2, childCount);
 
         Node<RectDouble2D> child1 = children[0];
         RectDouble2D child1Mbr = (RectDouble2D) child1.bounds();
         RectDouble2D expectedChild1Mbr = new RectDouble2D(0, 0, 4, 4);
-        Assert.assertEquals("Child 1 size incorrect after split", 4, child1.size());
-        Assert.assertEquals("Child 1 mbr incorrect after split", expectedChild1Mbr, child1Mbr);
+        assertEquals("Child 1 size incorrect after split", 4, child1.size());
+        assertEquals("Child 1 mbr incorrect after split", expectedChild1Mbr, child1Mbr);
 
         Node<RectDouble2D> child2 = children[1];
         RectDouble2D child2Mbr = (RectDouble2D) child2.bounds();
         RectDouble2D expectedChild2Mbr = new RectDouble2D(4, 0, 5, 1);
-        Assert.assertEquals("Child 2 size incorrect after split", 1, child2.size());
-        Assert.assertEquals("Child 2 mbr incorrect after split", expectedChild2Mbr, child2Mbr);
+        assertEquals("Child 2 size incorrect after split", 1, child2.size());
+        assertEquals("Child 2 mbr incorrect after split", expectedChild2Mbr, child2Mbr);
     }
 
     /**
@@ -127,7 +130,7 @@ public class LinearSplitLeafTest {
         final int expectedEntryCount = 17;
 
         final Stats stats = rTree.stats();
-        Assert.assertEquals("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + expectedEntryCount + " actual: " + stats.getEntryCount(), expectedEntryCount, stats.getEntryCount());
+        assertEquals("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + expectedEntryCount + " actual: " + stats.getEntryCount(), expectedEntryCount, stats.getEntryCount());
     }
 
     /**
@@ -137,18 +140,41 @@ public class LinearSplitLeafTest {
     @Test
     public void randomEntryTest() {
 
-        final int entryCount = 50000;
+        int entryCount = 25000;
         final RectDouble2D[] rects = RTree2DTest.generateRandomRects(entryCount);
 
-        final RTree<RectDouble2D> rTree = RTree2DTest.createRect2DTree(TYPE);
-        for (int i = 0; i < rects.length; i++) {
-            rTree.add(rects[i]);
-        }
+        for (RTree.Split s : RTree.Split.values()) {
+            for (int min : new int[]{2, 3, 4}) {
+                for (int max : new int[]{8}) {
 
-        final Stats stats = rTree.stats();
-        Assert.assertTrue("Unexpected number of entries in " + TYPE + " split tree: " + stats.getEntryCount() + " entries - expected: " + entryCount + " actual: " + stats.getEntryCount(),
-                Math.abs(entryCount - stats.getEntryCount()) < 20 /* in case of duplicates */);
-        stats.print(System.out);
+
+                    final RTree<RectDouble2D> rTree = RTree2DTest.createRect2DTree(s, min, max);
+                    int i = 0;
+                    for (RectDouble2D r : rects) {
+                        boolean added = rTree.add(r);
+                        if (!added)
+                            rTree.add(r); //for debugging: try again and see what happened
+                        assertTrue(added);
+                        i++;
+                        assertEquals(i, rTree.size());
+                        //assertEquals(i, rTree.stats().getEntryCount());
+
+                        boolean tryAddingAgainToTestForNonMutation = rTree.add(r);
+                        assertEquals(i, rTree.size()); //reinsertion should cause no change in size
+                        //assertEquals(i, rTree.stats().getEntryCount());
+                        assertFalse(tryAddingAgainToTestForNonMutation); //reinsertion of existing element will not affect size and will return false here
+                    }
+
+                    assertEquals(entryCount, rTree.size());
+
+                    final Stats stats = rTree.stats();
+                    assertEquals(entryCount, stats.getEntryCount());
+
+                    stats.print(System.out);
+
+                }
+            }
+        }
     }
 
     /**

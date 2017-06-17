@@ -29,9 +29,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
@@ -185,7 +183,7 @@ public class RTree2DTest {
             RectDouble2D[] results = new RectDouble2D[entryCount];
             int foundCount = rTree.containing(searchRect, results);
 
-            CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.getRoot();
+            CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.root();
 
             System.out.println("[" + type + "] searched " + CounterNode.searchCount + " nodes, returning " + foundCount + " entries");
             System.out.println("[" + type + "] evaluated " + CounterNode.bboxEvalCount + " b-boxes, returning " + foundCount + " entries");
@@ -270,7 +268,7 @@ public class RTree2DTest {
         rTree.add(rect);
         RectDouble2D oldRect = new RectDouble2D(0,1,2,3);
         RectDouble2D newRect = new RectDouble2D(1,2,3,4);
-        rTree.update(oldRect, newRect);
+        rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
         int num = rTree.containing(newRect, results);
         assertTrue("Did not find the updated HyperRect", num == 1);
@@ -280,6 +278,7 @@ public class RTree2DTest {
 
     /**
      * Generate 'count' random rectangles with fixed ranges.
+     * The returned array will be free of duplicates
      *
      * @param count - number of rectangles to generate
      * @return array of generated rectangles
@@ -295,13 +294,16 @@ public class RTree2DTest {
 
         final double hitProb = 1.0 * count * maxXRange * maxYRange / (minX * minY);
 
+        Set<RectDouble2D> added = new HashSet(count);
         final RectDouble2D[] rects = new RectDouble2D[count];
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < count; ) {
             final int x1 = rand.nextInt(minX);
             final int y1 = rand.nextInt(minY);
             final int x2 = x1 + rand.nextInt(maxXRange);
             final int y2 = y1 + rand.nextInt(maxYRange);
-            rects[i] = new RectDouble2D(x1, y1, x2, y2);
+            RectDouble2D next = new RectDouble2D(x1, y1, x2, y2);
+            if (added.add(next))
+                rects[i++] = next;
         }
 
         return rects;
@@ -352,9 +354,10 @@ public class RTree2DTest {
         final int maxXRange = 25;
 
 
-
+        Set<RectFloatND> s = new HashSet(count);
         final RectFloatND[] rects = new RectFloatND[count];
-        for (int i = 0; i < count; i++) {
+
+        for (int i = 0; i < count; ) {
 
             float[] min = new float[dimension];
             float[] max = new float[dimension];
@@ -374,7 +377,9 @@ public class RTree2DTest {
                 max[infDim] = Float.POSITIVE_INFINITY;
             }
 
-            rects[i] = new RectFloatND(min, max);
+            RectFloatND m = new RectFloatND(min, max);
+            if (s.add(m))
+                rects[i++] = m;
         }
 
         return rects;
@@ -388,6 +393,9 @@ public class RTree2DTest {
      */
     public static RTree<RectDouble2D> createRect2DTree(RTree.Split splitType) {
         return createRect2DTree(2, 8, splitType);
+    }
+    public static RTree<RectDouble2D> createRect2DTree(RTree.Split splitType, int min, int max) {
+        return createRect2DTree(min, max, splitType);
     }
 
     /**

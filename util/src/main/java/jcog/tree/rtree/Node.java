@@ -45,14 +45,16 @@ public interface Node<T> extends Nodelike<T> {
 
     /**
      * Add t to the index
-     *  @param t - value to add to index
+     *
+     * @param t      - value to add to index
      * @param parent - the callee which is the parent of this instance
      */
     Node<T> add(T t, Nodelike<T> parent);
 
     /**
      * Remove t from the index
-     *  @param t - value to remove from index
+     *
+     * @param t      - value to remove from index
      * @param parent - the callee which is the parent of this instance
      */
     Node<T> remove(T t, Nodelike<T> parent);
@@ -91,22 +93,28 @@ public interface Node<T> extends Nodelike<T> {
     void forEach(Consumer<T> consumer);
 
     boolean AND(Predicate<T> p);
+
     boolean OR(Predicate<T> p);
 
     /**
      * Consumer "accepts" every node in the given rect
-     *  @param rect     - limiting rect
-     *  @param consumer
-     *  @return whether to continue visit
+     *
+     * @param rect     - limiting rect
+     * @param consumer
+     * @return whether to continue visit
      */
     boolean intersecting(HyperRect rect, Predicate<T> consumer);
 
     boolean containing(HyperRect rect, Predicate<T> t);
 
     default <C extends Collection> C containing(HyperRect rect, C t) {
-        containing(rect, (Predicate)x -> {t.add(x); return true; });
+        containing(rect, (Predicate) x -> {
+            t.add(x);
+            return true;
+        });
         return t;
     }
+
     default Set<T> containedSet(HyperRect rect) {
         return containing(rect, new HashSet());
     }

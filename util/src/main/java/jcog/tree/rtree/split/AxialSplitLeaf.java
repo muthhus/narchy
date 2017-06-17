@@ -49,10 +49,10 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
         // choose axis to split
         int axis = 0;
         double rangeD = bounds.getRange(0);
-        for(int d=1; d<nD; d++) {
+        for (int d = 1; d < nD; d++) {
             // split along the greatest range extent
             final double dr = bounds.getRangeFinite(d, 0);
-            if(dr > rangeD) {
+            if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;
             }
@@ -65,7 +65,7 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
         // divide sorted leafs
         final Node<T> l1Node = splitType.newLeaf(builder, mMin, mMax);
-        transfer(sortedMbr, l1Node, 0, size/2);
+        transfer(sortedMbr, l1Node, 0, size / 2);
 
         final Node<T> l2Node = splitType.newLeaf(builder, mMin, mMax);
         transfer(sortedMbr, l2Node, size / 2, size);
@@ -77,7 +77,6 @@ public final class AxialSplitLeaf<T> extends Leaf<T> {
 
         return pNode;
     }
-
 
 
     private void transfer(HyperRect[] sortedSrc, Node<T> target, int from, int to) {

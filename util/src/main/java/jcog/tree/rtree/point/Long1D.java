@@ -20,7 +20,7 @@ public class Long1D implements HyperPoint {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || ((Long1D)obj).x == x;
+        return this == obj || ((Long1D) obj).x == x;
     }
 
     @Override

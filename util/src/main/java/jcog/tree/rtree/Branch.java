@@ -24,6 +24,8 @@ package jcog.tree.rtree;
 import com.google.common.base.Joiner;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
+import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -37,17 +39,14 @@ import java.util.function.Predicate;
 public final class Branch<T> implements Node<T> {
 
     private final Node<T>[] child;
-    private HyperRect mbr;
-    private int size;
-
-
     //TODO move these to a shared builder class
     private final Function<T, HyperRect> builder;
     private final int mMax;
     private final int mMin;
     private final RTree.Split splitType;
-
-    short childDiff = 0;
+    short childDiff;
+    private HyperRect mbr;
+    private int size;
 
     public Branch(final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
         this.mMin = mMin;
@@ -57,6 +56,17 @@ public final class Branch<T> implements Node<T> {
         this.size = 0;
         this.child = new Node[mMax];
         this.splitType = splitType;
+    }
+
+    @Override
+    public boolean contains(T t) {
+        if (!bounds().contains(builder.apply(t)))
+            return false;
+        for (int i = 0; i < size; i++) {
+            if (child[i].contains(t))
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -87,6 +97,7 @@ public final class Branch<T> implements Node<T> {
         return false;
     }
 
+    @NotNull
     @Override
     public HyperRect bounds() {
         return mbr;
@@ -95,39 +106,46 @@ public final class Branch<T> implements Node<T> {
     /**
      * Adds a data entry to one of the child nodes of this branch
      *
-     * @param t data entry to add
+     * @param t      data entry to add
      * @param parent
      * @return Node that the entry was added to
      */
     @Override
     public Node<T> add(final T t, Nodelike<T> parent) {
+        assert (childDiff == 0);
+
         final HyperRect tRect = builder.apply(t);
-        if (size < mMin) {
-            for (int i = 0; i < size; i++) {
-                Node ci = child[i];
-                if (ci.bounds().contains(tRect)) {
-                    Node<T> m = child[i] = ci.add(t, this);
-                    if (reportSizeDelta(parent)) {
-                        grow(m);
-                    }
-                    return m;
+
+        for (int i = 0; i < size; i++) {
+            Node ci = child[i];
+            if (ci.bounds().contains(tRect)) {
+                //check for existing item
+                if (ci.contains(t))
+                    return this; // duplicate detected (subtree not changed)
+
+                Node<T> m = ci.add(t, this);
+                if (reportNextSizeDelta(parent)) {
+                    child[i] = m;
+                    grow(m); //subtree was changed
+                    return this;
                 }
             }
+        }
+
+        if (size < mMin) {
+
             // no overlapping node - grow
-            final Node<T> nextLeaf = splitType.newLeaf(builder, mMin, mMax);
-            nextLeaf.add(t, this);
-            final int nextChild = addChild(nextLeaf);
-            if (reportSizeDelta(parent))
-                grow(nextChild);
+            grow(addChild(splitType.newLeaf(builder, mMin, mMax).add(t, parent)));
 
             return this;
 
         } else {
-            final int bestLeaf = chooseLeaf(t, tRect);
+
+            final int bestLeaf = chooseLeaf(t, tRect, parent);
 
             child[bestLeaf] = child[bestLeaf].add(t, this);
 
-            if (reportSizeDelta(parent)) {
+            if (reportNextSizeDelta(parent)) {
                 grow(bestLeaf);
 
                 // optimize on split to remove the extra created branch when there
@@ -139,13 +157,17 @@ public final class Branch<T> implements Node<T> {
                     child[bestLeaf] = branch.child[0];
                     child[size++] = branch.child[1];
                 }
+
+            } else {
+                //duplicate was found in sub-tree but we checked for duplicates above
+                assert(false);
             }
 
             return this;
         }
     }
 
-    private boolean reportSizeDelta(Nodelike<T> parent) {
+    private boolean reportNextSizeDelta(Nodelike<T> parent) {
         int x = childDiff;
         if (x == 0)
             return false; //nothing changed
@@ -170,7 +192,7 @@ public final class Branch<T> implements Node<T> {
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(tRect)) {
                 child[i] = child[i].remove(t, this);
-                if (reportSizeDelta(parent)) {
+                if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
                         System.arraycopy(child, i + 1, child, i, size - i - 1);
                         child[--size] = null;
@@ -196,12 +218,12 @@ public final class Branch<T> implements Node<T> {
         return this;
     }
 
-    public int childSize(int i) {
-        Node<T> cc = child[i];
-        if (cc == null)
-            return 0;
-        return cc.size();
-    }
+//    public int childSize(int i) {
+//        Node<T> cc = child[i];
+//        if (cc == null)
+//            return 0;
+//        return cc.size();
+//    }
 
     @Override
     public Node<T> update(final T OLD, final T NEW) {
@@ -259,7 +281,7 @@ public final class Branch<T> implements Node<T> {
         return size;
     }
 
-    private int chooseLeaf(final T t, final HyperRect tRect) {
+    private int chooseLeaf(final T t, final HyperRect tRect, Nodelike<T> parent) {
         if (size > 0) {
             int bestNode = 0;
             HyperRect childMbr = child[0].bounds().mbr(tRect);
@@ -287,11 +309,7 @@ public final class Branch<T> implements Node<T> {
             return bestNode;
         } else {
             final Node<T> n = splitType.newLeaf(builder, mMin, mMax);
-            n.add(t, this);
             child[size++] = n;
-
-            mbr = (mbr == null) ? n.bounds() : mbr.mbr(n.bounds());
-
             return size - 1;
         }
     }
@@ -321,7 +339,7 @@ public final class Branch<T> implements Node<T> {
         return true;
     }
 
-    public boolean nodeAND(Predicate<Node<T>> p) {
+    boolean nodeAND(Predicate<Node<T>> p) {
         for (int i = 0; i < size; i++) {
             if (!p.test(child[i]))
                 return false;
@@ -358,7 +376,6 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public String toString() {
-        return "Branch" + splitType + "{" + mbr + "x" + size + ":\n\t" +
-                (child != null ? Joiner.on("\n\t").skipNulls().join(child) : "null") + "\n}";
+        return "Branch" + splitType + '{' + mbr + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
     }
 }

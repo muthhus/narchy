@@ -7,6 +7,7 @@ import jcog.tree.rtree.RTree;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import static java.lang.Float.floatToIntBits;
 import static jcog.tree.rtree.RTree.FPSILON;
 
 
@@ -16,6 +17,7 @@ import static jcog.tree.rtree.RTree.FPSILON;
 public class FloatND implements HyperPoint, Serializable {
 
     public final float[] coord;
+    private int hash;
 
     public FloatND(FloatND copy) {
         this(copy.coord.clone());
@@ -23,6 +25,7 @@ public class FloatND implements HyperPoint, Serializable {
 
     public FloatND(float... coord) {
         this.coord = coord;
+        this.hash = Arrays.hashCode(coord);
     }
 
     public static FloatND fill(int dims, float value) {
@@ -60,16 +63,24 @@ public class FloatND implements HyperPoint, Serializable {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        FloatND p = (FloatND) obj;
-        return RTree.equals(coord, p.coord, FPSILON);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FloatND)) return false;
+
+        FloatND floatND = (FloatND) o;
+        return hash == floatND.hashCode() && Arrays.equals(coord, floatND.coord);
+
+
+//        for (int i = 0; i < coord.length; i++) {
+//            if (floatToIntBits(coord[i])!=floatToIntBits(floatND.coord[i]))
+//                return false;
+//        }
+//        return true;
     }
 
     @Override
     public int hashCode() {
-        //TODO compute each component rounded to nearest epsilon?
-        return Arrays.hashCode(coord);
+        return hash;
     }
 
     @Override

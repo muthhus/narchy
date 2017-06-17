@@ -135,10 +135,10 @@ public class LockingRTree<T> implements Spatialized<T> {
      * @param tnew - entry with new value
      */
     @Override
-    public void update(T told, T tnew) {
+    public void replace(T told, T tnew) {
         writeLock.lock();
         try {
-            tree.update(told, tnew);
+            tree.replace(told, tnew);
         } finally {
             writeLock.unlock();
         }
@@ -208,7 +208,7 @@ public class LockingRTree<T> implements Spatialized<T> {
     public boolean tryUpdate(T told, T tnew) {
         if (writeLock.tryLock()) {
             try {
-                tree.update(told, tnew);
+                tree.replace(told, tnew);
             } finally {
                 writeLock.unlock();
             }
@@ -234,8 +234,8 @@ public class LockingRTree<T> implements Spatialized<T> {
 
     @Override
     public boolean containing(HyperRect rect, Predicate<T> consumer) {
-        boolean result;
         readLock.lock();
+        boolean result;
         try {
             result = tree.containing(rect, consumer);
         } finally {
@@ -246,8 +246,8 @@ public class LockingRTree<T> implements Spatialized<T> {
 
     @Override
     public boolean intersecting(HyperRect rect, Predicate<T> consumer) {
-        boolean result;
         readLock.lock();
+        boolean result;
         try {
             result = tree.intersecting(rect, consumer);
         } finally {
@@ -274,5 +274,10 @@ public class LockingRTree<T> implements Spatialized<T> {
     @Override
     public void reportSizeDelta(int i) {
         tree.reportSizeDelta(i);
+    }
+
+    @Override
+    public boolean contains(T t) {
+        return tree.contains(t);
     }
 }

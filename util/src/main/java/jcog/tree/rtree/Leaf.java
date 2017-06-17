@@ -22,6 +22,7 @@ package jcog.tree.rtree;
 
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,16 +35,16 @@ import java.util.function.Predicate;
  */
 public abstract class Leaf<T> implements Node<T> {
 
+    @Deprecated
+    public final RTree.Split splitType;
     protected final short mMax;       // max entries per node
     protected final short mMin;       // least number of entries per node
-    protected short size;
-
-    protected HyperRect bounds;
     protected final HyperRect[] rect;
     protected final T[] data;
-
-    @Deprecated protected final Function<T, HyperRect> builder;
-    @Deprecated public final RTree.Split splitType;
+    @Deprecated
+    protected final Function<T, HyperRect> builder;
+    protected short size;
+    protected HyperRect bounds;
 
 
     protected Leaf(@Deprecated final Function<T, HyperRect> builder, final int mMin, final int mMax, final RTree.Split splitType) {
@@ -62,6 +63,7 @@ public abstract class Leaf<T> implements Node<T> {
 
         if (!contains(t)) {
             Node<T> next;
+
             if (size < mMax) {
                 final HyperRect tRect = builder.apply(t);
                 bounds = bounds != null ? bounds.mbr(tRect) : tRect;
@@ -73,7 +75,8 @@ public abstract class Leaf<T> implements Node<T> {
             } else {
                 next = split(t);
             }
-            parent.reportSizeDelta(1);
+            parent.reportSizeDelta(+1);
+
             return next;
         } else {
             return this;
@@ -82,8 +85,7 @@ public abstract class Leaf<T> implements Node<T> {
 
     @Override
     public void reportSizeDelta(int i) {
-//        if (i != 0)
-//            throw new UnsupportedOperationException();
+        //safely ignored
     }
 
     @Override
@@ -103,41 +105,40 @@ public abstract class Leaf<T> implements Node<T> {
     }
 
     public boolean contains(T t) {
-        return OR(e -> e==t || e.equals(t));
+        return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 
     @Override
-    public Node<T> remove(final T t, Nodelike<T> parent)  {
+    public Node<T> remove(final T t, Nodelike<T> parent) {
 
-        int i=0;
-        int j;
+        int i = 0;
 
-        while(i<size && (data[i]!=t) && (!data[i].equals(t))) {
+        while (i < size && (data[i] != t) && (!data[i].equals(t))) {
             i++;
         }
 
-        j=i;
+        int j = i;
 
-        while(j<size && ((data[j]==t) || data[j].equals(t))) {
+        while (j < size && ((data[j] == t) || data[j].equals(t))) {
             j++;
         }
 
-        if(i < j) {
-            final int nRemoved = j-i;
+        if (i < j) {
+            final int nRemoved = j - i;
             if (j < size) {
-                final int nRemaining = size-j;
+                final int nRemaining = size - j;
                 System.arraycopy(rect, j, rect, i, nRemaining);
                 System.arraycopy(data, j, data, i, nRemaining);
 
                 //TODO use Array.fill
-                for (int k=size-nRemoved; k < size; k++) {
+                for (int k = size - nRemoved; k < size; k++) {
                     rect[k] = null;
                     data[k] = null;
                 }
             } else {
                 //TODO use Array.fill
-                for (int k=i; k < size; k++) {
+                for (int k = i; k < size; k++) {
                     rect[k] = null;
                     data[k] = null;
 
@@ -148,11 +149,7 @@ public abstract class Leaf<T> implements Node<T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            if (size > 0) {
-                bounds = bounds.mbr(rect);
-            } else {
-                bounds = null;
-            }
+            bounds = size > 0 ? bounds.mbr(rect) : null;
 
         }
 
@@ -174,11 +171,7 @@ public abstract class Leaf<T> implements Node<T> {
                 data[i] = tnew;
             }
 
-            if (i == 0) {
-                bounds = rect[0];
-            } else {
-                bounds = bounds.mbr(rect[i]);
-            }
+            bounds = i == 0 ? rect[0] : bounds.mbr(rect[i]);
         }
 
         return this;
@@ -220,6 +213,7 @@ public abstract class Leaf<T> implements Node<T> {
         return true;
     }
 
+    @NotNull
     @Override
     public HyperRect bounds() {
         return bounds;
@@ -283,11 +277,9 @@ public abstract class Leaf<T> implements Node<T> {
         if (l2CostInc > l1CostInc) {
             l1Node.add(t, this);
         } else if (RTree.equals(l1CostInc, l2CostInc)) {
-            final double l1MbrCost = l1c;
-            final double l2MbrCost = l2c;
-            if (l1MbrCost < l2MbrCost) {
+            if (l1c < l2c) {
                 l1Node.add(t, this);
-            } else if (RTree.equals(l1MbrCost, l2MbrCost)) {
+            } else if (RTree.equals(l1c, l2c)) {
                 final double l1MbrMargin = l1Mbr.perimeter();
                 final double l2MbrMargin = l2Mbr.perimeter();
                 if (l1MbrMargin < l2MbrMargin) {
@@ -315,6 +307,6 @@ public abstract class Leaf<T> implements Node<T> {
 
     @Override
     public String toString() {
-        return "Leaf" + splitType + "{" + bounds + "x" + size + '}';
+        return "Leaf" + splitType + '{' + bounds + 'x' + size + '}';
     }
 }

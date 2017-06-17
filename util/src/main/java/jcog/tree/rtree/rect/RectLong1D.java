@@ -10,12 +10,16 @@ public class RectLong1D implements HyperRect<Long1D> {
 
     public final long min, max;
 
-    /** point */
+    /**
+     * point
+     */
     public RectLong1D(long f) {
         this(f, f);
     }
 
-    /** range */
+    /**
+     * range
+     */
     public RectLong1D(long f, long t) {
         this.min = f;
         this.max = t;
@@ -24,7 +28,7 @@ public class RectLong1D implements HyperRect<Long1D> {
     @Override
     public HyperRect<Long1D> mbr(HyperRect<Long1D>[] rect) {
         int n = rect.length;
-        assert(n > 0);
+        assert (n > 0);
         if (n == 1)
             return rect[0];
         long min = Long.MAX_VALUE, max = Long.MIN_VALUE;
@@ -66,18 +70,18 @@ public class RectLong1D implements HyperRect<Long1D> {
 
     @Override
     public Long1D center() {
-        return new Long1D((min + max)/2 );
+        return new Long1D((min + max) / 2);
     }
 
     @Override
     public double center(int d) {
-        assert(d==0);
+        assert (d == 0);
         return (min + max) / 2.0;
     }
 
     @Override
     public double getRange(int d) {
-        assert(d==0);
+        assert (d == 0);
         return Math.abs(min - max);
     }
 

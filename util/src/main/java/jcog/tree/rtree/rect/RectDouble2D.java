@@ -41,10 +41,14 @@ public class RectDouble2D implements HyperRect<Double2D> {
 
     public RectDouble2D(double x1, double y1, double x2, double y2) {
         if (x2 < x1) {
-            double t = x2; x2 = x1; x1 = t;
+            double t = x2;
+            x2 = x1;
+            x1 = t;
         }
         if (y2 < y1) {
-            double t = y2; y2 = y1; y1 = t;
+            double t = y2;
+            y2 = y1;
+            y1 = t;
         }
 
         min = new Double2D(x1, y1);
@@ -102,16 +106,17 @@ public class RectDouble2D implements HyperRect<Double2D> {
         return new Double2D(dx, dy);
     }
 
-    @Override public double center(int d) {
+    @Override
+    public double center(int d) {
         if (d == 0) {
             return min.x + (max.x - min.x) / 2.0;
         } else {
-            assert(d==1);
+            assert (d == 1);
             return min.y + (max.y - min.y) / 2.0;
         }
     }
 
-        @Override
+    @Override
     public Double2D min() {
         return min;
     }
@@ -154,7 +159,7 @@ public class RectDouble2D implements HyperRect<Double2D> {
     public double cost() {
         final double dx = max.x - min.x;
         final double dy = max.y - min.y;
-        return Math.abs( dx * dy );
+        return Math.abs(dx * dy);
     }
 
 

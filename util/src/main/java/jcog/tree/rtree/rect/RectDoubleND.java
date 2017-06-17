@@ -40,24 +40,14 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     public static final HyperRect ALL_2 = RectDoubleND.all(2);
     public static final HyperRect ALL_3 = RectDoubleND.all(3);
     public static final HyperRect ALL_4 = RectDoubleND.all(4);
-
-
-    public final DoubleND min;
-
-
-    public final DoubleND max;
-
-
     public static final DoubleND unbounded = new DoubleND() {
         @Override
         public String toString() {
             return "*";
         }
     };
-
-    public static HyperRect all(int i) {
-        return new RectDoubleND(DoubleND.fill(i, NEGATIVE_INFINITY), DoubleND.fill(i, POSITIVE_INFINITY));
-    }
+    public final DoubleND min;
+    public final DoubleND max;
 
     public RectDoubleND() {
         min = unbounded;
@@ -69,10 +59,10 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         max = p;
     }
 
-
     public RectDoubleND(double[] a, double[] b) {
         this(new DoubleND(a), new DoubleND(b));
     }
+
 
     public RectDoubleND(final DoubleND a, final DoubleND b) {
         int dim = a.dim();
@@ -92,6 +82,9 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         this.max = new DoubleND(max);
     }
 
+    public static HyperRect all(int i) {
+        return new RectDoubleND(DoubleND.fill(i, NEGATIVE_INFINITY), DoubleND.fill(i, POSITIVE_INFINITY));
+    }
 
     @Override
     public boolean contains(final HyperRect _inner) {
@@ -100,7 +93,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         int dim = dim();
         for (int i = 0; i < dim; i++) {
             if (!(min.coord[i] <= inner.min.coord[i] && max.coord[i] >= inner.max.coord[i]))
-            //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
+                //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
                 return false;
         }
         return true;
@@ -146,7 +139,8 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
 
-    @Override public double center(int dim) {
+    @Override
+    public double center(int dim) {
         return centerF(dim);
     }
 
@@ -160,7 +154,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         if (max == Double.POSITIVE_INFINITY)
             return min;
 
-        return (max + min)/2f;
+        return (max + min) / 2f;
     }
 
     @Override
@@ -189,7 +183,8 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         return max;
     }
 
-    @Override public double getRange(final int i) {
+    @Override
+    public double getRange(final int i) {
         double min = this.min.coord[i];
         double max = this.max.coord[i];
         if (min == max)
@@ -219,16 +214,9 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         if (min.equals(max)) {
             return min.toString();
         } else {
-            final StringBuilder sb = new StringBuilder();
-            sb.append('(');
-            sb.append(min);
-            sb.append(',');
-            sb.append(max);
-            sb.append(')');
-            return sb.toString();
+            return new StringBuilder().append('(').append(min).append(',').append(max).append(')').toString();
         }
     }
-
 
 
     public final static class Builder<X extends RectDoubleND> implements Function<X, HyperRect> {

@@ -40,24 +40,14 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
     public static final HyperRect ALL_2 = RectFloatND.all(2);
     public static final HyperRect ALL_3 = RectFloatND.all(3);
     public static final HyperRect ALL_4 = RectFloatND.all(4);
-
-
-    public final FloatND min;
-
-
-    public final FloatND max;
-
-
     public static final FloatND unbounded = new FloatND() {
         @Override
         public String toString() {
             return "*";
         }
     };
-
-    public static HyperRect all(int i) {
-        return new RectFloatND(FloatND.fill(i, NEGATIVE_INFINITY), FloatND.fill(i, POSITIVE_INFINITY));
-    }
+    public final FloatND min;
+    public final FloatND max;
 
     public RectFloatND() {
         min = unbounded;
@@ -69,10 +59,10 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
         max = p;
     }
 
-
     public RectFloatND(float[] a, float[] b) {
         this(new FloatND(a), new FloatND(b));
     }
+
 
     public RectFloatND(final FloatND a, final FloatND b) {
         int dim = a.dim();
@@ -92,6 +82,9 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
         this.max = new FloatND(max);
     }
 
+    public static HyperRect all(int i) {
+        return new RectFloatND(FloatND.fill(i, NEGATIVE_INFINITY), FloatND.fill(i, POSITIVE_INFINITY));
+    }
 
     @Override
     public boolean contains(final HyperRect _inner) {
@@ -100,7 +93,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
         int dim = dim();
         for (int i = 0; i < dim; i++) {
             if (!(min.coord[i] <= inner.min.coord[i] && max.coord[i] >= inner.max.coord[i]))
-            //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
+                //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
                 return false;
         }
         return true;
@@ -146,7 +139,8 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
     }
 
 
-    @Override public double center(int dim) {
+    @Override
+    public double center(int dim) {
         return centerF(dim);
     }
 
@@ -160,7 +154,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
         if (max == Float.POSITIVE_INFINITY)
             return min;
 
-        return (max + min)/2f;
+        return (max + min) / 2f;
     }
 
     @Override
@@ -189,7 +183,8 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
         return max;
     }
 
-    @Override public double getRange(final int i) {
+    @Override
+    public double getRange(final int i) {
         float min = this.min.coord[i];
         float max = this.max.coord[i];
         if (min == max)
@@ -228,7 +223,6 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable {
             return sb.toString();
         }
     }
-
 
 
     public final static class Builder<X extends RectFloatND> implements Function<X, HyperRect> {

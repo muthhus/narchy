@@ -98,7 +98,7 @@ public abstract class RectDouble1D implements HyperRect<Double1D> {
 
         @Override
         public String toString() {
-            return "[" + from +  "," + to + "]";
+            return "[" + from + ',' + to + ']';
         }
 
         @Override

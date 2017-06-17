@@ -35,15 +35,18 @@ public interface HyperRect<X extends HyperPoint> {
      * @param r - mbr to add
      * @return new HyperRect representing mbr of both HyperRects combined
      */
-    @Deprecated HyperRect<X> mbr(HyperRect<X> r);
+    @Deprecated
+    HyperRect<X> mbr(HyperRect<X> r);
 
 
-    /** warning, the array may contain nulls. in which case, break because these will be at the end */
+    /**
+     * warning, the array may contain nulls. in which case, break because these will be at the end
+     */
     default HyperRect<X> mbr(HyperRect<X>[] rect) {
         HyperRect<X> bounds = rect[0];
         for (int k = 1; k < rect.length; k++) {
             HyperRect<X> r = rect[k];
-            if (r==null)
+            if (r == null)
                 break;
             bounds = bounds.mbr(r);
         }
@@ -94,10 +97,7 @@ public interface HyperRect<X extends HyperPoint> {
 
     default double getRangeFinite(int d, double elseValue) {
         double r = getRange(d);
-        if (!Double.isFinite(r))
-            return elseValue;
-        else
-            return r;
+        return !Double.isFinite(r) ? elseValue : r;
     }
 
 

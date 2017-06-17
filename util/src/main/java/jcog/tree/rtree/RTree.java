@@ -57,30 +57,33 @@ public class RTree<T> implements Spatialized<T> {
         this(null);
     }
 
-    public RTree(@Nullable final Function<T,HyperRect> spatialize) {
-        this(spatialize, 2, 8, Split.AXIAL );
+    public RTree(@Nullable final Function<T, HyperRect> spatialize) {
+        this(spatialize, 2, 8, Split.AXIAL);
     }
 
-    public RTree(@Nullable Function<T,HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
+    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final Split splitType) {
         this.mMin = (short) mMin;
         this.mMax = (short) mMax;
 
         if (spatialize == null)
-            spatialize = (Function)this; //attempt to use subclass implementations of the Function<>
+            spatialize = (Function) this; //attempt to use subclass implementations of the Function<>
 
         this.size = 0;
         this.root = splitType.newLeaf(spatialize, mMin, mMax);
     }
 
     public static boolean equals(float a, float b) {
-        return equals(a, b, FPSILON );
+        return equals(a, b, FPSILON);
     }
+
     public static boolean equals(float a, float b, float epsilon) {
-        return a==b || Math.abs(a - b) < epsilon;
+        return a == b || Math.abs(a - b) < epsilon;
     }
+
     public static boolean equals(double a, double b) {
         return equals(a, b, EPSILON);
     }
+
     public static boolean equals(double a, double b, double epsilon) {
         return a == b || Math.abs(a - b) < epsilon;
     }
@@ -94,6 +97,7 @@ public class RTree<T> implements Spatialized<T> {
         }
         return true;
     }
+
     public static boolean equals(double[] a, double[] b, double epsilon) {
         if (a == b) return true;
         int l = a.length;
@@ -104,12 +108,15 @@ public class RTree<T> implements Spatialized<T> {
         return true;
     }
 
-    /** TODO handle duplicate items (ie: dont increase entryCount if exists) */
-    @Override public boolean add(final T t) {
+    /**
+     * TODO handle duplicate items (ie: dont increase entryCount if exists)
+     */
+    @Override
+    public boolean add(final T t) {
         int before = size;
         root = root.add(t, this);
         int after = size;
-        assert(after == before || after == before + 1);
+        assert (after == before || after == before + 1): "after=" + after + ", before=" + before;
         return after > before;
     }
 
@@ -120,12 +127,12 @@ public class RTree<T> implements Spatialized<T> {
             return false;
         root = root.remove(t, this);
         int after = size;
-        assert(after == before || after == before - 1);
+        assert (after == before || after == before - 1);
         return before > after;
     }
 
     @Override
-    public void update(final T told, final T tnew) {
+    public void replace(final T told, final T tnew) {
         root.update(told, tnew);
     }
 
@@ -196,16 +203,22 @@ public class RTree<T> implements Spatialized<T> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[size=" + size() + "]";
+        return getClass().getSimpleName() + "[size=" + size() + ']';
     }
 
-    @NotNull public Node<T> getRoot() {
+    @NotNull
+    public Node<T> root() {
         return this.root;
     }
 
     @Override
     public void reportSizeDelta(int i) {
         this.size += i;
+    }
+
+    @Override
+    public boolean contains(T t) {
+        return root.contains(t);
     }
 
 
@@ -219,24 +232,25 @@ public class RTree<T> implements Spatialized<T> {
     public enum Split {
         AXIAL {
             @Override
-            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
                 return new AxialSplitLeaf<>(builder, mMin, m);
             }
         },
         LINEAR {
             @Override
-            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
                 return new LinearSplitLeaf<>(builder, mMin, m);
             }
         },
         QUADRATIC {
             @Override
-            public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m) {
+            public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m) {
                 return new QuadraticSplitLeaf<>(builder, mMin, m);
             }
         },;
 
-        @NotNull abstract public <R> Node<R> newLeaf(Function<R,HyperRect> builder, int mMin, int m);
+        @NotNull
+        abstract public <R> Node<R> newLeaf(Function<R, HyperRect> builder, int mMin, int m);
 
     }
 }

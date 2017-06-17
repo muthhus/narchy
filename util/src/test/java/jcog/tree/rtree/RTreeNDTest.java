@@ -88,11 +88,12 @@ public class RTreeNDTest {
         }
     }
 
-    @Test
+    @Ignore @Test
     public void testSearchAllWithOneDimensionRandomlyInfinite() {
         System.out.println("\n\nINfinites");
         final int entryCount = 400;
-        searchAll(2, 4, (dim) -> RTree2DTest.generateRandomRectsWithOneDimensionRandomlyInfinite(dim, entryCount));
+        searchAll(2, 4,
+                (dim) -> RTree2DTest.generateRandomRectsWithOneDimensionRandomlyInfinite(dim, entryCount));
     }
 
     /**
@@ -152,7 +153,7 @@ public class RTreeNDTest {
 
 
                 Stats s = rTree.stats();
-                System.out.println("\t" + s);
+                s.print(System.out);
                 //System.out.println("\t" + rTree.getRoot());
                 assertTrue(s.getMaxDepth() < 8 /* reasonable */);
             }
@@ -353,7 +354,7 @@ public class RTreeNDTest {
                 final long start = System.nanoTime();
                 int foundCount = rTree.containing(searchRect, results);
                 final long end = System.nanoTime() - start;
-                CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.getRoot();
+                CounterNode<RectDouble2D> root = (CounterNode<RectDouble2D>) rTree.root();
 
                 //System.out.println("[" + type + "] searched " + root.containingCount + " nodes, returning " + foundCount + " entries");
                 System.out.println("[" + type + "] evaluated " + CounterNode.bboxEvalCount + " b-boxes, returning " + foundCount + " entries");
@@ -376,7 +377,7 @@ public class RTreeNDTest {
         assertEquals(rTree.size(), rects.length);
 
         for (int i = 0; i < rects.length; i++) {
-            Assert.assertFalse(rTree.getRoot().containedSet(rects[i]).isEmpty());
+            Assert.assertFalse(rTree.root().containedSet(rects[i]).isEmpty());
         }
     }
 
@@ -398,15 +399,15 @@ public class RTreeNDTest {
 
         assertEquals(1, rTree.size());
 
-        Assert.assertFalse("Missing hyperRect that should  be found " + rects[0], rTree.getRoot().containedSet(rects[0]).isEmpty());
+        Assert.assertFalse("Missing hyperRect that should  be found " + rects[0], rTree.root().containedSet(rects[0]).isEmpty());
 
         for (int i = 1; i < rects.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed on search " + rects[i], rTree.getRoot().containedSet(rects[i]).isEmpty());
+            Assert.assertTrue("Found hyperRect that should have been removed on search " + rects[i], rTree.root().containedSet(rects[i]).isEmpty());
         }
 
         final RectDouble2D hr = new RectDouble2D(0, 0, 5, 5);
         rTree.add(hr);
-        Assert.assertFalse(rTree.getRoot().containedSet(hr).isEmpty());
+        Assert.assertFalse(rTree.root().containedSet(hr).isEmpty());
         Assert.assertTrue("Found hyperRect that should have been removed on search", rTree.size() != 0);
     }
 
@@ -452,7 +453,7 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < rect.length; i++) {
-            Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.getRoot().containedSet(rect[i]).isEmpty());
+            Assert.assertTrue("Found hyperRect that should have been removed " + rect[i], rTree.root().containedSet(rect[i]).isEmpty());
         }
     }
 
@@ -477,7 +478,7 @@ public class RTreeNDTest {
         assertEquals(0, rTree.size());
 
         for (int i = 0; i < N; i++) {
-            Assert.assertTrue("#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i], rTree.getRoot().containedSet(rect[i]).isEmpty());
+            Assert.assertTrue("#" + i + " of " + rect.length + ": Found hyperRect that should have been removed" + rect[i], rTree.root().containedSet(rect[i]).isEmpty());
         }
 
         Assert.assertFalse("Found hyperRect that should have been removed on search ", rTree.size() > 0);
@@ -557,7 +558,7 @@ public class RTreeNDTest {
         rTree.add(rect);
         RectDouble2D oldRect = new RectDouble2D(0, 1, 2, 3);
         RectDouble2D newRect = new RectDouble2D(1, 2, 3, 4);
-        rTree.update(oldRect, newRect);
+        rTree.replace(oldRect, newRect);
         RectDouble2D[] results = new RectDouble2D[2];
         final int num = rTree.containing(newRect, results);
         Assert.assertTrue("Did not find the updated HyperRect", num == 1);

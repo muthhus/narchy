@@ -71,7 +71,7 @@ public class QuadraticSplitLeafTest {
         // 5 entrees guarantees a split
         rTree.add(new RectDouble2D(0, 2, 1, 4));
 
-        Branch root = (Branch) rTree.getRoot();
+        Branch root = (Branch) rTree.root();
         Node<RectDouble2D>[] children = root.children();
         int childCount = 0;
         for(Node c : children) {

@@ -124,7 +124,7 @@ abstract public class HijackTemporalExtendedBeliefTable2 extends HijackTemporalB
                 for (int i = 0; i < toRemove; i++) {
 
                     //after each one is removed, call super.remove(x)
-                    Node<Task> n = h.getRoot();
+                    Node<Task> n = h.root();
 
                     long min = n.bounds().min().coord(0);
 

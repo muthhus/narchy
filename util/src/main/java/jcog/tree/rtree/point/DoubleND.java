@@ -79,11 +79,11 @@ public class DoubleND implements HyperPoint, Serializable {
 
     @Override
     public final boolean isInfNeg() {
-        return this.isEntirely(-1.0 / 0.0);
+        return this.isEntirely(Double.NEGATIVE_INFINITY);
     }
 
     @Override
     public final boolean isInfPos() {
-        return this.isEntirely(1.0 / 0.0);
+        return this.isEntirely(Double.POSITIVE_INFINITY);
     }
 }
