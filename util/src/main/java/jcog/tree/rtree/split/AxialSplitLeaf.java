@@ -39,7 +39,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
     public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
         final Branch<T> pNode = model.newBranch();
 
-        final int nD = model.builder.apply(leaf.data[0]).dim(); //TODO builder.dim()
+        final int nD = model.bounds(leaf.data[0]).dim(); //TODO builder.dim()
 
         // choose axis to split
         int axis = 0;
@@ -57,7 +57,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final int splitDimension = axis;
 
         short size = leaf.size;
-        final HyperRect[] sortedMbr = HyperRect.toArray(leaf.data, size, model.builder);
+        final HyperRect[] sortedMbr = HyperRect.toArray(leaf.data, size, model.bounds);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
@@ -80,7 +80,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
 
         for (int j = 0; j < leaf.size; j++) {
             T jd = leaf.data[j];
-            HyperRect jr = model.builder.apply(jd);
+            HyperRect jr = model.bounds(jd);
 
             for (int i = from; i < to; i++) {
                 HyperRect si = sortedSrc[i];

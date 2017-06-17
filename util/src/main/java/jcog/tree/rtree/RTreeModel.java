@@ -9,19 +9,23 @@ import java.util.function.Function;
 public class RTreeModel<T> {
 
     public final Split<T> split;
-    public final Function<T, HyperRect> builder;
+    public final Function<T, HyperRect> bounds;
     public final short max;       // max entries per node
     public final short min;       // least number of entries per node
 
-    public RTreeModel(@Deprecated final Function<T, HyperRect> builder, DefaultSplits split, final int min, final int max) {
-        this(builder, split.get(), min, max);
+    public RTreeModel(@Deprecated final Function<T, HyperRect> bounds, DefaultSplits split, final int min, final int max) {
+        this(bounds, split.get(), min, max);
     }
 
-    public RTreeModel(@Deprecated final Function<T, HyperRect> builder, final Split<T> split, final int min, final int max) {
+    public RTreeModel(@Deprecated final Function<T, HyperRect> bounds, final Split<T> split, final int min, final int max) {
         this.max = (short) max;
         this.min = (short) min;
-        this.builder = builder;
+        this.bounds = bounds;
         this.split = split;
+    }
+
+    public HyperRect bounds(T t) {
+        return bounds.apply(t);
     }
 
     public Node<T> newLeaf() {

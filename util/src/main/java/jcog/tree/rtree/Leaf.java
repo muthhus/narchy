@@ -53,7 +53,7 @@ public class Leaf<T> implements Node<T> {
             Node<T> next;
 
             if (size < model.max) {
-                final HyperRect tRect = model.builder.apply(t);
+                final HyperRect tRect = model.bounds(t);
                 bounds = bounds != null ? bounds.mbr(tRect) : tRect;
 
                 data[size++] = t;
@@ -124,7 +124,7 @@ public class Leaf<T> implements Node<T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRect.mbr(data, model.builder) : null;
+            bounds = size > 0 ? HyperRect.mbr(data, model.bounds) : null;
 
         }
 
@@ -143,7 +143,7 @@ public class Leaf<T> implements Node<T> {
                 data[i] = tnew;
             }
 
-            bounds = i == 0 ? model.builder.apply(data[0]) : bounds.mbr(model.builder.apply(data[i]));
+            bounds = i == 0 ? model.bounds(data[0]) : bounds.mbr(model.bounds(data[i]));
         }
 
         return this;
@@ -154,7 +154,7 @@ public class Leaf<T> implements Node<T> {
     public boolean containing(HyperRect R, Predicate<T> t, RTreeModel<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (R.contains(model.builder.apply(d))) {
+            if (R.contains(model.bounds(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -192,7 +192,7 @@ public class Leaf<T> implements Node<T> {
     public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (rect.intersects(model.builder.apply(d))) {
+            if (rect.intersects(model.bounds(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -218,7 +218,7 @@ public class Leaf<T> implements Node<T> {
      */
     public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, RTreeModel<T> model) {
 
-        final HyperRect tRect = model.builder.apply(t);
+        final HyperRect tRect = model.bounds(t);
         final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);
 
         double tCost = tRect.cost();

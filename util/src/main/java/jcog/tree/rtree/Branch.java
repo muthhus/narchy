@@ -50,7 +50,7 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public boolean contains(T t, RTreeModel<T> model) {
-        if (!bounds().contains(model.builder.apply(t)))
+        if (!bounds().contains(model.bounds(t)))
             return false;
         for (int i = 0; i < size; i++) {
             if (child[i].contains(t, model))
@@ -105,7 +105,7 @@ public final class Branch<T> implements Node<T> {
     public Node<T> add(final T t, Nodelike<T> parent, RTreeModel<T> model) {
         assert (childDiff == 0);
 
-        final HyperRect tRect = model.builder.apply(t);
+        final HyperRect tRect = model.bounds(t);
 
         for (int i = 0; i < size; i++) {
             Node ci = child[i];
@@ -178,7 +178,7 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public Node<T> remove(final T t, Nodelike<T> parent, RTreeModel<T> model) {
-        final HyperRect tRect = model.builder.apply(t);
+        final HyperRect tRect = model.bounds(t);
 
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(tRect)) {
@@ -218,7 +218,7 @@ public final class Branch<T> implements Node<T> {
 
     @Override
     public Node<T> update(final T OLD, final T NEW, RTreeModel<T> model) {
-        final HyperRect tRect = model.builder.apply(OLD);
+        final HyperRect tRect = model.bounds(OLD);
 
         //TODO may be able to avoid recomputing bounds if the old was not found
         boolean found = false;

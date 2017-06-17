@@ -39,7 +39,7 @@ public final class LinearSplitLeaf<T> implements Split<T> {
         final int MAX = 1;
         final int NRANGE = 2;
         T[] data = leaf.data;
-        final int nD = model.builder.apply(data[0]).dim();
+        final int nD = model.bounds(data[0]).dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double[] separation = new double[nD];
@@ -56,31 +56,31 @@ public final class LinearSplitLeaf<T> implements Split<T> {
             for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
 
-                HyperRect rj = model.builder.apply(data[j]);
+                HyperRect rj = model.bounds(data[j]);
                 Comparable rjMin = rj.min().coord(d);
-                if (model.builder.apply(data[rd[MIN][MIN]]).min().coord(d).compareTo(rjMin) > 0) {
+                if (model.bounds(data[rd[MIN][MIN]]).min().coord(d).compareTo(rjMin) > 0) {
                     rd[MIN][MIN] = j;
                 }
 
-                if (model.builder.apply(data[rd[MIN][MAX]]).min().coord(d).compareTo(rjMin) < 0) {
+                if (model.bounds(data[rd[MIN][MAX]]).min().coord(d).compareTo(rjMin) < 0) {
                     rd[MIN][MAX] = j;
                 }
 
                 Comparable rjMax = rj.max().coord(d);
-                if (model.builder.apply(data[rd[MAX][MIN]]).max().coord(d).compareTo(rjMax) > 0) {
+                if (model.bounds(data[rd[MAX][MIN]]).max().coord(d).compareTo(rjMax) > 0) {
                     rd[MAX][MIN] = j;
                 }
 
-                if (model.builder.apply(data[rd[MAX][MAX]]).max().coord(d).compareTo(rjMax) < 0) {
+                if (model.bounds(data[rd[MAX][MAX]]).max().coord(d).compareTo(rjMax) < 0) {
                     rd[MAX][MAX] = j;
                 }
             }
 
             // highest max less lowest min
-            final double width = model.builder.apply(data[rIndex[d][MAX][MAX]]).max().distance(model.builder.apply(data[rIndex[d][MIN][MIN]]).min(), d);
+            final double width = model.bounds(data[rIndex[d][MAX][MAX]]).max().distance(model.bounds(data[rIndex[d][MIN][MIN]]).min(), d);
 
             // lowest max less highest min (normalized)
-            separation[d] = model.builder.apply(data[rIndex[d][MAX][MIN]]).max().distance(model.builder.apply(data[rIndex[d][MIN][MAX]]).min(), d) / width;
+            separation[d] = model.bounds(data[rIndex[d][MAX][MIN]]).max().distance(model.bounds(data[rIndex[d][MIN][MAX]]).min(), d) / width;
         }
 
         int r1Ext = rIndex[0][MAX][MIN], r2Ext = rIndex[0][MIN][MAX];
