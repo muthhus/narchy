@@ -1192,21 +1192,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     @Nullable
-    private Concept concept(@NotNull Termed termed, boolean createIfMissing) {
+    private Concept concept(@NotNull Termed _termed, boolean createIfMissing) {
 
-        termed = termed.unneg();
+        Term term = _termed.unneg();
 
-        if (termed instanceof Concept) {
-            Concept ct = (Concept) termed;
+        if (term instanceof Concept) {
+            Concept ct = (Concept) term;
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
         }
 
-        Term term = conceptTerm(termed.term());
-        return (term == null) ? null : terms.concept(term, createIfMissing);
-
-
+        Term cterm = conceptTerm(term);
+        return (cterm == null) ? null : terms.concept(cterm, createIfMissing);
     }
 
     /**

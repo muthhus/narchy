@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static nars.Op.NEG;
+
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Compound, Termlike {
 
@@ -95,7 +97,9 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Override
     public @NotNull Op op() {
-        return term.op();
+        Op t = term.op();
+        assert(t!=NEG); //HACK
+        return t;
     }
 
 
