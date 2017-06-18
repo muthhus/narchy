@@ -39,7 +39,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
     public Node<T> split(T t, Leaf<T> leaf, Spatialization<T> model) {
         final Branch<T> pNode = model.newBranch();
 
-        final int nD = model.bounds(leaf.data[0]).dim(); //TODO builder.dim()
+        final int nD = model.region(leaf.data[0]).dim(); //TODO builder.dim()
 
         // choose axis to split
         int axis = 0;
@@ -57,7 +57,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final int splitDimension = axis;
 
         short size = leaf.size;
-        final HyperRect[] sortedMbr = HyperRect.toArray(leaf.data, size, model.bounds);
+        final HyperRegion[] sortedMbr = HyperRegion.toArray(leaf.data, size, model.bounds);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
@@ -76,14 +76,14 @@ public final class AxialSplitLeaf<T> implements Split<T> {
     }
 
 
-    private static <T> void transfer(Leaf<T> leaf, HyperRect[] sortedSrc, Node<T> target, int from, int to, Spatialization<T> model) {
+    private static <T> void transfer(Leaf<T> leaf, HyperRegion[] sortedSrc, Node<T> target, int from, int to, Spatialization<T> model) {
 
         for (int j = 0; j < leaf.size; j++) {
             T jd = leaf.data[j];
-            HyperRect jr = model.bounds(jd);
+            HyperRegion jr = model.region(jd);
 
             for (int i = from; i < to; i++) {
-                HyperRect si = sortedSrc[i];
+                HyperRegion si = sortedSrc[i];
 
                 if (si!=null && jr.equals(si)) {
                     target.add(jd, leaf, model);

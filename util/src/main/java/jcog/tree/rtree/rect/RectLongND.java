@@ -1,7 +1,7 @@
 package jcog.tree.rtree.rect;
 
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.point.LongND;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,12 +13,12 @@ import java.util.function.Function;
  * Created by jcovert on 6/15/15.
  */
 
-public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<RectLongND> {
+public class RectLongND implements HyperRegion<LongND>, Serializable, Comparable<RectLongND> {
 
-    public static final HyperRect ALL_1 = RectLongND.all(1);
-    public static final HyperRect ALL_2 = RectLongND.all(2);
-    public static final HyperRect ALL_3 = RectLongND.all(3);
-    public static final HyperRect ALL_4 = RectLongND.all(4);
+    public static final HyperRegion ALL_1 = RectLongND.all(1);
+    public static final HyperRegion ALL_2 = RectLongND.all(2);
+    public static final HyperRegion ALL_3 = RectLongND.all(3);
+    public static final HyperRegion ALL_4 = RectLongND.all(4);
     public static final LongND unbounded = new LongND() {
         @Override
         public String toString() {
@@ -61,12 +61,12 @@ public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<R
         this.max = new LongND(max);
     }
 
-    public static HyperRect all(int i) {
+    public static HyperRegion all(int i) {
         return new RectLongND(LongND.fill(i, Long.MIN_VALUE), LongND.fill(i, Long.MAX_VALUE));
     }
 
     @Override
-    public boolean contains(final HyperRect _inner) {
+    public boolean contains(final HyperRegion _inner) {
         final RectLongND inner = (RectLongND) _inner;
 
         int dim = dim();
@@ -79,7 +79,7 @@ public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<R
     }
 
     @Override
-    public boolean intersects(final HyperRect r) {
+    public boolean intersects(final HyperRegion r) {
         final RectLongND x = (RectLongND) r;
 
         int dim = dim();
@@ -104,7 +104,7 @@ public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<R
     }
 
     @Override
-    public HyperRect mbr(final HyperRect r) {
+    public HyperRegion mbr(final HyperRegion r) {
         final RectLongND x = (RectLongND) r;
 
         int dim = dim();
@@ -153,13 +153,13 @@ public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<R
     }
 
     @Override
-    public LongND min() {
-        return min;
+    public double coord(boolean maxOrMin, int dimension) {
+        return maxOrMin ? max.coord[dimension] : min.coord[dimension];
     }
 
     @Override
-    public LongND max() {
-        return max;
+    public double distance(HyperRegion X, int dim, boolean maxOrMin, boolean XmaxOrMin) {
+        return max.coord[dim] - min.coord[dim];
     }
 
     @Override
@@ -212,7 +212,7 @@ public class RectLongND implements HyperRect<LongND>, Serializable, Comparable<R
     }
 
 
-    public final static class Builder<X extends RectLongND> implements Function<X, HyperRect> {
+    public final static class Builder<X extends RectLongND> implements Function<X, HyperRegion> {
 
         @Override
         public X apply(final X rect2D) {

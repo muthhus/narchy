@@ -48,15 +48,15 @@ public class Rect2DTest {
 
         // shouldn't affect MBR
         RectDouble2D rectInside = new RectDouble2D(0, 0, 1, 1);
-        HyperRect mbr = rect.mbr(rectInside);
-        double expectedMinX = rect.min().coord(0);
-        double expectedMinY = rect.min().coord(1);
-        double expectedMaxX = rect.max().coord(0);
-        double expectedMaxY = rect.max().coord(1);
-        double actualMinX = mbr.min().coord(0);
-        double actualMinY = mbr.min().coord(1);
-        double actualMaxX = mbr.max().coord(0);
-        double actualMaxY = mbr.max().coord(1);
+        RectDouble2D mbr = rect.mbr(rectInside);
+        double expectedMinX = rect.min.x;
+        double expectedMinY = rect.min.y;
+        double expectedMaxX = rect.max.x;
+        double expectedMaxY = rect.max.y;
+        double actualMinX = mbr.min.x;
+        double actualMinY = mbr.min.y;
+        double actualMaxX = mbr.max.x;
+        double actualMaxY = mbr.max.y;
         Assert.assertTrue("Bad minX - Expected: " + expectedMinX + " Actual: " + actualMinX, actualMinX == expectedMinX);
         Assert.assertTrue("Bad minY - Expected: " + expectedMinY + " Actual: " + actualMinY, actualMinY == expectedMinY);
         Assert.assertTrue("Bad maxX - Expected: " + expectedMaxX + " Actual: " + actualMaxX, actualMaxX == expectedMaxX);
@@ -69,10 +69,10 @@ public class Rect2DTest {
         expectedMinY = 0.0d;
         expectedMaxX = 5.0d;
         expectedMaxY = 4.0d;
-        actualMinX = mbr.min().coord(0);
-        actualMinY = mbr.min().coord(1);
-        actualMaxX = mbr.max().coord(0);
-        actualMaxY = mbr.max().coord(1);
+        actualMinX = mbr.min.x;
+        actualMinY = mbr.min.y;
+        actualMaxX = mbr.max.x;
+        actualMaxY = mbr.max.y;
         Assert.assertTrue("Bad minX - Expected: " + expectedMinX + " Actual: " + actualMinX, actualMinX == expectedMinX);
         Assert.assertTrue("Bad minY - Expected: " + expectedMinY + " Actual: " + actualMinY, actualMinY == expectedMinY);
         Assert.assertTrue("Bad maxX - Expected: " + expectedMaxX + " Actual: " + actualMaxX, actualMaxX == expectedMaxX);

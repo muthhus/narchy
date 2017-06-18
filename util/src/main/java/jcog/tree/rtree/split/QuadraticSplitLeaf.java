@@ -34,7 +34,7 @@ public final class QuadraticSplitLeaf<T> implements Split<T> {
 
         final Branch<T> pNode = model.newBranch();
 
-        final Node<T> l1Node = model.newLeaf();;
+        final Node<T> l1Node = model.newLeaf();
         final Node<T> l2Node = model.newLeaf();
 
         // find the two rectangles that are most wasteful
@@ -43,10 +43,10 @@ public final class QuadraticSplitLeaf<T> implements Split<T> {
         int r1Max = 0, r2Max = size - 1;
         T[] data = leaf.data;
         for (int i = 0; i < size; i++) {
-            HyperRect ii = model.bounds(data[i]);
+            HyperRegion ii = model.region(data[i]);
             for (int j = i + 1; j < size; j++) {
-                HyperRect jj = model.bounds(data[j]);
-                final HyperRect mbr = ii.mbr(jj);
+                HyperRegion jj = model.region(data[j]);
+                final HyperRegion mbr = ii.mbr(jj);
                 final double cost = mbr.cost() - (ii.cost() + jj.cost());
                 if (cost > minCost) {
                     r1Max = i;

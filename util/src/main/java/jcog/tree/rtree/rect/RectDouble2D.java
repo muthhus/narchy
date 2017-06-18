@@ -20,7 +20,7 @@ package jcog.tree.rtree.rect;
  * #L%
  */
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,7 @@ import java.util.function.Function;
 /**
  * Created by jcovert on 6/15/15.
  */
-public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2D> {
+public class RectDouble2D implements HyperRegion<Double2D>, Comparable<RectDouble2D> {
     public final Double2D min;
     public final Double2D max;
 
@@ -82,7 +82,7 @@ public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2
 
 
     @Override
-    public HyperRect<Double2D> mbr(final HyperRect<Double2D> r) {
+    public RectDouble2D mbr(final HyperRegion<Double2D> r) {
         final RectDouble2D r2 = (RectDouble2D) r;
         final double minX = Math.min(min.x, r2.min.x);
         final double minY = Math.min(min.y, r2.min.y);
@@ -116,15 +116,14 @@ public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2
         }
     }
 
-    @Override
-    public Double2D min() {
-        return min;
-    }
 
     @Override
-    public Double2D max() {
-        return max;
+    public double coord(boolean maxOrMin, int dimension) {
+        Double2D e = (maxOrMin ? max : min);
+        assert(dimension==0 || dimension==1);
+        return dimension==0 ? e.x : e.y;
     }
+
 
     @Override
     public double getRange(final int d) {
@@ -138,7 +137,7 @@ public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2
     }
 
     @Override
-    public boolean contains(@NotNull final HyperRect r) {
+    public boolean contains(@NotNull final HyperRegion r) {
         final RectDouble2D r2 = (RectDouble2D) r;
 
         return min.x <= r2.min.x &&
@@ -148,7 +147,7 @@ public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2
     }
 
     @Override
-    public boolean intersects(final HyperRect r) {
+    public boolean intersects(final HyperRegion r) {
         final RectDouble2D r2 = (RectDouble2D) r;
 
         return !((min.x > r2.max.x) || (r2.min.x > max.x) ||
@@ -208,10 +207,10 @@ public class RectDouble2D implements HyperRect<Double2D>, Comparable<RectDouble2
         return b;
     }
 
-    public final static class Builder implements Function<RectDouble2D, HyperRect> {
+    public final static class Builder implements Function<RectDouble2D, HyperRegion> {
 
         @Override
-        public HyperRect apply(final RectDouble2D rect2D) {
+        public HyperRegion apply(final RectDouble2D rect2D) {
             return rect2D;
         }
 

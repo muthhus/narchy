@@ -30,13 +30,16 @@ import java.util.function.Function;
 
 import static java.lang.Math.abs;
 
-public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRect<LongND>> {
+public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRegion<LongND>> {
 
     static final int radius = 16;
 
+
+
+
     final Space<Task> tree;
 
-    final Map<SignalTask, HyperRect> activeSignals = new ConcurrentHashMap<>();
+    final Map<SignalTask, HyperRegion> activeSignals = new ConcurrentHashMap<>();
 
     private long lastUpdate = Long.MIN_VALUE;
     private final AtomicBoolean compressing = new AtomicBoolean(false);
@@ -141,14 +144,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         return tree.cursor(timeRange(start, end));
     }
 
-    private HyperRect timeRange(long a, long b) {
+    private HyperRegion timeRange(long a, long b) {
         return new RectLongND(new long[]{a, Long.MIN_VALUE}, new long[]{b, Long.MAX_VALUE});
     }
 
 
     @NotNull
     @Override
-    public HyperRect<LongND> apply(@NotNull Task task) {
+    public HyperRegion<LongND> apply(@NotNull Task task) {
         long start = task.start();
         long end = task.end();
 
@@ -304,10 +307,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
             Node<Task> oldest = b.childMin(c -> {
                 RectLongND cb = (RectLongND) c.bounds();
                 float dur = nar.dur();
-                long start = cb.min().coord(0);
-                long end = cb.max().coord(0);
-                long minFreq = cb.min().coord(1);
-                long maxFreq = cb.min().coord(1);
+                long start = cb.min.coord[0];
+                long end = cb.max.coord[0];
+                long minFreq = cb.min.coord[1];
+                long maxFreq = cb.min.coord[1];
                 float freqDiff = undither32((int) (maxFreq>>32)) - undither32((int) (minFreq>>32));
                 float startAway = abs(start - now) / dur;
                 float endAway = abs(end - now) / dur;
@@ -366,7 +369,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         x.delete();
 
         if (x instanceof SignalTask) {
-            HyperRect curBounds = activeSignals.remove(x);
+            HyperRegion curBounds = activeSignals.remove(x);
             if (curBounds != null) {
                 return tree.remove(x, curBounds);
             }

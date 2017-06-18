@@ -1,13 +1,13 @@
 package jcog.tree.rtree.rect;
 
 import jcog.Util;
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.point.Long1D;
 
 /**
  * Created by me on 12/2/16.
  */
-public class RectLong1D implements HyperRect<Long1D> {
+public class RectLong1D implements HyperRegion<Long1D> {
 
     public final long min, max;
 
@@ -27,13 +27,13 @@ public class RectLong1D implements HyperRect<Long1D> {
     }
 
     @Override
-    public HyperRect<Long1D> mbr(HyperRect<Long1D>[] rect) {
+    public HyperRegion<Long1D> mbr(HyperRegion<Long1D>[] rect) {
         int n = rect.length;
         assert (n > 0);
         if (n == 1)
             return rect[0];
         long min = Long.MAX_VALUE, max = Long.MIN_VALUE;
-        for (HyperRect h : rect) {
+        for (HyperRegion h : rect) {
             if (h == null)
                 break;
             RectLong1D r = (RectLong1D) h;
@@ -46,7 +46,7 @@ public class RectLong1D implements HyperRect<Long1D> {
     }
 
     @Override
-    public HyperRect<Long1D> mbr(HyperRect<Long1D> r) {
+    public HyperRegion<Long1D> mbr(HyperRegion<Long1D> r) {
 
         RectLong1D s = (RectLong1D) r;
         long f = Math.min(min, s.min);
@@ -74,14 +74,12 @@ public class RectLong1D implements HyperRect<Long1D> {
     }
 
     @Override
-    public Long1D min() {
-        return new Long1D(min);
+    public double coord(boolean maxOrMin, int dimension) {
+        assert(dimension==0);
+        return maxOrMin ? max : min;
     }
 
-    @Override
-    public Long1D max() {
-        return new Long1D(max);
-    }
+
 
     @Override
     public Long1D center() {
@@ -101,13 +99,13 @@ public class RectLong1D implements HyperRect<Long1D> {
     }
 
     @Override
-    public boolean contains(HyperRect<Long1D> r) {
+    public boolean contains(HyperRegion<Long1D> r) {
         RectLong1D inner = (RectLong1D) r;
         return inner.min >= min && inner.max <= max;
     }
 
     @Override
-    public boolean intersects(HyperRect<Long1D> r) {
+    public boolean intersects(HyperRegion<Long1D> r) {
         RectLong1D rr = (RectLong1D) r;
         return (Math.max(min, rr.min) <= Math.min(max, rr.max));
     }

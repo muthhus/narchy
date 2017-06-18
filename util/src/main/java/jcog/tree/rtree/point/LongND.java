@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class LongND implements HyperPoint, Serializable, Comparable<LongND> {
 
     public final long[] coord;
-    private int hash;
+    private final int hash;
 
     public LongND(LongND copy) {
         this(copy.coord.clone());

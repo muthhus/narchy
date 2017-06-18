@@ -16,12 +16,12 @@ public class RTreeCursor<T> {
     private final Space<T> space;
     List<Leaf<T>> starts = new FasterList();
 
-    public RTreeCursor(Space<T> space, HyperRect start) {
+    public RTreeCursor(Space<T> space, HyperRegion start) {
         this.space = space;
         go(start);
     }
 
-    protected void go(HyperRect region) {
+    protected void go(HyperRegion region) {
         starts.clear();
         space.intersectingNodes(region, (n) -> {
             if (n instanceof Leaf)

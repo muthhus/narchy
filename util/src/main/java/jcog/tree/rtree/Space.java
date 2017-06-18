@@ -43,7 +43,7 @@ public interface Space<T> extends Nodelike<T> {
      * @param <T>         - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Space<T> rTree(final Function<T, HyperRect> spatializer) {
+    static <T> Space<T> rTree(final Function<T, HyperRegion> spatializer) {
         return new RTree<>(spatializer, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
     }
 
@@ -57,7 +57,7 @@ public interface Space<T> extends Nodelike<T> {
      * @param <T>       - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Space<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final Spatialization.DefaultSplits splitType) {
+    static <T> Space<T> rTree(final Function<T, HyperRegion> builder, final int minM, final int maxM, final Spatialization.DefaultSplits splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
 //
@@ -102,12 +102,12 @@ public interface Space<T> extends Nodelike<T> {
      * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
     default boolean remove(@NotNull final T x) {
-        return remove(x, model().bounds(x));
+        return remove(x, model().region(x));
     }
 
     Spatialization<T> model();
 
-    boolean remove(final T x, HyperRect xBounds);
+    boolean remove(final T x, HyperRegion xBounds);
 
     /**
      * Update entry in tree
@@ -126,9 +126,9 @@ public interface Space<T> extends Nodelike<T> {
 
     void forEach(Consumer<? super T> consumer);
 
-    boolean intersecting(HyperRect rect, Predicate<T> consumer);
+    boolean intersecting(HyperRegion rect, Predicate<T> consumer);
 
-    boolean containing(HyperRect rect, Predicate<T> consumer);
+    boolean containing(HyperRegion rect, Predicate<T> consumer);
 
     /**
      * Search for entries intersecting given bounding rect
@@ -138,7 +138,7 @@ public interface Space<T> extends Nodelike<T> {
      * @return Number of results found
      */
     @Deprecated
-    int containedToArray(final HyperRect rect, final T[] t);
+    int containedToArray(final HyperRegion rect, final T[] t);
 
 
     Stats stats();
@@ -154,14 +154,14 @@ public interface Space<T> extends Nodelike<T> {
         throw new UnsupportedOperationException();
     }
 
-    default RTreeCursor<T> cursor(HyperRect start) {
+    default RTreeCursor<T> cursor(HyperRegion start) {
         return new RTreeCursor<T>(this, start);
     }
 
     @NotNull Node<T> root();
 
-    void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile);
+    void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile);
 
-    HyperRect bounds(T task);
+    HyperRegion bounds(T task);
 
 }

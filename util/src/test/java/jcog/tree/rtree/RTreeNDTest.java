@@ -196,10 +196,10 @@ public class RTreeNDTest {
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
                 Assert.assertTrue("Unexpected result found:" + results[i],
-                RTree.equals(results[i].min().coord(0), i + 5) &&
-                        RTree.equals(results[i].min().coord(1), i + 5) &&
-                        RTree.equals(results[i].max().coord(0), i + 8) &&
-                        RTree.equals(results[i].max().coord(1), i + 8));
+                RTree.equals(results[i].min.x, i + 5) &&
+                        RTree.equals(results[i].min.y, i + 5) &&
+                        RTree.equals(results[i].max.x, i + 8) &&
+                        RTree.equals(results[i].max.y, i + 8));
             }
         }
     }
@@ -235,10 +235,11 @@ public class RTreeNDTest {
 
             // If the order of nodes in the tree changes, this test may fail while returning the correct results.
             for (int i = 0; i < resultCount; i++) {
-                Assert.assertTrue("Unexpected result found", RTree.equals(results.get(i).min().coord(0), i + 2) &&
-                        RTree.equals(results.get(i).min().coord(1), i + 2) &&
-                        RTree.equals(results.get(i).max().coord(0), i + 5) &&
-                        RTree.equals(results.get(i).max().coord(1), i + 5));
+                Assert.assertTrue("Unexpected result found",
+                RTree.equals(results.get(i).min.x, i + 2) &&
+                        RTree.equals(results.get(i).min.y, i + 2) &&
+                        RTree.equals(results.get(i).max.x, i + 5) &&
+                        RTree.equals(results.get(i).max.y, i + 5));
             }
         }
     }

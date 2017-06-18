@@ -28,7 +28,7 @@ import java.util.function.Function;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRect<X extends HyperPoint> {
+public interface HyperRegion<X extends HyperPoint> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
@@ -37,17 +37,17 @@ public interface HyperRect<X extends HyperPoint> {
      * @param r - mbr to add
      * @return new HyperRect representing mbr of both HyperRects combined
      */
-    HyperRect<X> mbr(HyperRect<X> r);
+    HyperRegion<X> mbr(HyperRegion<X> r);
 
 
-    static <X> HyperRect mbr(Function<X, HyperRect> builder, X[] rect, short size) {
+    static <X> HyperRegion mbr(Function<X, HyperRegion> builder, X[] rect, short size) {
         assert(size > 0);
-        HyperRect bounds = builder.apply(rect[0]);
+        HyperRegion bounds = builder.apply(rect[0]);
         for (int k = 1; k < size; k++) {
             X rr = rect[k];
             if (rr == null)
                 continue;
-            HyperRect r = builder.apply(rr);
+            HyperRegion r = builder.apply(rr);
             if (r == null)
                 break;
             bounds = bounds.mbr(r);
@@ -58,12 +58,12 @@ public interface HyperRect<X extends HyperPoint> {
     /**
      * warning, the array may contain nulls. in which case, break because these will be at the end
      */
-    default HyperRect<X> mbr(HyperRect<X>[] rect) {
-        HyperRect<X> bounds = rect[0];
+    default HyperRegion<X> mbr(HyperRegion<X>[] rect) {
+        HyperRegion<X> bounds = rect[0];
         for (int k = 1; k < rect.length; k++) {
-            HyperRect<X> r = rect[k];
+            HyperRegion<X> r = rect[k];
             if (r == null)
-                break;
+                continue;
             bounds = bounds.mbr(r);
         }
         return bounds;
@@ -77,20 +77,27 @@ public interface HyperRect<X extends HyperPoint> {
      */
     int dim();
 
-    /**
-     * Get the minimum HyperPoint of this HyperRect
-     *
-     * @return min HyperPoint
-     */
-    X min();
+//    /**
+//     * Get the minimum HyperPoint of this HyperRect
+//     *
+//     * @return min HyperPoint
+//     */
+//    X min();
+//
+//    /**
+//     * Get the minimum HyperPoint of this HyperRect
+//     *
+//     * @return min HyperPoint
+//     */
+//    X max();
 
     /**
-     * Get the minimum HyperPoint of this HyperRect
-     *
-     * @return min HyperPoint
+     * returns coordinate scalar at the given extremum and dimension
+     * @param maxOrMin
+     *   true = max, false = min
+     * @param dimension which dimension index
      */
-    X max();
-
+    double coord(boolean maxOrMin, int dimension);
 
     /**
      * Get the HyperPoint representing the center point in all dimensions of this HyperRect
@@ -99,9 +106,7 @@ public interface HyperRect<X extends HyperPoint> {
      */
     X center();
 
-    default double center(int d) {
-        return center().coord(d);
-    }
+    double center(int d);
 
     /**
      * Calculate the distance between the min and max HyperPoints in given dimension
@@ -123,7 +128,7 @@ public interface HyperRect<X extends HyperPoint> {
      * @param r - HyperRect to test
      * @return true if contains, false otherwise
      */
-    boolean contains(HyperRect<X> r);
+    boolean contains(HyperRegion<X> r);
 
     /**
      * Determines if this HyperRect contains or intersects parameter HyperRect
@@ -131,7 +136,7 @@ public interface HyperRect<X extends HyperPoint> {
      * @param r - HyperRect to test
      * @return true if intersects, false otherwise
      */
-    boolean intersects(HyperRect<X> r);
+    boolean intersects(HyperRegion<X> r);
 
     /**
      * Calculate the "cost" of this HyperRect - usually the area across all dimensions
@@ -154,13 +159,21 @@ public interface HyperRect<X extends HyperPoint> {
         return p;
     }
 
-    static <T> HyperRect[] toArray(T[] data, int size, Function<T, HyperRect> builder) {
-        HyperRect[] h = new HyperRect[size];
+    static <T> HyperRegion[] toArray(T[] data, int size, Function<T, HyperRegion> builder) {
+        HyperRegion[] h = new HyperRegion[size];
         for (int i = 0; i < size; i++) {
             h[i] = builder.apply(data[i]);
         }
         return h;
     }
+
+    /** gets the distance along a certain dimension from this region's to another's extrema */
+    default double distance(HyperRegion X, int dim, boolean maxOrMin, boolean XmaxOrMin) {
+        return Math.abs(
+            coord(maxOrMin, dim) - X.coord(XmaxOrMin, dim)
+        );
+    }
+
 
 
 //    @JsonIgnore  default double getRangeMin() {

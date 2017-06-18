@@ -61,7 +61,7 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @return number of entries found
      */
     @Override
-    public int containedToArray(HyperRect rect, T[] t) {
+    public int containedToArray(HyperRegion rect, T[] t) {
         readLock.lock();
         try {
             return tree.containedToArray(rect, t);
@@ -92,7 +92,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile) {
+    public void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile) {
         readLock.lock();
         try {
             tree.intersectingNodes(start, eachWhile);
@@ -125,7 +125,7 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @param x - entry to remove
      */
     @Override
-    public boolean remove(T x, HyperRect xBounds) {
+    public boolean remove(T x, HyperRegion xBounds) {
         writeLock.lock();
         try {
             return tree.remove(x, xBounds);
@@ -174,7 +174,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public HyperRect bounds(T task) {
+    public HyperRegion bounds(T task) {
         return tree.bounds(task);
     }
 
@@ -212,7 +212,7 @@ public class ConcurrentRTree<T> implements Space<T> {
      * @param t    - array to hold results
      * @return number of entries found or -1 if lock was not acquired
      */
-    public int trySearch(HyperRect rect, T[] t) {
+    public int trySearch(HyperRegion rect, T[] t) {
         if (readLock.tryLock()) {
             try {
                 return tree.containedToArray(rect, t);
@@ -304,7 +304,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public boolean containing(HyperRect rect, Predicate<T> consumer) {
+    public boolean containing(HyperRegion rect, Predicate<T> consumer) {
         readLock.lock();
         boolean result;
         try {
@@ -316,7 +316,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> consumer) {
+    public boolean intersecting(HyperRegion rect, Predicate<T> consumer) {
         readLock.lock();
         boolean result;
         try {

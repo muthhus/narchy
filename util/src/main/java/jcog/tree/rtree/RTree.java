@@ -50,11 +50,11 @@ public class RTree<T> implements Space<T> {
     public Spatialization<T> model;
 
 
-    public RTree(@Nullable final Function<T, HyperRect> spatialize) {
+    public RTree(@Nullable final Function<T, HyperRegion> spatialize) {
         this(spatialize, 2, 8, Spatialization.DefaultSplits.AXIAL);
     }
 
-    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final Spatialization.DefaultSplits splitType) {
+    public RTree(@Nullable Function<T, HyperRegion> spatialize, final int mMin, final int mMax, final Spatialization.DefaultSplits splitType) {
         this(new Spatialization<>(spatialize, splitType, mMin, mMax));
     }
 
@@ -126,7 +126,7 @@ public class RTree<T> implements Space<T> {
      * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
      */
     @Override
-    public boolean remove(final T x, HyperRect xBounds) {
+    public boolean remove(final T x, HyperRegion xBounds) {
         int before = size;
         if (before == 0)
             return false;
@@ -175,12 +175,12 @@ public class RTree<T> implements Space<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect intersecting, Predicate<T> consumer) {
+    public boolean intersecting(HyperRegion intersecting, Predicate<T> consumer) {
         return root.intersecting(intersecting, consumer, model);
     }
 
     /** returns how many items were filled */
-    @Override public int containedToArray(HyperRect rect, final T[] t) {
+    @Override public int containedToArray(HyperRegion rect, final T[] t) {
         final int[] i = {0};
         root.containing(rect, (x) -> {
             t[i[0]++] = x;
@@ -189,12 +189,12 @@ public class RTree<T> implements Space<T> {
         return i[0];
     }
 
-    public Set<T> containedAsSet(HyperRect rect) {
+    public Set<T> containedAsSet(HyperRegion rect) {
         return root.containedSet(rect, model);
     }
 
     @Override
-    public boolean containing(HyperRect rect, final Predicate<T> t) {
+    public boolean containing(HyperRegion rect, final Predicate<T> t) {
         return root.containing(rect, t, model);
     }
 
@@ -215,7 +215,7 @@ public class RTree<T> implements Space<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile) {
+    public void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile) {
         root().intersectingNodes(start, eachWhile, model);
     }
 
@@ -239,8 +239,9 @@ public class RTree<T> implements Space<T> {
         return root.contains(t, model);
     }
 
-    public HyperRect bounds(T x) {
-        return model.bounds(x);
+    @Override
+    public HyperRegion bounds(T x) {
+        return model.region(x);
     }
 
 }

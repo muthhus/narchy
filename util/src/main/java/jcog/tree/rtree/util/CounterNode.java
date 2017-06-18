@@ -20,7 +20,7 @@ package jcog.tree.rtree.util;
  * #L%
  */
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.Node;
 import jcog.tree.rtree.Nodelike;
 import jcog.tree.rtree.Spatialization;
@@ -46,7 +46,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public HyperRect bounds() {
+    public HyperRegion bounds() {
         return this.node.bounds();
     }
 
@@ -56,7 +56,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(T x, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
         return this.node.remove(x, xBounds, this, model);
     }
 
@@ -77,14 +77,14 @@ public final class CounterNode<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
+    public boolean containing(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         searchCount++;
         bboxEvalCount += this.node.size();
         return this.node.containing(rect, t, model);
     }
 
     @Override
-    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model) {
+    public void intersectingNodes(HyperRegion rect, Predicate<Node<T>> t, Spatialization<T> model) {
         node.intersectingNodes(rect, t, model);
     }
 
@@ -99,7 +99,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
+    public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         this.node.intersecting(rect, t, model);
         return false;
     }

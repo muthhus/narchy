@@ -21,7 +21,7 @@ package jcog.tree.rtree.rect;
  */
 
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.point.DoubleND;
 
 import java.io.Serializable;
@@ -34,12 +34,12 @@ import static java.lang.Double.POSITIVE_INFINITY;
  * Created by jcovert on 6/15/15.
  */
 
-public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
+public class RectDoubleND implements HyperRegion<DoubleND>, Serializable {
 
-    public static final HyperRect ALL_1 = RectDoubleND.all(1);
-    public static final HyperRect ALL_2 = RectDoubleND.all(2);
-    public static final HyperRect ALL_3 = RectDoubleND.all(3);
-    public static final HyperRect ALL_4 = RectDoubleND.all(4);
+    public static final HyperRegion ALL_1 = RectDoubleND.all(1);
+    public static final HyperRegion ALL_2 = RectDoubleND.all(2);
+    public static final HyperRegion ALL_3 = RectDoubleND.all(3);
+    public static final HyperRegion ALL_4 = RectDoubleND.all(4);
     public static final DoubleND unbounded = new DoubleND() {
         @Override
         public String toString() {
@@ -63,6 +63,10 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         this(new DoubleND(a), new DoubleND(b));
     }
 
+    @Override
+    public double coord(boolean maxOrMin, int dimension) {
+        return (maxOrMin ? max : min).coord[dimension];
+    }
 
     public RectDoubleND(final DoubleND a, final DoubleND b) {
         int dim = a.dim();
@@ -82,12 +86,12 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
         this.max = new DoubleND(max);
     }
 
-    public static HyperRect all(int i) {
+    public static HyperRegion all(int i) {
         return new RectDoubleND(DoubleND.fill(i, NEGATIVE_INFINITY), DoubleND.fill(i, POSITIVE_INFINITY));
     }
 
     @Override
-    public boolean contains(final HyperRect _inner) {
+    public boolean contains(final HyperRegion _inner) {
         final RectDoubleND inner = (RectDoubleND) _inner;
 
         int dim = dim();
@@ -100,7 +104,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
     @Override
-    public boolean intersects(final HyperRect r) {
+    public boolean intersects(final HyperRegion r) {
         final RectDoubleND x = (RectDoubleND) r;
 
         int dim = dim();
@@ -125,7 +129,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
     @Override
-    public HyperRect mbr(final HyperRect r) {
+    public HyperRegion mbr(final HyperRegion r) {
         final RectDoubleND x = (RectDoubleND) r;
 
         int dim = dim();
@@ -174,16 +178,6 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
     @Override
-    public DoubleND min() {
-        return min;
-    }
-
-    @Override
-    public DoubleND max() {
-        return max;
-    }
-
-    @Override
     public double getRange(final int i) {
         double min = this.min.coord[i];
         double max = this.max.coord[i];
@@ -219,7 +213,7 @@ public class RectDoubleND implements HyperRect<DoubleND>, Serializable {
     }
 
 
-    public final static class Builder<X extends RectDoubleND> implements Function<X, HyperRect> {
+    public final static class Builder<X extends RectDoubleND> implements Function<X, HyperRegion> {
 
         @Override
         public X apply(final X rect2D) {

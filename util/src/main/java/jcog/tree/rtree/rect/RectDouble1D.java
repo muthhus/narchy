@@ -1,12 +1,12 @@
 package jcog.tree.rtree.rect;
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.point.Double1D;
 
 /**
  * Created by me on 12/2/16.
  */
-public abstract class RectDouble1D implements HyperRect<Double1D> {
+public abstract class RectDouble1D implements HyperRegion<Double1D> {
 
 
     abstract public double from();
@@ -14,7 +14,7 @@ public abstract class RectDouble1D implements HyperRect<Double1D> {
     abstract public double to();
 
     @Override
-    public HyperRect mbr(HyperRect r) {
+    public HyperRegion mbr(HyperRegion r) {
 
         RectDouble1D s = (RectDouble1D) r;
         double from = from();
@@ -30,13 +30,9 @@ public abstract class RectDouble1D implements HyperRect<Double1D> {
     }
 
     @Override
-    public Double1D min() {
-        return new Double1D(from());
-    }
-
-    @Override
-    public Double1D max() {
-        return new Double1D(to());
+    public double coord(boolean maxOrMin, int dimension) {
+        assert(dimension==0);
+        return maxOrMin ? to() : from();
     }
 
     @Override
@@ -56,13 +52,13 @@ public abstract class RectDouble1D implements HyperRect<Double1D> {
     }
 
     @Override
-    public boolean contains(HyperRect r) {
+    public boolean contains(HyperRegion r) {
         RectDouble1D inner = (RectDouble1D) r;
         return inner.from() >= from() && inner.to() <= to();
     }
 
     @Override
-    public boolean intersects(HyperRect r) {
+    public boolean intersects(HyperRegion r) {
         RectDouble1D rr = (RectDouble1D) r;
         return (Math.max(from(), rr.from()) <= Math.min(to(), rr.to()));
     }

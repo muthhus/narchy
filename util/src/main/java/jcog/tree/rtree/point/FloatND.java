@@ -14,7 +14,7 @@ import java.util.Arrays;
 public class FloatND implements HyperPoint, Serializable, Comparable<FloatND> {
 
     public final float[] coord;
-    private int hash;
+    private final int hash;
 
     public FloatND(FloatND copy) {
         this(copy.coord.clone());

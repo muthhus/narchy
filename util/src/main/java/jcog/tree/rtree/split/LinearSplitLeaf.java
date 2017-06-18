@@ -39,7 +39,7 @@ public final class LinearSplitLeaf<T> implements Split<T> {
         final int MAX = 1;
         final int NRANGE = 2;
         T[] data = leaf.data;
-        final int nD = model.bounds(data[0]).dim();
+        final int nD = model.region(data[0]).dim();
         final int[][][] rIndex = new int[nD][NRANGE][NRANGE];
         // separation between min and max extremes
         final double[] separation = new double[nD];
@@ -56,31 +56,39 @@ public final class LinearSplitLeaf<T> implements Split<T> {
             for (int j = 1; j < size; j++) {
                 int[][] rd = rIndex[d];
 
-                HyperRect rj = model.bounds(data[j]);
-                Comparable rjMin = rj.min().coord(d);
-                if (model.bounds(data[rd[MIN][MIN]]).min().coord(d).compareTo(rjMin) > 0) {
+                HyperRegion rj = model.region(data[j]);
+                double rjMin = rj.coord(false, d);
+                if (model.region(data[rd[MIN][MIN]]).coord(false, d) > rjMin) { //TODO comparison order
                     rd[MIN][MIN] = j;
                 }
 
-                if (model.bounds(data[rd[MIN][MAX]]).min().coord(d).compareTo(rjMin) < 0) {
+                if (model.region(data[rd[MIN][MAX]]).coord(false, d) < rjMin) { //TODO comparison order (opposite previous)
                     rd[MIN][MAX] = j;
                 }
 
-                Comparable rjMax = rj.max().coord(d);
-                if (model.bounds(data[rd[MAX][MIN]]).max().coord(d).compareTo(rjMax) > 0) {
+                double rjMax = rj.coord(true, d);
+                if (model.region(data[rd[MAX][MIN]]).coord(true, d) > rjMax) {
                     rd[MAX][MIN] = j;
                 }
 
-                if (model.bounds(data[rd[MAX][MAX]]).max().coord(d).compareTo(rjMax) < 0) {
+                if (model.region(data[rd[MAX][MAX]]).coord(true, d) < rjMax) {
                     rd[MAX][MAX] = j;
                 }
             }
 
+//                        // highest max less lowest min
+//            final double width = model.bounds(data[rIndex[d][MAX][MAX]]).max().distance(model.bounds(data[rIndex[d][MIN][MIN]]).min(), d);
+//
+//            // lowest max less highest min (normalized)
+//            separation[d] = model.bounds(data[rIndex[d][MAX][MIN]]).max().distance(model.bounds(data[rIndex[d][MIN][MAX]]).min(), d) / width;
+
             // highest max less lowest min
-            final double width = model.bounds(data[rIndex[d][MAX][MAX]]).max().distance(model.bounds(data[rIndex[d][MIN][MIN]]).min(), d);
+            final double width = model.region(data[rIndex[d][MAX][MAX]]).
+                    distance(model.region(data[rIndex[d][MIN][MIN]]), d, true, false);
+
 
             // lowest max less highest min (normalized)
-            separation[d] = model.bounds(data[rIndex[d][MAX][MIN]]).max().distance(model.bounds(data[rIndex[d][MIN][MAX]]).min(), d) / width;
+            separation[d] = model.region(data[rIndex[d][MAX][MIN]]).distance(model.region(data[rIndex[d][MIN][MAX]]), d, true, false) / width;
         }
 
         int r1Ext = rIndex[0][MAX][MIN], r2Ext = rIndex[0][MIN][MAX];

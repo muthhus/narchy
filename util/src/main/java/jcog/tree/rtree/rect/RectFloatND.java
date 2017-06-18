@@ -21,7 +21,7 @@ package jcog.tree.rtree.rect;
  */
 
 
-import jcog.tree.rtree.HyperRect;
+import jcog.tree.rtree.HyperRegion;
 import jcog.tree.rtree.point.FloatND;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,12 +35,12 @@ import static java.lang.Float.POSITIVE_INFINITY;
  * Created by jcovert on 6/15/15.
  */
 
-public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable<RectFloatND> {
+public class RectFloatND implements HyperRegion<FloatND>, Serializable, Comparable<RectFloatND> {
 
-    public static final HyperRect ALL_1 = RectFloatND.all(1);
-    public static final HyperRect ALL_2 = RectFloatND.all(2);
-    public static final HyperRect ALL_3 = RectFloatND.all(3);
-    public static final HyperRect ALL_4 = RectFloatND.all(4);
+    public static final HyperRegion ALL_1 = RectFloatND.all(1);
+    public static final HyperRegion ALL_2 = RectFloatND.all(2);
+    public static final HyperRegion ALL_3 = RectFloatND.all(3);
+    public static final HyperRegion ALL_4 = RectFloatND.all(4);
     public static final FloatND unbounded = new FloatND() {
         @Override
         public String toString() {
@@ -83,12 +83,12 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable
         this.max = new FloatND(max);
     }
 
-    public static HyperRect all(int i) {
+    public static HyperRegion all(int i) {
         return new RectFloatND(FloatND.fill(i, NEGATIVE_INFINITY), FloatND.fill(i, POSITIVE_INFINITY));
     }
 
     @Override
-    public boolean contains(final HyperRect _inner) {
+    public boolean contains(final HyperRegion _inner) {
         final RectFloatND inner = (RectFloatND) _inner;
 
         int dim = dim();
@@ -101,7 +101,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable
     }
 
     @Override
-    public boolean intersects(final HyperRect r) {
+    public boolean intersects(final HyperRegion r) {
         final RectFloatND x = (RectFloatND) r;
 
         int dim = dim();
@@ -126,7 +126,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable
     }
 
     @Override
-    public HyperRect mbr(final HyperRect r) {
+    public HyperRegion mbr(final HyperRegion r) {
         final RectFloatND x = (RectFloatND) r;
 
         int dim = dim();
@@ -175,13 +175,8 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable
     }
 
     @Override
-    public FloatND min() {
-        return min;
-    }
-
-    @Override
-    public FloatND max() {
-        return max;
+    public double coord(boolean maxOrMin, int dimension) {
+        return (maxOrMin ? max : min).coord[dimension];
     }
 
     @Override
@@ -234,7 +229,7 @@ public class RectFloatND implements HyperRect<FloatND>, Serializable, Comparable
     }
 
 
-    public final static class Builder<X extends RectFloatND> implements Function<X, HyperRect> {
+    public final static class Builder<X extends RectFloatND> implements Function<X, HyperRegion> {
 
         @Override
         public X apply(final X rect2D) {

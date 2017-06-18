@@ -32,12 +32,14 @@ import java.util.function.Predicate;
  * Node that will contain the data entries. Implemented by different type of SplitType leaf classes.
  * <p>
  * Created by jcairns on 4/30/15.
+ *
+ * TODO just extend FastList<>
  */
 public class Leaf<T> implements Node<T> {
 
     public final T[] data;
     public short size;
-    public HyperRect bounds;
+    public HyperRegion bounds;
 
     protected Leaf(int mMax) {
         this.bounds = null;
@@ -52,7 +54,7 @@ public class Leaf<T> implements Node<T> {
             Node<T> next;
 
             if (size < model.max) {
-                final HyperRect tRect = model.bounds(t);
+                final HyperRegion tRect = model.region(t);
                 bounds = bounds != null ? bounds.mbr(tRect) : tRect;
 
                 data[size++] = t;
@@ -90,13 +92,14 @@ public class Leaf<T> implements Node<T> {
         return false;
     }
 
+    @Override
     public boolean contains(T t, Spatialization<T> model) {
         return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 
     @Override
-    public Node<T> remove(final T t, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         int i = 0;
 
@@ -123,7 +126,7 @@ public class Leaf<T> implements Node<T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRect.mbr(model.bounds, data, size) : null;
+            bounds = size > 0 ? HyperRegion.mbr(model.bounds, data, size) : null;
 
         }
 
@@ -154,7 +157,7 @@ public class Leaf<T> implements Node<T> {
                 data[i] = tnew;
             }
 
-            bounds = i == 0 ? model.bounds(data[0]) : bounds.mbr(model.bounds(data[i]));
+            bounds = i == 0 ? model.region(data[0]) : bounds.mbr(model.region(data[i]));
         }
 
         return this;
@@ -162,10 +165,10 @@ public class Leaf<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(HyperRect R, Predicate<T> t, Spatialization<T> model) {
+    public boolean containing(HyperRegion R, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (R.contains(model.bounds(d))) {
+            if (R.contains(model.region(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -174,7 +177,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model) {
+    public void intersectingNodes(HyperRegion rect, Predicate<Node<T>> t, Spatialization<T> model) {
 
     }
 
@@ -192,7 +195,7 @@ public class Leaf<T> implements Node<T> {
 
     @NotNull
     @Override
-    public HyperRect bounds() {
+    public HyperRegion bounds() {
         return bounds;
     }
 
@@ -205,10 +208,10 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
+    public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (rect.intersects(model.bounds(d))) {
+            if (rect.intersects(model.region(d))) {
                 if (!t.test(d))
                     return false;
             }
@@ -234,14 +237,14 @@ public class Leaf<T> implements Node<T> {
      */
     public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, Spatialization<T> model) {
 
-        final HyperRect tRect = model.bounds(t);
-        final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);
+        final HyperRegion tRect = model.region(t);
+        final HyperRegion l1Mbr = l1Node.bounds().mbr(tRect);
 
         double tCost = tRect.cost();
 
         double l1c = l1Mbr.cost();
         final double l1CostInc = Math.max(l1c - (l1Node.bounds().cost() + tCost), 0.0);
-        final HyperRect l2Mbr = l2Node.bounds().mbr(tRect);
+        final HyperRegion l2Mbr = l2Node.bounds().mbr(tRect);
         double l2c = l2Mbr.cost();
         final double l2CostInc = Math.max(l2c - (l2Node.bounds().cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
