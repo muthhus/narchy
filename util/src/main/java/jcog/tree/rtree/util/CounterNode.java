@@ -84,6 +84,11 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+        node.intersectingNodes(rect, t, model);
+    }
+
+    @Override
     public int size() {
         return this.node.size();
     }

@@ -1,15 +1,19 @@
 package nars.table;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import jcog.list.LimitedFasterList;
 import jcog.tree.rtree.*;
-import jcog.tree.rtree.point.Long1D;
-import jcog.tree.rtree.rect.RectLong1D;
+import jcog.tree.rtree.point.LongND;
+import jcog.tree.rtree.rect.RectLongND;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,11 +21,12 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRect<Long1D>> {
+public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRect<LongND>> {
+
+    static final int radius = 8;
 
 //    final AtomicInteger serial = new AtomicInteger(0);
 //    final ConcurrentHashMap<Task,Integer> id = new ConcurrentHashMap<>();
@@ -29,9 +34,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     final Spatialized<Task> tree;
 
     public RTreeBeliefTable() {
-        this.tree = new LockingRTree<Task>(
-                new RTree(this, 2,8, RTreeModel.DefaultSplits.LINEAR),
-                new ReentrantReadWriteLock(false));
+        this.tree = new ConcurrentRTree<Task>(
+                new RTree(this, 2,8, RTreeModel.DefaultSplits.LINEAR));
     }
     public RTreeBeliefTable(int cap) {
         this();
@@ -43,31 +47,57 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
 
-        //HACK
-        int window = 8;
-        long radius = dur * window;
-        LimitedFasterList<Task> m = new LimitedFasterList(8);
-        tree.intersecting(new RectLong1D(when- radius, when+radius), (t) -> m.add(t) );
-        if (!m.isEmpty())
-            return m.get(0);
-        else
-            return null;
+        MutableList<ObjectFloatPair<Task>> tt = timeDistanceSortedList(when - radius*dur, when + radius*dur, now);
+        switch (tt.size()) {
+            case 0: return null;
+            case 1:
+            default: //TODO for default case, use Top2 or clustering
+                return tt.get(0).getOne();
+        }
     }
-      @Override
+
+    protected MutableList<ObjectFloatPair<Task>> timeDistanceSortedList(long start, long end, long now) {
+        RTreeCursor<Task> c = tree.cursor(timeRange(start, end));
+        return c.listSorted((t) -> t.timeDistance(now));
+    }
+
+    private HyperRect timeRange(long a, long b) {
+        return new RectLongND(new long[] { a, Long.MIN_VALUE }, new long[] { b, Long.MAX_VALUE });
+    }
+
+    @Override
     public Truth truth(long when, int dur, EternalTable eternal) {
-        //HACK
-        List<Task> tt = $.newArrayList(2);
-        tree.intersecting(new RectLong1D(when - dur * 4, when + dur * 4), tt::add);
+
+
+        MutableList<ObjectFloatPair<Task>> tt = timeDistanceSortedList(when - radius*dur, when + radius*dur, when);
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
         if (!tt.isEmpty())
-            return TruthPolation.truth(e, when, dur, tt);
+            return TruthPolation.truth(e, when, dur, Iterables.transform(tt, ObjectFloatPair::getOne));
         else
             return e!=null ? e.truth() : null;
     }
 
     @Override
-    public HyperRect<Long1D> apply(Task task) {
-        return !task.isInput() ? new RectLong1D(task.start(), task.end()) : new RectLong1D(task.start(), task.start());
+    public HyperRect<LongND> apply(Task task) {
+        long start, end;
+        if (!task.isInput()) {
+            start = task.start(); end = task.end();
+        } else {
+            start = end = task.start();
+        }
+        int freq = dither32(task.freq());
+        int conf = dither32(task.freq());
+        long truth = freq << 32 /* most significant 32 bits */ | conf;
+
+        return new RectLongND(
+                new long[] { start, truth },
+                new long[] { end, truth }
+        );
+    }
+
+    /** map a float value (in range of 0..1 to an integer value (unsigned 31 bits) */
+    private static int dither32(float x) {
+        return (int)(x * (1 << 31));
     }
 
     @Override
@@ -84,7 +114,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
         final Task found = find(t);
         if (found==null) {
-            tree.add(t);
+            tree.addAsync(t);
         } else {
             if (t!=found) {
                 float overflow = found.priAddOverflow(activation);

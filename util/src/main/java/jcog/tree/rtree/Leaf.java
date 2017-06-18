@@ -35,7 +35,6 @@ import java.util.function.Predicate;
  */
 public class Leaf<T> implements Node<T> {
 
-
     public final T[] data;
     public short size;
     public HyperRect bounds;
@@ -160,6 +159,11 @@ public class Leaf<T> implements Node<T> {
             }
         }
         return true;
+    }
+
+    @Override
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+
     }
 
 

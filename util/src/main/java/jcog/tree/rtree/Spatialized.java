@@ -21,6 +21,7 @@ package jcog.tree.rtree;
  */
 
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -141,4 +142,17 @@ public interface Spatialized<T> extends Nodelike<T> {
     }
 
     void clear();
+
+    /** adds, deferred if necessary until un-busy */
+    default void addAsync(@NotNull T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    default RTreeCursor<T> cursor(HyperRect start) {
+        return new RTreeCursor<T>(this, start);
+    }
+
+    @NotNull Node<T> root();
+
+    void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile);
 }

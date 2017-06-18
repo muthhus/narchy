@@ -76,6 +76,14 @@
             <version>8.1.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
+        <dependency>
+            <groupId>com.conversantmedia</groupId>
+            <artifactId>disruptor</artifactId>
+            <version>1.2.10</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.fusesource.jansi</groupId>
             <artifactId>jansi</artifactId>
@@ -108,9 +116,9 @@
         </dependency>
 
         <!--<dependency>-->
-            <!--<groupId>org.apache.commons</groupId>-->
-            <!--<artifactId>commons-collections4</artifactId>-->
-            <!--<version>4.1</version>-->
+        <!--<groupId>org.apache.commons</groupId>-->
+        <!--<artifactId>commons-collections4</artifactId>-->
+        <!--<version>4.1</version>-->
         <!--</dependency>-->
 
         <dependency>
@@ -122,22 +130,22 @@
 
 
         <!--<dependency>-->
-            <!--<groupId>org.apache.commons</groupId>-->
-            <!--<artifactId>commons-lang3</artifactId>-->
-            <!--<version>3.6</version>-->
+        <!--<groupId>org.apache.commons</groupId>-->
+        <!--<artifactId>commons-lang3</artifactId>-->
+        <!--<version>3.6</version>-->
         <!--</dependency>-->
 
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
         <!--<dependency>-->
-            <!--<groupId>org.jgrapht</groupId>-->
-            <!--<artifactId>jgrapht-core</artifactId>-->
-            <!--<version>1.0.1</version>-->
+        <!--<groupId>org.jgrapht</groupId>-->
+        <!--<artifactId>jgrapht-core</artifactId>-->
+        <!--<version>1.0.1</version>-->
         <!--</dependency>-->
         <!-- http://mvnrepository.com/artifact/org.jgrapht/jgrapht-ext -->
         <!--<dependency>-->
-            <!--<groupId>org.jgrapht</groupId>-->
-            <!--<artifactId>jgrapht-ext</artifactId>-->
-            <!--<version>1.0.1</version>-->
+        <!--<groupId>org.jgrapht</groupId>-->
+        <!--<artifactId>jgrapht-ext</artifactId>-->
+        <!--<version>1.0.1</version>-->
         <!--</dependency>-->
 
         <!--<dependency>-->
@@ -250,9 +258,9 @@
 
 
         <!--<dependency>-->
-            <!--<groupId>org.objenesis</groupId>-->
-            <!--<artifactId>objenesis</artifactId>-->
-            <!--<version>2.5.1</version>-->
+        <!--<groupId>org.objenesis</groupId>-->
+        <!--<artifactId>objenesis</artifactId>-->
+        <!--<version>2.5.1</version>-->
 
         <!--</dependency>-->
 

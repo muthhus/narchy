@@ -112,6 +112,8 @@ public interface Node<T> extends Nodelike<T> {
         return (Set<T>) containing(rect, new HashSet(), model);
     }
 
+    void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model);
+
     /**
      * Recurses over index collecting stats
      *

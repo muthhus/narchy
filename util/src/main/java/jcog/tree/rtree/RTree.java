@@ -207,11 +207,16 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     @Override
+    public void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile) {
+        root().intersectingNodes(start, eachWhile, model);
+    }
+
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "[size=" + size() + ']';
     }
 
-    @NotNull
+    @Override @NotNull
     public Node<T> root() {
         return this.root;
     }

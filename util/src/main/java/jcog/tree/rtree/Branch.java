@@ -341,6 +341,23 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+        if (!bounds().intersects(rect))
+            return;
+
+        Node<T>[] children = this.child;
+        short s = this.size;
+        for (int i = 0; i < s; i++) {
+            Node<T> c = children[i];
+            if (c!=null && c.bounds().intersects(rect)) {
+                if (!t.test(c))
+                    return;
+                c.intersectingNodes(rect, t, model);
+            }
+        }
+    }
+
+    @Override
     public void collectStats(Stats stats, int depth) {
         for (int i = 0; i < size; i++)
             child[i].collectStats(stats, depth + 1);

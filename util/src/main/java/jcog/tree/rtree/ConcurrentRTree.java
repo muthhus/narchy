@@ -20,27 +20,33 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.tree.rtree.util.Stats;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * Created by jcovert on 12/30/15.
  */
-public class LockingRTree<T> implements Spatialized<T> {
+public class ConcurrentRTree<T> implements Spatialized<T> {
 
     public final RTree<T> tree;
+
+    final DisruptorBlockingQueue<T> toAdd = new DisruptorBlockingQueue<>(32);
     private final Lock readLock;
     private final Lock writeLock;
 
-    public LockingRTree(RTree<T> tree, ReadWriteLock lock) {
+    public ConcurrentRTree(RTree<T> tree) {
         this.tree = tree;
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
     }
+
 
     /**
      * Blocking locked search
@@ -59,6 +65,12 @@ public class LockingRTree<T> implements Spatialized<T> {
         }
     }
 
+    @NotNull
+    @Override
+    public Node<T> root() {
+        return tree.root();
+    }
+
     /**
      * Blocking locked add
      *
@@ -71,6 +83,34 @@ public class LockingRTree<T> implements Spatialized<T> {
             return tree.add(t);
         } finally {
             writeLock.unlock();
+        }
+    }
+
+    @Override
+    public void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile) {
+        readLock.lock();
+        try {
+            tree.intersectingNodes(start, eachWhile);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    /**
+     * prefer this instead of add() in multithread environments, because it elides what might ordinarily involve a lock wait
+     */
+    @Override
+    public void addAsync(@NotNull T t) {
+        toAdd.add(t);
+        if (writeLock.tryLock()) {
+            try {
+                T next;
+                while ((next = toAdd.poll()) != null) {
+                    tree.add(next);
+                }
+            } finally {
+                writeLock.unlock();
+            }
         }
     }
 

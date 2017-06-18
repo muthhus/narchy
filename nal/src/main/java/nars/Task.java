@@ -405,13 +405,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         }
     }
 
-    /**
-     * time difference to neareset 'temporal tangent'
-     */
-    default long nearestStartOrEndDelta(long when) {
-        long n = nearestStartOrEnd(when);
-        return Math.abs(when - n);
-    }
 
 
 //    @NotNull
