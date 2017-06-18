@@ -21,8 +21,10 @@ import static nars.time.Tense.ETERNAL;
 public class Signal {
 
     final int MAX_PERCEPT_DURATIONS =
-            Integer.MAX_VALUE;
+            //0;
+            //Integer.MAX_VALUE;
             //16;
+            32;
 
     public FloatSupplier pri;
 
@@ -73,11 +75,15 @@ public class Signal {
         Task previous = current;
 
         if (this.current != null) {
-            this.current.setEnd(now);
-            if (current.isDeleted() || now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)) {
+
+            boolean finish = current.isDeleted() || now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS);
+            if (finish) {
+                this.current.setEnd(now);
                 if (nextTruth == null)
                     nextTruth = current.truth;
                 this.current = null;
+            } else {
+                this.current.updateEnd(now);
             }
         }
 

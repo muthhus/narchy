@@ -25,7 +25,7 @@ public class TruthWave {
     long start;
     long end;
 
-    /** sequence of triples (freq, conf, occurr) for each task; NaN for eternal */
+    /** sequence of triples (freq, conf, start, end) for each task; NaN for eternal */
     float[] truth;
     int size;
     @Nullable

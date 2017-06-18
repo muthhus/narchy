@@ -177,12 +177,11 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(final T t, Nodelike<T> parent, RTreeModel<T> model) {
-        final HyperRect tRect = model.bounds(t);
+    public Node<T> remove(final T x, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
 
         for (int i = 0; i < size; i++) {
-            if (child[i].bounds().intersects(tRect)) {
-                child[i] = child[i].remove(t, this, model);
+            if (child[i].bounds().intersects(xBounds)) {
+                child[i] = child[i].remove(x, xBounds, this, model);
                 if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
                         System.arraycopy(child, i + 1, child, i, size - i - 1);

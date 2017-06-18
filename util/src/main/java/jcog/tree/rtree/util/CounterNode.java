@@ -56,8 +56,8 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(T t, Nodelike<T> parent, RTreeModel<T> model) {
-        return this.node.remove(t, this, model);
+    public Node<T> remove(T x, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
+        return this.node.remove(x, xBounds, this, model);
     }
 
     @Override

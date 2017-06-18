@@ -47,7 +47,7 @@ public class RTree<T> implements Spatialized<T> {
     @NotNull
     private Node<T> root;
     private int size;
-    private RTreeModel<T> model;
+    public RTreeModel<T> model;
 
 
     public RTree(@Nullable final Function<T, HyperRect> spatialize) {
@@ -117,12 +117,20 @@ public class RTree<T> implements Spatialized<T> {
         return after > before;
     }
 
+
+    @Override public RTreeModel<T> model() {
+        return model;
+    }
+
+    /**
+     * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
+     */
     @Override
-    public boolean remove(final T t) {
+    public boolean remove(final T x, HyperRect xBounds) {
         int before = size;
         if (before == 0)
             return false;
-        root = root.remove(t, this, model);
+        root = root.remove(x, xBounds, this, model);
         int after = size;
         assert (after == before || after == before - 1);
         return before > after;
@@ -231,5 +239,8 @@ public class RTree<T> implements Spatialized<T> {
         return root.contains(t, model);
     }
 
+    public HyperRect bounds(T x) {
+        return model.bounds(x);
+    }
 
 }

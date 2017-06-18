@@ -53,11 +53,12 @@ public interface Node<T> extends Nodelike<T> {
 
     /**
      * Remove t from the index
-     *  @param t      - value to remove from index
+     * @param t      - value to remove from index
+     * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
      * @param parent - the callee which is the parent of this instance
      * @param model
      */
-    Node<T> remove(T t, Nodelike<T> parent, RTreeModel<T> model);
+    Node<T> remove(T t, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model);
 
     /**
      * update an existing t in the index

@@ -3,9 +3,11 @@ package nars.table;
 import jcog.tree.rtree.*;
 import jcog.tree.rtree.point.LongND;
 import jcog.tree.rtree.rect.RectLongND;
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
+import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import org.eclipse.collections.api.list.MutableList;
@@ -16,7 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -29,9 +33,64 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     //final com.metamx.collections.spatial.RTree tree = new com.metamx.collections.spatial.RTree(1);
     final Spatialized<Task> tree;
 
+    static final HyperRect DeleteMe = new RectLongND();
+
+    final Map<SignalTask, HyperRect> activeSignals = new ConcurrentHashMap<>();
+
+    private long lastUpdate = Long.MIN_VALUE;
+
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<Task>(
-                new RTree(this, 2, 8, RTreeModel.DefaultSplits.LINEAR));
+                new RTree(this, 2, 8, RTreeModel.DefaultSplits.LINEAR)) {
+
+            @Override
+            public void addAsync(Task task) {
+                if (task instanceof SignalTask)
+                    activeSignals.put((SignalTask) task, tree.bounds(task));
+                super.addAsync(task);
+            }
+
+            @Override
+            public boolean remove(Task x) {
+                if (super.remove(x)) {
+                    if (x instanceof SignalTask)
+                        activeSignals.remove(x);
+                    return true;
+                } else return false;
+            }
+        };
+    }
+
+    public void updateSignalTasks(long now) {
+
+        if (this.lastUpdate == now)
+            return;
+
+        this.lastUpdate = now;
+
+
+        List<Task> inactivated = $.newArrayList();
+        activeSignals.replaceAll((x, prev) -> {
+
+            if (x.growing()) {
+                RectLongND next = (RectLongND) tree.bounds(x);
+
+                if (!next.equals(prev)) {
+                    //bounds changed
+                    boolean removed = tree.remove(x, prev);
+                    if (!removed) { //has been deleted otherwise
+                        inactivated.add(x); return prev;
+                    }
+                    boolean added = tree.add(x /*, next*/);
+                    assert(added);
+                    return next;
+                }
+                return prev;
+            }
+            inactivated.add(x); return prev;
+        });
+        inactivated.forEach(activeSignals::remove);
+
     }
 
     public RTreeBeliefTable(int cap) {
@@ -42,7 +101,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     private int capacity;
 
     @Override
-    public Truth truth(long when, int dur, EternalTable eternal) {
+    public Truth truth(long when, long now, int dur, EternalTable eternal) {
+
+        updateSignalTasks(now);
+
         List<Task> tt = cursor(when - radius * dur, when + radius * dur).list();
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
         if (!tt.isEmpty())
@@ -53,6 +115,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
+
+        updateSignalTasks(now);
+
         MutableList<ObjectFloatPair<Task>> tt = timeDistanceSortedList(when - radius * dur, when + radius * dur, now);
         switch (tt.size()) {
             case 0:
@@ -77,18 +142,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     }
 
 
-    @Override
-    public HyperRect<LongND> apply(Task task) {
-        long start, end;
-        if (!task.isInput()) {
-            start = task.start();
-            end = task.end();
-        } else {
-            start = end = task.start();
-        }
+    @NotNull @Override
+    public HyperRect<LongND> apply(@NotNull Task task) {
+        long start = task.start();
+        long end = task.end();
+
         int freq = dither32(task.freq());
-        int conf = dither32(task.freq());
-        long truth = freq << 32 /* most significant 32 bits */ | conf;
+        int conf = dither32(task.conf());
+        long truth = (((long)freq) << 32) /* most significant 32 bits */ | conf;
 
         return new RectLongND(
                 new long[]{start, truth},

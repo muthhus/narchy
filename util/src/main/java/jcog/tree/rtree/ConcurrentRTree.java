@@ -34,7 +34,7 @@ import java.util.function.Predicate;
  */
 public class ConcurrentRTree<T> implements Spatialized<T> {
 
-    public final RTree<T> tree;
+    public final Spatialized<T> tree;
 
     final DisruptorBlockingQueue<T> toAdd = new DisruptorBlockingQueue<>(32);
     private final Lock readLock;
@@ -47,6 +47,11 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
         this.writeLock = lock.writeLock();
     }
 
+
+    @Override
+    public RTreeModel<T> model() {
+        return tree.model();
+    }
 
     /**
      * Blocking locked search
@@ -117,13 +122,13 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
     /**
      * Blocking locked remove
      *
-     * @param t - entry to remove
+     * @param x - entry to remove
      */
     @Override
-    public boolean remove(T t) {
+    public boolean remove(T x, HyperRect xBounds) {
         writeLock.lock();
         try {
-            return tree.remove(t);
+            return tree.remove(x, xBounds);
         } finally {
             writeLock.unlock();
         }
@@ -139,7 +144,8 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
     }
 
 
-    public void read(Consumer<RTree<T>> x) {
+
+    public void read(Consumer<Spatialized<T>> x) {
         readLock.lock();
         try {
             x.accept(tree);
@@ -148,7 +154,7 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
         }
     }
 
-    public void write(Consumer<RTree<T>> x) {
+    public void write(Consumer<Spatialized<T>> x) {
         writeLock.lock();
         try {
             x.accept(tree);
@@ -157,7 +163,12 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
         }
     }
 
-//    @Override
+    @Override
+    public HyperRect bounds(T task) {
+        return tree.bounds(task);
+    }
+
+    //    @Override
 //    public void change(T x, T y) {
 //        writeLock.lock();
 //        try {

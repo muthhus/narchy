@@ -96,7 +96,7 @@ public class Leaf<T> implements Node<T> {
 
 
     @Override
-    public Node<T> remove(final T t, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> remove(final T t, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
 
         int i = 0;
 
@@ -123,7 +123,7 @@ public class Leaf<T> implements Node<T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRect.mbr(data, model.bounds) : null;
+            bounds = size > 0 ? HyperRect.mbr(model.bounds, data, size) : null;
 
         }
 

@@ -35,10 +35,7 @@ public class PoleCart extends NAgentX {
             try {
                 NAgent a = new PoleCart(n);
                 //((RealTime)n.time).durFPS(80f);
-                n.beliefConfidence(0.5f);
-                n.goalConfidence(0.5f);
-                a.curiosity.setValue(0.02f);
-                n.termVolumeMax.setValue(24);
+                n.termVolumeMax.setValue(32);
                 //n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {

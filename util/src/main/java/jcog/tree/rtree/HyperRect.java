@@ -40,10 +40,14 @@ public interface HyperRect<X extends HyperPoint> {
     HyperRect<X> mbr(HyperRect<X> r);
 
 
-    static <X> HyperRect mbr(X[] rect, Function<X,HyperRect> builder) {
+    static <X> HyperRect mbr(Function<X, HyperRect> builder, X[] rect, short size) {
+        assert(size > 0);
         HyperRect bounds = builder.apply(rect[0]);
-        for (int k = 1; k < rect.length; k++) {
-            HyperRect r = builder.apply(rect[k]);
+        for (int k = 1; k < size; k++) {
+            X rr = rect[k];
+            if (rr == null)
+                continue;
+            HyperRect r = builder.apply(rr);
             if (r == null)
                 break;
             bounds = bounds.mbr(r);

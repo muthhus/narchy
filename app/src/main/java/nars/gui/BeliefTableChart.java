@@ -1,6 +1,7 @@
 package nars.gui;
 
 import com.jogamp.opengl.GL2;
+import jcog.Util;
 import jcog.event.On;
 import nars.NAR;
 import nars.Task;
@@ -336,8 +337,10 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         wave.forEach((freq, conf, s, e) -> {
 
             boolean eternal = (s != s);
-            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
-            float ph = baseTaskSize + conf * baseTaskSize;// + geh / (1f / conf) / 4f;//10 + 10 * conf;
+            float pw = 0; //baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
+
+            /** smudge a low confidence task across more of the frequency range */
+            float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
 
             float start, end;
             if (showEternal && eternal) {
@@ -353,17 +356,16 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            float alpha = 0.2f + conf * 0.5f;
+            float alpha = 0.05f + (conf) * 0.75f;
             float r, g, b;
             if (beliefOrGoal) {
-                r = 0.75f;
-                g = 0.25f;
+                r = 0.75f*conf;
+                g = 0.25f*conf;
                 b = 0;
-
             } else {
                 r = 0;
-                g = 0.75f;
-                b = 0.25f;
+                g = 0.75f*conf;
+                b = 0.25f*conf;
             }
 
 
@@ -371,11 +373,11 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 float mid = (end + start) / 2f;
                 float W = Math.max((end - start), pw);
                 float x = mid - W / 2;
-                float y = freq - ph / 2;
+                float y = freq - ph/2;
                 gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
                 Draw.rect(gl,
                         x, y,
-                        W, ph);
+                        W, ph, 0);
             }
 
 

@@ -527,7 +527,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Truth truth(long when, int dur, @Nullable EternalTable eternal) {
+    public Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
 
         Truth x = TruthPolation.truth(
                 eternal != null ? eternal.strongest() : null,

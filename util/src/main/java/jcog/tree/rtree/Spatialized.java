@@ -98,10 +98,16 @@ public interface Spatialized<T> extends Nodelike<T> {
     /**
      * Remove the data entry from the SpatialSearch structure
      *
-     * @param t Data entry to be removed
+     * @param x Data entry to be removed
      * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
-    boolean remove(final T t);
+    default boolean remove(final T x) {
+        return remove(x, model().bounds(x));
+    }
+
+    RTreeModel<T> model();
+
+    boolean remove(final T x, HyperRect xBounds);
 
     /**
      * Update entry in tree
@@ -155,4 +161,7 @@ public interface Spatialized<T> extends Nodelike<T> {
     @NotNull Node<T> root();
 
     void intersectingNodes(HyperRect start, Predicate<Node<T>> eachWhile);
+
+    HyperRect bounds(T task);
+
 }
