@@ -334,11 +334,18 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     }
 
     private void renderWave(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
+        float[] confMinMax = wave.range(1);
+        if (confMinMax[0] == confMinMax[1]) {
+            confMinMax[0] = 0;
+            confMinMax[1] = 1;
+        }
         wave.forEach((freq, conf, s, e) -> {
 
             boolean eternal = (s != s);
             float pw = 0; //baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
 
+            //normalize to range
+            conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
             /** smudge a low confidence task across more of the frequency range */
             final float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
 
@@ -356,16 +363,16 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            float alpha = 0.2f + (conf) * 0.4f;
+            float alpha = 0.1f + (conf) * 0.4f;
             float r, g, b;
             if (beliefOrGoal) {
                 r = 0.1f + 0.9f*conf;
-                g = 0.1f + 0.4f*conf;
-                b = 0.1f;
+                g = 0.4f*conf;
+                b = 0;
             } else {
-                r = 0.1f;
+                r = 0;
                 g = 0.1f + 0.9f*conf;
-                b = 0.1f + 0.4f*conf;
+                b = 0.4f*conf;
             }
 
 

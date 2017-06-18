@@ -208,7 +208,9 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public void forEach(Consumer<? super T> consumer) {
         for (int i = 0; i < size; i++) {
-            consumer.accept(data[i]);
+            T d = data[i];
+            if (d!=null)
+                consumer.accept(d);
         }
     }
 

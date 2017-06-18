@@ -150,6 +150,17 @@ public class TruthWave {
         return end;
     }
 
+    /** returns 2 element array */
+    public float[] range(int dim) {
+        final float[] min = {Float.MAX_VALUE};
+        final float[] max = { Float.MIN_VALUE };
+        forEach((f,c,start,end) -> {
+            if (c > max[0]) max[0] = c;
+            if (c < min[0]) min[0] = c;
+        });
+        return new float[] {min[0], max[0]};
+    }
+
 
     @FunctionalInterface public interface TruthWaveVisitor {
         void onTruth(float f, float c, float start, float end);

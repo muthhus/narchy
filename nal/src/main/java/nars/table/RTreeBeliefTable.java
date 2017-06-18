@@ -27,13 +27,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static java.lang.Math.abs;
 import static java.util.Comparator.comparingDouble;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 8;
+    static final int sampleRadius = 32;
 
 
     public static class TaskRegion implements HyperRegion {
@@ -351,7 +350,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         //recurse through a subest of the weakest regions, while also collecting victims
         int sizeBefore = size();
-        List<Node<TaskRegion,?>> weakest = b.childMinList(c -> strength(now, dur, branchTimeRange, branchFreqRange, c), sizeBefore /2);
+        List<Node<TaskRegion, ?>> weakest = b.childMinList(c -> strength(now, dur, branchTimeRange, branchFreqRange, c), sizeBefore / 2);
         int w = weakest.size();
         if (w > 0) {
             for (int i = 0; i < w; i++) {
@@ -436,13 +435,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         float maxFreq = cb.freqMax;
         float freqDiff = (float) ((maxFreq - minFreq) / (1f + branchFreqRange));
 
-        float awayFromNow = (float) (abs(cb.center(0) - t) / dur); //0..1.0
+        float awayFromNow = (float) (Math.max(cb.start - t, cb.end - t)) / dur; //0..1.0
 
-        float timeSpan = (float) ((end - start) / (1f + branchTimeRange));
+        //float timeSpan = (float) ((end - start) / (1f + branchTimeRange));
 
-        return (freqDiff) *  //minimize
-                (timeSpan) *  //minimize
-                (1 + 1f / (1f + awayFromNow))  //maximize
+        return (float) ((1 + 0.50f * freqDiff) *  //minimize
+                //(1 + 0.10f * Math.sqrt(timeSpan)) *  //minimize
+                (1 + 1.00f * 1f / (1f + awayFromNow)))  //maximize
                 ;
     }
 

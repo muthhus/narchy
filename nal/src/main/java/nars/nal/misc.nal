@@ -175,8 +175,8 @@
     X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Question)
     X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Quest)
 
-    X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
-    X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)
+    //X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
+    //X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)
 
     X, (Y==>X), task("!") |-          Y, (Punctuation:Quest)
     X, (X==>Y), task("!") |-          Y, (Punctuation:Quest)

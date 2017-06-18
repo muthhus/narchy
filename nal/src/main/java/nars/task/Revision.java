@@ -299,7 +299,11 @@ public class Revision {
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
                     1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 
-            //discount related to loss of stamp when its capacity to contain the two incoming is reached
+            //relate high frequency difference with low confidence
+            float freqDiscount =
+                    1f - Math.abs(a.freq() - b.freq());
+
+            //relate to loss of stamp when its capacity to contain the two incoming is reached
             float stampCapacityDiscount =
                     Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
 
