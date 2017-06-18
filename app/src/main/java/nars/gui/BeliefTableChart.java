@@ -356,16 +356,16 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
             //r.renderTask(gl, qua, conf, pw, ph, xStart, xEnd, freq);
 
-            float alpha = 0.05f + (conf) * 0.75f;
+            float alpha = 0.2f + (conf) * 0.4f;
             float r, g, b;
             if (beliefOrGoal) {
-                r = 0.75f*conf;
-                g = 0.25f*conf;
-                b = 0;
+                r = 0.1f + 0.9f*conf;
+                g = 0.1f + 0.4f*conf;
+                b = 0.1f;
             } else {
-                r = 0;
-                g = 0.75f*conf;
-                b = 0.25f*conf;
+                r = 0.1f;
+                g = 0.1f + 0.9f*conf;
+                b = 0.1f + 0.4f*conf;
             }
 
 

@@ -38,7 +38,7 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     final DisruptorBlockingQueue<T> toAdd = new DisruptorBlockingQueue<>(32);
     private final Lock readLock;
-    private final Lock writeLock;
+    public final Lock writeLock;
 
     public ConcurrentRTree(RTree<T> tree) {
         this.tree = tree;

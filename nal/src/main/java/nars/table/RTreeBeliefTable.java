@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.Util;
 import jcog.tree.rtree.*;
 import jcog.tree.rtree.point.LongND;
 import jcog.tree.rtree.rect.RectLongND;
@@ -42,7 +43,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<Task>(
-                new RTree<Task>((Function) this, 2, 4, Spatialization.DefaultSplits.AXIAL) {
+                new RTree<Task>((Function) this, 2, 3, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
                     public boolean add(Task task) {
@@ -185,11 +186,22 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
         final Task found = find(t);
         if (found == null) {
-            tree.addAsync(t);
 
-            int over = size() - capacity;
-            if (over > 0)
-                compress(n);
+            int over = size() + 1 - capacity;
+            if (over > 0) {
+                ConcurrentRTree lt = ((ConcurrentRTree) tree);
+                lt.writeLock.lock();
+                try {
+                    tree.add(t);
+                    compress(n);
+                } finally {
+                    lt.writeLock.unlock();
+                }
+
+            } else {
+                tree.addAsync(t);
+            }
+
 
         } else {
             if (t != found) {
@@ -218,16 +230,31 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
     protected void compressNext(NAR nar) {
 
         //tree.forEachLeaf...
-        List<Task> victims = $.newArrayList();
-        compressNext(tree.root(), victims, nar);
+        compressNext(tree.root(), nar);
 
     }
 
-    private void compressNext(Node<Task> next, List<Task> victims, NAR nar) {
+    private void compressNext(Node<Task> next, NAR nar) {
         if (next instanceof Leaf) {
             Leaf<Task> l = (Leaf) next;
 
+            int size = l.size;
             Object[] ld = l.data;
+
+            //1. remove any deleted tasks
+            int deleted = 0;
+            for (int i = 0; i < size; i++) {
+                Object x = ld[i];
+                if (x == null)
+                    continue;
+                Task t = (Task) x;
+                if (t.isDeleted()) {
+                    if (removeTask(t))
+                        deleted++;
+                }
+            }
+            if (deleted > 0)
+                return; //done already
 
             //options
             //a. remove by heuristic
@@ -247,8 +274,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
                             Task c = Revision.merge(a, b, nar.time(), Param.TRUTH_EPSILON, nar.random());
                             if (c != null) {
                                 tree.addAsync(c);
-                                victims.add(a);
-                                victims.add(b);
                                 removeTask(a);
                                 removeTask(b);
                                 TaskTable.activate(c, c.pri(), nar);
@@ -261,7 +286,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
                 {
                     //d. pick a random task and try removing it (HACK)
                     Task r = (Task) ld[nar.random().nextInt(l.size)];
-                    victims.add(r);
                     removeTask(r);
                 }
 
@@ -287,10 +311,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
                 float freqDiff = undither32((int) (maxFreq>>32)) - undither32((int) (minFreq>>32));
                 float startAway = abs(start - now) / dur;
                 float endAway = abs(end - now) / dur;
-                return (1f + 0.5f * freqDiff) * (1f + 1f/(1f+startAway)) * (1f + 1f/(1f+endAway));
+                float timeSpan = (end - start) / dur;
+                return  (1 + freqDiff) *  //minimize
+                        (1 + Util.sigmoid(timeSpan)) *  //minimize
+                        (1 + 0.5f/(1f+startAway) + 0.5f/(1f+endAway))  //maximize
+                ;
             });
 
-            compressNext(oldest, victims, nar);
+            compressNext(oldest, nar);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -334,13 +362,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public boolean removeTask(Task x) {
+
+        x.delete();
+
         if (x instanceof SignalTask) {
             HyperRect curBounds = activeSignals.remove(x);
             if (curBounds != null) {
                 return tree.remove(x, curBounds);
             }
         }
-
 
         return tree.remove(x);
     }

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 
 import static jcog.Util.clamp;
+import static nars.Op.NEG;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
@@ -80,6 +81,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                     break;
                 termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
             }
+
+            if (termlink.get().op()==NEG)
+                throw new RuntimeException("NEG termlink: " + termlink);
 
             Premise p = new Premise(tasklink, termlink);
             float thisPri = priElseZero()/ sampleLimit;
