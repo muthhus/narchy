@@ -2,6 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.list.Top2;
 import jcog.tree.rtree.*;
@@ -461,11 +462,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         float awayFromNow = (float) (Math.max(cb.start - t, cb.end - t)) / dur; //0..1.0
 
-        //float timeSpan = (float) ((end - start) / (1f + branchTimeRange));
+        long timeSpan = cb.end - cb.start;
+        float timeSpanFactor = awayFromNow == 0 ? 1f : (timeSpan / (timeSpan + awayFromNow));
 
-        return (float) ((1 + 0.50f * freqDiff) *  //minimize
-                //(1 + 0.10f * Math.sqrt(timeSpan)) *  //minimize
-                (1 + 1.00f * 1f / (1f + awayFromNow)))  //maximize
+        return (
+                (1 + (cb.confMax * 1.0f) * freqDiff) *  //minimize, but only as important as confidence. ie. low confidence makes freq diff matter less
+                (1 + 0.10f * (timeSpanFactor)) *  //minimize: prefer smaller time spans
+                (1 + 1.0f * 1f / Util.sqr(1f + (awayFromNow)))) *  //maximize
+                (1 + 1.0f * cb.confMax) //minimize
                 ;
     }
 
