@@ -23,10 +23,8 @@ package jcog.tree.rtree.rect;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.point.Double2D;
-import org.eclipse.collections.impl.block.factory.Comparators;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
 import java.util.function.Function;
 
 /**

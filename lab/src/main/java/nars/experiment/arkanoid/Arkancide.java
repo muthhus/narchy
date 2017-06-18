@@ -4,7 +4,6 @@ package nars.experiment.arkanoid;
 import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;

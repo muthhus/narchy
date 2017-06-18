@@ -2,7 +2,6 @@ package nars.concept.dynamic;
 
 import jcog.list.FasterList;
 import jcog.pri.Priority;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
@@ -14,9 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
-
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 
 public class DynamicBeliefTable extends DefaultBeliefTable {

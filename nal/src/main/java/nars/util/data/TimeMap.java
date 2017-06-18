@@ -1,6 +1,5 @@
 package nars.util.data;
 
-import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.RTree;
 import jcog.tree.rtree.rect.RectDouble2D;
 import nars.NAR;
@@ -8,7 +7,6 @@ import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 
 public class TimeMap extends RTree<Task> implements Consumer<Task> {

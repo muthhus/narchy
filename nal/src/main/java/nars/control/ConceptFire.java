@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;

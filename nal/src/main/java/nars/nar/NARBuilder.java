@@ -8,7 +8,6 @@ import nars.index.term.TermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
-import nars.task.DerivedTask;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.util.MathArrays;

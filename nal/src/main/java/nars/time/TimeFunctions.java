@@ -24,7 +24,6 @@ import static nars.Op.*;
 import static nars.task.Revision.chooseByConf;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.*;
-import static nars.time.TimeFunctions.occInterpolate;
 
 /**
  * Strategies for solving temporal components of a derivation

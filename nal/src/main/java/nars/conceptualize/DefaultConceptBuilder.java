@@ -2,8 +2,6 @@ package nars.conceptualize;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
-import jcog.map.SynchronizedHashMap;
-import jcog.map.SynchronizedUnifiedMap;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.$;

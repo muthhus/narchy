@@ -5,19 +5,12 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.task.NALTask;
-import nars.term.Term;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.List;
-
-import static nars.Op.COMMAND;
 
 
 /**

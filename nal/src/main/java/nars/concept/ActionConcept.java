@@ -2,7 +2,6 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Task;
-import nars.table.EternalTable;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

@@ -4,11 +4,9 @@ import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
-import nars.concept.FuzzyScalarConcepts;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
 import javax.swing.*;

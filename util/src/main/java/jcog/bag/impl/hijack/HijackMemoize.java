@@ -11,7 +11,6 @@ import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.function.Consumer;

@@ -1,6 +1,5 @@
 package nars.derive.meta;
 
-import jcog.pri.Pri;
 import jcog.pri.Priority;
 import nars.*;
 import nars.control.premise.Derivation;

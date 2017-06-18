@@ -9,7 +9,6 @@ import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.nar.Default;
-import nars.nar.NARS;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
@@ -17,7 +16,6 @@ import nars.time.CycleTime;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
-import spacegraph.layout.Flatten;
 import spacegraph.widget.button.PushButton;
 
 import java.util.Objects;

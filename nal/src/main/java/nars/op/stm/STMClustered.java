@@ -2,7 +2,6 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;

@@ -3,7 +3,6 @@ package spacegraph.widget.meter;
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
 import jcog.tensor.ArrayTensor;
-import jcog.tensor.Tensor;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 

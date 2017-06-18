@@ -40,7 +40,6 @@ import static jcog.Texts.n4;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

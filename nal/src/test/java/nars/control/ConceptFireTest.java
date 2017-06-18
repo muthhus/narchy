@@ -5,8 +5,6 @@ import nars.concept.Concept;
 import nars.nar.Default;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class ConceptFireTest {
 
     @Test

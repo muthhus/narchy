@@ -2,14 +2,10 @@ package jcog.tree.rtree.point;
 
 
 import jcog.tree.rtree.HyperPoint;
-import jcog.tree.rtree.RTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Arrays;
-
-import static java.lang.Float.floatToIntBits;
-import static jcog.tree.rtree.RTree.FPSILON;
 
 
 /**
