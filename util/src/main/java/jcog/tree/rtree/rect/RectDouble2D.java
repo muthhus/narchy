@@ -98,7 +98,6 @@ public class RectDouble2D implements HyperRegion<Double2D>, Comparable<RectDoubl
         return 2;
     }
 
-    @Override
     public Double2D center() {
         final double dx = center(0);
         final double dy = center(1);
@@ -126,10 +125,10 @@ public class RectDouble2D implements HyperRegion<Double2D>, Comparable<RectDoubl
 
 
     @Override
-    public double getRange(final int d) {
-        if (d == 0) {
+    public double range(final int dim) {
+        if (dim == 0) {
             return max.x - min.x;
-        } else if (d == 1) {
+        } else if (dim == 1) {
             return max.y - min.y;
         } else {
             throw new IllegalArgumentException("Invalid dimension");

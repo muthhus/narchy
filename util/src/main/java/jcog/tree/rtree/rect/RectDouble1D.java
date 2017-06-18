@@ -35,7 +35,6 @@ public abstract class RectDouble1D implements HyperRegion<Double1D> {
         return maxOrMin ? to() : from();
     }
 
-    @Override
     public Double1D center() {
         return new Double1D(center(0));
     }
@@ -47,7 +46,7 @@ public abstract class RectDouble1D implements HyperRegion<Double1D> {
     }
 
     @Override
-    public double getRange(int d) {
+    public double range(int dim) {
         return Math.abs(from() - to());
     }
 
@@ -65,7 +64,7 @@ public abstract class RectDouble1D implements HyperRegion<Double1D> {
 
     @Override
     public double cost() {
-        return getRange(0);
+        return range(0);
     }
 
 

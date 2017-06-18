@@ -14,7 +14,6 @@ public class SignalTask extends NALTask {
 
     /** because this is an input task, its hash and equality will not depend on this value so it is free to change to represent a growing duration */
     public long slidingEnd = ETERNAL;
-    private boolean growing = true;
 
     public SignalTask(@NotNull Compound t, byte punct, @NotNull Truth truth, long start, long end, long stamp) {
         super(t, punct, truth, start, start, end,
@@ -31,14 +30,11 @@ public class SignalTask extends NALTask {
 
     public void setEnd(long now) {
         updateEnd(now);
-        growing = false;
     }
 
     public void updateEnd(long now) {
         this.slidingEnd = now;
     }
 
-    public boolean growing() {
-        return growing;
-    }
+
 }

@@ -98,7 +98,7 @@ public class RectLongND implements HyperRegion<LongND>, Serializable, Comparable
         float sigma = 1f;
         int dim = dim();
         for (int i = 0; i < dim; i++) {
-            sigma *= getRangeFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
+            sigma *= rangeIfFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
         }
         return sigma;
     }
@@ -136,7 +136,6 @@ public class RectLongND implements HyperRegion<LongND>, Serializable, Comparable
         return (max + min) / 2.0f;
     }
 
-    @Override
     public LongND center() {
         int dim = dim();
         long[] c = new long[dim];
@@ -163,9 +162,9 @@ public class RectLongND implements HyperRegion<LongND>, Serializable, Comparable
     }
 
     @Override
-    public double getRange(final int i) {
-        float min = this.min.coord[i];
-        float max = this.max.coord[i];
+    public double range(final int dim) {
+        float min = this.min.coord[dim];
+        float max = this.max.coord[dim];
         if (min == max)
             return 0;
         if ((min == Long.MIN_VALUE) || (max == Long.MAX_VALUE))

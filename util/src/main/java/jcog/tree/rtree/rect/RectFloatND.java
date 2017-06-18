@@ -87,40 +87,34 @@ public class RectFloatND implements HyperRegion<FloatND>, Serializable, Comparab
         return new RectFloatND(FloatND.fill(i, NEGATIVE_INFINITY), FloatND.fill(i, POSITIVE_INFINITY));
     }
 
-    @Override
-    public boolean contains(final HyperRegion _inner) {
-        final RectFloatND inner = (RectFloatND) _inner;
-
-        int dim = dim();
-        for (int i = 0; i < dim; i++) {
-            if (!(min.coord[i] <= inner.min.coord[i] && max.coord[i] >= inner.max.coord[i]))
-                //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean intersects(final HyperRegion r) {
-        final RectFloatND x = (RectFloatND) r;
-
-        int dim = dim();
-        for (int i = 0; i < dim; i++) {
-            /*return !((min.x > r2.max.x) || (r2.min.x > max.x) ||
-                    (min.y > r2.max.y) || (r2.min.y > max.y));*/
-
-            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
-                return false;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean contains(final HyperRegion _inner) {
+//        final RectFloatND x = (RectFloatND) _inner;
+//        int dim = dim();
+//        for (int i = 0; i < dim; i++) {
+//            if (!(min.coord[i] <= x.min.coord[i] && max.coord[i] >= x.max.coord[i]))
+//                return false;
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean intersects(final HyperRegion r) {
+//        final RectFloatND x = (RectFloatND) r;
+//        int dim = dim();
+//        for (int i = 0; i < dim; i++) {
+//            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
+//                return false;
+//        }
+//        return true;
+//    }
 
     @Override
     public double cost() {
         float sigma = 1f;
         int dim = dim();
         for (int i = 0; i < dim; i++) {
-            sigma *= getRangeFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
+            sigma *= rangeIfFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
         }
         return sigma;
     }
@@ -158,7 +152,6 @@ public class RectFloatND implements HyperRegion<FloatND>, Serializable, Comparab
         return (max + min) / 2f;
     }
 
-    @Override
     public FloatND center() {
         int dim = dim();
         float[] c = new float[dim];
@@ -180,9 +173,9 @@ public class RectFloatND implements HyperRegion<FloatND>, Serializable, Comparab
     }
 
     @Override
-    public double getRange(final int i) {
-        float min = this.min.coord[i];
-        float max = this.max.coord[i];
+    public double range(final int dim) {
+        float min = this.min.coord[dim];
+        float max = this.max.coord[dim];
         if (min == max)
             return 0;
         if ((min == NEGATIVE_INFINITY) || (max == Float.POSITIVE_INFINITY))
@@ -229,7 +222,7 @@ public class RectFloatND implements HyperRegion<FloatND>, Serializable, Comparab
     }
 
 
-    public final static class Builder<X extends RectFloatND> implements Function<X, HyperRegion> {
+    @Deprecated public final static class Builder<X extends RectFloatND> implements Function<X, HyperRegion> {
 
         @Override
         public X apply(final X rect2D) {

@@ -1,10 +1,9 @@
 package nars.table;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Sets;
 import jcog.Util;
 import jcog.tree.rtree.*;
-import jcog.tree.rtree.point.LongND;
-import jcog.tree.rtree.rect.RectLongND;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -19,47 +18,127 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.lang.Math.abs;
 
-public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRegion<LongND>> {
+public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int radius = 16;
-
-
+    static final int radius = 32;
 
 
-    final Space<Task> tree;
+    public static class TaskRegion implements HyperRegion {
 
-    final Map<SignalTask, HyperRegion> activeSignals = new ConcurrentHashMap<>();
+        public final long start;
+        long end; //allow end to stretch for ongoing tasks
+
+        public final float freqMin, freqMax, confMin, confMax;
+
+        @Nullable
+        public final Task task;
+
+        public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax) {
+            this(start, end, freqMin, freqMax, confMin, confMax, null);
+        }
+
+        public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax, Supplier<Task> task) {
+            this.start = start;
+            this.end = end;
+            this.freqMin = freqMin;
+            this.freqMax = freqMax;
+            this.confMin = confMin;
+            this.confMax = confMax;
+            this.task = null;
+        }
+
+        public TaskRegion(@NotNull Task task) {
+            this.task = task;
+            this.start = task.start();
+            this.end = task.end();
+            this.freqMin = this.freqMax = task.freq();
+            this.confMin = this.confMax = task.conf();
+        }
+
+        /** all inclusive time region */
+        public TaskRegion(long a, long b) {
+            this(a, b, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+        }
+
+
+        /**
+         * computes a mbr of the given regions
+         */
+        public static TaskRegion mbr(TaskRegion x, TaskRegion y) {
+            if (x == y) return x;
+            return new TaskRegion(
+                    Math.min(x.start, y.start), Math.max(x.end, y.end),
+                    Math.min(x.freqMin, y.freqMin), Math.max(x.freqMax, y.freqMax),
+                    Math.min(x.confMin, y.confMin), Math.max(x.confMax, y.confMax)
+            );
+        }
+
+        @Override
+        public int dim() {
+            return 3;
+        }
+
+        @Override
+        public TaskRegion mbr(HyperRegion r) {
+            return TaskRegion.mbr(this, (TaskRegion) r);
+        }
+
+        @Override
+        public double coord(boolean maxOrMin, int dimension) {
+            switch (dimension) {
+                case 0:
+                    return maxOrMin ? end : start;
+                case 1:
+                    return maxOrMin ? freqMax : freqMin;
+                case 2:
+                    return maxOrMin ? confMax : confMin;
+            }
+            throw new UnsupportedOperationException();
+        }
+
+        public void updateOngoingTask() {
+
+            this.end = task.end();
+
+        }
+
+        public boolean hasStretched() {
+            return this.end != task.end();
+        }
+
+    }
+
+    final Space<TaskRegion> tree;
+    final Set<TaskRegion> ongoing = Sets.newConcurrentHashSet();
 
     private long lastUpdate = Long.MIN_VALUE;
     private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
-        this.tree = new ConcurrentRTree<Task>(
-                new RTree<Task>((Function) this, 2, 3, Spatialization.DefaultSplits.AXIAL) {
+        this.tree = new ConcurrentRTree<TaskRegion>(
+                new RTree<TaskRegion>((t -> t), 2, 3, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
-                    public boolean add(Task task) {
+                    public boolean add(TaskRegion tr) {
+                        Task task = tr.task;
                         if (task instanceof SignalTask)
-                            activeSignals.put((SignalTask) task, tree.bounds(task));
-                        return super.add(task);
+                            ongoing.add(tr);
+                        return super.add(tr);
                     }
 
                     @Override
-                    public boolean remove(Task x) {
-                        if (super.remove(x)) {
-                            if (x instanceof SignalTask)
-                                activeSignals.remove(x);
+                    public boolean remove(TaskRegion tr) {
+                        if (super.remove(tr)) {
+                            Task task = tr.task;
+                            if (task instanceof SignalTask)
+                                ongoing.remove(tr);
                             return true;
                         } else return false;
                     }
@@ -73,30 +152,30 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
         this.lastUpdate = now;
 
+        ongoing.removeIf((r) -> {
 
-        List<Task> inactivated = $.newArrayList();
-        activeSignals.replaceAll((x, prev) -> {
+            if (r.task.isDeleted())
+                return true; //stop tracking
 
-            if (x.growing()) {
-                RectLongND next = (RectLongND) tree.bounds(x);
+            if (r.hasStretched()) {
 
-                if (!next.equals(prev)) {
-                    //bounds changed
-                    boolean removed = tree.remove(x, prev);
-                    if (!removed) { //has been deleted otherwise
-                        inactivated.add(x);
-                        return prev;
-                    }
-                    boolean added = tree.add(x /*, next*/);
-                    assert (added);
-                    return next;
+
+                boolean removed = tree.remove(r);
+                if (removed) {
+
+                    r.updateOngoingTask();
+
+                    tree.addAsync(r);
+
+                    return false; //keep tracking
+                } else {
+                    return true; //stop tracking, this task was not in the tree
                 }
-                return prev;
             }
-            inactivated.add(x);
-            return prev;
+
+            return true; //stop tracking
         });
-        inactivated.forEach(activeSignals::remove);
+
 
     }
 
@@ -112,10 +191,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
         updateSignalTasks(now);
 
-        List<Task> tt = cursor(when - radius * dur, when + radius * dur).list();
+        List<TaskRegion> tt = cursor(when - radius * dur, when + radius * dur).list();
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
         if (!tt.isEmpty())
-            return TruthPolation.truth(e, when, dur, tt);
+            return TruthPolation.truth(e, when, dur, Iterables.transform(tt, t -> t.task) );
         else
             return e != null ? e.truth() : null;
     }
@@ -125,55 +204,30 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
         updateSignalTasks(now);
 
-        MutableList<ObjectFloatPair<Task>> tt = timeDistanceSortedList(when - radius * dur, when + radius * dur, now);
+        MutableList<ObjectFloatPair<TaskRegion>> tt = timeDistanceSortedList(when - radius * dur, when + radius * dur, now);
         switch (tt.size()) {
             case 0:
                 return null;
             case 1:
             default: //TODO for default case, use Top2 or clustering
-                return tt.get(0).getOne();
+                return tt.get(0).getOne().task;
         }
     }
 
-    protected MutableList<ObjectFloatPair<Task>> timeDistanceSortedList(long start, long end, long now) {
-        RTreeCursor<Task> c = cursor(start, end);
-        return c.listSorted((t) -> t.timeDistance(now));
+    protected MutableList<ObjectFloatPair<TaskRegion>> timeDistanceSortedList(long start, long end, long now) {
+        RTreeCursor<TaskRegion> c = cursor(start, end);
+        return c.listSorted((t) -> t.task.timeDistance(now));
     }
 
-    private RTreeCursor<Task> cursor(long start, long end) {
+    private RTreeCursor<TaskRegion> cursor(long start, long end) {
         return tree.cursor(timeRange(start, end));
     }
 
     private HyperRegion timeRange(long a, long b) {
-        return new RectLongND(new long[]{a, Long.MIN_VALUE}, new long[]{b, Long.MAX_VALUE});
+        return new TaskRegion(a, b);
     }
 
 
-    @NotNull
-    @Override
-    public HyperRegion<LongND> apply(@NotNull Task task) {
-        long start = task.start();
-        long end = task.end();
-
-        int freq = dither32(task.freq());
-        int conf = dither32(task.conf());
-        long truth = (((long) freq) << 32) /* most significant 32 bits */ | conf;
-
-        return new RectLongND(
-                new long[]{start, truth},
-                new long[]{end, truth}
-        );
-    }
-
-    /**
-     * map a float value (in range of 0..1 to an integer value (< unsigned ~31 bits)
-     */
-    private static int dither32(float x) {
-        return (int) (x * (1 << 16));
-    }
-    private static float undither32(int x) {
-        return (x / (1 << 16));
-    }
 
     @Override
     public void setCapacity(int capacity) {
@@ -187,22 +241,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         if (activation == 0)
             return;
 
-        final Task found = find(t);
+        TaskRegion tr = new TaskRegion(t);
+        final Task found = find(tr);
         if (found == null) {
 
             int over = size() + 1 - capacity;
             if (over > 0) {
-                ConcurrentRTree lt = ((ConcurrentRTree) tree);
-                lt.writeLock.lock();
-                try {
-                    tree.add(t);
+                ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
+                lt.withWriteLock((r)->{
+                    r.add(tr);
                     compress(n);
-                } finally {
-                    lt.writeLock.unlock();
-                }
-
+                });
             } else {
-                tree.addAsync(t);
+                add(t);
             }
 
 
@@ -216,6 +267,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         if (activation > 0)
             TaskTable.activate(t, activation, n);
 
+    }
+
+    private void add(@NotNull Task t) {
+        tree.addAsync(new TaskRegion(t));
     }
 
     private void compress(NAR nar) {
@@ -237,9 +292,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     }
 
-    private void compressNext(Node<Task> next, NAR nar) {
+    private void compressNext(Node<TaskRegion> next, NAR nar) {
         if (next instanceof Leaf) {
-            Leaf<Task> l = (Leaf) next;
+            Leaf<TaskRegion> l = (Leaf) next;
 
             int size = l.size;
             Object[] ld = l.data;
@@ -250,10 +305,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
                 Object x = ld[i];
                 if (x == null)
                     continue;
-                Task t = (Task) x;
-                if (t.isDeleted()) {
-                    if (removeTask(t))
-                        deleted++;
+                TaskRegion t = (TaskRegion) x;
+                if (t.task.isDeleted()) {
+                    deleted++;
+                    removeAsync(t);
                 }
             }
             if (deleted > 0)
@@ -270,15 +325,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
             {
                 if (l.size > 1) {
                     //e. merge 0 and 1
-                    Task a = (Task) ld[0];
+                    TaskRegion a = (TaskRegion) ld[0];
                     if (a != null) {
-                        Task b = (Task) ld[1];
+                        TaskRegion b = (TaskRegion) ld[1];
                         if (b != null) {
-                            Task c = Revision.merge(a, b, nar.time(), Param.TRUTH_EPSILON, nar.random());
+                            Task c = Revision.merge(a.task, b.task, nar.time(), Param.TRUTH_EPSILON, nar.random());
                             if (c != null) {
-                                tree.addAsync(c);
-                                removeTask(a);
-                                removeTask(b);
+                                removeAsync(a);
+                                removeAsync(b);
+                                add(c);
                                 TaskTable.activate(c, c.pri(), nar);
                                 return;
                             }
@@ -288,14 +343,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
                 {
                     //d. pick a random task and try removing it (HACK)
-                    Task r = (Task) ld[nar.random().nextInt(l.size)];
-                    removeTask(r);
+                    TaskRegion r = (TaskRegion) ld[nar.random().nextInt(l.size)];
+                    removeAsync(r);
                 }
 
             }
 
         } else if (next instanceof Branch) {
-            Branch<Task> b = (Branch) next;
+            Branch<TaskRegion> b = (Branch) next;
 
             //options:
             //a. smallest
@@ -304,21 +359,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
             long now = nar.time();
 
-            Node<Task> oldest = b.childMin(c -> {
-                RectLongND cb = (RectLongND) c.bounds();
+            Node<TaskRegion> oldest = b.childMin(c -> {
+                TaskRegion cb = (TaskRegion) c.bounds();
                 float dur = nar.dur();
-                long start = cb.min.coord[0];
-                long end = cb.max.coord[0];
-                long minFreq = cb.min.coord[1];
-                long maxFreq = cb.min.coord[1];
-                float freqDiff = undither32((int) (maxFreq>>32)) - undither32((int) (minFreq>>32));
+                long start = cb.start;
+                long end = cb.end;
+                float minFreq = cb.freqMin;
+                float maxFreq = cb.freqMax;
+                float freqDiff = maxFreq - minFreq;
                 float startAway = abs(start - now) / dur;
                 float endAway = abs(end - now) / dur;
                 float timeSpan = (end - start) / dur;
-                return  (1 + freqDiff) *  //minimize
+                return (1 + freqDiff) *  //minimize
                         (1 + Util.sigmoid(timeSpan)) *  //minimize
-                        (1 + 0.5f/(1f+startAway) + 0.5f/(1f+endAway))  //maximize
-                ;
+                        (1 + 0.5f / (1f + startAway) + 0.5f / (1f + endAway))  //maximize
+                        ;
             });
 
             compressNext(oldest, nar);
@@ -327,12 +382,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         }
     }
 
-    protected Task find(@NotNull Task t) {
+    protected Task find(@NotNull TaskRegion t) {
         final Task[] found = {null};
-        tree.intersecting(apply(t), (x) -> {
+        tree.intersecting(t, (x) -> {
             if (x.equals(t)) {
-                found[0] = x;
-                return false;
+                @Nullable Task xt = x.task;
+                if (xt!=null) {
+                    found[0] = xt;
+                    return false; //finished
+                }
             }
             return true;
         });
@@ -360,24 +418,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        tree.forEach(x);
+        tree.forEach(r -> {
+            Task rt = r.task;
+            if (rt!=null)
+                x.accept(rt);
+        });
     }
 
     @Override
     public boolean removeTask(Task x) {
-
         x.delete();
+        return tree.remove(new TaskRegion(x));
+    }
 
-        if (x instanceof SignalTask) {
-            HyperRegion curBounds = activeSignals.remove(x);
-            if (curBounds != null) {
-                return tree.remove(x, curBounds);
-            }
-        }
-
+    public boolean remove(TaskRegion x) {
+        x.task.delete();
         return tree.remove(x);
     }
 
+    public void removeAsync(TaskRegion x) {
+        x.task.delete();
+        tree.removeAsync(x);
+    }
     @Override
     public void clear() {
         tree.clear();

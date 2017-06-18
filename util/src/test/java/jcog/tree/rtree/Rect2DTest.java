@@ -84,8 +84,8 @@ public class Rect2DTest {
 
         RectDouble2D rect = new RectDouble2D(0, 0, 4, 3);
 
-        double xRange = rect.getRange(0);
-        double yRange = rect.getRange(1);
+        double xRange = rect.range(0);
+        double yRange = rect.range(1);
         Assert.assertTrue("Bad range in dimension X - expected " + 4.0 + " but was " + xRange, xRange == 4.0d);
         Assert.assertTrue("Bad range in dimension Y - expected " + 3.0 + " but was " + yRange, yRange == 3.0d);
     }

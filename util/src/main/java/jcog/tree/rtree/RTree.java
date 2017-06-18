@@ -118,6 +118,8 @@ public class RTree<T> implements Space<T> {
     }
 
 
+
+
     @Override public Spatialization<T> model() {
         return model;
     }

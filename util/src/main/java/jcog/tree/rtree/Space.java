@@ -87,23 +87,6 @@ public interface Space<T> extends Nodelike<T> {
 //    }
 
 
-    /**
-     * Add the data entry to the SpatialSearch structure
-     *
-     * @param t Data entry to be added
-     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
-     */
-    boolean add(final T t);
-
-    /**
-     * Remove the data entry from the SpatialSearch structure
-     *
-     * @param x Data entry to be removed
-     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
-     */
-    default boolean remove(@NotNull final T x) {
-        return remove(x, model().region(x));
-    }
 
     Spatialization<T> model();
 
@@ -149,8 +132,31 @@ public interface Space<T> extends Nodelike<T> {
 
     void clear();
 
+    /**
+     * Add the data entry to the SpatialSearch structure
+     *
+     * @param t Data entry to be added
+     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
+     */
+    boolean add(final T t);
+
     /** adds, deferred if necessary until un-busy */
     default void addAsync(@NotNull T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Remove the data entry from the SpatialSearch structure
+     *
+     * @param x Data entry to be removed
+     * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
+     */
+    default boolean remove(@NotNull final T x) {
+        return remove(x, model().region(x));
+    }
+
+    /** removes, deferred if necessary until un-busy */
+    default void removeAsync(T x) {
         throw new UnsupportedOperationException();
     }
 

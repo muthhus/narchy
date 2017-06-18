@@ -43,10 +43,10 @@ public final class AxialSplitLeaf<T> implements Split<T> {
 
         // choose axis to split
         int axis = 0;
-        double rangeD = leaf.bounds.getRange(0);
+        double rangeD = leaf.bounds.range(0);
         for (int d = 1; d < nD; d++) {
             // split along the greatest range extent
-            final double dr = leaf.bounds.getRangeFinite(d, 0);
+            final double dr = leaf.bounds.rangeIfFinite(d, 0);
             if (dr > rangeD) {
                 axis = d;
                 rangeD = dr;

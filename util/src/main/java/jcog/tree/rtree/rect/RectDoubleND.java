@@ -90,40 +90,40 @@ public class RectDoubleND implements HyperRegion<DoubleND>, Serializable {
         return new RectDoubleND(DoubleND.fill(i, NEGATIVE_INFINITY), DoubleND.fill(i, POSITIVE_INFINITY));
     }
 
-    @Override
-    public boolean contains(final HyperRegion _inner) {
-        final RectDoubleND inner = (RectDoubleND) _inner;
-
-        int dim = dim();
-        for (int i = 0; i < dim; i++) {
-            if (!(min.coord[i] <= inner.min.coord[i] && max.coord[i] >= inner.max.coord[i]))
-                //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
-                return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean intersects(final HyperRegion r) {
-        final RectDoubleND x = (RectDoubleND) r;
-
-        int dim = dim();
-        for (int i = 0; i < dim; i++) {
-            /*return !((min.x > r2.max.x) || (r2.min.x > max.x) ||
-                    (min.y > r2.max.y) || (r2.min.y > max.y));*/
-
-            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
-                return false;
-        }
-        return true;
-    }
+//    @Override
+//    public boolean contains(final HyperRegion _inner) {
+//        final RectDoubleND inner = (RectDoubleND) _inner;
+//
+//        int dim = dim();
+//        for (int i = 0; i < dim; i++) {
+//            if (!(min.coord[i] <= inner.min.coord[i] && max.coord[i] >= inner.max.coord[i]))
+//                //if (min.coord[i] > inner.min.coord[i] || max.coord[i] < inner.max.coord[i])
+//                return false;
+//        }
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean intersects(final HyperRegion r) {
+//        final RectDoubleND x = (RectDoubleND) r;
+//
+//        int dim = dim();
+//        for (int i = 0; i < dim; i++) {
+//            /*return !((min.x > r2.max.x) || (r2.min.x > max.x) ||
+//                    (min.y > r2.max.y) || (r2.min.y > max.y));*/
+//
+//            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
+//                return false;
+//        }
+//        return true;
+//    }
 
     @Override
     public double cost() {
         double sigma = 1f;
         int dim = dim();
         for (int i = 0; i < dim; i++) {
-            sigma *= getRangeFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
+            sigma *= rangeIfFinite(i, 1 /* an infinite dimension can not be compared, so just ignore it */);
         }
         return sigma;
     }
@@ -161,7 +161,6 @@ public class RectDoubleND implements HyperRegion<DoubleND>, Serializable {
         return (max + min) / 2f;
     }
 
-    @Override
     public DoubleND center() {
         int dim = dim();
         double[] c = new double[dim];
@@ -178,9 +177,9 @@ public class RectDoubleND implements HyperRegion<DoubleND>, Serializable {
     }
 
     @Override
-    public double getRange(final int i) {
-        double min = this.min.coord[i];
-        double max = this.max.coord[i];
+    public double range(final int dim) {
+        double min = this.min.coord[dim];
+        double max = this.max.coord[dim];
         if (min == max)
             return 0;
         if ((min == NEGATIVE_INFINITY) || (max == Double.POSITIVE_INFINITY))

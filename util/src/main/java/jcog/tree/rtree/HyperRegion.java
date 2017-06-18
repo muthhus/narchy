@@ -28,7 +28,7 @@ import java.util.function.Function;
  * <p>
  * Created by jcairns on 4/30/15.
  */
-public interface HyperRegion<X extends HyperPoint> {
+public interface HyperRegion<X> {
 
     /**
      * Calculate the resulting mbr when combining param HyperRect with this HyperRect
@@ -41,7 +41,7 @@ public interface HyperRegion<X extends HyperPoint> {
 
 
     static <X> HyperRegion mbr(Function<X, HyperRegion> builder, X[] rect, short size) {
-        assert(size > 0);
+        assert (size > 0);
         HyperRegion bounds = builder.apply(rect[0]);
         for (int k = 1; k < size; k++) {
             X rr = rect[k];
@@ -93,31 +93,29 @@ public interface HyperRegion<X extends HyperPoint> {
 
     /**
      * returns coordinate scalar at the given extremum and dimension
-     * @param maxOrMin
-     *   true = max, false = min
+     *
+     * @param maxOrMin  true = max, false = min
      * @param dimension which dimension index
      */
     double coord(boolean maxOrMin, int dimension);
 
-    /**
-     * Get the HyperPoint representing the center point in all dimensions of this HyperRect
-     *
-     * @return middle HyperPoint
-     */
-    X center();
 
-    double center(int d);
+    default double center(int d) {
+        return (coord(true, d) + coord(false, d))/2.0;
+    }
 
     /**
      * Calculate the distance between the min and max HyperPoints in given dimension
      *
-     * @param d - dimension to calculate
+     * @param dim - dimension to calculate
      * @return double - the numeric range of the dimention (min - max)
      */
-    double getRange(final int d);
+    default double range(final int dim) {
+        return Math.abs(coord(true, dim) - coord(false, dim));
+    }
 
-    default double getRangeFinite(int d, double elseValue) {
-        double r = getRange(d);
+    default double rangeIfFinite(int dim, double elseValue) {
+        double r = range(dim);
         return !Double.isFinite(r) ? elseValue : r;
     }
 
@@ -128,7 +126,14 @@ public interface HyperRegion<X extends HyperPoint> {
      * @param r - HyperRect to test
      * @return true if contains, false otherwise
      */
-    boolean contains(HyperRegion<X> r);
+    default boolean contains(HyperRegion<X> x) {
+        int d = dim();
+        for (int i = 0; i < d; i++)
+            if (coord(false, i) > x.coord(false, i) ||
+                    coord(true, i) < x.coord(true, i))
+                return false;
+        return true;
+    }
 
     /**
      * Determines if this HyperRect contains or intersects parameter HyperRect
@@ -136,14 +141,30 @@ public interface HyperRegion<X extends HyperPoint> {
      * @param r - HyperRect to test
      * @return true if intersects, false otherwise
      */
-    boolean intersects(HyperRegion<X> r);
+    default boolean intersects(HyperRegion<X> x) {
+        int d = dim();
+        for (int i = 0; i < d; i++)
+            if (coord(false, i) > x.coord(true, i) ||
+                    coord(true, i) < x.coord(false, i))
+                return false;
+        return true;
+    }
+
+
 
     /**
-     * Calculate the "cost" of this HyperRect - usually the area across all dimensions
+     * Calculate the "cost" of this HyperRect - usually the area/volume/hypervolume across all dimensions
      *
      * @return - cost
      */
-    double cost();
+    default double cost() {
+        int n = dim();
+        double a = 1.0;
+        for (int d = 0; d < n; d++) {
+            a *= rangeIfFinite(d, 0);
+        }
+        return a;
+    }
 
     /**
      * Calculate the perimeter of this HyperRect - across all dimesnions
@@ -152,9 +173,9 @@ public interface HyperRegion<X extends HyperPoint> {
      */
     default double perimeter() {
         double p = 0.0;
-        final int nD = this.dim();
-        for (int d = 0; d < nD; d++) {
-            p += 2.0 * this.getRangeFinite(d, 0);
+        final int n = this.dim();
+        for (int d = 0; d < n; d++) {
+            p += /*2.0 * */this.rangeIfFinite(d, 0);
         }
         return p;
     }
@@ -167,13 +188,14 @@ public interface HyperRegion<X extends HyperPoint> {
         return h;
     }
 
-    /** gets the distance along a certain dimension from this region's to another's extrema */
+    /**
+     * gets the distance along a certain dimension from this region's to another's extrema
+     */
     default double distance(HyperRegion X, int dim, boolean maxOrMin, boolean XmaxOrMin) {
         return Math.abs(
-            coord(maxOrMin, dim) - X.coord(XmaxOrMin, dim)
+                coord(maxOrMin, dim) - X.coord(XmaxOrMin, dim)
         );
     }
-
 
 
 //    @JsonIgnore  default double getRangeMin() {

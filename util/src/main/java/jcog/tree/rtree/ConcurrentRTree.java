@@ -20,8 +20,8 @@ package jcog.tree.rtree;
  * #L%
  */
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.tree.rtree.util.Stats;
+import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.locks.Lock;
@@ -36,7 +36,8 @@ public class ConcurrentRTree<T> implements Space<T> {
 
     public final Space<T> tree;
 
-    final DisruptorBlockingQueue<T> toAdd = new DisruptorBlockingQueue<>(32);
+    final QueueLock<T> toAdd, toRemove;
+
     private final Lock readLock;
     public final Lock writeLock;
 
@@ -45,6 +46,8 @@ public class ConcurrentRTree<T> implements Space<T> {
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
+        toAdd = new QueueLock<T>(this::add);
+        toRemove = new QueueLock<T>(this::remove);
     }
 
 
@@ -106,17 +109,12 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public void addAsync(@NotNull T t) {
-        toAdd.add(t);
-        if (writeLock.tryLock()) {
-            try {
-                T next;
-                while ((next = toAdd.poll()) != null) {
-                    tree.add(next);
-                }
-            } finally {
-                writeLock.unlock();
-            }
-        }
+        toAdd.accept(t);
+    }
+
+    @Override
+    public void removeAsync(@NotNull T t) {
+        toRemove.accept(t);
     }
 
     /**
@@ -152,7 +150,6 @@ public class ConcurrentRTree<T> implements Space<T> {
             writeLock.unlock();
         }
     }
-
 
 
     public void read(Consumer<Space<T>> x) {
@@ -350,5 +347,15 @@ public class ConcurrentRTree<T> implements Space<T> {
     @Override
     public boolean contains(T t, Spatialization<T> model) {
         return tree.contains(t, model);
+    }
+
+    public void withWriteLock(Consumer<Space<T>> o) {
+        writeLock.lock();
+        try {
+            o.accept(tree);
+        } finally {
+            writeLock.unlock();
+        }
+
     }
 }

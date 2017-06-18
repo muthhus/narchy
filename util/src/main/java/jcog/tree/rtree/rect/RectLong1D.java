@@ -81,7 +81,6 @@ public class RectLong1D implements HyperRegion<Long1D> {
 
 
 
-    @Override
     public Long1D center() {
         return new Long1D((min + max) / 2);
     }
@@ -93,8 +92,8 @@ public class RectLong1D implements HyperRegion<Long1D> {
     }
 
     @Override
-    public double getRange(int d) {
-        assert (d == 0);
+    public double range(int dim) {
+        assert (dim == 0);
         return Math.abs(max - min);
     }
 
@@ -112,7 +111,7 @@ public class RectLong1D implements HyperRegion<Long1D> {
 
     @Override
     public double cost() {
-        return getRange(0);
+        return range(0);
     }
 
 
