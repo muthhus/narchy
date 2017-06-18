@@ -223,7 +223,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
         MutableList<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).
-                listSorted(t -> -strength(now, dur, 1f, t));
+                listSorted(t -> -strength(now, dur, t));
 
         switch (tt.size()) {
             case 0:
@@ -371,7 +371,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         //recurse through a subest of the weakest regions, while also collecting victims
         int sizeBefore = size();
-        List<Node<TaskRegion, ?>> weakest = b.childMinList(c -> strength(now, dur, branchFreqRange, (TaskRegion) c.bounds()), sizeBefore / 2);
+        List<Node<TaskRegion, ?>> weakest = b.childMinList(c -> strength(now, dur, (TaskRegion) c.bounds()), sizeBefore / 2);
         int w = weakest.size();
         if (w > 0) {
             for (int i = 0; i < w; i++) {
@@ -385,7 +385,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private void compressLeaf(Leaf<TaskRegion> l, NAR nar, List<TaskRegion> victims) {
         if (l.size() == 1) {
             //collect outlier as a potential victim
-            victims.add(l.child(0));
+            victims.add(l.get(0));
         } else {
 
             int size = l.size;
@@ -424,8 +424,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     a = t2.a;
                     b = t2.b;
                 } else {
-                    a = l.child(0);
-                    b = l.child(1);
+                    a = l.get(0);
+                    b = l.get(1);
                 }
 
                 Task c = Revision.merge(a.task, b.task, now, Param.TRUTH_EPSILON, nar.random());
@@ -454,11 +454,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    private float strength(long t, int dur, double branchFreqRange, TaskRegion cb) {
-
-        float minFreq = cb.freqMin;
-        float maxFreq = cb.freqMax;
-        float freqDiff = (float) ((maxFreq - minFreq) / (1f + branchFreqRange));
+    private float strength(long t, int dur, TaskRegion cb) {
 
         float awayFromNow = (float) (Math.max(cb.start - t, cb.end - t)) / dur; //0..1.0
 
@@ -466,10 +462,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         float timeSpanFactor = awayFromNow == 0 ? 1f : (timeSpan / (timeSpan + awayFromNow));
 
         return (
-                (1 + (cb.confMax * 1.0f) * freqDiff) *  //minimize, but only as important as confidence. ie. low confidence makes freq diff matter less
-                (1 + 0.10f * (timeSpanFactor)) *  //minimize: prefer smaller time spans
-                (1 + 1.0f * 1f / Util.sqr(1f + (awayFromNow)))) *  //maximize
-                (1 + 1.0f * cb.confMax) //minimize
+                (1 + 1.0f * (cb.freqMax - cb.freqMin)) *  //minimize
+                (1 + 1.0f * (cb.confMax - cb.confMin)) *  //minimize
+                (1 + 0.1f * (timeSpanFactor)) *  //minimize: prefer smaller time spans
+
+                (1 + 0.5f * 1f / Util.sqr(1f + (awayFromNow)))) *  //maximize
+                (1 + 0.5f * cb.confMax) //minimize
                 ;
     }
 

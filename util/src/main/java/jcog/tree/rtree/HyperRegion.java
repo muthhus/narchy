@@ -197,6 +197,19 @@ public interface HyperRegion<X> {
         );
     }
 
+    default <T extends HyperRegion> double variance(int dim, Node<T,T> container) {
+        double mean = center(dim);
+        double sumDiffSq = 0;
+        int s = container.size();
+        if (s < 2)
+            return 0;
+        for (int i = 0; i < s; i++) {
+            double diff = container.get(i).center(dim) - mean;
+            sumDiffSq += diff*diff;
+        }
+        return sumDiffSq / s-1;
+    }
+
 
 //    @JsonIgnore  default double getRangeMin() {
 //        int dim = dim();

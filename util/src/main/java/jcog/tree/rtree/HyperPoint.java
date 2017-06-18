@@ -25,7 +25,7 @@ package jcog.tree.rtree;
  * <p>
  * Created by jcairns on 5/5/15.
  */
-public interface HyperPoint {
+@Deprecated public interface HyperPoint {
 
     /**
      * The number of dimensions represented by this point

@@ -345,7 +345,8 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             float pw = 0; //baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
 
             //normalize to range
-            conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
+            //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
+
             /** smudge a low confidence task across more of the frequency range */
             final float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
 
@@ -393,7 +394,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
     private void renderWaveLine(float nowX, long minT, long maxT, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
-        gl.glLineWidth(2.0f);
+        gl.glLineWidth(3.0f);
         gl.glBegin(GL2.GL_LINE_STRIP);
 
         wave.forEach((freq, conf, start, end) -> {
@@ -412,7 +413,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             }
 
             float a =
-                    conf;
+                    conf * 0.75f;
                     //0.45f + 0.5f * conf;
             if (beliefOrGoal) {
                 gl.glColor4f(0.5f, 0.25f, 0f, a);

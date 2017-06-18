@@ -83,7 +83,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
     @Override
-    public Node<T, ?> child(int i) {
+    public Node<T, ?> get(int i) {
         return child[i];
     }
 

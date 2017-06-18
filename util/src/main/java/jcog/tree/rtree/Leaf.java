@@ -48,7 +48,7 @@ public class Leaf<T> implements Node<T, T> {
     }
 
     @Override
-    public T child(int i) {
+    public T get(int i) {
         return data[i];
     }
 

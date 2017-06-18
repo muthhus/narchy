@@ -23,14 +23,11 @@ package jcog.tree.rtree;
 import jcog.list.FasterList;
 import jcog.tree.rtree.util.Stats;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.impl.block.comparator.primitive.DoubleFunctionComparator;
 import org.eclipse.collections.impl.block.comparator.primitive.FloatFunctionComparator;
-import org.eclipse.collections.impl.factory.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -55,7 +52,7 @@ public interface Node<L, V> extends Nodelike<L> {
     }
 
     default Stream<V> stream() {
-        return IntStream.range(0, size()).mapToObj(this::child);
+        return IntStream.range(0, size()).mapToObj(this::get);
     }
 
     default FasterList<V> toList() {
@@ -63,7 +60,7 @@ public interface Node<L, V> extends Nodelike<L> {
         FasterList f = new FasterList(s);
         Object[] ff = f.array();
         for (int i = 0; i < s; i++) {
-            ff[i] = child(i);
+            ff[i] = get(i);
         }
         return f;
     }
@@ -73,7 +70,7 @@ public interface Node<L, V> extends Nodelike<L> {
         double minVal = Double.POSITIVE_INFINITY;
         int size = size();
         for (int i = 0; i < size; i++) {
-            V c = child(i);
+            V c = get(i);
             double val = rank.floatValueOf(c);
             if (val < minVal) {
                 min = c;
@@ -83,7 +80,7 @@ public interface Node<L, V> extends Nodelike<L> {
         return min;
     }
 
-    V child(int i);
+    V get(int i);
 
     /**
      * @return Rect - the bounding rectangle for this node

@@ -41,8 +41,8 @@ public final class CounterNode<T> implements Node<T, Object> {
     }
 
     @Override
-    public Object child(int i) {
-        return node.child(i);
+    public Object get(int i) {
+        return node.get(i);
     }
 
     @Override
