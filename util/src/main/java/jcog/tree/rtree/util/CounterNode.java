@@ -23,7 +23,7 @@ package jcog.tree.rtree.util;
 import jcog.tree.rtree.HyperRect;
 import jcog.tree.rtree.Node;
 import jcog.tree.rtree.Nodelike;
-import jcog.tree.rtree.RTreeModel;
+import jcog.tree.rtree.Spatialization;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -51,17 +51,17 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(T t, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> add(T t, Nodelike<T> parent, Spatialization<T> model) {
         return this.node.add(t, this, model);
     }
 
     @Override
-    public Node<T> remove(T x, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> remove(T x, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model) {
         return this.node.remove(x, xBounds, this, model);
     }
 
     @Override
-    public Node<T> update(T told, T tnew, RTreeModel<T> model) {
+    public Node<T> update(T told, T tnew, Spatialization<T> model) {
         return this.node.update(told, tnew, model);
     }
 
@@ -77,14 +77,14 @@ public final class CounterNode<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+    public boolean containing(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
         searchCount++;
         bboxEvalCount += this.node.size();
         return this.node.containing(rect, t, model);
     }
 
     @Override
-    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model) {
         node.intersectingNodes(rect, t, model);
     }
 
@@ -99,7 +99,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+    public boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
         this.node.intersecting(rect, t, model);
         return false;
     }
@@ -115,12 +115,17 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
+    public double perimeter(Spatialization<T> model) {
+        return node.perimeter(model);
+    }
+
+    @Override
     public void reportSizeDelta(int i) {
         node.reportSizeDelta(i);
     }
 
     @Override
-    public boolean contains(T t, RTreeModel<T> model) {
+    public boolean contains(T t, Spatialization<T> model) {
         return node.contains(t, model);
     }
 }

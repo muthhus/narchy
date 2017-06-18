@@ -30,7 +30,7 @@ import jcog.tree.rtree.*;
 public final class LinearSplitLeaf<T> implements Split<T> {
 
     @Override
-    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, Spatialization<T> model) {
         final Branch<T> pNode = model.newBranch();
         final Node<T> l1Node = model.newLeaf();
         final Node<T> l2Node = model.newLeaf();

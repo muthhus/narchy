@@ -340,7 +340,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             float pw = 0; //baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
 
             /** smudge a low confidence task across more of the frequency range */
-            float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
+            final float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
 
             float start, end;
             if (showEternal && eternal) {
@@ -377,7 +377,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
                 gl.glColor4f(r, g, b, alpha); //, 0.7f + 0.2f * q);
                 Draw.rect(gl,
                         x, y,
-                        W, ph, 0);
+                        W, ph);
             }
 
 

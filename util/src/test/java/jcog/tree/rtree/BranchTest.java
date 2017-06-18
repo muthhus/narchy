@@ -37,7 +37,7 @@ public class BranchTest {
     @Test
     public void branchOptimizationTest() {
 
-        for(RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
+        for(Spatialization.DefaultSplits type : Spatialization.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = RTree2DTest.createRect2DTree(type);
             RectDouble2D[] rects = RTree2DTest.generateRandomRects(80);
 

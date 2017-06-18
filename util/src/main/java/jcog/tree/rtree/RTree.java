@@ -40,25 +40,25 @@ import java.util.function.Predicate;
  * <p>
  * Created by jcairns on 4/30/15.</p>
  */
-public class RTree<T> implements Spatialized<T> {
+public class RTree<T> implements Space<T> {
     private static final double EPSILON = 1e-12;
     public static final float FPSILON = (float) EPSILON;
 
     @NotNull
     private Node<T> root;
     private int size;
-    public RTreeModel<T> model;
+    public Spatialization<T> model;
 
 
     public RTree(@Nullable final Function<T, HyperRect> spatialize) {
-        this(spatialize, 2, 8, RTreeModel.DefaultSplits.AXIAL);
+        this(spatialize, 2, 8, Spatialization.DefaultSplits.AXIAL);
     }
 
-    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final RTreeModel.DefaultSplits splitType) {
-        this(new RTreeModel<>(spatialize, splitType, mMin, mMax));
+    public RTree(@Nullable Function<T, HyperRect> spatialize, final int mMin, final int mMax, final Spatialization.DefaultSplits splitType) {
+        this(new Spatialization<>(spatialize, splitType, mMin, mMax));
     }
 
-    public RTree(RTreeModel<T> model) {
+    public RTree(Spatialization<T> model) {
         this.model = model;
         clear();
     }
@@ -118,7 +118,7 @@ public class RTree<T> implements Spatialized<T> {
     }
 
 
-    @Override public RTreeModel<T> model() {
+    @Override public Spatialization<T> model() {
         return model;
     }
 
@@ -132,7 +132,7 @@ public class RTree<T> implements Spatialized<T> {
             return false;
         root = root.remove(x, xBounds, this, model);
         int after = size;
-        assert (after == before || after == before - 1);
+        //assert (after == before || after == before - 1): "before: " + before + ", after: " + after;
         return before > after;
     }
 
@@ -235,7 +235,7 @@ public class RTree<T> implements Spatialized<T> {
     }
 
     @Override
-    public boolean contains(T t, RTreeModel<T> model) {
+    public boolean contains(T t, Spatialization<T> model) {
         return root.contains(t, model);
     }
 

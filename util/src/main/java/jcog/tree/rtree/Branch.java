@@ -24,6 +24,7 @@ package jcog.tree.rtree;
 import com.google.common.base.Joiner;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -49,7 +50,7 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public boolean contains(T t, RTreeModel<T> model) {
+    public boolean contains(T t, Spatialization<T> model) {
         if (!bounds().contains(model.bounds(t)))
             return false;
         for (int i = 0; i < size; i++) {
@@ -102,7 +103,7 @@ public final class Branch<T> implements Node<T> {
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
         assert (childDiff == 0);
 
         final HyperRect tRect = model.bounds(t);
@@ -177,7 +178,7 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> remove(final T x, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> remove(final T x, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         for (int i = 0; i < size; i++) {
             if (child[i].bounds().intersects(xBounds)) {
@@ -216,7 +217,7 @@ public final class Branch<T> implements Node<T> {
 //    }
 
     @Override
-    public Node<T> update(final T OLD, final T NEW, RTreeModel<T> model) {
+    public Node<T> update(final T OLD, final T NEW, Spatialization<T> model) {
         final HyperRect tRect = model.bounds(OLD);
 
         //TODO may be able to avoid recomputing bounds if the old was not found
@@ -240,7 +241,7 @@ public final class Branch<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(final HyperRect rect, final Predicate<T> t, RTreeModel<T> model) {
+    public boolean containing(final HyperRect rect, final Predicate<T> t, Spatialization<T> model) {
 
         for (int i = 0; i < size; i++) {
             Node c = child[i];
@@ -260,7 +261,7 @@ public final class Branch<T> implements Node<T> {
         return size;
     }
 
-    private int chooseLeaf(final T t, final HyperRect tRect, Nodelike<T> parent, RTreeModel<T> model) {
+    private int chooseLeaf(final T t, final HyperRect tRect, Nodelike<T> parent, Spatialization<T> model) {
         if (size > 0) {
             int bestNode = 0;
             HyperRect childMbr = child[0].bounds().mbr(tRect);
@@ -335,12 +336,12 @@ public final class Branch<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+    public boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
         return nodeAND(ci -> !(rect.intersects(ci.bounds()) && !ci.intersecting(rect, t, model)));
     }
 
     @Override
-    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model) {
         if (!bounds().intersects(rect))
             return;
 
@@ -373,5 +374,31 @@ public final class Branch<T> implements Node<T> {
     @Override
     public String toString() {
         return "Branch" + '{' + mbr + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
+    }
+
+    public Node<T> childMin(FloatFunction<Node<T>> rank) {
+        Node<T> min = null;
+        double minVal = Double.POSITIVE_INFINITY;
+        for (int i = 0; i < size; i++) {
+            Node<T> c = child[i];
+            double vol = rank.floatValueOf(c);
+            if (vol < minVal) {
+                min = c;
+                minVal = vol;
+            }
+        }
+        return min;
+    }
+
+    @Override
+    public double perimeter(Spatialization<T> model) {
+        double maxVolume = 0;
+        for (int i = 0; i < size; i++) {
+            Node<T> c = child[i];
+            double vol = c.perimeter(model);
+            if (vol > maxVolume)
+                maxVolume = vol;
+        }
+        return maxVolume;
     }
 }

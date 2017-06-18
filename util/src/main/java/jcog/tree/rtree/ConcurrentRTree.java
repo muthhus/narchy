@@ -32,9 +32,9 @@ import java.util.function.Predicate;
 /**
  * Created by jcovert on 12/30/15.
  */
-public class ConcurrentRTree<T> implements Spatialized<T> {
+public class ConcurrentRTree<T> implements Space<T> {
 
-    public final Spatialized<T> tree;
+    public final Space<T> tree;
 
     final DisruptorBlockingQueue<T> toAdd = new DisruptorBlockingQueue<>(32);
     private final Lock readLock;
@@ -49,7 +49,7 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
 
 
     @Override
-    public RTreeModel<T> model() {
+    public Spatialization<T> model() {
         return tree.model();
     }
 
@@ -134,6 +134,16 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
         }
     }
 
+    @Override
+    public boolean remove(T x) {
+        writeLock.lock();
+        try {
+            return tree.remove(x);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
     public void removeAll(Iterable<? extends T> t) {
         writeLock.lock();
         try {
@@ -145,7 +155,7 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
 
 
 
-    public void read(Consumer<Spatialized<T>> x) {
+    public void read(Consumer<Space<T>> x) {
         readLock.lock();
         try {
             x.accept(tree);
@@ -154,7 +164,7 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
         }
     }
 
-    public void write(Consumer<Spatialized<T>> x) {
+    public void write(Consumer<Space<T>> x) {
         writeLock.lock();
         try {
             x.accept(tree);
@@ -338,7 +348,7 @@ public class ConcurrentRTree<T> implements Spatialized<T> {
     }
 
     @Override
-    public boolean contains(T t, RTreeModel<T> model) {
+    public boolean contains(T t, Spatialization<T> model) {
         return tree.contains(t, model);
     }
 }

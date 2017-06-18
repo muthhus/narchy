@@ -41,7 +41,7 @@ public class RTree2DTest {
     @Test
     public void pointSearchTest() {
 
-        final RTree<Double2D> pTree = new RTree<>(new Double2D.Builder(), 2, 8, RTreeModel.DefaultSplits.AXIAL);
+        final RTree<Double2D> pTree = new RTree<>(new Double2D.Builder(), 2, 8, Spatialization.DefaultSplits.AXIAL);
 
         for(int i=0; i<10; i++) {
             pTree.add(new Double2D(i, i));
@@ -70,7 +70,7 @@ public class RTree2DTest {
 
         final int entryCount = 20;
 
-        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
+        for (Spatialization.DefaultSplits type : Spatialization.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRect2DTree(2, 8, type);
             for (int i = 0; i < entryCount; i++) {
                 rTree.add(new RectDouble2D(i, i, i+3, i+3));
@@ -110,7 +110,7 @@ public class RTree2DTest {
         final int entryCount = 10000;
         final RectDouble2D[] rects = generateRandomRects(entryCount);
 
-        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
+        for (Spatialization.DefaultSplits type : Spatialization.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRect2DTree(2, 8, type);
             for (int i = 0; i < rects.length; i++) {
                 rTree.add(rects[i]);
@@ -147,7 +147,7 @@ public class RTree2DTest {
         final int entryCount = 50_000;
 
         final RectDouble2D[] rects = generateRandomRects(entryCount);
-        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
+        for (Spatialization.DefaultSplits type : Spatialization.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRect2DTree(2, 8, type);
             for (int i = 0; i < rects.length; i++) {
                 rTree.add(rects[i]);
@@ -173,7 +173,7 @@ public class RTree2DTest {
         final int entryCount = 5000;
 
         final RectDouble2D[] rects = generateRandomRects(entryCount);
-        for (RTreeModel.DefaultSplits type : RTreeModel.DefaultSplits.values()) {
+        for (Spatialization.DefaultSplits type : Spatialization.DefaultSplits.values()) {
             RTree<RectDouble2D> rTree = createRect2DTree(2, 8, type);
             for (int i = 0; i < rects.length; i++) {
                 rTree.add(rects[i]);
@@ -194,7 +194,7 @@ public class RTree2DTest {
 
     @Test
     public void treeRemovalTest() {
-        final RTree<RectDouble2D> rTree = createRect2DTree(RTreeModel.DefaultSplits.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRect2DTree(Spatialization.DefaultSplits.QUADRATIC);
 
         RectDouble2D[] rects = new RectDouble2D[1000];
         for(int i = 0; i < rects.length; i++){
@@ -215,7 +215,7 @@ public class RTree2DTest {
 
     @Test
     public void treeSingleRemovalTest() {
-        final RTree<RectDouble2D> rTree = createRect2DTree(RTreeModel.DefaultSplits.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRect2DTree(Spatialization.DefaultSplits.QUADRATIC);
 
         RectDouble2D rect = new RectDouble2D(0,0,2,2);
         rTree.add(rect);
@@ -229,7 +229,7 @@ public class RTree2DTest {
     @Ignore
     // This test ignored because output needs to be manually evaluated.
     public void treeRemoveAndRebalanceTest() {
-        final RTree<RectDouble2D> rTree = createRect2DTree(RTreeModel.DefaultSplits.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRect2DTree(Spatialization.DefaultSplits.QUADRATIC);
 
         RectDouble2D[] rect = new RectDouble2D[65];
         for(int i = 0; i < rect.length; i++){
@@ -264,7 +264,7 @@ public class RTree2DTest {
 
     @Test
     public void treeUpdateTest() {
-        final RTree<RectDouble2D> rTree = createRect2DTree(RTreeModel.DefaultSplits.QUADRATIC);
+        final RTree<RectDouble2D> rTree = createRect2DTree(Spatialization.DefaultSplits.QUADRATIC);
 
         RectDouble2D rect = new RectDouble2D(0, 1, 2, 3);
         rTree.add(rect);
@@ -393,10 +393,10 @@ public class RTree2DTest {
      * @param splitType - type of leaf to use (affects how full nodes get split)
      * @return tree
      */
-    public static RTree<RectDouble2D> createRect2DTree(RTreeModel.DefaultSplits splitType) {
+    public static RTree<RectDouble2D> createRect2DTree(Spatialization.DefaultSplits splitType) {
         return createRect2DTree(2, 8, splitType);
     }
-    public static RTree<RectDouble2D> createRect2DTree(RTreeModel.DefaultSplits splitType, int min, int max) {
+    public static RTree<RectDouble2D> createRect2DTree(Spatialization.DefaultSplits splitType, int min, int max) {
         return createRect2DTree(min, max, splitType);
     }
 
@@ -408,10 +408,10 @@ public class RTree2DTest {
      * @param splitType - type of leaf to use (affects how full nodes get split)
      * @return tree
      */
-    public static RTree<RectDouble2D> createRect2DTree(int minM, int maxM, RTreeModel.DefaultSplits splitType) {
+    public static RTree<RectDouble2D> createRect2DTree(int minM, int maxM, Spatialization.DefaultSplits splitType) {
         return new RTree<>(new RectDouble2D.Builder(), minM, maxM, splitType);
     }
-    public static RTree<RectFloatND> createRectNDTree(int minM, int maxM, RTreeModel.DefaultSplits splitType) {
+    public static RTree<RectFloatND> createRectNDTree(int minM, int maxM, Spatialization.DefaultSplits splitType) {
         return new RTree<>(new RectFloatND.Builder(), minM, maxM, splitType);
     }
 }

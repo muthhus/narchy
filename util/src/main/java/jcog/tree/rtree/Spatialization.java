@@ -3,28 +3,29 @@ package jcog.tree.rtree;
 import jcog.tree.rtree.split.AxialSplitLeaf;
 import jcog.tree.rtree.split.LinearSplitLeaf;
 import jcog.tree.rtree.split.QuadraticSplitLeaf;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
-public class RTreeModel<T> {
+public class Spatialization<T> {
 
     public final Split<T> split;
     public final Function<T, HyperRect> bounds;
     public final short max;       // max entries per node
     public final short min;       // least number of entries per node
 
-    public RTreeModel(@Deprecated final Function<T, HyperRect> bounds, DefaultSplits split, final int min, final int max) {
+    public Spatialization(@Deprecated final Function<T, HyperRect> bounds, DefaultSplits split, final int min, final int max) {
         this(bounds, split.get(), min, max);
     }
 
-    public RTreeModel(@Deprecated final Function<T, HyperRect> bounds, final Split<T> split, final int min, final int max) {
+    public Spatialization(@Deprecated final Function<T, HyperRect> bounds, final Split<T> split, final int min, final int max) {
         this.max = (short) max;
         this.min = (short) min;
         this.bounds = bounds;
         this.split = split;
     }
 
-    public HyperRect bounds(T t) {
+    public HyperRect bounds(@NotNull T t) {
         return bounds.apply(t);
     }
 
@@ -38,6 +39,10 @@ public class RTreeModel<T> {
 
     public Node<T> split(T t, Leaf<T> leaf) {
         return split.split(t, leaf, this);
+    }
+
+    public double perimeter(T c) {
+        return bounds(c).perimeter();
     }
 
     /**

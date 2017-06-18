@@ -30,11 +30,11 @@ import java.util.function.Predicate;
 /**
  * Created by jcovert on 12/30/15.
  */
-public interface Spatialized<T> extends Nodelike<T> {
+public interface Space<T> extends Nodelike<T> {
 
     int DEFAULT_MIN_M = 2;
     int DEFAULT_MAX_M = 8;
-    RTreeModel.DefaultSplits DEFAULT_SPLIT_TYPE = RTreeModel.DefaultSplits.AXIAL;
+    Spatialization.DefaultSplits DEFAULT_SPLIT_TYPE = Spatialization.DefaultSplits.AXIAL;
 
     /**
      * Create an R-Tree with default values for m, M, and split type
@@ -43,7 +43,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param <T>         - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Spatialized<T> rTree(final Function<T, HyperRect> spatializer) {
+    static <T> Space<T> rTree(final Function<T, HyperRect> spatializer) {
         return new RTree<>(spatializer, DEFAULT_MIN_M, DEFAULT_MAX_M, DEFAULT_SPLIT_TYPE);
     }
 
@@ -57,7 +57,7 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param <T>       - The store type of the bound
      * @return SpatialSearch - The spatial search and index structure
      */
-    static <T> Spatialized<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final RTreeModel.DefaultSplits splitType) {
+    static <T> Space<T> rTree(final Function<T, HyperRect> builder, final int minM, final int maxM, final Spatialization.DefaultSplits splitType) {
         return new RTree<>(builder, minM, maxM, splitType);
     }
 //
@@ -101,11 +101,11 @@ public interface Spatialized<T> extends Nodelike<T> {
      * @param x Data entry to be removed
      * @return whether the item was added, or false if it wasn't (ex: duplicate or some other prohibition)
      */
-    default boolean remove(final T x) {
+    default boolean remove(@NotNull final T x) {
         return remove(x, model().bounds(x));
     }
 
-    RTreeModel<T> model();
+    Spatialization<T> model();
 
     boolean remove(final T x, HyperRect xBounds);
 

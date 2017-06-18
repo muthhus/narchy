@@ -49,7 +49,7 @@ public interface Node<T> extends Nodelike<T> {
      * @param parent - the callee which is the parent of this instance
      * @param model
      */
-    Node<T> add(T t, Nodelike<T> parent, RTreeModel<T> model);
+    Node<T> add(T t, Nodelike<T> parent, Spatialization<T> model);
 
     /**
      * Remove t from the index
@@ -58,7 +58,7 @@ public interface Node<T> extends Nodelike<T> {
      * @param parent - the callee which is the parent of this instance
      * @param model
      */
-    Node<T> remove(T t, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model);
+    Node<T> remove(T t, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model);
 
     /**
      * update an existing t in the index
@@ -66,7 +66,7 @@ public interface Node<T> extends Nodelike<T> {
      * @param tnew - value to update old index to
      * @param model
      */
-    Node<T> update(T told, T tnew, RTreeModel<T> model);
+    Node<T> update(T told, T tnew, Spatialization<T> model);
 
 
 
@@ -97,11 +97,11 @@ public interface Node<T> extends Nodelike<T> {
      * @param model
      * @return whether to continue visit
      */
-    boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model);
+    boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model);
 
-    boolean containing(HyperRect rect, Predicate<T> t, RTreeModel<T> model);
+    boolean containing(HyperRect rect, Predicate<T> t, Spatialization<T> model);
 
-    default Collection<T> containing(HyperRect rect, Collection t, RTreeModel<T> model) {
+    default Collection<T> containing(HyperRect rect, Collection t, Spatialization<T> model) {
         containing(rect, x -> {
             t.add(x);
             return true;
@@ -109,11 +109,11 @@ public interface Node<T> extends Nodelike<T> {
         return t;
     }
 
-    default Set<T> containedSet(HyperRect rect, RTreeModel<T> model) {
+    default Set<T> containedSet(HyperRect rect, Spatialization<T> model) {
         return (Set<T>) containing(rect, new HashSet(), model);
     }
 
-    void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model);
+    void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model);
 
     /**
      * Recurses over index collecting stats
@@ -130,4 +130,5 @@ public interface Node<T> extends Nodelike<T> {
      */
     Node<T> instrument();
 
+    double perimeter(Spatialization<T> model);
 }

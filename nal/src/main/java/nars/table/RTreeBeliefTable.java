@@ -2,6 +2,7 @@ package nars.table;
 
 import jcog.tree.rtree.*;
 import jcog.tree.rtree.point.LongND;
+import jcog.tree.rtree.rect.RectLong1D;
 import jcog.tree.rtree.rect.RectLongND;
 import nars.$;
 import nars.NAR;
@@ -21,33 +22,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static java.lang.Math.*;
+
 public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, HyperRect<LongND>> {
 
-    static final int radius = 8;
+    static final int radius = 16;
 
-    //    final AtomicInteger serial = new AtomicInteger(0);
-//    final ConcurrentHashMap<Task,Integer> id = new ConcurrentHashMap<>();
-    //final com.metamx.collections.spatial.RTree tree = new com.metamx.collections.spatial.RTree(1);
-    final Spatialized<Task> tree;
-
-    static final HyperRect DeleteMe = new RectLongND();
+    final Space<Task> tree;
 
     final Map<SignalTask, HyperRect> activeSignals = new ConcurrentHashMap<>();
 
     private long lastUpdate = Long.MIN_VALUE;
+    private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<Task>(
-                new RTree(this, 2, 8, RTreeModel.DefaultSplits.LINEAR)) {
+                new RTree<Task>((Function)this, 2, 4, Spatialization.DefaultSplits.AXIAL) {
 
             @Override
-            public void addAsync(Task task) {
+            public boolean add(Task task) {
                 if (task instanceof SignalTask)
                     activeSignals.put((SignalTask) task, tree.bounds(task));
-                super.addAsync(task);
+                return super.add(task);
             }
 
             @Override
@@ -58,7 +59,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
                     return true;
                 } else return false;
             }
-        };
+        });
     }
 
     public void updateSignalTasks(long now) {
@@ -179,6 +180,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         final Task found = find(t);
         if (found == null) {
             tree.addAsync(t);
+
+            int over = size() - capacity;
+            if (over > 0)
+                compress(n.time());
+
         } else {
             if (t != found) {
                 float overflow = found.priAddOverflow(activation);
@@ -189,6 +195,71 @@ public class RTreeBeliefTable implements TemporalBeliefTable, Function<Task, Hyp
         if (activation > 0)
             TaskTable.activate(t, activation, c, n);
 
+    }
+
+    private void compress(long now) {
+        if (compressing.compareAndSet(false, true)) {
+            try {
+                while (size() > capacity) {
+                    compressNext(now);
+                }
+            } finally {
+                compressing.set(false);
+            }
+        }
+    }
+
+    protected void compressNext(long now) {
+
+        //tree.forEachLeaf...
+        List<Task> victims = $.newArrayList();
+        compressNext(tree.root(), victims, now);
+
+    }
+
+    private void compressNext(Node<Task> next, List<Task> victims, long now) {
+        if (next instanceof Leaf) {
+            Leaf<Task> l = (Leaf)next;
+
+
+            //options
+            //a. remove by heuristic
+            //  1. the weakest task
+            //  2. the oldest task
+            //b. merge 2 or more into a revision
+            //c. do nothing, and/or try another leafnode
+            //d. pick a random task and try removing it (HACK)
+            Object[] ld = l.data;
+            Task r = (Task) ld[ThreadLocalRandom.current().nextInt(l.size)];
+            victims.add(r);
+            if (r instanceof SignalTask) {
+                HyperRect curBounds = activeSignals.remove(r);
+                if (curBounds!=null) {
+                    tree.remove(r, curBounds);
+                    return;
+                }
+            }
+
+            tree.remove(r);
+
+        } else if (next instanceof Branch) {
+            Branch<Task> b = (Branch)next;
+
+            //options:
+            //a. smallest
+            //b. oldest
+            //c. other metrics
+
+            Node<Task> oldest = b.childMin(c -> {
+                RectLongND cb = (RectLongND) c.bounds();
+                return //(float)cb.perimeter() +
+                    -Math.max(abs(cb.min().coord(0) - now ),abs(cb.max().coord(0) - now ));
+            });
+
+            compressNext(oldest, victims, now);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     protected Task find(@NotNull Task t) {

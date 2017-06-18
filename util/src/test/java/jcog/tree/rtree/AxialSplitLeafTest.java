@@ -32,7 +32,7 @@ import java.util.Random;
  */
 public class AxialSplitLeafTest {
 
-    private static final RTreeModel.DefaultSplits TYPE = RTreeModel.DefaultSplits.AXIAL;
+    private static final Spatialization.DefaultSplits TYPE = Spatialization.DefaultSplits.AXIAL;
 
     /**
      * Adds enough entries to force a single split and confirms that

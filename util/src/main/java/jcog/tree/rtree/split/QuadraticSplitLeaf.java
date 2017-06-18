@@ -30,7 +30,7 @@ import jcog.tree.rtree.*;
 public final class QuadraticSplitLeaf<T> implements Split<T> {
 
     @Override
-    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, Spatialization<T> model) {
 
         final Branch<T> pNode = model.newBranch();
 

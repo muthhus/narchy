@@ -35,7 +35,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class LinearSplitLeafTest {
 
-    private static final RTreeModel.DefaultSplits TYPE = RTreeModel.DefaultSplits.LINEAR;
+    private static final Spatialization.DefaultSplits TYPE = Spatialization.DefaultSplits.LINEAR;
 
     /**
      * Adds enough entries to force a single split and confirms that
@@ -143,7 +143,7 @@ public class LinearSplitLeafTest {
         int entryCount = 25000;
         final RectDouble2D[] rects = RTree2DTest.generateRandomRects(entryCount);
 
-        for (RTreeModel.DefaultSplits s : RTreeModel.DefaultSplits.values()) {
+        for (Spatialization.DefaultSplits s : Spatialization.DefaultSplits.values()) {
             for (int min : new int[]{2, 3, 4}) {
                 for (int max : new int[]{8}) {
 

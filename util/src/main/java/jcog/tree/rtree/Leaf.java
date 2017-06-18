@@ -46,7 +46,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
 
         if (!contains(t, model)) {
             Node<T> next;
@@ -90,13 +90,13 @@ public class Leaf<T> implements Node<T> {
         return false;
     }
 
-    public boolean contains(T t, RTreeModel<T> model) {
+    public boolean contains(T t, Spatialization<T> model) {
         return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 
     @Override
-    public Node<T> remove(final T t, HyperRect xBounds, Nodelike<T> parent, RTreeModel<T> model) {
+    public Node<T> remove(final T t, HyperRect xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         int i = 0;
 
@@ -131,9 +131,21 @@ public class Leaf<T> implements Node<T> {
 
     }
 
+     @Override
+    public double perimeter(Spatialization<T> model) {
+        double maxVolume = 0;
+        for (int i = 0; i < size; i++) {
+            T c = data[i];
+            double vol = model.perimeter(c);
+            if (vol > maxVolume)
+                maxVolume = vol;
+        }
+        return maxVolume;
+    }
+
 
     @Override
-    public Node<T> update(final T told, final T tnew, RTreeModel<T> model) {
+    public Node<T> update(final T told, final T tnew, Spatialization<T> model) {
         if (size <= 0)
             return this;
 
@@ -150,7 +162,7 @@ public class Leaf<T> implements Node<T> {
 
 
     @Override
-    public boolean containing(HyperRect R, Predicate<T> t, RTreeModel<T> model) {
+    public boolean containing(HyperRect R, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
             if (R.contains(model.bounds(d))) {
@@ -162,7 +174,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, RTreeModel<T> model) {
+    public void intersectingNodes(HyperRect rect, Predicate<Node<T>> t, Spatialization<T> model) {
 
     }
 
@@ -193,7 +205,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public boolean intersecting(HyperRect rect, Predicate<T> t, RTreeModel<T> model) {
+    public boolean intersecting(HyperRect rect, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
             if (rect.intersects(model.bounds(d))) {
@@ -220,7 +232,7 @@ public class Leaf<T> implements Node<T> {
      * @param t      data entry to be added
      * @param model
      */
-    public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, RTreeModel<T> model) {
+    public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRect tRect = model.bounds(t);
         final HyperRect l1Mbr = l1Node.bounds().mbr(tRect);

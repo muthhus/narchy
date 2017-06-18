@@ -36,7 +36,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
 
 
     @Override
-    public Node<T> split(T t, Leaf<T> leaf, RTreeModel<T> model) {
+    public Node<T> split(T t, Leaf<T> leaf, Spatialization<T> model) {
         final Branch<T> pNode = model.newBranch();
 
         final int nD = model.bounds(leaf.data[0]).dim(); //TODO builder.dim()
@@ -76,7 +76,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
     }
 
 
-    private static <T> void transfer(Leaf<T> leaf, HyperRect[] sortedSrc, Node<T> target, int from, int to, RTreeModel<T> model) {
+    private static <T> void transfer(Leaf<T> leaf, HyperRect[] sortedSrc, Node<T> target, int from, int to, Spatialization<T> model) {
 
         for (int j = 0; j < leaf.size; j++) {
             T jd = leaf.data[j];
