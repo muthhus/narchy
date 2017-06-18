@@ -102,7 +102,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         }
 
         if (activation >= Pri.EPSILON) {
-            TaskTable.activate(y, activation, c, n);
+            TaskTable.activate(y, activation, n);
         }
     }
 

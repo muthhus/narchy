@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.math.Interval;
 import nars.$;
 import nars.Param;
 import nars.Task;
@@ -274,6 +275,51 @@ public class Revision {
 
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
         return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(), 1, rng, mergeOrChoose);
+    }
+
+    /**
+     * t is the target time of the new merged task
+     */
+    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
+
+
+        Interval ai = new Interval(a.start(), a.end());
+        Interval bi = new Interval(b.start(), b.end());
+
+        //Interval timeOverlap = ai.intersection(bi);
+
+        /*if (timeOverlap != null)*/ {
+
+            float aa = a.evi() * (1 + ai.length());
+            float bb = b.evi() * (1 + bi.length());
+            float p = aa / (aa + bb);
+
+            float stampDiscount =
+//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
+                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+
+            //discount related to loss of stamp when its capacity to contain the two incoming is reached
+            float stampCapacityDiscount =
+                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
+
+            //float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
+
+
+            Interval union = ai.union(bi);
+            float timeDiscount = 1f; //rangeEquality + (1f - rangeEquality)
+                    //* ((float) (timeOverlap.length())) / (1 + union.length());
+
+            Truth t = merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
+            if (t != null) {
+                long mergedStart = union.a;
+                long mergedEnd = union.b;
+                return mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, rng);
+            }
+        }
+
+        return null;
+
     }
 
 //    /** get the task which occurrs nearest to the target time */

@@ -109,7 +109,7 @@ public class RTree<T> implements Space<T> {
      * TODO handle duplicate items (ie: dont increase entryCount if exists)
      */
     @Override
-    public boolean add(final T t) {
+    public boolean add(@NotNull final T t) {
         int before = size;
         root = root.add(t, this, model);
         int after = size;

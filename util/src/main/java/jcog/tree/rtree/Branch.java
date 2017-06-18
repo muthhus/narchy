@@ -103,7 +103,7 @@ public final class Branch<T> implements Node<T> {
      * @return Node that the entry was added to
      */
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T> add(@NotNull final T t, Nodelike<T> parent, Spatialization<T> model) {
         assert (childDiff == 0);
 
         final HyperRect tRect = model.bounds(t);

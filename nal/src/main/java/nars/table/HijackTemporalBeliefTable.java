@@ -2,7 +2,6 @@ package nars.table;
 
 import jcog.list.FasterList;
 import jcog.list.Top2;
-import jcog.math.Interval;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -463,51 +462,6 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //
 //    }
 
-    /**
-     * t is the target time of the new merged task
-     */
-    private Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
-
-
-        Interval ai = new Interval(a.start(), a.end());
-        Interval bi = new Interval(b.start(), b.end());
-
-        Interval timeOverlap = ai.intersection(bi);
-
-        if (timeOverlap != null) {
-
-            float aa = a.evi() * (1 + ai.length());
-            float bb = b.evi() * (1 + bi.length());
-            float p = aa / (aa + bb);
-
-            float stampDiscount =
-//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
-
-            //discount related to loss of stamp when its capacity to contain the two incoming is reached
-            float stampCapacityDiscount =
-                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
-
-            float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
-
-
-            Interval union = ai.union(bi);
-            float timeDiscount = rangeEquality + (1f - rangeEquality) * ((float) (timeOverlap.length())) / (1 + union.length());
-
-            Truth t = Revision.merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
-            if (t != null) {
-                long mergedStart = union.a;
-                long mergedEnd = union.b;
-                return Revision.mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, rng);
-            }
-        }
-
-        return null;
-
-    }
-
-
 
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
@@ -521,7 +475,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = merge(a, s.b, now, a.conf(), rng);
+        Task c = Revision.merge(a, s.b, now, a.conf(), rng);
         return c != null ? c : a;
     }
 
