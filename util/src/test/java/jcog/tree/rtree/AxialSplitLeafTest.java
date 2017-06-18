@@ -72,7 +72,7 @@ public class AxialSplitLeafTest {
         rTree.add(new RectDouble2D(0, 2, 1, 4));
 
         Branch root = (Branch) rTree.root();
-        Node<RectDouble2D>[] children = root.children();
+        Node<RectDouble2D, Object>[] children = root.children();
         int childCount = 0;
         for(Node c : children) {
             if (c != null) {
@@ -81,13 +81,13 @@ public class AxialSplitLeafTest {
         }
         Assert.assertEquals("Expected different number of children after split", 2, childCount);
 
-        Node<RectDouble2D> child1 = children[0];
+        Node<RectDouble2D, Object> child1 = children[0];
         RectDouble2D child1Mbr = (RectDouble2D) child1.bounds();
         RectDouble2D expectedChild1Mbr = new RectDouble2D(0, 0, 3, 4);
         Assert.assertEquals("Child 1 size incorrect after split", 3, child1.size());
         Assert.assertEquals("Child 1 mbr incorrect after split", expectedChild1Mbr, child1Mbr);
 
-        Node<RectDouble2D> child2 = children[1];
+        Node<RectDouble2D, Object> child2 = children[1];
         RectDouble2D child2Mbr = (RectDouble2D) child2.bounds();
         RectDouble2D expectedChild2Mbr = new RectDouble2D(2, 0, 5, 4);
         Assert.assertEquals("Child 2 size incorrect after split", 2, child2.size());

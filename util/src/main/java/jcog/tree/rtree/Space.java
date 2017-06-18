@@ -161,12 +161,12 @@ public interface Space<T> extends Nodelike<T> {
     }
 
     default RTreeCursor<T> cursor(HyperRegion start) {
-        return new RTreeCursor<T>(this, start);
+        return new RTreeCursor<>(this, start);
     }
 
-    @NotNull Node<T> root();
+    @NotNull Node<T, ?> root();
 
-    void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile);
+    void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
 
     HyperRegion bounds(T task);
 

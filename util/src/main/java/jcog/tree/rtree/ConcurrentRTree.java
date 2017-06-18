@@ -73,9 +73,8 @@ public class ConcurrentRTree<T> implements Space<T> {
         }
     }
 
-    @NotNull
     @Override
-    public Node<T> root() {
+    public Node<T, ?> root() {
         return tree.root();
     }
 
@@ -95,7 +94,7 @@ public class ConcurrentRTree<T> implements Space<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile) {
+    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
         readLock.lock();
         try {
             tree.intersectingNodes(start, eachWhile);

@@ -35,7 +35,7 @@ import java.util.function.Predicate;
  *
  * TODO just extend FastList<>
  */
-public class Leaf<T> implements Node<T> {
+public class Leaf<T> implements Node<T, T> {
 
     public final T[] data;
     public short size;
@@ -48,10 +48,15 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
+    public T child(int i) {
+        return data[i];
+    }
+
+    @Override
+    public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
 
         if (!contains(t, model)) {
-            Node<T> next;
+            Node<T, ?> next;
 
             if (size < model.max) {
                 final HyperRegion tRect = model.region(t);
@@ -99,7 +104,7 @@ public class Leaf<T> implements Node<T> {
 
 
     @Override
-    public Node<T> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> remove(final T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         int i = 0;
 
@@ -148,7 +153,7 @@ public class Leaf<T> implements Node<T> {
 
 
     @Override
-    public Node<T> update(final T told, final T tnew, Spatialization<T> model) {
+    public Node<T, ?> update(final T told, final T tnew, Spatialization<T> model) {
         if (size <= 0)
             return this;
 
@@ -177,7 +182,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRegion rect, Predicate<Node<T>> t, Spatialization<T> model) {
+    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
 
     }
 
@@ -235,7 +240,7 @@ public class Leaf<T> implements Node<T> {
      * @param t      data entry to be added
      * @param model
      */
-    public final void classify(final Node<T> l1Node, final Node<T> l2Node, final T t, Spatialization<T> model) {
+    public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRegion tRect = model.region(t);
         final HyperRegion l1Mbr = l1Node.bounds().mbr(tRect);
@@ -274,7 +279,7 @@ public class Leaf<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> instrument() {
+    public Node<T, Object> instrument() {
         return new CounterNode<>(this);
     }
 

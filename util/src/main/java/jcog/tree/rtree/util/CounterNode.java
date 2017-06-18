@@ -31,13 +31,18 @@ import java.util.function.Predicate;
 /**
  * Created by jcovert on 6/18/15.
  */
-public final class CounterNode<T> implements Node<T> {
+public final class CounterNode<T> implements Node<T, Object> {
     public static int searchCount;
     public static int bboxEvalCount;
-    private final Node<T> node;
+    private final Node<T, ?> node;
 
-    public CounterNode(final Node<T> node) {
+    public CounterNode(final Node<T, ?> node) {
         this.node = node;
+    }
+
+    @Override
+    public Object child(int i) {
+        return node.child(i);
     }
 
     @Override
@@ -51,17 +56,17 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> add(T t, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> add(T t, Nodelike<T> parent, Spatialization<T> model) {
         return this.node.add(t, this, model);
     }
 
     @Override
-    public Node<T> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> remove(T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
         return this.node.remove(x, xBounds, this, model);
     }
 
     @Override
-    public Node<T> update(T told, T tnew, Spatialization<T> model) {
+    public Node<T, ?> update(T told, T tnew, Spatialization<T> model) {
         return this.node.update(told, tnew, model);
     }
 
@@ -84,7 +89,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRegion rect, Predicate<Node<T>> t, Spatialization<T> model) {
+    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
         node.intersectingNodes(rect, t, model);
     }
 
@@ -110,7 +115,7 @@ public final class CounterNode<T> implements Node<T> {
     }
 
     @Override
-    public Node<T> instrument() {
+    public Node<T, ?> instrument() {
         return this;
     }
 

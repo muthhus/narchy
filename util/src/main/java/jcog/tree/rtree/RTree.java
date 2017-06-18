@@ -45,7 +45,7 @@ public class RTree<T> implements Space<T> {
     public static final float FPSILON = (float) EPSILON;
 
     @NotNull
-    private Node<T> root;
+    private Node<T, ?> root;
     private int size;
     public Spatialization<T> model;
 
@@ -216,8 +216,8 @@ public class RTree<T> implements Space<T> {
         return stats;
     }
 
-    @Override
-    public void intersectingNodes(HyperRegion start, Predicate<Node<T>> eachWhile) {
+
+    public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
         root().intersectingNodes(start, eachWhile, model);
     }
 
@@ -226,8 +226,8 @@ public class RTree<T> implements Space<T> {
         return getClass().getSimpleName() + "[size=" + size() + ']';
     }
 
-    @Override @NotNull
-    public Node<T> root() {
+    @Override
+    public Node<T, ?> root() {
         return this.root;
     }
 

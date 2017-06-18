@@ -21,6 +21,7 @@ package jcog.tree.rtree;
  */
 
 import jcog.tree.rtree.util.Stats;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -31,12 +32,32 @@ import java.util.function.Predicate;
 
 /**
  * Created by jcairns on 4/30/15.
+ * @param L the leaf type, ie. the type which will be found at the edges and which characterizes the type of the tree this may be used within
+ * @param V the type of child values, which will either be Node<L,?> for Branch, or L for leaves
  */
-public interface Node<T> extends Nodelike<T> {
+public interface Node<L, V> extends Nodelike<L> {
     /**
      * @return boolean - true if this node is a leaf
      */
     boolean isLeaf();
+
+
+    default V childMin(FloatFunction<V> rank) {
+        V min = null;
+        double minVal = Double.POSITIVE_INFINITY;
+        int size = size();
+        for (int i = 0; i < size; i++) {
+            V c = child(i);
+            double vol = rank.floatValueOf(c);
+            if (vol < minVal) {
+                min = c;
+                minVal = vol;
+            }
+        }
+        return min;
+    }
+
+    V child(int i);
 
     /**
      * @return Rect - the bounding rectangle for this node
@@ -45,20 +66,20 @@ public interface Node<T> extends Nodelike<T> {
 
     /**
      * Add t to the index
-     *  @param t      - value to add to index
+     *  @param l      - value to add to index
      * @param parent - the callee which is the parent of this instance
      * @param model
      */
-    Node<T> add(T t, Nodelike<T> parent, Spatialization<T> model);
+    Node<L, ?> add(L l, Nodelike<L> parent, Spatialization<L> model);
 
     /**
      * Remove t from the index
-     * @param t      - value to remove from index
+     * @param l      - value to remove from index
      * @param xBounds - the bounds of t which may not necessarily need to be the same as the bounds as model might report it now; for removing a changing value
      * @param parent - the callee which is the parent of this instance
      * @param model
      */
-    Node<T> remove(T t, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model);
+    Node<L, ?> remove(L l, HyperRegion xBounds, Nodelike<L> parent, Spatialization<L> model);
 
     /**
      * update an existing t in the index
@@ -66,7 +87,7 @@ public interface Node<T> extends Nodelike<T> {
      * @param tnew - value to update old index to
      * @param model
      */
-    Node<T> update(T told, T tnew, Spatialization<T> model);
+    Node<L, ?> update(L told, L tnew, Spatialization<L> model);
 
 
 
@@ -83,11 +104,11 @@ public interface Node<T> extends Nodelike<T> {
      *
      * @param consumer
      */
-    void forEach(Consumer<? super T> consumer);
+    void forEach(Consumer<? super L> consumer);
 
-    boolean AND(Predicate<T> p);
+    boolean AND(Predicate<L> p);
 
-    boolean OR(Predicate<T> p);
+    boolean OR(Predicate<L> p);
 
     /**
      * Consumer "accepts" every node in the given rect
@@ -97,11 +118,11 @@ public interface Node<T> extends Nodelike<T> {
      * @param model
      * @return whether to continue visit
      */
-    boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model);
+    boolean intersecting(HyperRegion rect, Predicate<L> t, Spatialization<L> model);
 
-    boolean containing(HyperRegion rect, Predicate<T> t, Spatialization<T> model);
+    boolean containing(HyperRegion rect, Predicate<L> t, Spatialization<L> model);
 
-    default Collection<T> containing(HyperRegion rect, Collection t, Spatialization<T> model) {
+    default Collection<L> containing(HyperRegion rect, Collection t, Spatialization<L> model) {
         containing(rect, x -> {
             t.add(x);
             return true;
@@ -109,11 +130,11 @@ public interface Node<T> extends Nodelike<T> {
         return t;
     }
 
-    default Set<T> containedSet(HyperRegion rect, Spatialization<T> model) {
-        return (Set<T>) containing(rect, new HashSet(), model);
+    default Set<L> containedSet(HyperRegion rect, Spatialization<L> model) {
+        return (Set<L>) containing(rect, new HashSet(), model);
     }
 
-    void intersectingNodes(HyperRegion rect, Predicate<Node<T>> t, Spatialization<T> model);
+    void intersectingNodes(HyperRegion rect, Predicate<Node<L, ?>> t, Spatialization<L> model);
 
     /**
      * Recurses over index collecting stats
@@ -128,7 +149,7 @@ public interface Node<T> extends Nodelike<T> {
      *
      * @return instrumented node wrapper
      */
-    Node<T> instrument();
+    Node<L, ?> instrument();
 
-    double perimeter(Spatialization<T> model);
+    double perimeter(Spatialization<L> model);
 }

@@ -2,7 +2,6 @@ package nars.table;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import jcog.Util;
 import jcog.tree.rtree.*;
 import nars.NAR;
 import nars.Param;
@@ -113,6 +112,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return this.end != task.end();
         }
 
+        public boolean isDeleted() {
+            return task!=null && task.isDeleted();
+        }
     }
 
     final Space<TaskRegion> tree;
@@ -292,7 +294,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    private void compressNext(Node<TaskRegion> next, NAR nar) {
+    private void compressNext(Node<TaskRegion, ?> next, NAR nar) {
         if (next instanceof Leaf) {
             Leaf<TaskRegion> l = (Leaf) next;
 
@@ -306,7 +308,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (x == null)
                     continue;
                 TaskRegion t = (TaskRegion) x;
-                if (t.task.isDeleted()) {
+                if (t.isDeleted()) {
                     deleted++;
                     removeAsync(t);
                 }
@@ -359,20 +361,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             long now = nar.time();
 
-            Node<TaskRegion> oldest = b.childMin(c -> {
-                TaskRegion cb = (TaskRegion) c.bounds();
-                float dur = nar.dur();
+            HyperRegion branchBounds = next.bounds();
+            double branchTimeRange = branchBounds.range(0);
+            double branchFreqRange = branchBounds.range(1);
+
+            Node<TaskRegion, ?> oldest = b.childMin(c -> {
+                TaskRegion cb = (TaskRegion)c.bounds();
+
                 long start = cb.start;
                 long end = cb.end;
                 float minFreq = cb.freqMin;
                 float maxFreq = cb.freqMax;
-                float freqDiff = maxFreq - minFreq;
-                float startAway = abs(start - now) / dur;
-                float endAway = abs(end - now) / dur;
-                float timeSpan = (end - start) / dur;
-                return (1 + freqDiff) *  //minimize
-                        (1 + Util.sigmoid(timeSpan)) *  //minimize
-                        (1 + 0.5f / (1f + startAway) + 0.5f / (1f + endAway))  //maximize
+                float freqDiff = (float) ((maxFreq - minFreq) / (1f + branchFreqRange));
+
+                float dur = nar.dur();
+                float awayFromNow = (float) (abs(cb.center(0) - now) / dur); //0..1.0
+
+                float timeSpan = (float) ((end - start) / (1f + branchTimeRange));
+
+                return (freqDiff) *  //minimize
+                        (timeSpan) *  //minimize
+                        (1 + 1f / (1f + awayFromNow))  //maximize
                         ;
             });
 

@@ -36,7 +36,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
 
 
     @Override
-    public Node<T> split(T t, Leaf<T> leaf, Spatialization<T> model) {
+    public Node<T, ?> split(T t, Leaf<T> leaf, Spatialization<T> model) {
         final Branch<T> pNode = model.newBranch();
 
         final int nD = model.region(leaf.data[0]).dim(); //TODO builder.dim()
@@ -61,10 +61,10 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs
-        final Node<T> l1Node = model.newLeaf();
+        final Node<T, T> l1Node = model.newLeaf();
         transfer(leaf, sortedMbr, l1Node, 0, size / 2, model);
 
-        final Node<T> l2Node = model.newLeaf();
+        final Node<T, T> l2Node = model.newLeaf();
         transfer(leaf, sortedMbr, l2Node, size / 2, size, model);
 
         leaf.classify(l1Node, l2Node, t, model);
@@ -76,7 +76,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
     }
 
 
-    private static <T> void transfer(Leaf<T> leaf, HyperRegion[] sortedSrc, Node<T> target, int from, int to, Spatialization<T> model) {
+    private static <T> void transfer(Leaf<T> leaf, HyperRegion[] sortedSrc, Node<T, ?> target, int from, int to, Spatialization<T> model) {
 
         for (int j = 0; j < leaf.size; j++) {
             T jd = leaf.data[j];

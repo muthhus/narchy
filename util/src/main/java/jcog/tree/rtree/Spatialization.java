@@ -29,7 +29,7 @@ public class Spatialization<T> {
         return bounds.apply(t);
     }
 
-    public Node<T> newLeaf() {
+    public Node<T, T> newLeaf() {
         return new Leaf(max);
     }
 
@@ -37,7 +37,7 @@ public class Spatialization<T> {
         return new Branch<>(max);
     }
 
-    public Node<T> split(T t, Leaf<T> leaf) {
+    public Node<T, ?> split(T t, Leaf<T> leaf) {
         return split.split(t, leaf, this);
     }
 
