@@ -19,10 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -32,7 +29,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 32;
+    static final int sampleRadius = 8;
 
 
     public static class TaskRegion implements HyperRegion {
@@ -47,6 +44,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax) {
             this(start, end, freqMin, freqMax, confMin, confMax, null);
+        }
+
+        @Override
+        public int hashCode() {
+            return task.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return task!=null ? task.toString() : Arrays.toString( new double[] {  start, end,  freqMin, freqMax, confMin, confMax } );
         }
 
         public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax, Supplier<Task> task) {
@@ -129,7 +136,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     final Set<TaskRegion> ongoing = Sets.newConcurrentHashSet();
 
     private long lastUpdate = Long.MIN_VALUE;
-    private final AtomicBoolean compressing = new AtomicBoolean(false);
+    //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<TaskRegion>(
@@ -214,17 +221,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         updateSignalTasks(now);
 
-        MutableList<ObjectFloatPair<TaskRegion>> tt = timeDistanceSortedList(when - sampleRadius * dur, when + sampleRadius * dur, now);
+
+        MutableList<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).
+                listSorted(t -> -strength(now, dur, 1f, t));
+
         switch (tt.size()) {
             case 0:
                 return null;
             case 1:
-            default: //TODO for default case, use Top2 or clustering
-                return tt.get(0).getOne().task;
+                return tt.get(0).task;
+
+            default:
+                Task a = tt.get(0).task;
+                Task b = tt.get(1).task;
+                Task c = Revision.merge(a, b, now, Param.TRUTH_EPSILON, rng);
+                return c != null ? c : a;
         }
+
+
     }
 
-    protected MutableList<ObjectFloatPair<TaskRegion>> timeDistanceSortedList(long start, long end, long now) {
+    protected MutableList<TaskRegion> timeDistanceSortedList(long start, long end, long now) {
         RTreeCursor<TaskRegion> c = cursor(start, end);
         return c.listSorted((t) -> t.task.timeDistance(now));
     }
@@ -258,11 +275,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (over > 0) {
                 ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
                 lt.withWriteLock((r) -> {
-                    r.add(tr);
                     compress(n);
+                    tree.add(tr); //already in write lock
                 });
             } else {
-                add(t);
+                tree.addAsync(tr);
             }
 
 
@@ -282,8 +299,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         tree.addAsync(new TaskRegion(t));
     }
 
+    /** assumes called with writeLock */
     private void compress(NAR nar) {
-        if (compressing.compareAndSet(false, true)) {
+        //if (compressing.compareAndSet(false, true)) {
             try {
                 FasterList<TaskRegion> victims = new FasterList<>();
                 while (size() > capacity) {
@@ -299,9 +317,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     victims.clear();
                 }
             } finally {
-                compressing.set(false);
+                //compressing.set(false);
             }
-        }
+        //}
     }
 
 
@@ -350,7 +368,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         //recurse through a subest of the weakest regions, while also collecting victims
         int sizeBefore = size();
-        List<Node<TaskRegion, ?>> weakest = b.childMinList(c -> strength(now, dur, branchTimeRange, branchFreqRange, c), sizeBefore / 2);
+        List<Node<TaskRegion, ?>> weakest = b.childMinList(c -> strength(now, dur, branchFreqRange, (TaskRegion) c.bounds()), sizeBefore / 2);
         int w = weakest.size();
         if (w > 0) {
             for (int i = 0; i < w; i++) {
@@ -426,11 +444,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
     }
 
-    private float strength(long t, int dur, double branchTimeRange, double branchFreqRange, Node<TaskRegion, ?> c) {
-        TaskRegion cb = (TaskRegion) c.bounds();
+    private float strength(long t, int dur, double branchFreqRange, TaskRegion cb) {
 
-        long start = cb.start;
-        long end = cb.end;
         float minFreq = cb.freqMin;
         float maxFreq = cb.freqMax;
         float freqDiff = (float) ((maxFreq - minFreq) / (1f + branchFreqRange));

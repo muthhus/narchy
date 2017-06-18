@@ -1,6 +1,7 @@
 package jcog.tree.rtree;
 
 import jcog.list.FasterList;
+import jcog.util.UniqueRanker;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
@@ -36,22 +37,20 @@ public class RTreeCursor<T> {
         });
     }
 
-    public List<T> list() {
-        List<T> l = new FasterList();
+    public FasterList<T> list() {
+        FasterList<T> l = new FasterList();
         forEach(l::add);
         return l;
     }
 
 
-    public MutableList listSorted(FloatFunction<T> c) {
-        ObjectFloatHashMap<T> ranks = new ObjectFloatHashMap<>();
-        forEach(x -> ranks.put(x, c.floatValueOf(x)));
-        return ranks.keyValuesView().toSortedListBy(ObjectFloatPair::getTwo);
+    public MutableList<T> listSorted(FloatFunction<T> c) {
+        return listSorted(new UniqueRanker<>(c));
     }
 
 
-    public List<T> listSorted(Comparator<T> ranker) {
-        List<T> l = list();
+    public FasterList<T> listSorted(Comparator<T> ranker) {
+        FasterList<T> l = list();
         Collections.sort(l, ranker);
         return l;
     }

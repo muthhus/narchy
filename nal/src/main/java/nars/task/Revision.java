@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.Util;
 import jcog.math.Interval;
 import nars.$;
 import nars.Param;
@@ -65,7 +66,7 @@ public class Revision {
                 );
     }
 
-    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf) {
+    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf, float confMax) {
         float w1 = a.evi();
         float w2 = b.evi();
         float w = (w1 + w2) * evidenceFactor;
@@ -89,7 +90,7 @@ public class Revision {
 
             float c = w2c(w);
             if (c >= minConf) {
-                return $.t(f, c);
+                return $.t(f, Math.min(confMax, c));
             }
 
         }
@@ -290,24 +291,28 @@ public class Revision {
         /*if (timeOverlap != null)*/
         {
 
-            float aa = a.evi() * (1 + ai.length());
-            float bb = b.evi() * (1 + bi.length());
+            float ae = a.evi();
+            float aa = ae * (1 + ai.length());
+            float be = b.evi();
+            float bb = be * (1 + bi.length());
             float p = aa / (aa + bb);
+
+            //relate high frequency difference with low confidence
+            float freqDiscount =
+                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
 
             float stampDiscount =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
                     1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 
-            //relate high frequency difference with low confidence
-            float freqDiscount =
-                    1f - Math.abs(a.freq() - b.freq());
+//            //relate to loss of stamp when its capacity to contain the two incoming is reached
+//            float stampCapacityDiscount =
+//                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
 
-            //relate to loss of stamp when its capacity to contain the two incoming is reached
-            float stampCapacityDiscount =
-                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
 
-            //float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
+            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
+            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
 
 
             float timeDiscount = 1f;
@@ -324,7 +329,7 @@ public class Revision {
             }
 
 
-            Truth t = merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
+            Truth t = merge(a, p, b,  freqDiscount * stampDiscount * timeDiscount, confMin, confMax);
             if (t != null) {
                 long mergedStart = union.a;
                 long mergedEnd = union.b;
