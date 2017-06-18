@@ -76,7 +76,6 @@ abstract public class NAgent implements NSense, NAct {
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
     private final PSink<Object, ITask> sense;
-    private final PSink<Object, ITask> ambition;
     private final PSink<Object, ITask> predict;
     private final PSink<Object, ITask> motor;
 
@@ -153,7 +152,6 @@ abstract public class NAgent implements NSense, NAct {
 
 
         this.sense = nar.in.stream(id + " sensor");
-        this.ambition = nar.in.stream(id + " ambition");
         this.predict = nar.in.stream(id + " predict");
         this.motor = nar.in.stream(id + " motor");
     }
@@ -243,7 +241,7 @@ abstract public class NAgent implements NSense, NAct {
                     ;
 
 
-            ambition.input(
+            predict.input(
                 Stream.of(happy.apply(nar), fireHappy)
             );
 

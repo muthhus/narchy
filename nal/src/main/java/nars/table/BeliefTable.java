@@ -135,17 +135,17 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return project(t, Stamp.TIMELESS);
     }*/
 
-    static float rankEternalByConfAndOriginality(@NotNull Task b) {
-        return rankEternalByConfAndOriginality(b.conf(), b.originality());
-    }
-
-    static float rankEternalByConfAndOriginality(float conf, float originality) {
-        return and(conf, originality);
-    }
-
-    static float rankEternalByConfAndOriginality(float conf, int hypotheticalEvidenceLength /* > 0 */) {
-        return rankEternalByConfAndOriginality(conf, TruthFunctions.originality(hypotheticalEvidenceLength));
-    }
+//    static float rankEternalByConfAndOriginality(@NotNull Task b) {
+//        return rankEternalByConfAndOriginality(b.conf(), b.originality());
+//    }
+//
+//    static float rankEternalByConfAndOriginality(float conf, float originality) {
+//        return and(conf, originality);
+//    }
+//
+//    static float rankEternalByConfAndOriginality(float conf, int hypotheticalEvidenceLength /* > 0 */) {
+//        return rankEternalByConfAndOriginality(conf, TruthFunctions.originality(hypotheticalEvidenceLength));
+//    }
 
 
     /**

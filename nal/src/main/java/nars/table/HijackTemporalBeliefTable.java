@@ -35,7 +35,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Override
     public float pri(@NotNull Task t) {
-        return TemporalBeliefTable.temporalTaskPriority(t, now);
+        return TemporalBeliefTable.temporalTaskPriority(t, now, 1 /*HACK*/);
     }
 
 

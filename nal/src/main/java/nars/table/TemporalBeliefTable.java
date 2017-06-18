@@ -17,8 +17,8 @@ import java.util.function.Consumer;
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
-    static float temporalTaskPriority(Task t, long now) {
-        return t.conf() * (1f + t.dtRange())/(1+Math.abs(now - t.nearestStartOrEnd(now)));
+    static float temporalTaskPriority(Task t, long now, float dur) {
+        return t.originality() * t.evi() * (1f + t.dtRange()/dur)/(1+Math.abs(now - t.nearestStartOrEnd(now)/dur));
     }
 
     /** finds or generates the strongest match to the specified parameters.

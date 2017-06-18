@@ -983,10 +983,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         } else if (v instanceof Task) {
             Task tv = ((Task) v);
             v = ansi()
-                    .a(tv.originality() >= 0.33f ?
+                    //.a(tv.originality() >= 0.33f ?
+                    .a(tv.pri() >= 0.25f ?
                             Ansi.Attribute.INTENSITY_BOLD :
                             Ansi.Attribute.INTENSITY_FAINT)
-                    .a(tv.pri() > 0.5f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
+                    .a(tv.pri() > 0.75f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
                     .fg(Priority.budgetSummaryColor(tv))
                     .a(
                             tv.toString(this, true)

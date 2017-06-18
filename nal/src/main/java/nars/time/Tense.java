@@ -54,11 +54,11 @@ public enum Tense  {
 //
 //    }
 
-    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, @NotNull Truth projectedTruth, long now) {
-        return !problem.term().hasVarQuery() ?
-                    BeliefTable.rankEternalByConfAndOriginality(solution) :
-                    or(solution.originality(), projectedTruth.expectation() / solution.term().complexity());
-    }
+//    public static float solutionQuality(@NotNull Task problem, @NotNull Task solution, @NotNull Truth projectedTruth, long now) {
+//        return !problem.term().hasVarQuery() ?
+//                    BeliefTable.rankEternalByConfAndOriginality(solution) :
+//                    or(solution.originality(), projectedTruth.expectation() / solution.term().complexity());
+//    }
 
     //    /**
 //        this method is used if the order is known to be matching, so it is not checked

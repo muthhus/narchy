@@ -3,6 +3,7 @@ package nars.table;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
+import jcog.list.Top2;
 import jcog.tree.rtree.*;
 import nars.NAR;
 import nars.Param;
@@ -14,13 +15,11 @@ import nars.task.TruthPolation;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -53,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         public String toString() {
-            return task!=null ? task.toString() : Arrays.toString( new double[] {  start, end,  freqMin, freqMax, confMin, confMax } );
+            return task != null ? task.toString() : Arrays.toString(new double[]{start, end, freqMin, freqMax, confMin, confMax});
         }
 
         public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax, Supplier<Task> task) {
@@ -299,26 +298,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         tree.addAsync(new TaskRegion(t));
     }
 
-    /** assumes called with writeLock */
+    /**
+     * assumes called with writeLock
+     */
     private void compress(NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
-            try {
-                FasterList<TaskRegion> victims = new FasterList<>();
-                while (size() > capacity) {
+        try {
+            FasterList<TaskRegion> victims = new FasterList<>();
+            while (size() > capacity) {
 
-                    int sBefore = size();
+                int sBefore = size();
 
-                    compressNext(tree.root(), nar, victims);
+                compressNext(tree.root(), nar, victims);
 
-                    if (size() == sBefore) {
-                        compressEvict(nar, victims);
-                    }
-
-                    victims.clear();
+                if (size() == sBefore) {
+                    compressEvict(nar, victims);
                 }
-            } finally {
-                //compressing.set(false);
+
+                victims.clear();
             }
+        } finally {
+            //compressing.set(false);
+        }
         //}
     }
 
@@ -333,7 +334,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             weakest = victims.get(0);
         } else {
             long now = nar.time();
-            weakest = victims.min(comparingDouble(a -> temporalTaskPriority(a.task, now)));
+            float dur = nar.dur();
+            weakest = victims.min(comparingDouble(a -> temporalTaskPriority(a.task, now, dur)));
         }
         compressEvict(weakest);
     }
@@ -412,27 +414,35 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             long now = nar.time();
+            float dur = nar.dur();
             if (l.size > 1) {
-                TaskRegion a = l.childMin(weakestTask(now));
-                if (a != null) {
-                    TaskRegion b = l.childMin(weakestTask(now, a));
-                    if (b != null) {
-                        Task c = Revision.merge(a.task, b.task, nar.time(), Param.TRUTH_EPSILON, nar.random());
-                        if (c != null) {
-                            //already has write lock so just use non-async methods
-                            remove(a);
-                            remove(b);
-                            add(c);
-                            TaskTable.activate(c, c.pri(), nar); //TODO defer until out of this critical section?
-
-                        } else {
-                            victims.add(a);
-                            victims.add(b);
-
-                        }
-                    }
+                TaskRegion a, b;
+                if (l.size > 2) {
+                    Top2<TaskRegion> t2 = new Top2<>(weakness(now, dur));
+                    l.forEach(t2);
+                    a = t2.a;
+                    b = t2.b;
+                } else {
+                    a = l.child(0);
+                    b = l.child(1);
                 }
+
+                Task c = Revision.merge(a.task, b.task, now, Param.TRUTH_EPSILON, nar.random());
+                if (c != null) {
+                    //already has write lock so just use non-async methods
+                    remove(a);
+                    remove(b);
+                    add(c);
+                    TaskTable.activate(c, c.pri(), nar); //TODO defer until out of this critical section?
+
+                } else {
+                    victims.add(a);
+                    victims.add(b);
+
+                }
+
             }
+        }
 
 //                     {
 //                         TaskRegion weakest = l.childMin(weakestTask(now));
@@ -441,7 +451,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //                         }
 //                     }
 
-        }
     }
 
     private float strength(long t, int dur, double branchFreqRange, TaskRegion cb) {
@@ -460,12 +469,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 ;
     }
 
-    private static FloatFunction<TaskRegion> weakestTask(long now) {
-        return (x) -> -temporalTaskPriority(x.task, now);
+    private static FloatFunction<TaskRegion> weakness(long now, float dur) {
+        return (x) -> -temporalTaskPriority(x.task, now, dur);
     }
 
-    private static FloatFunction<TaskRegion> weakestTask(long now, TaskRegion except) {
-        return (x) -> x != except ? -temporalTaskPriority(x.task, now) : Float.POSITIVE_INFINITY;
+    private static FloatFunction<TaskRegion> weakness(long now, float dur, TaskRegion except) {
+        return (x) -> x != except ? -temporalTaskPriority(x.task, now, dur) : Float.POSITIVE_INFINITY;
     }
 
     protected Task find(@NotNull TaskRegion t) {

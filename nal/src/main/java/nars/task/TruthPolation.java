@@ -96,7 +96,9 @@ public enum TruthPolation {
             if (eviSum > 0) {
                 float f = wFreqSum / eviSum;
 
-                float var = deltaSum / count;
+                float var =
+                        //deltaSum / count;
+                        0;
 
                 return new PreciseTruth(f, eviSum * (1f / (1f + var)), false);
 
