@@ -33,7 +33,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int radius = 32;
+    static final int sampleRadius = 8;
 
 
     public static class TaskRegion implements HyperRegion {
@@ -134,7 +134,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<TaskRegion>(
-                new RTree<TaskRegion>((t -> t), 2, 6, Spatialization.DefaultSplits.AXIAL) {
+                new RTree<TaskRegion>((t -> t), 2, 8, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
                     public boolean add(TaskRegion tr) {
@@ -202,7 +202,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         updateSignalTasks(now);
 
-        List<TaskRegion> tt = cursor(when - radius * dur, when + radius * dur).list();
+        List<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
         if (!tt.isEmpty())
             return TruthPolation.truth(e, when, dur, Iterables.transform(tt, t -> t.task));
@@ -215,7 +215,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         updateSignalTasks(now);
 
-        MutableList<ObjectFloatPair<TaskRegion>> tt = timeDistanceSortedList(when - radius * dur, when + radius * dur, now);
+        MutableList<ObjectFloatPair<TaskRegion>> tt = timeDistanceSortedList(when - sampleRadius * dur, when + sampleRadius * dur, now);
         switch (tt.size()) {
             case 0:
                 return null;

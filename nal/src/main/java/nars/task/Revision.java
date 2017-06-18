@@ -123,7 +123,7 @@ public class Revision {
             if (ccp != null) {
 
                 cc = ccp.getOne();
-                assert(cc.isNormalized());
+                assert (cc.isNormalized());
 
                 negated = ccp.getTwo();
                 break;
@@ -142,11 +142,10 @@ public class Revision {
                 newTruth,
                 now, start, end,
                 Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
-                    //TODO weight by the relative confidence of each so that more confidence contributes more evidence data to the stamp
-                    //long[] evidence = Stamp.zip(((DefaultBeliefTable) concept.tableFor(a.punc())).temporal);
         );
         t.setPri(a.priSafe(0) + b.priSafe(0));
-        return t;//.dur(lerp(aw / (aw + bw), a.dur(), b.dur())).log("Revection Merge");
+        //t.log("Revection Merge");
+        return t;
     }
 
 
@@ -286,9 +285,10 @@ public class Revision {
         Interval ai = new Interval(a.start(), a.end());
         Interval bi = new Interval(b.start(), b.end());
 
-        //Interval timeOverlap = ai.intersection(bi);
+        Interval timeOverlap = ai.intersection(bi);
 
-        /*if (timeOverlap != null)*/ {
+        /*if (timeOverlap != null)*/
+        {
 
             float aa = a.evi() * (1 + ai.length());
             float bb = b.evi() * (1 + bi.length());
@@ -306,9 +306,19 @@ public class Revision {
             //float rangeEquality = 0.5f / (1f + Math.abs(ai.length() - bi.length()));
 
 
+            float timeDiscount = 1f;
             Interval union = ai.union(bi);
-            float timeDiscount = 1f; //rangeEquality + (1f - rangeEquality)
-                    //* ((float) (timeOverlap.length())) / (1 + union.length());
+            if (timeOverlap == null) {
+                long separation = Math.max(a.timeDistance(b.start()), a.timeDistance(b.end()));
+                if (separation > 0) {
+                    long totalLength = ai.length() + bi.length();
+                    timeDiscount =
+                            (totalLength) /
+                                    (separation + totalLength)
+                    ;
+                }
+            }
+
 
             Truth t = merge(a, p, b, stampDiscount * timeDiscount * stampCapacityDiscount, confMin);
             if (t != null) {
