@@ -9,14 +9,14 @@ import nars.term.Termed;
 public class BudgetFairnessTest {
 
 
-    private static <X extends Termed> MultiStatistics.Condition<X> complexityLTE(int complexityLTE) {
-        return new MultiStatistics.Condition<X>("complexity<=" + complexityLTE, t -> t.complexity() <= complexityLTE);
+    private static <X extends Termed> MultiStatistics.BooleanClassifierWithStatistics<X> complexityLTE(int complexityLTE) {
+        return new MultiStatistics.BooleanClassifierWithStatistics<X>("complexity<=" + complexityLTE, t -> t.complexity() <= complexityLTE);
     }
-    private static <X extends Termed> MultiStatistics.Condition<X> volumeLTE(int complexityLTE) {
-        return new MultiStatistics.Condition<X>("volume<=" + complexityLTE, t -> t.volume() <= complexityLTE);
+    private static <X extends Termed> MultiStatistics.BooleanClassifierWithStatistics<X> volumeLTE(int complexityLTE) {
+        return new MultiStatistics.BooleanClassifierWithStatistics<X>("volume<=" + complexityLTE, t -> t.volume() <= complexityLTE);
     }
-    private static <X extends Termed> MultiStatistics.Condition<X> volumeIn(int min, int max) {
-        return new MultiStatistics.Condition<X>("volume=" + min + ".." + max, t -> {
+    private static <X extends Termed> MultiStatistics.BooleanClassifierWithStatistics<X> volumeIn(int min, int max) {
+        return new MultiStatistics.BooleanClassifierWithStatistics<X>("volume=" + min + ".." + max, t -> {
             int v = t.volume();
             return (v >= min && v <= max);
         });

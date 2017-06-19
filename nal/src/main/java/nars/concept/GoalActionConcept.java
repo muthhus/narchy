@@ -111,15 +111,15 @@ public class GoalActionConcept extends ActionConcept {
         //2. check current belief
         //3. check previous signal belief
         Truth nextTruth =
-                //beliefFeedback;
-                beliefFeedback != null ? beliefFeedback : belief; //latch
+                beliefFeedback;
+                //beliefFeedback != null ? beliefFeedback : belief; //latch
 
         Task fb = feedback.set(this, nextTruth, nar);
 
 
 //        //HACK insert shadow goal
         //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
-        Task fg = null;
+        //Task fg = null;
 
         //apply additional forgetting for past goals and beliefs, to promote future predictions
 //        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
@@ -131,8 +131,8 @@ public class GoalActionConcept extends ActionConcept {
 //        beliefs().forEachTask(decay);
 //        goals().forEachTask(decay);
 
-        //return Stream.of(fb).filter(Objects::nonNull);
-        return Stream.of(fb, fg).filter(Objects::nonNull);
+        return Stream.of(fb).filter(Objects::nonNull);
+        //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 
 

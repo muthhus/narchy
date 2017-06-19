@@ -1,66 +1,163 @@
 package jcog.math;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
+import com.google.common.math.PairedStats;
+import com.google.common.math.PairedStatsAccumulator;
+import jcog.list.FasterList;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * Created by me on 1/12/17.
  */
-public class MultiStatistics<X> implements FloatObjectProcedure<X> {
+public class MultiStatistics<X> implements Consumer<X> {
 
-    public static class Condition<X> extends RecycledSummaryStatistics {
+
+
+    public static class BooleanClassifierWithStatistics<X> extends RecycledSummaryStatistics implements Consumer<X> /* implements AbstractClassifier */ {
         public final Predicate<X> filter;
         public final String id;
-        public final HashBag<X> uniques;
+        @Nullable public final HashBag<X> uniques;
 
-        public Condition(String id, Predicate<X> filter) {
+        public BooleanClassifierWithStatistics(String id, Predicate<X> filter) {
+            this(id, filter, new HashBag());
+        }
+        public BooleanClassifierWithStatistics(String id, Predicate<X> filter, @Nullable HashBag<X> uniques) {
             super();
             this.id = id;
             this.filter = filter;
-            this.uniques = new HashBag<>();
+            this.uniques = uniques;
         }
 
         @Override
         public String toString() {
-            return id + ": #" + getN() +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + uniques;
+            long N = getN();
+            return id + ": " +
+                    (N > 0 ? (N +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + uniques)
+                        :
+                        "none")
+                    ;
         }
 
-        public void accept(X parameter, float v) {
+
+        @Override
+        public void accept(X x) {
+            accept(x, 1);
+        }
+
+        void accept(X parameter, float v) {
             if (filter.test(parameter)) {
                 accept(v);
-                uniques.add(parameter);
+                if (uniques!=null)
+                    uniques.add(parameter);
             }
         }
     }
 
-    public final Iterable<Condition<X>> cond;
+    public final List<Consumer<X>> cond;
 
-    public MultiStatistics(Condition<X>... cc) {
-        this(Lists.newArrayList(cc));
+
+    public MultiStatistics() {
+        this.cond = new FasterList();
+
+        /** wildcard catch-all; by default will not collect all the unique values but other added conditions will */
+        cond.add( new BooleanClassifierWithStatistics<X>("*", x -> true, null) );
     }
 
-    public MultiStatistics(Iterable<Condition<X>> cond) {
-        this.cond = Iterables.concat(
-                cond, Lists.newArrayList(
-                    new Condition<X>("*", x -> true)
-                )
-        );
+    public MultiStatistics<X> classify(String name, Predicate<X> test) {
+        cond.add(new BooleanClassifierWithStatistics<X>(name, test));
+        return this;
+    }
+
+    static class ScalarStats<X> extends RecycledSummaryStatistics implements Consumer<X> {
+        private final String id;
+        private final FloatFunction<X> test;
+
+        public ScalarStats(String id, FloatFunction<X> test) {
+            this.id = id;
+            this.test = test;
+        }
+        @Override
+        public String toString() {
+            return id + ": #" + getN() +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum();
+        }
+
+        @Override
+        public void accept(X x) {
+            float v = test.floatValueOf(x);
+            if (v == v)
+                accept(v);
+        }
+    }
+
+    public MultiStatistics<X> value(String name, FloatFunction<X> test) {
+        cond.add(new ScalarStats(name, test));
+        return this;
+    }
+
+    public MultiStatistics<X> value2D(String name, Function<X,float[]> test) {
+        cond.add(new TwoDStats(name, test));
+        return this;
     }
 
     @Override
-    public void value(float v, X parameter) {
-        for (Condition<X> cc : cond) {
-            cc.accept(parameter, v);
+    public final void accept(X x) {
+        for (Consumer<X> cc : cond) {
+            cc.accept(x);
         }
+    }
+
+    public MultiStatistics<X> add(@NotNull Iterable<X> ii) {
+        ii.forEach(this);
+        return this;
     }
 
     @Override
     public String toString() {
         return Joiner.on('\n').join(cond);
+    }
+
+    public void print() {
+        print(System.out);
+    }
+
+    public void print(Appendable out) {
+        try {
+            Joiner.on('\n').appendTo(out, cond);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static class TwoDStats<X> implements Consumer<X> {
+        private final PairedStatsAccumulator stats;
+        private final Function<X, float[]> func;
+        private final String id;
+
+        public TwoDStats(String name, Function<X,float[]> val) {
+            this.id = name;
+            this.stats = new PairedStatsAccumulator();
+            this.func = val;
+        }
+
+        @Override
+        public String toString() {
+            return id + " " + stats.snapshot().toString();
+        }
+
+        @Override
+        public void accept(X z) {
+            float[] xy = func.apply(z);
+            assert(xy.length==2);
+            stats.add(xy[0], xy[1]);
+        }
     }
 }

@@ -81,7 +81,7 @@ public class TaskConcept extends CompoundConcept {
     }
 
     @NotNull
-    final BeliefTable tableOrNew(@NotNull NAR nar, boolean beliefOrGoal) {
+    public final BeliefTable tableOrNew(@NotNull NAR nar, boolean beliefOrGoal) {
         @Nullable BeliefTable t = beliefOrGoal ? beliefs : goals;
         if (t == null) {
             t = newBeliefTable(nar, beliefOrGoal);
@@ -101,8 +101,8 @@ public class TaskConcept extends CompoundConcept {
 
 
     public TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        //return new HijackTemporalBeliefTable(tCap);
-        return new RTreeBeliefTable(tCap);
+        return new HijackTemporalBeliefTable(tCap);
+        //return new RTreeBeliefTable(tCap);
     }
 
     public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {

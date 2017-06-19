@@ -18,7 +18,7 @@ public abstract class Param  {
 
 
     /** belief projection lookahead time in premise formation, in multiples of duration */
-    public static final int PREDICTION_HORIZON = 2;
+    public static final int PREDICTION_HORIZON = 3;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

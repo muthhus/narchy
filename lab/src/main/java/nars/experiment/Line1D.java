@@ -33,9 +33,9 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.01f; //in time units
+        float tHz = 0.002f; //in time units
         float yResolution = 0.2f; //in 0..1.0
-        float periods = 2;
+        float periods = 64;
 
         final int runtime = Math.round(periods /tHz);
 
@@ -59,9 +59,9 @@ public class Line1D {
 
             a.speed.setValue(yResolution);
 
-            a.happy.resolution.setValue(0.1f);
+            a.happy.resolution.setValue(0.05f);
             a.out.resolution.setValue(yResolution);
-            a.in.resolution.setValue(yResolution /2);
+            a.in.resolution.setValue(yResolution);
             a.curiosity.setValue((2/yResolution)*tHz);
 
             //            a.in.beliefs().capacity(0, 100, a.nar);
@@ -171,17 +171,17 @@ public class Line1D {
 //            }
 //        });
                 Default n = new Default();
-                n.time.dur(1);
-                n.termVolumeMax.set(40);
-                n.goalConfidence(0.5f);
-                n.beliefConfidence(0.5f);
+                n.time.dur(10);
+                n.termVolumeMax.set(20);
+                n.goalConfidence(0.9f);
+                n.beliefConfidence(0.9f);
 
                 new Line1DExperiment() {
                     @Override
                     protected void onStart(Line1DSimplest a) {
                         new Thread(() -> {
                             //NAgentX.chart(a);
-                            int history = 5000;
+                            int history = 3000;
                             window(
                                     row(
                                             conceptPlot(a.nar, Lists.newArrayList(

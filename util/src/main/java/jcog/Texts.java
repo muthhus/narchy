@@ -548,7 +548,7 @@ public enum Texts {
         return c;
     }
 
-    public static String n2(float[] v) {
+    public static String n2(float... v) {
         StringBuilder sb = new StringBuilder(v.length * 4 + 2 /* approx */);
         int s = v.length;
         for (int i = 0; i < s; i++) {

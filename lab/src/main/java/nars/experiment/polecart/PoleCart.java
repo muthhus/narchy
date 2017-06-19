@@ -33,7 +33,7 @@ public class PoleCart extends NAgentX {
             try {
                 NAgent a = new PoleCart(n);
                 //((RealTime)n.time).durFPS(80f);
-                n.termVolumeMax.setValue(32);
+                n.termVolumeMax.setValue(24);
                 //n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {
@@ -41,7 +41,7 @@ public class PoleCart extends NAgentX {
                 e.printStackTrace();
                 return null;
             }
-        }, 40);
+        }, 20);
     }
 
     private static final long serialVersionUID = 1L;
@@ -67,8 +67,7 @@ public class PoleCart extends NAgentX {
     public static final double tau = 0.01;
     public static final double fricCart = 0.0001;
     public static final double fricPole =
-            0.007f;
-            //0.005;
+            0.004;
     public static final double totalMass = cartMass + poleMass;
     public static final double halfPole = 0.5 * poleLength;
     public static final double poleMassLength = halfPole * poleMass;

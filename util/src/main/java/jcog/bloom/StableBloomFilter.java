@@ -13,28 +13,26 @@ public class StableBloomFilter<E> implements CountingLeakySet<E> {
     private final byte[] cells;
     private final int numberOfCells;
     private final int numberOfHashes;
-    private final float unlearnRate;
     private final Random rng = new Random();
 
     public StableBloomFilter(int numberOfCells,
                              int numberOfHashes,
-                             float unlearnRate,
                              HashProvider<E> hashProvider) {
         this.numberOfCells = numberOfCells;
         this.numberOfHashes = numberOfHashes;
         this.cells = new byte[numberOfCells];
-        this.unlearnRate = unlearnRate;
         this.hashProvider = hashProvider;
     }
 
-    /** if the element isnt contained, add it. return the value from the contains test.*/
+    /** if the element isnt contained, add it. return true if added, false if already present.*/
     public boolean addIfMissing(E element) {
         int[] hash = hash(element);
         boolean c = contains(hash);
         if (!c) {
             add(hash);
+            return true;
         }
-        return c;
+        return false;
     }
 
     @Override
@@ -51,8 +49,6 @@ public class StableBloomFilter<E> implements CountingLeakySet<E> {
         for (int i = 0; i < numberOfHashes; i++) {
             increment(indices[i]);
         }
-
-        unlearn();
     }
 
     public boolean contains(int[] indices) {
@@ -78,8 +74,12 @@ public class StableBloomFilter<E> implements CountingLeakySet<E> {
         }
     }
 
-    private void unlearn() {
-        int unlearnedCells = Math.round(numberOfCells * unlearnRate);
+
+    public void unlearn(float rate) {
+        int unlearnedCells = Math.round(numberOfCells * rate);
+        unlearn(unlearnedCells);
+    }
+    public void unlearn(int unlearnedCells) {
         for (int i = 0; i < unlearnedCells; i++) {
             int index = rng.nextInt(numberOfCells);
             decrement(index);

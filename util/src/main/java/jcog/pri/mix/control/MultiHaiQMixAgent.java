@@ -11,9 +11,9 @@ public class MultiHaiQMixAgent implements MixAgent {
     public HaiQAgent[] agent;
 
 
-    final boolean controlRelative = false;
+    final boolean controlRelative = true;
 
-    final int controlResolution = controlRelative ? 9 : 4;
+    final int controlResolution = controlRelative ? 4 : 4;
     final float controlGranularity = 1.0f / (controlResolution);
 
     /**

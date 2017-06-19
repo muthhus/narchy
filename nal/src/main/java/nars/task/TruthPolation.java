@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -26,9 +27,9 @@ public enum TruthPolation {
     public static float evidenceDecay(float evi, int dur, long dt) {
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
-        /* float scale = ((float)dt) / dur;
-        if (scale > 0.5f) return 0;
-        else return evi * (1f - scale*2f);*/
+//        float scale = ((float)dt) / dur;
+//        if (scale > 0.5f) return 0;
+//        else return evi * (1f - scale*2f);
 
 
         return evi / (1 + (((float) dt) / dur)); //inverse linear
@@ -97,8 +98,8 @@ public enum TruthPolation {
                 float f = wFreqSum / eviSum;
 
                 float var =
-                        deltaSum / count;
-                        //0;
+                        //deltaSum / count;
+                        0;
 
                 return new PreciseTruth(f, eviSum * (1f / (1f + var)), false);
 

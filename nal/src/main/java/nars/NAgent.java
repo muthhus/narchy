@@ -146,6 +146,8 @@ abstract public class NAgent implements NSense, NAct {
                 return new EternalTable(1); //for storing the eternal happiness goal
             }
         };
+        //nar.goal(happy, 1f, nar.confDefault(GOAL)); //ETERNAL <- not safe to use yet
+
         fireHappy = new ConceptFire(happy, 1f);
 
         curiosity = new FloatParam( 0.10f);

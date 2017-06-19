@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,14 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
         n.on(this);
     }
 
-// THIS DITHERING AND CLONING IS DANGEROUS
+    @Override
+    public void process(@NotNull Task t, @NotNull NAR n) {
+        if (t.isEternal())
+            return;
+        super.process(t, n);
+    }
+
+    // THIS DITHERING AND CLONING IS DANGEROUS
 //    public void process(@NotNull Task t, @NotNull NAR n) {
 //        //dither the task frequency
 //        if (!t.isInput() && /*t.isBeliefOrGoal()*/ t.isBelief()) {

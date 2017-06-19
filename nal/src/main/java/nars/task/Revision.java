@@ -24,6 +24,7 @@ import java.util.Random;
 
 import static jcog.Util.lerp;
 import static nars.time.Tense.DTERNAL;
+import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -335,9 +336,9 @@ public class Revision {
             long width = (ai.length() + bi.length()) / 2; //TODO weight
             long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
 
-            Truth expected = table.truth(mid, now, dur);
-            if (expected == null)
-                return null;
+//            Truth expected = table.truth(mid, now, dur);
+//            if (expected == null)
+//                return null;
 
 
             start = mid - width / 2;
@@ -346,38 +347,39 @@ public class Revision {
             long u = ai.union(bi).length();
             long s = ai.length() + bi.length();
 
-            Truth startTruth = table.truth(start, now, dur);
-            if (startTruth == null)
-                return null;
-
-            Truth endTruth = table.truth(end, now, dur);
-            if (endTruth == null)
-                return null;
+//            Truth startTruth = table.truth(start, now, dur);
+//            if (startTruth == null)
+//                return null;
+//
+//            Truth endTruth = table.truth(end, now, dur);
+//            if (endTruth == null)
+//                return null;
 
             float factor = 1f;
 
-            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
-            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from
-            float diff = Math.abs(startTruth.freq() - endTruth.freq());
-            if (diff > 0)
-                factor *= (1f - diff);
+//            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
+//            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from
+//            float diff = Math.abs(startTruth.freq() - endTruth.freq());
+//            if (diff > 0)
+//                factor *= (1f - diff);
 
 
             if (timeOverlap == null) {
                 factor *= ((float) s) / (s + u);
             }
 
-            float conf = w2c(expected.evi() * factor);
-            if (conf >= Param.TRUTH_EPSILON)
-                newTruth = new PreciseTruth(expected.freq(), conf);
-            else
-                newTruth = null;
+            newTruth = revise(a, b, factor, c2w(confMin));
+
+//            float conf = w2c(expected.evi() * factor);
+//            if (conf >= Param.TRUTH_EPSILON)
+//                newTruth = new PreciseTruth(expected.freq(), conf);
+//            else
+//                newTruth = null;
         }
 
 
         if (newTruth != null) {
-            if (newTruth.conf() >= confMin)
-                return mergeInterpolate(a, b, start, end, now, dur, newTruth, true, rng);
+            return mergeInterpolate(a, b, start, end, now, dur, newTruth, true, rng);
         }
 
         return null;

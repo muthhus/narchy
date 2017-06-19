@@ -73,7 +73,7 @@ public class BloomFilterBuilder<E> {
      * @return Standard {@link LeakySet}.
      */
     public LeakySet<E> buildFilter() {
-        return new StableBloomFilter<>(size, numberOfHashes, 0, hashProvider);
+        return new StableBloomFilter<>(size, numberOfHashes, hashProvider);
     }
 
     /**
@@ -81,15 +81,15 @@ public class BloomFilterBuilder<E> {
      * @return {@link CountingLeakySet}.
      */
     public CountingLeakySet<E> buildCountingFilter() {
-        return new StableBloomFilter<>(size, numberOfHashes, 0, hashProvider);
+        return new StableBloomFilter<>(size, numberOfHashes,  hashProvider);
     }
 
-    /**
-     * Build the instance.
-     * @return A stable {@link LeakySet}.
-     */
-    public CountingLeakySet<E> buildStableFilter() {
-        return new StableBloomFilter<>(size, numberOfHashes, unlearningRate, hashProvider);
-    }
+//    /**
+//     * Build the instance.
+//     * @return A stable {@link LeakySet}.
+//     */
+//    public CountingLeakySet<E> buildStableFilter() {
+//        return new StableBloomFilter<>(size, numberOfHashes, unlearningRate, hashProvider);
+//    }
 
 }
