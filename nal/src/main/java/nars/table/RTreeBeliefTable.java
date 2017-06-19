@@ -2,11 +2,9 @@ package nars.table;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import jcog.Util;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -31,7 +29,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 32;
+    static final int sampleRadius = 4;
 
 
     public static class TaskRegion implements HyperRegion {
@@ -147,7 +145,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<TaskRegion>(
-                new RTree<TaskRegion>((t -> t), 2, 4, Spatialization.DefaultSplits.AXIAL) {
+                new RTree<TaskRegion>((t -> t), 2, 6, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
                     public boolean add(TaskRegion tr) {
@@ -197,7 +195,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 }
             }
 
-            return true; //stop tracking
+            return false; //keep tracking
         });
 
 
@@ -316,8 +314,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
+
             long now = nar.time();
             int dur = nar.dur();
+
+            Task input = tr.task;
+            float inputConf = input instanceof SignalTask ? 1f : input.conf(now, dur);
+
             FloatFunction<Task> wt = weaknessTask(now, dur);
             FloatFunction<TaskRegion> taskRanker = (t -> wt.floatValueOf(t.task));
             FloatFunction<TaskRegion> regionRanker = weaknessRegion(now, dur);
@@ -327,38 +330,57 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             Set<Activate> activations = new UnifiedSet(1);
             lt.withWriteLock((r) -> {
-                while (size() > capacity) {
 
-                    Top<TaskRegion> removeVictim = new Top<>(taskRanker);
+
+                    Top<TaskRegion> deleteVictim = new Top<>(taskRanker);
                     Top<Leaf<TaskRegion>> mergeVictim = new Top<>(mergeRanker);
 
-                    compressNext(tree.root(), removeVictim, mergeVictim, nar);
+                    compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, nar);
 
                     //decide to remove or merge:
-                    @Nullable TaskRegion toRemove = removeVictim.the;
+                    @Nullable TaskRegion toRemove = deleteVictim.the;
+                    @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
+                    if (toRemove == null && toMerge==null)
+                        return; //failed to compress
 
-                    @Nullable final Leaf<TaskRegion> toMerge = mergeVictim.the;
-                    float confMin = toRemove!=null ? toRemove.task.conf() : nar.confMin.floatValue();
+                    float confMin = toRemove != null ? toRemove.task.conf() : nar.confMin.floatValue();
                     Activate activation = null;
+
+                    if (toRemove != null && toMerge!=null) {
+                        Truth toRemoveNow = toRemove.task.truth(now, dur);
+                        TaskRegion toMergeRegion = (TaskRegion) (toMerge.region());
+                        float toMergeNow = (float) toMergeRegion.center(2); /* confMean*/ //not a fair comparison, so i use confMax/n
+                        if (toRemoveNow == null) {
+                            toRemove = null;
+                        } else {
+                            if (toRemoveNow.conf() >= toMergeNow)
+                                toMerge = null;
+                            else
+                                toRemove = null;
+                        }
+
+                    }
+
                     if (toMerge != null && (activation = compressMerge(toMerge, now, dur, confMin, nar.random())) != null) {
                         activations.add(activation);
                     } else if (toRemove != null) {
                         compressEvict(toRemove);
                     }
-                }
 
-                tree.add(tr);
+                    if (r.size() < capacity)
+                        tree.add(tr);
+                    else
+                        activations.clear();
+                });
 
-            });
-
-            nar.input(activations);
+                nar.input(activations);
 
 
-        } finally {
-            //compressing.set(false);
+            } finally{
+                //compressing.set(false);
+            }
+            //}
         }
-        //}
-    }
 
     private Activate compressMerge(Leaf<TaskRegion> l, long now, int dur, float confMin, Random rng) {
         short s = l.size;
@@ -400,22 +422,22 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         remove(t);
     }
 
-    private void compressNext(Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, NAR nar) {
+    private void compressNext(Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, float inputConf, NAR nar) {
         if (next instanceof Leaf) {
 
-            compressLeaf((Leaf) next, deleteVictim);
+            compressLeaf((Leaf) next, deleteVictim, inputConf, nar.time(), nar.dur());
 
             if (next.size() > 1)
                 mergeVictim.accept((Leaf) next);
 
         } else if (next instanceof Branch) {
-            compressBranch((Branch) next, deleteVictim, mergeVictim, nar);
+            compressBranch((Branch) next, deleteVictim, mergeVictim, inputConf, nar);
         } else {
             throw new RuntimeException();
         }
     }
 
-    private void compressBranch(Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, NAR nar) {
+    private void compressBranch(Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, float inputConf, NAR nar) {
         //options:
         //a. smallest
         //b. oldest
@@ -451,11 +473,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             Node<TaskRegion, ?> the = weakest.the;
             if (the != null)
-                compressNext(the, deleteVictims, mergeVictims, nar);
+                compressNext(the, deleteVictims, mergeVictims, inputConf, nar);
         }
     }
 
-    private void compressLeaf(Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims) {
+    private void compressLeaf(Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims, float inputConf, long now, int dur) {
 
         int size = l.size;
         Object[] ld = l.data;
@@ -469,7 +491,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             if (t.isDeleted()) {
                 remove(t); //already has write lock so just use non-async methods
             } else {
-                deleteVictims.accept(t);
+                if (t.task.conf(now, dur) <= inputConf)
+                    deleteVictims.accept(t);
             }
         }
     }
@@ -484,16 +507,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             float timeSpanFactor = awayFromNow == 0 ? 1f : (timeSpan / (timeSpan + awayFromNow));
 
             return (
-                    (1 + 1.0f * (cb.freqMax - cb.freqMin)) *  //minimize
-                            (1 + 1.0f * (cb.confMax - cb.confMin)) *  //minimize
-                            (1 + 0.1f * (timeSpanFactor)) *  //minimize: prefer smaller time spans
-                            (1 + 0.5f * 1f / Util.sqr(1f + (awayFromNow)))) *  //maximize
-                    (1 + 0.5f * cb.confMax) //minimize
+                    (float) Math.log(1 + 1f / awayFromNow)) //maximize
+                    * //AND
+                    (1f + 0.1f * (
+                            (1.0f * (cb.freqMax - cb.freqMin)) +  //minimize
+                            (0.5f * (cb.confMax - cb.confMin)) +  //minimize
+                            (1f * cb.confMax) + //minimize
+                            (1f * (timeSpanFactor))  //minimize: prefer smaller time spans
+                    ))
                     ;
         };
     }
 
-    private static FloatFunction<Task> weaknessTask(long when, float dur) {
+    private static FloatFunction<Task> weaknessTask(long when, int dur) {
         return (Task x) -> -temporalTaskPriority(x, when, dur);
     }
 

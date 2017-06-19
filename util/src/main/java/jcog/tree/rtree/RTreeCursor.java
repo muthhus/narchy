@@ -29,6 +29,8 @@ public class RTreeCursor<T> {
                 starts.add((Leaf) n);
             return true;
         });
+        if (starts.isEmpty() && space.root().isLeaf())
+            starts.add((Leaf)space.root());
     }
 
     public void forEach(Consumer<? super T> each) {

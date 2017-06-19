@@ -342,7 +342,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         wave.forEach((freq, conf, s, e) -> {
 
             boolean eternal = (s != s);
-            float pw = 0; //baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
+            float pw = baseTaskSize / 4f;// + gew / (1f / conf) / 4f;//10 + 10 * conf;
 
             //normalize to range
             //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);

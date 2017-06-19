@@ -336,6 +336,9 @@ public class Revision {
             long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
 
             Truth expected = table.truth(mid, now, dur);
+            if (expected == null)
+                return null;
+
 
             start = mid - width / 2;
             end = mid + width / 2;

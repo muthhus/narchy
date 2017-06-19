@@ -22,9 +22,9 @@ public class Signal {
 
     final int MAX_PERCEPT_DURATIONS =
             //0;
-            //Integer.MAX_VALUE;
+            Integer.MAX_VALUE;
             //16;
-            32;
+
 
     public FloatSupplier pri;
 
@@ -76,14 +76,10 @@ public class Signal {
 
         if (this.current != null) {
 
-            boolean finish = current.isDeleted() || now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS);
+            this.current.setEnd(now);
+            boolean finish = current.isDeleted() || ( MAX_PERCEPT_DURATIONS!=Integer.MAX_VALUE && (now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)));
             if (finish) {
-                this.current.setEnd(now);
-                if (nextTruth == null)
-                    nextTruth = current.truth;
                 this.current = null;
-            } else {
-                this.current.updateEnd(now);
             }
         }
 
@@ -92,6 +88,7 @@ public class Signal {
 
         //no signal
         if (nextTruth == null) {
+            //return this.current; //keep as is
             return (this.current = null);
         } else {
 
@@ -105,8 +102,7 @@ public class Signal {
 //                    current.setEnd(next);
 //                    return current;
 //                }
-//                return null;
-                //nothing, keep as-is
+                return current; //nothing, keep as-is
             } else {
 
                 SignalTask t;

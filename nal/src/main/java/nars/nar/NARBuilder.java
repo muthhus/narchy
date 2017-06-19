@@ -47,12 +47,12 @@ public interface NARBuilder {
         n.termVolumeMax.setValue(40);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 3, true);
-        MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 5, true, 32f);
+        MySTMClustered stm = new MySTMClustered(n, 512, BELIEF, 5, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(128, 0.4f);
+            n.addNAR(2048, 0.1f);
         }
 
 //        n.onTask(t -> {

@@ -29,10 +29,6 @@ public class SignalTask extends NALTask {
     }
 
     public void setEnd(long now) {
-        updateEnd(now);
-    }
-
-    public void updateEnd(long now) {
         this.slidingEnd = now;
     }
 

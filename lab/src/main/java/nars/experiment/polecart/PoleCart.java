@@ -19,7 +19,7 @@ import static jcog.Texts.n2;
 
 /**
  * adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
- * see also: https://github.com/rihardsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
+ * see also: https://github.com/rihasrdsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
  */
 public class PoleCart extends NAgentX {
 
