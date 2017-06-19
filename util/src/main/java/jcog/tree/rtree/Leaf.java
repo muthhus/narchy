@@ -52,6 +52,22 @@ public class Leaf<T> implements Node<T, T> {
         return data[i];
     }
 
+     public double variance(int dim, Spatialization<T> model) {
+        double mean = region().center(dim);
+        double sumDiffSq = 0;
+        int s = size();
+        if (s < 2)
+            return 0;
+        for (int i = 0; i < s; i++) {
+            T c = get(i);
+            if (c == null) continue;
+            double diff = model.region(c).center(dim) - mean;
+            sumDiffSq += diff*diff;
+        }
+        return sumDiffSq / s-1;
+    }
+
+
     @Override
     public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
 
@@ -131,7 +147,7 @@ public class Leaf<T> implements Node<T, T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRegion.mbr(model.bounds, data, size) : null;
+            bounds = size > 0 ? HyperRegion.mbr(model.region, data, size) : null;
 
         }
 
@@ -200,7 +216,7 @@ public class Leaf<T> implements Node<T, T> {
 
     @NotNull
     @Override
-    public HyperRegion bounds() {
+    public HyperRegion region() {
         return bounds;
     }
 
@@ -245,15 +261,15 @@ public class Leaf<T> implements Node<T, T> {
     public final void classify(final Node<T, T> l1Node, final Node<T, T> l2Node, final T t, Spatialization<T> model) {
 
         final HyperRegion tRect = model.region(t);
-        final HyperRegion l1Mbr = l1Node.bounds().mbr(tRect);
+        final HyperRegion l1Mbr = l1Node.region().mbr(tRect);
 
         double tCost = tRect.cost();
 
         double l1c = l1Mbr.cost();
-        final double l1CostInc = Math.max(l1c - (l1Node.bounds().cost() + tCost), 0.0);
-        final HyperRegion l2Mbr = l2Node.bounds().mbr(tRect);
+        final double l1CostInc = Math.max(l1c - (l1Node.region().cost() + tCost), 0.0);
+        final HyperRegion l2Mbr = l2Node.region().mbr(tRect);
         double l2c = l2Mbr.cost();
-        final double l2CostInc = Math.max(l2c - (l2Node.bounds().cost() + tCost), 0.0);
+        final double l2CostInc = Math.max(l2c - (l2Node.region().cost() + tCost), 0.0);
         if (l2CostInc > l1CostInc) {
             l1Node.add(t, this, model);
         } else if (RTree.equals(l1CostInc, l2CostInc)) {

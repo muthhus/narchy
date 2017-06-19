@@ -413,7 +413,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             }
 
             float a =
-                    conf * 0.75f;
+                    0.5f + conf * 0.3f;
                     //0.45f + 0.5f * conf;
             if (beliefOrGoal) {
                 gl.glColor4f(0.5f, 0.25f, 0f, a);

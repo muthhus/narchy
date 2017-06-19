@@ -50,7 +50,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {
-        if (!bounds().contains(model.region(t)))
+        if (!region().contains(model.region(t)))
             return false;
         for (int i = 0; i < size; i++) {
             if (child[i].contains(t, model))
@@ -74,7 +74,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         if (size < child.length) {
             child[size++] = n;
 
-            HyperRegion nr = n.bounds();
+            HyperRegion nr = n.region();
             mbr = mbr != null ? mbr.mbr(nr) : nr;
             return size - 1;
         } else {
@@ -94,7 +94,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @NotNull
     @Override
-    public HyperRegion bounds() {
+    public HyperRegion region() {
         return mbr;
     }
 
@@ -114,7 +114,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         for (int i = 0; i < size; i++) {
             Node ci = child[i];
-            if (ci.bounds().contains(tRect)) {
+            if (ci.region().contains(tRect)) {
                 //check for existing item
                 if (ci.contains(t, model))
                     return this; // duplicate detected (subtree not changed)
@@ -178,14 +178,14 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
     private void grow(Node<T, ?> node) {
-        mbr = mbr.mbr(node.bounds());
+        mbr = mbr.mbr(node.region());
     }
 
     @Override
     public Node<T, ?> remove(final T x, HyperRegion xBounds, Nodelike<T> parent, Spatialization<T> model) {
 
         for (int i = 0; i < size; i++) {
-            if (child[i].bounds().intersects(xBounds)) {
+            if (child[i].region().intersects(xBounds)) {
                 child[i] = child[i].remove(x, xBounds, this, model);
                 if (reportNextSizeDelta(parent)) {
                     if (child[i].size() == 0) {
@@ -204,7 +204,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 return child[0];
             }
 
-            mbr = child[0].bounds();
+            mbr = child[0].region();
             for (int i = 1; i < size; i++) {
                 grow(child[i]);
             }
@@ -227,12 +227,12 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         //TODO may be able to avoid recomputing bounds if the old was not found
         boolean found = false;
         for (int i = 0; i < size; i++) {
-            if (!found && tRect.intersects(child[i].bounds())) {
+            if (!found && tRect.intersects(child[i].region())) {
                 child[i] = child[i].update(OLD, NEW, model);
                 found = true;
             }
             if (i == 0) {
-                mbr = child[0].bounds();
+                mbr = child[0].region();
             } else {
                 grow(child[i]);
             }
@@ -249,7 +249,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         for (int i = 0; i < size; i++) {
             Node c = child[i];
-            if (rect.intersects(c.bounds())) {
+            if (rect.intersects(c.region())) {
                 if (!c.containing(rect, t, model))
                     return false;
             }
@@ -268,14 +268,14 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     private int chooseLeaf(final T t, final HyperRegion tRect, Nodelike<T> parent, Spatialization<T> model) {
         if (size > 0) {
             int bestNode = 0;
-            HyperRegion childMbr = child[0].bounds().mbr(tRect);
+            HyperRegion childMbr = child[0].region().mbr(tRect);
             double tCost = tRect.cost();
-            double leastEnlargement = childMbr.cost() - (child[0].bounds().cost() + tCost);
+            double leastEnlargement = childMbr.cost() - (child[0].region().cost() + tCost);
             double leastPerimeter = childMbr.perimeter();
 
             for (int i = 1; i < size; i++) {
-                childMbr = child[i].bounds().mbr(tRect);
-                final double nodeEnlargement = childMbr.cost() - (child[i].bounds().cost() + tCost);
+                childMbr = child[i].region().mbr(tRect);
+                final double nodeEnlargement = childMbr.cost() - (child[i].region().cost() + tCost);
                 if (nodeEnlargement < leastEnlargement) {
                     leastEnlargement = nodeEnlargement;
                     leastPerimeter = childMbr.perimeter();
@@ -341,19 +341,19 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        return nodeAND(ci -> !(rect.intersects(ci.bounds()) && !ci.intersecting(rect, t, model)));
+        return nodeAND(ci -> !(rect.intersects(ci.region()) && !ci.intersecting(rect, t, model)));
     }
 
     @Override
     public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-        if (!bounds().intersects(rect))
+        if (!region().intersects(rect))
             return;
 
         Node<T, ?>[] children = this.child;
         short s = this.size;
         for (int i = 0; i < s; i++) {
             Node<T, ?> c = children[i];
-            if (c!=null && c.bounds().intersects(rect)) {
+            if (c!=null && c.region().intersects(rect)) {
                 if (!t.test(c))
                     return;
                 c.intersectingNodes(rect, t, model);

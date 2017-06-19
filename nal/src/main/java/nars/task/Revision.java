@@ -6,6 +6,7 @@ import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.control.premise.Derivation;
+import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
@@ -66,20 +67,20 @@ public class Revision {
                 );
     }
 
-    public static Truth merge(@NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float evidenceFactor, float minConf, float confMax) {
+    public static Truth merge(@NotNull Truth newTruth, @NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf, float confMax) {
         float w1 = a.evi();
         float w2 = b.evi();
-        float w = (w1 + w2) * evidenceFactor;
+//        float w = (w1 + w2) * evidenceFactor;
 
-        if (w2c(w) >= minConf) {
-            //find the right balance of frequency
-            float w1f = aFrequencyBalance * w1;
-            float w2f = (1f - aFrequencyBalance) * w2;
-            float p = w1f / (w1f + w2f);
-
-            float af = a.freq();
-            float bf = b.freq();
-            float f = lerp(p, bf, af);
+////        if (w2c(w) >= minConf) {
+//            //find the right balance of frequency
+//            float w1f = aFrequencyBalance * w1;
+//            float w2f = (1f - aFrequencyBalance) * w2;
+//            float p = w1f / (w1f + w2f);
+//
+//            float af = a.freq();
+//            float bf = b.freq();
+//            float f = lerp(p, bf, af);
 
 //            //compute error (difference) in frequency TODO improve this
 //            float fError =
@@ -88,12 +89,12 @@ public class Revision {
 //
 //            w -= fError;
 
-            float c = w2c(w);
-            if (c >= minConf) {
-                return $.t(f, Math.min(confMax, c));
-            }
+//            float c = w2c(w);
+//            if (c >= minConf) {
+//                return $.t(f, Math.min(confMax, c));
+//            }
 
-        }
+//        }
 
         return null;
     }
@@ -104,7 +105,7 @@ public class Revision {
     }
 
 
-    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, @NotNull Truth newTruth, boolean mergeOrChoose, Random rng) {
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, int dur, Truth newTruth, boolean mergeOrChoose, Random rng) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -133,6 +134,7 @@ public class Revision {
 
         if (cc == null)
             return null;
+
 
         if (negated) {
             newTruth = newTruth.negated();
@@ -280,7 +282,7 @@ public class Revision {
     /**
      * t is the target time of the new merged task
      */
-    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
+    public static Task merge(TemporalBeliefTable table, @NotNull Task a, @NotNull Task b, long now, int dur, float confMin, Random rng) {
 
 
         Interval ai = new Interval(a.start(), a.end());
@@ -288,58 +290,96 @@ public class Revision {
 
         Interval timeOverlap = ai.intersection(bi);
 
-        /*if (timeOverlap != null)*/
+        long start, end;
+        @Nullable Truth newTruth;
         {
 
-            float ae = a.evi();
-            float aa = ae * (1 + ai.length());
-            float be = b.evi();
-            float bb = be * (1 + bi.length());
-            float p = aa / (aa + bb);
+//            float ae = a.evi();
+//            float aa = ae * (1 + ai.length());
+//            float be = b.evi();
+            //float bb = be * (1 + bi.length());
+            //float p = aa / (aa + bb);
 
-            //relate high frequency difference with low confidence
-            float freqDiscount =
-                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
+//            //relate high frequency difference with low confidence
+//            float freqDiscount =
+//                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
+//
+//            float stampDiscount =
+////                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+////                //TODO weight the contributed overlap amount by the relative confidence provided by each task
+//                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+//
+////            //relate to loss of stamp when its capacity to contain the two incoming is reached
+////            float stampCapacityDiscount =
+////                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
+//
+//
+//            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
+//            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
+//
+//
+//            float timeDiscount = 1f;
+//            if (timeOverlap == null) {
+//                long separation = Math.max(a.timeDistance(b.start()), a.timeDistance(b.end()));
+//                if (separation > 0) {
+//                    long totalLength = ai.length() + bi.length();
+//                    timeDiscount =
+//                            (totalLength) /
+//                                    (separation + totalLength)
+//                    ;
+//                }
+//            }
 
-            float stampDiscount =
-//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 
-//            //relate to loss of stamp when its capacity to contain the two incoming is reached
-//            float stampCapacityDiscount =
-//                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
+            //width will be the average width
+            long width = (ai.length() + bi.length()) / 2; //TODO weight
+            long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
+
+            Truth expected = table.truth(mid, now, dur);
+
+            start = mid - width / 2;
+            end = mid + width / 2;
+
+            long u = ai.union(bi).length();
+            long s = ai.length() + bi.length();
+
+            Truth startTruth = table.truth(start, now, dur);
+            if (startTruth == null)
+                return null;
+
+            Truth endTruth = table.truth(end, now, dur);
+            if (endTruth == null)
+                return null;
+
+            float factor = 1f;
+
+            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
+            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from
+            float diff = Math.abs(startTruth.freq() - endTruth.freq());
+            if (diff > 0)
+                factor *= (1f - diff);
 
 
-            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
-            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
-
-
-            float timeDiscount = 1f;
-            Interval union = ai.union(bi);
             if (timeOverlap == null) {
-                long separation = Math.max(a.timeDistance(b.start()), a.timeDistance(b.end()));
-                if (separation > 0) {
-                    long totalLength = ai.length() + bi.length();
-                    timeDiscount =
-                            (totalLength) /
-                                    (separation + totalLength)
-                    ;
-                }
+                factor *= ((float) s) / (s + u);
             }
 
+            float conf = w2c(expected.evi() * factor);
+            if (conf >= Param.TRUTH_EPSILON)
+                newTruth = new PreciseTruth(expected.freq(), conf);
+            else
+                newTruth = null;
+        }
 
-            Truth t = merge(a, p, b,  freqDiscount * stampDiscount * timeDiscount, confMin, confMax);
-            if (t != null) {
-                long mergedStart = union.a;
-                long mergedEnd = union.b;
-                return mergeInterpolate(a, b, mergedStart, mergedEnd, now, t, true, rng);
-            }
+
+        if (newTruth != null) {
+            if (newTruth.conf() >= confMin)
+                return mergeInterpolate(a, b, start, end, now, dur, newTruth, true, rng);
         }
 
         return null;
-
     }
+}
 
 //    /** get the task which occurrs nearest to the target time */
 //    @NotNull public static Task closestTo(@NotNull Task[] t, long when) {
@@ -356,8 +396,6 @@ public class Revision {
 //        }
 //        return best;
 //    }
-
-}
 
 
 //    public static float temporalIntersection(long now, long at, long bt, float window) {

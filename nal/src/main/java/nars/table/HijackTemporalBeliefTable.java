@@ -1,7 +1,7 @@
 package nars.table;
 
 import jcog.list.FasterList;
-import jcog.list.Top2;
+import jcog.util.Top2;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -475,7 +475,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = Revision.merge(a, s.b, now, a.conf(), rng);
+        Task c = Revision.merge(this, a, s.b, now, dur, Param.TRUTH_EPSILON, rng);
         return c != null ? c : a;
     }
 

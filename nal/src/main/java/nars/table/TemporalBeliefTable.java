@@ -18,7 +18,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
     static float temporalTaskPriority(Task t, long now, float dur) {
-        return t.originality() * t.conf() * (1f + t.dtRange()/dur)/(1+Math.abs(now - t.nearestStartOrEnd(now)/dur));
+        return /*t.originality() * */ t.conf() * (1f + t.dtRange()/dur)/(1+Math.abs(now - t.nearestStartOrEnd(now)/dur));
     }
 
     /** finds or generates the strongest match to the specified parameters.
@@ -30,6 +30,10 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
      * level in interpolation.
      * */
     Truth truth(long when, long now, int dur, EternalTable eternal);
+
+    default Truth truth(long when, long now, int dur) {
+        return truth(when, now, dur, null);
+    }
 
     @Override
     void clear();

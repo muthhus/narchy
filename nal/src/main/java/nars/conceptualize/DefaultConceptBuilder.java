@@ -45,8 +45,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 64, 64, 5, 24, 16),
-                new DefaultConceptState("awake", 64, 64, 5, 24, 16)
+                new DefaultConceptState("sleep", 32, 32, 5, 24, 16),
+                new DefaultConceptState("awake", 32, 32, 5, 24, 16)
         );
     }
 

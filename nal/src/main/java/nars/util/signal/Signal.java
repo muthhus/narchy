@@ -87,7 +87,7 @@ public class Signal {
             }
         }
 
-            this.lastInputTime = now;
+        this.lastInputTime = now;
 
 
         //no signal

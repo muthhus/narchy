@@ -26,6 +26,15 @@ import static jcog.Texts.n4;
 import static jcog.Util.sqr;
 
 /**
+ * intelligent stream filter
+it can be trained with a reinforcement learning agent for any goal
+it classifies each input in an array of configured classifications
+each classification has a gain level
+if it matches an input then then its gain will be applied in combination with all other matching gain values
+in -1..+1 range
+so they can override each other
+then this value is shifted and squared to get the final multiplier amount
+ 
  * record a finite history of mix parameters values
  * in order to assign credit
  * to historic classifications or something

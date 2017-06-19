@@ -34,6 +34,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Activate extends UnaryTask<Task> {
 
+    static final float activationThreshold = Pri.EPSILON * 128;
 
     /**
      * runs the task activation procedure
@@ -45,12 +46,11 @@ public class Activate extends UnaryTask<Task> {
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-
         Task t = get();
 
         float p = priElseZero();
-        if (p < Pri.EPSILON) {
-            return null;
+        if (p < activationThreshold) {
+            return DeleteMe;
         }
 
         Concept origin = t.concept(nar);
@@ -58,6 +58,7 @@ public class Activate extends UnaryTask<Task> {
             TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
             float remain = a.linkOverflow.floatValue();
             priSub(p - remain);
+
             return a.activations != null ? a.activations.array() : null;
         } else {
             return DeleteMe;

@@ -51,8 +51,8 @@ public final class CounterNode<T> implements Node<T, Object> {
     }
 
     @Override
-    public HyperRegion bounds() {
-        return this.node.bounds();
+    public HyperRegion region() {
+        return this.node.region();
     }
 
     @Override

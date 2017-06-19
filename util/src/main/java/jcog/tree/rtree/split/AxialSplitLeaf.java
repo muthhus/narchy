@@ -57,7 +57,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
         final int splitDimension = axis;
 
         short size = leaf.size;
-        final HyperRegion[] sortedMbr = HyperRegion.toArray(leaf.data, size, model.bounds);
+        final HyperRegion[] sortedMbr = HyperRegion.toArray(leaf.data, size, model.region);
         Arrays.sort(sortedMbr, Comparator.comparingDouble(o -> o.center(splitDimension)));
 
         // divide sorted leafs

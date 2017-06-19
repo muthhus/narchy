@@ -85,7 +85,7 @@ public interface Node<L, V> extends Nodelike<L> {
     /**
      * @return Rect - the bounding rectangle for this node
      */
-    @NotNull HyperRegion bounds();
+    @NotNull HyperRegion region();
 
     /**
      * Add t to the index
@@ -175,4 +175,6 @@ public interface Node<L, V> extends Nodelike<L> {
     Node<L, ?> instrument();
 
     double perimeter(Spatialization<L> model);
+
+
 }

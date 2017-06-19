@@ -1,4 +1,4 @@
-package jcog.list;
+package jcog.util;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 
