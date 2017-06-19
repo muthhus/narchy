@@ -111,8 +111,8 @@ public class GoalActionConcept extends ActionConcept {
         //2. check current belief
         //3. check previous signal belief
         Truth nextTruth =
-                beliefFeedback;
-                //beliefFeedback != null ? beliefFeedback : belief;
+                //beliefFeedback;
+                beliefFeedback != null ? beliefFeedback : belief; //latch
 
         Task fb = feedback.set(this, nextTruth, nar);
 
