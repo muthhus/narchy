@@ -551,7 +551,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     public void input(@NotNull ITask unclassified) {
-        exe.run(new CLink(unclassified));
+        input(new CLink<>(unclassified));
     }
 
     public void input(@NotNull CLink<ITask> partiallyClassified) {

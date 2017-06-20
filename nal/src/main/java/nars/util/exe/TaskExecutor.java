@@ -188,12 +188,13 @@ public class TaskExecutor extends Executioner {
         } else if (forgetEachPri > 0) {
             x.priSub(forgetEachPri);
         }
-        if (next != null)
-            actuallyFeedback(x, next);
+
+        actuallyFeedback(x, next);
     }
 
     protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-        nar.input(next);
+        if (next!=null)
+            nar.input(next);
     }
 
 

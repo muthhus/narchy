@@ -38,6 +38,11 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
     }
 
     @Override public P apply(P x) {
+        float value = x.pri();
+        if (value!=value)
+            throw new UnsupportedOperationException("NaN input: " + x);
+
+        in.accept(value);
         accept(x);
         return x;
     }

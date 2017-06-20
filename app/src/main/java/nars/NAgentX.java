@@ -149,19 +149,22 @@ abstract public class NAgentX extends NAgent {
 //                                    Draw.colorGrays(gl, x);
 //                                    return 0;
 //                                })
-                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
-                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
 
-                        row(
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
-                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
-                        ),
+
+//                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
+//                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
+//
+//                        row(
+//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
+//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
+//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
+//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
+//                        ),
+
                         //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
                         MatrixView.get(m.mixControl, 4, (x, gl) -> {
-                            Draw.colorGrays(gl, (x - 0.5f) * 2f);
+                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
                             return 0;
                         })
                 )
@@ -416,7 +419,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     static Surface mixPlot(NAgent a, MixContRL m, int history) {
-        return Grid.grid(m.size, i -> col(
+        return Grid.grid(m.dim, i -> col(
                 new MixGainPlot(a, m, history, i),
                 new MixTrafficPlot(a, m, history, i)
         ));
@@ -424,7 +427,7 @@ abstract public class NAgentX extends NAgent {
 
     private static class MixGainPlot extends Plot2D {
         public MixGainPlot(NAgent a, MixContRL m, int history, int i) {
-            super(history, Line);
+            super(history, BarWave);
 
             add(m.id(i), () -> m.gain(i), -1f, +1f);
             a.onFrame(this::update);
@@ -433,9 +436,9 @@ abstract public class NAgentX extends NAgent {
 
     private static class MixTrafficPlot extends Plot2D {
         public MixTrafficPlot(NAgent a, MixContRL m, int history, int i) {
-            super(history, BarWave);
-
-            add(m.id(i), () -> m.trafficInput(i), 0f, 1f);
+            super(history, Line);
+            add(m.id(i) + "_in", () -> m.trafficInput(i), 0f, 1f);
+            add(m.id(i), () -> m.trafficActive(i), 0f, 1f);
             a.onFrame(this::update);
         }
     }

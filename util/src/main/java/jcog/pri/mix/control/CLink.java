@@ -41,6 +41,11 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
     }
 
     @Override
+    public float pri() {
+        return ref.pri();
+    }
+
+    @Override
     public boolean delete() {
         if (ref.delete()) {
             clear();

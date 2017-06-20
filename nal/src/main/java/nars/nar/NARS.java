@@ -7,8 +7,9 @@ import jcog.math.FloatAveraged;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
-import jcog.pri.mix.control.MultiHaiQMixAgent;
+import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
+import jcog.pri.mix.control.MultiHaiQMixAgent;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -57,16 +58,16 @@ public class NARS extends NAR {
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 96*1024, -1, e),
+                new CaffeineIndex(new DefaultConceptBuilder(), 96 * 1024, -1, e),
                 rng, e);
     }
 
     @Override
     protected PSinks newInputMixer() {
-        MixContRL<ITask> r = new MixContRL<ITask>( 15f,
+        MixContRL<ITask> r = new MixContRL<ITask>(15f,
 
-                //new HaiQMixAgent(),
-                new MultiHaiQMixAgent(),
+                new HaiQMixAgent(),
+                //new MultiHaiQMixAgent(),
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
 
@@ -138,16 +139,14 @@ public class NARS extends NAR {
     public void input(ITask unclassified) {
         if (unclassified == null)
             return;
-        inputSub(((MixContRL) in).test(unclassified));
+        super.input(unclassified);
     }
 
-    void inputSub(CLink<ITask> x) {
-        int sub =
-                //random.nextInt(num);
-                Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
-        this.sub.get(sub).run(x);
+    @Override
+    public void input(@NotNull CLink<ITask> partiallyClassified) {
+        ((MixContRL)in).test(partiallyClassified);
+        super.input(partiallyClassified);
     }
-
 
     /**
      * default implementation convenience method
@@ -183,8 +182,18 @@ public class NARS extends NAR {
         }
 
         @Override
-        public boolean run(@NotNull CLink<ITask> t) {
-            throw new UnsupportedOperationException("should be intercepted by class NARS");
+        public boolean run(@NotNull CLink<ITask> x) {
+            NARS nar = (NARS) this.nar;
+            int sub =
+                    //random.nextInt(num);
+                    Math.abs(Util.hashWangJenkins(x.hashCode())) % nar.num;
+            return nar.sub.get(sub).run(x);
+        }
+
+
+        public CLink<ITask> apply(CLink<ITask> x) {
+            x.priMult( ((MixContRL)(((NARS)nar).in)).gain(x) );
+            return x;
         }
 
         @Override
@@ -260,7 +269,9 @@ public class NARS extends NAR {
 
         @Override
         protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-            NARS.this.input(next); //through post mix
+            ((RootExecutioner)exe).apply(x);
+            if (next!=null)
+                NARS.this.input(next); //through post mix
         }
 
         @Override

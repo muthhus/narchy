@@ -1,6 +1,7 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
+import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.math.FloatSupplier;
@@ -41,21 +42,33 @@ import static jcog.Util.sqr;
  * which resembles a differentiable
  * RNN backprop
  */
-public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLink<Y>>, FloatFunction<RoaringBitmap> {
+public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLink<Y>>, FloatFunction<RoaringBitmap> {
 
-    private final MixChannel<Y>[] mix;
+    private final MixChannel[] mix;
+    public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
+    public final FloatParam gainMax = new FloatParam(1f, 0f, 2f);
 
-    public static class MixChannel<Y extends Priority> {
-        public final AbstractClassifier<Y> test;
+    /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
+    private final AbstractClassifier<Y>[] tests;
+
+    public static class MixChannel {
+
         public final AtomicSummaryStatistics input = new AtomicSummaryStatistics();
         public final AtomicSummaryStatistics active = new AtomicSummaryStatistics();
         private String id;
 
-        public MixChannel(String id, AbstractClassifier<Y> test) {
+        public MixChannel(String id) {
             this.id = id;
-            this.test = test;
+        }
+
+        public void accept(float pri, boolean input, boolean active) {
+            if (input)
+                this.input.accept(pri);
+            if (active)
+                this.active.accept(pri);
         }
     }
+
 
 
     public final MixAgent agent;
@@ -75,8 +88,10 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
      */
     public final Tensor agentIn;
 
-    public final int size;
-
+    /**
+     * dim >= size
+     */
+    public final int dim;
 
     final int maxAux;
     final List<PSink<Y>> aux = new FasterList();
@@ -107,33 +122,34 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
         AbstractClassifier[] aa = new AbstractClassifier[aux];
         for (int a = 0; a < aux; a++) {
             aa[a] = new BooleanClassifier("ax" + a, (x) -> false);
+            dim++;
         }
-        dim += aux;
+        this.tests = tests;
         tests = ArrayUtils.addAll(tests, aa);
 
+        assert(dim >= tests.length);
+        this.dim = dim;
 
-        this.size = dim;
-        String[] names = new String[dim];
+
 
         int j = 0;
+        this.mix = new MixChannel[dim];
         for (AbstractClassifier t : tests) {
             int n = t.dimension();
             for (int i = 0; i < n; i++) {
-                names[j++] = t.name(i);
+                mix[j++] = new MixChannel(t.name(i));
             }
         }
-        for (; j < size; j++)
-            names[j] = "aux" + j;
+        for (; j < dim; ) {
+            mix[j++] = new MixChannel("aux" + "_" +j);
+        }
 
-        this.mix = new MixChannel[size];
-        for (int i = 0; i < size; i++)
-            mix[i] = new MixChannel<>(names[i], tests[i]);
 
         /** level values. between 0 and 1: 0 = max cut, 1 = max boost, 0.5 = x1 */
-        this.mixControl = new ArrayTensor(size);
+        this.mixControl = new ArrayTensor(this.dim);
 
-        this.nextInput = new ArrayTensor(size);
-        this.nextActive = new ArrayTensor(size);
+        this.nextInput = new ArrayTensor(this.dim);
+        this.nextActive = new ArrayTensor(this.dim);
         this.mixControl.fill(0.5f);
         this.nextInput.fill(0f);
         this.nextActive.fill(0f);
@@ -145,7 +161,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
                         this.input = nextInput,
                         this.active = nextActive,
                         //this.traffic = new TensorLERP(rawTraffic, 0.75f), //sum is normalized to 1
-                        mixControl.scale(1f / (size / 2f))
+                        mixControl.scale(1f / (this.dim / 2f))
                 )
         //      , 2)
         //,12)
@@ -164,16 +180,40 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
 
     public CLink<Y> test(CLink<Y> x) {
         int t = 0;
-        for (int i = 0, outsLength = size; i < outsLength; i++) {
-            AbstractClassifier<Y> c = mix[i].test;
+
+
+        for (AbstractClassifier c : tests) {
             c.classify(x.ref, x, t);
             t += c.dimension();
         }
+
+        //record input
+        float p = x.priElseZero();
+        if (p > 0)
+            x.forEach((int i) -> mix[i].accept(p, true, false));
+
         return x;
     }
 
-    public float gain(int i) {
-        return 2f * (mixControl.get(i) - 0.5f); //bipolarize
+
+    public float gain(int dimension) {
+        return 2f * (mixControl.get(dimension) - 0.5f); //bipolarize
+    }
+
+    /** computes the gain, and records the (pre-amplified) traffic */
+    public float gain(CLink<Y> x) {
+        float p = x.priElseZero();
+        if (p > priMin.floatValue()) {
+            x.forEach((int i) -> {
+                mix[i].accept(p, false, true);
+            });
+            return Math.min(gainMax.floatValue(), floatValueOf(x));
+        } else {
+            return 0;
+        }
+
+        //TODO record the post traffic?
+
     }
 
     @Override
@@ -195,7 +235,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
     public boolean next() {
 
         //HACK
-        if (size == 0 || mixControl == null || score == null || agentIn == null) return true;
+        if (mixControl == null || score == null || agentIn == null) return true;
 
         agent.act(agentIn, this.lastScore = score.asFloat(), mixControl);
 
@@ -208,7 +248,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
         float totalInput = 0, totalActive = 0;
         float[] nextInput = this.nextInput.data;
         float[] nextActive = this.nextActive.data;
-        for (int i = 0, vLength = size; i < vLength; i++) {
+        for (int i = 0; i < dim; i++) {
             MixChannel mm = this.mix[i];
             float ii = mm.input.sumThenClear();
             float aa = mm.active.sumThenClear();
@@ -233,24 +273,21 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
                     //set the gain for this knob to minimum, so it doesnt need to learn that whtever particular setting exists had any effect
                     mixControl.set(0f, i);
                     nextActive[i] = 0;
-                } else {
-                    nextActive[i] /= total;
                 }
+            } else {
+                nextActive[i] /= total;
             }
         }
 
     }
 
     public String summary() {
-        return IntStream.range(0, size).mapToObj(i -> id(i) + " " + n4(trafficInput(i))+"->"+n4(trafficActive(i))).collect(Collectors.joining(", "));
+        return IntStream.range(0, dim).mapToObj(i -> id(i) + " " + n4(trafficInput(i)) + "->" + n4(trafficActive(i))).collect(Collectors.joining(", "));
     }
 
 
-    public int size() {
-        return size;
-    }
-
-    @Override public PSink<Y> newStream(Object x, Consumer<CLink<Y>> each) {
+    @Override
+    public PSink<Y> newStream(Object x, Consumer<CLink<Y>> each) {
         synchronized (aux) {
 
             int aux = this.aux.size();
@@ -260,9 +297,13 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
             //TODO return a previously created sink with exact name, using Map
 
             int id = auxStart + aux;
-            mix[id].id = x.toString();
+            MixChannel mm = this.mix[id];
+            mm.id = x.toString();
 
-            PSink<Y> p = new PSink<>(x, (y) -> each.accept(new CLink(y, id)));
+            PSink<Y> p = new PSink<>(x, (y) -> {
+                each.accept(new CLink<>(y, id));
+            });
+
 
             this.aux.add(p);
 
@@ -280,6 +321,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y,CLin
     public double trafficInput(int i) {
         return input.get(i);
     }
+
     public double trafficActive(int i) {
         return active.get(i);
     }
