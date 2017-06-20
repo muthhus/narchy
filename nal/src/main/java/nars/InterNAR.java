@@ -31,7 +31,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     public final NAR nar;
     public final LeakOut out;
 
-    private final PSink<Object, ITask> receive;
+    private final PSink<ITask> receive;
 
 
     public InterNAR(NAR nar) throws IOException {
@@ -63,7 +63,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
         super(port, discover);
         this.nar = nar;
 
-        this.receive = nar.in.stream(this);
+        this.receive = nar.newInputChannel(this);
 
         this.out = new LeakOut(nar, 256, outRate) {
             @Override protected float send(Task x) {

@@ -44,7 +44,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
-    private final PSink<Object, ITask> in;
+    private final PSink<ITask> in;
 
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;
@@ -78,7 +78,7 @@ public class MySTMClustered extends STMClustered {
 
         lastIteration = nar.time();
 
-        this.in = nar.in.stream(this);
+        this.in = nar.newInputChannel(this);
         net.setAlpha(0.05f);
         //net.setBeta(0.05f);
         net.setWinnerUpdateRate(0.03f, 0.01f);

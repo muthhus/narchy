@@ -3,6 +3,7 @@ package nars.util.exe;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.Pri;
+import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Param;
 import nars.task.ITask;
@@ -39,9 +40,9 @@ public class TaskExecutor extends Executioner {
     /**
      * active tasks
      */
-    public final PriorityHijackBag<ITask, ITask> active = new PriorityHijackBag<>(4) {
+    public final PriorityHijackBag<ITask, CLink<ITask>> active = new PriorityHijackBag<>(4) {
         @Override
-        protected final Consumer<ITask> forget(float rate) {
+        protected final Consumer<CLink<ITask>> forget(float rate) {
             return null; //manages its own forgets
             //return new PForget(rate);
         }
@@ -49,8 +50,8 @@ public class TaskExecutor extends Executioner {
 
         @NotNull
         @Override
-        public final ITask key(ITask value) {
-            return value;
+        public final ITask key(CLink<ITask> value) {
+            return value.ref;
         }
     };
 
@@ -161,14 +162,14 @@ public class TaskExecutor extends Executioner {
         }
     }
 
-    protected void actuallyRun(ITask x) {
+    protected void actuallyRun(CLink<ITask> x) {
         ITask[] next;
         try {
 
             if (x.isDeleted())
                 return;
 
-            next = x.run(nar);
+            next = x.ref.run(nar);
 
         } catch (Throwable e) {
             e.printStackTrace();
@@ -183,7 +184,7 @@ public class TaskExecutor extends Executioner {
             x.delete();
             //toRemove.add(x);
         } else if (next == ITask.Disappear) {
-            active.remove(x); //immediately but dont affect its budget
+            active.remove(x.ref); //immediately but dont affect its budget
         } else if (forgetEachPri > 0) {
             x.priSub(forgetEachPri);
         }
@@ -191,14 +192,14 @@ public class TaskExecutor extends Executioner {
             actuallyFeedback(x, next);
     }
 
-    protected void actuallyFeedback(ITask x, ITask[] next) {
+    protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
         nar.input(next);
     }
 
 
     @Override
-    public boolean run(@NotNull ITask input) {
-        if (input.punc() == COMMAND) {
+    public boolean run(@NotNull CLink<ITask> input) {
+        if (input.ref.punc() == COMMAND) {
             actuallyRun(input); //commands executed immediately
             return true;
         } else {

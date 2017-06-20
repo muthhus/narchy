@@ -8,7 +8,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

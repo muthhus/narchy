@@ -2,7 +2,7 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
-import jcog.pri.mix.control.RLMixControl;
+import jcog.pri.mix.control.MixContRL;
 import jcog.tensor.ArrayTensor;
 import nars.gui.Vis;
 import nars.nar.Default;
@@ -120,7 +120,7 @@ abstract public class NAgentX extends NAgent {
         chart(n, a);
 
         int HISTORY = 24;
-        RLMixControl m = (RLMixControl) n.in;
+        MixContRL m = (MixContRL) n.in;
         window(row(
 
                 mixPlot(a, m, HISTORY),
@@ -160,7 +160,7 @@ abstract public class NAgentX extends NAgent {
                         ),
                         //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
-                        MatrixView.get(m.agentOut, 4, (x, gl) -> {
+                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
                             Draw.colorGrays(gl, (x - 0.5f) * 2f);
                             return 0;
                         })
@@ -415,7 +415,7 @@ abstract public class NAgentX extends NAgent {
         return c;
     }
 
-    static Surface mixPlot(NAgent a, RLMixControl m, int history) {
+    static Surface mixPlot(NAgent a, MixContRL m, int history) {
         return Grid.grid(m.size, i -> col(
                 new MixGainPlot(a, m, history, i),
                 new MixTrafficPlot(a, m, history, i)
@@ -423,19 +423,19 @@ abstract public class NAgentX extends NAgent {
     }
 
     private static class MixGainPlot extends Plot2D {
-        public MixGainPlot(NAgent a, RLMixControl m, int history, int i) {
+        public MixGainPlot(NAgent a, MixContRL m, int history, int i) {
             super(history, Line);
 
-            add(m.name(i), () -> m.gain(i), -1f, +1f);
+            add(m.id(i), () -> m.gain(i), -1f, +1f);
             a.onFrame(this::update);
         }
     }
 
     private static class MixTrafficPlot extends Plot2D {
-        public MixTrafficPlot(NAgent a, RLMixControl m, int history, int i) {
+        public MixTrafficPlot(NAgent a, MixContRL m, int history, int i) {
             super(history, BarWave);
 
-            add(m.name(i), () -> m.traffic(i), 0f, 1f);
+            add(m.id(i), () -> m.trafficInput(i), 0f, 1f);
             a.onFrame(this::update);
         }
     }

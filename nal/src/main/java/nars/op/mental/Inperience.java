@@ -75,7 +75,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
      */
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
-    final PSink<Object, ITask> in;
+    final PSink<ITask> in;
 
     float beliefFactor = 1f;
     float questionFactor = 0.5f;
@@ -139,7 +139,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         );
         this.nar = n;
 
-        in = nar.in.stream(this);
+        in = nar.newInputChannel(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();

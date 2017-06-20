@@ -84,7 +84,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         NARSpace cs = new SimpleConceptGraph1(n,
                 () -> (((TaskExecutor) (n.exe)).active)
                         .stream()
-                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 64, 64, 1, 3);

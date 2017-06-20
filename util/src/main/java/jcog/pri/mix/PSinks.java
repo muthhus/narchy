@@ -2,6 +2,8 @@ package jcog.pri.mix;
 
 import jcog.pri.Priority;
 
-public interface PSinks<X, Y extends Priority> {
-    PSink<X, Y> stream(X x);
+import java.util.function.Consumer;
+
+public interface PSinks<X extends Priority, Y extends Priority> {
+    PSink<X> newStream(Object streamID, Consumer<Y> each);
 }

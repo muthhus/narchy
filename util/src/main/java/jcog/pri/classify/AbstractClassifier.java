@@ -2,11 +2,11 @@ package jcog.pri.classify;
 
 import org.roaringbitmap.RoaringBitmap;
 
-public abstract class AbstractClassifier<X, Y> {
+public abstract class AbstractClassifier<X> {
 
-    public final Y name;
+    public final Object name;
 
-    public AbstractClassifier(Y name) {
+    public AbstractClassifier(Object name) {
         this.name = name;
     }
 

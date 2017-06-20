@@ -75,9 +75,9 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final PSink<Object, ITask> sense;
-    private final PSink<Object, ITask> predict;
-    private final PSink<Object, ITask> motor;
+    private final PSink<ITask> sense;
+    private final PSink<ITask> predict;
+    private final PSink<ITask> motor;
 
 
     private boolean initialized;
@@ -153,9 +153,9 @@ abstract public class NAgent implements NSense, NAct {
         curiosity = new FloatParam( 0.10f);
 
 
-        this.sense = nar.in.stream(id + " sensor");
-        this.predict = nar.in.stream(id + " predict");
-        this.motor = nar.in.stream(id + " motor");
+        this.sense = nar.newInputChannel(id + " sensor");
+        this.predict = nar.newInputChannel(id + " predict");
+        this.motor = nar.newInputChannel(id + " motor");
     }
 
     @Override

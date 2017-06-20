@@ -1,6 +1,7 @@
 package nars.util.exe;
 
 import jcog.Loop;
+import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +81,7 @@ abstract public class Executioner implements Executor {
     }
 
     /** returns whether the input was accepted */
-    abstract public boolean run(@NotNull ITask input);
+    abstract public boolean run(@NotNull CLink<ITask> input);
 
     public Loop loop(float fps /* initial */, Runnable repeated) {
         return new Periodic(fps, repeated);

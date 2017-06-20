@@ -4,7 +4,7 @@ import org.roaringbitmap.RoaringBitmap;
 
 import java.util.function.Predicate;
 
-public class BooleanClassifier<X, Y> extends AbstractClassifier<X,Y> {
+public class BooleanClassifier<X, Y> extends AbstractClassifier<X> {
 
     final Predicate<X> pred;
 

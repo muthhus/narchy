@@ -19,10 +19,10 @@ import java.util.function.Consumer;
  *
  * see: http://dr-lex.be/info-stuff/volumecontrols.html#about
  */
-public class Mix<X, Y extends Priority> implements PSinks<X, Y>  {
+public class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y>  {
 
 
-    public final Map<X, PSink> streams = new ConcurrentHashMap();
+    public final Map<Object, PSink> streams = new ConcurrentHashMap();
     final List<PSink> streamList = new CopyOnWriteArrayList<>();
 
     public TelemetryRing data;
@@ -32,25 +32,21 @@ public class Mix<X, Y extends Priority> implements PSinks<X, Y>  {
 
         //TODO use a WeakValue map?
 
-    final Consumer<Y> target;
     public PSink[] streamID = new PSink[0];
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public Mix(Consumer<Y> target) {
-        this.target = target;
-    }
 
     /** gets or creates a mix stream for the given key */
-    @Override public PSink<X, Y> stream(X x) {
+    @Override public PSink<X> newStream(Object streamID, Consumer<Y> each) {
 
-        return streams.computeIfAbsent(x, xx -> {
+        return streams.computeIfAbsent(streamID, xx -> {
             //nullify the history, need to create a new one for the new stream
             //TODO allow empty channel slots in the history buffer for stream alloc/dealloc
             data = null;
-            PSink s = new PSink(xx, target);
+            PSink<Y> s = new PSink<>(xx, each);
             streamList.add(s);
-            streamID = streamList.toArray(streamID);
+            this.streamID = streamList.toArray(this.streamID);
             return s;
         });
     }

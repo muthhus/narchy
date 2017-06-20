@@ -7,7 +7,6 @@ import nars.concept.TaskConcept;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +18,6 @@ import java.util.function.Consumer;
 import static java.util.stream.StreamSupport.stream;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.and;
 
 /**
  * A model storing, ranking, and projecting beliefs or goals (tasks with TruthValue).

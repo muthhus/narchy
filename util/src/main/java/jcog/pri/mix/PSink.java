@@ -12,15 +12,15 @@ import java.util.stream.Stream;
 /** a sink channel (ie. target/destination) for streams of Priority instances,
  *      with mix controls. safe for multiple writers, as long as the target
  *      consumer also is. */
-public class PSink<K,P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
+public class PSink<P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
 
     public final AtomicSummaryStatistics in, out;
-    public final K id;
+    public final Object id;
     private final Consumer<P> target;
 
     float minThresh = Pri.EPSILON;
 
-    public PSink(K id, Consumer<P> target) {
+    public PSink(Object id, Consumer<P> target) {
         super(1f, 0f, 2f);
         this.id = id;
         in = new AtomicSummaryStatistics();

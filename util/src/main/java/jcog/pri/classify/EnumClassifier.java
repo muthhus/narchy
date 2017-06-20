@@ -5,7 +5,7 @@ import org.roaringbitmap.RoaringBitmap;
 import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
-public class EnumClassifier<Y, X> extends AbstractClassifier<X,Y> {
+public class EnumClassifier<Y, X> extends AbstractClassifier<X> {
 
     //private final String[] labels;
     private final ToIntFunction<X> which;

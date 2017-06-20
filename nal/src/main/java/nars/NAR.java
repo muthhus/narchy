@@ -10,7 +10,9 @@ import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.mix.Mix;
+import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
+import jcog.pri.mix.control.CLink;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.conceptualize.state.ConceptState;
@@ -121,7 +123,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     protected final NARLoop loop = new NARLoop(this);
 
-    @NotNull public final PSinks in;
+    @NotNull public final PSinks<ITask, CLink<ITask>> in;
 
 
     //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
@@ -193,7 +195,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.exe = exe;
 
         this.emotion = new Emotion();
-        this.in = newInput();
+        this.in = newInputMixer();
 
         this.level = 8;
 
@@ -208,8 +210,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         restart();
     }
 
-    protected PSinks newInput() {
-        return new Mix<>((Consumer<ITask>)this::input);
+    protected PSinks<ITask, CLink<ITask>> newInputMixer() {
+        return new Mix<>();
+    }
+
+    public PSink<ITask> newInputChannel(Object id) {
+        return in.newStream(id, this::input);
     }
 
 
@@ -543,8 +549,13 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         for (ITask x : t)
             if (x!=null) input(x);
     }
-    public void input(@NotNull ITask t) {
-        exe.run(t);
+
+    public void input(@NotNull ITask unclassified) {
+        exe.run(new CLink(unclassified));
+    }
+
+    public void input(@NotNull CLink<ITask> partiallyClassified) {
+        exe.run(partiallyClassified);
     }
 
 

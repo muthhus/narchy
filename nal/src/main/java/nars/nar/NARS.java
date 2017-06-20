@@ -6,8 +6,9 @@ import jcog.Util;
 import jcog.math.FloatAveraged;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
+import jcog.pri.mix.control.CLink;
 import jcog.pri.mix.control.MultiHaiQMixAgent;
-import jcog.pri.mix.control.RLMixControl;
+import jcog.pri.mix.control.MixContRL;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -61,8 +62,8 @@ public class NARS extends NAR {
     }
 
     @Override
-    protected PSinks newInput() {
-        RLMixControl<String, ITask> r = new RLMixControl<>(this::inputSub, 15f,
+    protected PSinks newInputMixer() {
+        MixContRL<ITask> r = new MixContRL<ITask>( 15f,
 
                 //new HaiQMixAgent(),
                 new MultiHaiQMixAgent(),
@@ -134,13 +135,13 @@ public class NARS extends NAR {
     }
 
     @Override
-    public void input(ITask x) {
-        if (x == null)
+    public void input(ITask unclassified) {
+        if (unclassified == null)
             return;
-        ((RLMixControl) in).accept(x);
+        inputSub(((MixContRL) in).test(unclassified));
     }
 
-    void inputSub(ITask x) {
+    void inputSub(CLink<ITask> x) {
         int sub =
                 //random.nextInt(num);
                 Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
@@ -182,7 +183,7 @@ public class NARS extends NAR {
         }
 
         @Override
-        public boolean run(@NotNull ITask t) {
+        public boolean run(@NotNull CLink<ITask> t) {
             throw new UnsupportedOperationException("should be intercepted by class NARS");
         }
 
@@ -258,7 +259,7 @@ public class NARS extends NAR {
         }
 
         @Override
-        protected void actuallyFeedback(ITask x, ITask[] next) {
+        protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
             NARS.this.input(next); //through post mix
         }
 
