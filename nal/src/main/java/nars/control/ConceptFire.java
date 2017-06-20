@@ -39,6 +39,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         final Concept c = id;
 
         final Bag<Task, PriReference<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
+        if (tasklinks.isEmpty())
+            return null;
+
         final Bag<Term, PriReference<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
         nar.terms.commit(c); //index cache update
 

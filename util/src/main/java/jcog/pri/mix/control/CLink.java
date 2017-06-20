@@ -8,9 +8,9 @@ import org.roaringbitmap.RoaringBitmap;
 /** Priority implementatio nwhich proxies to another and attaches a bitmap feature vector */
 public class CLink<X extends Priority> extends RoaringBitmap implements Priority {
 
-    public final X ref;
+    @NotNull public final X ref;
 
-    public CLink(X ref, int... initialBits) {
+    public CLink(@NotNull X ref, int... initialBits) {
         super();
         this.ref = ref;
         for (int i : initialBits)
@@ -48,7 +48,7 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
     @Override
     public boolean delete() {
         if (ref.delete()) {
-            clear();
+            //dont clear the bits yet, they may be used shortly afterward
             return true;
         }
         return false;

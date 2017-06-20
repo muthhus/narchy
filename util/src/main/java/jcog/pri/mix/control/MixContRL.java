@@ -46,7 +46,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
 
     private final MixChannel[] mix;
     public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
-    public final FloatParam gainMax = new FloatParam(1f, 0f, 2f);
+    public final FloatParam gainMax = new FloatParam(4f, 0f, 16f);
 
     /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
     private final AbstractClassifier<Y>[] tests;
@@ -161,7 +161,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
                         this.input = nextInput,
                         this.active = nextActive,
                         //this.traffic = new TensorLERP(rawTraffic, 0.75f), //sum is normalized to 1
-                        mixControl.scale(1f / (this.dim / 2f))
+                        mixControl
                 )
         //      , 2)
         //,12)
@@ -254,7 +254,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
             float aa = mm.active.sumThenClear();
             nextInput[i] = ii;
             totalInput += ii;
-            nextActive[i] = aa;
+            nextActive[i] = aa; //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
             totalActive += aa;
         }
         float total = totalInput + totalActive;

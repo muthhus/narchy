@@ -324,7 +324,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     /**
      * resolves the key associated with a particular value
      */
-    @NotNull K key(V value);
+    @NotNull K key(@NotNull V value);
 
 
     default void print() {

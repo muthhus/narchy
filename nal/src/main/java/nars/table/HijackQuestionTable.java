@@ -32,7 +32,6 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 
         if (pressure.floatValue() >= Pri.EPSILON)
             commit(); //apply forgetting
-
     }
 
     @Override

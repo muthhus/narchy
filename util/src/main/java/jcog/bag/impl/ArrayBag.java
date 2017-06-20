@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -362,7 +363,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     @Deprecated
     public Bag<X, PriReference<X>> commit() {
         double p = this.pressure.getAndSet(0);
-        if (p > 0) {
+        if (p > Pri.EPSILON) {
             return commit(PriForget.forget(size(), capacity(), (float) p, mass, PriForget.DEFAULT_TEMP, Priority.EPSILON, PriForget::new));
         }
         return this;

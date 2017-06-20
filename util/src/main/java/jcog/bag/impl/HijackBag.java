@@ -163,7 +163,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         GET, PUT, REMOVE
     }
 
-    private V update(Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
+    private V update(@NotNull Object k, @Nullable V incoming /* null to remove */, Mode mode, @Nullable MutableFloat overflowing) {
 
         AtomicReferenceArray<V> map = this.map.get();
         int c = map.length();
@@ -216,13 +216,13 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                                     toReturn = next;
                                 }
                             }
-                            if (toReturn == p) {
-                                float oo = pri(p);
-                                if (oo == oo) {
-                                    pressurize(-oo); //undo pressurization
-                                    if (overflowing != null) overflowing.add(oo);
-                                }
-                            }
+//                            if (toReturn == p) {
+//                                float oo = pri(p);
+//                                if (oo == oo) {
+//                                    pressurize(-oo); //undo pressurization
+//                                    if (overflowing != null) overflowing.add(oo);
+//                                }
+//                            }
                             break;
 
                         case REMOVE:
@@ -388,6 +388,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 //        if (p != p)
 //            return null; //already deleted
 
+        pressurize(pri(v));
+
         V y = update(key(v), v, PUT, overflowing);
 
         return y;
@@ -404,11 +406,13 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return xGet(tCAPACITY);
     }
 
+    @Override
     @NotNull
     public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
         return sample(each, false);
     }
 
+    @Override
     @NotNull
     public HijackBag<K, V> sample(Bag.BagCursor<? super V> each, boolean pop) {
 
@@ -481,13 +485,22 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         frac = Util.unitize(frac);
         float p = depressurize();
         float pF = frac * p;
-        if (pF > Pri.EPSILON)
-            pressure.addAndGet(p - pF); //restore the unused amount
-        return pF;
+        if (pF >= Pri.EPSILON) {
+            pressurize(p - pF);
+            return pF;
+        }
+        return 0;
     }
 
+    /** always >= 0 */
     public float depressurize() {
-        return (float) pressure.getAndSet(0);
+        float pv = (float) pressure.getAndSet(0);
+        if (pv >= 0) {
+            return pv;
+        } else {
+            pressure.set(0);
+            return 0;
+        }
     }
 
     @Override
@@ -499,7 +512,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        PriForget.forget(s, capacity(), (float) p, mass, PriForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
+                        PriForget.forget(s, capacity(), p, mass, PriForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
                         null
         );
 

@@ -74,6 +74,9 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
     public final void clear() {
         update.accumulate(Double.NaN);
     }
+//    public final void clear(float percentToClear) {
+//          TODO impl
+//    }
 
     public final void accept(double value) {
         if (value != value)
@@ -229,6 +232,13 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
         });
         return i;
     }
+
+//    public float sumThenClear(float percentToClear) {
+//        float f = (float) sum;
+//        if (percentToClear>0)
+//            clear(percentToClear);
+//        return f;
+//    }
 
     public float sumThenClear() {
         float f = (float) sum;

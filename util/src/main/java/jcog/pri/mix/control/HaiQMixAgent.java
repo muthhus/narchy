@@ -8,7 +8,7 @@ import jcog.tensor.Tensor;
 public class HaiQMixAgent implements MixAgent {
 
     HaiQAgent agent;
-    float delta = 0.25f;
+    float delta = 0.2f;
 
     @Override
     public void act(Tensor in, float score, ArrayTensor out) {

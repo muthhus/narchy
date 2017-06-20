@@ -50,7 +50,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
     @NotNull
     @Override
-    public Task key(Task value) {
+    public Task key(@NotNull Task value) {
         return value;
     }
 

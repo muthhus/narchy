@@ -1,5 +1,6 @@
 package nars.util.exe;
 
+import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.pri.Pri;
@@ -8,6 +9,7 @@ import nars.NAR;
 import nars.Param;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -47,6 +49,11 @@ public class TaskExecutor extends Executioner {
             //return new PForget(rate);
         }
 
+        @NotNull
+        @Override
+        public HijackBag<ITask, CLink<ITask>> commit(@Nullable Consumer<CLink<ITask>> update) {
+            return this;
+        }
 
         @NotNull
         @Override
@@ -112,6 +119,7 @@ public class TaskExecutor extends Executioner {
         r.run(); //synchronous
     }
 
+
     protected void flush() {
         if (!busy.compareAndSet(false, true))
             return;
@@ -134,7 +142,9 @@ public class TaskExecutor extends Executioner {
 
             float eFrac = ((float) toExe) / ps;
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * active.depressurize(eFrac) / toExe;
-            this.forgetEachPri = pAvg > Pri.EPSILON ? pAvg : 0;
+            this.forgetEachPri =
+                    pAvg > Pri.EPSILON ? pAvg : 0;
+                    //0;
 
             active.sample(toExe, this::actuallyRun);
 

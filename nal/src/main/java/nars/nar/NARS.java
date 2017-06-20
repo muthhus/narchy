@@ -64,14 +64,14 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInputMixer() {
-        MixContRL<ITask> r = new MixContRL<ITask>(15f,
+        MixContRL<ITask> r = new MixContRL<ITask>(40f,
 
                 new HaiQMixAgent(),
                 //new MultiHaiQMixAgent(),
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
 
-                10,
+                8,
 
                 new EnumClassifier<>("type", new String[]{
                         "Belief", "Goal", "Question", "Quest",

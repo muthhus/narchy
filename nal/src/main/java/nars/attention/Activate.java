@@ -36,6 +36,7 @@ public class Activate extends UnaryTask<Task> {
 
     static final float activationThreshold = Pri.EPSILON * 128;
 
+
     /**
      * runs the task activation procedure
      */
