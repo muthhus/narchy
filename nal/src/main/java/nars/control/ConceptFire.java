@@ -21,8 +21,8 @@ import static nars.Op.NEG;
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /** rate at which ConceptFire forms premises */
-    private static final int sampleLimit = 16;
-    private static final float priMinAbsolute = Pri.EPSILON * 16;
+    private static final int sampleLimit = 4;
+    private static final float priMinAbsolute = Pri.EPSILON * 4;
     private static final float momentum = 0.5f;
 
 
@@ -91,7 +91,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 throw new RuntimeException("NEG termlink: " + termlink);
 
             Premise p = new Premise(tasklink, termlink);
-            float thisPri = priElseZero()/ sampleLimit;
+            float thisPri = priElseZero();
             if (thisPri > minPri) {
                 p.pri(thisPri * (1f-momentum));
                 ITask[] result = p.run(nar);

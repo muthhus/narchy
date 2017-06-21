@@ -380,10 +380,13 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 //        float p = pri(v);
 //        if (p != p)
 //            return null; //already deleted
+        K k = key(v);
+        if (k == null)
+            return null;
 
         pressurize(pri(v));
 
-        V y = update(key(v), v, PUT, overflowing);
+        V y = update(k, v, PUT, overflowing);
 
         return y;
     }

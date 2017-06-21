@@ -252,13 +252,14 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
         float totalInput = 0, totalActive = 0;
         float[] nextInput = this.nextInput.data;
         float[] nextActive = this.nextActive.data;
+        float[] prevActive = this.nextActive.data.clone();
         for (int i = 0; i < dim; i++) {
             MixChannel mm = this.mix[i];
             float ii = mm.input.sumThenClear();
             float aa = mm.active.sumThenClear();
             nextInput[i] = ii;
             totalInput += ii;
-            nextActive[i] = Util.lerp((1f-activeTaskMomentum), nextActive[i], aa); //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
+            nextActive[i] = aa;
             totalActive += aa;
         }
         float total = totalInput + totalActive;
@@ -272,15 +273,17 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
                 inputEmpty = false;
                 nextInput[i] /= total;
             }
-            if (nextActive[i] < Pri.EPSILON) {
-                if (inputEmpty) {
-                    //set the gain for this knob to minimum, so it doesnt need to learn that whtever particular setting exists had any effect
-                    mixControl.set(0f, i);
-                    nextActive[i] = 0;
-                }
-            } else {
-                nextActive[i] /= total;
-            }
+//            if (nextActive[i] < Pri.EPSILON) {
+////                if (inputEmpty) {
+////                    //set the gain for this knob to neutral, so it doesnt need to learn that whtever particular setting exists had any effect
+////                    mixControl.set(0.5f, i);
+////                    nextActive[i] = 0;
+////                }
+//            } else {
+                //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
+            float a = total >= Pri.EPSILON ? nextActive[i] / total : 0f;
+            nextActive[i] = Util.lerp((1f-activeTaskMomentum), prevActive[i], a);;
+            //}
         }
 
     }
