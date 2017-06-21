@@ -1,6 +1,7 @@
 package nars.nar;
 
 
+import jcog.pri.mix.control.CLink;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.conceptualize.ConceptBuilder;
@@ -8,11 +9,12 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.stm.STMTemporalLinkage;
+import nars.task.ITask;
+import nars.task.NALTask;
 import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -26,6 +28,28 @@ public class Default extends NAR {
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
 
+    public static class SynchTaskExecutor extends TaskExecutor {
+
+        public SynchTaskExecutor(int capacity, float rate) {
+            super(capacity, rate);
+        }
+
+//        @Override
+//        protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
+//            if (next!=null) {
+//                for (ITask i : next) {
+//                    if (i==null)
+//                        continue;
+//
+//                    if (i instanceof NALTask)
+//                        actuallyRun(new CLink(i));
+//                    else
+//                        nar.input(i);
+//                }
+//                //super.actuallyFeedback(x, next);
+//            }
+//        }
+    }
 
     public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 1);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
@@ -39,7 +63,7 @@ public class Default extends NAR {
         this(
             new DefaultTermIndex(activeTasks * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new TaskExecutor(activeTasks, 0.2f));
+            new SynchTaskExecutor(activeTasks, 0.2f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 16;

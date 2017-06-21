@@ -14,7 +14,6 @@ import java.util.stream.Stream;
  *      consumer also is. */
 public class PSink<P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
 
-    public final AtomicSummaryStatistics in, out;
     public final Object id;
     private final Consumer<P> target;
 
@@ -23,8 +22,7 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
     public PSink(Object id, Consumer<P> target) {
         super(1f, 0f, 2f);
         this.id = id;
-        in = new AtomicSummaryStatistics();
-        out = new AtomicSummaryStatistics();
+
         this.target = target;
     }
 
@@ -42,7 +40,6 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
         if (value!=value)
             throw new UnsupportedOperationException("NaN input: " + x);
 
-        in.accept(value);
         accept(x);
         return x;
     }
@@ -88,8 +85,8 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
             if (pg >= minThresh) {
                 pp.setPri(p * g);
                 target.accept(pp);
-                in.accept(p);
-                out.accept(p * g);
+//                in.accept(p);
+//                out.accept(p * g);
             }
         }
 
@@ -97,8 +94,8 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
 
     /** reset gathered statistics */
     public void clear() {
-        in.clear();
-        out.clear();
+//        in.clear();
+//        out.clear();
         //quaMeter.clear();
     }
 }

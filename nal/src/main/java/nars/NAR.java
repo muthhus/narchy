@@ -215,7 +215,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     public PSink<ITask> newInputChannel(Object id) {
-        return in.newStream(id, this::input);
+        return in.newStream(id, x -> input((CLink<ITask>)x));
     }
 
 

@@ -21,9 +21,9 @@ import static nars.Op.NEG;
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /** rate at which ConceptFire forms premises */
-    private static final int sampleLimit = 4;
+    private static final int sampleLimit = 8;
     private static final float priMinAbsolute = Pri.EPSILON * 4;
-    private static final float momentum = 0.5f;
+    private static final float momentum = 0.1f;
 
 
     public ConceptFire(Concept c, float pri) {

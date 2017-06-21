@@ -44,7 +44,7 @@ public class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y> 
             //nullify the history, need to create a new one for the new stream
             //TODO allow empty channel slots in the history buffer for stream alloc/dealloc
             data = null;
-            PSink<Y> s = new PSink<>(xx, each);
+            PSink<Y> s = new PSink<Y>(xx, each);
             streamList.add(s);
             this.streamID = streamList.toArray(this.streamID);
             return s;
@@ -55,49 +55,49 @@ public class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y> 
 //        //TODO downsample correctly
 //    }
 
-    /** captures state into the history, resetting any periodic statistics.
-     * warning: a long value for time will not fit in float with full precision
-     * it may need to be downsampled to a lower time unit first, for example
-     * to isolate a more recent range of unixtime, or to use deciseconds etc
-     * instead of nanoseconds
-     * */
-    public void commit(float time) {
-        if (!busy.compareAndSet(false,true))
-            return;
-
-        try {
-
-            TelemetryRing r = data;
-
-            if (r == null) {
-
-                int colsPerStream = 2;
-                int n = streamID.length;
-                List<String> cols = new FasterList(1+ n * colsPerStream);
-                cols.add("t");
-                for (int i = 0; i < n; i++) {
-                    cols.add(streamID[i].id + " sum");
-                    cols.add(streamID[i].id + " n");
-                }
-                this.data = r = new TelemetryRing(historySize, cols.toArray(new String[cols.size()]));
-                now = new float[1 + colsPerStream * n];
-            }
-
-            int i = 0;
-            now[i++] = time;
-            for (PSink s : streamID) {
-                now[i++] = (float)s.out.getSum();
-                now[i++] = s.out.getN();
-                s.clear();
-            }
-
-            r.commit(now);
-
-        } finally {
-            busy.set(false);
-        }
-
-
-    }
+//    /** captures state into the history, resetting any periodic statistics.
+//     * warning: a long value for time will not fit in float with full precision
+//     * it may need to be downsampled to a lower time unit first, for example
+//     * to isolate a more recent range of unixtime, or to use deciseconds etc
+//     * instead of nanoseconds
+//     * */
+//    public void commit(float time) {
+//        if (!busy.compareAndSet(false,true))
+//            return;
+//
+//        try {
+//
+//            TelemetryRing r = data;
+//
+//            if (r == null) {
+//
+//                int colsPerStream = 2;
+//                int n = streamID.length;
+//                List<String> cols = new FasterList(1+ n * colsPerStream);
+//                cols.add("t");
+//                for (int i = 0; i < n; i++) {
+//                    cols.add(streamID[i].id + " sum");
+//                    cols.add(streamID[i].id + " n");
+//                }
+//                this.data = r = new TelemetryRing(historySize, cols.toArray(new String[cols.size()]));
+//                now = new float[1 + colsPerStream * n];
+//            }
+//
+//            int i = 0;
+//            now[i++] = time;
+//            for (PSink s : streamID) {
+//                now[i++] = (float)s.out.getSum();
+//                now[i++] = s.out.getN();
+//                s.clear();
+//            }
+//
+//            r.commit(now);
+//
+//        } finally {
+//            busy.set(false);
+//        }
+//
+//
+//    }
 
 }

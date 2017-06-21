@@ -9,7 +9,6 @@ import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
 import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
-import jcog.pri.mix.control.MultiHaiQMixAgent;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
