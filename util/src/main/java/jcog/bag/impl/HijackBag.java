@@ -216,13 +216,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                                     toReturn = next;
                                 }
                             }
-//                            if (toReturn == p) {
-//                                float oo = pri(p);
-//                                if (oo == oo) {
-//                                    pressurize(-oo); //undo pressurization
-//                                    if (overflowing != null) overflowing.add(oo);
-//                                }
-//                            }
                             break;
 
                         case REMOVE:

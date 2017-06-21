@@ -15,6 +15,7 @@ import nars.util.exe.TaskExecutor;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -66,10 +67,10 @@ public class Default extends NAR {
         public DefaultTermIndex(int capacity, ConceptBuilder cb) {
             super(
                     cb,
-                    //new HashMap<>(capacity, 0.9f),
-                    //new HashMap<>(capacity, 0.9f)
-                    new UnifiedMap(capacity, 0.9f),
-                    new UnifiedMap(capacity, 0.9f)
+                    new HashMap<>(capacity, 0.9f),
+                    new HashMap<>(capacity, 0.9f)
+                    //new UnifiedMap(capacity, 0.9f),
+                    //new UnifiedMap(capacity, 0.9f)
                     //new ConcurrentHashMap<>(capacity),
                     //new ConcurrentHashMap<>(capacity)
                     //new ConcurrentHashMapUnsafe(capacity)

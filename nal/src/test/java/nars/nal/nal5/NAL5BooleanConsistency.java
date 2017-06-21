@@ -36,7 +36,7 @@ public class NAL5BooleanConsistency {
                 d.nal(7);
                 d.termVolumeMax.setValue(16);
 
-                //d.log();
+                d.log();
 
                 String[] outcomes = {
                         "(x-->(0,0))",

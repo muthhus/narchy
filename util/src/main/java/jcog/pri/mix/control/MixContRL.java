@@ -1,6 +1,7 @@
 package jcog.pri.mix.control;
 
 import jcog.Loop;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import jcog.math.AtomicSummaryStatistics;
@@ -50,6 +51,9 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
 
     /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
     private final AbstractClassifier<Y>[] tests;
+
+    /** should probably be calibrated in relation to the executioner's processing rate */
+    private float activeTaskMomentum = 0.5f;
 
     public static class MixChannel {
 
@@ -225,7 +229,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
 
         //preGain[0] += levels.get(size - 1); //bias
 
-        return /*sqr*/( //l^4
+        return sqr( //l^4
                 sqr(1f + preGain[0]) //l^2
         )
                 ;
@@ -254,12 +258,12 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
             float aa = mm.active.sumThenClear();
             nextInput[i] = ii;
             totalInput += ii;
-            nextActive[i] = aa; //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
+            nextActive[i] = Util.lerp((1f-activeTaskMomentum), nextActive[i], aa); //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
             totalActive += aa;
         }
         float total = totalInput + totalActive;
         //normalize
-        for (int i = 0, vLength = nextInput.length; i < vLength; i++) {
+        for (int i = 0; i < dim; i++) {
             boolean inputEmpty;
             if (nextInput[i] < Pri.EPSILON) {
                 inputEmpty = true;
