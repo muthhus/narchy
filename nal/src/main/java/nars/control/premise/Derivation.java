@@ -32,7 +32,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * evaluates a premise (task, belief, termlink, taskLink, ...) to derive 0 or more new tasks
  */
-abstract public class Derivation extends Unify implements TermContext {
+public class Derivation extends Unify implements TermContext {
 
     @NotNull public NAR nar;
     @NotNull public DerivationBudgeting budgeting;
@@ -268,8 +268,6 @@ abstract public class Derivation extends Unify implements TermContext {
         return this;
     }
 
-    /** called by conclusion */
-    abstract public void derive(DerivedTask t);
 
   /** set in Solve once these (3) conclusion parameters have been determined */
     public void truth(Truth truth, byte punc, long[] evidence) {

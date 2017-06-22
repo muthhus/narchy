@@ -9,10 +9,13 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.control.SynchTaskExecutor;
 import nars.derive.DefaultDeriver;
 import nars.gui.Vis;
 import nars.nar.Default;
 import nars.test.agent.Line1DSimplest;
+import nars.time.CycleTime;
+import nars.util.exe.InstrumentedExecutor;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
@@ -170,7 +173,14 @@ public class Line1D {
 //                System.err.println(t.proof());
 //            }
 //        });
-                Default n = new Default();
+                InstrumentedExecutor exe = new InstrumentedExecutor(new SynchTaskExecutor(512, 0.2f));
+
+                Default n = new Default(
+                    new Default.DefaultTermIndex(32*1024),
+                    new CycleTime(),
+                    exe
+                );
+
                 n.time.dur(10);
                 n.termVolumeMax.set(20);
                 n.goalConfidence(0.9f);

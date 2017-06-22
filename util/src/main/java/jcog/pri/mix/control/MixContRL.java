@@ -43,14 +43,14 @@ import static jcog.Util.sqr;
  * which resembles a differentiable
  * RNN backprop
  */
-public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLink<Y>>, FloatFunction<RoaringBitmap> {
+public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>>, FloatFunction<RoaringBitmap> {
 
     private final MixChannel[] mix;
     public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
     public final FloatParam gainMax = new FloatParam(4f, 0f, 16f);
 
     /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
-    private final AbstractClassifier<Y>[] tests;
+    private final AbstractClassifier<X>[] tests;
 
     /** should probably be calibrated in relation to the executioner's processing rate */
     private float activeTaskMomentum = 0.5f;
@@ -98,7 +98,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
     public final int dim;
 
     final int maxAux;
-    final List<PSink<Y>> aux = new FasterList();
+    final List<PSink<X,CLink<X>>> aux = new FasterList();
 
     /**
      * values less than 1 eventually lowers channel volume levels to zero (flat, ie. x1)
@@ -113,7 +113,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
     final int auxStart;
 
 
-    public MixContRL(float fps, MixAgent agent, FloatSupplier score, int aux, AbstractClassifier<Y>... tests) {
+    public MixContRL(float fps, MixAgent agent, FloatSupplier score, int aux, AbstractClassifier<X>... tests) {
         super(fps);
 
         this.maxAux = aux;
@@ -178,11 +178,11 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
         this.score = score;
     }
 
-    public CLink<Y> test(Y x) {
-        return test(new CLink<Y>(x));
+    public CLink<X> test(X x) {
+        return test(new CLink<X>(x));
     }
 
-    public CLink<Y> test(CLink<Y> x) {
+    public CLink<X> test(CLink<X> x) {
         int t = 0;
 
 
@@ -205,7 +205,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
     }
 
     /** computes the gain, and records the (pre-amplified) traffic */
-    public float gain(CLink<Y> x) {
+    public float gain(CLink<X> x) {
         float p = x.priElseZero();
         if (p > priMin.floatValue()) {
             x.forEach((int i) -> {
@@ -294,7 +294,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
 
 
     @Override
-    public PSink<Y> newStream(Object x, Consumer<CLink<Y>> each) {
+    public PSink<X,CLink<X>> newStream(Object x, Consumer<CLink<X>> each) {
         synchronized (aux) {
 
             int aux = this.aux.size();
@@ -307,9 +307,7 @@ public class MixContRL<Y extends Priority> extends Loop implements PSinks<Y, CLi
             MixChannel mm = this.mix[id];
             mm.id = x.toString();
 
-            PSink<Y> p = new PSink<>(x, (y) -> {
-                each.accept(new CLink<>(y, id));
-            });
+            PSink<X,CLink<X>> p = new PSink<X,CLink<X>>(x, xx -> new CLink(xx, id), each);
 
 
             this.aux.add(p);

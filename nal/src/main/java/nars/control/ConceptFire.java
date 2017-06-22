@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -15,8 +16,7 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -28,7 +28,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /** rate at which ConceptFire forms premises */
     private static final int sampleLimit = 8;
     private static final float priMinAbsolute = Pri.EPSILON * 4;
-    private static final float momentum = 0.1f;
+    private static final float momentum = 0.5f;
 
 
     public ConceptFire(Concept c, float pri) {
@@ -64,6 +64,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         int ttl = sampleLimit;
 
+        Map<ITask,ITask> results = new HashMap();
+
         Random rng = nar.random();
         while (ttl-- > 0 && pri >= minPri) {
             tasklink = taskl.get(
@@ -92,21 +94,34 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             if (termlink.get().op()==NEG)
                 throw new RuntimeException("NEG termlink: " + termlink);
 
-            Premise p = new Premise(tasklink, termlink);
+            Premise p = new Premise(tasklink, termlink, results);
             float thisPri = priElseZero();
             if (thisPri > minPri) {
                 p.pri(thisPri * (1f-momentum));
-                ITask[] result = p.run(nar);
-                if (result!=null) {
-                    nar.input(result);
-                    float cost = thisPri - p.priElseZero();
-                    priSub(cost);
+                p.run(nar);
+                if (results.values().stream().mapToDouble(Prioritized::priElseZero).sum() >= thisPri) {
+                    setPri(0);
+                    break;
                 }
-                //premises.add(new Premise(tasklink, termlink));
+//                if (result!=null) {
+//                    for (ITask x : result) {
+//                        results.merge(x, x, (pv, nv) -> {
+//                           pv.merge(nv);
+//                           return pv;
+//                        });
+//                    }
+//                    float cost = thisPri - p.priElseZero();
+//                    priSub(cost);
+//                }
             }
         }
 
-        return null;
+        int size = results.size();
+        if (size > 0)
+            return results.values().toArray(new ITask[size]);
+        else
+            return null;
+
 //        int num = premises.size();
 //        if (num > 0) {
 //            ITask[] pp = premises.array();

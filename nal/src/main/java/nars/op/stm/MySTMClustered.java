@@ -44,7 +44,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
-    private final PSink<ITask> in;
+    private final PSink in;
 
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;

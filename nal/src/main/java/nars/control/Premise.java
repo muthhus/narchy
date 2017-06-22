@@ -14,15 +14,19 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.control.premise.Derivation;
 import nars.derive.DefaultDeriver;
 import nars.table.BeliefTable;
 import nars.task.BinaryTask;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
@@ -40,11 +44,14 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> {
 
-    static final ThreadLocal<BufferedDerivation> derivation =
-            ThreadLocal.withInitial(BufferedDerivation::new);
+    static final ThreadLocal<Derivation> derivation =
+            ThreadLocal.withInitial(Derivation::new);
 
-    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
+    transient private final Map<ITask, ITask> buffer;
+
+    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Map<ITask,ITask> buffer) {
         super(tasklink, termlink, 0 /* priority assigned after construction */);
+        this.buffer = buffer;
     }
 
     /**
@@ -154,9 +161,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
                 or
                         (taskPri, beliefPriority);
 
-        BufferedDerivation d = derivation.get();
-
-        d.buffer.clear(); //should be clear but just in case
+        Derivation d = derivation.get();
 
         d.restartA(nar);
         d.restartB(task);
@@ -165,9 +170,10 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
 
         DefaultDeriver.the.test(d);
 
-        ITask[] r = d.flush(parentTaskPri);
-//
-        return r;
+        return null;
+//        ITask[] r = d.flush(parentTaskPri);
+////
+//        return r;
     }
 
     /**
@@ -282,4 +288,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
 //            return null;
     }
 
+    public void accept(DerivedTask t) {
+        buffer.merge(t, t, ITask::merge);
+    }
 }

@@ -3,6 +3,7 @@ package jcog.pri.mix;
 import jcog.list.FasterList;
 import jcog.meter.TelemetryRing;
 import jcog.pri.Priority;
+import jcog.pri.mix.control.CLink;
 
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * mixes inputs from different identified sources in different amounts
@@ -19,10 +21,10 @@ import java.util.function.Consumer;
  *
  * see: http://dr-lex.be/info-stuff/volumecontrols.html#about
  */
-public class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y>  {
+public abstract class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y>, Function<X,Y> {
 
 
-    public final Map<Object, PSink> streams = new ConcurrentHashMap();
+    public final Map<Object, PSink<X,Y>> streams = new ConcurrentHashMap();
     final List<PSink> streamList = new CopyOnWriteArrayList<>();
 
     public TelemetryRing data;
@@ -38,18 +40,19 @@ public class Mix<X extends Priority, Y extends Priority> implements PSinks<X,Y> 
 
 
     /** gets or creates a mix stream for the given key */
-    @Override public PSink<X> newStream(Object streamID, Consumer<Y> each) {
+    @Override public PSink<X,Y> newStream(Object streamID, Consumer<Y> each) {
 
         return streams.computeIfAbsent(streamID, xx -> {
             //nullify the history, need to create a new one for the new stream
             //TODO allow empty channel slots in the history buffer for stream alloc/dealloc
             data = null;
-            PSink<Y> s = new PSink<Y>(xx, each);
+            PSink<X,Y> s = new PSink(xx, this, each);
             streamList.add(s);
             this.streamID = streamList.toArray(this.streamID);
             return s;
         });
     }
+
 
 //    public void commit(Time t) {
 //        //TODO downsample correctly

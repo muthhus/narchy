@@ -282,8 +282,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     if (Param.DEBUG)
                         t.log(rule);
 
-                    d.premise.priSub(priority);
-                    d.derive(t);
+                    d.premise.accept(t);
 
                 }
             }

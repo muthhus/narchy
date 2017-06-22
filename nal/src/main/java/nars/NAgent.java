@@ -75,9 +75,9 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final PSink<ITask> sense;
-    private final PSink<ITask> predict;
-    private final PSink<ITask> motor;
+    private final PSink sense;
+    private final PSink predict;
+    private final PSink motor;
 
 
     private boolean initialized;

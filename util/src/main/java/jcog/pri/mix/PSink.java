@@ -1,7 +1,6 @@
 package jcog.pri.mix;
 
 import jcog.data.FloatParam;
-import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 
@@ -12,17 +11,18 @@ import java.util.stream.Stream;
 /** a sink channel (ie. target/destination) for streams of Priority instances,
  *      with mix controls. safe for multiple writers, as long as the target
  *      consumer also is. */
-public class PSink<P extends Priority> extends FloatParam implements Function<P,P>, Consumer<P> {
+public class PSink<X extends Priority, Y extends Priority> extends FloatParam implements Function<X, Y>, Consumer<X> {
 
     public final Object id;
-    private final Consumer<P> target;
+    private final Function<X, Y> transfer;
+    private final Consumer<Y> target;
 
     float minThresh = Pri.EPSILON;
 
-    public PSink(Object id, Consumer<P> target) {
+    public PSink(Object id, Function<X, Y> transfer, Consumer<Y> target) {
         super(1f, 0f, 2f);
         this.id = id;
-
+        this.transfer = transfer;
         this.target = target;
     }
 
@@ -31,60 +31,57 @@ public class PSink<P extends Priority> extends FloatParam implements Function<P,
         return id.toString();
     }
 
-    public Stream<P> apply(Stream<P> x) {
-        return x.peek(this);
+    public Stream<Y> apply(Stream<X> x) {
+        return x.map(this);
     }
 
-    @Override public P apply(P x) {
-        float value = x.pri();
-        if (value!=value)
-            throw new UnsupportedOperationException("NaN input: " + x);
-
-        accept(x);
-        return x;
+    @Override public Y apply(X x) {
+        return transfer.apply(x);
     }
 
-    public P[] apply(P[] x) {
-        for (P y : x)
-            accept(y);
-        return x;
-    }
+//    public Y[] apply(X[] x) {
+//        for (X xx : x)
+//            accept(xx);
+//        return x;
+//    }
 
 
-    public final void input(Iterable<? extends P> xx) {
+    public final void input(Iterable<? extends X> xx) {
         xx.forEach( this );
     }
 
-    public final void input(Stream<P> x) {
+    public final void input(Stream<X> x) {
         x.forEach( this );
     }
 
-    public final void input(P[] x) {
-        for (P p : x)
+    public final void input(X[] x) {
+        for (X p : x)
             input(p);
     }
 
-    public final void input(P x) {
+    public final void input(X x) {
         target.accept(apply(x));
     }
 
 
 
     @Override
-    public void accept(P pp) {
-        if (pp == null)
+    public void accept(X x) {
+        if (x == null)
             return;
 
-        float p = pp.pri();
+        float p = x.pri();
         if (p!=p)
             return;
+
 
         float g = floatValue();
         if (p >= 0 && g >= 0) {
             float pg = p * g;
             if (pg >= minThresh) {
-                pp.setPri(p * g);
-                target.accept(pp);
+                x.setPri(p * g);
+                Y y = apply(x);
+                target.accept(y);
 //                in.accept(p);
 //                out.accept(p * g);
             }

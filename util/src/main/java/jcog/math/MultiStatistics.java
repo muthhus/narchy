@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 public class MultiStatistics<X> implements Consumer<X> {
 
 
-
     public static class BooleanClassifierWithStatistics<X> extends RecycledSummaryStatistics implements Consumer<X> /* implements AbstractClassifier */ {
         public final Predicate<X> filter;
         public final String id;
@@ -71,6 +70,21 @@ public class MultiStatistics<X> implements Consumer<X> {
         /** wildcard catch-all; by default will not collect all the unique values but other added conditions will */
         cond.add( new BooleanClassifierWithStatistics<X>("*", x -> true, null) );
     }
+
+
+    public void clear() {
+        for (Consumer<X> c : cond) {
+
+            //HACK
+            if (c instanceof BooleanClassifierWithStatistics)
+                ((BooleanClassifierWithStatistics)c).clear();
+            else if (c instanceof ScalarStats)
+                ((ScalarStats)c).clear();
+            else
+                throw new UnsupportedOperationException();
+        }
+    }
+
 
     public MultiStatistics<X> classify(String name, Predicate<X> test) {
         cond.add(new BooleanClassifierWithStatistics<X>(name, test));

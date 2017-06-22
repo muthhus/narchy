@@ -211,11 +211,16 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {
-        return new Mix<>();
+        return new Mix<ITask,CLink<ITask>>() {
+            @Override
+            public CLink<ITask> apply(ITask iTask) {
+                return new CLink(iTask);
+            }
+        };
     }
 
-    public PSink<ITask> newInputChannel(Object id) {
-        return in.newStream(id, x -> input((CLink<ITask>)x));
+    public PSink<ITask,CLink<ITask>> newInputChannel(Object id) {
+        return in.newStream(id, x -> input(x));
     }
 
 
