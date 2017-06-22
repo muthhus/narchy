@@ -52,6 +52,9 @@ public class AffinityExecutor implements Executor {
 
             try (AffinityLock lock = AffinityLock.acquireLock()) {
                 cmd.run(); //avoid virtual call to super etc
+            } catch (Exception e) {
+                e.printStackTrace();
+                cmd.run();
             }
 
             threads.remove(this);

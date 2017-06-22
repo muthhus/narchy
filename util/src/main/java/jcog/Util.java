@@ -1290,6 +1290,9 @@ public enum Util {
         return x;
     }
 
+    public static int selectRoulette(float[] x, Random rng) {
+        return selectRoulette(x.length, (n) -> x[n], rng);
+    }
     /**
      * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
      * Returns the selected index based on the weights(probabilities)

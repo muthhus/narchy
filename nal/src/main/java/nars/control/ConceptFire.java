@@ -1,8 +1,10 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -13,7 +15,10 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static jcog.Util.clamp;
 import static nars.Op.NEG;
@@ -48,44 +53,41 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         final Bag<Term, PriReference<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
         nar.terms.commit(c); //index cache update
 
+
+        List<PriReference<Task>> taskl = $.newArrayList();
+        List<PriReference<Term>> terml = $.newArrayList();
+        tasklinks.sample(8, ((Consumer<PriReference<Task>>) taskl::add));
+        termlinks.sample(8, ((Consumer<PriReference<Term>>) terml::add));
+
         @Nullable PriReference<Task> tasklink = null;
         @Nullable PriReference<Term> termlink = null;
-        float taskLinkPri = -1f, termLinkPri = -1f;
-
-        //FasterList<Premise> premises = new FasterList<>(0,new Premise[maxPremisesPerCycle]);
-        //also maybe Set is appropriate here
-
-        float taskMargin = 1f/(1+tasklinks.size());
-        float termMargin = 1f/(1+termlinks.size());
-
-        /**
-         * this implements a pair of roulette wheel random selectors
-         * which have their options weighted according to the normalized
-         * termlink and tasklink priorities.  normalization allows the absolute
-         * range to be independent which should be ok since it is only affecting
-         * the probabilistic selection sequence and doesnt affect derivation
-         * budgeting directly.
-         */
 
         int ttl = sampleLimit;
 
         Random rng = nar.random();
         while (ttl-- > 0 && pri >= minPri) {
-            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                tasklink = tasklinks.sample();
-                if (tasklink == null)
-                    break;
+            tasklink = taskl.get(
+                Util.selectRoulette(taskl.size(), (i)->taskl.get(i).priElseZero(), rng)
+            );
+            termlink = terml.get(
+                Util.selectRoulette(terml.size(), (i)->terml.get(i).priElseZero(), rng)
+            );
 
-                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
-            }
-
-
-            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                termlink = termlinks.sample();
-                if (termlink == null)
-                    break;
-                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
-            }
+//            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+//                tasklink = tasklinks.sample();
+//                if (tasklink == null)
+//                    break;
+//
+//                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
+//            }
+//
+//
+//            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+//                termlink = termlinks.sample();
+//                if (termlink == null)
+//                    break;
+//                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
+//            }
 
             if (termlink.get().op()==NEG)
                 throw new RuntimeException("NEG termlink: " + termlink);
