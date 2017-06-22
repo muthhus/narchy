@@ -1,5 +1,6 @@
 package nars.control.premise;
 
+import jcog.Util;
 import nars.Task;
 import nars.term.Compound;
 import nars.term.Term;
@@ -16,6 +17,10 @@ import static nars.Op.GOAL;
  * see: http://sciencing.com/calculate-growth-rate-percent-change-4532706.html
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
+
+    /** range for adjusting polarization (1f has no effect) */
+    final float minPolarizationFactor = 0.9f;
+    final float maxPolarizationFactor = 1f;
 
 //    /** preference for polarity (includes conf) */
 //    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);
@@ -67,7 +72,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm);
         if (truth != null) { //belief and goal:
             p *= simplicityFactor;
-            float freqFactor = polarization(truth.freq());
+            float freqFactor = Util.lerp(polarization(truth.freq()), minPolarizationFactor, maxPolarizationFactor);
             p *= freqFactor;
             float confFactor = evidencePreservationRelative(truth, d);
             p *= confFactor;
@@ -85,9 +90,11 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         return p;
     }
 
-    /** returns a value between 0.5 and 1.0 relative to the polarity of the frequency */
+    /**
+     * returns a value between 0.5 and 1.0 relative to the polarity of the frequency
+     */
     float polarization(float freq) {
-        return 0.5f + Math.abs(freq - 0.5f);
+        return Math.abs(freq - 0.5f) * 2f;
     }
 
 //    static float polarizationFactor(@Nullable Truth truth) {
@@ -115,14 +122,14 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
      */
     public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, @NotNull Term belief) {
         float premCmp =
-                punc==BELIEF || punc==GOAL ?
+                punc == BELIEF || punc == GOAL ?
                         task.complexity() + belief.complexity()
                         :
                         Math.max(task.complexity(), belief.complexity()) //questions, more strict
-                    ;
+                ;
 
         float concCmp = conclusion.complexity();
-        return (premCmp/(premCmp + concCmp));
+        return (premCmp / (premCmp + concCmp));
         //controls complexity decay rate
 //        int penaltyComplexity;
 //        if (punc == QUESTION || punc == QUEST) {
@@ -144,7 +151,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
     protected float evidencePreservationRelative(@NotNull Truth truth, @NotNull Derivation d) {
         float concEvi = truth.evi();
         float premiseEvi = d.premiseEvi;
-        float evidenceShrink = (premiseEvi - concEvi) / ((premiseEvi + concEvi)/2f);
+        float evidenceShrink = (premiseEvi - concEvi) / ((premiseEvi + concEvi) / 2f);
         return 1f / (1f + Math.max(0, evidenceShrink));
     }
 

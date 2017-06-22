@@ -1,5 +1,6 @@
 package nars.test.agent;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
@@ -117,10 +118,15 @@ public class Line1DSimplest extends NAgent {
 
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
-        //return (1f - dist); //unipolar, 0..1.0
+        return Util.sqr(1f - dist); //unipolar, 0..1.0
 
-        float r = (2f - dist); //bipolar, normalized to -1..+1
-        return (r-1f);
+
+//        float r = (1f - dist/2f); //bipolar, normalized to -1..+1
+//        if (r < 0.25f) return 1f;
+//        return -1f;
+
+        //return Util.sqr(r);
+        //return (r-1f);
     }
 
 

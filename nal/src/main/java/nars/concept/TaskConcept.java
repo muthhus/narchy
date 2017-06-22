@@ -101,8 +101,8 @@ public class TaskConcept extends CompoundConcept {
 
 
     public TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        return new HijackTemporalBeliefTable(tCap);
-        //return new RTreeBeliefTable(tCap);
+        //return new HijackTemporalBeliefTable(tCap);
+        return new RTreeBeliefTable(tCap);
     }
 
     public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {

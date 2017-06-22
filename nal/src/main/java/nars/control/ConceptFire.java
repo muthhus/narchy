@@ -35,7 +35,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             ThreadLocal.withInitial(LinkedHashMap::new);
 
     static final int TASKLINKS_SAMPLED = 4;
-    static final int TERMLINKS_SAMPLED = 4;
+    static final int TERMLINKS_SAMPLED = 8;
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
@@ -48,7 +48,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         if (pri != pri || pri < priMinAbsolute)
             return null;
 
-        final float minPri = Math.max(pri * momentum, priMinAbsolute);
+        final float minPri = priMinAbsolute;
 
         final Concept c = id;
 

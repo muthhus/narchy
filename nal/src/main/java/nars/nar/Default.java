@@ -26,7 +26,7 @@ public class Default extends NAR {
     //private static final Logger logger = LoggerFactory.getLogger(Default.class);
 
 
-    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 1);
+    public final STMTemporalLinkage stmLinkage = new STMTemporalLinkage(this, 1, false);
     //public final STMTemporalLinkage2 stmLinkage = new STMTemporalLinkage2(this, 4, 2, 2);
 
     @Deprecated
@@ -38,7 +38,7 @@ public class Default extends NAR {
         this(
             new DefaultTermIndex(activeTasks * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new TaskExecutor(activeTasks, 0.2f));
+            new TaskExecutor(activeTasks, 0.1f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 16;
@@ -66,8 +66,8 @@ public class Default extends NAR {
         public DefaultTermIndex(int capacity, ConceptBuilder cb) {
             super(
                     cb,
-                    new HashMap<>(capacity, 0.9f),
-                    new HashMap<>(capacity, 0.9f)
+                    new HashMap<>(capacity/*, 0.9f*/),
+                    new HashMap<>(capacity/*, 0.9f*/)
                     //new UnifiedMap(capacity, 0.9f),
                     //new UnifiedMap(capacity, 0.9f)
                     //new ConcurrentHashMap<>(capacity),

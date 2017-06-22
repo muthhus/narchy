@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
+import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 
 /**
@@ -25,7 +26,9 @@ public interface NAct {
 
     NAR nar();
 
-    /** master curiosity factor, for all actions */
+    /**
+     * master curiosity factor, for all actions
+     */
     FloatParam curiosity();
 
     /**
@@ -85,19 +88,72 @@ public interface NAct {
      */
     @Nullable
     default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
-        return actionTriState(s, (v) -> { i.accept(v); return true; } );
+        return actionTriState(s, (v) -> {
+            i.accept(v);
+            return true;
+        });
+    }
+
+    /**
+     * tri-state implemented as delta version memory of last state.
+     * initial state is neutral.
+     */
+    @Nullable
+    default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
+        final int[] state = {0};
+        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+            //radius of center dead zone; diameter = 2x this
+            float deadZoneFreqRadius =
+                    //1/7f;
+                    1f / 6;
+
+
+            int deltaState;
+            if (d == null) {
+                deltaState = 0;
+            } else {
+                float f = d.freq();
+                if (f > 0.5f + deadZoneFreqRadius)
+                    deltaState = +1;
+                else if (f < 0.5f - deadZoneFreqRadius)
+                    deltaState = -1;
+                else
+                    deltaState = 0;
+            }
+
+
+            int curState = state[0];
+            state[0] = Math.min(Math.max(curState + deltaState, -1), +1);
+
+            //float f = curState != state[0] ? (deltaState > 0 ? 1f : 0f) : 0.5f /* had no effect */;
+            float f;
+            switch (state[0]) {
+                case -1: f = 0f; break;
+                case 0: f = 0.5f; break;
+                case +1: f = 1f; break;
+                default:
+                    throw new RuntimeException();
+            }
+            if (i.test(state[0]))
+                return $.t( f, nar().confDefault(BELIEF));
+            else
+                return null;
+        });
+        m.resolution.setValue(0.5f);
+        actions().add(m);
+        return m;
     }
 
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
+    default GoalActionConcept actionTriStateContinuous(@NotNull Compound s, @NotNull IntPredicate i) {
 
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
             float deadZoneFreqRadius =
                     //1/7f;
-                     1f/6;
-                    // 1f/4;
-                    //1f/3f;
+                    1f / 6;
+            // 1f/4;
+            //1f/3f;
 
 
             int ii;
@@ -158,9 +214,9 @@ public interface NAct {
                 } else if (f == 0) {
                     ii = -1;
                 } else if (f > 0.5f) {
-                    ii = nar().random().nextFloat() <= ((f - 0.5f)*2f) ? +1 : 0;
+                    ii = nar().random().nextFloat() <= ((f - 0.5f) * 2f) ? +1 : 0;
                 } else if (f < 0.5f) {
-                    ii = nar().random().nextFloat() <= ((0.5f - f)*2f) ? -1 : 0;
+                    ii = nar().random().nextFloat() <= ((0.5f - f) * 2f) ? -1 : 0;
                 } else
                     ii = 0;
             }
@@ -293,7 +349,7 @@ public interface NAct {
     @NotNull
     default GoalActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatToFloatFunction update) {
         return actionUnipolar(s, (f) -> {
-            if (f!=f)
+            if (f != f)
                 return Float.NaN;
             else {
                 float y = (f - 0.5f) * 2f;
@@ -310,12 +366,11 @@ public interface NAct {
         return action(s, (b, d) -> {
             float o = (d != null) ? d.freq() : 0.5f /*Float.NaN*/;
             float f = update.valueOf(o);
-            if (f!=f)
+            if (f != f)
                 f = 0.5f;
             return $.t(f, nar().confDefault(GOAL));
         });
     }
-
 
 
 }

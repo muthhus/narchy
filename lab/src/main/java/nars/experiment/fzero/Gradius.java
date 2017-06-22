@@ -7,8 +7,11 @@ import nars.NAgentX;
 import nars.Narsese;
 import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
+import nars.video.CameraSensor;
+import nars.video.PixelBag;
 import nars.video.Scale;
 
+import static java4k.gradius4k.Gradius4K.OBJ_Y;
 import static nars.video.BufferedImageBitmap2D.ColorMode.R;
 
 /**
@@ -21,38 +24,67 @@ public class Gradius extends NAgentX {
     public Gradius(NAR nar) throws Narsese.NarseseException {
         super("G", nar);
 
-        this.g =  new Gradius4K();
+        this.g = new Gradius4K();
 
-        Scale camScale = new Scale(() -> g.image, 64, 64);
-        Scale camScaleLow = new Scale(() -> g.image, 16, 16);
-        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
-                R,
-                BufferedImageBitmap2D.ColorMode.B,
-                BufferedImageBitmap2D.ColorMode.G
-        }) {
-            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
-                    (cm == R ? camScale : camScaleLow).filter(cm)
-            ).resolution(0.1f);
-        }
+        //Scale camScale = new Scale(() -> g.image, 64, 64);
+        PixelBag cc = PixelBag.of(() -> g.image, 48, 48);
+        cc.setClarity(0.5f, 0.9f);
 
-        actionToggle($.inh(Atomic.the("fire"),id),
-                (b)-> g.keys[Gradius4K.VK_SHOOT] = b );
 
-        actionTriState($.inh(Atomic.the("x"), id ), (dh) -> {
+        //TODO fix the panning/zooming
+        onFrame((z) -> {
+
+            float x = (g.player[Gradius4K.OBJ_X] - g.cameraX) / g.getWidth();
+            float y = (g.player[OBJ_Y]) / g.getHeight();
+
+            cc.setXRelative(x/2f);
+            cc.setYRelative(y/2f);
+            cc.setZoom(0.8f);
+
+            //cc.setXRelative( mario.)
+        });
+
+        CameraSensor<PixelBag> camScale = senseCamera("(G,cam)" /*"(nario,local)"*/, cc);
+        camScale.resolution(0.1f);
+
+
+//        Scale camScaleLow = new Scale(() -> g.image, 16, 16);
+//        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
+//                R,
+//                BufferedImageBitmap2D.ColorMode.B,
+//                BufferedImageBitmap2D.ColorMode.G
+//        }) {
+//            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
+//                    (cm == R ? camScale : camScaleLow).filter(cm)
+//            ).resolution(0.1f);
+//        }
+
+        actionToggle($.inh(Atomic.the("fire"), id),
+                (b) -> g.keys[Gradius4K.VK_SHOOT] = b);
+
+        actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
             g.keys[Gradius4K.VK_LEFT] = false;
             g.keys[Gradius4K.VK_RIGHT] = false;
             switch (dh) {
-                case +1: g.keys[Gradius4K.VK_RIGHT] = true; break;
-                case -1: g.keys[Gradius4K.VK_LEFT] = true; break;
+                case +1:
+                    g.keys[Gradius4K.VK_RIGHT] = true;
+                    break;
+                case -1:
+                    g.keys[Gradius4K.VK_LEFT] = true;
+                    break;
             }
         });
 
-        actionTriState($.inh(Atomic.the("y"), id ), (dh) -> {
+        actionTriState($.inh(Atomic.the("y"), id), (dh) -> {
             g.keys[Gradius4K.VK_UP] = false;
             g.keys[Gradius4K.VK_DOWN] = false;
             switch (dh) {
-                case +1: g.keys[Gradius4K.VK_DOWN] = true; break;
-                case -1: g.keys[Gradius4K.VK_UP] = true; break;
+                case +1:
+                    g.keys[Gradius4K.VK_DOWN] = true;
+                    break;
+                case -1:
+                    g.keys[Gradius4K.VK_UP] = true;
+                    break;
             }
         });
 
@@ -81,17 +113,17 @@ public class Gradius extends NAgentX {
 
     public static void main(String[] args) {
 
-         NAgentX.runRT((n) -> {
+        NAgentX.runRT((n) -> {
 
-             n.termVolumeMax.setValue(20);
+            n.termVolumeMax.setValue(20);
 
-             Gradius a = null;
-             try {
-                 a = new Gradius(n);
-             } catch (Narsese.NarseseException e) {
-                 e.printStackTrace();
-             }
-             return a;
+            Gradius a = null;
+            try {
+                a = new Gradius(n);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+            }
+            return a;
 
         }, 20f);
 

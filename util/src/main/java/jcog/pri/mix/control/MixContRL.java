@@ -16,8 +16,6 @@ import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import jcog.tensor.TensorChain;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.roaringbitmap.RoaringBitmap;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -43,11 +41,12 @@ import static jcog.Util.sqr;
  * which resembles a differentiable
  * RNN backprop
  */
-public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>>, FloatFunction<RoaringBitmap> {
+public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>> {
 
     private final MixChannel[] mix;
     public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
-    public final FloatParam gainMax = new FloatParam(4f, 0f, 16f);
+    public final FloatParam gainMin = new FloatParam(0.25f, 0f, 0f);
+    public final FloatParam gainMax = new FloatParam(1.25f, 0f, 16f);
 
     /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
     private final AbstractClassifier<X>[] tests;
@@ -208,31 +207,25 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     public float gain(CLink<X> x) {
         float p = x.priElseZero();
         if (p > priMin.floatValue()) {
+            final float[] preGain = {0};
             x.forEach((int i) -> {
                 mix[i].accept(p, false, true);
+                preGain[0] += gain(i);
             });
-            return Math.min(gainMax.floatValue(), floatValueOf(x));
+
+            //preGain[0] += levels.get(size - 1); //bias
+
+            return Util.lerp(Util.sigmoid(preGain[0]), gainMin.floatValue(), gainMax.floatValue());
+//                sqr( //l^4
+//                sqr(1f + preGain[0]) //l^2
+//        )
+//                ;
         } else {
             return 0;
         }
 
         //TODO record the post traffic?
 
-    }
-
-    @Override
-    public float floatValueOf(RoaringBitmap t) {
-        final float[] preGain = {0};
-        t.forEach((int i) -> {
-            preGain[0] += gain(i);
-        });
-
-        //preGain[0] += levels.get(size - 1); //bias
-
-        return sqr( //l^4
-                sqr(1f + preGain[0]) //l^2
-        )
-                ;
     }
 
     @Override
@@ -265,12 +258,9 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         float total = totalInput + totalActive;
         //normalize
         for (int i = 0; i < dim; i++) {
-            boolean inputEmpty;
             if (nextInput[i] < Pri.EPSILON) {
-                inputEmpty = true;
                 nextInput[i] = 0;
             } else {
-                inputEmpty = false;
                 nextInput[i] /= total;
             }
 //            if (nextActive[i] < Pri.EPSILON) {
@@ -282,7 +272,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 //            } else {
                 //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
             float a = total >= Pri.EPSILON ? nextActive[i] / total : 0f;
-            nextActive[i] = Util.lerp((1f-activeTaskMomentum), prevActive[i], a);;
+            nextActive[i] = Util.lerp(activeTaskMomentum, prevActive[i], a);;
             //}
         }
 

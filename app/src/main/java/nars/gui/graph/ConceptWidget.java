@@ -3,10 +3,12 @@ package nars.gui.graph;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.hijack.PLinkHijackBag;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.Task;
 import nars.concept.Concept;
@@ -27,6 +29,7 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 import static spacegraph.math.v3.v;
@@ -42,7 +45,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
     private transient ConceptSpace space;
     public float pri = 0;
 
-    private float edgeDecayRate = 0.1f;
+    private float edgeDecayRate = 0.5f;
 
 
     public ConceptWidget(Termed x) {
@@ -66,8 +69,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
-                new PLinkHijackBag(0, 2);
-        //new ArrayBag<>(0, PriMerge.avg, new HashMap());
+                //new PLinkHijackBag(0, 2);
+                new ArrayBag<>(0, PriMerge.avg, new HashMap());
 
 
 //        for (int i = 0; i < edges; i++)
@@ -336,7 +339,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
-                        0.1f + 0.5f * edgeProp;
+                        // 0.5f * edgeProp
+                        0.1f + 0.75f * Util.or(termlinkPri, tasklinkPri);
 
                 this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 0.1f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));

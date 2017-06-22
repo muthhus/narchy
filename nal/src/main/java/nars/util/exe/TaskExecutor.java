@@ -46,6 +46,7 @@ public class TaskExecutor extends Executioner {
 //     * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
 //     */
 //    protected float forgetEachPri;
+    public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
     /**
      * active tasks
@@ -75,6 +76,7 @@ public class TaskExecutor extends Executioner {
             return super.iterator();
         }
     };
+
 
     public TaskExecutor(int capacity) {
         super();
@@ -206,9 +208,11 @@ public class TaskExecutor extends Executioner {
             //toRemove.add(x);
         } else if (next == ITask.Disappear) {
             active.remove(x.ref); //immediately but dont affect its budget
-        } /*else if (forgetEachPri > 0) {
-            //x.priSub(forgetEachPri);
-        }*/
+        } else  {
+            float g = masterGain.floatValue();
+            if (g!=1)
+                x.priMult(g);
+        }
 
         actuallyFeedback(x, next);
     }

@@ -30,7 +30,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 4;
+    static final int sampleRadius = 2;
 
 
     public static class TaskRegion implements HyperRegion {
@@ -49,7 +49,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         public boolean equals(Object obj) {
-            return this == obj || (task != null ? Objects.equals(task, ((TaskRegion) obj).task) : false);
+            return this == obj || (task != null && Objects.equals(task, ((TaskRegion) obj).task));
         }
 
         @Override

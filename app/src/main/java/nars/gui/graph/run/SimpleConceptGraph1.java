@@ -65,13 +65,13 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         Param.DEBUG = false;
 
-        TaskExecutor te = new TaskExecutor(64, 0.05f);
+        TaskExecutor exe = new TaskExecutor(128, 0.25f);
         Default n = new Default(
                 new Default.DefaultTermIndex(512, new DefaultConceptBuilder()),
                 new CycleTime(),
-                te
+                exe
         );
-        float fps = 1f;
+        float fps = 25f;
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -163,7 +163,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         SpaceGraph.window(
                 col(
-                        reflect(fd)
+                        reflect(fd),
+                        reflect(exe)
                         //new CheckBox("Atoms", atomsEnabled),
                         //reflect( new CycleView(n) ),
 //                        new PushButton("+", () -> {
@@ -191,14 +192,12 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
         n.input("(a-->b).", "(b-->c).","(c-->d).");
-        n.log();
+        //n.log();
 
-        for (int i = 0; i < 50; i++) {
-            System.out.println(n.time() + "\n" + te.stats() + "\n\n");
-            n.run(1);
-        }
+        n.onCycle(nn->{System.out.println(nn.time() + "\n" + exe.stats() + "\n\n");});
 
-        //n.startFPS(fps).join();
+        n.startFPS(fps).join();
+
 
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));

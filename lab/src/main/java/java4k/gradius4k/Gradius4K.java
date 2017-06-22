@@ -45,7 +45,44 @@ public class Gradius4K extends GamePanel implements Runnable {
     public static final int VK_SHOOT = 0x42;
     public int score = 0;
     public int playerDead = 1;
-    public int SPEED = 10;
+    public int SPEED = 2;
+    public float cameraX = 0;
+    public float[] player = new float[256];
+
+    public static final int OBJ_X = 0;
+    public static final int OBJ_Y = 1;
+    public static final int OBJ_TYPE = 2;
+    public static final int OBJ_SPRITE = 3;
+    public static final int OBJ_REMOVE = 4;
+    public static final int OBJ_VX = 5;
+    public static final int OBJ_VY = 6;
+    public static final int OBJ_SCALE_X = 7;
+    public static final int OBJ_SCALE_Y = 8;
+    public static final int OBJ_TIMER = 9;
+    public static final int OBJ_NONRENDERABLE = 10;
+    public static final int OBJ_ANGLE = 11;
+    public static final int OBJ_X2 = 12;
+    public static final int OBJ_Y2 = 13;
+    public static final int OBJ_ENEMY_BULLET = 14;
+    public static final int OBJ_RADIUS = 15;
+    public static final int OBJ_MAKE_POWER_UP = 16;
+    public static final int OBJ_WALL_EXPLOSION = 17;
+    public static final int OBJ_HITS = 18;
+    public static final int OBJ_SHOOT_DELAY = 19;
+    public static final int OBJ_BOSS = 20;
+    public static final int OBJ_BUBBLE = 21;
+    public static final int OBJ_FORCE_FIELD = 22;
+    public static final int OBJ_DISABLED = 23;
+    public static final int OBJ_SHRINKER = 24;
+    public static final int OBJ_ATTRACTOR = 25;
+    public static final int OBJ_FAN_BLADE = 26;
+
+    public static final int TYPE_EXPLOSION = 0;
+    public static final int TYPE_EXPLOSION_SEED = 1;
+    public static final int TYPE_PLAYER = 2;
+    public static final int TYPE_BULLET = 3;
+    public static final int TYPE_ENEMY = 4;
+    public static final int TYPE_POWER_UP = 5;
 
     public static void main(String[] args) {
         new Gradius4K();
@@ -72,40 +109,6 @@ public class Gradius4K extends GamePanel implements Runnable {
 
     public void run() {
 
-        final int OBJ_X = 0;
-        final int OBJ_Y = 1;
-        final int OBJ_TYPE = 2;
-        final int OBJ_SPRITE = 3;
-        final int OBJ_REMOVE = 4;
-        final int OBJ_VX = 5;
-        final int OBJ_VY = 6;
-        final int OBJ_SCALE_X = 7;
-        final int OBJ_SCALE_Y = 8;
-        final int OBJ_TIMER = 9;
-        final int OBJ_NONRENDERABLE = 10;
-        final int OBJ_ANGLE = 11;
-        final int OBJ_X2 = 12;
-        final int OBJ_Y2 = 13;
-        final int OBJ_ENEMY_BULLET = 14;
-        final int OBJ_RADIUS = 15;
-        final int OBJ_MAKE_POWER_UP = 16;
-        final int OBJ_WALL_EXPLOSION = 17;
-        final int OBJ_HITS = 18;
-        final int OBJ_SHOOT_DELAY = 19;
-        final int OBJ_BOSS = 20;
-        final int OBJ_BUBBLE = 21;
-        final int OBJ_FORCE_FIELD = 22;
-        final int OBJ_DISABLED = 23;
-        final int OBJ_SHRINKER = 24;
-        final int OBJ_ATTRACTOR = 25;
-        final int OBJ_FAN_BLADE = 26;
-
-        final int TYPE_EXPLOSION = 0;
-        final int TYPE_EXPLOSION_SEED = 1;
-        final int TYPE_PLAYER = 2;
-        final int TYPE_BULLET = 3;
-        final int TYPE_ENEMY = 4;
-        final int TYPE_POWER_UP = 5;
 
         int playerShootDelay = 0;
         int fireworks = 0;
@@ -124,13 +127,12 @@ public class Gradius4K extends GamePanel implements Runnable {
         float dx = 0;
         float dy = 0;
         float mag = 0;
-        float cameraX = 0;
+
         float cameraVx = 0;
 
         boolean bossMode = false;
 
         Graphics2D g2 = null;
-        float[] player = null;
         int[][] levelMap = null;
 
         image = new BufferedImage(256, 256, 1);
@@ -946,7 +948,7 @@ public class Gradius4K extends GamePanel implements Runnable {
 
     // to run in window, uncomment below
     /*public static void main(String[] args) throws Throwable {
-	  javax.swing.JFrame frame = new javax.swing.JFrame("Gradius 4K");
+      javax.swing.JFrame frame = new javax.swing.JFrame("Gradius 4K");
 	  frame.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
 	  a applet = new a();
 	  applet.setPreferredSize(new java.awt.Dimension(512, 512));
