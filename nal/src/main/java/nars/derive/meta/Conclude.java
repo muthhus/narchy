@@ -91,23 +91,11 @@ public final class Conclude extends AbstractPred<Derivation> {
      * false to stop it
      */
     @Override
-    public final boolean test(@NotNull Derivation m) {
-
-        //int start = m.now();
-        accept(m);
-        //m.revert(start);
-
-        return true;
-    }
-
-    /**
-     * start for derivation concluder
-     */
-    private void accept(@NotNull Derivation d) {
+    public final boolean test(@NotNull Derivation d) {
          NAR nar = d.nar;
 
         if (rule.minNAL > nar.level())  //HACK
-            return;
+            return true;
 
 
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
@@ -121,10 +109,8 @@ public final class Conclude extends AbstractPred<Derivation> {
         for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
             Term bp = b0;
             b0 = compoundOrNull(d.transform(b0, index));
-            if (b0 == null)
-                return;
-            if (b0 == conclusionPattern)
-                return;
+            if (b0 == null || b0 == conclusionPattern)
+                return true;
             if (b0 == bp)
                 break; //no change
         }
@@ -181,7 +167,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
 
-                    return;
+                    return true;
                 } else {
                     temporalized = temporalized2;
                 }
@@ -189,7 +175,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                 int tdt = temporalized.dt();
                 if (tdt == XTERNAL || tdt == -XTERNAL) {
                     //throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
-                    return;
+                    return true;
                 }
 
                 //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
@@ -240,13 +226,13 @@ public final class Conclude extends AbstractPred<Derivation> {
                     );
 
                     if (Cv == null || Cv.equals(C) /* keep only if it differs */)
-                        return;
+                        return true;
                     else {
                         C = Cv;
                         if (C.op()==NEG) {
                             C = compoundOrNull(C.unneg()); //argh
                             if (C == null)
-                                return;
+                                return true;
                             negating = !negating;
                         }
                     }
@@ -262,7 +248,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                 if (priority == priority) {
 
                     if (priority < Priority.EPSILON) {
-                        return; //wasted
+                        return true; //wasted
                     }
 
                     if (negating && truth != null)
@@ -274,7 +260,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                                     new DerivedTask(C, punc, truth, d, start, end);
 
                     if (t.equals(d.task) || t.equals(d.belief)) {
-                        return; //created a duplicate of the task
+                        return true; //created a duplicate of the task
                     }
 
                     t.setPri(priority);
@@ -282,7 +268,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     if (Param.DEBUG)
                         t.log(rule);
 
-                    d.premise.accept(t);
+                    return d.premise.accept(t);
 
                 }
             }
@@ -294,6 +280,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 //                logger.warn("{} {}", m, e.getMessage());
 //        }
 
+        return true;
     }
 
 

@@ -45,7 +45,6 @@ import spacegraph.widget.slider.FloatSlider;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -358,99 +357,6 @@ public class Vis {
 
     public static ReflectionSurface reflect(Object c) {
         return new ReflectionSurface(c);
-    }
-
-    public static class ConceptBagChart extends BagChart<PriReference<Concept>> implements Consumer<NAR> {
-
-        private final On on;
-        long now;
-        int dur;
-        final NAR nar;
-
-        public ConceptBagChart(Iterable<PriReference<Concept>> b, int count, NAR nar) {
-            super(b, count);
-            this.now = nar.time();
-            this.nar = nar;
-            on = nar.onCycle(this);
-        }
-
-        @Override
-        public void stop() {
-            super.stop();
-            on.off();
-        }
-
-        @Override
-        public void accept(NAR nar) {
-            update();
-        }
-
-        @Override
-        public void update(double width, double height, Iterable<? extends PriReference<Concept>> children, BiConsumer<PriReference<Concept>, ItemVis<PriReference<Concept>>> update) {
-            long now = nar.time();
-            if (now == this.now)
-                return;
-            this.now = now;
-
-            dur = nar.dur();
-            super.update(width, height, children, update);
-        }
-
-        @Override
-        public void accept(PriReference<Concept> x, ItemVis<PriReference<Concept>> y) {
-            float p = x.priSafe(0);
-
-            float r, g, b;
-
-            Concept c = x.get();
-            if (c != null) if (c instanceof Atomic) {
-                r = g = b = p * 0.5f;
-            } else {
-                float belief = 0.5f, goal = 0.5f;
-                //float a = 0;
-
-                long n = now;
-
-                @Nullable Truth bt = c.beliefs().truth(n, dur);
-                if (bt != null) {
-                    belief = bt.freq();
-                    //a += bt.conf();
-                }
-
-                @Nullable Truth gt = c.goals().truth(n, dur);
-                if (gt != null) {
-                    goal = gt.freq();
-                    //a += gt.conf();
-                }
-
-                //a = Math.min(a, 1f);
-
-
-                if (goal < 0.5f) {
-                    r = 0.05f + 0.75f * (0.5f - goal);
-                    g = 0;
-                } else {
-                    g = 0.05f + 0.75f * (goal - 0.5f);
-                    r = 0;
-                }
-
-                b = 0.05f + 0.95f * belief;
-
-                /*else if (c.hasQuestions() || c.hasQuests()) {
-                    r = 1; //yellow
-                    g = 1/2;
-                    b = 0;
-                } */ /*else {
-                    r = g = b = 0;
-                }*/
-            }
-            else {
-                r = g = b = 0f;
-            }
-
-            y.update(p, r, g, b);
-
-        }
     }
 
     public static class EmotionPlot extends Grid implements Consumer<NAR> {

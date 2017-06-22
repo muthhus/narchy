@@ -288,7 +288,20 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
 //            return null;
     }
 
-    public void accept(DerivedTask t) {
-        buffer.merge(t, t, ITask::merge);
+    public boolean accept(DerivedTask nt) {
+        buffer.compute(nt, (tt, pt) -> {
+            if (pt == null) {
+                priSub(nt.priElseZero());
+                return nt;
+            } else {
+                float ptBefore = pt.priElseZero();
+                pt.merge(nt);
+                float ptAfter = pt.priElseZero();
+                float cost = ptAfter - ptBefore;
+                priSub(cost);
+                return pt;
+            }
+        });
+        return (priElseZero() > Pri.EPSILON);
     }
 }

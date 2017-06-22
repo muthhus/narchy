@@ -48,8 +48,11 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
     @Override
     protected void paint(GL2 gl) {
         if (busy.compareAndSet(false,true)) {
-            super.paint(gl);
-            busy.set(false);
+            try {
+                super.paint(gl);
+            } finally {
+                busy.set(false);
+            }
         }
     }
 

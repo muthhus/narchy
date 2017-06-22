@@ -6,6 +6,7 @@ import com.jogamp.opengl.GL2;
 import jcog.bag.util.Bagregate;
 import jcog.list.CircularArrayList;
 import jcog.list.FasterList;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
@@ -100,7 +101,9 @@ public class TreeChart<X> extends Surface {
 
     private void squarify(CircularArrayList<ItemVis<X>> children, Collection<ItemVis> row, double w) {
         CircularArrayList<ItemVis<X>> remainPoped = new CircularArrayList(children);
-        ItemVis c = remainPoped.poll();//.pop();
+        ItemVis c = remainPoped.poll();//.pop();]
+        if (c == null)
+            return;
 
         FasterList<ItemVis> concatRow = concat(row, c);
 
@@ -120,7 +123,7 @@ public class TreeChart<X> extends Surface {
         }
     }
 
-    private static FasterList<ItemVis> concat(Collection<ItemVis> row, ItemVis c) {
+    private static FasterList<ItemVis> concat(@NotNull Collection<ItemVis> row, @NotNull ItemVis c) {
         FasterList<ItemVis> concatRow = new FasterList<>(row.size() + 1);
         concatRow.addAll(row);
         concatRow.add(c);

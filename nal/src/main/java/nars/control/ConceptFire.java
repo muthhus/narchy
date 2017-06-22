@@ -9,7 +9,6 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.control.premise.Derivation;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
@@ -17,22 +16,26 @@ import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import static jcog.Util.clamp;
-import static nars.Op.NEG;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
-    /** rate at which ConceptFire forms premises */
+    /**
+     * rate at which ConceptFire forms premises
+     */
     private static final int sampleLimit = 3;
     private static final float priMinAbsolute = Pri.EPSILON * 4;
     private static final float momentum = 0.5f;
 
-    static final ThreadLocal<Map<ITask,ITask>> buffers =
+    static final ThreadLocal<Map<ITask, ITask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
+
+    static final int TASKLINKS_SAMPLED = 4;
+    static final int TERMLINKS_SAMPLED = 4;
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
@@ -42,10 +45,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     @Override
     public ITask[] run(NAR nar) {
         float pri = this.pri;
-        if (pri!=pri || pri < priMinAbsolute)
+        if (pri != pri || pri < priMinAbsolute)
             return null;
 
-        final float minPri = Math.max( pri * momentum, priMinAbsolute);
+        final float minPri = Math.max(pri * momentum, priMinAbsolute);
 
         final Concept c = id;
 
@@ -58,10 +61,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
 
         List<PriReference<Task>> taskl = $.newArrayList();
-        tasklinks.sample(8, ((Consumer<PriReference<Task>>) taskl::add));
+
+        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) return null;
         List<PriReference<Term>> terml = $.newArrayList();
-        termlinks.sample(8, ((Consumer<PriReference<Term>>) terml::add));
+        termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) return null;
 
         @Nullable PriReference<Task> tasklink = null;
@@ -69,7 +73,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         int ttl = sampleLimit;
 
-        Map<ITask,ITask> results = buffers.get();
+        Map<ITask, ITask> results = buffers.get();
         try {
 
             Random rng = nar.random();
@@ -97,30 +101,31 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 //                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
                 //            }
 
-                if (termlink.get().op() == NEG)
-                    throw new RuntimeException("NEG termlink: " + termlink);
+//                if (termlink.get().op() == NEG)
+//                    throw new RuntimeException("NEG termlink: " + termlink);
 
                 Premise p = new Premise(tasklink, termlink, results);
                 float thisPri = priElseZero();
-                if (thisPri > minPri) {
-                    p.pri(thisPri / sampleLimit * (1f - momentum));
-                    p.run(nar);
-                    if (results.values().stream().mapToDouble(Prioritized::priElseZero).sum() >= thisPri) {
-                        setPri(0);
-                        break;
-                    }
-                    //                if (result!=null) {
-                    //                    for (ITask x : result) {
-                    //                        results.merge(x, x, (pv, nv) -> {
-                    //                           pv.merge(nv);
-                    //                           return pv;
-                    //                        });
-                    //                    }
-                    //                    float cost = thisPri - p.priElseZero();
-                    //                    priSub(cost);
-                    //                }
-                }
+                float pBefore = thisPri / sampleLimit * (1f - momentum);
+                p.pri(pBefore);
+                p.run(nar);
+                float pAfter = p.priElseZero();
+                float cost = pBefore - pAfter;
+                if (cost >= Pri.EPSILON)
+                    priSub(cost);
+
+                //                if (result!=null) {
+                //                    for (ITask x : result) {
+                //                        results.merge(x, x, (pv, nv) -> {
+                //                           pv.merge(nv);
+                //                           return pv;
+                //                        });
+                //                    }
+                //                    float cost = thisPri - p.priElseZero();
+                //                    priSub(cost);
+                //                }
             }
+
 
             int size = results.size();
             if (size > 0)

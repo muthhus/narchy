@@ -426,7 +426,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         assert(activation>=0);
         if (activation >= Pri.EPSILON) {
-            TaskTable.activate(activated, Float.POSITIVE_INFINITY, nar);
+            TaskTable.activate(activated, activation, nar);
         }
     }
 

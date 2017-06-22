@@ -258,6 +258,9 @@ public class CircularArrayList<E> extends AbstractList<E> implements RandomAcces
 
     @Override
     public E removeLast() {
+        int s = size();
+        if (s == 0)
+            return null;
         return remove(size - 1);
     }
 

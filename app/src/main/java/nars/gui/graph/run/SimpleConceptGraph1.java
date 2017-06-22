@@ -1,14 +1,22 @@
 package nars.gui.graph.run;
 
+import com.google.common.collect.Iterables;
+import jcog.bag.util.Bagregate;
+import jcog.pri.PLink;
+import jcog.pri.PriReference;
+import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
+import nars.gui.BagChart;
+import nars.gui.NARChart;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.nar.Default;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.test.DeductiveMeshTest;
@@ -17,6 +25,7 @@ import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 import spacegraph.widget.button.PushButton;
+import spacegraph.widget.meter.TreeChart;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -39,13 +48,30 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //                        term.complexity()==3 && term.toString().endsWith("-->x)");
     }
 
+    public static class TaskTreeChart extends NARChart<ITask> {
+
+        public TaskTreeChart(@NotNull Iterable<ITask> b, int limit, NAR nar) {
+            super(new Bagregate(b, limit, 1f), limit, nar);
+        }
+
+        @Override
+        public void accept(ITask x, ItemVis<ITask> y) {
+            float p = x.priElseZero();
+            y.update(p, 0.25f + 0.5f * p, 0.25f, 0.25f);
+        }
+    }
+
     public static void main(String[] args) throws Narsese.NarseseException {
 
         Param.DEBUG = false;
 
+        TaskExecutor te = new TaskExecutor(64, 0.05f);
         Default n = new Default(
                 new Default.DefaultTermIndex(512, new DefaultConceptBuilder()),
-                new CycleTime(), new TaskExecutor(64, 0.25f));
+                new CycleTime(),
+                te
+        );
+        float fps = 1f;
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -80,6 +106,10 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        }
 
 
+//        SpaceGraph.window(
+//            new TaskTreeChart(Iterables.transform(te.active, (CLink<ITask> x)-> x.ref), 32, n),
+//            500, 500
+//        );
 
         NARSpace cs = new SimpleConceptGraph1(n,
                 () -> (((TaskExecutor) (n.exe)).active)
@@ -87,7 +117,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                         .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
                         .filter(Objects::nonNull)
                         .iterator()
-                /* TODO */, 64, 64, 1, 3);
+                /* TODO */, 64, 64, 7, 15);
 
 
         SpaceGraph<Term> s = new SpaceGraph(
@@ -133,23 +163,23 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         SpaceGraph.window(
                 col(
-                        reflect(fd),
+                        reflect(fd)
                         //new CheckBox("Atoms", atomsEnabled),
                         //reflect( new CycleView(n) ),
-                        new PushButton("+", () -> {
-                            try {
-                                n.input("x:h! :|:");
-                            } catch (Narsese.NarseseException e) {
-                                e.printStackTrace();
-                            }
-                        }),
-                        new PushButton("-", () -> {
-                            try {
-                                n.input("--x:h! :|:");
-                            } catch (Narsese.NarseseException e) {
-                                e.printStackTrace();
-                            }
-                        })
+//                        new PushButton("+", () -> {
+//                            try {
+//                                n.input("x:h! :|:");
+//                            } catch (Narsese.NarseseException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }),
+//                        new PushButton("-", () -> {
+//                            try {
+//                                n.input("--x:h! :|:");
+//                            } catch (Narsese.NarseseException e) {
+//                                e.printStackTrace();
+//                            }
+//                        })
                 ),
                 400, 400);
 
@@ -159,12 +189,17 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        for (int i = 1; i < 24; i++)
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
-        new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
+        //new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
+        n.input("(a-->b).", "(b-->c).","(c-->d).");
+        n.log();
 
-        n.startFPS(15f).join();
+        for (int i = 0; i < 50; i++) {
+            System.out.println(n.time() + "\n" + te.stats() + "\n\n");
+            n.run(1);
+        }
 
+        //n.startFPS(fps).join();
 
-        //n.input("(a-->b).", "(b-->c).","(c-->d).");
 
         //new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
 

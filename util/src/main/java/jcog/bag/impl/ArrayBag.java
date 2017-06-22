@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 
 /**
@@ -252,6 +253,41 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     @Override
     public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each, boolean pop) {
         sample(each, 0, pop);
+        return this;
+    }
+
+    @Override
+    public Bag<X, PriReference<X>> sample(int max, Consumer<? super PriReference<X>> each) {
+        return sample(max, ((x) -> { each.accept(x); return true;  }));
+    }
+
+    @Override
+    public Bag<X, PriReference<X>> sample(int max, Predicate<? super PriReference<X>> kontinue) {
+        synchronized (items) {
+            assert(max > 0);
+            int s = size();
+            PriReference<X>[] ll = items.list;
+            if (s == 1) {
+                //get the only
+                kontinue.test(ll[0]);
+            } else if (s == max) {
+                //get all
+                for (int i = 0; i < s; i++) {
+                    if (!kontinue.test(ll[i]))
+                        break;
+                }
+            } else if (s > 1) {
+                //get some: choose random starting index, get the next consecutive values
+                max = Math.min(s, max);
+                for (int i = ThreadLocalRandom.current().nextInt(s), m = 0; m < max; m++) {
+                    PriReference<X> lll = ll[i++];
+                    if (lll!=null)
+                        if (!kontinue.test(lll))
+                            break;
+                    if (i == s) i = 0; //modulo
+                }
+            }
+        }
         return this;
     }
 
