@@ -182,11 +182,8 @@ public class TaskExecutor extends Executioner {
             next = x.ref.run(nar);
 
         } catch (Throwable e) {
-            e.printStackTrace();
-            x.delete(); //TODO add to a 'bad' bag?
-            if (Param.DEBUG)
-                NAR.logger.error("{} {}", x, e.getMessage());
-
+            NAR.logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
+            x.delete();
             return;
         }
 
@@ -196,7 +193,7 @@ public class TaskExecutor extends Executioner {
         } else if (next == ITask.Disappear) {
             active.remove(x.ref); //immediately but dont affect its budget
         } else if (forgetEachPri > 0) {
-            x.priSub(forgetEachPri);
+            //x.priSub(forgetEachPri);
         }
 
         actuallyFeedback(x, next);

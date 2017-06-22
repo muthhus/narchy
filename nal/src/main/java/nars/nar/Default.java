@@ -12,6 +12,7 @@ import nars.op.stm.STMTemporalLinkage;
 import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -30,14 +31,14 @@ public class Default extends NAR {
 
     @Deprecated
     public Default() {
-        this(128);
+        this(256);
     }
 
     public Default(int activeTasks) {
         this(
             new DefaultTermIndex(activeTasks * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
             new CycleTime(),
-            new SynchTaskExecutor(activeTasks, 0.2f));
+            new TaskExecutor(activeTasks, 0.2f));
     }
 
     public static final int INDEX_TO_CORE_INITIAL_SIZE_RATIO = 16;

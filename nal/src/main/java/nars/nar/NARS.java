@@ -191,7 +191,8 @@ public class NARS extends NAR {
 
 
         public CLink<ITask> apply(CLink<ITask> x) {
-            x.priMult( ((MixContRL)(((NARS)nar).in)).gain(x) );
+            if (!x.isDeleted())
+                x.priMult( ((MixContRL)(((NARS)nar).in)).gain(x) );
             return x;
         }
 
@@ -267,8 +268,14 @@ public class NARS extends NAR {
         }
 
         @Override
+        protected void actuallyRun(CLink<ITask> x) {
+            ((RootExecutioner)exe).apply(x); //apply gain before running, because it may be an ephemeral task this would be the only point to affect it and its children
+
+            super.actuallyRun(x);
+        }
+
+        @Override
         protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-            ((RootExecutioner)exe).apply(x);
             if (next!=null)
                 NARS.this.input(next); //through post mix
         }

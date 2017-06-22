@@ -53,7 +53,9 @@ public class AffinityExecutor implements Executor {
             try (AffinityLock lock = AffinityLock.acquireLock()) {
                 cmd.run(); //avoid virtual call to super etc
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Could not acquire affinity lock; executing normally: {} ", e.getMessage());
+                //e.printStackTrace();
+
                 cmd.run();
             }
 
