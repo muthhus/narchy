@@ -58,7 +58,7 @@ public class GenericCompoundDT extends ProxyCompound {
 
         if (obj instanceof GenericCompoundDT) {
 
-            GenericCompoundDT d = (GenericCompoundDT)obj;
+            GenericCompoundDT d = (GenericCompoundDT) obj;
 
             Compound ref = this.ref;
             Compound dref = d.ref;
@@ -89,7 +89,7 @@ public class GenericCompoundDT extends ProxyCompound {
 
             return (hashDT == d.hashDT && dt == d.dt);
         } else if (obj instanceof ProxyCompound) {
-            return equals(((ProxyCompound)obj).ref);
+            return equals(((ProxyCompound) obj).ref);
         }
 
         return false;
@@ -113,7 +113,7 @@ public class GenericCompoundDT extends ProxyCompound {
 
     @Override
     public boolean isTemporal() {
-        return (op().temporal && (dt!=DTERNAL)) || subterms().isTemporal();
+        return (op().temporal && (dt != DTERNAL)) || subterms().isTemporal();
     }
 
     @NotNull
@@ -138,16 +138,16 @@ public class GenericCompoundDT extends ProxyCompound {
         if (nextDT == this.dt)
             return this;
 
-            if (op().commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
-                //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
-                @NotNull TermContainer st = subterms();
-                if (!st.isSorted()) {
-                    GenericCompound g = new GenericCompound(op(), TermVector.the(Terms.sorted(subterms().toArray())));
-                    if (nextDT!=DTERNAL)
-                        return new GenericCompoundDT( g, nextDT);
-                    else
-                        return g;
-                }
+        if (op().commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
+            //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
+            @NotNull TermContainer st = subterms();
+            if (!st.isSorted()) {
+                GenericCompound g = new GenericCompound(op(), TermVector.the(Terms.sorted(subterms().toArray())));
+                if (nextDT != DTERNAL)
+                    return new GenericCompoundDT(g, nextDT);
+                else
+                    return g;
+            }
 
         }
         return ref.dt(nextDT);

@@ -377,9 +377,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
                 ii = 0;
                 termPos.clear();
                 try {
-                    IO.mapSubTerms(b, (o, depth, p) -> {
-                        termPos.add(p);
-                    });
+                    IO.mapSubTerms(b, (o, depth, p) -> termPos.add(p));
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (Exception e) {

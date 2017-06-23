@@ -241,12 +241,12 @@ public class MySTMClustered extends STMClustered {
                         @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
                         if (cp != null) {
                             int uuLen = uu.length;
-                            long[] evidence = Stamp.zip(() -> new ArrayIterator<Stamp>(uu), uuLen); //HACK
+                            long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
 
                             Task m = new GeneratedTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                            float maxPri = new FasterList<Task>(uuLen, uu)
+                            float maxPri = new FasterList<>(uuLen, uu)
                                     .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
 
                             m.priority().setPri(BudgetFunctions.fund(maxPri, false, uu));

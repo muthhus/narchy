@@ -12,7 +12,7 @@ public abstract class RealTime implements Time {
 
 
     private final int unitsPerSecod;
-    volatile long t;
+    long t;
     long t0 = -1;
     private long start;
 

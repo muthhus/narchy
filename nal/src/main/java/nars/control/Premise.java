@@ -179,7 +179,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    protected long whenMatch(Task task, long now, NAR nar) {
+    protected static long whenMatch(Task task, long now, NAR nar) {
         if (task.isEternal()) {
             return ETERNAL;
         } else if (task.isInput()) {
@@ -198,7 +198,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
         //now + dur;
     }
 
-    protected long whenAnswer(Task task, long now) {
+    protected static long whenAnswer(Task task, long now) {
         return task.nearestStartOrEnd(now);
     }
 

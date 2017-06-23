@@ -15,7 +15,7 @@ public enum AbstractPatternOp  {
 
     @NotNull
     static Compound name(@NotNull Class c, int subterm, String param) {
-        return $.func(c.getSimpleName(), $.the("p" + Integer.toString(subterm))
+        return $.func(c.getSimpleName(), $.the('p' + Integer.toString(subterm))
                 , $.quote(param));
     }
 

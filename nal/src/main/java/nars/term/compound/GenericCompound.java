@@ -109,6 +109,7 @@ public class GenericCompound implements Compound {
     }
 
     /** creates a new instance with the given dt value */
+    @Override
     public Compound dt(int dt) {
         if (dt==DTERNAL)
             return this;

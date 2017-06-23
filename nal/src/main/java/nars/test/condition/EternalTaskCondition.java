@@ -104,7 +104,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @NotNull
     public static String rangeStringN2(float min, float max) {
-        return "(" + Texts.n2(min) + ',' + Texts.n2(max) + ')';
+        return '(' + Texts.n2(min) + ',' + Texts.n2(max) + ')';
     }
 
     /**

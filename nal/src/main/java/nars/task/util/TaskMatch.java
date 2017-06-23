@@ -48,7 +48,7 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
         @NotNull
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "(" + term + ")";
+            return getClass().getSimpleName() + '(' + term + ')';
         }
     }
 

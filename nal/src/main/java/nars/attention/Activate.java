@@ -121,7 +121,7 @@ public class Activate extends UnaryTask<Task> {
                 ThreadLocal.withInitial(() -> new SaneObjectFloatHashMap<>(64));
         private final Task task;
         @Deprecated
-        private int maxDepth; //TODO subtract from this then it wont need stored
+        private final int maxDepth; //TODO subtract from this then it wont need stored
 
 
         transient final protected TaskConcept origin;
@@ -151,8 +151,8 @@ public class Activate extends UnaryTask<Task> {
          */
         private static final float TERMLINK_BALANCE = 0.5f;
 
-        transient private ObjectFloatHashMap<Termed> spread;
-        transient private NAR nar;
+        final transient private ObjectFloatHashMap<Termed> spread;
+        final transient private NAR nar;
         transient private FasterList<ITask> activations;
 
         public TaskActivation(NAR nar, Task t, TaskConcept origin, float p, int maxDepth) {

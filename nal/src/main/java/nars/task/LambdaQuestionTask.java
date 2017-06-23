@@ -28,9 +28,7 @@ public class LambdaQuestionTask extends NALTask {
     }
 
     public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull Consumer<Task> eachAnswer) {
-        this(term, punc, occ, history, nar, (q, a) -> {
-            eachAnswer.accept(a);
-        });
+        this(term, punc, occ, history, nar, (q, a) -> eachAnswer.accept(a));
     }
 
     public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<? super LambdaQuestionTask, Task> eachAnswer) {

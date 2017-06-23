@@ -130,15 +130,15 @@ public class InstrumentedExecutor extends Executioner {
 //        return meters.computeIfAbsent(cc, c -> new PeriodMeter(c.getName(), -1));
 //    }
 
-    static void measure(Runnable cmd, PeriodMeter p) {
-        long start = System.nanoTime();
-        cmd.run();
-        long end = System.nanoTime();
-
-        synchronized (p) {
-            p.hitNano(end - start);
-        }
-    }
+//    static void measure(Runnable cmd, PeriodMeter p) {
+//        long start = System.nanoTime();
+//        cmd.run();
+//        long end = System.nanoTime();
+//
+//        synchronized (p) {
+//            p.hitNano(end - start);
+//        }
+//    }
 
     @Override
     public float load() {

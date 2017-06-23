@@ -63,7 +63,7 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInputMixer() {
-        MixContRL<ITask> r = new MixContRL<ITask>(40f,
+        MixContRL<ITask> r = new MixContRL<>(40f,
 
                 new HaiQMixAgent(),
                 //new MultiHaiQMixAgent(),

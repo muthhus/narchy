@@ -102,7 +102,7 @@ public interface Concept extends Termed {
         if (m == null)
             return null;
         //synchronized (m) {
-            return (C) m.remove(key);
+        return (C) m.remove(key);
         //}
 
     }

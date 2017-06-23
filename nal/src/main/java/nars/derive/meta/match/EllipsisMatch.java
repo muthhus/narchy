@@ -123,12 +123,6 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        return false;
-        //throw new UnsupportedOperationException();
-    }
-
-    @Override
     public void append(@NotNull Appendable w) throws IOException {
         w.append(toString());
     }

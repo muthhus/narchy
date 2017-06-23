@@ -328,9 +328,12 @@ public abstract class TermBuilder {
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
                     return finish(op, t);
-            default:
-                throw new InvalidTermException(op, t, "diff requires 2 terms");
+
+
         }
+
+        throw new InvalidTermException(op, t, "diff requires 2 terms");
+
     }
 
 
@@ -1288,7 +1291,7 @@ public abstract class TermBuilder {
 
 
         boolean dtChanged = (pdt != c.dt());
-        boolean subsChanged = (!newSubs.equals(oldSubs));
+        boolean subsChanged = (!Arrays.equals(newSubs, oldSubs));
 
         if (subsChanged || dtChanged) {
 

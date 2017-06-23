@@ -67,21 +67,4 @@ public interface Variable extends Atomic {
         meta[5] |= structure();
     }
 
-    @Override
-    default int varQuery() {
-        return 0;
-    }
-
-    @Override
-    default int varPattern() {
-        return 0;
-    }
-
-    @Override
-    default int varIndep() {
-        return 0;
-    }
-
-    @Override
-    default int varDep() { return 0; }
 }

@@ -106,9 +106,9 @@ public class Derivation extends Unify implements TermContext {
     public boolean cyclic, overlap;
     //public final float overlapAmount;
 
-    private substitute _substitute;
-    private substituteIfUnifiesAny _substituteIfUnifiesAny;
-    private substituteIfUnifiesDep _substituteIfUnifiesDep;
+    private final substitute _substitute;
+    private final substituteIfUnifiesAny _substituteIfUnifiesAny;
+    private final substituteIfUnifiesDep _substituteIfUnifiesDep;
     private int serial;
 
 

@@ -56,7 +56,7 @@ public class NLPGen {
         final int maxVars = 6;
         for (int i = 0; i < maxVars; i++) {
             String v = String.valueOf((char) ('A' + i));
-            narsese = narsese.replaceAll(v, "%" + v);
+            narsese = narsese.replaceAll(v, '%' + v);
         }
 
         try {

@@ -130,7 +130,7 @@ public class TestNAR {
             try {
                 nar.input(x);
             } catch (Narsese.NarseseException e) {
-                assertTrue(e.toString(), false);
+                fail(e.toString());
             }
         return this;
     }
@@ -154,7 +154,7 @@ public class TestNAR {
         try {
             nar.inputAt(time, s);
         } catch (Narsese.NarseseException e) {
-            assertTrue(e.toString(), false);
+            fail(e.toString());
         }
         return this;
     }
@@ -484,7 +484,7 @@ public class TestNAR {
     @NotNull
     public TestNAR askAt(int i, String term) {
         try {
-            nar.inputAt(i, term + "?");
+            nar.inputAt(i, term + '?');
         } catch (Narsese.NarseseException e) {
             e.printStackTrace();
         } catch (Throwable e) {

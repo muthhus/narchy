@@ -100,7 +100,7 @@ public interface NSense {
      */
     default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) throws Narsese.NarseseException {
         for (O e : values) {
-            Compound t = switchTerm(term, "\"" + e.toString() + "\"");
+            Compound t = switchTerm(term, '"' + e.toString() + '"');
             sense(t, () -> value.get().equals(e));
         }
     }

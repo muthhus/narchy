@@ -61,11 +61,6 @@ public interface Atomic extends Term {
     String toString();
 
 
-    /** default atomic unification is equality */
-    @Override default boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        return false;
-    }
-
     @Override
     default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
         return whileTrue.test(this, parent);

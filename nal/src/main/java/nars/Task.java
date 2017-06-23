@@ -582,6 +582,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      * Check if a Task is a direct input,
      * or if its origin has been forgotten or never known
      */
+    @Override
     default boolean isInput() {
         return stamp().length <= 1;
         //return evidence().length <= 1;
@@ -980,10 +981,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         }
 
         /*if (isCommand)*/
-        {
-            nar.eventTaskProcess.emit(cmd);
-            return null;
-        }
+        nar.eventTaskProcess.emit(cmd);
+        return null;
 
     }
 
@@ -1040,19 +1039,19 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     default boolean isFutureOf(long when) {
         long x = nearestStartOrEnd(when);
-        return x == ETERNAL ? true : x > when;
+        return x == ETERNAL || x > when;
     }
     default boolean isPastOf(long when) {
         long x = nearestStartOrEnd(when);
-        return x == ETERNAL ? true : x < when;
+        return x == ETERNAL || x < when;
     }
     default boolean isPresentOf(long when) {
         long x = nearestStartOrEnd(when);
-        return x == ETERNAL ? true : x == when;
+        return x == ETERNAL || x == when;
     }
     default boolean isPresentOf(long when, int dur) {
         long x = nearestStartOrEnd(when);
-        return x == ETERNAL ? true : Math.abs(x-when) <= dur;
+        return x == ETERNAL || Math.abs(x - when) <= dur;
     }
 
 }

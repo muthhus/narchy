@@ -292,13 +292,12 @@ public class Revision {
 
         long start, end;
         @Nullable Truth newTruth;
-        {
 
 //            float ae = a.evi();
 //            float aa = ae * (1 + ai.length());
 //            float be = b.evi();
-            //float bb = be * (1 + bi.length());
-            //float p = aa / (aa + bb);
+        //float bb = be * (1 + bi.length());
+        //float p = aa / (aa + bb);
 
 //            //relate high frequency difference with low confidence
 //            float freqDiscount =
@@ -331,20 +330,20 @@ public class Revision {
 //            }
 
 
-            //width will be the average width
-            long width = (ai.length() + bi.length()) / 2; //TODO weight
-            long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
+        //width will be the average width
+        long width = (ai.length() + bi.length()) / 2; //TODO weight
+        long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
 
 //            Truth expected = table.truth(mid, now, dur);
 //            if (expected == null)
 //                return null;
 
 
-            start = mid - width / 2;
-            end = mid + width / 2;
+        start = mid - width / 2;
+        end = mid + width / 2;
 
-            long u = ai.union(bi).length();
-            long s = ai.length() + bi.length();
+        long u = ai.union(bi).length();
+        long s = ai.length() + bi.length();
 
 //            Truth startTruth = table.truth(start, now, dur);
 //            if (startTruth == null)
@@ -354,7 +353,7 @@ public class Revision {
 //            if (endTruth == null)
 //                return null;
 
-            float factor = 1f;
+        float factor = 1f;
 
 //            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
 //            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from
@@ -363,18 +362,17 @@ public class Revision {
 //                factor *= (1f - diff);
 
 
-            if (timeOverlap == null) {
-                factor *= ((float) s) / (s + u);
-            }
+        if (timeOverlap == null) {
+            factor *= ((float) s) / (s + u);
+        }
 
-            newTruth = revise(a, b, factor, c2w(confMin));
+        newTruth = revise(a, b, factor, c2w(confMin));
 
 //            float conf = w2c(expected.evi() * factor);
 //            if (conf >= Param.TRUTH_EPSILON)
 //                newTruth = new PreciseTruth(expected.freq(), conf);
 //            else
 //                newTruth = null;
-        }
 
 
         if (newTruth != null) {

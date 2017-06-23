@@ -65,16 +65,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         sub.recurseTerms(v);
     }
 
-    @Override
-    public boolean OR(@NotNull Predicate<Term> p) {
-        return p.test(sub);
-    }
-
-    @Override
-    public boolean AND(@NotNull Predicate<Term> p) {
-        return p.test(sub);
-    }
-
 
     @Override
     public int hashCode() {

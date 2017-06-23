@@ -43,12 +43,6 @@ abstract public class PatternCompound extends GenericCompound {
         commutativeCached = super.isCommutative();
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return IO.Printer.stringify(this).toString();
-    }
-
 
     @Override
     public int dt() {

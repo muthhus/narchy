@@ -57,7 +57,7 @@ public final class SubTermStructure extends AtomicPred<Derivation> {
                         ("onBit_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
                             :
                         ("onAll_" + Integer.toBinaryString(bits))
-                ) + ")";
+                ) + ')';
 
     }
 

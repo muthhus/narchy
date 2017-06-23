@@ -143,7 +143,7 @@ public class Builtin {
             return result;
         }));
 
-        nar.on("assertEquals", (Operator) (op, args, nn) -> {
+        nar.on("assertEquals", (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             Assert.assertEquals(/*msg,*/ 2, args.length);
             Assert.assertEquals(/*msg,*/ args[0], args[1]);
@@ -166,17 +166,15 @@ public class Builtin {
         nar.on("log", log);
         nar.on(Command.LOG_FUNCTOR, log);
 
-        nar.on("error", (Operator) (a, t, n) -> NAR.logger.error("{}", t));
+        nar.on("error", (a, t, n) -> NAR.logger.error("{}", t));
 
-        nar.on("reset", (Operator) (op, args1, nn) ->
+        nar.on("reset", (op, args1, nn) ->
                 nn.runLater(nn::reset)
         );
 
-        nar.on("clear", (Operator) (op, args, n) -> {
+        nar.on("clear", (op, args, n) -> {
             n.clear();
-            n.runLater(() -> {
-                Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)");
-            });
+            n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
         });
 
 

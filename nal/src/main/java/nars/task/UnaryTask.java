@@ -30,7 +30,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
     @Override
     public final @NotNull String toString() {
-        return "$" + Texts.n4(pri) + " " + getClass().getSimpleName() + "(\"" + id + "\")";
+        return '$' + Texts.n4(pri) + ' ' + getClass().getSimpleName() + "(\"" + id + "\")";
     }
 
     @Override

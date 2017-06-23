@@ -19,11 +19,13 @@ public class DebugDerivedTask extends DerivedTask {
         this.parentBelief = d.belief;
     }
 
+    @Override
     @Nullable
     public final Task getParentTask() {
         return parentTask;
     }
 
+    @Override
     @Nullable
     public final Task getParentBelief() {
         return parentBelief;

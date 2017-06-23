@@ -84,6 +84,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         return false;
     }
 
+    @Override
     public void add(@NotNull Task x, TaskConcept c, NAR n) {
 
         float activation = x.priSafe(0);

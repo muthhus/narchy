@@ -214,9 +214,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         String s = concepts.estimatedSize() + " concepts, " + (subterms!=null ? (subterms.estimatedSize() + " subterms") : "");
 
         if (Param.DEBUG)
-            s += " " + concepts.stats().toString();
+            s += ' ' + concepts.stats().toString();
 
-        return s + "\n" + super.summary();
+        return s + '\n' + super.summary();
         //(" + n2(s.hitRate()) + " hitrate, " +
                 //s.requestCount() + " reqs)";
 

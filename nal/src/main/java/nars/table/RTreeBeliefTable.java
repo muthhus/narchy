@@ -152,8 +152,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
-        this.tree = new ConcurrentRTree<TaskRegion>(
-                new RTree<TaskRegion>((t -> t), 2, 4, Spatialization.DefaultSplits.AXIAL) {
+        this.tree = new ConcurrentRTree<>(
+                new RTree<>((t -> t), 2, 4, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
                     public boolean add(TaskRegion tr) {
@@ -269,7 +269,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return tree.cursor(timeRange(start, end));
     }
 
-    private HyperRegion timeRange(long a, long b) {
+    private static HyperRegion timeRange(long a, long b) {
         return new TaskRegion(a, b);
     }
 
@@ -506,7 +506,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
     }
 
-    private FloatFunction<TaskRegion> regionStrength(long when, int dur) {
+    private static FloatFunction<TaskRegion> regionStrength(long when, int dur) {
 
         return (TaskRegion cb) -> {
 

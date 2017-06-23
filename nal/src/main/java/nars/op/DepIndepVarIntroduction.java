@@ -23,7 +23,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     public static final VarIntro the = new VarIntro();
 
-    public final static Term varIntro(Term x, NAR n) {
+    public static Term varIntro(Term x, NAR n) {
         return the.introduce(x, n);
     }
 

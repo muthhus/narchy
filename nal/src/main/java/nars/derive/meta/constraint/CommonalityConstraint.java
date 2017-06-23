@@ -36,7 +36,7 @@ public abstract class CommonalityConstraint extends MatchConstraint {
                         :
                         invalid(/*(Term)*/x, C);
             } else {
-                result = invalid((Term)x, (Term)y);
+                result = invalid(x, y);
             }
         }
         return result;

@@ -56,9 +56,7 @@ public final class STMTemporalLinkage extends STM {
         if (tPri == 0)
             return;
 
-        Iterator<Task> ss = stm.iterator();
-        while (ss.hasNext()) {
-            Task u = ss.next();
+        for (Task u : stm) {
             if (u == null) continue; //skip null's and dummy's
             link(t, strength, tPri, u);
         }
