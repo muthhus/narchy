@@ -25,7 +25,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 150;
+    final int cycles = 550;
 
     @Test
     public void revision() {
@@ -82,6 +82,7 @@ public class NAL5Test extends AbstractNALTest {
     public void testImplBeliefPosPos() {
         //B, (A ==> C), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         test()
+                .log()
                 .believe("(b)")
                 .believe("((b)==>(c))", 1, 0.9f)
                 .mustBelieve(cycles, "(c)", 1.00f, 0.81f);
@@ -514,7 +515,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void testImplNegNeg() {
         test()
-                .log()
+                //.log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (--,(y))).")
                 .mustBelieve(cycles * 2, "(y)", 0.0f, 0.81f)

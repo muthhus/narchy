@@ -51,6 +51,48 @@ public enum TruthPolation {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
+        /**
+     * computes truth at a given time from iterative task samples
+     * includes variance calculation for reduction of evidence in proportion to confusion/conflict
+     * uses "waldorf method" to calculate a running variance
+     * additionally, the variance is weighted by the contributor's confidences
+     */
+    public static class TruthPolationBasic implements Consumer<Task> {
+        float eviSum = 0, wFreqSum = 0;
+        final long when;
+        final int dur;
+
+        public TruthPolationBasic(long when, int dur) {
+            this.when = when;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Task t) {
+             float tw = t.evi(when, dur);
+
+            if (tw > 0) {
+                eviSum += tw;
+
+                float f = t.freq();
+                wFreqSum += tw * f;
+            }
+
+        }
+
+
+        public PreciseTruth truth() {
+            if (eviSum > 0) {
+                float f = wFreqSum / eviSum;
+                return new PreciseTruth(f, eviSum, false);
+
+            } else {
+                return null;
+            }
+
+        }
+    }
+
     /**
      * computes truth at a given time from iterative task samples
      * includes variance calculation for reduction of evidence in proportion to confusion/conflict
@@ -97,8 +139,7 @@ public enum TruthPolation {
                 float f = wFreqSum / eviSum;
 
                 float var =
-                        //deltaSum / count;
-                        0;
+                        deltaSum / count;
 
                 return new PreciseTruth(f, eviSum * (1f / (1f + var)), false);
 
@@ -113,7 +154,7 @@ public enum TruthPolation {
     public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
 
-        TruthPolationWithVariance t = new TruthPolationWithVariance(when, dur);
+        TruthPolationBasic t = new TruthPolationBasic(when, dur);
 
         // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
