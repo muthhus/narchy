@@ -104,9 +104,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final transient Emotion emotion;
     @NotNull
     public final Time time;
-    /**
-     * holds known Term's and Concept's
-     */
+
     @NotNull
     public final TermIndex terms;
 
@@ -120,13 +118,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     int level;
 
-
     protected final NARLoop loop = new NARLoop(this);
 
     @NotNull public final PSinks<ITask, CLink<ITask>> in;
-
-
-    //private final Collection<Object> on = $.newArrayList(); //registered handlers, for strong-linking them when using soft-index
 
     public final void printConceptStatistics() {
         printConceptStatistics(System.out);

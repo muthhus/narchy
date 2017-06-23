@@ -28,7 +28,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
      * rate at which ConceptFire forms premises
      */
     private static final int sampleLimit = 12;
-    private static final float priMinAbsolute = Pri.EPSILON * 4;
+    private static final float priMinAbsolute = Pri.EPSILON * 128;
     private static final float momentum = 0.5f;
 
     static final ThreadLocal<Map<ITask, ITask>> buffers =
