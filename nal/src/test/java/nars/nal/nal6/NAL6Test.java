@@ -17,7 +17,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 480;
+    final int cycles = 1480;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -557,7 +557,7 @@ public class NAL6Test extends AbstractNALTest {
             .mustBelieve(cycles, "(y,y)", 0f, 0.81f) ; //B, (A <=> C), ...
     }
     @Test public void testEquivSpecificPN() {
-        test().believe("(y)").believe("--(($x) <=> ($x,y))")
+        test().log().believe("(y)").believe("--(($x) <=> ($x,y))")
             .mustBelieve(cycles, "(y,y)", 0f, 0.81f) ; //B, (A <=> C), ...
     }
     @Test public void testEquivSpecificNN() {

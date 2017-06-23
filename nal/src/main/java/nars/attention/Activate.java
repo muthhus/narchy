@@ -346,11 +346,12 @@ public class Activate extends UnaryTask<Task> {
 
         }
 
-        private static boolean linkableSub(Term x) {
+        static boolean linkableSub(Term x) {
 
             //assert(!(x instanceof UnnormalizedVariable));
 
-            if (x instanceof AtomInt || x instanceof Variable)
+
+            if (x instanceof Variable || x instanceof AtomInt)
                 return false;
 
             return true;
