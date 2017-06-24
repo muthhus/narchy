@@ -58,7 +58,7 @@ public class Line1D {
 
             a.speed.setValue(yResolution);
 
-            a.happy.resolution.setValue(0.04f);
+            a.happy.resolution.setValue(0.02f);
             a.out.resolution.setValue(yResolution);
             a.in.resolution.setValue(yResolution);
             a.curiosity.setValue((2/yResolution)*tHz);
@@ -169,7 +169,10 @@ public class Line1D {
 //                System.err.println(t.proof());
 //            }
 //        });
-                InstrumentedExecutor exe = new InstrumentedExecutor(new TaskExecutor(256, 0.5f));
+                InstrumentedExecutor exe =
+                        new InstrumentedExecutor(
+                        new TaskExecutor(256, 0.5f)
+                );
 
                 Default n = new Default(
                     new Default.DefaultTermIndex(32*1024),
@@ -177,10 +180,10 @@ public class Line1D {
                     exe
                 );
 
-                n.time.dur(1);
-                n.termVolumeMax.set(14);
+                n.time.dur(4);
+                n.termVolumeMax.set(28);
                 n.goalConfidence(0.5f);
-                n.beliefConfidence(0.9f);
+                n.beliefConfidence(0.5f);
 
                 new Line1DExperiment() {
                     @Override

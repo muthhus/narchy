@@ -17,7 +17,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 1480;
+    final int cycles = 2480;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -503,7 +503,7 @@ public class NAL6Test extends AbstractNALTest {
     @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk
     public void strong_elimination()  {
         TestNAR tester = test();
-        //tester.log();
+        tester.log();
         tester.believe("<(&&,<($a,is,cat) --> test>,<($a,is,$b) --> sentence>) ==> <$a --> $b>>");
         tester.believe("<(tim,is,cat) --> test>");
         tester.mustBelieve(cycles*2, "<<(tim,is,$1) --> sentence> ==> <tim --> $1>>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");

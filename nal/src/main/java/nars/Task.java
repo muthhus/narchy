@@ -79,7 +79,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         if (a == ETERNAL)
             return cw;
         else if (when == ETERNAL)
-            return t.eternalizedEvi();
+            return t.eviEternalized();
         else {
             long z = end();
 
@@ -89,14 +89,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             } else {
                 //nearest endpoint of the interval
-                if (dur > 0) {
-                    cw = TruthPolation.evidenceDecay(cw, dur, a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when));
-                } else {
-                    cw = 0;
+                assert(dur>0);
+                long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
+                if (dist > 0) {
+                    //cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
+                    cw = 0; //immediate cut-off
                 }
 
                 if (eternalizable(term())) {
-                    float et = t.eternalizedEvi();
+                    float et = t.eviEternalized();
                     if (et > cw)
                         cw = et;
                 }
@@ -111,7 +112,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     static boolean eternalizable(Term term) {
 
-        return false;
+        return true;
+        //return false;
         //return term.varIndep() > 0;
         //return term.vars() > 0;
         //return true;
@@ -883,7 +885,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
     @Override
-    default ITask[] run(NAR n) {
+    default ITask[] run(@NotNull NAR n) {
 
         float inputPri = this.pri();
         if (inputPri != inputPri)

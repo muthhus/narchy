@@ -244,7 +244,7 @@ public interface Truth extends Truthed {
     }
 
 
-    default float eternalizedEvi() {
+    default float eviEternalized() {
 //        float c = eternalizedConf();
 //        return c2w(c);
         return conf(); //c2w(w2c(conf)) = conf

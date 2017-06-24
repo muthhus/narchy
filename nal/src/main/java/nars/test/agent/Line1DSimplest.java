@@ -38,11 +38,10 @@ public class Line1DSimplest extends NAgent {
     public Line1DSimplest(NAR n) {
         super("", n);
 
-        in = senseNumber(
-                //$.inh($.the("i"), id),
-                //$.inh(Atomic.the("i"), id),
-                $.p("i"),
-                this.i);
+        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+                this.i
+                //()->Util.sigmoid(this.o.floatValue() - this.i.floatValue())
+        );
 //        FuzzyScalarConcepts in = senseNumberBi(
 //                //$.inh($.the("i"), id),
 //                $.p($.the("i"), id),
@@ -118,7 +117,7 @@ public class Line1DSimplest extends NAgent {
 
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
-        return Util.sqr(1f - dist); //unipolar, 0..1.0
+        return (1f - dist)*2-1; //unipolar, 0..1.0
 
 
 //        float r = (1f - dist/2f); //bipolar, normalized to -1..+1

@@ -3,6 +3,7 @@ package nars.task;
 import com.google.common.collect.Lists;
 import nars.Task;
 import nars.truth.PreciseTruth;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,7 +52,11 @@ public enum TruthPolation {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
-        /**
+    public static float eternalize(float conf) {
+        return w2c(conf);
+    }
+
+    /**
      * computes truth at a given time from iterative task samples
      * includes variance calculation for reduction of evidence in proportion to confusion/conflict
      * uses "waldorf method" to calculate a running variance
@@ -69,8 +74,7 @@ public enum TruthPolation {
 
         @Override
         public void accept(Task t) {
-             float tw = t.evi(when, dur);
-
+            float tw = t.evi(when, dur);
             if (tw > 0) {
                 eviSum += tw;
 
@@ -154,7 +158,9 @@ public enum TruthPolation {
     public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
 
-        TruthPolationBasic t = new TruthPolationBasic(when, dur);
+        TruthPolationWithVariance t =
+                //new TruthPolationBasic(when, dur);
+                new TruthPolationWithVariance(when, dur);
 
         // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper

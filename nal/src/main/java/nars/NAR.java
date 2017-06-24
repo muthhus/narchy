@@ -202,6 +202,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             terms.start(this);
 
         time.clear();
+
+        exe.start(this);
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {
