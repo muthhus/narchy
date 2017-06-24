@@ -74,8 +74,9 @@ abstract public class Loop implements Runnable {
         int prevPeriodMS;
         if ((prevPeriodMS = periodMS.getAndSet(nextPeriodMS)) != nextPeriodMS) {
             if (prevPeriodMS < 0 && nextPeriodMS >= 0) {
-                if (thread.compareAndSet(null, new Thread(this))) {
-                    thread.get().start();
+                Thread myNewThread = new Thread(this);
+                if (thread.compareAndSet(null, myNewThread)) {
+                    myNewThread.start();
                 }
             } else if (prevPeriodMS >= 0 && nextPeriodMS < 0) {
                 Thread prevThread;

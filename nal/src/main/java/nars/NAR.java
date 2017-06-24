@@ -201,7 +201,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
 
-        restart();
+        time.clear();
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {

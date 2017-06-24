@@ -49,7 +49,7 @@ public class NARS extends NAR {
 
 
     public final List<SubExecutor> sub = $.newArrayList();
-    private int num;
+    public int num;
 
     private AffinityExecutor pool;
     private List<Loop> loops;
@@ -174,6 +174,10 @@ public class NARS extends NAR {
 
         }
 
+        @Override
+        public void start(NAR nar) {
+            super.start(nar);
+        }
 
         @Override
         public void runLater(Runnable cmd) {
@@ -304,16 +308,13 @@ public class NARS extends NAR {
     }
 
 
-    public boolean running() {
-        return this.loop.isRunning();
-    }
-
-
     @Override
     public NARLoop startPeriodMS(int ms) {
+        assert (!this.loop.isRunning());
+
         synchronized (terms) {
 
-            assert (!running());
+            exe.start(this);
 
             int num = sub.size();
 
@@ -331,7 +332,7 @@ public class NARS extends NAR {
     @Override
     public void stop() {
         synchronized (terms) {
-            if (!running())
+            if (!this.loop.isRunning())
                 return;
 
             super.stop();

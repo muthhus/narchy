@@ -12,6 +12,7 @@ import nars.nar.NARBuilder;
 import nars.op.Command;
 import nars.term.Term;
 import nars.time.RealTime;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -79,12 +80,12 @@ public class NARWeb extends WebServer {
 
 
         AtomicDouble fps = new AtomicDouble(5f);
-        AtomicReference<NARLoop> l = new AtomicReference<>(nar.startFPS(fps.floatValue()));
+        //AtomicReference<NARLoop> l = new AtomicReference<>(nar);
 
         InterNAR net = new InterNAR(nar, 8, port);
 
         nar.on("stop", (o, t, n) -> {
-            l.get().stop();
+            nar.stop();
         });
 
         nar.on("start", (o, t, n) -> {
@@ -96,7 +97,7 @@ public class NARWeb extends WebServer {
                 if (x >= 0)
                     fps.set(nextFPS = x);
             }
-            start(nar, l, nextFPS);
+            start(nar, nextFPS);
         });
         nar.on("stat", (o, t, n) -> {
 
@@ -110,18 +111,17 @@ public class NARWeb extends WebServer {
             Command.log( n, Util.jsonNode(stat).toString());
         });
 
-
+        start(nar, fps.floatValue());
 
         Hear.wiki(nar);
 
         NARWeb w = new NARWeb(nar, port);
 
-        start(nar, l, fps.floatValue());
 
 
     }
 
-    public static void start(NAR nar, AtomicReference<NARLoop> l, float nextFPS) {
-        l.set(nar.startFPS(nextFPS));
+    public static @NotNull NARLoop start(NAR nar, float nextFPS) {
+        return nar.startFPS(nextFPS);
     }
 }
