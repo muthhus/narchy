@@ -4,18 +4,23 @@ import jcog.Loop;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
+import jcog.list.LimitedFasterList;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.math.FloatSupplier;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jcog.pri.classify.AbstractClassifier;
 import jcog.pri.classify.BooleanClassifier;
+import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import jcog.tensor.TensorChain;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -50,6 +55,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
     /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
     private final AbstractClassifier<X>[] tests;
+    private final ObjectIntPair<EnumClassifier<X>>[] dynTests;
 
     /** should probably be calibrated in relation to the executioner's processing rate */
     private float activeTaskMomentum = 0.5f;
@@ -130,6 +136,17 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         this.tests = tests;
         tests = ArrayUtils.addAll(tests, aa);
 
+
+        List<ObjectIntPair<EnumClassifier>> dynTests = new FasterList();
+        int i = 0;
+        for (AbstractClassifier c : tests) {
+            if (c instanceof EnumClassifier && ((EnumClassifier)c).isDynamic())
+                dynTests.add(PrimitiveTuples.pair((EnumClassifier)c, i));
+            i += c.dimension();
+        }
+
+        this.dynTests = dynTests.toArray(new ObjectIntPair[dynTests.size()]);
+
         assert(dim >= tests.length);
         this.dim = dim;
 
@@ -139,8 +156,8 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         this.mix = new MixChannel[dim];
         for (AbstractClassifier t : tests) {
             int n = t.dimension();
-            for (int i = 0; i < n; i++) {
-                mix[j++] = new MixChannel(t.name(i));
+            for (int k = 0; k < n; k++) {
+                mix[j++] = new MixChannel(t.name(k));
             }
         }
         for (; j < dim; ) {
@@ -178,7 +195,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     }
 
     public CLink<X> test(X x) {
-        return test(new CLink<X>(x));
+        return test(new CLink<>(x));
     }
 
     public CLink<X> test(CLink<X> x) {
@@ -208,6 +225,11 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         float p = x.priElseZero();
         if (p > priMin.floatValue()) {
             final float[] preGain = {0};
+
+            for (ObjectIntPair<EnumClassifier<X>> c : dynTests) {
+                c.getOne().classify(x.ref, x, c.getTwo());
+            }
+
             x.forEach((int i) -> {
                 mix[i].accept(p, false, true);
                 preGain[0] += gain(i);
@@ -297,7 +319,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
             MixChannel mm = this.mix[id];
             mm.id = x.toString();
 
-            PSink<X,CLink<X>> p = new PSink<X,CLink<X>>(x, xx -> new CLink(xx, id), each);
+            PSink<X,CLink<X>> p = new PSink<X,CLink<X>>(x, xx -> new CLink<>(xx, id), each);
 
 
             this.aux.add(p);

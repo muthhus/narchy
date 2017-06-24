@@ -72,14 +72,14 @@ public class NARS extends NAR {
 
                 8,
 
-                new EnumClassifier<>("type", new String[]{
+                new EnumClassifier("type", new String[]{
                         "Belief", "Goal", "Question", "Quest",
                         "Activation", "ConceptFire"
                 }, (x) -> {
 
                     if (x instanceof Task) {
                         //NAL
-                        switch (x.punc()) {
+                        switch (((Task)x).punc()) {
                             case BELIEF:
                                 return 0;
                             case GOAL:
@@ -98,7 +98,7 @@ public class NARS extends NAR {
                     return -1;
                 }),
 
-                new EnumClassifier<>("complexity", 3, (t) -> {
+                new EnumClassifier("complexity", 3, (t) -> {
                     if (t instanceof NALTask) {
                         int c = ((NALTask) t).complexity();
                         int m = termVolumeMax.intValue();
@@ -109,7 +109,7 @@ public class NARS extends NAR {
                     return -1;
                 }),
 
-                new EnumClassifier<>("when", new String[]{"Present", "Future", "Past"}, (t) -> {
+                new EnumClassifier("when", new String[]{"Present", "Future", "Past"}, (t) -> {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
@@ -122,7 +122,7 @@ public class NARS extends NAR {
                         }
                     }
                     return -1;
-                })
+                }, true)
 
 //            new MixRouter.Classifier<>("original",
 //                    (x) -> x.stamp().length <= 2),
