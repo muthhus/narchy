@@ -1,11 +1,13 @@
 package nars.util.exe;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.google.common.base.Joiner;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
+import jcog.pri.Pri;
 import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Param;
@@ -29,6 +31,7 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
+    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
     protected boolean trace;
 
     /**
@@ -58,6 +61,20 @@ public class TaskExecutor extends Executioner {
             //return new PForget(rate);
         }
 
+        @Override
+        public void onRemoved(@NotNull CLink<ITask> value) {
+            if (value.priElseZero() >= Pri.EPSILON) {
+                if (overflow.remainingCapacity() < 1) {
+                    overflow.poll(); //forget
+                }
+                overflow.offer(value); //save
+            } else {
+                CLink<ITask> x = overflow.poll();
+                if (x!=null && x.priElseZero() >= Pri.EPSILON)
+                    put(x); //restore
+            }
+        }
+
         @NotNull
         @Override
         public HijackBag<ITask, CLink<ITask>> commit(@Nullable Consumer<CLink<ITask>> update) {
@@ -81,6 +98,9 @@ public class TaskExecutor extends Executioner {
     public TaskExecutor(int capacity) {
         super();
         active.capacity(capacity);
+
+        int overCapacity = capacity * 8;
+        overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {
@@ -192,20 +212,20 @@ public class TaskExecutor extends Executioner {
         ITask[] next;
         try {
 
-            if (x.isDeleted())
-                return;
+            if (x.isDeleted()) {
+                active.remove(x.ref);
+            }
 
             next = x.ref.run(nar);
 
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
-            x.delete();
+            x.delete(); active.remove(x.ref);
             return;
         }
 
         if (next == ITask.DeleteMe) {
-            x.delete();
-            //toRemove.add(x);
+            x.delete(); active.remove(x.ref);
         } else if (next == ITask.Disappear) {
             active.remove(x.ref); //immediately but dont affect its budget
         } else  {

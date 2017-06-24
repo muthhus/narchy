@@ -19,7 +19,7 @@ import static nars.Op.GOAL;
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     /** range for adjusting polarization (1f has no effect) */
-    final float minPolarizationFactor = 0.9f;
+    final float minPolarizationFactor = 0.75f;
     final float maxPolarizationFactor = 1f;
 
 //    /** preference for polarity (includes conf) */
