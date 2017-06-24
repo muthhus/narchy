@@ -1,9 +1,9 @@
 package nars.web;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
-import jcog.net.attn.MeshMap;
 import nars.$;
 import nars.InterNAR;
 import nars.NAR;
@@ -15,9 +15,10 @@ import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.stream.Collectors.toList;
 
 
 public class NARWeb extends WebServer {
@@ -25,26 +26,44 @@ public class NARWeb extends WebServer {
     //private static final Logger logger = LoggerFactory.getLogger(nars.web.NARWeb.class);
 
     private final NarseseIOService io;
-    private final ActiveConceptService active;
-    private final MeshMap<Object, Object> net;
+    //private final ActiveConceptService active;
+    //private final MeshMap<Object, Object> net;
 
-    public NARWeb(NAR nar, int httpPort) {
+    final Set<NAR> nars = Sets.newConcurrentHashSet();
+
+    public NARWeb(/*NAR nar, */int httpPort) {
         super(httpPort);
 
-        addPrefixPath("/terminal", socket(io = new NarseseIOService(nar)));
+        addPrefixPath("/terminal", socket(io = new NarseseIOService(nars)));
 
-        net = MeshMap.get("d1", (k, v) -> {
-            System.out.println(k + " " + v);
-            try {
-                io.send(Util.toBytes(new Object[] { k , v }));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+        addPrefixPath("/nars", (x) -> {
+
+
+            //x.startBlocking();
+            x.getResponseSender().send(Util.jsonMapper.writeValueAsString(
+                    Map.of(System.currentTimeMillis(),
+                            nars.stream().map(this::summary).collect(toList()))
+                    )
+            );
+            //OutputStream os = x.getOutputStream();
+            //Util.jsonMapper.writeValue(os, nars);
+            //os.close();
+            //x.endExchange();
+
         });
+
+//        net = MeshMap.get("d1", (k, v) -> {
+//            System.out.println(k + " " + v);
+//            try {
+//                io.send(Util.toBytes(new Object[] { k , v }));
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+//        });
 
 
         //.addPrefixPath("/emotion", socket(new EvalService(nar, "emotion", 200)))
-        addPrefixPath("/active", socket(active = new ActiveConceptService(nar, 200, 48)));
+        //addPrefixPath("/active", socket(active = new ActiveConceptService(nar, 200, 48)));
 //        addPrefixPath("/json/in", socket(new WebsocketService() {
 //
 //            @Override
@@ -66,6 +85,14 @@ public class NARWeb extends WebServer {
 //        }));
 
 
+    }
+
+    private Object summary(NAR y) {
+        return Lists.newArrayList(
+                y.self().toString(),
+                y.terms.summary(),
+                y.emotion.summary()
+        );
     }
 
     public static void main(String[] args) throws Exception {
@@ -91,7 +118,7 @@ public class NARWeb extends WebServer {
         nar.on("start", (o, t, n) -> {
 
             float nextFPS = fps.floatValue();
-            if (t.length>0) {
+            if (t.length > 0) {
                 Term z = t[0];
                 int x = $.intValue(z, -1); //TODO handle float's
                 if (x >= 0)
@@ -101,22 +128,21 @@ public class NARWeb extends WebServer {
         });
         nar.on("stat", (o, t, n) -> {
 
-            Map<String,Object> stat = new TreeMap();
+            Map<String, Object> stat = new TreeMap();
             //NARLoop ll = nar.loop;
             //stat.put("cpu",ll!=null ? ll.toString() : "paused");
             stat.put("mem", nar.terms.summary());
             stat.put("emo", nar.emotion.summary());
             stat.put("net", net.summary());
 
-            Command.log( n, Util.jsonNode(stat).toString());
+            Command.log(n, Util.jsonNode(stat).toString());
         });
 
         start(nar, fps.floatValue());
 
         Hear.wiki(nar);
 
-        NARWeb w = new NARWeb(nar, port);
-
+        NARWeb w = new NARWeb(port);
 
 
     }

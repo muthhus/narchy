@@ -110,7 +110,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
 
     @NotNull
-    private Atom self = Param.randomSelf();
+    private Term self = Param.randomSelf();
 
 
     /**
@@ -262,7 +262,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         setSelf((Atom) Atomic.the(self));
     }
 
-    public void setSelf(Atom self) {
+    public void setSelf(Term self) {
         this.self = self;
     }
 
@@ -1542,7 +1542,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     /**
      * The id/name of the reasoner
      */
-    public final Atom self() {
+    public final Term self() {
         return self;
     }
 

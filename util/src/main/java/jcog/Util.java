@@ -17,7 +17,9 @@ package jcog;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.io.CharStreams;
@@ -1615,6 +1617,21 @@ public enum Util {
     public final static ObjectMapper msgPackMapper =
             new ObjectMapper(new MessagePackFactory())
                     .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+            ;
+    public final static ObjectMapper jsonMapper =
+            new ObjectMapper()
+                    .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+            .enable(SerializationFeature.WRAP_EXCEPTIONS)
+            .enable(SerializationFeature.WRITE_NULL_MAP_VALUES)
+            .enable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
+            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+            .enable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)
+            .enable(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)
+            .enable(MapperFeature.AUTO_DETECT_FIELDS)
+            .enable(MapperFeature.AUTO_DETECT_GETTERS)
+            .enable(MapperFeature.AUTO_DETECT_IS_GETTERS)
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            //.disable(SerializationFeature.FAIL_ON_SELF_REFERENCES)
             ;
 
     /**
