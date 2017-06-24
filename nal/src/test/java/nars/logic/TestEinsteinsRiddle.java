@@ -3,7 +3,7 @@ package nars.logic;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -17,13 +17,7 @@ public class TestEinsteinsRiddle {
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR n = new Default() {
-//            @Override
-//            public Deriver newDeriver() {
-//                return new DeriverTransform(b -> new DeriverTransform.TracedBoolPredicate(b))
-//                        .apply((TrieDeriver) super.newDeriver());
-//            }
-        };
+        NAR n = new NARBuilder().get();
         n.termVolumeMax.setValue(1024);
         n.log();
         URL resource = TestEinsteinsRiddle.class.getResource("einsteinsRiddle.nal");

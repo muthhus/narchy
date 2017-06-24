@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
@@ -24,7 +24,7 @@ public class TemporalInductionTest {
         String task = "<a --> b>. :|:";
         String task2 = "<c --> d>. :|:";
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
 
         //TextOutput.out(n);
 
@@ -69,7 +69,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
 
         //TextOutput.out(n);
 
@@ -84,7 +84,7 @@ public class TemporalInductionTest {
     }
     @Test public void testQuestionProjection() throws Narsese.NarseseException {
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
 
         n.log();
 
@@ -107,7 +107,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() throws Narsese.NarseseException {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        NAR d = new Default();
+        NAR d = new NARBuilder().get();
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");

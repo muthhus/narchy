@@ -9,14 +9,10 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.control.SynchTaskExecutor;
 import nars.derive.DefaultDeriver;
 import nars.gui.Vis;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.test.agent.Line1DSimplest;
-import nars.time.CycleTime;
-import nars.util.exe.InstrumentedExecutor;
-import nars.util.exe.TaskExecutor;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
@@ -112,7 +108,7 @@ public class Line1D {
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
-                Default n = new Default();
+                NAR n = new NARBuilder().get();
                 n.random().setSeed(System.nanoTime());
 
                 n.time.dur(1);
@@ -133,9 +129,9 @@ public class Line1D {
 //                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
             })/*.tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
                 x.in.streams.values().forEach(s -> s.setValue(y));
-            })*/.tweak("stmSize", 1, 2, 1, (y, x) -> {
+            })*//*.tweak("stmSize", 1, 2, 1, (y, x) -> {
                 ((Default) x).stmLinkage.capacity.setValue(y);
-            }).tweak("confMin", 0.01f, 0.9f, 0.1f, (y, x) -> {
+            })*/.tweak("confMin", 0.01f, 0.9f, 0.1f, (y, x) -> {
                 x.confMin.setValue(y);
             }).tweak("truthResolution", 0, 0.05f, 0.01f, (y, x) -> {
                 x.truthResolution.setValue(y);
@@ -169,16 +165,12 @@ public class Line1D {
 //                System.err.println(t.proof());
 //            }
 //        });
-                InstrumentedExecutor exe =
-                        new InstrumentedExecutor(
-                        new TaskExecutor(256, 0.5f)
-                );
-
-                Default n = new Default(
-                    new Default.DefaultTermIndex(32*1024),
-                    new CycleTime(),
-                    exe
-                );
+//                InstrumentedExecutor exe =
+//                        new InstrumentedExecutor(
+//                        new TaskExecutor(256, 0.5f)
+//                );
+//
+                NAR n = new NARBuilder().get();
 
                 n.time.dur(4);
                 n.termVolumeMax.set(28);

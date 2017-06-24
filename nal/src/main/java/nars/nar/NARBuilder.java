@@ -4,26 +4,39 @@ import jcog.learn.lstm.SimpleLSTM;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
+import nars.conceptualize.ConceptBuilder;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
+import nars.index.term.map.MapTermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
+import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
+import nars.util.exe.TaskExecutor;
 import org.apache.commons.math3.util.MathArrays;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
 
-/**
- * Created by me on 12/27/16.
- */
-public interface NARBuilder {
+public class NARBuilder {
 
-    static NARS newMultiThreadNAR(int threads, Time clock) {
+    private @NotNull Supplier<TermIndex> concepts = () -> new NARBuilder.BasicTermIndex(1024 );
+
+    private @NotNull Time time = new CycleTime();
+
+    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.1f);
+
+    private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
+
+    public static NARS newMultiThreadNAR(int threads, Time clock) {
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
         NARS n = new NARS(clock, new XorShift128PlusRandom(), 1);
@@ -63,6 +76,90 @@ public interface NARBuilder {
 
         return n;
     }
+
+    public NARBuilder index(@NotNull TermIndex concepts) {
+        this.concepts = () -> concepts;
+        return this;
+    }
+
+    public NARBuilder time(@NotNull Time time) {
+        this.time = time;
+        return this;
+    }
+
+    public NARBuilder exe(Executioner exe) {
+        this.exe = () -> exe;
+        return this;
+    }
+
+    public NAR get() {
+        return new NAR(concepts.get(), exe.get(), time, rng.get());
+    }
+
+    class NARTune implements Runnable {
+        private final NAR nar;
+        final static int outputs = 4, inputs = outputs;
+        private final SimpleLSTM net;
+
+        double[] prev, next, predict;
+        private final float alpha = 0.05f;
+
+        public NARTune(NAR nar) {
+
+            this.nar = nar;
+
+            prev = new double[inputs];
+            next = new double[outputs];
+            predict = new double[outputs];
+
+            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
+
+            nar.onCycle(this);
+
+        }
+
+        @Override
+        public void run() {
+            double[] current = new double[outputs];
+            current[0] = nar.emotion.learningVol();
+            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
+            current[2] = nar.emotion.busyPri.getMean();
+            current[3] = nar.emotion.confident.getMean();
+
+            double error = MathArrays.distance1(predict, current);
+
+            double[] predictNext = net.learn(prev, current, alpha);
+
+            System.out.println(n2(error) + " err\t" + n4(prev) + " -|> " + n4(current) + " ->? " + n4(predictNext));
+
+            System.arraycopy(predictNext, 0, predict, 0, outputs);
+            System.arraycopy(current, 0, prev, 0, outputs);
+        }
+    }
+
+    /**
+     * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution
+     */
+    public static class BasicTermIndex extends MapTermIndex {
+
+        public BasicTermIndex(int capacity) {
+            this(capacity, new DefaultConceptBuilder());
+        }
+
+        public BasicTermIndex(int capacity, ConceptBuilder cb) {
+            super(
+                    cb,
+                    new HashMap<>(capacity/*, 0.9f*/),
+                    new HashMap<>(capacity/*, 0.9f*/)
+                    //new UnifiedMap(capacity, 0.9f),
+                    //new UnifiedMap(capacity, 0.9f)
+                    //new ConcurrentHashMap<>(capacity),
+                    //new ConcurrentHashMap<>(capacity)
+                    //new ConcurrentHashMapUnsafe(capacity)
+            );
+        }
+    }
+}
 
 
 //        if (threads == -1)
@@ -356,20 +453,20 @@ public interface NARBuilder {
 //        return n;
 //    }
 
-    NAR get();
-
-    //Control getControl(NAR n);
-    //n.setControl(getControl(n));
-
-    Executioner getExec();
-
-    Time getTime();
-
-    TermIndex getIndex();
-
-    Random getRandom();/* {
-        return new XorShift128PlusRandom(1);
-    }*/
+//    NAR get();
+//
+//    //Control getControl(NAR n);
+//    //n.setControl(getControl(n));
+//
+//    Executioner getExec();
+//
+//    Time getTime();
+//
+//    TermIndex getIndex();
+//
+//    Random getRandom();/* {
+//        return new XorShift128PlusRandom(1);
+//    }*/
 
 //    class MutableNARBuilder implements NARBuilder {
 //
@@ -427,46 +524,3 @@ public interface NARBuilder {
 //        }
 //    }
 
-
-    class NARTune implements Runnable {
-        private final NAR nar;
-        final static int outputs = 4, inputs = outputs;
-        private final SimpleLSTM net;
-
-        double[] prev, next, predict;
-        private final float alpha = 0.05f;
-
-        public NARTune(NAR nar) {
-
-            this.nar = nar;
-
-            prev = new double[inputs];
-            next = new double[outputs];
-            predict = new double[outputs];
-
-            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
-
-            nar.onCycle(this);
-
-        }
-
-        @Override
-        public void run() {
-            double[] current = new double[outputs];
-            current[0] = nar.emotion.learningVol();
-            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
-            current[2] = nar.emotion.busyPri.getMean();
-            current[3] = nar.emotion.confident.getMean();
-
-            double error = MathArrays.distance1(predict, current);
-
-            double[] predictNext = net.learn(prev, current, alpha);
-
-            System.out.println(n2(error) + " err\t" + n4(prev) + " -|> " + n4(current) + " ->? " + n4(predictNext));
-
-            System.arraycopy(predictNext, 0, predict, 0, outputs);
-            System.arraycopy(current, 0, prev, 0, outputs);
-        }
-    }
-
-}

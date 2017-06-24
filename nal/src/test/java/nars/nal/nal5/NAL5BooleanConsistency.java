@@ -1,11 +1,8 @@
 package nars.nal.nal5;
 
-import nars.$;
-import nars.Narsese;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +29,7 @@ public class NAL5BooleanConsistency {
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
-                Default d = new Default();
+                NAR d = new NARBuilder().get();
                 d.nal(7);
                 d.termVolumeMax.setValue(16);
 

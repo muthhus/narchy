@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicBeliefTable;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import org.junit.Test;
 
@@ -55,7 +55,8 @@ public class NAL7DurationTest {
     @Test
     public void testTemporalIntersection() throws Narsese.NarseseException {
 
-        NAR n = new Default(512);
+        //this.activeTasks = activeTasks;
+        NAR n = new NARBuilder().get();
 
         //n.log();
         n.inputAt( 0,"a:x. :|:");

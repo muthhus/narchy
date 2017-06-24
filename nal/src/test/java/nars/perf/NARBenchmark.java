@@ -2,7 +2,8 @@
 package nars.perf;
 
 import nars.$;
-import nars.nar.Default;
+import nars.NAR;
+import nars.nar.NARBuilder;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;
@@ -13,12 +14,12 @@ import static nars.perf.JmhBenchmark.perf;
 @State(Scope.Benchmark)
 public class NARBenchmark {
 
-    Default n;
+    NAR n;
 
     @Setup
     public void prepare() {
 
-        n = new Default();
+        n = new NARBuilder().get();
         //n.inputActivation.setValue(0.5f);
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);

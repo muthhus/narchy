@@ -4,7 +4,7 @@ import jcog.list.FasterList;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.op.Operator;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -30,7 +30,8 @@ public class Line1DSimplestTest {
 
         float c = 0.9f;
 
-        NAR n = new Default(1024);
+        //this.activeTasks = activeTasks;
+        NAR n = new NARBuilder().get();
         n.termVolumeMax.setValue(8);
 
         int BETWEEN = 32;
@@ -91,7 +92,7 @@ public class Line1DSimplestTest {
     @Test
     public void testSimple1() throws Narsese.NarseseException {
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
 
 
         Line1DSimplest a = new Line1DSimplest(n);
@@ -131,12 +132,7 @@ public class Line1DSimplestTest {
 
         Param.ANSWER_REPORTING = false;
 
-        Default n = new Default() {
-//            @Override
-//            public Deriver newDeriver() {
-//                return Deriver.get("induction.nal");
-//            }
-        };
+        NAR n = new NARBuilder().get();
 
         n.truthResolution.setValue(0.01f);
         n.termVolumeMax.setValue(16);
@@ -201,7 +197,8 @@ public class Line1DSimplestTest {
     @Test public void testSimpleCheat() throws Narsese.NarseseException {
 
 
-        Default n = new Default(1024);
+        //this.activeTasks = activeTasks;
+        NAR n = new NARBuilder().get();
 
 
 
@@ -311,7 +308,8 @@ public class Line1DSimplestTest {
     @Test public void testSequenceLearning() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        Default n = new Default(1024);
+        //this.activeTasks = activeTasks;
+        NAR n = new NARBuilder().get();
         n.on("say", (Operator) (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
                 try {

@@ -7,7 +7,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
@@ -109,7 +109,7 @@ public class FuzzyScalarConceptsTest {
 
     @Test
     public void testRewardConceptsFuzzification2() {
-        NAR d = new Default();
+        NAR d = new NARBuilder().get();
         MutableFloat m = new MutableFloat(0f);
 
         testSteadyFreqCondition(m,

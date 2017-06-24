@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import nars.truth.DiscreteTruth;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +72,7 @@ public class TaskTest {
 
     @Test
     public void inputTwoUniqueTasksDef() throws Narsese.NarseseException {
-        inputTwoUniqueTasks(new Default());
+        inputTwoUniqueTasks(new NARBuilder().get());
     }
     /*@Test public void inputTwoUniqueTasksSolid() {
         inputTwoUniqueTasks(new Solid(4, 1, 1, 1, 1, 1));
@@ -112,7 +112,8 @@ public class TaskTest {
     public void testDoublePremiseMultiEvidence() throws Narsese.NarseseException {
 
         //Param.DEBUG = true;
-        Default d = new Default(100);
+        //this.activeTasks = activeTasks;
+        NAR d = new NARBuilder().get();
         //d.log();
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");

@@ -1,6 +1,6 @@
 package nars.experiment.rover;
 
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;
@@ -20,7 +20,7 @@ public class RoverMaze1 {
 
 
     public static void main(String[] args) {
-        Rover r = new Rover(new Default()) {
+        Rover r = new Rover(new NARBuilder().get()) {
 
             @Override protected void create(Dynamics world) {
 

@@ -4,7 +4,7 @@ import jcog.bag.Bag;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -24,8 +24,9 @@ import static org.junit.Assert.assertEquals;
  */
 public class RevisionTest {
 
-    public static Default newNAR(int maxBeliefs) {
-        Default d = new Default(256);
+    public static NAR newNAR(int maxBeliefs) {
+        //this.activeTasks = activeTasks;
+        NAR d = new NARBuilder().get();
         d.nal(7);// {
 
         /*
@@ -70,7 +71,7 @@ public class RevisionTest {
     void testRevision(int delay1, boolean beliefOrGoal) {
         Param.DEBUG = true;
 
-        Default  n = newNAR(6);
+        NAR n = newNAR(6);
         n.nal(1);
 
 
@@ -209,7 +210,7 @@ public class RevisionTest {
     }
 
     @Test public void testRevision3Eternals() throws Narsese.NarseseException {
-        Default  n = newNAR(6);
+        NAR n = newNAR(6);
         //n.log();
         n.input("(a). %1.0;0.5%",
                 "(a). %0.0;0.5%",
@@ -243,7 +244,7 @@ public class RevisionTest {
     /** test that budget is conserved during a revision between
      * the input tasks and the result */
     @Test public void testRevisionBudgeting() {
-        Default  n = newNAR(6);
+        NAR n = newNAR(6);
 
         BeliefAnalysis b = new BeliefAnalysis(n, AB);
 

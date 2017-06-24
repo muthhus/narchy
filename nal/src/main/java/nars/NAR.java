@@ -182,7 +182,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    public NAR(@NotNull Time time, @NotNull TermIndex terms, @NotNull Random rng, @NotNull Executioner exe) {
+    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng) {
 
         this.random = rng;
 

@@ -1,11 +1,9 @@
 package nars;
 
 import jcog.data.FloatParam;
-import jcog.pri.mix.control.MultiHaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
 import jcog.tensor.ArrayTensor;
 import nars.gui.Vis;
-import nars.nar.Default;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
 import nars.term.Term;
@@ -259,10 +257,10 @@ abstract public class NAgentX extends NAgent {
                             new WindowButton("nar", () -> nar),
                             new WindowButton("emotion", () -> Vis.emotionPlots(a, 256)),
                             //new WindowButton( "focus", nar::focus),
-                            nar instanceof Default ?
+                            nar instanceof NAR ?
                                     grid(
                                             //new WindowButton( "deriver", () -> (((Default)nar).deriver) ),
-                                            new WindowButton("deriverFilter", () -> ((Default) nar).budgeting)
+                                            new WindowButton("deriverFilter", () -> nar.budgeting)
                                     ) : label(nar.getClass())
 
                             //new WindowButton("mix", () -> new MixBoard(nar, nar.in))

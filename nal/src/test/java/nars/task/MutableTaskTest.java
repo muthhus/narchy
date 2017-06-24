@@ -2,7 +2,7 @@ package nars.task;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.time.Tense;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 public class MutableTaskTest {
 
     @Test public void testTenseEternality() throws Narsese.NarseseException {
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
 
         String s = "<a --> b>.";
 

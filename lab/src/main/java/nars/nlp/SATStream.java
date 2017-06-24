@@ -1,7 +1,8 @@
 package nars.nlp;
 
+import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 
 /**
  * Created by me on 2/10/16.
@@ -9,7 +10,8 @@ import nars.nar.Default;
 public class SATStream {
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        Default d = new Default(1000);
+        //this.activeTasks = activeTasks;
+        NAR d = new NARBuilder().get();
 
         //d.inputActivation.setValue(0.2f);
 

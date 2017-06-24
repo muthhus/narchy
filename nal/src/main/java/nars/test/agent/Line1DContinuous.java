@@ -1,19 +1,13 @@
 package nars.test.agent;
 
-import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.atom.Atomic;
-import nars.time.CycleTime;
-import nars.util.exe.Executioner;
-import nars.util.exe.TaskExecutor;
 
 import java.util.Arrays;
 
@@ -193,16 +187,7 @@ public class Line1DContinuous extends NAgent {
 
     public static void main(String[] args) {
 
-        XorShift128PlusRandom rng = new XorShift128PlusRandom((int)(Math.random()*1000));
-
-        final Executioner exe =
-                //new MultiThreadExecutioner(2, 2048);
-                new TaskExecutor(128);
-
-        Default nar = new Default(
-                new CaffeineIndex(new DefaultConceptBuilder(), 1024*16, exe),
-                new CycleTime(), exe
-        );
+        NAR nar = new NARBuilder().get();
         nar.termVolumeMax.set(32);
 
 

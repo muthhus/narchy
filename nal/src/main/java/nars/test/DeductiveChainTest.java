@@ -3,7 +3,7 @@ package nars.test;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -70,7 +70,7 @@ public class DeductiveChainTest  {
         Param.DEBUG = false;
 
         for (int length = 3; length < 10; length++) {
-            Default n = new Default();
+            NAR n = new NARBuilder().get();
             n.nal(6);
             test(n, length, 1000*length, inh);
         }

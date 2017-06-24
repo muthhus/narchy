@@ -7,11 +7,9 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
-import nars.time.RealTime;
 import nars.time.Tense;
-import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -258,9 +256,10 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
+        NAR n = new NARBuilder().get();
+        /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
-            new TaskExecutor(256, 0.25f));
+            new TaskExecutor(256, 0.25f));*/
 
 //        NARS n = new NARS(new RealTime.DS(true), new XorShift128PlusRandom(1), 1);
 //        n.addNAR(16, 0.25f);

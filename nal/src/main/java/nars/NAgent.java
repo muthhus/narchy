@@ -16,7 +16,6 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.control.ConceptFire;
-import nars.nar.Default;
 import nars.table.EternalTable;
 import nars.task.GeneratedTask;
 import nars.task.ITask;
@@ -636,7 +635,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public static float varPct(NAR nar) {
-        if (nar instanceof Default) {
+        if (nar instanceof NAR) {
             RecycledSummaryStatistics is = new RecycledSummaryStatistics();
             nar.forEachConceptActive(xx -> {
                 Term tt = xx.term();

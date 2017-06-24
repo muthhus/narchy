@@ -9,7 +9,7 @@ import nars.conceptualize.DefaultConceptBuilder;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.index.term.map.MapTermIndex;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.TaskExecutor;
@@ -85,12 +85,8 @@ public class InterNARTest {
         }
     }
 
-    private static Default newNAR() {
-        return new Default(
-                new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024)),
-                new RealTime.DSHalf(true),
-                new TaskExecutor(256)
-        );
+    private static NAR newNAR() {
+        return new NARBuilder().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true)).exe(new TaskExecutor(256)).get();
     }
 
     @Test

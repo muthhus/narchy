@@ -17,7 +17,7 @@ public class CommandTest {
 
     @Test
     public void testEcho() throws Narsese.NarseseException {
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
         AtomicBoolean invoked = new AtomicBoolean();
         n.on("c", (args) -> {
             assertEquals("(x)", args.toString());

@@ -55,10 +55,9 @@ public class NARS extends NAR {
     private List<Loop> loops;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(time,
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 96 * 1024, -1, e), e, time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                new CaffeineIndex(new DefaultConceptBuilder(), 96 * 1024, -1, e),
-                rng, e);
+                rng);
     }
 
     @Override

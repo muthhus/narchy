@@ -1,8 +1,9 @@
 package nars.nal.nal8;
 
+import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.test.TestNAR;
 import org.junit.Test;
 
@@ -14,7 +15,7 @@ public class FunctorTest {
 
     @Test
     public void testImmediateTransformOfInput() throws Narsese.NarseseException { //as opposed to deriver's use of it
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
 
 
         d.log();
@@ -34,7 +35,7 @@ public class FunctorTest {
 
     @Test
     public void testAdd1() throws Narsese.NarseseException {
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
 
         d.input("add(1,2,#x)!");
         d.run(16);
@@ -44,7 +45,7 @@ public class FunctorTest {
 
     @Test
     public void testAdd1Temporal() throws Narsese.NarseseException {
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
 
         d.input("add(1,2,#x)! :|:");
         d.run(16);
@@ -56,7 +57,7 @@ public class FunctorTest {
     @Test public void testFunctor1() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        TestNAR t = new TestNAR(new Default());
+        TestNAR t = new TestNAR(new NARBuilder().get());
         //t.log();
         t.believe("((complexity($1)<->3)==>c3($1))");
         t.ask("c3(x:y)");
@@ -69,7 +70,7 @@ public class FunctorTest {
         //Param.DEBUG = true;
 
         int TIME = 2048;
-        TestNAR t = new TestNAR(new Default());
+        TestNAR t = new TestNAR(new NARBuilder().get());
 
         Param.DEBUG = true; t.log();
         t.believe("(equal(complexity($1),complexity($2)) ==> c({$1,$2}))");

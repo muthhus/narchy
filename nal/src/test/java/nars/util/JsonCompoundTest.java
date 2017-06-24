@@ -1,8 +1,9 @@
 package nars.util;
 
 import nars.$;
+import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.task.util.TaskRule;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
@@ -12,7 +13,7 @@ import org.junit.Test;
 public class JsonCompoundTest {
 
     @Test public void testJsonArray() throws Narsese.NarseseException {
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
         d.log();
 
         new TaskRule("(json,%1):{x(%2)}", "X(%1,%2)", d);
@@ -30,7 +31,7 @@ public class JsonCompoundTest {
     }
 
     @Test public void testBigJSON() {
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
         d.log();
 
         int n = 0;
@@ -60,7 +61,7 @@ public class JsonCompoundTest {
                 "     \"title\": \"Wildfires\"\n" +
                 "    }\n" +
                 "   ] }";
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
         d.log();
         d.believe($.inh((Compound)$.fromJSON(j), "x"));
         d.run(1000);

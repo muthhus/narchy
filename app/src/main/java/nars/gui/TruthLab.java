@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -210,7 +210,8 @@ public class TruthLab extends Grid {
 
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        NAR n = new Default(1000);
+        //this.activeTasks = activeTasks;
+        NAR n = new NARBuilder().get();
 
         SpaceGraph.window(
                 new TruthLab(n, $("(x)"), $("(y)"),

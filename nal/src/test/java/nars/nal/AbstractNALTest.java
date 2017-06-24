@@ -3,7 +3,8 @@ package nars.nal;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
+import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -68,10 +69,13 @@ public abstract class AbstractNALTest {
 
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
-                    Default d = new Default();
-                    d.nal(level);
-                    d.termVolumeMax.setValue(32);
-                    return d;
+                    NAR n = new NARBuilder().get();
+                    n.termVolumeMax.setValue(32);
+                    n.nal(level);
+                    if (level >= 7) {
+                        new STMTemporalLinkage(n, 1, false);
+                    }
+                    return n;
                 }
         ));
                 /*if (level < 8) {

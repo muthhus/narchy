@@ -12,7 +12,7 @@ import nars.IO;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.LeakOut;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.web.WebsocketService;
 
@@ -129,12 +129,12 @@ public class NarseseIOService extends WebsocketService {
     }
 
     private NAR build(JsonNode builder) {
-        Default d = new Default(); //TODO interpret builder
+        NAR d = new NARBuilder().get(); //TODO interpret builder
         return postBuild(d);
     }
 
     private NAR buildDefault(WebSocketChannel socket) {
-        NAR t = new Default();
+        NAR t = new NARBuilder().get();
         t.setSelf($.p(socket.getLocalAddress().toString(), socket.getPeerAddress().toString()));
         t.startFPS(fps);
         return postBuild(t);

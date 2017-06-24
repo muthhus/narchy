@@ -1,7 +1,7 @@
 package nars.derive.meta.constraint;
 
 import nars.nal.AbstractNALTest;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,16 +38,7 @@ public class MatchConstraintTest {
             $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
-        new TestNAR(new Default() {
-//            @Override
-//            public Deriver newDeriver() {
-//                try {
-//                    return TrieDeriver.get("(M --> P), (M --> S), task(\".\"), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)");
-//                } catch (Narsese.NarseseException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-        })
+        new TestNAR(new NARBuilder().get())
                 .log()
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
@@ -62,13 +53,7 @@ public class MatchConstraintTest {
             $.08;.75$ happy(L). 1866⋈1876 %1.0;.75% {1866⋈1876: êbaîCóòrj}
             $.04;.43$ ((((L)~(i|(L)))|(L))-->happy). 1876 %.10;.21% {1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrm;êbaîCóòrÏ} Dynamic
         */
-        new TestNAR(new Default() {
-//            @Override
-//            public Deriver newDeriver() {
-//                return null;
-//                //return TrieDeriver.get("what is it");
-//            }
-        })
+        new TestNAR(new NARBuilder().get())
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("(((i)|(L))-->happy)", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "(((i)|(L))-->happy)", BELIEF, 1f, 1f, 0.81f, 0.81f, ETERNAL);

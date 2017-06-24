@@ -1,9 +1,10 @@
 package nars.experiment;
 
 import jcog.Util;
+import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.test.agent.Line1DSimplest;
 
 public class Line1DQ {
@@ -12,7 +13,7 @@ public class Line1DQ {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        Default n = new Default();
+        NAR n = new NARBuilder().get();
         //n.log();
         n.time.dur(5);
 

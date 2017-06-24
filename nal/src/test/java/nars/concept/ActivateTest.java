@@ -2,7 +2,7 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import org.junit.Test;
 
 /**
@@ -13,7 +13,7 @@ public class ActivateTest {
     @Test
     public void testDerivedBudgets() throws Narsese.NarseseException {
 
-        NAR n= new Default();
+        NAR n= new NARBuilder().get();
 
         //TODO System.err.println("TextOutput.out impl in progress");
         //n.stdout();

@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import nars.*;
 import nars.index.term.PatternTermIndex;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -32,7 +32,7 @@ public class UnificationTest {
     public void start() {
         t = new TestNAR(
                 //new Terminal()
-                new Default() //TODO return to using Terminal as a demo of its minimal functionality
+                new NARBuilder().get() //TODO return to using Terminal as a demo of its minimal functionality
         );
     }
 
@@ -875,7 +875,7 @@ public class UnificationTest {
 
     void testIntroduction(String subj, Op relation, String pred, String belief, @NotNull String concl) {
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
         n.nal(6);
 
         new TestNAR(n)

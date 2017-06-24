@@ -2,7 +2,7 @@ package nars.nlp;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,7 +24,7 @@ public class NLPTest {
     public void testNLP0() throws IOException, Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
         //n.DEFAULT_QUEST_PRIORITY = 0.1f;
 
         //n.quaMin.setValue(0.1f);

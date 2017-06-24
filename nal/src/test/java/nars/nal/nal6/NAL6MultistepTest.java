@@ -1,9 +1,10 @@
 package nars.nal.nal6;
 
+import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.concept.Concept;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.time.Tense;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        Default n = new Default();
+        NAR n = new NARBuilder().get();
         //d.log();
         n.input(
                 "(burglary). %0.7;0.9%",
@@ -80,7 +81,7 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        Default d = new Default();
+        NAR d = new NARBuilder().get();
         //d.log();
         d.input(
                 "(burglary).   %0.7;0.9%",

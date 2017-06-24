@@ -4,14 +4,12 @@ import jcog.net.UDPeer;
 import jcog.net.UDPeerSim;
 import jcog.pri.PLink;
 import nars.$;
+import nars.NAR;
 import nars.concept.Concept;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
-import nars.index.term.map.MapTermIndex;
-import nars.nar.Default;
-import nars.time.CycleTime;
+import nars.nar.NARBuilder;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
@@ -21,7 +19,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static jcog.Texts.i;
 
@@ -32,9 +29,7 @@ public class SimpleUDPeerGraph {
 
     public static void main(String[] args) throws IOException {
 
-        Default n = new Default(
-                new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap<>()),
-                new CycleTime(), new TaskExecutor(512, 0.5f));
+        NAR n = new NARBuilder().get();
 
         int population = 256;
 

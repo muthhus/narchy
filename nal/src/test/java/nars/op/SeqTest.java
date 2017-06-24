@@ -6,7 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
@@ -26,7 +26,7 @@ public class SeqTest {
 
     @Test
     public void test1() throws Narsese.NarseseException {
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
         Seq s = new Seq().on(n);
         n.log();
         n.input("seqAdd(s, a:x). :|:");

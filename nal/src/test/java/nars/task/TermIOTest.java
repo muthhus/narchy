@@ -2,7 +2,7 @@ package nars.task;
 
 import com.google.common.collect.Sets;
 import nars.*;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
@@ -140,7 +140,7 @@ public class TermIOTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(16384);
 
-        NAR a = new Default()
+        NAR a = new NARBuilder().get()
                         .input("a:b.", "b:c.", "c:d!")
                         .run(32)
                         .output(baos);
@@ -148,7 +148,7 @@ public class TermIOTest {
         byte[] x = baos.toByteArray();
         out.println("NAR tasks serialized: " + x.length + " bytes");
 
-        NAR b = new Default()
+        NAR b = new NARBuilder().get()
                         .inputBinary(new ByteArrayInputStream(x)).run(1)
                         //.next()
                         //.forEachConceptTask(true,true,true,true, out::println)

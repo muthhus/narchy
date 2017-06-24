@@ -1,10 +1,7 @@
 package nars.rdfowl;
 
 import nars.NAR;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.Default;
-import nars.time.CycleTime;
+import nars.nar.NARBuilder;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
 import org.junit.Ignore;
@@ -24,7 +21,7 @@ public class NQuadsRDFTest {
 
     @Test
     public void test1() throws Exception {
-        NAR n = new Default();
+        NAR n = new NARBuilder().get();
         //n.stdout();
         NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
         n.run(1);
@@ -37,11 +34,11 @@ public class NQuadsRDFTest {
 
         //Multi nar = new Multi(3,512,
         Executioner e = new TaskExecutor(128);
-        Default n = new Default(
-                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
-                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
-                new CycleTime(), e
-        );
+        NAR n = new NARBuilder().get();
+//                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
+//                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
+//                new CycleTime(), e
+//        );
 
         File output = new File("/tmp/onto.nal");
         PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512*1024));

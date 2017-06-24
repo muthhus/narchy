@@ -1,31 +1,21 @@
 package nars.gui.graph.run;
 
-import com.google.common.collect.Iterables;
 import jcog.bag.util.Bagregate;
-import jcog.pri.PLink;
-import jcog.pri.PriReference;
-import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
-import nars.gui.BagChart;
 import nars.gui.NARChart;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import nars.task.ITask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.test.DeductiveMeshTest;
-import nars.time.CycleTime;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
-import spacegraph.widget.button.PushButton;
-import spacegraph.widget.meter.TreeChart;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,12 +55,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         Param.DEBUG = false;
 
-        TaskExecutor exe = new TaskExecutor(128, 0.25f);
-        Default n = new Default(
-                new Default.DefaultTermIndex(512, new DefaultConceptBuilder()),
-                new CycleTime(),
-                exe
-        );
+        NAR n = new NARBuilder().get();
         float fps = 25f;
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
@@ -164,7 +149,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         SpaceGraph.window(
                 col(
                         reflect(fd),
-                        reflect(exe)
+                        reflect(n.exe)
                         //new CheckBox("Atoms", atomsEnabled),
                         //reflect( new CycleView(n) ),
 //                        new PushButton("+", () -> {
@@ -194,7 +179,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         n.input("(a-->b).", "(b-->c).","(c-->d).");
         //n.log();
 
-        n.onCycle(nn->{System.out.println(nn.time() + "\n" + exe.stats() + "\n\n");});
+        //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});
 
         n.startFPS(fps).join();
 

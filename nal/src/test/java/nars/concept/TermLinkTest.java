@@ -1,14 +1,15 @@
 package nars.concept;
 
+import nars.NAR;
 import nars.Narsese;
-import nars.nar.Default;
+import nars.nar.NARBuilder;
 import org.junit.Test;
 
 
 public class TermLinkTest {
 
     @Test public void testTermLinkActivationOnConceptualization() throws Narsese.NarseseException {
-        Default n = new Default();
+        NAR n = new NARBuilder().get();
         n.input("a:b.");
         n.input("b:c.");
         n.log();

@@ -1,12 +1,10 @@
 package nars.budget;
 
 import nars.Narsese;
-import nars.nar.Default;
 import nars.time.CycleTime;
 import nars.util.exe.TaskExecutor;
 import org.junit.Test;
 
-import static nars.nar.Default.INDEX_TO_CORE_INITIAL_SIZE_RATIO;
 
 
 public class TestDerivationBudgeting {
@@ -68,20 +66,20 @@ public class TestDerivationBudgeting {
 //            System.out.println();
 //        }
     }
-
-    @Test
-    public void testSimpleBudgetChain() throws Narsese.NarseseException {
-        int activeConcepts = 8;
-        Default d = new Default(
-                new Default.DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
-                new CycleTime(),
-                new InstrumentedExecutor(activeConcepts, 0.5f)
-        );
-        d.input("a:b.","b:c.","c:d.");
-        //d.log();
-        d.run(50);
-
-    }
+//
+//    @Test
+//    public void testSimpleBudgetChain() throws Narsese.NarseseException {
+//        int activeConcepts = 8;
+//        Default d = new Default(
+//                new Default.DefaultTermIndex(activeConcepts * INDEX_TO_CORE_INITIAL_SIZE_RATIO),
+//                new CycleTime(),
+//                new InstrumentedExecutor(activeConcepts, 0.5f)
+//        );
+//        d.input("a:b.","b:c.","c:d.");
+//        //d.log();
+//        d.run(50);
+//
+//    }
 
 //    @Test
 //    public void testWonderAboutIncompletePlan() {
