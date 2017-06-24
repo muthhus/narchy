@@ -46,8 +46,8 @@ public class ConcurrentRTree<T> implements Space<T> {
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
-        toAdd = new QueueLock<T>(this::add);
-        toRemove = new QueueLock<T>(this::remove);
+        toAdd = new QueueLock<>(this::add);
+        toRemove = new QueueLock<>(this::remove);
     }
 
 

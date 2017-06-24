@@ -375,11 +375,11 @@ public class Activate extends UnaryTask<Task> {
 
         void tasklink(Concept rcpt, float pri) {
 
-            rcpt.tasklinks().put(
+            rcpt.tasklinks().putAsync(
                     //new RawPLink(value, pri),
-                    new PLinkUntilDeleted(task, pri),
+                    new PLinkUntilDeleted(task, pri)
                     //new WeakPLinkUntilDeleted(task, pri),
-                    null);
+                    /*null*/);
         }
 
         void termlink(Concept recipient, Term target, float pri) {

@@ -11,6 +11,7 @@ import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.table.SortedListTable;
+import jcog.util.QueueLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +33,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     public final PriMerge mergeFunction;
 
+    final QueueLock<PriReference<X>> toPut = new QueueLock<>((p)->this.put(p, null));
 
     /**
      * inbound pressure sum since last commit
@@ -94,9 +96,6 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      */
     @Override
     protected boolean updateItems(@Nullable PriReference<X> toAdd) {
-
-
-
 
         int c = capacity();
         List<PriReference> pendingRemoval = null;
@@ -328,6 +327,11 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         if (modified) {
             commit(null);
         }
+    }
+
+    @Override
+    public final void putAsync(@NotNull PriReference<X> b) {
+        toPut.accept(b);
     }
 
     @Override

@@ -86,6 +86,10 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return put(x, null);
     }
 
+    default void putAsync(@NotNull V b) {
+        put(b);
+    }
+
     //        @Nullable
 //        @Override public PLink<V> put(@NotNull V v) {
 //            //TODO combine with CurveBag.put(v)

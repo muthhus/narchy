@@ -70,7 +70,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      * @param dur  duration period across which evidence can decay before and after its defined start/stop time
      * @return value >= 0 indicating the evidence
      */
-    default float evi(long when, int dur) {
+    default float evi(long when, final int dur) {
 
         Truth t = truth();
         long a = start();

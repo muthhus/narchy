@@ -28,6 +28,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
         super(cam.width, cam.height);
         this.cam = cam;
         this.nar = a.nar;
+        this.dur = nar.dur();
         on = a.onFrame(this);
     }
 

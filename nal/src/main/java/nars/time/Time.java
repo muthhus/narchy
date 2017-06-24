@@ -34,13 +34,14 @@ public interface Time extends Serializable {
 
     /**
      * the default duration applied to input tasks that do not specify one
+     * >0
      */
     int dur();
 
     /**
      * set the duration, return this
      *
-     * @param d
+     * @param d, d>0
      */
     Time dur(int d);
 

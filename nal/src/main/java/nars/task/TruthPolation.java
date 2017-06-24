@@ -157,6 +157,7 @@ public enum TruthPolation {
     @Nullable
     public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
 
+        assert(dur>0);
 
         TruthPolationWithVariance t =
                 //new TruthPolationBasic(when, dur);

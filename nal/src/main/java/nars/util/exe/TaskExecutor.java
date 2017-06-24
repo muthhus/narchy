@@ -62,6 +62,15 @@ public class TaskExecutor extends Executioner {
         }
 
         @Override
+        public CLink<ITask> put(@NotNull CLink<ITask> x) {
+            CLink<ITask> y = super.put(x);
+            if (y == null) {
+                overflow.offer(x);
+            }
+            return y;
+        }
+
+        @Override
         public void onRemoved(@NotNull CLink<ITask> value) {
             if (value.priElseZero() >= Pri.EPSILON) {
                 if (overflow.remainingCapacity() < 1) {
