@@ -71,27 +71,20 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Override
     public Truth truth(long when, long now, int dur, NAR nar) {
         DynTruth d = truth(when, now, null, false, nar);
-        return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
+        return Truth.maxConf(d != null ? d.truth() : null,
+                super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
     }
 
 
     @Nullable
-    public DynTruth truth(long when, Compound template, boolean evidence, NAR nar) {
-        return truth(when, when, template,  /*nar.concept(template)*/
+    public DynTruth truth(long when, @NotNull Compound template, boolean evidence, NAR nar) {
+        return truth(when, nar.time(), template,  /*nar.concept(template)*/
                 evidence, nar);
     }
 
 
     @Nullable
-    DynTruth truth(long when, long now, Compound template, boolean evidence, NAR nar) {
-
-        if (template == null) {
-            //HACK
-            if (isEmpty())
-                return null;
-            template = iterator().next().term(); //HACK
-        }
-
+    DynTruth truth(long when, long now, @NotNull Compound template, boolean evidence, NAR nar) {
         return model.eval(template, beliefOrGoal, when, now, evidence, nar); //newDyn(evidence);
     }
 

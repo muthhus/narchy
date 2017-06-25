@@ -10,8 +10,10 @@ import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -23,7 +25,7 @@ import static nars.Op.GOAL;
  */
 public class GoalActionConcept extends ActionConcept {
 
-    public final Signal feedback, feedbackGoal;
+    public final Signal feedback/*, feedbackGoal*/;
     private final FloatParam curiosity;
 
 
@@ -35,11 +37,14 @@ public class GoalActionConcept extends ActionConcept {
     }
 
     public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
-        super(term, n);
+        super(term,
+                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable()),
+                null,
+                n);
 
         this.curiosity = curiosity;
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
-        this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
+        //this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -115,6 +120,8 @@ public class GoalActionConcept extends ActionConcept {
                 //beliefFeedback != null ? beliefFeedback : belief; //latch
 
         Task fb = feedback.set(this, nextTruth, nar.time::nextStamp, nar);
+
+        ((SensorBeliefTable)beliefs).commit(fb);
 
 
 //        //HACK insert shadow goal

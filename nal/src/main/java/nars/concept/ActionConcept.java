@@ -2,6 +2,7 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Task;
+import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,10 @@ import java.util.stream.Stream;
 
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Stream<Task>> {
 
+
+    public ActionConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
+        super(term, beliefs, goals, n);
+    }
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, null, null, n);

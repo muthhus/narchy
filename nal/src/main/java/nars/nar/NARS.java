@@ -3,12 +3,14 @@ package nars.nar;
 import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
+import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.math.FloatAveraged;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
 import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
+import jcog.util.Memoize;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
@@ -19,15 +21,25 @@ import nars.control.ConceptFire;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
+import nars.term.Termed;
 import nars.time.Time;
+import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.primitive.ByteLongPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,6 +47,7 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Op.*;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * recursive cluster of NAR's
@@ -211,6 +224,7 @@ public class NARS extends NAR {
         public void cycle(@NotNull NAR nar) {
 
 
+
 //            int waitCycles = 0;
 //            while (!passive.isQuiescent()) {
 //                Util.pauseNext(waitCycles++);
@@ -219,6 +233,7 @@ public class NARS extends NAR {
             if (!busy.compareAndSet(false, true))
                 return; //already in the cycle
 
+            ((NARS)nar).nextCycle();
             try {
 
                 if (lastCycle != null) {
@@ -231,6 +246,8 @@ public class NARS extends NAR {
 
                     lastCycle.reinitialize();
                     passive.execute(lastCycle);
+
+                    ((NARS)nar).nextCycle();
 
                 } else {
                     lastCycle = passive.submit(this);
@@ -264,6 +281,40 @@ public class NARS extends NAR {
         }
 
     }
+
+    protected void nextCycle() {
+//        if (!((HijackMemoize)truthCache).isEmpty()) {
+//            System.out.println("Truth Cache: " + truthCache.summary());
+//        } else {
+//            truthCache.summary(); //HACK to call stat reset
+//        }
+//
+//        truthCache.clear();
+    }
+
+//    /** temporary 1-cycle old cache of truth calculations */
+//    final Memoize<Pair<Termed, ByteLongPair>, Truth> truthCache =
+//            new HijackMemoize<>(2048, 3,
+//                    k -> {
+//                        Truth x = super.truth(k.getOne(), k.getTwo().getOne(), k.getTwo().getTwo());
+//                        if (x == null)
+//                            return Truth.Null;
+//                        return x;
+//                    }
+//            );
+//
+//    @Override
+//    public @Nullable Truth truth(@Nullable Termed concept, byte punc, long when) {
+//        Pair<Termed, ByteLongPair> key = Tuples.pair(concept, PrimitiveTuples.pair(punc, when));
+//        Truth t = truthCache.apply(key);
+//        if (t == Truth.Null) {
+//            return null;
+//        }
+//        return t;
+//        //return truthCache.computeIfAbsent(key, k -> super.truth(k.getOne(), k.getTwo().getOne(), k.getTwo().getTwo()));
+//        //return super.truth(concept, punc, when);
+//    }
+
 
     class SubExecutor extends TaskExecutor {
         public SubExecutor(int inputQueueCapacity, float exePct) {
@@ -300,6 +351,7 @@ public class NARS extends NAR {
             return l;
         }
     }
+
 
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {

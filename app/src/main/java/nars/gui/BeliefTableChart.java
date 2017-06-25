@@ -119,11 +119,15 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         if (cc != null) {
             cp = 1f; /*nar.pri(cc);*/ if (cp!=cp) cp = 0;
             beliefs.set(cc.beliefs(), now, dur, nar);
+            beliefs.current = nar.beliefTruth(cc, now);
             goals.set(cc.goals(), now, dur, nar);
+            goals.current = nar.goalTruth(cc, now);
         } else {
             cp = 0;
             beliefs.set(BeliefTable.EMPTY, now, dur, nar);
+            beliefs.current = null;
             goals.set(BeliefTable.EMPTY, now, dur, nar);
+            goals.current = null;
         }
 
         ready();
@@ -307,10 +311,10 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         //draw projections
         if (projections > 0 && minT != maxT) {
 
-            BeliefTable table = beliefOrGoal ? c.beliefs() : c.goals();
+
 
             TruthWave pwave = beliefProj;
-            pwave.project(table, minT, maxT, dur, projections, nar);
+            pwave.project(c, beliefOrGoal, minT, maxT, dur, projections, nar);
             renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 

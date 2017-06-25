@@ -33,6 +33,48 @@ import static nars.truth.TruthFunctions.w2c;
 
 /** scalar (1D) truth value "frequency", stored as a floating point value */
 public interface Truth extends Truthed {
+    Truth Null = new Truth() {
+
+        @Override
+        public String toString() {
+            return "Truth.Null";
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj == this;
+        }
+
+        @Override
+        public boolean equals(@Nullable Truthed x, float tolerance) {
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return 0;
+        }
+
+        @Override
+        public float freq() {
+            return Float.NaN;
+        }
+
+        @Override
+        public float conf() {
+            return Float.NaN;
+        }
+
+        @Override
+        public float evi() {
+            return Float.NaN;
+        }
+
+        @Override
+        public float eviEternalized() {
+            return Float.NaN;
+        }
+    };
 
 //    Term Truth_TRUE = $.the("TRUE");
 //    Term Truth_FALSE = $.the("FALSE");

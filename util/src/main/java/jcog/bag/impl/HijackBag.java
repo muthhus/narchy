@@ -145,18 +145,23 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (x != null) {
             forEachActive(this, x, this::_onRemoved);
         }
+
     }
 
     @Nullable
-    public AtomicReferenceArray<V> reset() {
+    private AtomicReferenceArray<V> reset() {
 
-        AtomicReferenceArray<V> newMap = new AtomicReferenceArray<>(capacity());
+        if (!xCompareAndSet(tSIZE, 0, 0)) {
+            AtomicReferenceArray<V> newMap = new AtomicReferenceArray<>(capacity());
 
-        AtomicReferenceArray<V> prevMap = map.getAndSet(newMap);
+            AtomicReferenceArray<V> prevMap = map.getAndSet(newMap);
 
-        commit(null);
+            commit();
 
-        return prevMap;
+            return prevMap;
+        }
+
+        return null;
     }
 
     enum Mode {
@@ -346,9 +351,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         float priEpsilon = Pri.EPSILON;
 
         if (oldPri > priEpsilon) {
-            assert(temperature < reprobes);
+            assert (temperature < reprobes);
 
-            float newPriSlice = newPri/(reprobes/temperature);
+            float newPriSlice = newPri / (reprobes / temperature);
             float thresh = newPriSlice / (newPriSlice + oldPri);
             return random().nextFloat() < thresh;
         } else {
@@ -488,7 +493,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return 0;
     }
 
-    /** always >= 0 */
+    /**
+     * always >= 0
+     */
     public float depressurize() {
         float pv = (float) pressure.getAndSet(0);
         if (pv >= 0) {

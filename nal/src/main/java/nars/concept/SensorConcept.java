@@ -3,8 +3,6 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
-import nars.table.DefaultBeliefTable;
-import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -34,58 +32,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-
-    /**
-     * latches the last known task
-     */
-    static class SensorBeliefTable extends DefaultBeliefTable {
-
-        static final int durationsTolerance = 4;
-
-        private Task current;
-
-        public SensorBeliefTable(TemporalBeliefTable t) {
-            super(t);
-        }
-
-        public void commit(Task next) {
-            this.current = next;
-        }
-
-        @Override
-        public Truth truth(long when, long now, int dur, NAR nar) {
-            Task current = this.current;
-            if (current != null)
-                if (current.start() <= now && current.end() >= now)
-                    return current.truth();
-
-            Truth x = super.truth(when, now, dur, nar);
-
-            if (x == null && current != null && now <= current.end() + durationsTolerance * dur) {
-                return current.truth();
-            } else {
-                return x;
-            }
-        }
-
-        @Override
-        public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
-
-            Task current = this.current;
-            if (current != null)
-                if (current.start() <= now && current.end() >= now)
-                    return current;
-
-            Task x = super.match(when, now, dur, against, template, noOverlap, nar);
-
-            //if nothing matched, assume the current value still holds for some finite time
-            if (x == null && current != null && now <= current.end() + durationsTolerance * dur) {
-                return current;
-            } else {
-                return x;
-            }
-        }
-    }
 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(term, new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable()),

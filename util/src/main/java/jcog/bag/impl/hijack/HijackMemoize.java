@@ -216,6 +216,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     }
 
 
+
     @Override
     protected boolean replace(float incoming, HalfWeakPair<K, V> existing) {
         if (!super.replace(incoming, existing)) {

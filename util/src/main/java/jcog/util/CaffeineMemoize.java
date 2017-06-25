@@ -37,4 +37,10 @@ public class CaffeineMemoize<K,V> implements Memoize<K,V> {
         CacheStats stats = cache.stats();
         return n2(stats.hitRate()*100f) + "% hits, " + cache.estimatedSize() + " size";
     }
+
+    @Override
+    public void clear() {
+        cache.invalidateAll();
+        cache.cleanUp();
+    }
 }
