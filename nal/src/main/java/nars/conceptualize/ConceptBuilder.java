@@ -1,7 +1,11 @@
 package nars.conceptualize;
 
 import nars.NAR;
+import nars.concept.TaskConcept;
 import nars.conceptualize.state.ConceptState;
+import nars.table.BeliefTable;
+import nars.table.RTreeBeliefTable;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +23,8 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     @NotNull ConceptState init();
     @NotNull ConceptState awake();
     @NotNull ConceptState sleep();
+
+    RTreeBeliefTable newTemporalBeliefTable();
 
     void start(NAR nar);
 
@@ -47,9 +53,21 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
+        public RTreeBeliefTable newTemporalBeliefTable() {
+            return null;
+        }
+
+        @Override
         public void start(NAR nar) {
 
         }
 
+        @Override
+        public BeliefTable newBeliefTable(Compound t, boolean beliefOrGoal) {
+            return null;
+        }
+
     };
+
+    BeliefTable newBeliefTable(Compound t, boolean beliefOrGoal);
 }

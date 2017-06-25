@@ -102,18 +102,20 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     public void setCapacity(int c) {
-        if (this.capacity != c) {
-
-            this.capacity = c;
+        int wasCapacity = this.capacity;
+        if (wasCapacity != c) {
 
             synchronized (this) {
+                if (wasCapacity == c)
+                    return; //already set
+
+                this.capacity = c;
 
                 int s = size();
 
                 //TODO can be accelerated by batch remove operation
                 while (c < s--) {
-                    Task r = removeLast();
-                    r.delete();
+                    removeLast().delete();
                 }
             }
 
@@ -122,7 +124,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        forEach((y) -> { if (!y.isDeleted()) x.accept(y); } );
+        super.forEach((y) -> { if (!y.isDeleted()) x.accept(y); } );
     }
 
 

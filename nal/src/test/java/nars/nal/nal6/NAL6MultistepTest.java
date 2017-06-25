@@ -59,7 +59,7 @@ public class NAL6MultistepTest {
             n.run(100);
             burglary = n.concept("(burglary)");
             earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
-            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0));
+            //System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0, nar) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0, nar));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
@@ -81,9 +81,9 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        NAR d = new NARBuilder().get();
+        NAR n = new NARBuilder().get();
         //d.log();
-        d.input(
+        n.input(
                 "(burglary).   %0.7;0.9%",
                 "(earthquake). %0.2;0.9%",
                 "((&&, (burglary), (earthquake)) ==> (alarm)).      %0.9;0.9%",
@@ -98,15 +98,15 @@ public class NAL6MultistepTest {
         for (int i = 0; i < 5; i++) {
             // burglary.print();  earthquake.print();
             //long now = d.time();
-            d.run(100);
-            burglary = d.concept("(burglary)");
-            earthquake = d.concept("(earthquake)");            // burglary.print();  earthquake.print();
-            System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0));
+            n.run(100);
+            burglary = n.concept("(burglary)");
+            earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
+            System.out.println("burglary=" + n.beliefTruth(burglary,0) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0,0, n));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%
-        assertEquals(0.99f, burglary.belief(Tense.ETERNAL,0,0).freq(), 0.33f /* approximate */);
-        assertEquals(0.23f, earthquake.belief(Tense.ETERNAL,0,0).freq(), 0.1f /* approximate */);
+        assertEquals(0.99f, n.beliefTruth(burglary, 0).freq(), 0.33f /* approximate */);
+        assertEquals(0.23f, n.beliefTruth(earthquake, 0).freq(), 0.1f /* approximate */);
 
 
 

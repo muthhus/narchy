@@ -69,13 +69,13 @@ public class RTreeBeliefTableTest {
         n.log();
 
         TaskConcept c = (TaskConcept) n.conceptualize(term);
-        @NotNull BeliefTable cb = c.tableOrNew(n, true);
-        int numTasks = 0;
+        @NotNull BeliefTable cb = c.table(true);
+        //int numTasks = 0;
         long time=0;
         while (time < end) {
             cb.add($.task(term, BELIEF, func.valueOf(time), 0.9f).time(time).setPriThen(0.5f).apply(n), c, n);
             time += period;
-            numTasks++;
+            //numTasks++;
         }
 
         //n.run(1);

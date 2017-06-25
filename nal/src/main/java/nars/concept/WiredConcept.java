@@ -27,18 +27,18 @@ public abstract class WiredConcept extends TaskConcept implements PermanentConce
 
     public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
 
-    public WiredConcept(@NotNull Compound term, @NotNull NAR n) {
+    protected WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         resolution.setValue(n.truthResolution);
         n.on(this);
     }
 
-    @Override
-    public void process(@NotNull Task t, @NotNull NAR n) {
-        if (t.isEternal())
-            return;
-        super.process(t, n);
-    }
+//    @Override
+//    public void process(@NotNull Task t, @NotNull NAR n) {
+//        if (t.isEternal())
+//            return;
+//        super.process(t, n);
+//    }
 
     // THIS DITHERING AND CLONING IS DANGEROUS
 //    public void process(@NotNull Task t, @NotNull NAR n) {

@@ -81,16 +81,16 @@ public class FuzzyScalarConceptsTest {
     }
 
     public void testSteadyFreqCondition(MutableFloat m, FuzzyScalarConcepts f, FloatPredicate withFreqSum) {
-        NAR d = f.nar;
+        NAR n = f.nar;
         //run a few oscillations
         for (int i = 0; i < 5; i++) {
             m.setValue(Math.sin(i/2f));
-            d.cycle();
+            n.cycle();
 
 
             double freqSum = StreamSupport.stream(f.spliterator(), false)
-                    .peek(x -> d.input(x.apply(d)))
-                    .map(x -> x.belief(d.time(), d.time.dur()))
+                    .peek(x -> n.input(x.apply(n)))
+                    .map(x -> n.beliefTruth(x, n.time()))
                     .mapToDouble(x -> x!=null ? x.freq() : 0f).sum();
 
             System.out.println(

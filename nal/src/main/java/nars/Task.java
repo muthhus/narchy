@@ -378,7 +378,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             TaskConcept concept = concept(nar);
             if (concept != null) {
                 ArrayBag<Task> answers = concept.computeIfAbsent(Op.QUESTION, () ->
-                        new AnswerBag(nar, this).capacity(Param.MAX_INPUT_ANSWERS));
+                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
                 answers.commit();
 
                 float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());

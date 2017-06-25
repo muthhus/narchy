@@ -109,11 +109,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //    }
 
 
-    @Override
-    public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {
-        return EternalTable.EMPTY;
-    }
-
     public void setSignal(FloatSupplier signal) {
         this.signal = signal;
     }

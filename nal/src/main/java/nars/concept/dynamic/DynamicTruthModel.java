@@ -66,7 +66,7 @@ abstract public class DynamicTruthModel {
 
 
                 if (tableDynamic /*&& subterm instanceof Compound*/) {
-                    DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi);
+                    DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi, n);
                     if (ndt != null) {
                         Truth ntt = ndt.truth();
                         if (ntt != null && add(i, d, ntt.negIf(negated), confMin)) {
@@ -82,7 +82,7 @@ abstract public class DynamicTruthModel {
                 } else {
                     Truth nt;
                     if (evi) {
-                        Task bt = table.match(when + dt, now, dur);
+                        Task bt = table.match(when + dt, now, dur, n);
                         if (bt == null)
                             return null;
 
@@ -90,7 +90,7 @@ abstract public class DynamicTruthModel {
                         nt = bt.truth(when+dt, dur); //TODO project to target time if task isnt at it
 
                     } else {
-                        nt = table.truth(when + dt, now, dur); //truth only
+                        nt = table.truth(when + dt, now, dur, n); //truth only
                     }
 
                     if (nt == null || !add(i, d, nt.negIf(negated), confMin)) {

@@ -6,18 +6,16 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
+import nars.table.TemporalBeliefTable;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 
 public class DynamicBeliefTable extends DefaultBeliefTable {
 
-    private final DynamicConcept dynamicConcept;
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
 
@@ -32,24 +30,23 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         super.add(input, concept, nar);
     }
 
-    public DynamicBeliefTable(DynamicConcept dynamicConcept, DynamicTruthModel model, boolean beliefOrGoal) {
-        super();
-        this.dynamicConcept = dynamicConcept;
+    public DynamicBeliefTable(TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
+        super(t);
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;
     }
 
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when) {
-        return generate(template, when, dynamicConcept.nar.time(), null);
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, NAR nar) {
+        return generate(template, when, now, null, nar);
     }
 
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b) {
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b, NAR nar) {
 
-        DynTruth yy = truth(when, template, true);
+        DynTruth yy = truth(when, template, true, nar);
         if (yy == null)
             return null;
 
@@ -65,50 +62,51 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             if (e > end) end = e;
         }
 
-        return yy.task(template, beliefOrGoal, now, start, end, b, dynamicConcept.nar);
+        return yy.task(template, beliefOrGoal, now, start, end, b, nar);
     }
 
     @Override
-    @Nullable
-    public Truth truth(long when, long now, int dur) {
-        DynTruth d = dyntruth(when, now, false);
-        return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now, dur) /* includes only non-dynamic beliefs */);
+    public Truth truth(long when, long now, int dur, NAR nar) {
+        DynTruth d = dyntruth(when, now, false, nar);
+        return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
     }
 
     @Nullable
-    DynTruth dyntruth(long when, long now, boolean evidence) {
-        return truth(when, now, dynamicConcept.term(), evidence);
+    DynTruth dyntruth(long when, long now, boolean evidence, NAR nar) {
+        return truth(when, now, null, evidence, nar);
     }
 
+
     @Nullable
-    public DynTruth truth(long when, @NotNull Compound template, boolean evidence) {
+    public DynTruth truth(long when, int dt, boolean evidence, NAR nar) {
+        return truth(when, null /*(Compound)(dynamicConcept.term().dt(dt))*/, evidence, nar);
+    }
+
+        @Nullable
+    public DynTruth truth(long when, @NotNull Compound template, boolean evidence, NAR nar) {
         return truth(when, when, template,  /*nar.concept(template)*/
-                evidence);
+                evidence, nar);
     }
 
-    @Nullable
-    public DynTruth truth(long when, int dt, boolean evidence) {
-        return truth(when, (Compound)(dynamicConcept.term().dt(dt)), evidence);
-    }
 
     @Nullable
-    public DynTruth truth(long when, long now, @NotNull Compound template, boolean evidence) {
-        return model.eval(template, beliefOrGoal, when, now, evidence, dynamicConcept.nar); //newDyn(evidence);
+    public DynTruth truth(long when, long now, @NotNull Compound template, boolean evidence, NAR nar) {
+        return model.eval(template, beliefOrGoal, when, now, evidence, nar); //newDyn(evidence);
     }
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, Random rng) {
+    public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, NAR nar) {
 
         if (template == null) {
             template =
-                    dynamicConcept.nar.terms.retemporalize(target.term(),
+                    nar.terms.retemporalize(target.term(),
                             target.isEternal() ?
-                                    dynamicConcept.nar.terms.retemporalizationDTERNAL : dynamicConcept.nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+                                    nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
         }
 
-        Task y = generate(template, when);
+        Task y = generate(template, when, now, nar);
 
-        Task x = super.match(when, now, dur, target, template, noOverlap, rng);
+        Task x = super.match(when, now, dur, target, template, noOverlap, nar);
 
         if (x == null) return y;
         if (y == null || x.equals(y)) return x;

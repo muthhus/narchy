@@ -15,6 +15,7 @@ import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptFire;
 import nars.control.premise.DerivationBudgeting;
@@ -829,7 +830,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public Truth truth(@Nullable Termed concept, byte punc, long when) {
         if (concept != null) {
             @Nullable Concept c = concept(concept);
-            if (c != null) {
+            if (c instanceof TaskConcept) {
                 BeliefTable table;
                 switch (punc) {
                     case BELIEF:
@@ -841,7 +842,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     default:
                         throw new UnsupportedOperationException();
                 }
-                return table.truth(when, dur());
+                return table.truth(when, dur(), this);
             }
         }
         return null;
@@ -1392,6 +1393,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
         terms.set(c);
+        c.state(terms.conceptBuilder().awake(), this);
 
         return c;
     }
@@ -1555,5 +1557,14 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @Override
     public final Termed get(Term x, boolean createIfAbsent) {
         return terms.get(x, createIfAbsent);
+    }
+
+    /** strongest matching belief for the target time */
+    public Task belief(Compound c, long when) {
+        return concept(c).beliefs().match(when, dur(), this);
+    }
+    /** strongest matching goal for the target time */
+    public Task goal(Compound c, long when) {
+        return concept(c).goals().match(when, dur(), this);
     }
 }

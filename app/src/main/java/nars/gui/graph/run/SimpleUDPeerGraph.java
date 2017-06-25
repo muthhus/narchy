@@ -56,7 +56,7 @@ public class SimpleUDPeerGraph {
                     locations.add(new v2(
                             (float) (Math.sin(4f * n.random().nextFloat()) * WorldX - WorldX/2),
                             (float) (Math.cos(4f * n.random().nextFloat()) * WorldY - WorldY/2)));
-                    peer[i].them.capacity(8);
+                    peer[i].them.setCapacity(8);
                 }
 
                 s.nodeBuilder = (x) -> {

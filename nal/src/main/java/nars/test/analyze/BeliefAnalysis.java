@@ -6,21 +6,30 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
 import nars.time.Tense;
 import nars.truth.TruthWave;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** utility class for analyzing the belief/goal state of a concept */
-public class BeliefAnalysis extends EnergyAnalysis {
+public class BeliefAnalysis extends EnergyAnalysis implements Termed {
 
 	public final Compound term;
 
 	public BeliefAnalysis(NAR n, Compound term) {
 		super(n);
 		this.term = term;
+	}
+
+	@NotNull
+	@Override
+	public Term term() {
+		return term;
 	}
 
 	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
@@ -51,8 +60,8 @@ public class BeliefAnalysis extends EnergyAnalysis {
 	}
 
 	@Nullable
-	public Concept concept() {
-		return nar.concept(term);
+	public TaskConcept concept() {
+		return (TaskConcept) nar.concept(term);
 	}
 
 	@Nullable

@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.nar.NARBuilder;
 import nars.nar.Terminal;
 import nars.table.BeliefTable;
@@ -50,7 +51,7 @@ public class TemporalInductionTest {
 
         //n.forEachActiveConcept(Concept::print);
 
-        Concept c = n.concept("a:b");
+        TaskConcept c = (TaskConcept) n.concept("a:b");
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 
         BeliefTable b = c.beliefs();
@@ -61,10 +62,10 @@ public class TemporalInductionTest {
 
         //least relevant
         int dur = n.dur();
-        assertEquals("(b-->a). 0 %1.0;.90%", b.match(0, dur).toStringWithoutBudget());
+        assertEquals("(b-->a). 0 %1.0;.90%", n.belief(c, 0).toStringWithoutBudget());
 
         //most current relevant overall:
-        assertEquals("(b-->a). 5 %0.0;.90%", b.match(n.time(), dur).toStringWithoutBudget());
+        assertEquals("(b-->a). 5 %0.0;.90%", n.belief(c, n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {

@@ -34,7 +34,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-
     private final CameraSensor pixels;
 
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
@@ -765,9 +764,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             SensorConcept s = sensors.get(y * tetris_width + x);
 
-            Truth b = s.beliefs().truth(now + whenRelative, whenRelative, dur);
+            Truth b = s.beliefs().truth(now + whenRelative, whenRelative, dur, nar);
             float bf = b != null ? b.freq() : 0.5f;
-            Truth dt = s.goals().truth(now + whenRelative, whenRelative, dur);
+            Truth dt = s.goals().truth(now + whenRelative, whenRelative, dur, nar);
             float dr, dg;
             if (dt == null) {
                 dr = dg = 0;

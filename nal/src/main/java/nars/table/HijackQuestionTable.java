@@ -15,8 +15,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 
     public HijackQuestionTable(int cap, int reprobes) {
         super(reprobes);
-
-        capacity(cap);
+        setCapacity(cap);
     }
 
 
@@ -37,7 +36,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     @Override
     public void capacity(int newCapacity, NAR nar) {
         setCapacity(newCapacity); //hijackbag
-        capacity(newCapacity); //question table
+        setCapacity(newCapacity);
     }
 
 

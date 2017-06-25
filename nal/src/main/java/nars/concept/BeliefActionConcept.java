@@ -40,12 +40,12 @@ public class BeliefActionConcept extends ActionConcept {
         long now = nar.time();
 
         Truth belief =
-                belief(now, dur);
+                belief(now, dur, nar);
                 //beliefIntegrated.commitAverage();
         action.accept(belief);
 
         Truth goal =
-                goal(now, dur);
+                goal(now, dur, nar);
                 //goalIntegrated.commitAverage();
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent

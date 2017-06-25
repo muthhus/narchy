@@ -63,7 +63,7 @@ public class NAL5BooleanConsistency {
                     String s = outcomes[k];
                     Concept dc = d.concept(s);
                     assertNotNull(dc);
-                    @Nullable Task t = dc.beliefs().match(d.time(), d.dur());
+                    @Nullable Task t = d.belief((Compound)dc, d.time());
                     Truth b = t!=null ? t.truth() : null;
 
                     System.out.println("\t" + s + "\t" + b);

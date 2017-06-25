@@ -69,10 +69,10 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     public final void setCapacity(int newCapacity) {
         if (newCapacity != this.capacity) {
             this.capacity = newCapacity;
-            synchronized (items) {
+            //synchronized (items) {
                 if (this.size() > newCapacity)
                     commit(null, true);
-            }
+            //}
             //return true;
         }
         //return false;

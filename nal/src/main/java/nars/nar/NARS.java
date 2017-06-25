@@ -112,7 +112,7 @@ public class NARS extends NAR {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur() * 2) {
+                        if (Math.abs(h - now) <= dur() ) {
                             return 0; //present
                         } else if (h > now) {
                             return 1; //future

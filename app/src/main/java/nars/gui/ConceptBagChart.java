@@ -32,13 +32,13 @@ public class ConceptBagChart extends NARChart<PriReference<Concept>> {
 
             long n = now;
 
-            @Nullable Truth bt = c.beliefs().truth(n, dur);
+            @Nullable Truth bt = c.beliefs().truth(n, dur, nar);
             if (bt != null) {
                 belief = bt.freq();
                 //a += bt.conf();
             }
 
-            @Nullable Truth gt = c.goals().truth(n, dur);
+            @Nullable Truth gt = c.goals().truth(n, dur, nar);
             if (gt != null) {
                 goal = gt.freq();
                 //a += gt.conf();

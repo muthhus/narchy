@@ -106,7 +106,7 @@ public class TaskExecutor extends Executioner {
 
     public TaskExecutor(int capacity) {
         super();
-        active.capacity(capacity);
+        active.setCapacity(capacity);
 
         int overCapacity = capacity * 8;
         overflow = new DisruptorBlockingQueue(overCapacity);

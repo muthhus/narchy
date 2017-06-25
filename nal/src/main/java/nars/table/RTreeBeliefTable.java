@@ -230,7 +230,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
+    public Task match(long when, long now, int dur, @Nullable Task against, NAR nar) {
 
         updateSignalTasks(now);
 
@@ -249,7 +249,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 Task a = tt.get(0).task;
                 Task b = tt.get(1).task;
 
-                Task c = Revision.merge(this, a, b, now, dur, Param.TRUTH_EPSILON, rng);
+                Task c = Revision.merge(this, a, b, now, dur, Param.TRUTH_EPSILON, nar.random());
                 return c != null ? c : a;
         }
 

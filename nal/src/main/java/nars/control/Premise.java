@@ -122,7 +122,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
                 } else {
                     long when = whenMatch(task, now, nar);
-                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar.random());
+                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar);
                 }
 
                 if (match != null) {

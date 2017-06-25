@@ -12,10 +12,14 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.conceptualize.state.ConceptState;
 import nars.conceptualize.state.DefaultConceptState;
+import nars.table.BeliefTable;
+import nars.table.DefaultBeliefTable;
+import nars.table.RTreeBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -118,7 +122,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                         Bag... bags
                                         //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
     ) {
-        return new CompoundConcept(t, nar, bags);
+        return new CompoundConcept(t, bags);
     }
 
     private TaskConcept newTask(@NotNull Compound t, Bag... bags) {
@@ -247,12 +251,36 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 throw new RuntimeException("negation terms must not be conceptualized");
         }
 
-        return
-                dmt != null ?
-                        new DynamicConcept(t, dmt, null, nar, newLinkBags(t)) :
-                        new TaskConcept(t, nar, newLinkBags(t))
-                ;
+        if (dmt != null) {
+
+            BeliefTable beliefs = dmt != null ?
+                    new DynamicBeliefTable(newTemporalBeliefTable(), dmt, true) :
+                    newBeliefTable(t, true);
+
+            BeliefTable goals = dmt != null ?
+                    new DynamicBeliefTable(newTemporalBeliefTable(), dmt, true) :
+                    newBeliefTable(t, true);
+
+            return new DynamicConcept(t, beliefs, goals, nar);
+        } else {
+            return new TaskConcept(t, nar);
+        }
     }
+
+    @Override
+    public BeliefTable newBeliefTable(Compound c, boolean beliefOrGoal) {
+        //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
+        //return new HijackTemporalBeliefTable(tCap);
+        //return new RTreeBeliefTable(tCap);
+        DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable());
+        return b;
+    }
+
+    @Override
+    public RTreeBeliefTable newTemporalBeliefTable() {
+        return new RTreeBeliefTable();
+    }
+
 
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
         return !subterms.OR(x -> x instanceof Variable);
@@ -345,9 +373,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            //ConcurrentHashMapUnsafe(cap);
 //        } else {
 //            return new HashMap(defaultInitialCap, 1f);
-         //   if (volume < 16) {
-                return new ConcurrentHashMap(0, loadFactor);
-                //return new ConcurrentHashMapUnsafe(0);
+            //   if (volume < 16) {
+            return new ConcurrentHashMap(0, loadFactor);
+            //return new ConcurrentHashMapUnsafe(0);
 //            } else if (volume < 32) {
 //                return new SynchronizedHashMap(0, loadFactor);
 //                //return new TrieMap();

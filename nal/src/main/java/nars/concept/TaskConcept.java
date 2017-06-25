@@ -1,6 +1,5 @@
 package nars.concept;
 
-import jcog.bag.Bag;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -21,18 +20,20 @@ public class TaskConcept extends CompoundConcept {
     private QuestionTable questions;
     @Nullable
     private QuestionTable quests;
-    @Nullable
-    protected BeliefTable beliefs;
-    @Nullable
-    protected BeliefTable goals;
-
-    public TaskConcept(@NotNull Compound term, @NotNull NAR nar, @NotNull Bag... linkBags) {
-        super(term, nar, linkBags);
-    }
+    @NotNull
+    protected final BeliefTable beliefs;
+    @NotNull
+    protected final BeliefTable goals;
 
 
     public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, n, ((DefaultConceptBuilder)n.terms.conceptBuilder()).newLinkBags(term));
+        this(term, null, null, n);
+    }
+
+    public TaskConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
+        super(term, ((DefaultConceptBuilder)n.terms.conceptBuilder()).newLinkBags(term));
+        this.beliefs = beliefs!=null ? beliefs : n.terms.conceptBuilder().newBeliefTable(this, true);
+        this.goals = goals!=null ? goals: n.terms.conceptBuilder().newBeliefTable(this, false);
     }
 
 
@@ -81,32 +82,8 @@ public class TaskConcept extends CompoundConcept {
     }
 
     @NotNull
-    public final BeliefTable tableOrNew(@NotNull NAR nar, boolean beliefOrGoal) {
-        @Nullable BeliefTable t = beliefOrGoal ? beliefs : goals;
-        if (t == null) {
-            t = newBeliefTable(nar, beliefOrGoal);
-            if (beliefOrGoal) beliefs = t;
-            else goals = t;
-        }
-        return t;
-    }
-
-    @NotNull
-    protected BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
-        return new DefaultBeliefTable();
-//        int eCap = state.beliefCap(this, beliefOrGoal, true);
-//        int tCap = state.beliefCap(this, beliefOrGoal, false);
-//        return newBeliefTable(nar, beliefOrGoal, eCap, tCap);
-    }
-
-
-    public TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
-        //return new HijackTemporalBeliefTable(tCap);
-        return new RTreeBeliefTable(tCap);
-    }
-
-    public EternalTable newEternalTable(int eCap, boolean isBeliefOrGoal) {
-        return eCap > 0 ? new EternalTable(eCap) : EternalTable.EMPTY;
+    public final BeliefTable table(boolean beliefOrGoal) {
+        return beliefOrGoal ? beliefs : goals;
     }
 
 
@@ -156,13 +133,11 @@ public class TaskConcept extends CompoundConcept {
 
     @Override
     public ConceptState state(@NotNull ConceptState p, NAR nar) {
-        super.state(p, nar);
         ConceptState current = this.state;
         if (current != p) {
-
+            super.state(p, nar);
             beliefCapacity(p, nar);
             questionCapacity(p, nar);
-
         }
         return current;
     }
@@ -174,11 +149,13 @@ public class TaskConcept extends CompoundConcept {
      */
     public void process(@NotNull Task t, @NotNull NAR n) {
         switch (t.punc()) {
+
             case BELIEF:
-                tableOrNew(n, true).add(t, this, n);
+                beliefs.add(t, this, n);
                 break;
+
             case GOAL:
-                tableOrNew(n, false).add(t, this, n);
+                goals.add(t, this, n);
                 break;
 
             case QUESTION:
@@ -218,21 +195,20 @@ public class TaskConcept extends CompoundConcept {
     @Override
     public void delete(@NotNull NAR nar) {
         super.delete(nar);
-        beliefs = goals = null;
+        beliefs.clear();
+        goals.clear();
         questions = quests = null;
     }
 
-    public int taskCount() {
-        int s = 0;
-        if (beliefs != null)
-            s += beliefs.size();
-        if (goals != null)
-            s += goals.size();
-        if (questions != null)
-            s += questions.size();
-        if (quests != null)
-            s += quests.size();
-
-        return s;
-    }
+//    public int taskCount() {
+//        int s = 0;
+//        s += beliefs.size();
+//        s += goals.size();
+//        if (questions != null)
+//            s += questions.size();
+//        if (quests != null)
+//            s += quests.size();
+//
+//        return s;
+//    }
 }

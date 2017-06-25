@@ -16,7 +16,7 @@ public class CurveBag<X> extends ArrayBag<X> {
 
     public CurveBag(int initialCapacity, @NotNull PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
         super(mergeFunction, map);
-        capacity(initialCapacity);
+        setCapacity(initialCapacity);
     }
 
 

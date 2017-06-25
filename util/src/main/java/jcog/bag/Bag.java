@@ -666,11 +666,6 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         forEach(b -> each.accept(key(b)));
     }
 
-    default Bag<K, V> capacity(int i) {
-        setCapacity(i);
-        return this;
-    }
-
 
 //    default boolean putIfAbsent(V b) {
 //        K x = b.get();

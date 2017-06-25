@@ -132,7 +132,7 @@ public enum TermGraph {
                 return;
 
             int dur = nar.dur();
-            Task t = c.beliefs().match(when, dur);
+            Task t = nar.belief((Compound)c, when);
             if (t == null)
                 return;
 

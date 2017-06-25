@@ -236,7 +236,7 @@ public class RevisionTest {
         NAR n = newNAR(3)
                 .input("(x ==> y). :|: %1.0;0.9%",
                        "(x ==> y). :|: %0.0;0.9%" ).run(1);
-        Truth t = n.concept("(x ==> y)").belief(0, 1);
+        Truth t = n.beliefTruth("(x ==> y)", 0);
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);
     }

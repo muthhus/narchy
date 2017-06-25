@@ -52,9 +52,9 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     public float update(int x, int y, GL2 g) {
 
         Concept s = cam.matrix[x][y];
-        Truth b = s.beliefs().truth(now, dur);
+        Truth b = s.beliefs().truth(now, dur, nar);
         float bf = b != null ? b.freq() : 0.5f;
-        Truth d = s.goals().truth(now, dur);
+        Truth d = s.goals().truth(now, dur, nar);
 //        if (d == null) {
 //            dr = dg = 0;
 //        } else {

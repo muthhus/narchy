@@ -3,9 +3,14 @@ package nars.concept.dynamic;
 import jcog.bag.Bag;
 import nars.NAR;
 import nars.concept.TaskConcept;
+import nars.conceptualize.ConceptBuilder;
+import nars.table.BeliefTable;
+import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 
 public class DynamicConcept extends TaskConcept {
@@ -13,18 +18,9 @@ public class DynamicConcept extends TaskConcept {
     @NotNull
     @Deprecated final NAR nar;
 
-    public DynamicConcept(@NotNull Compound term, @Nullable DynamicTruthModel beliefModel, @Nullable DynamicTruthModel goalModel, @NotNull NAR nar, @NotNull Bag... bags) {
-        super(term, nar, bags);
+    public DynamicConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, NAR nar) {
+        super(term, beliefs, goals, nar);
         this.nar = nar;
-        this.beliefs =
-                beliefModel!=null ?
-                        new DynamicBeliefTable(this, beliefModel, true) :
-                        super.newBeliefTable(nar, true);
-
-        this.goals =
-                goalModel != null ?
-                        new DynamicBeliefTable(this, goalModel, false) :
-                        super.newBeliefTable(nar, false);
     }
 
 

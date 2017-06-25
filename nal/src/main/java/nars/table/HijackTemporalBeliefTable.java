@@ -464,7 +464,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, Random rng) {
+    public Task match(long when, long now, int dur, @Nullable Task against, NAR nar) {
 
         //choose only top:
         //return maxBy(evidence(when, now, dur));
@@ -475,7 +475,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = Revision.merge(this, a, s.b, now, dur, Param.TRUTH_EPSILON, rng);
+        Task c = Revision.merge(this, a, s.b, now, dur, Param.TRUTH_EPSILON, nar.random());
         return c != null ? c : a;
     }
 

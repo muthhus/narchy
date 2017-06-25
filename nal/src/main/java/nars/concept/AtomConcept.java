@@ -61,7 +61,8 @@ public class AtomConcept extends Atom implements Concept {
         ConceptState current = this.state;
         if (current!=p) {
             this.state = p;
-            linkCapacity(p.linkCap(this, true),p.linkCap(this, false));
+            termlinks().setCapacity(p.linkCap(this, true));
+            tasklinks().setCapacity(p.linkCap(this, false));
         }
         return current;
     }
@@ -114,10 +115,10 @@ public class AtomConcept extends Atom implements Concept {
     }
 
 
-    @Override
-    public void delete(@NotNull NAR nar) {
-        Concept.delete(this, nar);
-        meta = null;
-    }
+//    @Override
+//    public void delete(@NotNull NAR nar) {
+//        Concept.delete(this, nar);
+//        meta = null;
+//    }
 
 }

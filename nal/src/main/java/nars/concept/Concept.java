@@ -142,28 +142,18 @@ public interface Concept extends Termed {
         }
     }
 
-    default void linkCapacity(int termlinks, int tasklinks) {
-        termlinks().setCapacity(termlinks);
-        tasklinks().setCapacity(tasklinks);
-    }
 
-    void delete(NAR nar);
+    default void delete(@NotNull NAR nar) {
 
+        termlinks().clear();
+        tasklinks().clear();
 
-    static void delete(@NotNull Concept c, @NotNull NAR nar) {
+        beliefs().clear();
+        goals().clear();
+        questions().clear();
+        quests().clear();
 
-        if (c instanceof PermanentConcept)
-            throw new RuntimeException("permanent concept deleted: " + c);
-
-        c.beliefs().clear();
-        c.goals().clear();
-        c.questions().clear();
-        c.quests().clear();
-
-        c.termlinks().clear();
-        c.tasklinks().clear();
-
-        c.state(ConceptState.Deleted, nar);
+        state(ConceptState.Deleted, nar);
 
     }
 
@@ -192,27 +182,27 @@ public interface Concept extends Termed {
 
 
     /** use NAR.beliefTruth(Term|String, when) */
-    @Deprecated @Nullable
-    default Truth belief(long when, long now, int dur) {
-        return beliefs().truth(when, now, dur);
+    @Deprecated
+    default Truth belief(long when, long now, int dur, NAR nar) {
+        return beliefs().truth(when, now, dur, nar);
     }
 
     /** use NAR.goalTruth(Term|String, when) */
-    @Deprecated @Nullable
-    default Truth goal(long when, long now, int dur) {
-        return goals().truth(when, now, dur);
+    @Deprecated
+    default Truth goal(long when, long now, int dur, NAR nar) {
+        return goals().truth(when, now, dur, nar);
     }
 
     /** use NAR.beliefTruth(Term|String, when) */
-    @Deprecated @Nullable
-    default Truth belief(long when, int dur) {
-        return belief(when, when, dur);
+    @Deprecated
+    default Truth belief(long when, int dur, NAR nar) {
+        return belief(when, when, dur, nar);
     }
 
     /** use NAR.goalTruth(Term|String, when) */
-    @Deprecated @Nullable
-    default Truth goal(long when, int dur) {
-        return goal(when, when, dur);
+    @Deprecated
+    default Truth goal(long when, int dur, NAR nar) {
+        return goal(when, when, dur, nar);
     }
 
 //    @Nullable

@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static java.util.stream.StreamSupport.stream;
@@ -59,12 +58,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap, Random rng) {
+        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap, NAR nar) {
             return null;
         }
 
         @Override
-        public @Nullable Task match(long when, long now, int dur) {
+        public @Nullable Task match(long when, long now, int dur, NAR nar) {
             return null;
         }
 
@@ -108,9 +107,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
 
-        @Nullable
         @Override
-        public Truth truth(long when, long now, int dur) {
+        public Truth truth(long when, long now, int dur, NAR nar) {
             return null;
         }
 
@@ -151,18 +149,18 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     @Nullable void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
-    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, Random rng);
+    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
 
-    default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap, Random rng) {
-        return match(when, now, dur, against, null, noOverlap, rng);
+    default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap, NAR nar) {
+        return match(when, now, dur, against, null, noOverlap, nar);
     }
 
-    @Nullable default Task match(long when, long now, int dur) {
-        return match(when, now, dur, null, true, ThreadLocalRandom.current() /* HACK */);
+    @Nullable default Task match(long when, long now, int dur, NAR nar) {
+        return match(when, now, dur, null, true, nar);
     }
 
-    @Nullable default Task match(long when, int dur) {
-        return match(when, when, dur);
+    @Nullable default Task match(long when, int dur, NAR nar) {
+        return match(when, when, dur, nar);
     }
 
     @Deprecated @Nullable default Task matchEternal() {
@@ -195,12 +193,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      * estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available
      */
-    @Nullable Truth truth(long when, long now, int dur);
+    Truth truth(long when, long now, int dur, NAR nar);
 
 
-    @Nullable
-    default Truth truth(long when, int dur) {
-        return truth(when, when, dur);
+    default Truth truth(long when, int dur, NAR nar) {
+        return truth(when, when, dur, nar);
     }
 
 
@@ -229,7 +226,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
 
 
-        Task answer = match(when, now, dur, question, question.term(), false, nar.random());
+        Task answer = match(when, now, dur, question, question.term(), false, nar);
         if (answer == null || answer.isDeleted())
             return null;
 

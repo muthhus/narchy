@@ -10,43 +10,49 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
-import java.util.Random;
 import java.util.function.Consumer;
 
 
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
-public class DefaultBeliefTable implements BeliefTable {
+public class DefaultBeliefTable extends EternalTable implements BeliefTable {
 
-    @Nullable
-    public EternalTable eternal = null;
-    @Nullable
-    public TemporalBeliefTable temporal = null;
+//    @Nullable   public EternalTable eternal = this;
 
+    @NotNull public final TemporalBeliefTable temporal;
+
+    public DefaultBeliefTable(TemporalBeliefTable t) {
+        super(0);
+        temporal = t;
+    }
+
+    @Override
+    public void setCapacity(int c) {
+        throw new RuntimeException("only super.setCapacity should be called by this instance");
+    }
 
     /**
      * TODO this value can be cached per cycle (when,now) etc
      */
-    @Nullable
     @Override
-    public Truth truth(long when, long now, int dur) {
+    public Truth truth(long when, long now, int dur, NAR nar) {
 
-        Truth tt = temporal().truth(when, now, dur, eternal);
+        Truth tt = temporal().truth(when, now, dur, this);
 
-        return (tt != null) ? tt : eternal().truth();
+        return (tt != null) ? tt : super.truth();
 
     }
 
     @Override
     public boolean removeTask(Task x) {
-        return (x.isEternal()) ? eternal().removeTask(x) : temporal().removeTask(x);
+        return (x.isEternal()) ? super.removeTask(x) : temporal().removeTask(x);
     }
 
     @Override
     public void clear() {
         temporal().clear();
-        eternal().clear();
+        super.clear();
     }
 
     @NotNull
@@ -54,73 +60,69 @@ public class DefaultBeliefTable implements BeliefTable {
     @Deprecated
     public final Iterator<Task> iterator() {
         return Iterators.concat(
-                eternal().taskIterator(),
+                super.taskIterator(),
                 temporal().taskIterator()
         );
     }
 
     @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
-        eternal().forEachTask(action);
-        temporal().forEachTask(action);
+        forEachTask(action);
     }
 
     @Override
-    public final void forEachTask(Consumer<? super Task> x) {
-        forEach(x);
+    public final void forEachTask(Consumer<? super Task> action) {
+        super.forEachTask(action);
+        temporal().forEachTask(action);
     }
 
     @Override
     public float priSum() {
         final float[] total = {0};
         Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
-        eternal().forEachTask(totaler);
+        super.forEachTask(totaler);
         temporal().forEachTask(totaler);
         return total[0];
     }
 
     @Override
     public int size() {
-        return eternal().size() + temporal().size();
+        return super.size() + temporal().size();
     }
 
     @Override
     @Deprecated
     public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
-        return eternal().capacity() + temporal().capacity();
+        return super.capacity() + temporal().capacity();
     }
 
     @Override
     public final void capacity(int eternals, int temporals) {
-        temporal().setCapacity(temporals);
-        eternal().setCapacity(eternals);
+        temporal.setCapacity(temporals);
+        super.setCapacity(eternals);
     }
 
     public EternalTable eternal() {
-        @Nullable EternalTable e = eternal;
-        if (e == null) return EternalTable.EMPTY;
-        return e;
+        return this;
     }
 
     public TemporalBeliefTable temporal() {
-        @Nullable TemporalBeliefTable t = temporal;
-        if (t == null) return TemporalBeliefTable.EMPTY;
-        return t;
+        return temporal;
     }
 
     /**
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, Random rng) {
+    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
 
-        final Task ete = eternal().strongest();
+        final Task ete = super.strongest();
 //        if (ete != null && when == ETERNAL) {
 //            return ete;
 //        }
 
-        Task tmp = temporal().match(when, now, dur, against, rng);
+        Task tmp = temporal().match(when, now, dur, against, nar);
 
         if (tmp == null) {
             return ete;
@@ -143,35 +145,9 @@ public class DefaultBeliefTable implements BeliefTable {
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
-            if (eternal == null) {
-                //synchronized (concept) {
-                    /*if (eternal == EternalTable.EMPTY)*/
-                {
-                    boolean isBeliefOrGoal = input.isBelief();
-                    int cap = concept.state().beliefCap(concept, isBeliefOrGoal, true);
-                    if (cap > 0)
-                        eternal = concept.newEternalTable(cap, isBeliefOrGoal); //allocate
-                    else
-                        return;
-                }
-                //}
-            }
-
-            eternal.add(input, concept, nar);
+            super.add(input, concept, nar);
 
         } else {
-            if (temporal == null) {
-                //synchronized (concept) {
-                    /*if (temporal == TemporalBeliefTable.EMPTY)*/
-                { //HACK double boiler
-                    int cap = concept.state().beliefCap(concept, input.isBelief(), false);
-                    if (cap > 0)
-                        temporal = concept.newTemporalTable(cap, nar); //allocate
-                    else
-                        return;
-                }
-                //}
-            }
 
             temporal.add(input, concept, nar);
         }

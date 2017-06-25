@@ -46,12 +46,12 @@ public class CompoundConcept implements Concept, Compound, Termlike {
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR nar,
+    public CompoundConcept(@NotNull Compound term,
                            Bag... bags) {
-        this(term, nar, bags[0], bags[1]);
+        this(term,  bags[0], bags[1]);
     }
 
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR nar,
+    public CompoundConcept(@NotNull Compound term,
                            @NotNull Bag<Term, PriReference<Term>> termLinks, @NotNull Bag<Task, PriReference<Task>> taskLinks
     ) {
 
@@ -134,19 +134,19 @@ public class CompoundConcept implements Concept, Compound, Termlike {
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder(), n);
+        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder());
     }
 
 
-    CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b, @NotNull NAR nar) {
-        this(term, nar, b.newLinkBags(term));
+    CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b) {
+        this(term, b.newLinkBags(term));
     }
 
-    @Override
-    public void delete(@NotNull NAR nar) {
-        Concept.delete(this, nar);
-        meta = null;
-    }
+//    @Override
+//    public void delete(@NotNull NAR nar) {
+//        Concept.delete(this, nar);
+//        meta = null;
+//    }
 
     @Override
     public final ConceptState state() {
@@ -158,7 +158,8 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         ConceptState current = this.state;
         if (current != p) {
             this.state = p;
-            linkCapacity( p.linkCap(this, true), p.linkCap(this, false));
+            termlinks().setCapacity(p.linkCap(this, true));
+            tasklinks().setCapacity(p.linkCap(this, false));
         }
         return current;
     }
