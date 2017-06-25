@@ -115,24 +115,18 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
                 Task match;
                 long now = nar.time();
 
-
-
                 if (task.isQuestOrQuestion()) {
                     long when = whenAnswer(task, now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
+                    if (match!=null)
+                        tryAnswer(reUnified, taskLink, match, nar);
                 } else {
                     long when = whenMatch(task, now, nar);
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar);
                 }
 
-                if (match != null) {
-                    if (match.isBelief() /* not Goal */) {
-                        belief = match;
-                    }
-
-                    if ((task.isQuestion() && match.isBelief()) || (task.isQuest() && match.isGoal())) {
-                        tryAnswer(reUnified, taskLink, match, nar);
-                    }
+                if (match != null && match.isBelief()) {
+                    belief = match;
                 }
             }
 

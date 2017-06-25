@@ -104,7 +104,7 @@ public class BeliefTableTest  {
 
         BeliefTable beliefs = b.concept().beliefs();
 
-        assertEquals(0.5, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.001);
+        assertEquals(0.5, beliefs.match(ETERNAL, ETERNAL, 0, null, null, true, null).conf(), 0.001);
         int dur = n.dur();
         assertEquals(0.5, n.beliefTruth(b, n.time()).conf(), 0.001);
         assertEquals(1, beliefs.size());
@@ -112,18 +112,18 @@ public class BeliefTableTest  {
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
-        assertEquals(0.669, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.01);
+        assertEquals(0.669, beliefs.match(ETERNAL, ETERNAL, 0, null, null, true, null).conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
-        assertEquals(0.75, bb.match(ETERNAL, ETERNAL, 0, null).conf(), 0.001);
+        assertEquals(0.75, bb.match(ETERNAL, ETERNAL, 0, null, null, true, null).conf(), 0.001);
         assertEquals(0.75, n.beliefTruth(b, n.time()).conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
-        assertEquals(0.79, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.02);
+        assertEquals(0.79, beliefs.match(ETERNAL, ETERNAL, 0, null, null, true, null).conf(), 0.02);
         assertEquals(7, beliefs.size());
 
         //n.step();

@@ -140,8 +140,14 @@ public interface NAct {
                 return null;
         });
         m.resolution.setValue(0.5f);
-        actions().add(m);
+        addAction(m);
+
         return m;
+    }
+
+    default void addAction(ActionConcept c) {
+        actions().add(c);
+        nar().on(c);
     }
 
     @Nullable
@@ -192,7 +198,7 @@ public interface NAct {
         });
         m.resolution.setValue(0.5f);
 
-        actions().add(m);
+        addAction(m);
 
         return m;
     }
@@ -335,7 +341,7 @@ public interface NAct {
     @NotNull
     default GoalActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
         GoalActionConcept m = new GoalActionConcept(s, this, update);
-        actions().add(m);
+        addAction(m);
         return m;
     }
 

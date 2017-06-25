@@ -48,8 +48,13 @@ public interface NSense {
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
         SensorConcept s = new SensorConcept(term, nar(), value, truthFunc);
 
-        sensors().add(s);
+        addSensor(s);
         return s;
+    }
+
+    default void addSensor(SensorConcept c) {
+        sensors().add(c);
+        nar().on(c);
     }
 
     /**
@@ -171,7 +176,7 @@ public interface NSense {
         SensorConcept c = new SensorConcept(id, nar(), v,
                 (x) -> t(Util.unitize(x), nar().confDefault(Op.BELIEF))
         );
-        sensors().add(c);
+        addSensor(c);
         return c;
     }
 

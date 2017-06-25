@@ -62,7 +62,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return null;
         }
 
-        @Override
         public @Nullable Task match(long when, long now, int dur, NAR nar) {
             return null;
         }
@@ -149,14 +148,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     @Nullable void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
     Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
-
-    default Task match(long when, long now, int dur, @Nullable Task against, boolean noOverlap, NAR nar) {
-        return match(when, now, dur, against, null, noOverlap, nar);
-    }
-
-    @Nullable default Task match(long when, long now, int dur, NAR nar) {
-        return match(when, now, dur, null, true, nar);
-    }
 
 
     default void print(@NotNull PrintStream out) {

@@ -29,7 +29,6 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
     protected WiredConcept(@NotNull Compound term, @NotNull NAR n) {
         super(term, n);
         resolution.setValue(n.truthResolution);
-        n.on(this);
     }
 
 //    @Override

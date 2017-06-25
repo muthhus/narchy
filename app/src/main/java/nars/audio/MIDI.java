@@ -100,8 +100,8 @@ public class MIDI {
                     return null;
             });
             c.resolution.setValue(0.1f);
-
             nar.on(c);
+
             //c.beliefs().capacity(1, c.beliefs().capacity());
             c.process(new NALTask(c, BELIEF, $.t(0f, 0.35f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);
             c.process(new NALTask(c, GOAL, $.t(0f, 0.1f), 0, ETERNAL, ETERNAL, nar.time.nextInputStamp()), nar);

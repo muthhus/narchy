@@ -34,9 +34,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
-    public SensorConcept(@NotNull String term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) throws Narsese.NarseseException {
-        this($.$(term), n, signal, truth);
-    }
 
     public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
         super(term, n);
@@ -68,9 +65,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return nar.time::nextStamp;
     }
 
-    public Truth belief(long when, int dur, NAR nar) {
-        return null;
-    }
+
 
     //    /** originating from this sensor, or a future prediction */
 //    @Override

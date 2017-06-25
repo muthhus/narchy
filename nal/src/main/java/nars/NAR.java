@@ -1561,10 +1561,19 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     /** strongest matching belief for the target time */
     public Task belief(Compound c, long when) {
-        return concept(c).beliefs().match(when, time(), dur(), this);
+        return match(c, BELIEF, when);
     }
     /** strongest matching goal for the target time */
-    public Task goal(Compound c, long when) {
-        return concept(c).goals().match(when, time(), dur(), this);
+    public final Task goal(Compound c, long when) {
+        return match(c, GOAL, when);
+    }
+
+    /** punc must be either BELIEF or GOAL */
+    public Task match(Compound c, byte punc, long when) {
+        Concept concept = concept(c);
+        if (concept == null)
+            return null;
+
+        return ((BeliefTable)concept.table(punc)).match(when, time(), dur(), null, null, false, this);
     }
 }
