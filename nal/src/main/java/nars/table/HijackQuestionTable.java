@@ -34,9 +34,8 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     }
 
     @Override
-    public void capacity(int newCapacity, NAR nar) {
+    public void capacity(int newCapacity) {
         setCapacity(newCapacity); //hijackbag
-        setCapacity(newCapacity);
     }
 
 

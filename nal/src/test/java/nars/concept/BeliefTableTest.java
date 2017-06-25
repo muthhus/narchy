@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import static nars.task.RevisionTest.AB;
 import static nars.task.RevisionTest.newNAR;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -103,7 +104,7 @@ public class BeliefTableTest  {
 
         BeliefTable beliefs = b.concept().beliefs();
 
-        assertEquals(0.5, beliefs.matchEternal().conf(), 0.001);
+        assertEquals(0.5, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.001);
         int dur = n.dur();
         assertEquals(0.5, n.beliefTruth(b, n.time()).conf(), 0.001);
         assertEquals(1, beliefs.size());
@@ -111,18 +112,18 @@ public class BeliefTableTest  {
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
-        assertEquals(0.669, beliefs.matchEternal().conf(), 0.01);
+        assertEquals(0.669, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
-        assertEquals(0.75, bb.matchEternal().conf(), 0.001);
+        assertEquals(0.75, bb.match(ETERNAL, ETERNAL, 0, null).conf(), 0.001);
         assertEquals(0.75, n.beliefTruth(b, n.time()).conf(), 0.01);
 
         b.believe(1.0f, 0.5f); n.cycle();
         b.print();
-        assertEquals(0.79, beliefs.matchEternal().conf(), 0.02);
+        assertEquals(0.79, beliefs.match(ETERNAL, ETERNAL, 0, null).conf(), 0.02);
         assertEquals(7, beliefs.size());
 
         //n.step();
@@ -187,7 +188,7 @@ public class BeliefTableTest  {
 
 
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth(i, n.dur(), n));
+            System.out.println(i + "\t" + table.truth((long) i, (long) i, n.dur(), n));
         }
         System.out.println();
         for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
@@ -195,19 +196,19 @@ public class BeliefTableTest  {
         }
 
         /* first */
-        @Nullable Truth firstBeliefTruth = table.truth(0, n.dur(), n);
+        @Nullable Truth firstBeliefTruth = table.truth((long) 0, (long) 0, n.dur(), n);
         assertEquals(0.43f, firstBeliefTruth.freq(), 0.1f);
 
         /* last */
         int dur = n.dur();
-        @Nullable Truth lastBeliefTruth = table.truth(spacing * (maxBeliefs - 1), dur, n);
+        @Nullable Truth lastBeliefTruth = table.truth((long) (spacing * (maxBeliefs - 1)), (long) (spacing * (maxBeliefs - 1)), dur, n);
         assertEquals(0.56f, lastBeliefTruth.freq(), 0.1f);
 
-        @Nullable Truth endTruth = table.truth(spacing * (maxBeliefs - 1) + margin, dur, n);
+        @Nullable Truth endTruth = table.truth((long) (spacing * (maxBeliefs - 1) + margin), (long) (spacing * (maxBeliefs - 1) + margin), dur, n);
         assertEquals(0.55f, endTruth.freq(), 0.2f);
         assertTrue(lastBeliefTruth.conf() >= endTruth.conf());
 
-        @Nullable Truth startTruth = table.truth(0 - margin, dur, n);
+        @Nullable Truth startTruth = table.truth((long) (0 - margin), (long) (0 - margin), dur, n);
         assertEquals(0.44f, startTruth.freq(), 0.2f);
         assertTrue(firstBeliefTruth.conf() >= startTruth.conf());
     }

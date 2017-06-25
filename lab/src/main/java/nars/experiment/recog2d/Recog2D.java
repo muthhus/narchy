@@ -162,7 +162,7 @@ public class Recog2D extends NAgentX {
                         long now = nar.time();
                         int dur = nar.dur();
 
-                        Truth t = c.belief(now, dur, nar);
+                        Truth t = c.belief(now, now, dur, nar);
                         if (t != null) {
                             conf = t.conf();
                             freq = t.freq();
@@ -258,7 +258,8 @@ public class Recog2D extends NAgentX {
         for (int i = 0; i < maxImages; i++) {
 
 
-            Truth g = nar.concept(outs.outVector[i]).belief(nar.time(), nar.dur(), nar);
+            long when = nar.time();
+            Truth g = nar.concept(outs.outVector[i]).belief(when, when, nar.dur(), nar);
 
             if (g == null) {
                 error += 0.5;

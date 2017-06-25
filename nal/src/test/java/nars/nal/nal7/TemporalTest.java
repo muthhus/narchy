@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 
 
@@ -402,7 +403,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().matchEternal().term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, ETERNAL, 0, null).term().toString());
     }
 
     @Test

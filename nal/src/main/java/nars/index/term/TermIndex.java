@@ -419,7 +419,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         Concept cc = (Concept) c;
         if (cc.isDeleted()) {
-            cc.state(conceptBuilder().init(), nar);
+            cc.state(conceptBuilder().init());
         }
         commit(cc);
         return cc;

@@ -44,7 +44,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
             @Override
             protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
-                return SensorConcept.this.update(currentBelief, nar);
+                return SensorConcept.this.nextStamp(nar);
             }
         };
 
@@ -59,7 +59,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //    }
 
     /** returns a new stamp for a sensor task */
-    protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+    protected LongSupplier nextStamp(@NotNull NAR nar) {
         //Truth g = goal(nar.time(), nar.dur());
         //if (g!=null) {
             //compare goal with belief state to determine if an adjustment task should be created
@@ -68,7 +68,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return nar.time::nextStamp;
     }
 
-
+    public Truth belief(long when, int dur, NAR nar) {
+        return null;
+    }
 
     //    /** originating from this sensor, or a future prediction */
 //    @Override

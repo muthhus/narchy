@@ -12,16 +12,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
+import static nars.table.QuestionTable.StorelessQuestionTable;
 
 /**
  * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests
  */
 public class TaskConcept extends CompoundConcept {
 
-    @Nullable
-    private QuestionTable questions;
-    @Nullable
-    private QuestionTable quests;
+//    @Nullable
+//    private QuestionTable questions;
+//    @Nullable
+//    private QuestionTable quests;
     @NotNull
     protected final BeliefTable beliefs;
     @NotNull
@@ -39,54 +40,44 @@ public class TaskConcept extends CompoundConcept {
     }
 
 
-    /**
-     * Pending Quests to be answered by new desire values
-     */
     @NotNull
     @Override
     public final QuestionTable quests() {
-        return questionTableOrEmpty(quests);
+        return StorelessQuestionTable;
+        //return questionTableOrEmpty(quests);
     }
 
     @NotNull
     @Override
     public final QuestionTable questions() {
-        return questionTableOrEmpty(questions);
+        return StorelessQuestionTable;
+        //return questionTableOrEmpty(questions);
     }
 
 
     @NotNull
     static QuestionTable questionTableOrEmpty(@Nullable QuestionTable q) {
-        return q != null ? q : QuestionTable.EMPTY;
+        return q != null ? q : StorelessQuestionTable;
     }
 
-    @NotNull
-    static BeliefTable beliefTableOrEmpty(@Nullable BeliefTable b) {
-        return b != null ? b : BeliefTable.EMPTY;
-    }
-
-    @NotNull
-    final QuestionTable questionsOrNew(@NotNull NAR nar) {
-        //TODO this isnt thread safe
-        return questions == null ? (questions =
-                //new ArrayQuestionTable(state.questionCap(true)))
-                new HijackQuestionTable(state.questionCap(true), 3))
-                : questions;
-
-    }
-
-    @NotNull
-    final QuestionTable questsOrNew(@NotNull NAR nar) {
-        return quests == null ? (quests =
-                //new ArrayQuestionTable(state.questionCap(false)))
-                new HijackQuestionTable(state.questionCap(false), 3))
-                : quests;
-    }
-
-    @NotNull
-    public final BeliefTable table(boolean beliefOrGoal) {
-        return beliefOrGoal ? beliefs : goals;
-    }
+//
+//    @NotNull
+//    final QuestionTable questionsOrNew() {
+//        //TODO this isnt thread safe
+//        return (questions == null) ? ((questions =
+//                //new ArrayQuestionTable(state.questionCap(true)))
+//                //new HijackQuestionTable(state.questionCap(true), 3))
+//                StorelessQuestionTable) : questions;
+//
+//    }
+//
+//    @NotNull
+//    final QuestionTable questsOrNew() {
+//        return quests == null ? (quests =
+//                //new ArrayQuestionTable(state.questionCap(false)))
+//                new HijackQuestionTable(state.questionCap(false), 3))
+//                : quests;
+//    }
 
 
     /**
@@ -96,7 +87,7 @@ public class TaskConcept extends CompoundConcept {
     @NotNull
     @Override
     public final BeliefTable beliefs() {
-        return beliefTableOrEmpty(beliefs);
+        return beliefs;
     }
 
     /**
@@ -105,41 +96,32 @@ public class TaskConcept extends CompoundConcept {
     @NotNull
     @Override
     public final BeliefTable goals() {
-        return beliefTableOrEmpty(goals);
+        return goals;
     }
 
-    protected void beliefCapacity(@NotNull ConceptState p, NAR nar) {
-
-        int be = p.beliefCap(this, true, true);
-        int bt = p.beliefCap(this, true, false);
-
-        int ge = p.beliefCap(this, false, true);
-        int gt = p.beliefCap(this, false, false);
-
-        beliefCapacity(be, bt, ge, gt, nar);
-    }
-
-    protected final void beliefCapacity(int be, int bt, int ge, int gt, NAR nar) {
+    protected final void beliefCapacity(int be, int bt, int ge, int gt) {
 
         beliefs().capacity(be, bt);
         goals().capacity(ge, gt);
 
     }
 
-    protected void questionCapacity(@NotNull ConceptState p, NAR nar) {
-        questions().capacity((byte) p.questionCap(true), nar);
-        quests().capacity((byte) p.questionCap(false), nar);
-    }
-
-
 
     @Override
-    public ConceptState state(@NotNull ConceptState p, NAR nar) {
+    public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
-            super.state(p, nar);
-            beliefCapacity(p, nar);
-            questionCapacity(p, nar);
+            super.state(p);
+
+            int be = p.beliefCap(this, true, true);
+            int bt = p.beliefCap(this, true, false);
+
+            int ge = p.beliefCap(this, false, true);
+            int gt = p.beliefCap(this, false, false);
+
+            beliefCapacity(be, bt, ge, gt);
+            questions().capacity(p.questionCap(true));
+            quests().capacity(p.questionCap(false));
         }
         return current;
     }
@@ -162,35 +144,14 @@ public class TaskConcept extends CompoundConcept {
 
             case QUESTION:
             case QUEST:
-                (t.isQuestion() ? questionsOrNew(n) : questsOrNew(n))
-                        .add(t, this, n);
+                QuestionTable.StorelessQuestionTable.add(t, this, n);
+//                (t.isQuestion() ? questionsOrNew() : questsOrNew())
+//                        .add(t, this, n);
                 break;
 
             default:
                 throw new RuntimeException("Invalid sentence type: " + t);
         }
-
-//        return inserted;
-//        if ((accepted != null) &&
-//                (this == accepted || !this.equals(accepted))) {
-//
-//            n.terms.commit(c);
-//
-//            if (!isInput()) //dont count direct input as learning
-//                n.emotion.learn(accepted.pri(), accepted.volume());
-//
-//            n.eventTaskProcess.emit(/*post*/accepted);
-//
-//            return new ITask[]{new SpreadingActivation(accepted, c)};
-//        }
-//
-//        // REJECTED DUE TO PRE-EXISTING REDUNDANCY,
-//        // INSUFFICIENT CONFIDENCE/PRIORITY/RELEVANCE
-//        // OR OTHER REASON
-//
-//        return null;
-
-
 
     }
 
@@ -199,18 +160,7 @@ public class TaskConcept extends CompoundConcept {
         super.delete(nar);
         beliefs.clear();
         goals.clear();
-        questions = quests = null;
+        //questions = quests = null;
     }
 
-//    public int taskCount() {
-//        int s = 0;
-//        s += beliefs.size();
-//        s += goals.size();
-//        if (questions != null)
-//            s += questions.size();
-//        if (quests != null)
-//            s += quests.size();
-//
-//        return s;
-//    }
 }

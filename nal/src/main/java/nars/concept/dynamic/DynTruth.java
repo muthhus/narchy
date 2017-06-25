@@ -42,6 +42,9 @@ public final class DynTruth implements Truthed {
     @Nullable
     public float budget() {
         //RawBudget b = new RawBudget();
+        if (e == null)
+            return Float.NaN;
+
         int s = e.size();
         assert (s > 0);
 

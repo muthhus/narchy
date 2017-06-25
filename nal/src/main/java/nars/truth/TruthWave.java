@@ -88,7 +88,7 @@ public class TruthWave {
         }
         this.start = (long) start;
         this.end = (long) end;
-        this.current = b.truth(now, dur, nar);
+        this.current = b.truth(now, now, dur, nar);
     }
 
     public static void load(float[] array, int index, long start, long end, @Nullable Truthed truth) {
@@ -131,7 +131,7 @@ public class TruthWave {
         int j = 0;
         for (int i = 0; i < points; i++) {
             long lt = (long)t;
-            load(data, (j++) * ENTRY_SIZE, lt, lt, table.truth(lt, dur, nar));
+            load(data, (j++) * ENTRY_SIZE, lt, lt, table.truth(lt, lt, dur, nar));
             t+= dt;
         }
         this.current = null;

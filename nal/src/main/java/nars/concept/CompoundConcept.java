@@ -66,12 +66,12 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Override
     public @NotNull QuestionTable questions() {
-        return QuestionTable.EMPTY;
+        return QuestionTable.StorelessQuestionTable;
     }
 
     @Override
     public @Nullable QuestionTable quests() {
-        return QuestionTable.EMPTY;
+        return QuestionTable.StorelessQuestionTable;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     }
 
     @Override
-    public ConceptState state(@NotNull ConceptState p, NAR nar) {
+    public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
             this.state = p;

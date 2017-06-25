@@ -54,6 +54,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         long start = Long.MAX_VALUE;
         long end = Long.MIN_VALUE;
         @Nullable FasterList<Task> ee = yy.e;
+        if (ee == null)
+            return null;
+
         for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
             Task x = ee.get(i);
             long s = x.start();
@@ -91,12 +94,26 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, NAR nar) {
+        if (isEmpty())
+            return null;
 
         if (template == null) {
-            template =
-                    nar.terms.retemporalize(target.term(),
-                            target.isEternal() ?
-                                    nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+            if (target!=null) {
+                template =
+                        nar.terms.retemporalize(target.term(),
+                                target.isEternal() ?
+                                        nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+
+            }
+            if (template == null) {
+                //HACK use the first held task
+                try {
+                    Task first = iterator().next();
+                    template = first.term();
+                } catch (NullPointerException e) {
+                    return null;
+                }
+            }
         }
 
         Task y = generate(template, when, now, nar);

@@ -69,7 +69,7 @@ public class RTreeBeliefTableTest {
         n.log();
 
         TaskConcept c = (TaskConcept) n.conceptualize(term);
-        @NotNull BeliefTable cb = c.table(true);
+        @NotNull BeliefTable cb = true ? c.beliefs() : c.goals();
         //int numTasks = 0;
         long time=0;
         while (time < end) {

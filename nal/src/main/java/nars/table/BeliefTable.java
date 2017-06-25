@@ -90,7 +90,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
 
-        @Override
         public Task matchEternal() {
             return null;
         }
@@ -159,14 +158,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return match(when, now, dur, null, true, nar);
     }
 
-    @Nullable default Task match(long when, int dur, NAR nar) {
-        return match(when, when, dur, nar);
-    }
-
-    @Deprecated @Nullable default Task matchEternal() {
-        return match(ETERNAL, ETERNAL, 0, null, false, null);
-    }
-
 
     default void print(@NotNull PrintStream out) {
         this.forEachTask(t -> out.println(t + " " + Arrays.toString(t.stamp()))); //TODO print Stamp using same methods Task uses
@@ -196,12 +187,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     Truth truth(long when, long now, int dur, NAR nar);
 
 
-    default Truth truth(long when, int dur, NAR nar) {
-        return truth(when, when, dur, nar);
-    }
-
-
-//    default float expectation(long when, int dur) {
+    //    default float expectation(long when, int dur) {
 //        Truth t = truth(when, dur);
 //        return t != null ? t.expectation() : 0.5f;
 //    }

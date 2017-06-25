@@ -153,7 +153,7 @@ public interface Concept extends Termed {
         questions().clear();
         quests().clear();
 
-        state(ConceptState.Deleted, nar);
+        state(ConceptState.Deleted);
 
     }
 
@@ -178,9 +178,6 @@ public interface Concept extends Termed {
         return state() == ConceptState.Deleted;
     }
 
-
-
-
     /** use NAR.beliefTruth(Term|String, when) */
     @Deprecated
     default Truth belief(long when, long now, int dur, NAR nar) {
@@ -192,25 +189,6 @@ public interface Concept extends Termed {
     default Truth goal(long when, long now, int dur, NAR nar) {
         return goals().truth(when, now, dur, nar);
     }
-
-    /** use NAR.beliefTruth(Term|String, when) */
-    @Deprecated
-    default Truth belief(long when, int dur, NAR nar) {
-        return belief(when, when, dur, nar);
-    }
-
-    /** use NAR.goalTruth(Term|String, when) */
-    @Deprecated
-    default Truth goal(long when, int dur, NAR nar) {
-        return goal(when, when, dur, nar);
-    }
-
-//    @Nullable
-//    default float goalConf(long now, int dur, float ifMissing) {
-//        Truth t = goals().truth(now, dur);
-//        return (t != null) ? t.conf() : ifMissing;
-//    }
-
 
     @Nullable
     default TaskTable table(byte punc) {
@@ -228,78 +206,6 @@ public interface Concept extends Termed {
         }
     }
 
-//    default @Nullable Task merge(@NotNull Task x, @NotNull Task y, long when, @NotNull NAR nar) {
-//        long now = nar.time();
-//        Truth truth = ((BeliefTable) tableFor(y.punc())).truth(when, now);
-//        if (truth == null)
-//            return null;
-//        return Revision.answer(x, y, when, now, truth);
-//    }
-
-
-    //    /** link to a specific peer */
-//    static <T> void linkPeer(@NotNull Bag<T> bag, @NotNull T x, @NotNull Budget b, float q) {
-//        //@NotNull Bag<Termed> bag = termlinks();
-//        BLink<? extends T> existing = bag.get(x);
-//        if (existing == null)
-//            return;
-//
-//        /*
-//        Hebbian Learning:
-//            deltaWeight = (input[fromNeuron] -
-//                            output[toNeuron] * weight(fromNeuron,toNeuron)
-//							* output[toNeuron] * this.learningRate);
-//							*
-//            deltaWeight = input[toNeuron] * output[toNeuron] * learningRate;
-//            deltaWeight = (input - netInput) * output * this.learningRate; // is it right to use netInput here?
-//			deltaWeight = input * desiredOutput * this.learningRate;
-//         */
-//
-//
-//        boolean init;
-//        if (existing == null ) {
-//            bag.put(x, b, q, null);
-//            init = true;
-//        } else {
-//            init = false;
-//        }
-//
-//        float bp = b.pri();
-//        if (bp == bp /*!NaN */) {
-//
-//            final float learningRate = (bp * q) / bag.capacity();
-//            //System.out.println(this + " activating " + x);
-//            bag.forEach(tl -> {
-//                //                if (active && init)
-////                    return; //dont modify the newly inserted link
-//
-//                float p = tl.pri();
-//                if (p!=p) //the link is currently deleted
-//                    return;
-//
-//                boolean active = tl == existing;
-//                float dp = (active ? learningRate : -learningRate);
-//                tl.priAdd(dp);
-//                //System.out.println(tl.toString2());
-//            });
-//
-//        }
-//
-//    }
-
-//    /** link to all existing termlinks, hierarchical and heterarchical */
-//    default void linkPeers(@NotNull Budgeted b, float scale, @NotNull NAR nar, boolean recurse) {
-//        List<Termed> targets = Global.newArrayList(termlinks().size());
-//        termlinks().forEach(tl -> targets.add(tl.get()));
-//        float subScale = scale / targets.size();
-//        targets.forEach(t -> {
-//            //System.out.println(Concept.this + " activate " + t + " " + b + "x" + subScale);
-//            termlinks().put(t, b, subScale, null); //activate the termlink
-//            nar.conceptualize(t, b, subScale, recurse ? subScale : 0f, null);
-//        });
-//
-//    }
-
 
     default void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
         if (includeConceptBeliefs) beliefs().forEachTask(each);
@@ -315,20 +221,20 @@ public interface Concept extends Termed {
         quests().forEachTask(each);
     }
 
-    @NotNull
-    default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
-
-        TaskTable beliefs = onbeliefs ? beliefs() : null;
-        TaskTable goals = ongoals ? goals() : null;
-        TaskTable questions = onquestions ? questions() : null;
-        TaskTable quests = onquests ? quests() : null;
-
-        Iterator<Task> b1 = beliefs != null ? beliefs.taskIterator() : Collections.emptyIterator();
-        Iterator<Task> b2 = goals != null ? goals.taskIterator() : Collections.emptyIterator();
-        Iterator<Task> b3 = questions != null ? questions.taskIterator() : Collections.emptyIterator();
-        Iterator<Task> b4 = quests != null ? quests.taskIterator() : Collections.emptyIterator();
-        return Iterators.concat(b1, b2, b3, b4);
-    }
+//    @NotNull
+//    default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
+//
+//        TaskTable beliefs = onbeliefs ? beliefs() : null;
+//        TaskTable goals = ongoals ? goals() : null;
+//        TaskTable questions = onquestions ? questions() : null;
+//        TaskTable quests = onquests ? quests() : null;
+//
+//        Iterator<Task> b1 = beliefs != null ? beliefs.taskIterator() : Collections.emptyIterator();
+//        Iterator<Task> b2 = goals != null ? goals.taskIterator() : Collections.emptyIterator();
+//        Iterator<Task> b3 = questions != null ? questions.taskIterator() : Collections.emptyIterator();
+//        Iterator<Task> b4 = quests != null ? quests.taskIterator() : Collections.emptyIterator();
+//        return Iterators.concat(b1, b2, b3, b4);
+//    }
 
 
     default void print() {
@@ -431,42 +337,10 @@ public interface Concept extends Termed {
     /**
      * returns the previous state
      */
-    @Nullable ConceptState state(@NotNull ConceptState c, @NotNull NAR nar);
+    ConceptState state(@NotNull ConceptState c);
 
     /** can return null if no templates */
     @Nullable TermContainer templates();
-
-
-
-//    default Iterator<? extends Termed> getTermedAdjacents(boolean termLinks, boolean taskLinks) {
-//        if (termLinks && taskLinks) {
-//            return concat(
-//                    getTermLinks().iterator(), getTaskLinks().iterator()
-//            );
-//        }
-//        if (termLinks) {
-//            return getTermLinks().iterator();
-//        }
-//        if (taskLinks) {
-//            return getTaskLinks().iterator();
-//        }
-//
-//        return null;
-//    }
-
-//    default Iterator<Term> adjacentTerms(boolean termLinks, boolean taskLinks) {
-//        return transform(adjacentTermables(termLinks, taskLinks), Termed::getTerm);
-//    }
-
-//    default Iterator<Concept> adjacentConcepts(boolean termLinks, boolean taskLinks) {
-//        final Iterator<Concept> termToConcept = transform(adjacentTerms(termLinks, taskLinks), new Function<Termed, Concept>() {
-//            @Override
-//            public Concept apply(final Termed term) {
-//                return getMemory().concept(term.getTerm());
-//            }
-//        });
-//        return filter(termToConcept, Concept.class); //should remove null's (unless they never get included anyway), TODO Check that)
-//    }
 
     /**
      * Created by me on 9/13/16.

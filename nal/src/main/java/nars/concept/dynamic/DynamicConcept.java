@@ -7,7 +7,8 @@ import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 
 
-public class DynamicConcept extends TaskConcept {
+/** just a marker class for a TaskConcept with DynamicBeliefTables */
+public final class DynamicConcept extends TaskConcept {
 
     @NotNull
     @Deprecated final NAR nar;

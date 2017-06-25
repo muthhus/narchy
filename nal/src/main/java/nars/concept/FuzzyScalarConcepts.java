@@ -188,8 +188,10 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
                 sensors.iterator(), s -> {
                     if (s == null)
                         return "?";
-                    else
-                        return s.term() + " " + s.beliefs().truth(nar.time(), nar.dur(), nar);
+                    else {
+                        long when = nar.time();
+                        return s.term() + " " + s.beliefs().truth(when, when, nar.dur(), nar);
+                    }
                 }
         ));
     }

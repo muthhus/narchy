@@ -153,7 +153,8 @@ public class DynamicBeliefTableTest {
         CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"));
         int dur = n.dur();
 
-        Truth t = prod.belief(n.time(), dur, n);
+        long when1 = n.time();
+        Truth t = prod.belief(when1, when1, dur, n);
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.conceptualize($("(x --> (/,f,_,y))"));
@@ -167,7 +168,8 @@ public class DynamicBeliefTableTest {
 
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(n.time(), dur, n);
+        long when = n.time();
+        Truth t2 = prod.belief(when, when, dur, n);
 
         assertEquals(t2, n.beliefTruth(imgX, n.time()));
         assertEquals(t2, n.beliefTruth(imgY, n.time()));
@@ -182,27 +184,29 @@ public class DynamicBeliefTableTest {
         nar.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f).run(1);
 
         CompoundConcept prod = (CompoundConcept) nar.concept($("(f-->(x, y))"));
-        Truth t = prod.belief(0, dur, nar);
+        Truth t = prod.belief((long) 0, (long) 0, dur, nar);
 
         CompoundConcept imgX = (CompoundConcept) nar.conceptualize($("((\\,f,_,y)-->x)"));
         assertNotNull(imgX);
-        Truth xb = imgX.belief(0, dur, nar);
+        Truth xb = imgX.belief((long) 0, (long) 0, dur, nar);
         assertNotNull(xb);
         assertEquals(t, xb);
 
         CompoundConcept imgY = (CompoundConcept) nar.conceptualize($("((\\,f,x,_)-->y)"));
-        assertEquals(t, imgY.belief(0, dur, nar));
+        assertEquals(t, imgY.belief((long) 0, (long) 0, dur, nar));
 
 
 
         nar.run(6); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.belief(0, dur, nar);
+        Truth t2 = prod.belief((long) 0, (long) 0, dur, nar);
 
-        assertEquals(t2, imgX.belief(0, dur, nar));
-        assertNotEquals(t2, imgX.belief(nar.time(), dur, nar));
-        assertEquals(t2, imgY.belief(0, dur, nar));
-        assertNotEquals(t2, imgY.belief(nar.time(), dur, nar));
+        assertEquals(t2, imgX.belief((long) 0, (long) 0, dur, nar));
+        long when1 = nar.time();
+        assertNotEquals(t2, imgX.belief(when1, when1, dur, nar));
+        assertEquals(t2, imgY.belief((long) 0, (long) 0, dur, nar));
+        long when = nar.time();
+        assertNotEquals(t2, imgY.belief(when, when, dur, nar));
 
     }
 

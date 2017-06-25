@@ -35,7 +35,7 @@ public class InterNARTest {
 
         final int CONNECTION_TIME = 200;
         int preCycles = 15;
-        int postCycles = 500;
+        int postCycles = 10;
 
         Param.ANSWER_REPORTING = false;
 

@@ -4,7 +4,7 @@ import jcog.list.FasterList;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -12,6 +12,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -45,63 +47,48 @@ abstract public class DynamicTruthModel {
 
         for (int i = 0; i < inputs.length; i++) {
             @NotNull Term subterm = inputs[i];
-//            if (subterm == null)
-//                throw new NullPointerException();
 
             boolean negated = subterm.op() == Op.NEG;
             if (negated)
                 subterm = subterm.unneg();
 
-            Concept subConcept = n.concept(subterm);
-            if (subConcept != null) {
-                BeliefTable table = beliefOrGoal ? subConcept.beliefs() : subConcept.goals();
-                boolean tableDynamic = table instanceof DynamicBeliefTable;
-                if (!tableDynamic && table.isEmpty())
+            if (!(subterm instanceof Compound))
+                continue;
+
+            TaskConcept subConcept = (TaskConcept) n.concept(subterm);
+            if (subConcept == null)
+                return null;
+
+            int dt = superterm.subtermTime(subterm);
+            if (dt == DTERNAL)
+                dt = 0; //TODO maybe this should never happen, and if it does there is an error
+
+            boolean evi = d.e != null;
+
+            Truth nt;
+            if (evi) {
+                //task
+                Task bt = n.belief(subConcept, when + dt);
+                if (bt == null) {
                     return null;
-
-                int dt = superterm.subtermTime(subterm);
-                if (dt == DTERNAL)
-                    dt = 0; //TODO maybe this should never happen, and if it does there is an error
-                boolean evi = d.e != null;
-
-
-                if (tableDynamic /*&& subterm instanceof Compound*/) {
-                    DynTruth ndt = ((DynamicBeliefTable) table).truth(when + dt, now, (Compound) subterm, evi, n);
-                    if (ndt != null) {
-                        Truth ntt = ndt.truth();
-                        if (ntt != null && add(i, d, ntt.negIf(negated), confMin)) {
-                            if (evi) {
-                                d.e.addAll(ndt.e);
-                            }
-                        } else {
-                            return null;
-                        }
-                    } else {
-                        return null;
-                    }
-                } else {
-                    Truth nt;
-                    if (evi) {
-                        Task bt = table.match(when + dt, now, dur, n);
-                        if (bt == null)
-                            return null;
-
-                        d.e.add(bt);
-                        nt = bt.truth(when+dt, dur); //TODO project to target time if task isnt at it
-
-                    } else {
-                        nt = table.truth(when + dt, now, dur, n); //truth only
-                    }
-
-                    if (nt == null || !add(i, d, nt.negIf(negated), confMin)) {
-                        return null;
-                    }
-
                 }
 
+                nt = bt.truth(when + dt, dur); //project to target time if task isnt at it
+                if (nt==null)
+                    return null;
+
+                d.e.add(bt);
+
             } else {
+                //truth only
+                nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, when + dt);
+            }
+
+            if (nt == null || !add(i, d, nt.negIf(negated), confMin)) {
                 return null;
             }
+
+
         }
 
 
@@ -211,7 +198,8 @@ abstract public class DynamicTruthModel {
 
     public static class Intersection extends DynamicTruthModel {
 
-        @NotNull private final Term[] comp;
+        @NotNull
+        private final Term[] comp;
 
         protected Intersection() {
             this.comp = Term.EmptyArray;
@@ -291,10 +279,11 @@ abstract public class DynamicTruthModel {
 
     public static class Identity extends DynamicTruthModel {
 
-        @NotNull private final Term[] components;
+        @NotNull
+        private final Term[] components;
 
         public Identity(@NotNull Compound proxy, @NotNull Compound base) {
-            this.components = new Term[] { base };
+            this.components = new Term[]{base};
         }
 
         @NotNull

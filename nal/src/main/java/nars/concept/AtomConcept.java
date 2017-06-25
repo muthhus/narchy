@@ -2,7 +2,6 @@ package nars.concept;
 
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
-import nars.NAR;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermContext;
@@ -22,7 +21,7 @@ public class AtomConcept extends Atom implements Concept {
     private final Bag<Term,PriReference<Term>> termLinks;
     private final Bag<Task,PriReference<Task>> taskLinks;
 
-    @Nullable private transient ConceptState state = ConceptState.Deleted;
+    @NotNull private transient ConceptState state = ConceptState.Deleted;
 
     @Nullable
     private Map meta;
@@ -57,7 +56,7 @@ public class AtomConcept extends Atom implements Concept {
     }
 
     @Override
-    public ConceptState state(@NotNull ConceptState p, NAR nar) {
+    public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current!=p) {
             this.state = p;
@@ -105,13 +104,13 @@ public class AtomConcept extends Atom implements Concept {
     @Override
     @NotNull
     public QuestionTable questions() {
-        return QuestionTable.EMPTY;
+        return QuestionTable.StorelessQuestionTable;
     }
 
     @NotNull
     @Override
     public QuestionTable quests() {
-        return QuestionTable.EMPTY;
+        return QuestionTable.StorelessQuestionTable;
     }
 
 

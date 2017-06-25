@@ -842,7 +842,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     default:
                         throw new UnsupportedOperationException();
                 }
-                return table.truth(when, dur(), this);
+                return table.truth(when, when, dur(), this);
             }
         }
         return null;
@@ -1393,7 +1393,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
         terms.set(c);
-        c.state(terms.conceptBuilder().awake(), this);
+        c.state(terms.conceptBuilder().awake());
 
         return c;
     }
@@ -1421,7 +1421,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     public final void setState(@NotNull Concept c, @NotNull ConceptState p) {
 
-        if (c.state(p, this) != p) {
+        if (c.state(p) != p) {
             terms.onStateChanged(c);
         }
 
@@ -1561,10 +1561,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     /** strongest matching belief for the target time */
     public Task belief(Compound c, long when) {
-        return concept(c).beliefs().match(when, dur(), this);
+        return concept(c).beliefs().match(when, time(), dur(), this);
     }
     /** strongest matching goal for the target time */
     public Task goal(Compound c, long when) {
-        return concept(c).goals().match(when, dur(), this);
+        return concept(c).goals().match(when, time(), dur(), this);
     }
 }

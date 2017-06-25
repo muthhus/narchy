@@ -15,35 +15,40 @@ import java.util.function.Consumer;
 public interface QuestionTable extends TaskTable {
 
 
-    void capacity(int newCapacity, NAR nar);
+    void capacity(int newCapacity);
 
 
+    /** allows question to pass through it to the link activation phase, but
+     * otherwise does not store it
+     */
+    @NotNull QuestionTable StorelessQuestionTable = new NullQuestionTable() {
 
-//    /** called when a new answer appears */
-//    void answer(@NotNull Task result, Concept answerConcept, @NotNull NAR nar, @NotNull List<Task> displ);
+        @Override
+        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+            TaskTable.activate(t, t.pri(), n);
+        }
 
-//    {
-//        for (Task a : this) {
-//            if (e.test(a, t))
-//                return a;
-//        }
-//        return null;
-//    }
-
-    @NotNull QuestionTable EMPTY = new QuestionTable() {
+        @Override
+        public int capacity() {
+            return Integer.MAX_VALUE;
+        }
 
 
+    };
+
+    @NotNull QuestionTable NullQuestionTable = new NullQuestionTable();
+
+    static class NullQuestionTable implements QuestionTable {
+
+        @Override
+        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+
+        }
 
         @Override
         public Iterator<Task> taskIterator() {
             return Collections.emptyIterator();
         }
-//
-//        @Override
-//        public Spliterator<Task> spliterator() {
-//            return Spliterators.emptySpliterator();
-//        }
-
 
         @Override
         public void clear() {
@@ -60,13 +65,9 @@ public interface QuestionTable extends TaskTable {
             return false;
         }
 
-        @Override
-        public void add(@NotNull Task t, TaskConcept c, NAR n) {
-
-        }
 
         @Override
-        public void capacity(int newCapacity, NAR n) {
+        public void capacity(int newCapacity) {
 
         }
 
@@ -80,9 +81,5 @@ public interface QuestionTable extends TaskTable {
             return 0;
         }
 
-
-
-    };
-
-
+    }
 }
