@@ -1,13 +1,14 @@
 package nars.concept;
 
 import jcog.math.FloatSupplier;
-import nars.$;
 import nars.NAR;
-import nars.Narsese;
 import nars.Task;
+import nars.table.DefaultBeliefTable;
+import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.Truthed;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -23,8 +24,7 @@ import java.util.function.LongSupplier;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR,Task> {
-
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR, Task> {
 
 
     @NotNull
@@ -35,10 +35,71 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
 
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth)  {
-        super(term, n);
+    /**
+     * latches the last known task
+     */
+    static class SensorBeliefTable extends DefaultBeliefTable {
+
+        static final int durationsTolerance = 4;
+
+        private Task current;
+
+        public SensorBeliefTable(TemporalBeliefTable t) {
+            super(t);
+        }
+
+        public void commit(Task next) {
+            this.current = next;
+        }
+
+        @Override
+        public Truth truth(long when, long now, int dur, NAR nar) {
+            Task current = this.current;
+            if (current != null)
+                if (current.start() <= now && current.end() >= now)
+                    return current.truth();
+
+            Truth x = super.truth(when, now, dur, nar);
+
+            if (x == null && current != null && now <= current.end() + durationsTolerance * dur) {
+                return current.truth();
+            } else {
+                return x;
+            }
+        }
+
+        @Override
+        public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
+
+            Task current = this.current;
+            if (current != null)
+                if (current.start() <= now && current.end() >= now)
+                    return current;
+
+            Task x = super.match(when, now, dur, against, template, noOverlap, nar);
+
+            //if nothing matched, assume the current value still holds for some finite time
+            if (x == null && current != null && now <= current.end() + durationsTolerance * dur) {
+                return current;
+            } else {
+                return x;
+            }
+        }
+    }
+
+    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
+        super(term, new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable()),
+                null, n);
 
         this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
+
+            @Override
+            public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier nextStamp, NAR nar) {
+                Task t = super.set(term, nextTruth, nextStamp, nar);
+                ((SensorBeliefTable) beliefs()).commit(t); //HACK
+                return t;
+            }
+
             @Override
             protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
                 return SensorConcept.this.nextStamp(nar);
@@ -55,16 +116,17 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //        return new SensorBeliefTable();
 //    }
 
-    /** returns a new stamp for a sensor task */
+    /**
+     * returns a new stamp for a sensor task
+     */
     protected LongSupplier nextStamp(@NotNull NAR nar) {
         //Truth g = goal(nar.time(), nar.dur());
         //if (g!=null) {
-            //compare goal with belief state to determine if an adjustment task should be created
-            //System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
+        //compare goal with belief state to determine if an adjustment task should be created
+        //System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
         //}
         return nar.time::nextStamp;
     }
-
 
 
     //    /** originating from this sensor, or a future prediction */
@@ -115,22 +177,22 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this.currentValue = signal.asFloat();
     }
 
-    @NotNull public final void pri(FloatSupplier v) {
+    @NotNull
+    public final void pri(FloatSupplier v) {
         sensor.pri(v);
     }
 
-    @NotNull public SensorConcept pri(float v) {
+    @NotNull
+    public SensorConcept pri(float v) {
         sensor.pri(v);
         return this;
     }
-
 
 
     @Override
     public float asFloat() {
         return currentValue;
     }
-
 
 
 //    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {
@@ -143,7 +205,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //    }
 
 
-
 //    /** adaptively sets the priority of a group of sensors via a function  */
 //    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull FloatToFloatFunction f, @NotNull NAR nar) {
 //        c.forEach( s -> s.pri(() -> {
@@ -151,9 +212,12 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 //        } ) );
 //    }
 
-    /** should only be called if autoupdate() is false */
+    /**
+     * should only be called if autoupdate() is false
+     */
     @Nullable
-    @Override public final Task apply(NAR nar) {
+    @Override
+    public final Task apply(NAR nar) {
         return sensor.apply(nar);
     }
 

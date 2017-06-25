@@ -21,22 +21,9 @@ public interface QuestionTable extends TaskTable {
     /** allows question to pass through it to the link activation phase, but
      * otherwise does not store it
      */
-    @NotNull QuestionTable StorelessQuestionTable = new NullQuestionTable() {
+    @NotNull QuestionTable Unstored = new EmptyQuestionTable();
 
-        @Override
-        public void add(@NotNull Task t, TaskConcept c, NAR n) {
-            TaskTable.activate(t, t.pri(), n);
-        }
-
-        @Override
-        public int capacity() {
-            return Integer.MAX_VALUE;
-        }
-
-
-    };
-
-    @NotNull QuestionTable NullQuestionTable = new NullQuestionTable();
+    @NotNull QuestionTable Null = new NullQuestionTable();
 
     static class NullQuestionTable implements QuestionTable {
 
@@ -80,6 +67,21 @@ public interface QuestionTable extends TaskTable {
         public int size() {
             return 0;
         }
+
+    }
+
+    class EmptyQuestionTable extends QuestionTable.NullQuestionTable {
+
+        @Override
+        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+            TaskTable.activate(t, t.pri(), n);
+        }
+
+        @Override
+        public int capacity() {
+            return Integer.MAX_VALUE;
+        }
+
 
     }
 }

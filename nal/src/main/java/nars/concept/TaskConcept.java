@@ -2,17 +2,17 @@ package nars.concept;
 
 import nars.NAR;
 import nars.Task;
+import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
-import nars.table.HijackQuestionTable;
 import nars.table.QuestionTable;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
-import static nars.table.QuestionTable.StorelessQuestionTable;
+import static nars.table.QuestionTable.Unstored;
 
 /**
  * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests
@@ -28,36 +28,27 @@ public class TaskConcept extends CompoundConcept {
     @NotNull
     protected final BeliefTable goals;
 
-
-    public TaskConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, null, null, n);
+    public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, @NotNull NAR n) {
+        this(term, beliefs, goals, n.terms.conceptBuilder());
     }
 
-    public TaskConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
-        super(term, ((DefaultConceptBuilder)n.terms.conceptBuilder()).newLinkBags(term));
-        this.beliefs = beliefs!=null ? beliefs : n.terms.conceptBuilder().newBeliefTable(this, true);
-        this.goals = goals!=null ? goals: n.terms.conceptBuilder().newBeliefTable(this, false);
+    public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb) {
+        super(term, ((DefaultConceptBuilder)cb).newLinkBags(term));
+        this.beliefs = beliefs!=null ? beliefs : cb.newBeliefTable(this, true);
+        this.goals = goals!=null ? goals: cb.newBeliefTable(this, false);
     }
 
 
     @NotNull
     @Override
     public final QuestionTable quests() {
-        return StorelessQuestionTable;
-        //return questionTableOrEmpty(quests);
+        return Unstored;
     }
 
     @NotNull
     @Override
     public final QuestionTable questions() {
-        return StorelessQuestionTable;
-        //return questionTableOrEmpty(questions);
-    }
-
-
-    @NotNull
-    static QuestionTable questionTableOrEmpty(@Nullable QuestionTable q) {
-        return q != null ? q : StorelessQuestionTable;
+        return Unstored;
     }
 
 //
@@ -101,8 +92,8 @@ public class TaskConcept extends CompoundConcept {
 
     protected final void beliefCapacity(int be, int bt, int ge, int gt) {
 
-        beliefs().capacity(be, bt);
-        goals().capacity(ge, gt);
+        beliefs().setCapacity(be, bt);
+        goals().setCapacity(ge, gt);
 
     }
 
@@ -144,7 +135,7 @@ public class TaskConcept extends CompoundConcept {
 
             case QUESTION:
             case QUEST:
-                QuestionTable.StorelessQuestionTable.add(t, this, n);
+                QuestionTable.Unstored.add(t, this, n);
 //                (t.isQuestion() ? questionsOrNew() : questsOrNew())
 //                        .add(t, this, n);
                 break;

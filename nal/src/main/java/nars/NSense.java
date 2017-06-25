@@ -43,7 +43,6 @@ public interface NSense {
         return sense(term, value, (x) -> $.t(x, nar().confDefault(Op.BELIEF)));
     }
 
-
     @NotNull
     default SensorConcept sense(@NotNull Compound term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
         SensorConcept s = new SensorConcept(term, nar(), value, truthFunc);

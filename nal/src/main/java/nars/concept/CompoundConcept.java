@@ -63,15 +63,14 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         this.state = ConceptState.Deleted;
     }
 
-
     @Override
     public @NotNull QuestionTable questions() {
-        return QuestionTable.StorelessQuestionTable;
+        return QuestionTable.Null;
     }
 
     @Override
     public @Nullable QuestionTable quests() {
-        return QuestionTable.StorelessQuestionTable;
+        return QuestionTable.Null;
     }
 
     @Override
@@ -142,12 +141,6 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         this(term, b.newLinkBags(term));
     }
 
-//    @Override
-//    public void delete(@NotNull NAR nar) {
-//        Concept.delete(this, nar);
-//        meta = null;
-//    }
-
     @Override
     public final ConceptState state() {
         return state;
@@ -164,11 +157,125 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         return current;
     }
 
+    @Override
+    public final boolean equals(Object obj) {
+        return this == obj || term.equals(obj);
+    }
+
+    @Override
+    public final int hashCode() {
+        return term.hashCode();
+    }
+
+    @Override
+    public final String toString() {
+        return term.toString();
+    }
+
+    @NotNull
+    public Term term(int i) {
+        return term.sub(i);
+    }
+
+    @Override
+    public int size() {
+        return term.size();
+    }
+
+    /** first-level only */
+    @Deprecated @Override public boolean contains(@NotNull Termlike t) {
+        return term.contains(t);
+    }
+
+    @Deprecated
+    @Override
+    public boolean isTemporal() {
+        return false; //term.isTemporal();
+    }
+
+    @Nullable
+    @Deprecated
+    @Override
+    public Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return term.sub(i, ifOutOfBounds);
+    }
+
+    @Deprecated
+    @Override
+    public boolean AND(@NotNull Predicate<Term> v) {
+        return term.AND(v);
+    }
+
+    @Deprecated
+    @Override
+    public boolean OR(@NotNull Predicate<Term> v) {
+        return term.OR(v);
+    }
+
+    @Deprecated
+    @Override
+    public int vars() {
+        return term.vars();
+    }
+
+    @Deprecated
+    @Override
+    public int varIndep() {
+        return term.varIndep();
+    }
+
+    @Deprecated
+    @Override
+    public int varDep() {
+        return term.varDep();
+    }
+
+    @Deprecated
+    @Override
+    public int varQuery() {
+        return term.varQuery();
+    }
+
+    @Deprecated
+    @Override
+    public int varPattern() {
+        return term.varPattern();
+    }
+
+    @Deprecated
+    @Override
+    public int complexity() {
+        return term.complexity();
+    }
+
+    @Deprecated
+    @Override
+    public int structure() {
+        return term.structure();
+    }
+
+    @Override
+    public int volume() {
+        return term.volume();
+    }
+
+    @Override
+    public boolean isNormalized() {
+        return term.isNormalized(); //compound concepts may be un-normalized
+    }
+
+    @Override
+    public boolean isDynamic() {
+        return false; //concepts themselves are always non-dynamic
+    }
+
+    @Override
+    public int dt() {
+        return term.dt();
+    }
 
 
-
-
-
+}
 
 //    /**
 //     * apply derivation feedback and update NAR emotion state
@@ -330,136 +437,3 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 //                ((1f) / (range * historyFactor));
 //    }
 
-    @Override
-    public final boolean equals(Object obj) {
-
-        return this == obj || term.equals(obj);
-    }
-
-    @Override
-    public final int hashCode() {
-        return term.hashCode();
-    }
-
-    @Override
-    public final String toString() {
-        return term.toString();
-    }
-
-    @NotNull
-    public Term term(int i) {
-        return term.sub(i);
-    }
-
-    @Override
-    public int size() {
-        return term.size();
-    }
-
-    /** first-level only */
-    @Deprecated @Override public boolean contains(@NotNull Termlike t) {
-        return term.contains(t);
-    }
-
-    @Deprecated
-    @Override
-    public boolean isTemporal() {
-        return false; //term.isTemporal();
-    }
-
-    @Nullable
-    @Deprecated
-    @Override
-    public Term sub(int i, @Nullable Term ifOutOfBounds) {
-        return term.sub(i, ifOutOfBounds);
-    }
-
-    @Deprecated
-    @Override
-    public boolean AND(@NotNull Predicate<Term> v) {
-        return term.AND(v);
-    }
-
-    @Deprecated
-    @Override
-    public boolean OR(@NotNull Predicate<Term> v) {
-        return term.OR(v);
-    }
-
-    @Deprecated
-    @Override
-    public int vars() {
-        return term.vars();
-    }
-
-    @Deprecated
-    @Override
-    public int varIndep() {
-        return term.varIndep();
-    }
-
-    @Deprecated
-    @Override
-    public int varDep() {
-        return term.varDep();
-    }
-
-    @Deprecated
-    @Override
-    public int varQuery() {
-        return term.varQuery();
-    }
-
-    @Deprecated
-    @Override
-    public int varPattern() {
-        return term.varPattern();
-    }
-
-    @Deprecated
-    @Override
-    public int complexity() {
-        return term.complexity();
-    }
-
-    @Deprecated
-    @Override
-    public int structure() {
-        return term.structure();
-    }
-
-    @Override
-    public int volume() {
-        return term.volume();
-    }
-
-    @Override
-    public boolean isNormalized() {
-        return term.isNormalized(); //compound concepts may be un-normalized
-    }
-
-    @Override
-    public boolean isDynamic() {
-        return false; //concepts themselves are always non-dynamic
-    }
-
-    @Override
-    public int dt() {
-        return term.dt();
-    }
-
-
-//    static final class MyMicrosphereTemporalBeliefTable extends MicrosphereTemporalBeliefTable {
-//
-//        private final Time time;
-//
-//        public MyMicrosphereTemporalBeliefTable(int tCap, Time time) {
-//            super(tCap);
-//            this.time = time;
-//        }
-//
-//        @Override public float focus(float dt, float evidence) {
-//            return TruthPolation.evidenceDecay(evidence, time.duration(), dt);
-//        }
-//    }
-}

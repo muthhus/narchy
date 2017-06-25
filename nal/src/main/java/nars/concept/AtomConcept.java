@@ -104,13 +104,13 @@ public class AtomConcept extends Atom implements Concept {
     @Override
     @NotNull
     public QuestionTable questions() {
-        return QuestionTable.StorelessQuestionTable;
+        return QuestionTable.Unstored;
     }
 
     @NotNull
     @Override
     public QuestionTable quests() {
-        return QuestionTable.StorelessQuestionTable;
+        return QuestionTable.Unstored;
     }
 
 

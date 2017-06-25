@@ -113,7 +113,7 @@ public class MIDI {
                     volume[finalI] = Float.NaN;
                 }
 
-                n.input(c.feedbackGoal.set(c.term(), v == v ? $.t(v, nar.confDefault(GOAL)) : null, n));
+                n.input(c.feedbackGoal.set(c.term(), v == v ? $.t(v, nar.confDefault(GOAL)) : null, n.time::nextStamp, n));
 
                 n.input(c.apply(n));
             });

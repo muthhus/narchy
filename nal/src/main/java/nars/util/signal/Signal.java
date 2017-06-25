@@ -53,16 +53,9 @@ public class Signal {
         this.resolution = resolution;
     }
 
-
-    public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, NAR nar) {
-        return set(term, nextTruth, nar.time::nextStamp, nar);
-    }
-
     public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
 
-
         long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
-
 
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;

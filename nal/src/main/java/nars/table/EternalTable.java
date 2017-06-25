@@ -111,7 +111,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
                 this.capacity = c;
 
-                int s = size();
+                int s = size;
 
                 //TODO can be accelerated by batch remove operation
                 while (c < s--) {
@@ -290,7 +290,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         Task displaced = null;
 
         synchronized (this) {
-            if (size() == capacity()) {
+            if (size == capacity()) {
                 Task weakestPresent = weakest();
                 if (weakestPresent != null) {
                     if (floatValueOf(weakestPresent) <= floatValueOf(incoming)) {

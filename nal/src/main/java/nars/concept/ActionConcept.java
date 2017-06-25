@@ -15,7 +15,7 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
 
 
     public ActionConcept(@NotNull Compound term, @NotNull NAR n) {
-        super(term, n);
+        super(term, null, null, n);
     }
 
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {

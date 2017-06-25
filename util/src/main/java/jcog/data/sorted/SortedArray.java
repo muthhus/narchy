@@ -53,7 +53,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public E[] list = (E[]) zeroList;
 
-    private int size;
+    protected int size;
 
     public E[] array() {
         return list;

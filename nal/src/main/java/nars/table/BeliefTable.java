@@ -53,7 +53,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public void capacity(int eternals, int temporals) {
+        public void setCapacity(int eternals, int temporals) {
             throw new RuntimeException("tried to set capacity on null table impl");
         }
 
@@ -117,7 +117,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     };
 
-    void capacity(int eternals, int temporals);
+    void setCapacity(int eternals, int temporals);
 
 
 //    /**

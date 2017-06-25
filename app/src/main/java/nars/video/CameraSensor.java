@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -152,6 +153,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
                 PixelConcept sss = new PixelConcept(cell, x, y);
+                nar.on(sss);
 
 
                 l.add(sss);
@@ -284,9 +286,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 return id;
             } else {
                 //extra
+                Random rng = nar.random();
                 return concept(
-                        x + (nar.random().nextBoolean() ? -1 : +1),
-                        y + (nar.random().nextBoolean() ? -1 : +1)
+                        x + (rng.nextBoolean() ? -1 : +1),
+                        y + (rng.nextBoolean() ? -1 : +1)
                 );
             }
 

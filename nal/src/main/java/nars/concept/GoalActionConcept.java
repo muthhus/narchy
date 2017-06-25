@@ -114,7 +114,7 @@ public class GoalActionConcept extends ActionConcept {
                 beliefFeedback;
                 //beliefFeedback != null ? beliefFeedback : belief; //latch
 
-        Task fb = feedback.set(this, nextTruth, nar);
+        Task fb = feedback.set(this, nextTruth, nar.time::nextStamp, nar);
 
 
 //        //HACK insert shadow goal

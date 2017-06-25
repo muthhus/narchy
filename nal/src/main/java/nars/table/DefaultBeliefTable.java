@@ -27,10 +27,6 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
         temporal = t;
     }
 
-    @Override
-    public void setCapacity(int c) {
-        throw new RuntimeException("only super.setCapacity should be called by this instance");
-    }
 
     /**
      * TODO this value can be cached per cycle (when,now) etc
@@ -60,7 +56,7 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
     @Deprecated
     public final Iterator<Task> iterator() {
         return Iterators.concat(
-                super.taskIterator(),
+                super.iterator(),
                 temporal().taskIterator()
         );
     }
@@ -87,20 +83,25 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
 
     @Override
     public int size() {
-        return super.size() + temporal().size();
+        return size /* eternal */ + temporal().size();
     }
 
     @Override
     @Deprecated
     public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
-        return super.capacity() + temporal().capacity();
+        return capacity /* eternal */ + temporal().capacity();
     }
 
     @Override
-    public final void capacity(int eternals, int temporals) {
+    public final void setCapacity(int eternals, int temporals) {
         temporal.setCapacity(temporals);
         super.setCapacity(eternals);
+    }
+
+    @Override
+    public void setCapacity(int c) {
+        throw new RuntimeException("only super.setCapacity should be called by this instance");
     }
 
     public EternalTable eternal() {
