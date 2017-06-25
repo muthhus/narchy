@@ -30,11 +30,11 @@ public class DynamicBeliefTableTest {
         n.believe("b:x", 0f, 0.9f);
         n.run(1);
         long now = n.time();
-        assertEquals($.t(1f,0.81f), n.beliefTruth("(a:x && a:y)", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth("(b:x && a:y)", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth("(a:x && (--,a:y))", now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth("((--,b:x) && a:y)", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth("((--,b:x) && (--,a:y))", now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("(a:x && a:y)")), now));
+        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("(b:x && a:y)")), now));
+        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("(a:x && (--,a:y))")), now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("((--,b:x) && a:y)")), now));
+        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("((--,b:x) && (--,a:y))")), now));
     }
     @Test
     public void testDynamicIntersection() throws Narsese.NarseseException {
@@ -50,16 +50,16 @@ public class DynamicBeliefTableTest {
         int dur = n.dur();
         assertTrue(n.conceptualize($("((x|y)-->a)")).beliefs() instanceof DynamicBeliefTable);
         assertEquals($.t(1f,0.81f), n.beliefTruth("((x|y)-->a)", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth("((x|z)-->a)", now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth("((x&z)-->a)", now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth("(b --> (x|y))", now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth("(b --> (x|z))", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth("(b --> (x&z))", now));
+        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("((x|z)-->a)")), now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("((x&z)-->a)")), now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|y))")), now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|z))")), now));
+        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x&z))")), now));
 
         Concept xIntNegY = n.conceptualize($("((x|(--,y))-->a)"));
         assertTrue(xIntNegY instanceof DynamicConcept);
         assertEquals($.t(0f,0.81f), n.beliefTruth(xIntNegY, now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth("((x|(--,z))-->a)", now));
+        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("((x|(--,z))-->a)")), now));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class DynamicBeliefTableTest {
         //test change after a component's revision:
         n.believe("a:y", 0, 0.95f);
         n.run(1);
-        Truth now2 = n.beliefTruth("(&&, a:x, a:y, a:z)", n.time());
+        Truth now2 = n.beliefTruth(n.conceptualize($("(&&, a:x, a:y, a:z)")), n.time());
         assertTrue(now2.freq() < 0.4f);
 
     }

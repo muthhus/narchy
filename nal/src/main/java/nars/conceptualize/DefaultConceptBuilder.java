@@ -254,11 +254,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (dmt != null) {
 
             BeliefTable beliefs = dmt != null ?
-                    new DynamicBeliefTable(newTemporalBeliefTable(), dmt, true) :
+                    new DynamicBeliefTable(t, newTemporalBeliefTable(), dmt, true) :
                     newBeliefTable(t, true);
 
             BeliefTable goals = dmt != null ?
-                    new DynamicBeliefTable(newTemporalBeliefTable(), dmt, true) :
+                    new DynamicBeliefTable(t, newTemporalBeliefTable(), dmt, true) :
                     newBeliefTable(t, false);
 
             return new DynamicConcept(t, beliefs, goals, nar);

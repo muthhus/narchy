@@ -18,6 +18,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
+    private final Compound term;
 
     //static final boolean rejectDerivations = false;
 
@@ -30,8 +31,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         super.add(input, concept, nar);
     }
 
-    public DynamicBeliefTable(TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
+    public DynamicBeliefTable(Compound c, TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
         super(t);
+        this.term = c;
         this.model = model;
         this.beliefOrGoal = beliefOrGoal;
     }
@@ -70,7 +72,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long when, long now, int dur, NAR nar) {
-        DynTruth d = truth(when, now, null, false, nar);
+        DynTruth d = truth(when, now, term, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
                 super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
     }
